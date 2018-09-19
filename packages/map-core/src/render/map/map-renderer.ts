@@ -1,3 +1,4 @@
+import { IDynamicFactory } from '../../utils/dynamic-factory';
 import { ILayerRenderer } from '../layers/map-layer-renderer';
 import { IGroupLayerRenderer } from '../layers/group-layer-renderer';
 
@@ -27,6 +28,7 @@ export interface IMapRenderer {
 
     setTarget(target: HTMLElement): void;
     setViewport(viewport: IMapViewport): void;
+    getLayersFactory(): IDynamicFactory<ILayerRenderer>;
     setLayerGroup(group: IGroupLayerRenderer);
     getSize(): [number, number];
     destroy(): void;
