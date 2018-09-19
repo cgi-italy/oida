@@ -1,0 +1,44 @@
+{
+  "name": "@cgi-eo/map-mobx",
+  "version": "0.0.1",
+  "description": "mobx mapping library bindings",
+  "module": "dist/map-mobx.js",
+  "main": "dist/map-mobx.cjs.js",
+  "types": "dist/types/index.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "rollup --config rollup.config.js && rollup --config rollup.config.js --environment FORMAT:cjs",
+    "watch": "rollup --config rollup.config.js --watch",
+    "lint": "tslint --project ./tsconfig.json",
+    "test": "jest --config jest.config.js"
+  },
+  "author": "stefano marra",
+  "license": "UNLICENSED",
+  "publishConfig": {
+    "registry": "http://cgi-int.eoss-cloud.it/nexus/repository/cgi-eo/"
+  },
+  "peerDependencies": {
+    "mobx": "^4.4.0",
+    "mobx-state-tree": "^3.3.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^23.3.2",
+    "jest": "^23.6.0",
+    "mobx": "^4.4.0",
+    "mobx-state-tree": "^3.3.0",
+    "rollup": "^0.66.0",
+    "rollup-plugin-commonjs": "^9.1.6",
+    "rollup-plugin-json": "^3.1.0",
+    "rollup-plugin-node-resolve": "^3.4.0",
+    "rollup-plugin-typescript2": "^0.17.0",
+    "ts-jest": "^23.1.4",
+    "tslint": "^5.11.0",
+    "typescript": "^3.0.3"
+  },
+  "dependencies": {
+    "@cgi-eo/map-core": "^0.0.1"
+  }
+}

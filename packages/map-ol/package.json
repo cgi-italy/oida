@@ -1,0 +1,44 @@
+{
+  "name": "@cgi-eo/map-ol",
+  "version": "0.0.1",
+  "description": "Openlayers map renderer wrapper library",
+  "module": "dist/map-ol.js",
+  "main": "dist/map-ol.cjs.js",
+  "types": "dist/types/index.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "rollup --config rollup.config.js && rollup --config rollup.config.js --environment FORMAT:cjs",
+    "watch": "rollup --config rollup.config.js --watch",
+    "lint": "tslint --project ./tsconfig.json",
+    "test": "jest --config jest.config.js"
+  },
+  "author": "stefano marra",
+  "license": "UNLICENSED",
+  "publishConfig": {
+    "registry": "http://cgi-int.eoss-cloud.it/nexus/repository/cgi-eo/"
+  },
+  "dependencies": {
+    "@cgi-eo/map-core": "^0.0.1",
+    "ol": "^5.2.0",
+    "proj4": "^2.5.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.0.1",
+    "@babel/preset-env": "^7.0.0",
+    "@types/jest": "^23.3.2",
+    "babel-core": "7.0.0-bridge.0",
+    "babel-jest": "^23.6.0",
+    "jest": "^23.6.0",
+    "rollup": "^0.66.0",
+    "rollup-plugin-commonjs": "^9.1.6",
+    "rollup-plugin-json": "^3.1.0",
+    "rollup-plugin-node-resolve": "^3.4.0",
+    "rollup-plugin-typescript2": "^0.17.0",
+    "ts-jest": "^23.1.4",
+    "tslint": "^5.11.0",
+    "typescript": "^3.0.3"
+  }
+}
