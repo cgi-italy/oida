@@ -2,6 +2,12 @@
   "command": {
     "bootstrap": {
       "hoist": true
+    },
+    "publish": {
+      "registry": "http://cgi-int.eoss-cloud.it/nexus/repository/cgi-eo/",
+      "conventionalCommits": true,
+      "verifyAccess": false,
+      "message": "chore(release): publish %s"
     }
   },
   "packages": [
