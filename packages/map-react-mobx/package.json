@@ -1,6 +1,6 @@
 {
   "name": "@cgi-eo/map-react-mobx",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "react map components",
   "module": "dist/map-react-mobx.js",
   "main": "dist/map-react-mobx.cjs.js",
@@ -45,7 +45,7 @@
     "typescript": "^3.0.3"
   },
   "dependencies": {
-    "@cgi-eo/map-core": "^0.0.1",
-    "@cgi-eo/map-mobx": "^0.0.1"
+    "@cgi-eo/map-core": "^0.1.0",
+    "@cgi-eo/map-mobx": "^0.1.0"
   }
 }

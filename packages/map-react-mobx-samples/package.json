@@ -1,6 +1,6 @@
 {
   "name": "@cgi-eo/map-react-mobx-samples",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "react map samples",
   "main": "src/app.tsx",
   "scripts": {
@@ -33,10 +33,10 @@
     "webpack-merge": "^4.1.4"
   },
   "dependencies": {
-    "@cgi-eo/map-core": "^0.0.1",
-    "@cgi-eo/map-mobx": "^0.0.1",
-    "@cgi-eo/map-ol": "^0.0.1",
-    "@cgi-eo/map-react-mobx": "^0.0.1",
+    "@cgi-eo/map-core": "^0.1.0",
+    "@cgi-eo/map-mobx": "^0.1.0",
+    "@cgi-eo/map-ol": "^0.1.0",
+    "@cgi-eo/map-react-mobx": "^0.1.0",
     "mobx": "^4.4.0",
     "mobx-react": "^5.2.8",
     "mobx-state-tree": "^3.3.0",
