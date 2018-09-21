@@ -2,16 +2,20 @@ import { IDynamicFactory } from '../../utils/dynamic-factory';
 import { ILayerRenderer } from '../layers/map-layer-renderer';
 import { IGroupLayerRenderer } from '../layers/group-layer-renderer';
 
+export type BBox = [number, number, number, number];
+
 export interface IMapProjection {
     code: string;
     projDef?: string;
-    extent?: [number, number, number, number];
+    extent?: BBox;
     wrapX?: boolean;
 }
 
+export type MapCoord  = [number, number, number?];
+
 export interface IMapViewport {
     resolution: number;
-    center: [number, number];
+    center: MapCoord;
     rotation?: number;
     pitch?: number;
 }
@@ -24,13 +28,15 @@ export interface IMapRendererProps {
     onViewUpdated?: (viewport?: IMapViewport) => void;
 }
 
+export type Size = [number, number];
+
 export interface IMapRenderer {
 
     setTarget(target: HTMLElement): void;
     setViewport(viewport: IMapViewport): void;
     getLayersFactory(): IDynamicFactory<ILayerRenderer>;
     setLayerGroup(group: IGroupLayerRenderer);
-    getSize(): [number, number];
+    getSize(): Size;
     destroy(): void;
 }
 
