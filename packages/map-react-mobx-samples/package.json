@@ -3,6 +3,10 @@
   "version": "0.1.0",
   "description": "react map samples",
   "main": "src/app.tsx",
+  "files": [
+    "dist",
+    "src"
+  ],
   "scripts": {
     "build": "webpack --config webpack.prod.js",
     "lint": "tslint --project ./tsconfig.json",
@@ -19,9 +23,13 @@
     "@types/react": "^16.4.14",
     "@types/react-dom": "^16.0.7",
     "awesome-typescript-loader": "^5.2.1",
+    "clean-webpack-plugin": "^0.1.19",
+    "copy-webpack-plugin": "^4.5.2",
+    "css-loader": "^1.0.0",
     "file-loader": "^2.0.0",
     "html-webpack-plugin": "^3.2.0",
     "jest": "^23.6.0",
+    "mini-css-extract-plugin": "^0.4.3",
     "source-map-loader": "^0.2.4",
     "ts-jest": "^23.1.4",
     "tslint": "^5.11.0",
@@ -33,6 +41,7 @@
     "webpack-merge": "^4.1.4"
   },
   "dependencies": {
+    "@cgi-eo/map-cesium": "^0.0.1",
     "@cgi-eo/map-core": "^0.1.0",
     "@cgi-eo/map-mobx": "^0.1.0",
     "@cgi-eo/map-ol": "^0.1.0",

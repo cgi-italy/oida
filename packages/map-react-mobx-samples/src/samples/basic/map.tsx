@@ -1,10 +1,13 @@
 import * as React from 'react';
+
 import { Map, TileLayer, MapRendererController } from '@cgi-eo/map-mobx';
+
 import '@cgi-eo/map-ol';
+import '@cgi-eo/map-cesium';
 
 import { MapComponent } from '@cgi-eo/map-react-mobx';
 
-let mapState = Map.create({
+export const mapState = Map.create({
     renderer: {
         id: 'ol'
     },
@@ -19,13 +22,29 @@ let mapState = Map.create({
     }
 });
 
-mapState.layers.children.add(TileLayer.create({
-    id: 'base',
-    layerType: 'tile',
-    source: {
-        id: 'osm'
+mapState.layers.children.add([
+    TileLayer.create({
+        id: 'base',
+        layerType: 'tile',
+        source: {
+            id: 'osm'
+        },
+    }),
+    {
+        id: 's2',
+        layerType: 'tile',
+        source: {
+            id: 'wms',
+            url: 'https://tiles.maps.eox.at/wms',
+            layers: 's2cloudless',
+            parameters: {
+                tiled: true
+            },
+            srs: 'EPSG:4326'
+        },
+        opacity: 0.5
     }
-}));
+]);
 
 window['gMapState'] = mapState;
 

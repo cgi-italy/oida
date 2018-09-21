@@ -1,8 +1,13 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
-const config = ((env = {}) => {
-    return {
+const cesiumConfig = require('@cgi-eo/map-cesium/config/webpack.cesium.js');
+const webpackMerge = require('webpack-merge');
+
+const config = (env = {}) => {
+    return webpackMerge(cesiumConfig({nodeModulesDir: '../../node_modules'}),
+    {
         entry: {
             app: './src/app.tsx'
         },
@@ -35,6 +40,22 @@ const config = ((env = {}) => {
                     ]
                 },
                 {
+                    test: /\.css$/,
+                    use: [
+                      MiniCssExtractPlugin.loader,
+                      {
+                        loader: 'css-loader',
+                        options: {
+                          importLoaders: 0,
+                          sourceMap: true,
+                          import: false,
+                          modules: false,
+                          minimize: true
+                        }
+                      }
+                    ]
+                },
+                {
                     test: /\.(png|jpe?g|gif|svg)$/i,
                     use: [
                         {
@@ -62,10 +83,14 @@ const config = ((env = {}) => {
             new HtmlWebpackPlugin({
                 template: './src/index.ejs',
                 baseUrl: env.baseUrl || '/'
+            }),
+            new MiniCssExtractPlugin({
+                filename: "[name].[hash].bundle.css",
+                chunkFilename: "[id].[hash].css"
             })
         ]
-    }
-});
+    })
+};
 
 
 module.exports = config;

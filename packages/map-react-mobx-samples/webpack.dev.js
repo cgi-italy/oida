@@ -1,7 +1,7 @@
 const webpackMerge = require('webpack-merge');
 const commonConfig = require('./webpack.common.js');
 
-const config = (env) => {
+const config = (env = {}) => {
     return webpackMerge(commonConfig(env),{
         mode: 'development',
         devtool: 'cheap-module-eval-source-map',

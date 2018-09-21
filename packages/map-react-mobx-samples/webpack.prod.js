@@ -1,8 +1,9 @@
 const webpackMerge = require('webpack-merge');
 const commonConfig = require('./webpack.common.js');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const CleanWebpackPlugin = require('clean-webpack-plugin');
 
-const config = (env) => {
+const config = (env = {}) => {
     return webpackMerge(commonConfig(env),{
         mode: 'production',
         devtool: 'source-map',
@@ -11,7 +12,8 @@ const config = (env) => {
                 analyzerMode: 'static',
                 reportFilename: '../bundle-report.html',
                 openAnalyzer: false
-            })
+            }),
+            new CleanWebpackPlugin([env.outpath || 'dist'])
         ]
     });
 }
