@@ -72,7 +72,10 @@ export class MapRendererController {
             });
 
             this.layersController_.setMapRenderer(this.mapRenderer_);
-            this.mapRenderer_.setLayerGroup(this.layersController_.getLayerRenderer());
+
+            if (this.mapRenderer_) {
+                this.mapRenderer_.setLayerGroup(this.layersController_.getLayerRenderer());
+            }
 
         }
 

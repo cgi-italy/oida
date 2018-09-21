@@ -59,7 +59,7 @@ export class GroupLayerController extends MapLayerController<IGroupLayerRenderer
         super.unbindFromLayerState_();
     }
 
-    protected createChildLayer_(mapLayer, idx = -1) {
+    protected createChildLayer_(mapLayer, idx?: number) {
         let childLayerController = layerControllersFactory.create(mapLayer.layerType, {
             mapLayer
         });
