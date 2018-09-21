@@ -1,6 +1,6 @@
 {
   "name": "@cgi-eo/map-mobx",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "mobx mapping library bindings",
   "module": "dist/map-mobx.js",
   "main": "dist/map-mobx.cjs.js",
@@ -39,6 +39,6 @@
     "typescript": "^3.0.3"
   },
   "dependencies": {
-    "@cgi-eo/map-core": "^0.1.0"
+    "@cgi-eo/map-core": "^0.2.0"
   }
 }

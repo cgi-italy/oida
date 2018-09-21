@@ -1,6 +1,6 @@
 {
   "name": "@cgi-eo/map-core",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "core map utils and definitions",
   "module": "dist/map-core.js",
   "main": "dist/map-core.cjs.js",

@@ -1,6 +1,6 @@
 {
   "name": "@cgi-eo/map-ol",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Openlayers map renderer wrapper library",
   "module": "dist/map-ol.js",
   "main": "dist/map-ol.cjs.js",
@@ -21,7 +21,7 @@
     "registry": "http://cgi-int.eoss-cloud.it/nexus/repository/cgi-eo/"
   },
   "dependencies": {
-    "@cgi-eo/map-core": "^0.1.0",
+    "@cgi-eo/map-core": "^0.2.0",
     "ol": "^5.2.0",
     "proj4": "^2.5.0"
   },
