@@ -7,9 +7,13 @@
       "registry": "http://cgi-int.eoss-cloud.it/nexus/repository/cgi-eo/",
       "conventionalCommits": true,
       "verifyAccess": false,
-      "message": "chore(release): publish %s"
+      "message": "chore(release): publish"
     }
   },
+  "ignoreChanges": [
+    "**/__tests__/**",
+    "**/*.md"
+  ],
   "packages": [
     "packages/*"
   ],
