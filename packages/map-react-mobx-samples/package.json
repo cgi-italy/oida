@@ -4,7 +4,6 @@
   "description": "react map samples",
   "main": "src/app.tsx",
   "files": [
-    "dist",
     "src"
   ],
   "scripts": {
