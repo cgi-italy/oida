@@ -17,5 +17,5 @@ export const TileLayer = LayerType.addType(
                 };
             }
         };
-    })
+    }).named('TileLayer')
 );

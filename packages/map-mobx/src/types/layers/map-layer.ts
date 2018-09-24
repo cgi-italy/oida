@@ -12,7 +12,7 @@ const LayerBase = types.compose(
 );
 
 export const LayerType = DynamicUnion('layer', (layerModel) => {
-    return MapEntityType.addType('layer', types.compose(
+    return MapEntityType.addType('mapLayer', types.compose(layerModel.name,
         LayerBase,
         layerModel
     ));

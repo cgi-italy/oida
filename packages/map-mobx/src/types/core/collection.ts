@@ -70,5 +70,5 @@ export const Collection = (itemsType) => {
                 return self.items[parseInt(matches[1])];
             }
         };
-    });
+    }).named(`${itemsType.name}Collection`);
 };

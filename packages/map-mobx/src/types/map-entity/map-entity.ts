@@ -16,5 +16,5 @@ export const MapEntityType = DynamicUnion('mapEntity', (entityModel) => {
     return types.compose(
         MapEntityBase,
         entityModel
-    ).named('MapEntity');
+    ).named(entityModel.name);
 });

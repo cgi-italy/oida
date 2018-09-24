@@ -12,7 +12,6 @@ export const DynamicUnion = (typeId, baseTypeFactory) => {
                 model.props({
                     [`${typeId}Type`]: types.optional(types.literal(id), id)
                 })
-                .named(id)
             );
 
             REGISTERED_TYPES.push(specificType);
@@ -21,7 +20,11 @@ export const DynamicUnion = (typeId, baseTypeFactory) => {
         },
         getUnion: () => {
             if (!UnionType) {
-                UnionType =  types.late(() => types.union(...REGISTERED_TYPES));
+                UnionType =  types.late(() => {
+                    UnionType.name = `${typeId}: Union(${REGISTERED_TYPES.map(type => type.name).join()})`;
+                    return types.union(...REGISTERED_TYPES);
+                });
+                UnionType.name = typeId;
             }
             return UnionType;
         }
