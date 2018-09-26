@@ -25,6 +25,7 @@
     "mobx-state-tree": "^3.3.0"
   },
   "devDependencies": {
+    "@types/geojson": "^7946.0.4",
     "@types/jest": "^23.3.2",
     "jest": "^23.6.0",
     "mobx": "^4.4.0",

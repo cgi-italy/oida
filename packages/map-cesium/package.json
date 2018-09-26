@@ -30,6 +30,7 @@
   "devDependencies": {
     "@babel/core": "^7.0.1",
     "@babel/preset-env": "^7.0.0",
+    "@types/geojson": "^7946.0.4",
     "@types/jest": "^23.3.2",
     "babel-core": "7.0.0-bridge.0",
     "babel-jest": "^23.6.0",
