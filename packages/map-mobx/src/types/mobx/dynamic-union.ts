@@ -18,6 +18,11 @@ export const DynamicUnion = (typeId, baseTypeFactory) => {
 
             return specificType;
         },
+        getType: (id) => {
+            return REGISTERED_TYPES.filter((type) => {
+                return type.properties[`${typeId}Type`].defaultValue === id;
+            });
+        },
         getUnion: () => {
             if (!UnionType) {
                 UnionType =  types.late(() => {
