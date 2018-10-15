@@ -100,3 +100,4 @@ export class OLStyleParser {
         return style;
     }
 }
+

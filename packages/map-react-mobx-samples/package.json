@@ -1,5 +1,6 @@
 {
   "name": "@cgi-eo/map-react-mobx-samples",
+  "private": true,
   "version": "0.3.0",
   "description": "react map samples",
   "main": "src/app.tsx",

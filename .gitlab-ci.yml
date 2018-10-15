@@ -1,0 +1,202 @@
+image: node:10.9
+
+cache:
+  untracked: true
+  key: "$CI_COMMIT_REF_SLUG"
+  paths:
+    - node_modules/
+    - "packages/*/node_modules"
+  policy: pull
+
+variables:
+  RELEASE_MSG: "chore(release): publish"
+
+stages:
+  - setup
+  - build
+  - test
+  - publish
+  - deploy
+
+install_dependencies:
+  stage: setup
+  cache:
+    untracked: true
+    key: "$CI_COMMIT_REF_SLUG"
+    paths:
+      - node_modules/
+      - "packages/*/node_modules"
+    policy: pull-push
+  script:
+    - npm ci
+    - node_modules/.bin/lerna bootstrap
+  only:
+    - branches
+
+build:
+  stage: build
+  artifacts:
+    paths:
+      - "packages/*/dist"
+    expire_in: 1 hr
+  script:
+    - npm run build -- -- -- --env.baseUrl='{{ getenv "BASE_URL"}}'
+  only:
+    - branches
+
+lint:
+  stage: test
+  script:
+    - npm run lint
+  dependencies: []
+  only:
+    - branches
+  except:
+    variables:
+      - $CI_COMMIT_TITLE == $RELEASE_MSG
+
+test:
+  stage: test
+  script:
+    - npm run test
+  dependencies:
+    - build
+  only:
+    - branches
+  except:
+    variables:
+      - $CI_COMMIT_TITLE == $RELEASE_MSG
+
+
+publish_canary:
+  stage: publish
+  script:
+    - nexus_login
+    - "node_modules/.bin/lerna publish --canary --preid $CI_COMMIT_REF_SLUG --yes"
+  dependencies:
+    - build
+  only:
+    - branches
+  except:
+    variables:
+      - $CANARY_PUBLISH_DISABLED
+      - $CI_COMMIT_TITLE == $RELEASE_MSG
+
+publish_samples:
+  stage: publish
+  image: docker:stable-git
+  services:
+    - docker:stable-dind
+  script:
+    - setup_docker
+    - build_docker_image
+  dependencies:
+    - build
+  only:
+    - branches
+  except:
+    variables:
+      - $SAMPLES_PUBLISH_DISABLED
+
+publish_release:
+  stage: publish
+  script:
+    - nexus_login
+    - node_modules/.bin/lerna publish from-git --yes
+  dependencies:
+    - build
+  only:
+    refs:
+      - branches
+    variables:
+      - $CI_COMMIT_TITLE == $RELEASE_MSG
+
+release:
+  stage: deploy
+  script:
+    - try_release
+  dependencies:
+    - build
+  when: manual
+  only:
+    refs:
+      - master
+  except:
+    variables:
+      - $CI_COMMIT_TITLE == $RELEASE_MSG
+
+.auto_devops: &auto_devops |
+  # Auto DevOps variables and functions
+  [[ "$TRACE" ]] && set -x
+  export CI_APPLICATION_REPOSITORY=$CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG
+  export CI_APPLICATION_TAG=$CI_COMMIT_SHA
+  export CI_CONTAINER_NAME=ci_job_build_${CI_JOB_ID}
+
+
+  function git_login() {
+    git config --global user.name "$GIT_USER"
+    git config --global user.email "$GIT_EMAIL"
+    git remote set-url origin "https://$GIT_USER:$GIT_PWD@gitlab.dev.eoss-cloud.it/$CI_PROJECT_PATH.git"
+  }
+
+  function nexus_login() {
+     echo //$NEXUS_REPO/:_authToken=$NEXUS_AUTH_TOKEN > ~/.npmrc
+  }
+
+  function try_release() {
+    git checkout $CI_COMMIT_REF_SLUG
+    if [ $(git rev-parse HEAD) == $CI_COMMIT_SHA ]; then
+      git_login
+      node_modules/.bin/lerna version --yes
+    else
+       echo 'Commit is not on branch tip. Unable to perform a release'
+       exit 1
+    fi
+  }
+
+  function setup_docker() {
+    if ! docker info &>/dev/null; then
+      if [ -z "$DOCKER_HOST" -a "$KUBERNETES_PORT" ]; then
+        export DOCKER_HOST='tcp://localhost:2375'
+      fi
+    fi
+  }
+
+
+  function registry_login() {
+    if [[ -n "$CI_REGISTRY_USER" ]]; then
+      echo "Logging to GitLab Container Registry with CI credentials..."
+      docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
+      echo ""
+    fi
+  }
+
+  function build_docker_image() {
+    registry_login
+
+    for package in packages/*/; do
+        if [[ -f "$package"/Dockerfile ]]; then
+            PACKAGE=`basename "$package"`;
+            DOCKER_TAG=$CI_REGISTRY_IMAGE/$PACKAGE/$CI_COMMIT_REF_SLUG:$CI_APPLICATION_TAG
+            echo "Building Dockerfile for $PACKAGE application..."
+            docker build \
+                --build-arg HTTP_PROXY="$HTTP_PROXY" \
+                --build-arg http_proxy="$http_proxy" \
+                --build-arg HTTPS_PROXY="$HTTPS_PROXY" \
+                --build-arg https_proxy="$https_proxy" \
+                --build-arg FTP_PROXY="$FTP_PROXY" \
+                --build-arg ftp_proxy="$ftp_proxy" \
+                --build-arg NO_PROXY="$NO_PROXY" \
+                --build-arg no_proxy="$no_proxy" \
+                -t "$DOCKER_TAG" "$package"
+
+            echo "Pushing to GitLab Container Registry..."
+            docker push "$DOCKER_TAG"
+            echo ""
+        fi
+    done
+  }
+
+
+before_script:
+  - *auto_devops
