@@ -18,7 +18,7 @@
   "author": "stefano marra",
   "license": "UNLICENSED",
   "publishConfig": {
-    "registry": "http://cgi-int.eoss-cloud.it/nexus/repository/cgi-eo/"
+    "registry": "https://nexus.dev.eoss-cloud.it/repository/npm-cgi-eo/"
   },
   "devDependencies": {
     "@types/geojson": "^7946.0.4",

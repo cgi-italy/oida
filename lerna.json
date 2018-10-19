@@ -4,7 +4,7 @@
       "hoist": true
     },
     "publish": {
-      "registry": "http://cgi-int.eoss-cloud.it/nexus/repository/cgi-eo/",
+      "registry": "https://nexus.dev.eoss-cloud.it/repository/npm-cgi-eo/",
       "conventionalCommits": true,
       "verifyAccess": false,
       "message": "chore(release): publish"
