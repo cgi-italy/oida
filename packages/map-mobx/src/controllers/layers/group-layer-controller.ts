@@ -1,12 +1,13 @@
-import { GROUP_LAYER_ID, IGroupLayerRenderer } from '@cgi-eo/map-core';
+import { GROUP_LAYER_ID, IGroupLayerRenderer, IMapRenderer } from '@cgi-eo/map-core';
 
 import { MapLayerController } from './map-layer-controller';
 import { layerControllersFactory } from './layer-controllers-factory';
 
+import { IGroupLayer } from '../../types/layers/group-layer';
 
-export class GroupLayerController extends MapLayerController<IGroupLayerRenderer> {
+export class GroupLayerController extends MapLayerController<IGroupLayerRenderer, IGroupLayer> {
 
-    private mapRenderer_ = null;
+    private mapRenderer_: IMapRenderer = null;
     private childLayersControllers_ : {[key: string]: MapLayerController } = {};
 
     constructor(config) {
@@ -27,8 +28,8 @@ export class GroupLayerController extends MapLayerController<IGroupLayerRenderer
         super.destroy();
     }
 
-    protected createLayerRenderer_(mapRenderer) {
-        return mapRenderer.getLayersFactory().create(GROUP_LAYER_ID, {
+    protected createLayerRenderer_(mapRenderer: IMapRenderer) {
+        return <IGroupLayerRenderer>mapRenderer.getLayersFactory().create(GROUP_LAYER_ID, {
             mapRenderer: mapRenderer
         });
     }
@@ -39,11 +40,11 @@ export class GroupLayerController extends MapLayerController<IGroupLayerRenderer
         this.subscriptionTracker_.addSubscription(this.mapLayer_.children.items.observe((change) => {
             if (change.type === 'splice') {
                 let idx = change.index;
-                change.added.forEach((mapLayer) => {
+                change.added.forEach((mapLayer: any) => {
                     this.createChildLayer_(mapLayer.value, idx++);
                 });
 
-                change.removed.forEach((mapLayer) => {
+                change.removed.forEach((mapLayer: any) => {
                     this.destroyChildLayer_(mapLayer.snapshot.id);
                 });
             }

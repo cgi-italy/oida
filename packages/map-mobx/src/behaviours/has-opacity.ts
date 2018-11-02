@@ -6,7 +6,7 @@ export const hasOpacity = types
     })
     .actions(self => {
         return {
-            setOpacity(opacity) {
+            setOpacity(opacity: number) {
                 self.opacity = opacity;
             }
         };

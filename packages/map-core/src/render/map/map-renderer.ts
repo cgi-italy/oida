@@ -7,7 +7,7 @@ export type BBox = [number, number, number, number];
 export interface IMapProjection {
     code: string;
     projDef?: string;
-    extent?: BBox;
+    extent?: number[];
     wrapX?: boolean;
 }
 
@@ -15,7 +15,7 @@ export type MapCoord  = [number, number, number?];
 
 export interface IMapViewport {
     resolution: number;
-    center: MapCoord;
+    center: number[];
     rotation?: number;
     pitch?: number;
 }
@@ -36,7 +36,7 @@ export interface IMapRenderer {
     setViewport(viewport: IMapViewport): void;
     getLayersFactory(): IDynamicFactory<ILayerRenderer>;
     setLayerGroup(group: IGroupLayerRenderer);
-    getSize(): Size;
+    getSize(): number[];
     destroy(): void;
 }
 

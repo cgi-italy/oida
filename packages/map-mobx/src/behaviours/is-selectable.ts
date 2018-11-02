@@ -6,7 +6,7 @@ export const isSelectable = types
     })
     .actions(self => {
         return {
-            setSelected(selected) {
+            setSelected(selected: boolean) {
                 self.selected = selected;
             }
         };

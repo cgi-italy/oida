@@ -1,6 +1,6 @@
 import { types } from 'mobx-state-tree';
 
-import { MapEntityType, MapEntityCollection } from '@cgi-eo/map-mobx';
+import { MapEntityType, createMapEntityCollectionType, FeatureLayer } from '@cgi-eo/map-mobx';
 
 import { mapState } from './map';
 const boltIcon = require('../../../images/bolt.png');
@@ -10,15 +10,15 @@ export const FeatureType = MapEntityType.addType('feature', types.model('Feature
     geometry: types.frozen()
 }));
 
-export const FeatureCollection = MapEntityCollection('featureCollection', FeatureType);
+export const FeatureCollection = createMapEntityCollectionType(FeatureType);
 
 export const myFeatures = FeatureCollection.create({
     collectionId: 'myFeatures'
 });
 
-mapState.layers.children.add({
+
+let featureLayer = FeatureLayer.create({
     id: 'featureSample',
-    layerType: 'feature',
     source: myFeatures,
     config: {
         clampToGround: true
@@ -51,3 +51,4 @@ mapState.layers.children.add({
     }
 });
 
+mapState.layers.children.add(featureLayer);

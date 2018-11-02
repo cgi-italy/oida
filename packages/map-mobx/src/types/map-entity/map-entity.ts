@@ -12,9 +12,12 @@ const MapEntityBase = types.compose(
     isHoverable
 );
 
-export const MapEntityType = DynamicUnion('mapEntity', (entityModel) => {
+export const MapEntityType = DynamicUnion<'mapEntityType', typeof MapEntityBase>
+    ('mapEntityType', (entityModel) => {
     return types.compose(
+        entityModel.name,
         MapEntityBase,
         entityModel
-    ).named(entityModel.name);
+    );
 });
+

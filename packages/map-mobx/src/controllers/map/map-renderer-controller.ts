@@ -2,12 +2,14 @@ import { reaction, observable, IObservableValue } from 'mobx';
 
 import { SubscriptionTracker, mapRendererFactory, IMapRenderer } from '@cgi-eo/map-core';
 
+import { IMap } from '../../types/map/map';
+
 import { GroupLayerController } from '../layers/group-layer-controller';
 
 
 export class MapRendererController {
 
-    private mapState_;
+    private mapState_: IMap;
     private mapRenderer_: IMapRenderer;
     private domTarget_: IObservableValue<HTMLElement>;
     private subscriptionTracker_: SubscriptionTracker = new SubscriptionTracker();

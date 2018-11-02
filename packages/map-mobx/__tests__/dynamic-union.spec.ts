@@ -4,7 +4,7 @@ import { DynamicUnion } from '../src/types/mobx/dynamic-union';
 describe('Dynamic union type', () => {
 
     it('Should allow registration of new type', () => {
-        let testTypeFactory = DynamicUnion('test', (testModel) => {
+        let testTypeFactory = DynamicUnion('testType', (testModel) => {
             return testModel;
         });
 

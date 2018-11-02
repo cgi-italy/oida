@@ -2,9 +2,11 @@ import { autorun } from 'mobx';
 
 import { SubscriptionTracker, ILayerRenderer, IMapRenderer } from '@cgi-eo/map-core';
 
-export abstract class MapLayerController<T extends ILayerRenderer = ILayerRenderer> {
+import { IMapLayer } from '../../types/layers/map-layer';
 
-    protected mapLayer_;
+export abstract class MapLayerController<T extends ILayerRenderer = ILayerRenderer, U extends IMapLayer = IMapLayer> {
+
+    protected mapLayer_: U;
     protected layerRenderer_: T;
     protected subscriptionTracker_: SubscriptionTracker = new SubscriptionTracker();
 

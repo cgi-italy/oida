@@ -1,22 +1,22 @@
-import { types } from 'mobx-state-tree';
+import { types, Instance } from 'mobx-state-tree';
 
 import { FEATURE_LAYER_ID } from '@cgi-eo/map-core';
 
 import { LayerType } from './map-layer';
 import { FunctionType } from '../mobx/function-type';
-import { MapEntityCollection } from '../map-entity/map-entity-collection';
+import { getMapEntityCollectionType } from '../map-entity/map-entity-collection';
 import { ReferenceOrType } from '../mobx/reference-or-type';
 
 export const FeatureLayer = LayerType.addType(FEATURE_LAYER_ID,
-    types.model({
+    types.model('FeatureLayer', {
         config: types.frozen(),
-        source: ReferenceOrType(MapEntityCollection()),
+        source: ReferenceOrType(getMapEntityCollectionType()),
         geometryGetter: FunctionType,
         styleGetter: FunctionType
     })
     .actions((self) => {
         return {
-            setGeoemtryGetter: (geometryGetter) => {
+            setGeometryGetter: (geometryGetter) => {
                 self.geometryGetter = geometryGetter;
             },
             setStyleGetter: (styleGetter) => {
@@ -27,5 +27,6 @@ export const FeatureLayer = LayerType.addType(FEATURE_LAYER_ID,
             }
         };
     })
-    .named('FeatureLayer')
 );
+
+export type IFeatureLayer = Instance<typeof FeatureLayer>;

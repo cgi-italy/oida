@@ -1,17 +1,19 @@
 import { observe, reaction } from 'mobx';
 import { onPatch } from 'mobx-state-tree';
 
-import { FEATURE_LAYER_ID, IFeatureLayerRenderer } from '@cgi-eo/map-core';
+import { FEATURE_LAYER_ID, IFeatureLayerRenderer, IMapRenderer } from '@cgi-eo/map-core';
 
 import { MapLayerController } from './map-layer-controller';
 import { layerControllersFactory } from './layer-controllers-factory';
 
-export class FeatureLayerController extends MapLayerController<IFeatureLayerRenderer> {
+import { IFeatureLayer } from '../../types/layers/feature-layer';
+
+export class FeatureLayerController extends MapLayerController<IFeatureLayerRenderer, IFeatureLayer> {
 
     protected collectionUnsubscribe_;
 
-    protected createLayerRenderer_(mapRenderer) {
-        return mapRenderer.getLayersFactory().create(FEATURE_LAYER_ID, {
+    protected createLayerRenderer_(mapRenderer: IMapRenderer) {
+        return <IFeatureLayerRenderer>mapRenderer.getLayersFactory().create(FEATURE_LAYER_ID, {
             mapRenderer: mapRenderer,
             ...this.mapLayer_.config
         });

@@ -6,7 +6,7 @@ export const isHoverable = types
     })
     .actions(self => {
         return {
-            setHovered(hovered) {
+            setHovered(hovered: boolean) {
                 self.hovered = hovered;
             }
         };

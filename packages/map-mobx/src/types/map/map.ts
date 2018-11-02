@@ -1,4 +1,4 @@
-import { types } from 'mobx-state-tree';
+import { types, SnapshotIn, Instance } from 'mobx-state-tree';
 
 import { MapView } from './map-view';
 import { MapRenderer } from './map-renderer';
@@ -11,8 +11,10 @@ export const Map = types.model('Map', {
 })
 .actions(self => {
     return {
-        setRenderer(renderer) {
+        setRenderer(renderer: SnapshotIn<typeof MapRenderer>) {
             self.renderer = MapRenderer.create(renderer);
         }
     };
 });
+
+export type IMap = Instance<typeof Map>;

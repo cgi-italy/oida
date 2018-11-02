@@ -1,6 +1,6 @@
-import { types } from 'mobx-state-tree';
+import { types, IAnyModelType } from 'mobx-state-tree';
 
-export const ReferenceOrType = (Type) => {
+export const ReferenceOrType = <T extends IAnyModelType>(Type: T) => {
     return types.union(
         {
             dispatcher: (snapshot) => {

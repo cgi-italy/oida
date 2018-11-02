@@ -1,20 +1,27 @@
-import { types, detach, flow, resolveIdentifier } from 'mobx-state-tree';
+import { types, detach, flow, resolveIdentifier, IAnyModelType, IType, Instance, SnapshotOrInstance } from 'mobx-state-tree';
 
-export const Collection = (itemsType) => {
+function isArray<T>(type: T | T[]): type is T[] {
+    return Array.isArray(type);
+}
+
+export const Collection = <T extends IAnyModelType>(itemsType: T) => {
     return types.model({
         items: types.optional(types.array(itemsType), [])
     }).actions((self) => {
         return {
-            add: (items, idx = -1) => {
-                if (!Array.isArray(items)) {
-                    items = [items];
-                }
+            add: (items: SnapshotOrInstance<T>[] | SnapshotOrInstance<T>, idx = -1) => {
 
                 if (idx < 0 || idx > self.items.length) {
                     idx = self.items.length;
                 }
 
-                self.items.splice(idx, 0, ...items);
+                if (isArray(items)) {
+                    self.items.splice(idx, 0, ...<any>items);
+                    return self.items.slice(idx, idx + items.length);
+                } else {
+                    self.items.splice(idx, 0, <any>items);
+                    return self.items[idx];
+                }
             },
             asyncAdd: flow(function* addBatch(items, idx = -1, frameBatchSize = 100) {
                 if (!Array.isArray(items)) {
@@ -47,7 +54,7 @@ export const Collection = (itemsType) => {
             sort: (compareFn) => {
                 self.items = self.items.sort(compareFn);
             },
-            clear: (item) => {
+            clear: () => {
                 self.items.clear();
             }
         };

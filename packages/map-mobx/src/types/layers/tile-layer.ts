@@ -1,4 +1,4 @@
-import { types } from 'mobx-state-tree';
+import { types, Instance } from 'mobx-state-tree';
 
 import { TILE_LAYER_ID } from '@cgi-eo/map-core';
 
@@ -6,7 +6,7 @@ import { LayerType } from './map-layer';
 
 export const TileLayer = LayerType.addType(
     TILE_LAYER_ID,
-    types.model({
+    types.model('TileLayer', {
         source: types.frozen()
     }).actions((self) => {
         return {
@@ -17,5 +17,7 @@ export const TileLayer = LayerType.addType(
                 };
             }
         };
-    }).named('TileLayer')
+    })
 );
+
+export type ITileLayer = Instance<typeof TileLayer>;

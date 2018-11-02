@@ -1,4 +1,4 @@
-import { types } from 'mobx-state-tree';
+import { types, Instance } from 'mobx-state-tree';
 
 import { DynamicUnion } from '../mobx/dynamic-union';
 import { MapEntityType } from '../map-entity/map-entity';
@@ -11,9 +11,13 @@ const LayerBase = types.compose(
     hasOpacity
 );
 
-export const LayerType = DynamicUnion('layer', (layerModel) => {
+const MapLayerBase = MapEntityType.addType('mapLayer', LayerBase);
+
+export const LayerType = DynamicUnion<'layerType', typeof MapLayerBase>('layerType', (layerModel) => {
     return MapEntityType.addType('mapLayer', types.compose(layerModel.name,
         LayerBase,
         layerModel
     ));
 });
+
+export type IMapLayer = Instance<typeof MapLayerBase>;

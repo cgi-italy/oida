@@ -6,7 +6,7 @@ export const hasVisibility = types
     })
     .actions(self => {
         return {
-            setVisible(visible) {
+            setVisible(visible: boolean) {
                 self.visible = visible;
             }
         };

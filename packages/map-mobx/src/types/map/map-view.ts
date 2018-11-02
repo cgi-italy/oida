@@ -1,4 +1,4 @@
-import { types } from 'mobx-state-tree';
+import { types, SnapshotIn } from 'mobx-state-tree';
 import { MapProjection } from './map-projection';
 import { MapViewport } from './map-viewport';
 
@@ -9,13 +9,13 @@ export const MapView = types
         updating: types.optional(types.boolean, false)
     }).actions(self => {
         return {
-            setProjection(projection) {
+            setProjection(projection: SnapshotIn<typeof MapProjection>) {
                 self.projection = MapProjection.create(projection);
             },
-            setViewport(viewport) {
+            setViewport(viewport: SnapshotIn<typeof MapViewport>) {
                 self.viewport = MapViewport.create(viewport);
             },
-            setUpdating(updating) {
+            setUpdating(updating: boolean) {
                 self.updating = updating;
             }
         };

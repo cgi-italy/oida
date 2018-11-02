@@ -1,19 +1,19 @@
 import { observe } from 'mobx';
 
-import { TILE_LAYER_ID, ITileLayerRenderer } from '@cgi-eo/map-core';
+import { TILE_LAYER_ID, ITileLayerRenderer, IMapRenderer } from '@cgi-eo/map-core';
 
 import { MapLayerController } from './map-layer-controller';
 import { layerControllersFactory } from './layer-controllers-factory';
 
-
-export class TileLayerController extends MapLayerController<ITileLayerRenderer> {
+import { ITileLayer } from '../../types/layers/tile-layer';
+export class TileLayerController extends MapLayerController<ITileLayerRenderer, ITileLayer> {
 
     constructor(config) {
         super(config);
     }
 
-    protected createLayerRenderer_(mapRenderer) {
-        return mapRenderer.getLayersFactory().create(TILE_LAYER_ID, {
+    protected createLayerRenderer_(mapRenderer: IMapRenderer) {
+        return <ITileLayerRenderer>mapRenderer.getLayersFactory().create(TILE_LAYER_ID, {
             mapLayer: this.mapLayer_,
             mapRenderer: mapRenderer
         });
