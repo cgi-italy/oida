@@ -5,7 +5,7 @@ import { SubscriptionTracker, mapRendererFactory, IMapRenderer } from '@cgi-eo/m
 import { IMap } from '../../types/map/map';
 
 import { GroupLayerController } from '../layers/group-layer-controller';
-
+import { InteractionListController } from '../interactions/interactions-list-controller';
 
 export class MapRendererController {
 
@@ -14,6 +14,7 @@ export class MapRendererController {
     private domTarget_: IObservableValue<HTMLElement>;
     private subscriptionTracker_: SubscriptionTracker = new SubscriptionTracker();
     private layersController_: GroupLayerController;
+    private interactionsController_: InteractionListController;
     private ignoreNextViewportChange_: boolean = false;
 
     constructor(config) {
@@ -24,6 +25,10 @@ export class MapRendererController {
 
         this.layersController_ = new GroupLayerController({
             mapLayer: this.mapState_.layers
+        });
+
+        this.interactionsController_ = new InteractionListController({
+            interactions: this.mapState_.interactions
         });
 
         this.bindTMapState_();
@@ -47,6 +52,11 @@ export class MapRendererController {
 
     destroy() {
         this.subscriptionTracker_.unsubscribe();
+        if (this.mapRenderer_) {
+            this.layersController_.destroy();
+            this.interactionsController_.destroy();
+            this.mapRenderer_.destroy();
+        }
     }
 
     private initMapRenderer_(rendererConfig) {
@@ -74,6 +84,7 @@ export class MapRendererController {
             });
 
             this.layersController_.setMapRenderer(this.mapRenderer_);
+            this.interactionsController_.setMapRenderer(this.mapRenderer_);
 
             if (this.mapRenderer_) {
                 this.mapRenderer_.setLayerGroup(this.layersController_.getLayerRenderer());

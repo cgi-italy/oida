@@ -34,6 +34,7 @@
     "typescript": "^3.0.3"
   },
   "dependencies": {
-    "browser-bunyan": "^1.4.0"
+    "browser-bunyan": "^1.4.0",
+    "geodesy": "^1.1.3"
   }
 }

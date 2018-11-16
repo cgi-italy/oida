@@ -1,4 +1,4 @@
-import { types, SnapshotIn } from 'mobx-state-tree';
+import { types, SnapshotIn, Instance } from 'mobx-state-tree';
 import { MapProjection } from './map-projection';
 import { MapViewport } from './map-viewport';
 
@@ -20,3 +20,5 @@ export const MapView = types
             }
         };
     });
+
+export type IMapView = Instance<typeof MapView>;

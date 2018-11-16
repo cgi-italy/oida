@@ -9,6 +9,8 @@ import { getCenter as getExtentCenter } from 'ol/extent';
 import { mapRendererFactory, IMapRenderer, IMapRendererProps, IMapViewport, IMapProjection } from '@cgi-eo/map-core';
 
 import { olLayersFactory } from '../layers/ol-layers-factory';
+import { olInteractionsFactory } from '../interactions/ol-interactions-factory';
+
 import { OLGroupLayer } from '../layers';
 
 export const OL_RENDERER_ID = 'ol';
@@ -37,6 +39,10 @@ export class OLMapRenderer implements IMapRenderer {
 
     getLayersFactory() {
         return olLayersFactory;
+    }
+
+    getInteractionsFactory() {
+        return olInteractionsFactory;
     }
 
     getViewer() {

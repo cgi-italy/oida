@@ -19,6 +19,7 @@ import 'cesium/Source/Widgets/CesiumWidget/CesiumWidget.css';
 import { mapRendererFactory, IMapRenderer, IMapRendererProps, IMapViewport, IMapProjection, Size, MapCoord } from '@cgi-eo/map-core';
 
 import { cesiumLayersFactory } from '../layers/cesium-layers-factory';
+import { cesiumInteractionsFactory } from '../interactions/cesium-interactions-factory';
 import { CesiumGroupLayer } from '../layers/cesium-group-layer';
 import { getProjectionFromSRS } from '../utils/projection';
 
@@ -65,6 +66,10 @@ export class CesiumMapRenderer implements IMapRenderer {
 
     getLayersFactory() {
         return cesiumLayersFactory;
+    }
+
+    getInteractionsFactory() {
+        return cesiumInteractionsFactory;
     }
 
     getViewer() {
