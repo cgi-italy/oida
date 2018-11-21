@@ -244,16 +244,20 @@ export class CesiumMapRenderer implements IMapRenderer {
             };
         } else {
             let bs = BoundingSphere.fromEllipsoid(scene.globe.ellipsoid);
-            let resolution = camera.getPixelSize(
-                bs,
-                scene.drawingBufferWidth,
-                scene.drawingBufferHeight
-            );
+
             let center = camera.positionCartographic;
+            let pixelSize = new Cartesian2();
+
+            camera.frustum.getPixelDimensions(
+                scene.drawingBufferWidth,
+                scene.drawingBufferHeight,
+                camera.positionCartographic.height,
+                pixelSize
+            );
 
             return {
                 center: <Size>[CesiumMath.toDegrees(center.longitude), CesiumMath.toDegrees(center.latitude)],
-                resolution,
+                resolution: Math.max(pixelSize.x, pixelSize.y),
                 rotation: CesiumMath.toDegrees(camera.heading),
                 pitch: 90 + CesiumMath.toDegrees(camera.pitch)
             };
