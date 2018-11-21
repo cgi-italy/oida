@@ -3,12 +3,14 @@ import { GROUP_LAYER_ID, IGroupLayerRenderer, IMapRenderer } from '@cgi-eo/map-c
 import { MapLayerController } from './map-layer-controller';
 import { layerControllersFactory } from './layer-controllers-factory';
 
+import { MapEntityCollectionTracker } from '../../utils';
+
 import { IGroupLayer } from '../../types/layers/group-layer';
 
 export class GroupLayerController extends MapLayerController<IGroupLayerRenderer, IGroupLayer> {
 
     private mapRenderer_: IMapRenderer = null;
-    private childLayersControllers_ : {[key: string]: MapLayerController } = {};
+    private mapEntityCollectionTracker_: MapEntityCollectionTracker<MapLayerController<IGroupLayerRenderer, IGroupLayer>>;
 
     constructor(config) {
         super(config);
@@ -17,15 +19,6 @@ export class GroupLayerController extends MapLayerController<IGroupLayerRenderer
     setMapRenderer(mapRenderer) {
         this.mapRenderer_ = mapRenderer;
         super.setMapRenderer(mapRenderer);
-    }
-
-    destroy() {
-        if (this.layerRenderer_) {
-            for (let id in this.childLayersControllers_) {
-                this.destroyChildLayer_(id);
-            }
-        }
-        super.destroy();
     }
 
     protected createLayerRenderer_(mapRenderer: IMapRenderer) {
@@ -37,49 +30,38 @@ export class GroupLayerController extends MapLayerController<IGroupLayerRenderer
     protected bindToLayerState_() {
         super.bindToLayerState_();
 
-        this.subscriptionTracker_.addSubscription(this.mapLayer_.children.items.observe((change) => {
-            if (change.type === 'splice') {
-                let idx = change.index;
-                change.added.forEach((mapLayer: any) => {
-                    this.createChildLayer_(mapLayer.value, idx++);
-                });
-
-                change.removed.forEach((mapLayer: any) => {
-                    this.destroyChildLayer_(mapLayer.snapshot.id);
-                });
-            }
-        }));
-
-        this.mapLayer_.children.items.forEach((mapLayer) => {
-            this.createChildLayer_(mapLayer);
+        this.mapEntityCollectionTracker_ = new MapEntityCollectionTracker({
+            collection: this.mapLayer_.children,
+            onEntityAdd: this.createChildLayer_.bind(this),
+            onEntityRemove: this.destroyChildLayer_.bind(this)
         });
 
     }
 
     protected unbindFromLayerState_() {
         super.unbindFromLayerState_();
+        this.mapEntityCollectionTracker_.destroy();
+        delete this.mapEntityCollectionTracker_;
     }
 
     protected createChildLayer_(mapLayer, idx?: number) {
         let childLayerController = layerControllersFactory.create(mapLayer.layerType, {
             mapLayer
         });
-        this.childLayersControllers_[mapLayer.id] = childLayerController;
         childLayerController.setMapRenderer(this.mapRenderer_);
         let childLayerRenderer = childLayerController.getLayerRenderer();
         if (childLayerRenderer) {
             this.layerRenderer_.addLayer(childLayerRenderer, idx);
         }
+        return childLayerController;
     }
 
-    protected destroyChildLayer_(id) {
-        let childLayerController = this.childLayersControllers_[id];
+    protected destroyChildLayer_(childLayerController: MapLayerController<IGroupLayerRenderer, IGroupLayer>) {
         let childLayerRenderer = childLayerController.getLayerRenderer();
         if (childLayerRenderer) {
             this.layerRenderer_.removeLayer(childLayerRenderer);
         }
         childLayerController.destroy();
-        delete this.childLayersControllers_[id];
     }
 
 }

@@ -31,8 +31,8 @@ export abstract class MapLayerController<T extends ILayerRenderer = ILayerRender
 
     destroy() {
         if (this.layerRenderer_) {
-            this.layerRenderer_.destroy();
             this.unbindFromLayerState_();
+            this.layerRenderer_.destroy();
             this.layerRenderer_ = null;
         }
     }

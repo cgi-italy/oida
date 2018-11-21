@@ -6,11 +6,13 @@ import { FEATURE_LAYER_ID, IFeatureLayerRenderer, IMapRenderer } from '@cgi-eo/m
 import { MapLayerController } from './map-layer-controller';
 import { layerControllersFactory } from './layer-controllers-factory';
 
+import { MapEntityCollectionTracker } from '../../utils';
+
 import { IFeatureLayer } from '../../types/layers/feature-layer';
 
 export class FeatureLayerController extends MapLayerController<IFeatureLayerRenderer, IFeatureLayer> {
 
-    protected collectionUnsubscribe_;
+    private mapEntityCollectionTracker_: MapEntityCollectionTracker<MapLayerController<IFeatureLayerRenderer, IFeatureLayer>>;
 
     protected createLayerRenderer_(mapRenderer: IMapRenderer) {
         return <IFeatureLayerRenderer>mapRenderer.getLayersFactory().create(FEATURE_LAYER_ID, {
@@ -48,37 +50,21 @@ export class FeatureLayerController extends MapLayerController<IFeatureLayerRend
 
     protected unbindFromLayerState_() {
         super.unbindFromLayerState_();
-        if (this.collectionUnsubscribe_) {
-            this.collectionUnsubscribe_();
-            delete this.collectionUnsubscribe_;
-        }
+        this.mapEntityCollectionTracker_.destroy();
+        delete this.mapEntityCollectionTracker_;
     }
 
     protected onSourceChange_(source) {
-        if (this.collectionUnsubscribe_) {
-            this.collectionUnsubscribe_();
-            delete this.collectionUnsubscribe_;
-            this.layerRenderer_.removeAllFeatures();
+
+        if (this.mapEntityCollectionTracker_) {
+            this.mapEntityCollectionTracker_.destroy();
+            delete this.mapEntityCollectionTracker_;
         }
         if (source) {
-            source.items.forEach((item) => {
-                this.addFeature_(item);
-            });
-
-            this.collectionUnsubscribe_ = onPatch(source, (change, reverse) => {
-                switch (change.op) {
-                    case 'add':
-                        this.addFeature_(this.mapLayer_.source.getItemFromPath(change.path));
-                        break;
-                    case 'remove':
-                        this.layerRenderer_.removeFeature(reverse.value.id);
-                        break;
-                    case 'replace':
-                        let item = this.mapLayer_.source.getItemFromPath(change.path);
-                        this.layerRenderer_.updateFeatureStyle(item.id, this.mapLayer_.styleGetter(item));
-                        this.layerRenderer_.updateFeatureGeometry(item.id, this.mapLayer_.geometryGetter(item));
-                        break;
-                }
+            this.mapEntityCollectionTracker_ = new MapEntityCollectionTracker({
+                collection: source,
+                onEntityAdd: this.addFeature_.bind(this),
+                onEntityRemove: this.removeFeature_.bind(this)
             });
         }
     }
@@ -89,6 +75,26 @@ export class FeatureLayerController extends MapLayerController<IFeatureLayerRend
             this.mapLayer_.geometryGetter(entity),
             this.mapLayer_.styleGetter(entity)
         );
+
+        let geometryObserver = reaction(() => this.mapLayer_.geometryGetter(entity), (geometry) => {
+            this.layerRenderer_.updateFeatureGeometry(entity.id, geometry);
+        });
+
+        let styleObserver = reaction(() => this.mapLayer_.styleGetter(entity), (style) => {
+            this.layerRenderer_.updateFeatureStyle(entity.id, style);
+        });
+
+        return {
+            id: entity.id,
+            geometryObserver,
+            styleObserver
+        };
+    }
+
+    protected removeFeature_(featureTracker) {
+        featureTracker.geometryObserver();
+        featureTracker.styleObserver();
+        this.layerRenderer_.removeFeature(featureTracker.id);
     }
 
 }
