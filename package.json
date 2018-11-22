@@ -3,6 +3,7 @@
   "private": true,
   "scripts": {
     "build": "lerna run --stream build",
+    "clean": "lerna run --parallel clean",
     "cz": "git-cz",
     "lint": "lerna run --parallel lint",
     "check-staged": "lint-staged",

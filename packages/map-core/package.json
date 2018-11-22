@@ -11,6 +11,7 @@
   ],
   "scripts": {
     "build": "rollup --config rollup.config.js && rollup --config rollup.config.js --environment FORMAT:cjs",
+    "clean": "rimraf ./dist ./.rpt2_cache",
     "watch": "rollup --config rollup.config.js --watch",
     "lint": "tslint --project ./tsconfig.json",
     "test": "jest --config ./jest.config.js"
@@ -24,6 +25,7 @@
     "@types/geojson": "^7946.0.4",
     "@types/jest": "^23.3.2",
     "jest": "^23.6.0",
+    "rimraf": "^2.6.2",
     "rollup": "^0.66.0",
     "rollup-plugin-commonjs": "^9.1.6",
     "rollup-plugin-json": "^3.1.0",
