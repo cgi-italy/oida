@@ -1,5 +1,5 @@
 {
-  "name": "@cgi-eo/map-cesium",
+  "name": "@oida/map-cesium",
   "version": "0.2.0",
   "description": "Cesium map renderer wrapper library",
   "module": "dist/map-cesium.js",
@@ -23,7 +23,7 @@
     "registry": "https://nexus.dev.eoss-cloud.it/repository/npm-cgi-eo/"
   },
   "dependencies": {
-    "@cgi-eo/map-core": "^0.3.0"
+    "@oida/core": "^0.3.0"
   },
   "peerDependencies": {
     "cesium": "^1.49.0"

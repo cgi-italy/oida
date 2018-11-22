@@ -1,6 +1,6 @@
 import { types } from 'mobx-state-tree';
 
-import { MapEntityType, createMapEntityCollectionType, FeatureLayer } from '@cgi-eo/map-mobx';
+import { MapEntityType, createMapEntityCollectionType, FeatureLayer } from '@oida/state-mst';
 
 import { mapState } from './map';
 const boltIcon = require('../../../images/bolt.png');

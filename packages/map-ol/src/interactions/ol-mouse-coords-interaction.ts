@@ -2,7 +2,7 @@ import { listen, unlisten } from 'ol/events';
 import EventType from 'ol/events/EventType';
 import { transform } from 'ol/proj';
 
-import { IMouseCoordsInteraction, IMouseCoordsInteractionProps, MOUSE_COORDS_INTERACTION_ID } from '@cgi-eo/map-core';
+import { IMouseCoordsInteraction, IMouseCoordsInteractionProps, MOUSE_COORDS_INTERACTION_ID } from '@oida/core';
 
 import { olInteractionsFactory } from './ol-interactions-factory';
 import { OLMapRenderer } from '../map/ol-map-renderer';

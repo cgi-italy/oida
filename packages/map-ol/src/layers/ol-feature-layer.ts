@@ -4,7 +4,7 @@ import Feature from 'ol/Feature';
 import GeoJSON from 'ol/format/GeoJSON';
 
 
-import { FEATURE_LAYER_ID, IFeatureLayerRenderer } from '@cgi-eo/map-core';
+import { FEATURE_LAYER_ID, IFeatureLayerRenderer } from '@oida/core';
 
 import { OLMapLayer } from './ol-map-layer';
 import { olLayersFactory } from './ol-layers-factory';

@@ -1,6 +1,6 @@
 import Group from 'ol/layer/Group';
 
-import { GROUP_LAYER_ID, IGroupLayerRenderer } from '@cgi-eo/map-core';
+import { GROUP_LAYER_ID, IGroupLayerRenderer } from '@oida/core';
 
 import { OLMapLayer } from './ol-map-layer';
 import { olLayersFactory } from './ol-layers-factory';

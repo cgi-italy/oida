@@ -1,4 +1,4 @@
-import { IPointStyle, ILineStyle, IPolygonStyle } from '@cgi-eo/map-core';
+import { IPointStyle, ILineStyle, IPolygonStyle } from '@oida/core';
 
 export type GeometryStyle = IPointStyle | ILineStyle | IPolygonStyle;
 

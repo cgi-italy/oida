@@ -2,7 +2,7 @@ import PrimitiveCollection from 'cesium/Source/Scene/PrimitiveCollection';
 import ImageryLayerCollection from 'cesium/Source/Scene/ImageryLayerCollection';
 import ImageryLayer from 'cesium/Source/Scene/ImageryLayer';
 
-import { ILayerRenderer } from '@cgi-eo/map-core';
+import { ILayerRenderer } from '@oida/core';
 
 import { CesiumMapRenderer } from '../map/cesium-map-renderer';
 

@@ -1,0 +1,42 @@
+{
+  "name": "@oida/core",
+  "version": "0.3.0",
+  "description": "core utils and definitions",
+  "module": "dist/core.js",
+  "main": "dist/core.cjs.js",
+  "types": "dist/types/index.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "rollup --config rollup.config.js && rollup --config rollup.config.js --environment FORMAT:cjs",
+    "clean": "rimraf ./dist ./.rpt2_cache",
+    "watch": "rollup --config rollup.config.js --watch",
+    "lint": "tslint --project ./tsconfig.json",
+    "test": "jest --config ./jest.config.js"
+  },
+  "author": "stefano marra",
+  "license": "UNLICENSED",
+  "publishConfig": {
+    "registry": "https://nexus.dev.eoss-cloud.it/repository/npm-cgi-eo/"
+  },
+  "devDependencies": {
+    "@types/geojson": "^7946.0.4",
+    "@types/jest": "^23.3.2",
+    "jest": "^23.6.0",
+    "rimraf": "^2.6.2",
+    "rollup": "^0.66.0",
+    "rollup-plugin-commonjs": "^9.1.6",
+    "rollup-plugin-json": "^3.1.0",
+    "rollup-plugin-node-resolve": "^3.4.0",
+    "rollup-plugin-typescript2": "^0.17.0",
+    "ts-jest": "^23.1.4",
+    "tslint": "^5.11.0",
+    "typescript": "^3.0.3"
+  },
+  "dependencies": {
+    "browser-bunyan": "^1.4.0",
+    "geodesy": "^1.1.3"
+  }
+}

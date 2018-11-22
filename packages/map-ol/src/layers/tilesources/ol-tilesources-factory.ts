@@ -1,6 +1,6 @@
 import TileGrid from 'ol/tilegrid/TileGrid';
 
-import { createDynamicFactory } from '@cgi-eo/map-core';
+import { createDynamicFactory } from '@oida/core';
 
 let factory = createDynamicFactory('ol-tilesources');
 

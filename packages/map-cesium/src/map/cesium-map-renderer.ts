@@ -16,7 +16,7 @@ import ImageryLayer from 'cesium/Source/Scene/ImageryLayer';
 
 import 'cesium/Source/Widgets/CesiumWidget/CesiumWidget.css';
 
-import { mapRendererFactory, IMapRenderer, IMapRendererProps, IMapViewport, IMapProjection, Size, MapCoord } from '@cgi-eo/map-core';
+import { mapRendererFactory, IMapRenderer, IMapRendererProps, IMapViewport, IMapProjection, Size, MapCoord } from '@oida/core';
 
 import { cesiumLayersFactory } from '../layers/cesium-layers-factory';
 import { cesiumInteractionsFactory } from '../interactions/cesium-interactions-factory';

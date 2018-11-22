@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { MapRendererController } from '@cgi-eo/map-mobx';
+import { MapRendererController } from '@oida/state-mst';
 
 export interface MapComponentProps {
     rendererController: MapRendererController;

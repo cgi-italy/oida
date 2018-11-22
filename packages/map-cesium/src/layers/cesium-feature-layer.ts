@@ -1,7 +1,7 @@
 import { CesiumMapLayer } from './cesium-map-layer';
 import { cesiumLayersFactory } from './cesium-layers-factory';
 
-import { FEATURE_LAYER_ID, IFeatureLayerRenderer, IFeatureStyle } from '@cgi-eo/map-core';
+import { FEATURE_LAYER_ID, IFeatureLayerRenderer, IFeatureStyle } from '@oida/core';
 
 import { CesiumGeometryRenderer, CesiumPointRenderer, CesiumLineRenderer, CesiumPolygonRenderer } from './geometry-renderers';
 

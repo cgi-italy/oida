@@ -1,5 +1,5 @@
 {
-  "name": "@cgi-eo/map-ol",
+  "name": "@oida/map-ol",
   "version": "0.2.0",
   "description": "Openlayers map renderer wrapper library",
   "module": "dist/map-ol.js",
@@ -11,6 +11,7 @@
   ],
   "scripts": {
     "build": "rollup --config rollup.config.js && rollup --config rollup.config.js --environment FORMAT:cjs",
+    "clean": "rimraf ./dist ./.rpt2_cache",
     "watch": "rollup --config rollup.config.js --watch",
     "lint": "tslint --project ./tsconfig.json",
     "test": "jest --config jest.config.js"
@@ -21,7 +22,7 @@
     "registry": "https://nexus.dev.eoss-cloud.it/repository/npm-cgi-eo/"
   },
   "dependencies": {
-    "@cgi-eo/map-core": "^0.3.0",
+    "@oida/core": "^0.3.0",
     "ol": "^5.2.0",
     "proj4": "^2.5.0"
   },
@@ -33,6 +34,7 @@
     "babel-core": "7.0.0-bridge.0",
     "babel-jest": "^23.6.0",
     "jest": "^23.6.0",
+    "rimraf": "^2.6.2",
     "rollup": "^0.66.0",
     "rollup-plugin-commonjs": "^9.1.6",
     "rollup-plugin-json": "^3.1.0",

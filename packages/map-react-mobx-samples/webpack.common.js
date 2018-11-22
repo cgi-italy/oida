@@ -2,7 +2,7 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
-const cesiumConfig = require('@cgi-eo/map-cesium/config/webpack.cesium.js');
+const cesiumConfig = require('@oida/map-cesium/config/webpack.cesium.js');
 const webpackMerge = require('webpack-merge');
 
 const config = (env = {}) => {

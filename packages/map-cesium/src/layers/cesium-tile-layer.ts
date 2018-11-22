@@ -1,6 +1,6 @@
 import ImageryLayer from 'cesium/Source/Scene/ImageryLayer';
 
-import { TILE_LAYER_ID } from '@cgi-eo/map-core';
+import { TILE_LAYER_ID } from '@oida/core';
 
 import { cesiumTileSourcesFactory } from './tilesources/cesium-tilesources-factory';
 

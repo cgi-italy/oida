@@ -1,7 +1,7 @@
 
 import LayerBase from 'ol/layer/Base';
 
-import { ILayerRenderer } from '@cgi-eo/map-core';
+import { ILayerRenderer } from '@oida/core';
 
 import { OLMapRenderer } from '../map/ol-map-renderer';
 

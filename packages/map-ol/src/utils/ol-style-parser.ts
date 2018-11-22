@@ -4,7 +4,7 @@ import Circle from 'ol/style/Circle';
 import Stroke from 'ol/style/Stroke';
 import Fill from 'ol/style/Fill';
 
-import { IFeatureStyle, IPointStyle, isIcon, ILineStyle, IPolygonStyle } from '@cgi-eo/map-core';
+import { IFeatureStyle, IPointStyle, isIcon, ILineStyle, IPolygonStyle } from '@oida/core';
 
 export class OLStyleParser {
 

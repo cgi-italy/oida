@@ -1,7 +1,7 @@
 import { CesiumMapLayer } from './cesium-map-layer';
 import { cesiumLayersFactory } from './cesium-layers-factory';
 
-import { GROUP_LAYER_ID, IGroupLayerRenderer } from '@cgi-eo/map-core';
+import { GROUP_LAYER_ID, IGroupLayerRenderer } from '@oida/core';
 
 export class CesiumGroupLayer extends CesiumMapLayer implements IGroupLayerRenderer {
     constructor(config) {

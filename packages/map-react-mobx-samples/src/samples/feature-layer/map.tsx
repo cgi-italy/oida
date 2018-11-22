@@ -1,11 +1,11 @@
 import * as React from 'react';
 
-import { Map, TileLayer, MapRendererController } from '@cgi-eo/map-mobx';
+import { Map, TileLayer, MapRendererController } from '@oida/state-mst';
 
-import '@cgi-eo/map-ol';
-import '@cgi-eo/map-cesium';
+import '@oida/map-ol';
+import '@oida/map-cesium';
 
-import { MapComponent } from '@cgi-eo/map-react-mobx';
+import { MapComponent } from '@oida/map-react-mobx';
 
 export const mapState = Map.create({
     renderer: {
