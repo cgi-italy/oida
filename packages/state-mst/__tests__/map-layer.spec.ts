@@ -1,6 +1,6 @@
 import { types, typecheck, getSnapshot } from 'mobx-state-tree';
 import { LayerType } from '../src/types/layers/map-layer';
-import { MapEntityType } from '../src/types/map-entity/map-entity';
+import { MapEntityType } from '../src/types/map/map-entity';
 
 describe('Map layer type', () => {
 

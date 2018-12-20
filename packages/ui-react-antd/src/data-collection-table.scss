@@ -1,0 +1,9 @@
+.ant-table-row {
+    &.hovered {
+        background-color: $table-row-hover-bg;
+    }
+
+    &.selected {
+        background-color: $table-selected-row-bg;
+    }
+}

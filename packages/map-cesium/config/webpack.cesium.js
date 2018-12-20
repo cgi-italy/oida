@@ -9,7 +9,8 @@ const cesiumWorkers = '../Build/Cesium/Workers';
 
 const config = (config = {}) => {
 
-    let nodeModulesDir = config.nodeModulesDir || 'node_modules';
+    const nodeModulesDir = config.nodeModulesDir || 'node_modules';
+    const cesiumBaseUrl = config.cesiumBaseUrl || 'Cesium';
 
     return {
         amd: {
@@ -28,12 +29,12 @@ const config = (config = {}) => {
         plugins: [
             new webpack.DefinePlugin({
                 // Define relative base path in cesium for loading assets
-                CESIUM_BASE_URL: JSON.stringify('')
+                CESIUM_BASE_URL: JSON.stringify(`/${cesiumBaseUrl}`)
             }),
             new CopyWebpackPlugin([
-                { from: path.join(nodeModulesDir, cesiumSource, cesiumWorkers), to: 'Workers' },
-                { from: path.join(nodeModulesDir, cesiumSource, 'Assets'), to: 'Assets' },
-                { from: path.join(nodeModulesDir, cesiumSource, 'Widgets'), to: 'Widgets' }
+                { from: path.join(nodeModulesDir, cesiumSource, cesiumWorkers), to: `${cesiumBaseUrl}/Workers` },
+                { from: path.join(nodeModulesDir, cesiumSource, 'Assets'), to: `${cesiumBaseUrl}/Assets` },
+                { from: path.join(nodeModulesDir, cesiumSource, 'Widgets'), to: `${cesiumBaseUrl}/Widgets` }
             ])
         ]
     }

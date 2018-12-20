@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "declarationDir": "./dist/types",
+    "module": "es2015",
+    "lib": ["es6", "dom"],
+    "sourceMap": true,
+    "jsx": "react",
+    "noImplicitAny": false,
+    "experimentalDecorators": true,
+    "outDir": "./dist",
+    "target": "es5",
+    "moduleResolution": "node",
+    "esModuleInterop": true
+  },
+  "typeRoots": [
+    "node_modules/@types"
+  ],
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

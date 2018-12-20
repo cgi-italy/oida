@@ -1,13 +1,12 @@
 {
-  "name": "@oida/map-ol",
-  "version": "0.2.0",
-  "description": "Openlayers map renderer wrapper library",
-  "module": "dist/map-ol.js",
-  "main": "dist/map-ol.cjs.js",
+  "name": "@oida/ui-react-core",
+  "version": "0.0.1",
+  "description": "ui core components",
+  "module": "dist/ui-react-core.js",
+  "main": "dist/ui-react-core.cjs.js",
   "types": "dist/types/index.d.ts",
   "files": [
-    "dist",
-    "src"
+    "dist"
   ],
   "scripts": {
     "build": "rollup --config rollup.config.js && rollup --config rollup.config.js --environment FORMAT:cjs",
@@ -21,19 +20,19 @@
   "publishConfig": {
     "registry": "https://nexus.dev.eoss-cloud.it/repository/npm-cgi-eo/"
   },
-  "dependencies": {
-    "@oida/core": "^0.3.0",
-    "ol": "^5.2.0",
-    "proj4": "^2.5.0"
+  "peerDependencies": {
+    "classnames": "^2.2.6",
+    "react": "^16.6.3",
+    "react-dom": "^16.6.3"
   },
   "devDependencies": {
-    "@babel/core": "^7.0.1",
-    "@babel/preset-env": "^7.0.0",
-    "@types/geojson": "^7946.0.4",
     "@types/jest": "^23.3.2",
-    "babel-core": "7.0.0-bridge.0",
-    "babel-jest": "^23.6.0",
+    "@types/react": "^16.7.6",
+    "@types/react-dom": "^16.0.9",
+    "classnames": "^2.2.6",
     "jest": "^23.6.0",
+    "react": "^16.6.3",
+    "react-dom": "^16.6.3",
     "rimraf": "^2.6.2",
     "rollup": "^0.66.0",
     "rollup-plugin-commonjs": "^9.1.6",
@@ -43,5 +42,8 @@
     "ts-jest": "^23.1.4",
     "tslint": "^5.11.0",
     "typescript": "3.1.6"
+  },
+  "dependencies": {
+    "@oida/core": "^0.3.0"
   }
 }

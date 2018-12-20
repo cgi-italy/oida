@@ -22,9 +22,9 @@
   },
   "peerDependencies": {
     "classnames": "^2.2.6",
-    "mobx": "^4.5.2",
-    "mobx-react": "^5.3.6",
-    "mobx-state-tree": "^3.7.1",
+    "mobx": "^4.8.0",
+    "mobx-react": "^5.4.3",
+    "mobx-state-tree": "^3.9.0",
     "react": "^16.6.3",
     "react-dom": "^16.6.3"
   },
@@ -35,9 +35,9 @@
     "@types/react-dom": "^16.0.9",
     "classnames": "^2.2.6",
     "jest": "^23.6.0",
-    "mobx": "^4.5.2",
-    "mobx-react": "^5.3.6",
-    "mobx-state-tree": "^3.7.1",
+    "mobx": "^4.8.0",
+    "mobx-react": "^5.4.3",
+    "mobx-state-tree": "^3.9.0",
     "react": "^16.6.3",
     "react-dom": "^16.6.3",
     "rimraf": "^2.6.2",
@@ -48,7 +48,7 @@
     "rollup-plugin-typescript2": "^0.17.0",
     "ts-jest": "^23.1.4",
     "tslint": "^5.11.0",
-    "typescript": "^3.0.3"
+    "typescript": "3.1.6"
   },
   "dependencies": {
     "@oida/core": "^0.3.0",

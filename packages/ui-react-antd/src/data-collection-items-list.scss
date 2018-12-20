@@ -1,0 +1,16 @@
+.ant-list-item-content {
+    > span {
+        margin: -$list-item-padding;
+        padding: $list-item-padding;
+        cursor: pointer;
+        width: 100%;
+
+        &.hovered {
+            background-color: $table-row-hover-bg;
+        }
+
+        &.selected {
+            background-color: $table-selected-row-bg;
+        }
+    }
+}

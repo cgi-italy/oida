@@ -22,15 +22,15 @@
     "registry": "https://nexus.dev.eoss-cloud.it/repository/npm-cgi-eo/"
   },
   "peerDependencies": {
-    "mobx": "^4.5.2",
-    "mobx-state-tree": "^3.7.1"
+    "mobx": "^4.8.0",
+    "mobx-state-tree": "^3.9.0"
   },
   "devDependencies": {
     "@types/geojson": "^7946.0.4",
     "@types/jest": "^23.3.2",
     "jest": "^23.6.0",
-    "mobx": "^4.5.2",
-    "mobx-state-tree": "^3.7.1",
+    "mobx": "^4.8.0",
+    "mobx-state-tree": "^3.9.0",
     "rimraf": "^2.6.2",
     "rollup": "^0.66.0",
     "rollup-plugin-commonjs": "^9.1.6",
@@ -39,7 +39,7 @@
     "rollup-plugin-typescript2": "^0.17.0",
     "ts-jest": "^23.1.4",
     "tslint": "^5.11.0",
-    "typescript": "^3.0.3"
+    "typescript": "3.1.6"
   },
   "dependencies": {
     "@oida/core": "^0.3.0",
