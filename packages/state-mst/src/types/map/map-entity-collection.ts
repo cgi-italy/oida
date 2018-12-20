@@ -1,4 +1,4 @@
-import { types, IAnyModelType } from 'mobx-state-tree';
+import { types, IAnyModelType, Instance } from 'mobx-state-tree';
 
 import { DynamicUnion } from '../mst/dynamic-union';
 import { Collection } from '../core';
@@ -18,8 +18,8 @@ const MapEntityCollections = DynamicUnion<'mapEntityCollectionType', typeof Base
     }
 );
 
-export const createMapEntityCollectionType = <T extends IAnyModelType>(type: T) => {
-    return MapEntityCollections.addType(`${type.name}Collection`, Collection(type));
+export const createMapEntityCollectionType = <T extends IAnyModelType>(type: T, collectionFactory = Collection) => {
+    return MapEntityCollections.addType(`${type.name}Collection`, collectionFactory(type));
 };
 
 export const getMapEntityCollectionType = (id?: string) => {
@@ -29,3 +29,5 @@ export const getMapEntityCollectionType = (id?: string) => {
         return MapEntityCollections.getUnion();
     }
 };
+
+export type IMapEntityCollection = Instance<ReturnType<typeof createMapEntityCollectionType>>;

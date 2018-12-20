@@ -1,4 +1,4 @@
-import { types } from 'mobx-state-tree';
+import { types, Instance } from 'mobx-state-tree';
 
 import { DynamicUnion } from '../mst/dynamic-union';
 import { hasVisibility, isSelectable, isHoverable } from '../mixins';
@@ -21,3 +21,4 @@ export const MapEntityType = DynamicUnion<'mapEntityType', typeof MapEntityBase>
     );
 });
 
+export type IMapEntity = Instance<typeof MapEntityBase>;

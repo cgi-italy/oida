@@ -1,10 +1,10 @@
-import { types, detach, flow, resolveIdentifier, IAnyModelType, IType, Instance, SnapshotOrInstance } from 'mobx-state-tree';
+import { types, detach, flow, resolveIdentifier, IAnyType, SnapshotOrInstance } from 'mobx-state-tree';
 
 function isArray<T>(type: T | T[]): type is T[] {
     return Array.isArray(type);
 }
 
-export const Collection = <T extends IAnyModelType>(itemsType: T) => {
+export const Collection = <T extends IAnyType>(itemsType: T) => {
     return types.model({
         items: types.optional(types.array(itemsType), [])
     }).actions((self) => {
@@ -75,6 +75,9 @@ export const Collection = <T extends IAnyModelType>(itemsType: T) => {
                     return null;
                 }
                 return self.items[parseInt(matches[1])];
+            },
+            getItemType: () => {
+                return itemsType;
             }
         };
     }).named(`${itemsType.name}Collection`);
