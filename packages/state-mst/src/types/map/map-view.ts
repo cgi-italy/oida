@@ -6,7 +6,8 @@ export const MapView = types
     .model('MapView', {
         projection: MapProjection,
         viewport: MapViewport,
-        updating: types.optional(types.boolean, false)
+        updating: types.optional(types.boolean, false),
+        animateOnChange: types.optional(types.boolean, true)
     }).actions(self => {
         return {
             setProjection(projection: SnapshotIn<typeof MapProjection>) {
@@ -17,6 +18,25 @@ export const MapView = types
             },
             setUpdating(updating: boolean) {
                 self.updating = updating;
+            },
+            setAnimateOnChange(animate: boolean) {
+                self.animateOnChange = animate;
+            }
+        };
+    }).extend((self) => {
+
+        let currentTarget: HTMLElement;
+
+        return {
+            actions: {
+                setCurrentTarget: (target: HTMLElement) => {
+                    currentTarget = target;
+                }
+            },
+            views: {
+                get size() {
+                    return currentTarget ? [currentTarget.clientWidth, currentTarget.clientHeight] : null;
+                }
             }
         };
     });

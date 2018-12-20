@@ -7,6 +7,14 @@ import { hasOpacity } from '../mixins';
 const LayerBase = types.compose(
     types.model({
         name: types.optional(types.string, ''),
+    }).volatile(self => ({
+        renderer: null
+    })).actions((self) => {
+        return {
+            setRenderer(renderer) {
+                self.renderer = renderer;
+            }
+        };
     }),
     hasOpacity
 );

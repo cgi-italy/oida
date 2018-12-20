@@ -34,7 +34,7 @@ export type Size = [number, number];
 export interface IMapRenderer {
 
     setTarget(target: HTMLElement): void;
-    setViewport(viewport: IMapViewport): void;
+    setViewport(viewport: IMapViewport, animate?: boolean): void;
     getLayersFactory(): IDynamicFactory<ILayerRenderer>;
     getInteractionsFactory(): IDynamicFactory<IMapInteractionImplementation>;
     setLayerGroup(group: IGroupLayerRenderer);

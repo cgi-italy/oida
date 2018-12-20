@@ -13,4 +13,12 @@ export const MapRenderer = types
                 };
             }
         };
+    }).volatile(self => ({
+        implementation: null
+    })).actions((self) => {
+        return {
+            setImplementation(implementation) {
+                self.implementation = implementation;
+            }
+        };
     });

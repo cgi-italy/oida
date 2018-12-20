@@ -22,6 +22,7 @@ export abstract class MapLayerController<T extends ILayerRenderer = ILayerRender
             if (this.layerRenderer_) {
                 this.bindToLayerState_();
             }
+            this.mapLayer_.setRenderer(this.layerRenderer_);
         }
     }
 

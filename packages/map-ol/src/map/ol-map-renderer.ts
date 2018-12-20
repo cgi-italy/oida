@@ -28,8 +28,8 @@ export class OLMapRenderer implements IMapRenderer {
         this.viewer_.setTarget(target);
     }
 
-    setViewport(viewport: IMapViewport) {
-        this.updateViewFromProps_(this.viewer_.getView(), viewport);
+    setViewport(viewport: IMapViewport, animate?: boolean) {
+        this.updateViewFromProps_(this.viewer_.getView(), viewport, animate);
     }
 
     setLayerGroup(group: OLGroupLayer) {
@@ -140,7 +140,7 @@ export class OLMapRenderer implements IMapRenderer {
         return view;
     }
 
-    private updateViewFromProps_(view, viewProps) {
+    private updateViewFromProps_(view, viewProps, animate?: boolean) {
 
         let projection = view.getProjection();
 
@@ -153,8 +153,15 @@ export class OLMapRenderer implements IMapRenderer {
             }
         }
 
-        view.setCenter(center);
-        view.setResolution(resolution);
+        if (animate) {
+            view.animate({
+                center: center,
+                resolution: resolution
+            });
+        } else {
+            view.setCenter(center);
+            view.setResolution(resolution);
+        }
     }
 
 }

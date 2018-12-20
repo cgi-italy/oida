@@ -40,6 +40,7 @@ export class MapRendererController {
             this.mapRenderer_.setTarget(target);
         }
         this.domTarget_.set(target);
+        this.mapState_.view.setCurrentTarget(target);
     }
 
     getDomMTarget() : HTMLElement {
@@ -90,6 +91,8 @@ export class MapRendererController {
                 this.mapRenderer_.setLayerGroup(this.layersController_.getLayerRenderer());
             }
 
+            this.mapState_.renderer.setImplementation(this.mapRenderer_);
+
         }
 
     }
@@ -115,7 +118,7 @@ export class MapRendererController {
                     return;
                 }
                 if (this.mapRenderer_) {
-                    this.mapRenderer_.setViewport(viewport);
+                    this.mapRenderer_.setViewport(viewport, this.mapState_.view.animateOnChange);
                 }
             })
         );
