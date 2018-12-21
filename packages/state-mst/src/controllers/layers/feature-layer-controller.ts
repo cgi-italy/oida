@@ -1,4 +1,4 @@
-import { observe, reaction } from 'mobx';
+import { observe, reaction, IReactionDisposer } from 'mobx';
 import { onPatch } from 'mobx-state-tree';
 
 import { FEATURE_LAYER_ID, IFeatureLayerRenderer, IMapRenderer } from '@oida/core';
@@ -10,9 +10,18 @@ import { MapEntityCollectionTracker } from '../../utils';
 
 import { IFeatureLayer } from '../../types/layers/feature-layer';
 
+type FeatureTracker = {
+    id: string,
+    disposeGeometryObserver: IReactionDisposer,
+    disposeStyleObserver: IReactionDisposer
+};
+
+const defaultGeometryGetter = (entity) => entity.geometry;
+const defaultStyleGetter = (entity) => entity.style;
+
 export class FeatureLayerController extends MapLayerController<IFeatureLayerRenderer, IFeatureLayer> {
 
-    private mapEntityCollectionTracker_: MapEntityCollectionTracker<MapLayerController<IFeatureLayerRenderer, IFeatureLayer>>;
+    private mapEntityCollectionTracker_: MapEntityCollectionTracker<FeatureTracker>;
 
     protected createLayerRenderer_(mapRenderer: IMapRenderer) {
         return <IFeatureLayerRenderer>mapRenderer.getLayersFactory().create(FEATURE_LAYER_ID, {
@@ -32,16 +41,21 @@ export class FeatureLayerController extends MapLayerController<IFeatureLayerRend
 
         this.subscriptionTracker_.addSubscription(
             observe(this.mapLayer_, 'geometryGetter', () => {
+                let geometryGetter = this.mapLayer_.geometryGetter || defaultGeometryGetter;
+
                 this.mapLayer_.source.items.forEach((item) => {
-                    this.layerRenderer_.updateFeatureGeometry(item.id, this.mapLayer_.geometryGetter(item));
+                    this.layerRenderer_.updateFeatureGeometry(item.id, geometryGetter(item));
                 });
             })
         );
 
         this.subscriptionTracker_.addSubscription(
             observe(this.mapLayer_, 'styleGetter', () => {
+
+                let styleGetter = this.mapLayer_.styleGetter || defaultStyleGetter;
+
                 this.mapLayer_.source.items.forEach((item) => {
-                    this.layerRenderer_.updateFeatureStyle(item.id, this.mapLayer_.styleGetter(item));
+                    this.layerRenderer_.updateFeatureStyle(item.id, styleGetter(item));
                 });
             })
         );
@@ -70,30 +84,35 @@ export class FeatureLayerController extends MapLayerController<IFeatureLayerRend
     }
 
     protected addFeature_(entity) {
+
+
+        let geometryGetter = this.mapLayer_.geometryGetter || defaultGeometryGetter;
+        let styleGetter = this.mapLayer_.styleGetter || defaultStyleGetter;
+
         this.layerRenderer_.addFeature(
             entity.id,
-            this.mapLayer_.geometryGetter(entity),
-            this.mapLayer_.styleGetter(entity)
+            geometryGetter(entity),
+            styleGetter(entity)
         );
 
-        let geometryObserver = reaction(() => this.mapLayer_.geometryGetter(entity), (geometry) => {
+        let disposeGeometryObserver = reaction(() => geometryGetter(entity), (geometry) => {
             this.layerRenderer_.updateFeatureGeometry(entity.id, geometry);
         });
 
-        let styleObserver = reaction(() => this.mapLayer_.styleGetter(entity), (style) => {
+        let disposeStyleObserver = reaction(() => styleGetter(entity), (style) => {
             this.layerRenderer_.updateFeatureStyle(entity.id, style);
         });
 
         return {
             id: entity.id,
-            geometryObserver,
-            styleObserver
+            disposeGeometryObserver,
+            disposeStyleObserver
         };
     }
 
     protected removeFeature_(featureTracker) {
-        featureTracker.geometryObserver();
-        featureTracker.styleObserver();
+        featureTracker.disposeGeometryObserver();
+        featureTracker.disposeStyleObserver();
         this.layerRenderer_.removeFeature(featureTracker.id);
     }
 

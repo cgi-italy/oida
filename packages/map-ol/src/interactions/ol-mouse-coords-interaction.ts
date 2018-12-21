@@ -42,15 +42,17 @@ export class OLMouseCoordsInteraction implements IMouseCoordsInteraction {
             let px = this.viewer_.getEventPixel(evt);
             let coord = this.viewer_.getCoordinateFromPixel(px);
 
-            let proj = this.viewer_.getView().getProjection();
-            if (proj.getCode() !== 'EPSG:4326') {
-                coord = transform(coord, proj, 'EPSG:4326');
-            }
+            if (coord) {
+                let proj = this.viewer_.getView().getProjection();
+                if (proj.getCode() !== 'EPSG:4326') {
+                    coord = transform(coord, proj, 'EPSG:4326');
+                }
 
-            onMouseCoords({
-                lat: coord[1],
-                lon: coord[0]
-            });
+                onMouseCoords({
+                    lat: coord[1],
+                    lon: coord[0]
+                });
+            }
         }));
 
         this.evtSubscriptions_.push(listen(viewport, EventType.MOUSEOUT, () => {

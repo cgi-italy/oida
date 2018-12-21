@@ -23,13 +23,15 @@ export class MapEntityCollectionTracker<T> {
         this.stateSubscription_ = this.trackerConfig_.collection.items.observe((change) => {
             if (change.type === 'splice') {
                 let idx = change.index;
-                change.added.forEach((mapEntity: any) => {
-                    this.onEntityAdd_(mapEntity.value, idx++);
-                });
 
                 change.removed.forEach((mapEntity: any) => {
                     this.onEntityRemoved_(mapEntity.snapshot.id);
                 });
+
+                change.added.forEach((mapEntity: any) => {
+                    this.onEntityAdd_(mapEntity.value, idx++);
+                });
+
             } else if (change.type === 'update') {
                 let idx = change.index;
                 this.onEntityRemoved_(change.oldValue.id);

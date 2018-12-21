@@ -6,7 +6,7 @@ import { MapInteractionController } from './map-interaction-controller';
 import { interactionControllersFactory } from './interaction-controllers-factory';
 
 //only for typings
-const CollectionInstance = Collection(MapInteraction).create();
+const CollectionInstance = Collection(MapInteraction).create({});
 
 export class InteractionListController {
 

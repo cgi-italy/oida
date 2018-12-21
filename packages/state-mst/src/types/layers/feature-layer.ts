@@ -11,8 +11,8 @@ export const FeatureLayer = LayerType.addType(FEATURE_LAYER_ID,
     types.model('FeatureLayer', {
         config: types.frozen(),
         source: ReferenceOrType(getMapEntityCollectionType()),
-        geometryGetter: FunctionType,
-        styleGetter: FunctionType
+        geometryGetter: types.maybe(FunctionType),
+        styleGetter: types.maybe(FunctionType)
     })
     .actions((self) => {
         return {
