@@ -3,8 +3,9 @@
   "version": "0.0.1",
   "description": "oida samples based on mst for state management and antd for widgeting",
   "main": "src/index.tsx",
+  "private": true,
   "scripts": {
-    "build": "webpack --config webpack.prod.js",
+    "build:samples": "webpack --config webpack.prod.js",
     "lint": "tslint --project ./tsconfig.json",
     "start": "webpack-dev-server --config webpack.dev.js --mode development --progress --colors",
     "test": "jest --config jest.config.js"

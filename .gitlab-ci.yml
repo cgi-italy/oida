@@ -40,7 +40,8 @@ build:
       - "packages/*/dist"
     expire_in: 1 hr
   script:
-    - npm run build -- -- -- --env.baseUrl='{{ getenv "BASE_URL"}}'
+    - npm run build
+    - npm run build:samples -- -- -- --env.baseUrl='{{ getenv "BASE_URL"}}'
   only:
     - branches
 
