@@ -6,7 +6,7 @@ import { FEATURE_LAYER_ID, IFeatureLayerRenderer, IMapRenderer } from '@oida/cor
 import { MapLayerController } from './map-layer-controller';
 import { layerControllersFactory } from './layer-controllers-factory';
 
-import { MapEntityCollectionTracker } from '../../utils';
+import { ArrayTracker } from '../../utils';
 
 import { IFeatureLayer } from '../../types/layers/feature-layer';
 
@@ -21,7 +21,7 @@ const defaultStyleGetter = (entity) => entity.style;
 
 export class FeatureLayerController extends MapLayerController<IFeatureLayerRenderer, IFeatureLayer> {
 
-    private mapEntityCollectionTracker_: MapEntityCollectionTracker<FeatureTracker>;
+    private sourceTracker_: ArrayTracker<FeatureTracker>;
 
     protected createLayerRenderer_(mapRenderer: IMapRenderer) {
         return <IFeatureLayerRenderer>mapRenderer.getLayersFactory().create(FEATURE_LAYER_ID, {
@@ -43,9 +43,11 @@ export class FeatureLayerController extends MapLayerController<IFeatureLayerRend
             observe(this.mapLayer_, 'geometryGetter', () => {
                 let geometryGetter = this.mapLayer_.geometryGetter || defaultGeometryGetter;
 
-                this.mapLayer_.source.items.forEach((item) => {
-                    this.layerRenderer_.updateFeatureGeometry(item.id, geometryGetter(item));
-                });
+                if (this.mapLayer_.source) {
+                    this.mapLayer_.source.items.forEach((item) => {
+                        this.layerRenderer_.updateFeatureGeometry(item.id, geometryGetter(item));
+                    });
+                }
             })
         );
 
@@ -54,9 +56,11 @@ export class FeatureLayerController extends MapLayerController<IFeatureLayerRend
 
                 let styleGetter = this.mapLayer_.styleGetter || defaultStyleGetter;
 
-                this.mapLayer_.source.items.forEach((item) => {
-                    this.layerRenderer_.updateFeatureStyle(item.id, styleGetter(item));
-                });
+                if (this.mapLayer_.source) {
+                    this.mapLayer_.source.items.forEach((item) => {
+                        this.layerRenderer_.updateFeatureStyle(item.id, styleGetter(item));
+                    });
+                }
             })
         );
 
@@ -64,21 +68,21 @@ export class FeatureLayerController extends MapLayerController<IFeatureLayerRend
 
     protected unbindFromLayerState_() {
         super.unbindFromLayerState_();
-        this.mapEntityCollectionTracker_.destroy();
-        delete this.mapEntityCollectionTracker_;
+        this.sourceTracker_.destroy();
+        delete this.sourceTracker_;
     }
 
     protected onSourceChange_(source) {
 
-        if (this.mapEntityCollectionTracker_) {
-            this.mapEntityCollectionTracker_.destroy();
-            delete this.mapEntityCollectionTracker_;
+        if (this.sourceTracker_) {
+            this.sourceTracker_.destroy();
+            delete this.sourceTracker_;
         }
         if (source) {
-            this.mapEntityCollectionTracker_ = new MapEntityCollectionTracker({
-                collection: source,
-                onEntityAdd: this.addFeature_.bind(this),
-                onEntityRemove: this.removeFeature_.bind(this)
+            this.sourceTracker_ = new ArrayTracker({
+                items: source.items,
+                onItemAdd: this.addFeature_.bind(this),
+                onItemRemove: this.removeFeature_.bind(this)
             });
         }
     }

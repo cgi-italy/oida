@@ -1,13 +1,19 @@
-import { types, detach, flow, resolveIdentifier, IAnyModelType, IType, Instance, SnapshotOrInstance } from 'mobx-state-tree';
-import { Collection } from './collection';
+import { resolveIdentifier, IMSTArray, IAnyType } from 'mobx-state-tree';
 
-export const IndexedCollection = <T extends IAnyModelType>(itemsType: T, key: string) => {
+import { Collection, ICollection } from './collection';
 
-    return Collection(itemsType).actions((self) => {
+function defaultIdentifierResolver(id: string, collection: ICollection) {
+    return resolveIdentifier(collection.getItemType(), collection.items, id);
+}
+
+export const IndexedCollection = (collection: ReturnType<typeof Collection>, identifierResolver = defaultIdentifierResolver) => {
+
+    return collection.actions((self) => {
         return {
-            itemWithId: (id) => {
-                return resolveIdentifier(itemsType, self.items, id);
+            itemWithId: (id: string) => {
+                return identifierResolver(id, self);
             },
         };
     });
 };
+

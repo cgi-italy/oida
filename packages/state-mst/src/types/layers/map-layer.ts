@@ -5,6 +5,7 @@ import { MapEntityType } from '../map/map-entity';
 import { hasOpacity } from '../mixins';
 
 const LayerBase = types.compose(
+    'MapLayer',
     types.model({
         name: types.optional(types.string, ''),
     }).volatile(self => ({

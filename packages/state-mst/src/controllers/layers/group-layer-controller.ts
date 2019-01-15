@@ -3,14 +3,14 @@ import { GROUP_LAYER_ID, IGroupLayerRenderer, IMapRenderer } from '@oida/core';
 import { MapLayerController } from './map-layer-controller';
 import { layerControllersFactory } from './layer-controllers-factory';
 
-import { MapEntityCollectionTracker } from '../../utils';
+import { ArrayTracker } from '../../utils';
 
 import { IGroupLayer } from '../../types/layers/group-layer';
 
 export class GroupLayerController extends MapLayerController<IGroupLayerRenderer, IGroupLayer> {
 
     private mapRenderer_: IMapRenderer = null;
-    private mapEntityCollectionTracker_: MapEntityCollectionTracker<MapLayerController<IGroupLayerRenderer, IGroupLayer>>;
+    private layersTracker_: ArrayTracker<MapLayerController<IGroupLayerRenderer, IGroupLayer>>;
 
     constructor(config) {
         super(config);
@@ -30,18 +30,18 @@ export class GroupLayerController extends MapLayerController<IGroupLayerRenderer
     protected bindToLayerState_() {
         super.bindToLayerState_();
 
-        this.mapEntityCollectionTracker_ = new MapEntityCollectionTracker({
-            collection: this.mapLayer_.children,
-            onEntityAdd: this.createChildLayer_.bind(this),
-            onEntityRemove: this.destroyChildLayer_.bind(this)
+        this.layersTracker_ = new ArrayTracker({
+            items: this.mapLayer_.children.items,
+            onItemAdd: this.createChildLayer_.bind(this),
+            onItemRemove: this.destroyChildLayer_.bind(this)
         });
 
     }
 
     protected unbindFromLayerState_() {
         super.unbindFromLayerState_();
-        this.mapEntityCollectionTracker_.destroy();
-        delete this.mapEntityCollectionTracker_;
+        this.layersTracker_.destroy();
+        delete this.layersTracker_;
     }
 
     protected createChildLayer_(mapLayer, idx?: number) {

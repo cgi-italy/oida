@@ -1,1 +1,1 @@
-export * from './map-entity-collection-tracker';
+export * from './array-tracker';

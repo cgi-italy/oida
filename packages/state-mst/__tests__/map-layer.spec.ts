@@ -6,7 +6,7 @@ describe('Map layer type', () => {
 
     it('Should be an instance of MapEntityType and LayerType', () => {
 
-        const TestLayerType = LayerType.addType('testType', types.model({}));
+        const TestLayerType = LayerType.addType('testType', types.model('TestLayer', {}));
 
         const layer = TestLayerType.create({
             id: 'testLayer'

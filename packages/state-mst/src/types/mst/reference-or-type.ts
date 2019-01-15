@@ -1,18 +1,22 @@
-import { types, IAnyModelType } from 'mobx-state-tree';
+import { types, IAnyModelType, IReferenceType, IMaybe } from 'mobx-state-tree';
 
-export const ReferenceOrType = <T extends IAnyModelType>(Type: T) => {
+export const ReferenceOrType = <T extends IAnyModelType>(Type: T, referenceType?: IMaybe<IReferenceType<T>>) => {
+
+    if (!referenceType) {
+        referenceType =  types.safeReference(Type);
+    }
     return types.union(
         {
             dispatcher: (snapshot) => {
-                if (typeof(snapshot) === 'string') {
-                    return  types.reference(Type);
-                } else {
-                    return Type;
+                if (!snapshot || typeof(snapshot) === 'string') {
+                    return referenceType;
+                } else if (snapshot) {
+                    return types.maybe(Type);
                 }
             }
         },
-        types.reference(Type),
-        Type
+        referenceType,
+        types.maybe(Type)
     );
 };
 

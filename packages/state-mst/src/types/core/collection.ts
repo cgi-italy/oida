@@ -1,4 +1,4 @@
-import { types, detach, flow, resolveIdentifier, IAnyType, SnapshotOrInstance } from 'mobx-state-tree';
+import { types, detach, flow, resolveIdentifier, IAnyType, SnapshotOrInstance, Instance } from 'mobx-state-tree';
 
 function isArray<T>(type: T | T[]): type is T[] {
     return Array.isArray(type);
@@ -66,9 +66,6 @@ export const Collection = <T extends IAnyType>(itemsType: T) => {
             itemAt: (index) => {
                 return self.items[index];
             },
-            itemWithId: (id) => {
-                return resolveIdentifier(itemsType, self.items, id);
-            },
             getItemFromPath: (path) => {
                 let matches = path.match(pathRegex);
                 if (!matches || matches.length < 2) {
@@ -82,3 +79,5 @@ export const Collection = <T extends IAnyType>(itemsType: T) => {
         };
     }).named(`${itemsType.name}Collection`);
 };
+
+export type ICollection = Instance<ReturnType<typeof Collection>>;

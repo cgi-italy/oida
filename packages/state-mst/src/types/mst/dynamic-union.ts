@@ -1,4 +1,4 @@
-import { types, IModelType, ModelProperties, IAnyModelType } from 'mobx-state-tree';
+import { types, IModelType, ModelProperties, IAnyModelType, Instance } from 'mobx-state-tree';
 
 declare type ExtractProps<T extends IAnyModelType> = T extends IModelType<infer P, any, any, any> ? P : never;
 declare type ExtractOthers<T extends IAnyModelType> = T extends IModelType<any, infer O, any, any> ? O : never;
@@ -13,7 +13,7 @@ export const DynamicUnion = <TYPE_KEY extends string, BASE extends IAnyModelType
     ) => {
 
     const REGISTERED_TYPES = [];
-    let UnionType = null;
+    let UnionType: ReturnType<typeof baseTypeFactory> = null;
 
     return {
         addType: <PROPS extends ModelProperties, OTHERS>(id: string, model: IModelType<PROPS, OTHERS>) => {
@@ -46,10 +46,10 @@ export const DynamicUnion = <TYPE_KEY extends string, BASE extends IAnyModelType
         },
         getUnion: () => {
             if (!UnionType) {
-                UnionType =  types.late(() => {
+                UnionType = types.late(() => {
                     UnionType.name = `${typeKey}: Union(${REGISTERED_TYPES.map(type => type.name).join()})`;
                     return types.union(...REGISTERED_TYPES);
-                });
+                }) as BASE;
                 UnionType.name = typeKey;
             }
             return UnionType;

@@ -13,7 +13,7 @@ const LayerRendererMock = jest.fn(() => ({
     destroy: jest.fn()
 }));
 
-const TestLayer = LayerType.addType('test', types.model({}));
+const TestLayer = LayerType.addType('test', types.model('TestLayer', {}));
 
 const layerRendererMockInstance = new LayerRendererMock();
 const mapRendererMockInstance = new MapRendererMock();
