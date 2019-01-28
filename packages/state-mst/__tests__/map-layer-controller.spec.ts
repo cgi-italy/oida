@@ -2,7 +2,7 @@ import { types } from 'mobx-state-tree';
 import { IMapRenderer, ILayerRenderer } from '@oida/core';
 
 import { MapLayerController } from '../src/controllers/layers/map-layer-controller';
-import { LayerType } from '../src/types/layers/map-layer';
+import { MapLayer } from '../src/types/layers/map-layer';
 
 const MapRendererMock = jest.fn<IMapRenderer>();
 
@@ -13,7 +13,7 @@ const LayerRendererMock = jest.fn(() => ({
     destroy: jest.fn()
 }));
 
-const TestLayer = LayerType.addType('test', types.model('TestLayer', {}));
+const TestLayer = MapLayer.addModel(types.model('TestLayer', {}));
 
 const layerRendererMockInstance = new LayerRendererMock();
 const mapRendererMockInstance = new MapRendererMock();

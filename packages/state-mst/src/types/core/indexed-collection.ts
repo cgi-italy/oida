@@ -6,9 +6,9 @@ function defaultIdentifierResolver(id: string, collection: ICollection) {
     return resolveIdentifier(collection.getItemType(), collection.items, id);
 }
 
-export const IndexedCollection = (collection: ReturnType<typeof Collection>, identifierResolver = defaultIdentifierResolver) => {
+export const IndexedCollection = <T extends IAnyType>(itemsType: T, identifierResolver = defaultIdentifierResolver) => {
 
-    return collection.actions((self) => {
+    return Collection(itemsType).actions((self) => {
         return {
             itemWithId: (id: string) => {
                 return identifierResolver(id, self);

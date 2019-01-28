@@ -2,11 +2,10 @@ import { types, Instance } from 'mobx-state-tree';
 
 import { TILE_LAYER_ID } from '@oida/core';
 
-import { LayerType } from './map-layer';
+import { MapLayer } from './map-layer';
 
-export const TileLayer = LayerType.addType(
-    TILE_LAYER_ID,
-    types.model('TileLayer', {
+export const TileLayer = MapLayer.addModel(
+    types.model(TILE_LAYER_ID, {
         source: types.frozen()
     }).actions((self) => {
         return {

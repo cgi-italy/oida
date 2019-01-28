@@ -29,7 +29,7 @@ export const getAppState = () => {
                 id: 'osm'
             },
         }),
-        {
+        TileLayer.create({
             id: 's2',
             layerType: 'tile',
             source: {
@@ -42,7 +42,7 @@ export const getAppState = () => {
                 srs: 'EPSG:4326'
             },
             opacity: 0.5
-        }
+        })
     ]);
 
     return appState;

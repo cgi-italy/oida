@@ -1,43 +1,44 @@
 import { SubscriptionTracker, IMapRenderer } from '@oida/core';
 
 import { Collection } from '../../types/core/collection';
-import { MapInteraction, IMapInteraction } from '../../types/interactions/map-interaction';
+import { MapInteractionType, IMapInteraction } from '../../types/interactions/map-interaction';
 import { MapInteractionController } from './map-interaction-controller';
 import { interactionControllersFactory } from './interaction-controllers-factory';
 
+import { ArrayTracker } from '../../utils/array-tracker';
+
 //only for typings
-const CollectionInstance = Collection(MapInteraction).create({});
+const CollectionInstance = Collection(MapInteractionType).create({});
 
 export class InteractionListController {
 
     private interactions_: typeof CollectionInstance;
     private mapRenderer_: IMapRenderer;
-    private interactionControllers_: {
-        [x: string]: MapInteractionController
-    };
-    private subscriptionTracker_: SubscriptionTracker = new SubscriptionTracker();
+
+    private interactionsTracker_: ArrayTracker<MapInteractionController>;
 
     constructor(config) {
         this.interactions_ = config.interactions;
         this.mapRenderer_ = null;
 
-        this.interactionControllers_ = {};
-
-        this.bindToInteractionsState_();
+        this.interactionsTracker_ = new ArrayTracker({
+            items: this.interactions_.items,
+            onItemAdd: this.createInteractionController_.bind(this),
+            onItemRemove: this.destroyInteractionController_.bind(this)
+        });
     }
 
     setMapRenderer(renderer: IMapRenderer) {
         this.mapRenderer_ = renderer;
-        for (let id in this.interactionControllers_) {
-            this.interactionControllers_[id].setMapRenderer(renderer);
-        }
+        this.interactionsTracker_.forEachItem((controller) => {
+            if (controller) {
+                controller.setMapRenderer(renderer);
+            }
+        });
     }
 
     destroy() {
-        for (let id in this.interactionControllers_) {
-            this.destroyInteractionController_(id);
-        }
-        this.subscriptionTracker_.unsubscribe();
+        this.interactionsTracker_.destroy();
     }
 
     private createInteractionController_(interaction: IMapInteraction) {
@@ -46,37 +47,16 @@ export class InteractionListController {
         });
 
         if (interactionController) {
-            this.interactionControllers_[interaction.id] = interactionController;
             interactionController.setMapRenderer(this.mapRenderer_);
         }
+
+        return interactionController;
     }
 
-    private destroyInteractionController_(id) {
-        let interactionController = this.interactionControllers_[id];
-        if (interactionController) {
-            interactionController.destroy();
+    private destroyInteractionController_(controller: MapInteractionController) {
+        if (controller) {
+            controller.destroy();
         }
-        delete this.interactionControllers_[id];
-    }
-
-    private bindToInteractionsState_() {
-
-        this.subscriptionTracker_.addSubscription(this.interactions_.items.observe((change) => {
-            if (change.type === 'splice') {
-                change.removed.forEach((interaction: any) => {
-                    this.destroyInteractionController_(interaction.snapshot.id);
-                });
-
-                change.added.forEach((interaction: any) => {
-                    this.createInteractionController_(interaction.value);
-                });
-
-            }
-        }));
-
-        this.interactions_.items.forEach((interaction) => {
-            this.createInteractionController_(interaction);
-        });
     }
 
 }

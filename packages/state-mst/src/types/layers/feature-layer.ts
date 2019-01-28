@@ -2,15 +2,15 @@ import { types, Instance } from 'mobx-state-tree';
 
 import { FEATURE_LAYER_ID } from '@oida/core';
 
-import { LayerType } from './map-layer';
+import { MapLayer } from './map-layer';
 import { FunctionType } from '../mst/function-type';
-import { getMapEntityCollectionType } from '../map/map-entity-collection';
+import { getEntityCollectionType } from '../entity/entity-collection';
 import { ReferenceOrType } from '../mst/reference-or-type';
 
-export const FeatureLayer = LayerType.addType(FEATURE_LAYER_ID,
-    types.model('FeatureLayer', {
+export const FeatureLayer = MapLayer.addModel(
+    types.model(FEATURE_LAYER_ID, {
         config: types.frozen(),
-        source: ReferenceOrType(getMapEntityCollectionType()),
+        source: ReferenceOrType(getEntityCollectionType()),
         geometryGetter: types.maybe(FunctionType),
         styleGetter: types.maybe(FunctionType)
     })

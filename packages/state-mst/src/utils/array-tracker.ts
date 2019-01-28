@@ -20,6 +20,12 @@ export class ArrayTracker<T, ITEM extends IAnyType = IAnyType> {
         this.bindToCollectionState_();
     }
 
+    forEachItem(callback: (T) => void) {
+        for (let id in this.itemTracker_) {
+            callback(this.itemTracker_[id]);
+        }
+    }
+
     destroy() {
         this.unbindFromCollectionState_();
     }

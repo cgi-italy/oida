@@ -4,8 +4,8 @@ import { MapInteractionType } from './map-interaction';
 
 import { MOUSE_COORDS_INTERACTION_ID } from '@oida/core';
 
-export const MouseCoordsInteraction = MapInteractionType.addType(MOUSE_COORDS_INTERACTION_ID, types.model(
-    'MouseCoordsInteraction',
+export const MouseCoordsInteraction = MapInteractionType.addModel(types.model(
+    MOUSE_COORDS_INTERACTION_ID,
     {
         mouseCoords: types.frozen(),
     }

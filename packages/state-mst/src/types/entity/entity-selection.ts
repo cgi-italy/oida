@@ -1,12 +1,13 @@
-import { types, addDisposer, Instance, getSnapshot, resolveIdentifier } from 'mobx-state-tree';
+import { types, addDisposer, Instance, getSnapshot, resolveIdentifier, IAnyModelType } from 'mobx-state-tree';
 
-import { MapEntityType, MapEntityReference, createMapEntityReference, resolveMapEntityReference } from './map-entity';
+import { Entity } from './entity';
+import { EntityReference, createEntityReference, resolveEntityReference } from './entity-reference';
 import { hasSelectableItems } from '../mixins/has-selectable-items';
 
 import { SelectionMode } from  '@oida/core';
 
-const MapEntityHovered = types.model({
-    hoveredItem: MapEntityReference
+const EntityHovered = types.model({
+    hoveredItem: EntityReference
 }).actions((self) => {
     return {
         setHovered: (item) => {
@@ -26,13 +27,13 @@ const MapEntityHovered = types.model({
     };
 });
 
-export const MapEntitySelection = types.compose(
-    'MapEntitySelection',
-    hasSelectableItems(MapEntityType.getUnion(), {
-        referenceType: MapEntityReference,
-        idGetter: createMapEntityReference
+export const EntitySelection = types.compose(
+    'EntitySelection',
+    hasSelectableItems(Entity as IAnyModelType, {
+        referenceType: EntityReference,
+        idGetter: createEntityReference
     }),
-    MapEntityHovered
+    EntityHovered
 ).actions((self) => {
     return {
         afterCreate: () => {
@@ -43,7 +44,7 @@ export const MapEntitySelection = types.compose(
                     });
 
                     change.removed.forEach((item: any) => {
-                        let entity = resolveMapEntityReference(item.snapshot);
+                        let entity = resolveEntityReference(item.snapshot, self);
                         if (entity) {
                             entity.setSelected(false);
                         }
@@ -59,4 +60,4 @@ export const MapEntitySelection = types.compose(
     };
 });
 
-export type IMapEntitySelection = Instance<typeof MapEntitySelection>;
+export type IEntitySelection = Instance<typeof EntitySelection>;
