@@ -9,6 +9,8 @@ import { layerControllersFactory } from './layer-controllers-factory';
 import { ArrayTracker } from '../../utils';
 
 import { IFeatureLayer } from '../../types/layers/feature-layer';
+import { createEntityReference } from '../../types/entity/entity-reference';
+
 
 type FeatureTracker = {
     id: string,
@@ -93,22 +95,24 @@ export class FeatureLayerController extends MapLayerController<IFeatureLayerRend
         let geometryGetter = this.mapLayer_.geometryGetter || defaultGeometryGetter;
         let styleGetter = this.mapLayer_.styleGetter || defaultStyleGetter;
 
+        let featureId = createEntityReference(entity);
+
         this.layerRenderer_.addFeature(
-            entity.id,
+            featureId,
             geometryGetter(entity),
             styleGetter(entity)
         );
 
         let disposeGeometryObserver = reaction(() => geometryGetter(entity), (geometry) => {
-            this.layerRenderer_.updateFeatureGeometry(entity.id, geometry);
+            this.layerRenderer_.updateFeatureGeometry(featureId, geometry);
         });
 
         let disposeStyleObserver = reaction(() => styleGetter(entity), (style) => {
-            this.layerRenderer_.updateFeatureStyle(entity.id, style);
+            this.layerRenderer_.updateFeatureStyle(featureId, style);
         });
 
         return {
-            id: entity.id,
+            id: featureId,
             disposeGeometryObserver,
             disposeStyleObserver
         };

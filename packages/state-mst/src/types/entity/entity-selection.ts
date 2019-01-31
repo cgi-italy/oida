@@ -33,7 +33,10 @@ export const EntitySelection = types.compose(
         referenceType: EntityReference,
         idGetter: createEntityReference
     }),
-    EntityHovered
+    EntityHovered,
+    types.model({
+        id: types.identifier
+    })
 ).actions((self) => {
     return {
         afterCreate: () => {

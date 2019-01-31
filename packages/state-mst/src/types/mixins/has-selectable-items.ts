@@ -17,7 +17,7 @@ export const hasSelectableItems = <T extends IAnyModelType>(
     }).actions((self) => {
 
         const getItemIndex = (item) => {
-            return self.selectedItems.indexOf(idGetter(item));
+            return self.selectedItems.indexOf(item);
         };
 
         const addItem = (item) => {
@@ -30,21 +30,26 @@ export const hasSelectableItems = <T extends IAnyModelType>(
 
         return {
             modifySelection: (item, mode: SelectionMode) => {
+
                 if (mode === SelectionMode.Replace) {
                     self.selectedItems.clear();
-                    addItem(item);
-                } else if (mode === SelectionMode.Add) {
-                    if (getItemIndex(item) === -1) {
+                }
+                if (item) {
+                    if (mode === SelectionMode.Replace) {
                         addItem(item);
-                    }
-                } else if (mode === SelectionMode.Remove) {
-                    removeItem(item);
-                } else if (mode === SelectionMode.Toggle) {
-                    let idx = getItemIndex(item);
-                    if (idx !== -1) {
-                        self.selectedItems.splice(idx, 1);
-                    } else {
-                        addItem(item);
+                    } else if (mode === SelectionMode.Add) {
+                        if (getItemIndex(item) === -1) {
+                            addItem(item);
+                        }
+                    } else if (mode === SelectionMode.Remove) {
+                        removeItem(item);
+                    } else if (mode === SelectionMode.Toggle) {
+                        let idx = getItemIndex(item);
+                        if (idx !== -1) {
+                            self.selectedItems.splice(idx, 1);
+                        } else {
+                            addItem(item);
+                        }
                     }
                 }
             },

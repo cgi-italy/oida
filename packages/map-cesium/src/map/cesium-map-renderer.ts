@@ -52,10 +52,16 @@ export class CesiumMapRenderer implements IMapRenderer {
     }
 
 
-    setViewport(viewport: IMapViewport) {
-        this.viewer_.camera.setView(
-            this.getViewFromProps_(viewport)
-        );
+    setViewport(viewport: IMapViewport, animate?: boolean) {
+        let view = this.getViewFromProps_(viewport);
+        if (animate) {
+            this.viewer_.camera.flyTo({
+                ...view,
+                duration: 1.5
+            });
+        } else {
+            this.viewer_.camera.setView(view);
+        }
     }
 
     setLayerGroup(group: CesiumGroupLayer) {
