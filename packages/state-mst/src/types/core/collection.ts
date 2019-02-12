@@ -63,7 +63,7 @@ export const Collection = <T extends IAnyType>(itemsType: T) => {
         let pathRegex = new RegExp(`^/items/([0-9]*)`);
 
         return {
-            itemAt: (index) => {
+            itemAt: (index) : Instance<T> => {
                 return self.items[index];
             },
             getItemFromPath: (path) => {

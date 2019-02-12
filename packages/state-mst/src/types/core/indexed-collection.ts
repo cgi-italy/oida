@@ -1,4 +1,4 @@
-import { resolveIdentifier, IMSTArray, IAnyType } from 'mobx-state-tree';
+import { resolveIdentifier, IMSTArray, IAnyType, Instance } from 'mobx-state-tree';
 
 import { Collection, ICollection } from './collection';
 
@@ -10,9 +10,18 @@ export const IndexedCollection = <T extends IAnyType>(itemsType: T, identifierRe
 
     return Collection(itemsType).actions((self) => {
         return {
-            itemWithId: (id: string) => {
+            itemWithId: (id: string) : Instance<T> => {
                 return identifierResolver(id, self);
-            },
+            }
+        };
+    }).actions((self) => {
+        return {
+            removeItemWithId: (id: string) => {
+                let item = self.itemWithId(id);
+                if (item) {
+                    self.remove(item);
+                }
+            }
         };
     });
 };

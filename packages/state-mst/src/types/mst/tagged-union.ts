@@ -1,6 +1,6 @@
 import {
     types,
-    IType, IModelType, ISimpleType, IOptionalIType,
+    IType, IModelType, ISimpleType, IOptionalIType, IAnyType,
     ModelProperties, ModelPropertiesDeclarationToProperties
  } from 'mobx-state-tree';
 
@@ -11,7 +11,7 @@ export const TaggedUnion =
     const REGISTERED_TYPES: Array<IType<any, any, any>> = [];
 
     const methods = {
-        addModel: <PROPS extends ModelProperties, OTHERS>(model: IModelType<PROPS, OTHERS>) => {
+        addModel: <SUB_PROPS extends ModelProperties, SUB_OTHERS>(model: IModelType<SUB_PROPS, SUB_OTHERS>) => {
 
             if (!model.name || model.name === 'AnonymousModel') {
                 throw new Error('Registration of anonymous model is not allowed');
@@ -64,11 +64,16 @@ export const TaggedUnion =
 
     type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 
+    type BaseProp = PROPS & ModelPropertiesDeclarationToProperties<{ [K in TAG_KEY]: IOptionalIType<ISimpleType<string>>; }>;
+
     let UnionType = types.late(() => {
         UnionType.name = `${BaseModel.name}: Union(${REGISTERED_TYPES.map(type => type.name).join()})`;
         return types.union(...REGISTERED_TYPES);
     }) as Omit<
-        IModelType<PROPS & ModelPropertiesDeclarationToProperties<{ [K in TAG_KEY]: IOptionalIType<ISimpleType<string>>; }>, OTHERS>,
+        IModelType<
+            BaseProp
+            , OTHERS
+        >,
         'extend' | 'views' | 'actions' | 'volatile' | 'named' | 'props' | 'properties' | 'postProcessSnapshot' | 'preProcessSnapshot'
     > & Partial<typeof methods>;
 

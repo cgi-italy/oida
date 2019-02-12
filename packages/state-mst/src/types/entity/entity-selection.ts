@@ -11,6 +11,9 @@ const EntityHovered = types.model({
 }).actions((self) => {
     return {
         setHovered: (item) => {
+            if (self.hoveredItem === item) {
+                return;
+            }
             if (self.hoveredItem) {
                 self.hoveredItem.setHovered(false);
             }
