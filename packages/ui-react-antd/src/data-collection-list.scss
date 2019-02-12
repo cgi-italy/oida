@@ -1,0 +1,69 @@
+@import './data-filterer.scss';
+
+.data-collection-list {
+
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding-top: 5px;
+
+    .filter-section {
+        flex-shrink: 0;
+        flex-grow: 0;
+
+        .ant-collapse {
+            position: relative;
+            border: none;
+            margin-bottom: 5px;
+
+            .ant-collapse-item {
+
+                border: none;
+
+                .ant-collapse-header {
+                    position: absolute;
+                    z-index: 100;
+                    right: 5px;
+                    top: 4px;
+                    transform: translateY(-100%);
+                    padding: 4px;
+                    border: solid 1px transparent;
+                    border-bottom: none;
+
+                    border-radius: 4px 4px 0 0;
+                }
+
+                .ant-collapse-content {
+                    border: 1px solid rgb(217, 217, 217);
+                    margin: 3px 5px 0px 0px;
+                    background: $background-color-base;
+                    border-radius: 4px 0 4px 4px;
+
+                    .ant-collapse-content-box {
+                        padding: 0.5rem 1rem;
+                    }
+                }
+
+                &.ant-collapse-item-active {
+
+                    .ant-collapse-header {
+
+                        border-color: $border-color-base;
+                        background: $background-color-base;
+
+                        .ant-btn {
+                            background: $primary-color;
+                            color: white;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    .ant-list {
+        flex-grow: 1;
+        flex-shrink: 1;
+    }
+
+}

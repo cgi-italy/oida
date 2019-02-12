@@ -1,14 +1,18 @@
 import React from 'react';
 
-import { DataCollectionProps, DataPagerRenderer, DataSorterRenderer } from '@oida/ui-react-core';
+import { Collapse, Button, Icon } from 'antd';
+
+import { DataCollectionProps, DataPagerRenderer, DataSorterRenderer, DataFiltererRenderer } from '@oida/ui-react-core';
 
 import { DataCollectionItemsList, DataCollectionItemsListProps } from './data-collection-items-list';
 import { DataPager } from './data-pager';
 import { DataSortCombo } from './data-sort-combo';
+import { DataFilterer } from './data-filterer';
 
 export type DataCollectionListProps<T> = {
     pagerRender?: DataPagerRenderer;
     sortRender?: DataSorterRenderer;
+    filtererRender?: DataFiltererRenderer;
 } & DataCollectionProps<T> & DataCollectionItemsListProps<T>;
 
 export class DataCollectionList<T> extends React.Component<DataCollectionListProps<T>> {
@@ -21,20 +25,30 @@ export class DataCollectionList<T> extends React.Component<DataCollectionListPro
         ),
         sortRender: (props) => (
             <DataSortCombo style={{width: '150px'}} {...props}></DataSortCombo>
+        ),
+        filtererRender: (props) => (
+            <Collapse destroyInactivePanel={true}>
+                <Collapse.Panel key='filter' header={<Button size='small'><Icon type='filter'></Icon></Button>} showArrow={false}>
+                    <DataFilterer {...props}></DataFilterer>
+                </Collapse.Panel>
+            </Collapse>
         )
     };
 
     render() {
-        let {items, paging, sorting, pagerRender, sortRender, ...listProps} = this.props;
+        let {items, paging, sorting, filters, pagerRender, sortRender, filtererRender, ...listProps} = this.props;
         return  (
-            <React.Fragment>
-                {sortRender(sorting)}
+            <div className='data-collection-list'>
+                <div className='filter-section'>
+                    {sortRender(sorting)}
+                    {filtererRender(filters)}
+                </div>
                 <DataCollectionItemsList
                     {...items}
                     {...listProps}
                 ></DataCollectionItemsList>
                 {pagerRender(paging)}
-            </React.Fragment>
+            </div>
         );
     }
 }

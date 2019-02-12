@@ -21,6 +21,9 @@ export const DataFilters = types.model('DataFilters', {
         },
         unset: (key) => {
             self.items.delete(key);
+        },
+        clear: () => {
+            self.items.clear();
         }
     };
 });
