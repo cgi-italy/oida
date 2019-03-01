@@ -8,7 +8,7 @@ export type BBox = [number, number, number, number];
 export interface IMapProjection {
     code: string;
     projDef?: string;
-    extent?: number[];
+    extent?: BBox;
     wrapX?: boolean;
 }
 
@@ -16,7 +16,7 @@ export type MapCoord  = [number, number, number?];
 
 export interface IMapViewport {
     resolution: number;
-    center: number[];
+    center: MapCoord;
     rotation?: number;
     pitch?: number;
 }
@@ -35,10 +35,12 @@ export interface IMapRenderer {
 
     setTarget(target: HTMLElement): void;
     setViewport(viewport: IMapViewport, animate?: boolean): void;
+    fitExtent(extent: BBox, animate?: boolean): void;
+    getViewportExtent(): BBox;
     getLayersFactory(): IDynamicFactory<ILayerRenderer>;
     getInteractionsFactory(): IDynamicFactory<IMapInteractionImplementation>;
     setLayerGroup(group: IGroupLayerRenderer);
-    getSize(): number[];
+    getSize(): Size;
     destroy(): void;
 }
 

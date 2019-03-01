@@ -3,6 +3,7 @@ import SceneMode from 'cesium/Source/Scene/SceneMode';
 import MapMode2D from 'cesium/Source/Scene/MapMode2D';
 
 import BoundingSphere from 'cesium/Source/Core/BoundingSphere';
+import Rectangle from 'cesium/Source/Core/Rectangle';
 import Cartesian2 from 'cesium/Source/Core/Cartesian2';
 import Cartesian3 from 'cesium/Source/Core/Cartesian3';
 import Cartographic from 'cesium/Source/Core/Cartographic';
@@ -16,7 +17,7 @@ import ImageryLayer from 'cesium/Source/Scene/ImageryLayer';
 
 import 'cesium/Source/Widgets/CesiumWidget/CesiumWidget.css';
 
-import { mapRendererFactory, IMapRenderer, IMapRendererProps, IMapViewport, IMapProjection, Size, MapCoord } from '@oida/core';
+import { mapRendererFactory, IMapRenderer, IMapRendererProps, IMapViewport, BBox, Size } from '@oida/core';
 
 import { cesiumLayersFactory } from '../layers/cesium-layers-factory';
 import { cesiumInteractionsFactory } from '../interactions/cesium-interactions-factory';
@@ -62,6 +63,28 @@ export class CesiumMapRenderer implements IMapRenderer {
         } else {
             this.viewer_.camera.setView(view);
         }
+    }
+
+    fitExtent(extent, animate?: boolean) {
+        if (animate) {
+            this.viewer_.camera.flyTo({
+                destination : Rectangle.fromDegrees(...extent)
+            });
+        } else {
+            this.viewer_.camera.setView({
+                destination : Rectangle.fromDegrees(...extent)
+            });
+        }
+    }
+
+    getViewportExtent() {
+        let rectangle =  this.viewer_.camera.computeViewRectangle();
+        return <BBox>[
+            CesiumMath.toDegrees(rectangle.west),
+            CesiumMath.toDegrees(rectangle.south),
+            CesiumMath.toDegrees(rectangle.east),
+            CesiumMath.toDegrees(rectangle.north)
+        ];
     }
 
     setLayerGroup(group: CesiumGroupLayer) {

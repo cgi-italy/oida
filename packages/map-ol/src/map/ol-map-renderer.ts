@@ -32,6 +32,16 @@ export class OLMapRenderer implements IMapRenderer {
         this.updateViewFromProps_(this.viewer_.getView(), viewport, animate);
     }
 
+    fitExtent(extent, animate?: boolean) {
+        this.viewer_.getView().fit(extent, {
+            duration: animate ? 1000 : 0
+        });
+    }
+
+    getViewportExtent() {
+        return this.viewer_.getView().calculateExtent(this.getSize());
+    }
+
     setLayerGroup(group: OLGroupLayer) {
         this.layerGroup_ = group;
         this.viewer_.setLayerGroup(group.getOLObject());
