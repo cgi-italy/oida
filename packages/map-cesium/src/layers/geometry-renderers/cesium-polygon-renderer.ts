@@ -111,8 +111,11 @@ export class CesiumPolygonRenderer implements CesiumGeometryRenderer {
             let attributes = feature.fill.getGeometryInstanceAttributes(feature.id);
             attributes.color = ColorGeometryInstanceAttribute.toValue(new Color(...style.fillColor));
             attributes = feature.stroke.getGeometryInstanceAttributes(feature.id);
-            attributes.color = ColorGeometryInstanceAttribute.toValue(new Color(...style.strkeColor));
+            attributes.color = ColorGeometryInstanceAttribute.toValue(new Color(...style.strokeColor));
         }
+
+        feature.stroke.show = style.visible;
+        feature.fill.show = style.visible;
 
         feature.style = style;
 
