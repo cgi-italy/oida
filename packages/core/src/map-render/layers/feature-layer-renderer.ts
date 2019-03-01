@@ -4,7 +4,7 @@ interface IGeometryStyle {
     visible: boolean;
 }
 
-declare type Color = [number, number, number, number?];
+export type Color = [number, number, number, number?];
 
 interface ICircleStyle extends IGeometryStyle {
     radius?: number;
