@@ -21,6 +21,18 @@ type FeatureTracker = {
 const defaultGeometryGetter = (entity) => entity.geometry;
 const defaultStyleGetter = (entity) => entity.style;
 
+export const featureIdFromEntityReference = (entityReference: string, geometryIdx?: number) => {
+    if (typeof(geometryIdx) === 'number') {
+        return `${entityReference}[${geometryIdx}]`;
+    } else {
+        return entityReference;
+    }
+};
+
+export const entityReferenceFromFeatureId = (featureId: string) => {
+    return featureId.replace(/\[[0-9]+\]$/, '');
+};
+
 export class FeatureLayerController extends MapLayerController<IFeatureLayerRenderer, IFeatureLayer> {
 
     private sourceTracker_: ArrayTracker<FeatureTracker>;
@@ -39,31 +51,6 @@ export class FeatureLayerController extends MapLayerController<IFeatureLayerRend
             reaction(() => this.mapLayer_.source, (source) => {
                 this.onSourceChange_(source);
             }, {fireImmediately: true})
-        );
-
-        this.subscriptionTracker_.addSubscription(
-            observe(this.mapLayer_, 'geometryGetter', () => {
-                let geometryGetter = this.mapLayer_.geometryGetter || defaultGeometryGetter;
-
-                if (this.mapLayer_.source) {
-                    this.mapLayer_.source.items.forEach((item) => {
-                        this.layerRenderer_.updateFeatureGeometry(item.id, geometryGetter(item));
-                    });
-                }
-            })
-        );
-
-        this.subscriptionTracker_.addSubscription(
-            observe(this.mapLayer_, 'styleGetter', () => {
-
-                let styleGetter = this.mapLayer_.styleGetter || defaultStyleGetter;
-
-                if (this.mapLayer_.source) {
-                    this.mapLayer_.source.items.forEach((item) => {
-                        this.layerRenderer_.updateFeatureStyle(item.id, styleGetter(item));
-                    });
-                }
-            })
         );
 
     }
@@ -95,33 +82,85 @@ export class FeatureLayerController extends MapLayerController<IFeatureLayerRend
         let geometryGetter = this.mapLayer_.geometryGetter || defaultGeometryGetter;
         let styleGetter = this.mapLayer_.styleGetter || defaultStyleGetter;
 
-        let featureId = createEntityReference(entity);
+        let entityReference = createEntityReference(entity);
 
-        this.layerRenderer_.addFeature(
-            featureId,
-            geometryGetter(entity),
-            styleGetter(entity)
-        );
+        let geometry = geometryGetter(entity);
+        let style = styleGetter(entity);
 
-        let disposeGeometryObserver = reaction(() => geometryGetter(entity), (geometry) => {
-            this.layerRenderer_.updateFeatureGeometry(featureId, geometry);
-        });
+        if (geometry.type === 'GeometryCollection') {
+            let geometries = geometry.geometries;
 
-        let disposeStyleObserver = reaction(() => styleGetter(entity), (style) => {
-            this.layerRenderer_.updateFeatureStyle(featureId, style);
-        });
+            let featureIds = [];
 
-        return {
-            id: featureId,
-            disposeGeometryObserver,
-            disposeStyleObserver
-        };
+            geometries.forEach((geometry, idx) => {
+
+                let id = featureIdFromEntityReference(entityReference, idx);
+
+                this.layerRenderer_.addFeature(
+                    id,
+                    geometry,
+                    style[idx] || style
+                );
+
+                featureIds.push(id);
+            });
+
+            let disposeGeometryObserver = reaction(() => geometryGetter(entity), (geometry) => {
+                let geometries = geometry.geometries;
+
+                featureIds.forEach((id, idx) => {
+                    this.layerRenderer_.updateFeatureGeometry(id, geometries[idx]);
+                });
+
+            });
+
+            let disposeStyleObserver = reaction(() => styleGetter(entity), (style) => {
+                featureIds.forEach((id, idx) => {
+                    this.layerRenderer_.updateFeatureStyle(id, style[idx] || style);
+                });
+            });
+
+            return {
+                id: featureIds,
+                disposeGeometryObserver,
+                disposeStyleObserver
+            };
+        } else {
+
+            let featureId = featureIdFromEntityReference(entityReference);
+
+            this.layerRenderer_.addFeature(
+                featureId,
+                geometryGetter(entity),
+                styleGetter(entity)
+            );
+
+            let disposeGeometryObserver = reaction(() => geometryGetter(entity), (geometry) => {
+                this.layerRenderer_.updateFeatureGeometry(featureId, geometry);
+            });
+
+            let disposeStyleObserver = reaction(() => styleGetter(entity), (style) => {
+                this.layerRenderer_.updateFeatureStyle(featureId, style);
+            });
+
+            return {
+                id: featureId,
+                disposeGeometryObserver,
+                disposeStyleObserver
+            };
+        }
     }
 
     protected removeFeature_(featureTracker) {
         featureTracker.disposeGeometryObserver();
         featureTracker.disposeStyleObserver();
-        this.layerRenderer_.removeFeature(featureTracker.id);
+        if (Array.isArray(featureTracker.id)) {
+            featureTracker.id.forEach((id) => {
+                this.layerRenderer_.removeFeature(id);
+            });
+        } else {
+            this.layerRenderer_.removeFeature(featureTracker.id);
+        }
     }
 
 }

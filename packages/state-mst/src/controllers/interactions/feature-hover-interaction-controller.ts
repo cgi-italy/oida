@@ -6,6 +6,7 @@ import { interactionControllersFactory } from './interaction-controllers-factory
 
 import { IFeatureHoverInteraction } from '../../types/interactions/feature-hover-interaction';
 import { resolveEntityReference } from '../../types/entity/entity-reference';
+import { entityReferenceFromFeatureId } from '../layers/feature-layer-controller';
 
 export class FeatureHoverInteractionController extends
     MapInteractionController<IFeatureHoverInteractionImplementation, IFeatureHoverInteraction> {
@@ -20,7 +21,7 @@ export class FeatureHoverInteractionController extends
             onFeatureHover: (featureId: string) => {
                 let entity = null;
                 if (featureId) {
-                    entity = resolveEntityReference(featureId, this.interaction_);
+                    entity = resolveEntityReference(entityReferenceFromFeatureId(featureId), this.interaction_);
                 }
                 this.interaction_.selection.setHovered(entity);
             }

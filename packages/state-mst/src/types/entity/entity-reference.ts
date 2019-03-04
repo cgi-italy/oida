@@ -6,20 +6,21 @@ import {
     IEntityCollection
 } from './entity-collection';
 
+const SEPARATOR = '\\./';
 
 export function createEntityReference<T extends IEntity>(entity: T) {
-    let id = `${entity.id}.${getType(entity).name}`;
+    let id = `${entity.id}${SEPARATOR}${getType(entity).name}`;
     try {
         let collection = getParent(getParent(entity)) as IEntityCollection;
         typecheck(getEntityCollectionType(), collection);
-        return `${id}.${collection.id}`;
+        return `${id}${SEPARATOR}${collection.id}`;
     } catch (e) {
         return id;
     }
 }
 
 export const resolveEntityReference = (reference: string, parent: IAnyStateTreeNode) => {
-    let [id, type, collectionId] = reference.split('.');
+    let [id, type, collectionId] = reference.split(SEPARATOR);
     if (collectionId) {
         let collection = resolveIdentifier(getEntityCollectionType(), getRoot(parent), collectionId);
         return resolveIdentifier(Entity.getSpecificType(type), collection.items, id);

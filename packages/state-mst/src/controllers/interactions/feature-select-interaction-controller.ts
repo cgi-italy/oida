@@ -8,6 +8,7 @@ import { interactionControllersFactory } from './interaction-controllers-factory
 
 import { IFeatureSelectInteraction } from '../../types/interactions/feature-select-interaction';
 import { resolveEntityReference } from '../../types/entity/entity-reference';
+import { entityReferenceFromFeatureId } from '../layers/feature-layer-controller';
 
 export class FeatureSelectInteractionController extends
     MapInteractionController<IFeatureSelectInteractionImplementation, IFeatureSelectInteraction> {
@@ -22,7 +23,7 @@ export class FeatureSelectInteractionController extends
             onFeatureSelect: (featureId: string, mode: SelectionMode) => {
                 let entity = null;
                 if (featureId) {
-                    entity = resolveEntityReference(featureId, this.interaction_);
+                    entity = resolveEntityReference(entityReferenceFromFeatureId(featureId), this.interaction_);
                 }
                 this.interaction_.selection.modifySelection(entity, mode);
             }
