@@ -44,6 +44,7 @@
     "typescript": "3.1.6"
   },
   "dependencies": {
-    "@oida/core": "^0.3.0"
+    "@oida/core": "^0.3.0",
+    "scroll-into-view-if-needed": "^2.2.20"
   }
 }
