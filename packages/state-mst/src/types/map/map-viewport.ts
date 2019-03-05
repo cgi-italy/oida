@@ -6,4 +6,19 @@ export const MapViewport = types
         resolution: types.number,
         rotation: types.optional(types.number, 0),
         pitch: types.optional(types.number, 0)
+    }).actions((self) => {
+        return {
+            setCenter(center) {
+                self.center = center;
+            },
+            setResolution(resolution: number) {
+                self.resolution = resolution;
+            },
+            setRotation(rotation: number) {
+                self.rotation = rotation;
+            },
+            setPitch(pitch: number) {
+                self.pitch = pitch;
+            }
+        };
     });

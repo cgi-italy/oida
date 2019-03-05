@@ -1,6 +1,6 @@
 import { reaction, observable, IObservableValue } from 'mobx';
 
-import { SubscriptionTracker, mapRendererFactory, IMapRenderer, IMapViewport } from '@oida/core';
+import { SubscriptionTracker, mapRendererFactory, IMapRenderer, IMapViewport, MapCoord } from '@oida/core';
 
 import { IMap } from '../../types/map/map';
 
@@ -111,14 +111,22 @@ export class MapRendererController {
 
         this.subscriptionTracker_.addSubscription(
             reaction(() => {
-                return this.mapState_.view.viewport;
+
+                let viewport = this.mapState_.view.viewport;
+
+                return {
+                    center: <MapCoord>viewport.center.slice(),
+                    resolution: viewport.resolution,
+                    rotation: viewport.rotation,
+                    pitch: viewport.pitch
+                };
             }, (viewport) => {
                 if (this.ignoreNextViewportChange_) {
                     this.ignoreNextViewportChange_ = false;
                     return;
                 }
                 if (this.mapRenderer_) {
-                    this.mapRenderer_.setViewport(<IMapViewport><unknown>viewport, this.mapState_.view.animateOnChange);
+                    this.mapRenderer_.setViewport(viewport, this.mapState_.view.animateOnChange);
                 }
             })
         );
