@@ -1,10 +1,11 @@
 import React from 'react';
+
 import classnames from 'classnames';
 
-import { List } from 'antd';
+import { List, Tooltip } from 'antd';
 
 import { LoadingState, SelectionMode } from '@oida/core';
-import { DataCollectionItemsProps } from '@oida/ui-react-core';
+import { DataCollectionItemsProps, canBeScrolledIntoView } from '@oida/ui-react-core';
 
 export type DataCollectionItemsListProps<T> = {
     meta?(item: T): {avatar?: React.ReactNode, description?: React.ReactNode, title?: React.ReactNode};
@@ -24,6 +25,8 @@ export class DataCollectionItemsList<T> extends React.Component<DataCollectionIt
             isItemHovered,
             getItemKey,
             isItemSelected,
+            getItemIcon,
+            getItemActions,
             meta,
             content,
             extra,
@@ -31,41 +34,65 @@ export class DataCollectionItemsList<T> extends React.Component<DataCollectionIt
             onSelectAction
         } = props;
 
+
+        let renderItem = (item: T) => {
+
+            let actions = [];
+            if (getItemActions)
+                actions = getItemActions(item).map((action) => {
+                    return (
+                        <Tooltip title={action.name}>
+                            <a onClick={
+                                () => {
+                                    action.callback(item);
+                            }
+                            }>
+                                {action.icon}
+                            </a>
+                        </Tooltip>
+                    );
+                });
+
+            let itemMeta = (
+                <List.Item.Meta avatar={
+                    getItemIcon &&
+                    (
+                        <span className='ant-avatar ant-avatar-circle ant-avatar-image'>
+                            {getItemIcon(item)}
+                        </span>
+                    )} {...meta(item)}>
+                </List.Item.Meta>
+            );
+
+            let ListItem = canBeScrolledIntoView(List.Item);
+
+            return (
+                    <ListItem
+                        scrollToItem={isItemHovered(item) || isItemSelected(item)}
+                        extra={extra && extra(item)}
+                        actions={actions}
+                        className={classnames({'hovered': isItemHovered(item), 'selected': isItemSelected(item)})}
+                        onMouseEnter={() => {
+                            onHoverAction(item, true);
+                        }}
+                        onMouseLeave={() => {
+                            onHoverAction(item, false);
+                        }}
+                        onClick={() => {
+                            onSelectAction(item, SelectionMode.Replace);
+                        }}
+                        >
+                            {content ? [content(item), itemMeta] : itemMeta}
+                    </ListItem>
+            );
+        };
+
         if (ItemHOC) {
             this.renderItem = (item: T) => (
-                <ItemHOC>{() => (
-                    <List.Item extra={extra && extra(item)}>
-                        <span className={classnames({'hovered': isItemHovered(item), 'selected': isItemSelected(item)})}
-                            onMouseEnter={() => onHoverAction(item, true)}
-                            onMouseLeave={() => onHoverAction(item, false)}
-                            onClick={() => onSelectAction(item, SelectionMode.Replace)}
-                        >
-                            {meta && (
-                                <List.Item.Meta {...meta(item)}>
-                                </List.Item.Meta>
-                            )}
-                            {content && content(item)}
-                        </span>
-                    </List.Item>
-                )}
-                </ItemHOC>
+                <ItemHOC>{() => renderItem(item)}</ItemHOC>
             );
         } else {
-            this.renderItem = (item: T) => (
-                <List.Item extra={extra && extra(item)}>
-                    <span className={classnames({'hovered': isItemHovered(item), 'selected': isItemSelected(item)})}
-                        onMouseEnter={() => onHoverAction(item, true)}
-                        onMouseLeave={() => onHoverAction(item, false)}
-                        onClick={() => onSelectAction(item, SelectionMode.Replace)}
-                    >
-                        {meta && (
-                            <List.Item.Meta {...meta(item)}>
-                            </List.Item.Meta>
-                        )}
-                        {content && content(item)}
-                    </span>
-                </List.Item>
-            );
+            this.renderItem = renderItem;
         }
     }
 
@@ -75,6 +102,8 @@ export class DataCollectionItemsList<T> extends React.Component<DataCollectionIt
             itemHOC: ItemHOC,
             isItemHovered,
             getItemKey,
+            getItemIcon,
+            getItemActions,
             isItemSelected,
             meta,
             content,
@@ -88,6 +117,7 @@ export class DataCollectionItemsList<T> extends React.Component<DataCollectionIt
 
         return  (
             <List
+                size='small'
                 loading={loadingState === LoadingState.Loading}
                 dataSource={data}
                 renderItem={this.renderItem}

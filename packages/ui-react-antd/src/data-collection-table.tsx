@@ -69,10 +69,14 @@ export class DataCollectionTable<T> extends React.Component<DataCollectionTableP
                     pagination={false}
                     columns={tableColumns}
                     onChange={(pagination, filters, sortProps) => {
-                        sorting.onSortChange({
-                            key: sortProps.columnKey,
-                            order: sortProps.order === 'ascend' ? SortOrder.Ascending : SortOrder.Descending
-                        });
+                        if (sortProps && sortProps.columnKey) {
+                            sorting.onSortChange({
+                                key: sortProps.columnKey,
+                                order: sortProps.order === 'ascend' ? SortOrder.Ascending : SortOrder.Descending
+                            });
+                        } else {
+                            sorting.onSortClear();
+                        }
                     }}
                 ></Table>
                 {pagerRender(paging)}

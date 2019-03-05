@@ -1,16 +1,43 @@
-.ant-list-item-content {
-    > span {
-        margin: -$list-item-padding;
-        padding: $list-item-padding;
+
+@import '@oida/ui-react-core/style/utils.scss';
+
+.ant-list {
+
+    @include scrollbar(10px, $primary-color, $primary-2);
+
+    overflow: auto;
+    scroll-behavior: smooth;
+
+    .ant-list-item {
+
         cursor: pointer;
-        width: 100%;
+        padding-top: 5px;
+        padding-bottom: 1px;
 
         &.hovered {
             background-color: $table-row-hover-bg;
         }
 
         &.selected {
-            background-color: $table-selected-row-bg;
+
+            &:not(.hovered) {
+                background-color: $table-selected-row-bg;
+            }
+
+            &.hovered {
+                background-color: lighten($table-selected-row-bg, 10%);
+            }
         }
+
+        .ant-list-item-meta-title {
+            margin-bottom: 0px;
+        }
+
+        .ant-list-item-meta-description {
+            font-size: $font-size-sm;
+        }
+
+
     }
+
 }

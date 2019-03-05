@@ -12,6 +12,8 @@ export type DataCollectionItemsProps<T> = {
     getItemKey: (item: T) => string;
     isItemHovered: (item: T) => boolean;
     isItemSelected: (item: T) => boolean;
+    getItemActions?: (item: T) => DataCollectionItemAction<T>[];
+    getItemIcon?: (item: T) => React.ReactNode;
     itemHOC?: React.ReactNode,
     onHoverAction: (item: T, hovered: boolean) => void;
     onSelectAction: (item:  T, mode: SelectionMode) => void;
