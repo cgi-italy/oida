@@ -12,24 +12,17 @@ export type DateRangeField = FormField<typeof DATE_RANGE_FIELD_ID, {start: Date,
 
 
 setFormFieldSerializer(DATE_RANGE_FIELD_ID, {
-    toKVP: (formField) => {
+    toJSON: (value) => {
         return {
-            [formField.name]: {
-                start: formField.value.start.toISOString(),
-                end: formField.value.end.toISOString()
-            }
+            start: value.start.toISOString(),
+            end: value.end.toISOString()
         };
     },
-    fromKVP: (queryParams, name) => {
-        let value = queryParams[name];
-        if (value) {
-            return {
-                start: new Date(value.start),
-                end: new Date(value.end)
-            };
-        } else {
-            return null;
-        }
+    fromJSON: (value) => {
+        return {
+            start: new Date(value.start),
+            end: new Date(value.end)
+        };
     },
     toString: (formField) => {
         if (formField.config.withTime) {

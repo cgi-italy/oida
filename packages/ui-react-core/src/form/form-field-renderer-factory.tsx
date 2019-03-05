@@ -1,5 +1,5 @@
 
-import { FormField, FormFieldConfig, FormFieldRenderer, FormFieldDefinition, isFormFieldDefinitionWithWrapper } from './form-field';
+import { FormField, FormFieldRenderer, FormFieldDefinition, isFormFieldDefinitionWithWrapper } from './form-field';
 
 type ExtractType<IT extends FormField<any, any, any>> = IT extends FormField<infer TYPE, any, any> ? TYPE : never;
 type ExtractValue<IT extends FormField<any, any, any>> = IT extends FormField<any, infer T, any> ? T : never;

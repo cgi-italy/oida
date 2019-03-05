@@ -7,24 +7,22 @@ type ExtractType<IT extends FormField<any, any, any>> = IT extends FormField<inf
 type ExtractValue<IT extends FormField<any, any, any>> = IT extends FormField<any, infer T, any> ? T : never;
 type ExtractConfig<IT extends FormField<any, any, any>> = IT extends FormField<any, any, infer CONFIG> ? CONFIG : never;
 
-export type FormFieldFromKVP<T> = (queryParams: {[x: string]: any}, name: string) => T;
-export type FormFieldToKVP<T> = (formField: {name: string, value: T}) => {[x: string]: any};
+export type FormFieldFromJSON<T> = (value: any) => T;
+export type FormFieldToJSON<T> = (value: T) => any;
 export type FormFieldToString<CONFIG, T> = (formField: {title: string, config: CONFIG, value: T}) => string;
 
 export type FormFieldSerializer<CONFIG, T> = {
-    fromKVP: FormFieldFromKVP<T>;
-    toKVP: FormFieldToKVP<T>;
+    fromJSON: FormFieldFromJSON<T>;
+    toJSON: FormFieldToJSON<T>;
     toString: FormFieldToString<CONFIG, T>;
 };
 
-const defaultFormFieldFromKVP = (queryParams, name) => {
-    return queryParams[name];
+const defaultFormFieldFromJSON = (value) => {
+    return value;
 };
 
-const defaultFormFieldToKVP = (formField) => {
-    return {
-        [formField.name]: formField.value
-    };
+const defaultFormFieldToJSON = (value) => {
+    return value;
 };
 
 const defaultFormFieldToString = (formField) => {
@@ -32,8 +30,8 @@ const defaultFormFieldToString = (formField) => {
 };
 
 let defaultFormFieldSerializer = {
-    fromKVP: defaultFormFieldFromKVP,
-    toKVP: defaultFormFieldToKVP,
+    fromJSON: defaultFormFieldFromJSON,
+    toJSON: defaultFormFieldToJSON,
     toString: defaultFormFieldToString
 };
 
