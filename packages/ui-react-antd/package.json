@@ -4,10 +4,10 @@
   "description": "antd components",
   "module": "dist/ui-react-antd.js",
   "main": "dist/ui-react-antd.cjs.js",
-  "style": "dist/styles/ui-react-antd.css",
+  "saas": "dist/styles/index.scss",
   "types": "dist/types/index.d.ts",
   "files": [
-    "dist"
+    "dist", "src", "config"
   ],
   "scripts": {
     "build": "rollup --config rollup.config.js && rollup --config rollup.config.js --environment FORMAT:cjs",
@@ -52,6 +52,7 @@
   },
   "dependencies": {
     "@oida/core": "^0.3.0",
-    "@oida/ui-react-core": "^0.0.1"
+    "@oida/ui-react-core": "^0.0.1",
+    "moment": "^2.22.2"
   }
 }

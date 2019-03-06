@@ -5,6 +5,9 @@ const tsImportPluginFactory = require('ts-import-plugin');
 const config = (config = {}) => {
 
     let tsLoaderOptions = config.tsLoaderOptions || {};
+
+    tsLoaderOptions.customTransformers = tsLoaderOptions.customTransformers || {};
+
     let styleLoader = config.styleLoader || 'style-loader';
 
     let cssLoaderOptions = config.cssLoaderOptions || {
@@ -26,11 +29,17 @@ const config = (config = {}) => {
                             loader: 'awesome-typescript-loader',
                             options: {
                                 getCustomTransformers: () => ({
-                                    before: [tsImportPluginFactory({
-                                        libraryName: 'antd',
-                                        libraryDirectory: 'lib',
-                                        style: true
-                                    })]
+                                    before: [
+                                        tsImportPluginFactory({
+                                            libraryName: 'antd',
+                                            libraryDirectory: 'lib',
+                                            style: true
+                                        }),
+                                        ...tsLoaderOptions.customTransformers.before || []
+                                    ],
+                                    after: [
+                                        ...tsLoaderOptions.customTransformers.after || []
+                                    ]
                                 }),
                                 ...tsLoaderOptions
                             }
