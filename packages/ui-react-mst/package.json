@@ -30,6 +30,7 @@
     "react-dom": "^16.6.3"
   },
   "devDependencies": {
+    "@types/chroma-js": "^1.4.1",
     "@types/geojson": "^7946.0.4",
     "@types/jest": "^23.3.2",
     "@types/react": "^16.7.18",
@@ -57,6 +58,7 @@
   "dependencies": {
     "@oida/core": "^0.3.0",
     "@oida/state-mst": "^0.2.0",
-    "@oida/ui-react-core": "^0.0.1"
+    "@oida/ui-react-core": "^0.0.1",
+    "chroma-js": "^2.0.2"
   }
 }
