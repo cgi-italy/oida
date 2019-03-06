@@ -1,0 +1,13 @@
+.map-nav-controls {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    button.ant-btn.ant-btn-icon-only.zoom-ctrl {
+        padding: 0 5px;
+
+        &:not(:first-child) {
+            margin-top: 2px;
+        }
+    }
+}
