@@ -1,3 +1,16 @@
 import common from '../../config/rollup.config.default';
 
-export default Object.assign({}, common);
+import copy from 'rollup-plugin-copy-glob';
+
+const pkg = require('./package.json');
+
+export default {
+    ...common,
+    plugins: [
+        ...common.plugins,
+        copy([
+            {files: 'styles/**/*.scss', dest: 'dist/styles'}
+        ])
+    ]
+};
+
