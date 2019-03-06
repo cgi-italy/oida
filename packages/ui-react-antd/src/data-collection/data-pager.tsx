@@ -12,6 +12,7 @@ export class DataPager extends React.Component<PaginationProps & DataPagerProps>
 
         return (
             <Pagination
+                size='small'
                 current={page + 1}
                 pageSize={pageSize}
                 total={total}

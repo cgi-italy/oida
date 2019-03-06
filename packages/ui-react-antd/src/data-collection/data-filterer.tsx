@@ -3,7 +3,7 @@ import React from 'react';
 import { Form } from 'antd';
 
 import { DataFiltererProps, FormFieldConfig } from '@oida/ui-react-core';
-import { antdFormFieldRendererFactory } from './form/antd-form-field-renderer-factory';
+import { antdFormFieldRendererFactory } from '../form/antd-form-field-renderer-factory';
 
 export class DataFilterer extends React.Component<DataFiltererProps> {
 

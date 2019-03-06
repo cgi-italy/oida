@@ -35,12 +35,14 @@ export class DataSortCombo extends React.Component<SelectProps & DataSorterProps
         return (
             <InputGroup compact>
                 <Button
+                    size='small'
                     disabled={!sortKey}
                     icon={sortOrder === SortOrder.Ascending ? 'sort-ascending' : 'sort-descending'}
                     onClick={this.switchSortOrder.bind(this)}
                 ></Button>
                 <Select
                     {...props}
+                    size='small'
                     allowClear={true}
                     showSearch={true}
                     filterOption={true}

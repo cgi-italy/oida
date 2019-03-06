@@ -1,4 +1,4 @@
-import { AnyFormFieldDefinition, FormFieldValues } from './form/form-field';
+import { AnyFormFieldDefinition, FormFieldValues } from '../form/form-field';
 
 export type DataFiltererProps = {
     filters: Array<AnyFormFieldDefinition>;

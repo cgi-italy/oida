@@ -7,6 +7,14 @@ export type DataCollectionItemAction<T> = {
     icon?: React.ReactNode;
 };
 
+export type DataCollectionItemProps<T> = {
+    key: string;
+    selected: boolean;
+    hovered: boolean;
+    icon?: React.ReactNode;
+    actions?: DataCollectionItemAction<T>[];
+};
+
 export type DataCollectionItemsProps<T> = {
     data: T[];
     getItemKey: (item: T) => string;

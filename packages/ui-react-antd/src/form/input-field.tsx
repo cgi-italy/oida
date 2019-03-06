@@ -68,7 +68,7 @@ export class InputFieldRenderer extends React.Component<StringField & InputField
 
     render() {
 
-        let { value, onChange, ...renderProps } = this.props;
+        let { value, onChange, changeDelay, ...renderProps } = this.props;
 
          return (
             <Input
