@@ -57,7 +57,7 @@
     "mobx": "^4.8.0",
     "mobx-react": "^5.4.3",
     "mobx-state-tree": "^3.9.0",
-    "ol": "^5.2.0",
+    "ol": "^5.3.1",
     "react": "^16.6.3",
     "react-dom": "^16.6.3",
     "react-router-dom": "^4.3.1"

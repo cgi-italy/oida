@@ -1,6 +1,9 @@
 
 import { types } from 'mobx-state-tree';
 
+//imported to avoid an issue with generated typings declaration
+import { IFeatureStyle } from '@oida/core';
+
 import { FeatureLayer } from '@oida/state-mst';
 import { AOICollection } from './types/aoi';
 import { MapModule, MAP_MODULE_DEFAULT_ID } from '../map';

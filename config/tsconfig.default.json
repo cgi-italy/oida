@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "declarationMap": true,
+    "composite": true,
+    "module": "es2015",
+    "lib": ["es6", "dom"],
+    "sourceMap": true,
+    "noImplicitAny": false,
+    "experimentalDecorators": true,
+    "target": "es5",
+    "esModuleInterop": true,
+    "moduleResolution": "node"
+  },
+}

@@ -1,16 +1,9 @@
 {
+  "extends": "../../config/tsconfig.default.json",
   "compilerOptions": {
-    "declaration": true,
     "declarationDir": "./dist/types",
-    "module": "es2015",
-    "lib": ["es6", "dom"],
-    "sourceMap": true,
-    "noImplicitAny": false,
-    "experimentalDecorators": true,
     "outDir": "./dist",
-    "target": "es5",
-    "esModuleInterop": true,
-    "moduleResolution": "node"
+    "rootDir": "src"
   },
   "typeRoots": [
     "node_modules/@types"

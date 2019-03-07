@@ -1,6 +1,9 @@
 import React from 'react';
 import  classNames from 'classnames';
 
+//imported to avoid an issue with generated typings declaration
+import { IMapRenderer } from '@oida/core';
+
 import { IMap, MapRendererController } from '@oida/state-mst';
 
 export interface MapComponentProps {

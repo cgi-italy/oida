@@ -20,6 +20,11 @@ const config = (config = {}) => {
     let lessLoaderOptions = config.lessLoaderOptions || {};
 
     return {
+        resolve: {
+            alias: {
+                "@oida/ui-react-antd": '@oida/ui-react-antd/src'
+            }
+        },
         module: {
             rules: [
                 {

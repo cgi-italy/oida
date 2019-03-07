@@ -22,8 +22,10 @@
     "registry": "https://nexus.dev.eoss-cloud.it/repository/npm-cgi-eo/"
   },
   "dependencies": {
-    "@oida/core": "^0.3.0",
-    "ol": "^5.2.0",
+    "@oida/core": "^0.3.0"
+  },
+  "peerDependencies": {
+    "ol": "^5.3.1",
     "proj4": "^2.5.0"
   },
   "devDependencies": {
@@ -34,12 +36,14 @@
     "babel-core": "7.0.0-bridge.0",
     "babel-jest": "^23.6.0",
     "jest": "^23.6.0",
+    "ol": "^5.3.1",
+    "proj4": "^2.5.0",
     "rimraf": "^2.6.2",
-    "rollup": "^0.66.0",
+    "rollup": "^1.5.0",
     "rollup-plugin-commonjs": "^9.1.6",
     "rollup-plugin-json": "^3.1.0",
-    "rollup-plugin-node-resolve": "^3.4.0",
-    "rollup-plugin-typescript2": "^0.17.0",
+    "rollup-plugin-node-resolve": "^4.0.1",
+    "rollup-plugin-typescript2": "^0.19.3",
     "ts-jest": "^23.1.4",
     "tslint": "^5.11.0",
     "typescript": "3.1.6"
