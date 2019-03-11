@@ -4,6 +4,9 @@ import { observer } from 'mobx-react';
 import { IMapView } from '@oida/state-mst';
 import { MapNavControlsRenderer } from '@oida/ui-react-core';
 
+import { MAP_MODULE_DEFAULT_ID } from '../map-module';
+import { inject } from '../../../utils/inject';
+
 export type MapNavControlsProps = {
     mapView: IMapView;
     zoomFactor?: number
@@ -40,3 +43,9 @@ class MapNavControlsBase extends React.Component<MapNavControlsProps> {
 }
 
 export const MapNavControls = observer(MapNavControlsBase);
+
+export const MapNavControlsS = inject(({appState}) => {
+    return {
+        mapView: appState[MAP_MODULE_DEFAULT_ID].map.view
+    };
+})(MapNavControls);

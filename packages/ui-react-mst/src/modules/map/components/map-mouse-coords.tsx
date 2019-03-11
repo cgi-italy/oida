@@ -2,7 +2,11 @@ import React from 'react';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
 
-import { formatLat, formatLon } from '@oida/core';
+import { formatLat, formatLon, MOUSE_COORDS_INTERACTION_ID } from '@oida/core';
+import { MouseCoordsInteraction } from '@oida/state-mst';
+
+import { MAP_MODULE_DEFAULT_ID } from '../map-module';
+import { inject } from '../../../utils/inject';
 
 import './map-mouse-coords.scss';
 
@@ -34,3 +38,23 @@ MapMouseCoordsBase.defaultProps = {
 };
 
 export const MapMouseCoords = observer(MapMouseCoordsBase);
+
+export const MapMouseCoordsS = inject(({appState}) => {
+
+    let map = appState[MAP_MODULE_DEFAULT_ID].map;
+
+    let mouseCoordsInteraction = map.interactions.items.find((interaction) => {
+        return interaction.mapInteractionType === MOUSE_COORDS_INTERACTION_ID;
+    });
+
+    if (!mouseCoordsInteraction) {
+        mouseCoordsInteraction = MouseCoordsInteraction.create({
+            id: MOUSE_COORDS_INTERACTION_ID
+        });
+        map.interactions.add(mouseCoordsInteraction);
+    }
+
+    return {
+        coords: mouseCoordsInteraction.mouseCoords
+    };
+})(MapMouseCoords);

@@ -6,6 +6,9 @@ import { IMapRenderer } from '@oida/core';
 
 import { IMap, MapRendererController } from '@oida/state-mst';
 
+import { MAP_MODULE_DEFAULT_ID } from '../map-module';
+import { inject } from '../../../utils/inject';
+
 export interface MapComponentProps {
     mapState: IMap;
     className?: string;
@@ -56,3 +59,8 @@ export class MapComponent extends React.PureComponent<MapComponentProps> {
     }
 }
 
+export const MapComponentS = inject(({appState}) => {
+    return {
+        mapState: appState[MAP_MODULE_DEFAULT_ID].map
+    };
+})(MapComponent);
