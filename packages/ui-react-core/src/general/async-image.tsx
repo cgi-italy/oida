@@ -17,6 +17,7 @@ type AsyncImageState = {
 
 export class AsyncImage extends React.Component<AsyncImageProps, AsyncImageState> {
 
+    private isMounted_ = true;
 
     constructor(props) {
         super(props);
@@ -35,6 +36,10 @@ export class AsyncImage extends React.Component<AsyncImageProps, AsyncImageState
         if (prevProps.imageUrl !== this.props.imageUrl) {
             this.resetImageSrc();
         }
+    }
+
+    componentWillUnmount() {
+        this.isMounted_ = false;
     }
 
     render() {
@@ -94,9 +99,11 @@ export class AsyncImage extends React.Component<AsyncImageProps, AsyncImageState
             });
             imageUrl.then((src) => {
                 if (imageUrl === this.props.imageUrl) {
-                    this.setState({
-                        src: src
-                    });
+                    if (this.isMounted_) {
+                        this.setState({
+                            src: src
+                        });
+                    }
                 }
             });
         }
