@@ -20,7 +20,7 @@ export class CesiumTileLayer  extends CesiumMapLayer {
 
     updateSource(config) {
         this.imageries_.removeAll(false);
-        let source = cesiumTileSourcesFactory.create(config.source.id, config.source);
+        let source = cesiumTileSourcesFactory.create(config.id, config);
         if (source) {
             this.imageries_.add(new ImageryLayer(source));
         }
