@@ -1,18 +1,20 @@
-import WebMapServiceImageryProvider from 'cesium/Source/Scene/WebMapServiceImageryProvider';
+import WebMapTileServiceImageryProvider from 'cesium/Source/Scene/WebMapTileServiceImageryProvider';
 
 import { cesiumTileSourcesFactory } from './cesium-tilesources-factory';
 
 import { getTileGridFromSRS, getUrlFromTemplate } from './cesium-tilesource-utils';
 
-cesiumTileSourcesFactory.register('wms', (config) => {
+cesiumTileSourcesFactory.register('wmts', (config) => {
     let tileGrid = getTileGridFromSRS(config.srs || 'EPSG:4326', config.tileGrid);
     if (tileGrid) {
-        return new WebMapServiceImageryProvider({
+        return new WebMapTileServiceImageryProvider({
             url: getUrlFromTemplate(config),
-            layers: config.layers,
+            subdomains: config.subdomains,
+            layer: config.layer,
+            style: config.style || 'default',
             format: config.format,
-            parameters: config.parameters,
-            enablePickFeatures: false,
+            tileMatrixSetID: config.matrixSet,
+            tileMatrixLabels: config.tileGrid.matrixIds,
             tilingScheme: tileGrid.scheme,
             ...tileGrid.config
         });

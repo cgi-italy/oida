@@ -1,16 +1,13 @@
 import GeographicProjection from 'cesium/Source/Core/GeographicProjection';
 import WebMercatorProjection from 'cesium/Source/Core/WebMercatorProjection';
-import GeographicTilingScheme from 'cesium/Source/Core/GeographicTilingScheme.js';
-import WebMercatorTilingScheme from 'cesium/Source/Core/WebMercatorTilingScheme.js';
 
-
-enum ProjectionType {
+export enum ProjectionType {
     GlobalGeodetic,
     GlobalMercator,
     Other
 }
 
-const getProjectionType = (srs) => {
+export const getProjectionType = (srs) => {
 
     let projection : ProjectionType;
 
@@ -43,19 +40,5 @@ export const getProjectionFromSRS = (srs, defaultGeographic = false) => {
         return new WebMercatorProjection();
     } else {
         return defaultGeographic ? new GeographicProjection() : null;
-    }
-};
-
-
-export const getTileSchemeFromSRS = (srs) => {
-
-    let projection = getProjectionType(srs);
-
-    if (projection === ProjectionType.GlobalGeodetic) {
-        return new GeographicTilingScheme();
-    } else if (projection === ProjectionType.GlobalMercator) {
-        return new WebMercatorTilingScheme();
-    } else {
-        return null;
     }
 };

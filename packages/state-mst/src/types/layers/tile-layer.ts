@@ -10,10 +10,7 @@ export const TileLayer = MapLayer.addModel(
     }).actions((self) => {
         return {
             setSource: (source) => {
-                self.source = {
-                    ...self.source,
-                    ...source
-                };
+                self.source = source;
             }
         };
     })

@@ -1,17 +1,11 @@
-import TileWMS from 'ol/source/TileWMS';
+import XYZSource from 'ol/source/XYZ';
 
 import { olTileSourcesFactory } from './ol-tilesources-factory';
-
 import { getTileGridFromConfig, getUrlFromConfig } from './ol-tilesource-utils';
 
-olTileSourcesFactory.register('wms', function(config) {
-
-    return new TileWMS({
+olTileSourcesFactory.register('xyz', function(config) {
+    return new XYZSource({
         ...getUrlFromConfig(config),
-        params: {
-          LAYERS: config.layers,
-          ...config.parameters
-        },
         tileGrid: config.tileGrid ? getTileGridFromConfig(config.srs, config.tileGrid) : null,
         projection: config.srs,
         wrapX: config.wrapX

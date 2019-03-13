@@ -12,17 +12,25 @@ export class CesiumTileLayer  extends CesiumMapLayer {
     constructor(config) {
         super(config);
 
-        let source = cesiumTileSourcesFactory.create(config.mapLayer.source.id, config.mapLayer.source);
-        if (source) {
-            this.imageries_.add(new ImageryLayer(source));
+        try {
+            let source = cesiumTileSourcesFactory.create(config.mapLayer.source.id, config.mapLayer.source);
+            if (source) {
+                this.imageries_.add(new ImageryLayer(source));
+            }
+        } catch (e) {
+
         }
     }
 
     updateSource(config) {
         this.imageries_.removeAll(false);
-        let source = cesiumTileSourcesFactory.create(config.id, config);
-        if (source) {
-            this.imageries_.add(new ImageryLayer(source));
+        try {
+            let source = cesiumTileSourcesFactory.create(config.id, config);
+            if (source) {
+                this.imageries_.add(new ImageryLayer(source));
+            }
+        } catch (e) {
+
         }
     }
 
