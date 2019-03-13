@@ -1,6 +1,6 @@
 import Map from 'ol/Map';
 import View from 'ol/View';
-import { get as getProj, transform } from 'ol/proj';
+import { get as getProj, transform, transformExtent } from 'ol/proj';
 
 import { register } from 'ol/proj/proj4';
 import proj4 from 'proj4';
@@ -33,13 +33,34 @@ export class OLMapRenderer implements IMapRenderer {
     }
 
     fitExtent(extent, animate?: boolean) {
+        let view = this.viewer_.getView();
+        let projection = view.getProjection();
+        if (projection.getCode() !== 'EPSG:4326') {
+            extent = transformExtent(extent, 'EPSG:4326', projection);
+            if (isNaN(extent[0]) || isNaN(extent[1]) || isNaN(extent[2]) || isNaN(extent[3])) {
+                return;
+            }
+        }
         this.viewer_.getView().fit(extent, {
             duration: animate ? 1000 : 0
         });
     }
 
     getViewportExtent() {
-        return this.viewer_.getView().calculateExtent(this.getSize());
+
+        let view = this.viewer_.getView();
+
+        let extent =  view.calculateExtent(this.getSize());
+
+        let projection = view.getProjection();
+        if (projection.getCode() !== 'EPSG:4326') {
+            extent = transformExtent(extent, projection, 'EPSG:4326');
+            if (isNaN(extent[0]) || isNaN(extent[1]) || isNaN(extent[2]) || isNaN(extent[3])) {
+                return null;
+            }
+        }
+
+        return extent;
     }
 
     setLayerGroup(group: OLGroupLayer) {
