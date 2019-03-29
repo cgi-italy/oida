@@ -1,5 +1,4 @@
-import { observe, reaction, IReactionDisposer } from 'mobx';
-import { onPatch } from 'mobx-state-tree';
+import { reaction, IReactionDisposer } from 'mobx';
 
 import { FEATURE_LAYER_ID, IFeatureLayerRenderer, IMapRenderer } from '@oida/core';
 
@@ -48,7 +47,16 @@ export class FeatureLayerController extends MapLayerController<IFeatureLayerRend
         super.bindToLayerState_();
 
         this.subscriptionTracker_.addSubscription(
-            reaction(() => this.mapLayer_.source, (source) => {
+            reaction(() => {
+                let source;
+                //source could be an invalid reference
+                try {
+                    source = this.mapLayer_.source;
+                } catch (e) {
+                    source = null;
+                }
+                return source;
+            }, (source) => {
                 this.onSourceChange_(source);
             }, {fireImmediately: true})
         );
@@ -57,8 +65,10 @@ export class FeatureLayerController extends MapLayerController<IFeatureLayerRend
 
     protected unbindFromLayerState_() {
         super.unbindFromLayerState_();
-        this.sourceTracker_.destroy();
-        delete this.sourceTracker_;
+        if (this.sourceTracker_) {
+            this.sourceTracker_.destroy();
+            delete this.sourceTracker_;
+        }
     }
 
     protected onSourceChange_(source) {
