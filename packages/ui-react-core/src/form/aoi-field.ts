@@ -9,9 +9,17 @@ export type AoiValue = {
     geometry: GeoJSON.Geometry;
 };
 
+export enum AoiAction {
+    None,
+    DrawBBox,
+    DrawPolygon,
+    LinkToViewport
+}
+
 export type AoiFieldConfig = {
     onDrawBBoxAction?: () => void;
     onDrawPolygonAction?: () => void;
+    activeAction: AoiAction;
     color?: string;
     onHoverAction?: (hovered: boolean) => void;
     onSelectAction?: (selected: boolean) => void;

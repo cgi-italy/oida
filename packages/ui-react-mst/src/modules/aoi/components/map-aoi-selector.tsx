@@ -4,7 +4,7 @@ import { observer } from 'mobx-react';
 import { FeatureDrawMode, FeatureDrawEvent, SelectionMode, FEATURE_DRAW_INTERACTION_ID } from '@oida/core';
 
 import { IMap, IFeatureDrawInteraction, IEntitySelection } from '@oida/state-mst';
-import { FormFieldRenderer, AoiField }  from '@oida/ui-react-core';
+import { FormFieldRenderer, AoiField, AoiAction }  from '@oida/ui-react-core';
 
 import { AOI_MODULE_DEFAULT_ID } from '../aoi-module';
 
@@ -22,7 +22,7 @@ export type AoiSelectorProps = Pick<AoiField, Exclude<keyof AoiField, 'config' |
 
 let nextAoiId = 1;
 
-class AoiSelectorBase extends React.Component<AoiSelectorProps, {aoi: IAOI}> {
+class AoiSelectorBase extends React.Component<AoiSelectorProps, {aoi: IAOI, activeAction: AoiAction}> {
 
     private aoiId_: string;
 
@@ -31,7 +31,8 @@ class AoiSelectorBase extends React.Component<AoiSelectorProps, {aoi: IAOI}> {
         this.aoiId_ = `${nextAoiId++}`;
 
         this.state = {
-            aoi: null
+            aoi: null,
+            activeAction: AoiAction.None
         };
     }
 
@@ -41,17 +42,43 @@ class AoiSelectorBase extends React.Component<AoiSelectorProps, {aoi: IAOI}> {
             geometry: evt.geometry
         });
         this.props.drawInteraction.setDrawMode(FeatureDrawMode.Off, {});
-    }
-
-    drawBBox() {
-        this.props.drawInteraction.setDrawMode(FeatureDrawMode.BBox, {
-            onDrawEnd: this.onDrawEnd.bind(this)
+        this.setState({
+            activeAction: AoiAction.None
         });
     }
 
+    drawBBox() {
+
+        if (this.state.activeAction === AoiAction.DrawBBox) {
+            this.cancelDraw();
+        } else {
+            this.props.drawInteraction.setDrawMode(FeatureDrawMode.BBox, {
+                onDrawEnd: this.onDrawEnd.bind(this)
+            });
+            this.setState({
+                activeAction: AoiAction.DrawBBox
+            });
+        }
+    }
+
     drawPolygon() {
-        this.props.drawInteraction.setDrawMode(FeatureDrawMode.Polygon, {
-            onDrawEnd: this.onDrawEnd.bind(this)
+        if (this.state.activeAction === AoiAction.DrawPolygon) {
+            this.cancelDraw();
+        } else {
+            this.props.drawInteraction.setDrawMode(FeatureDrawMode.Polygon, {
+                onDrawEnd: this.onDrawEnd.bind(this)
+            });
+
+            this.setState({
+                activeAction: AoiAction.DrawPolygon
+            });
+        }
+    }
+
+    cancelDraw() {
+        this.props.drawInteraction.setDrawMode(FeatureDrawMode.Off, {});
+        this.setState({
+            activeAction: AoiAction.None
         });
     }
 
@@ -132,6 +159,7 @@ class AoiSelectorBase extends React.Component<AoiSelectorProps, {aoi: IAOI}> {
             config: {
                 onDrawBBoxAction: this.drawBBox.bind(this),
                 onDrawPolygonAction: this.drawPolygon.bind(this),
+                activeAction: this.state.activeAction,
                 onHoverAction: this.onAoiHover.bind(this),
                 onSelectAction: this.onAoiSelect.bind(this),
                 color: aoi ? aoi.color : null
