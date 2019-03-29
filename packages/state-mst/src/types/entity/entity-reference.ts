@@ -23,7 +23,7 @@ export const resolveEntityReference = (reference: string, parent: IAnyStateTreeN
     let [id, type, collectionId] = reference.split(SEPARATOR);
     if (collectionId) {
         let collection = resolveIdentifier(getEntityCollectionType(), getRoot(parent), collectionId);
-        return resolveIdentifier(Entity.getSpecificType(type), collection.items, id);
+        return collection.itemWithId(id);
     } else {
         return resolveIdentifier(Entity.getSpecificType(type), getRoot(parent), id);
     }

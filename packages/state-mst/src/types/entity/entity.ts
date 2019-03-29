@@ -11,7 +11,16 @@ const EntityBase = types.compose(
     hasVisibility,
     isSelectable,
     isHoverable
-);
+).preProcessSnapshot((snapshot: any) => {
+    if (snapshot && typeof snapshot.id === 'number') {
+        return {
+            ...snapshot,
+            id: snapshot.id.toString()
+        };
+    } else {
+        return snapshot;
+    }
+});
 
 
 export const Entity = TaggedUnion('entityType', EntityBase);
