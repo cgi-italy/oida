@@ -1,6 +1,6 @@
 {
   "name": "@oida/ui-react-antd",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "antd components",
   "typescript:main": "src/index.ts",
   "module": "dist/ui-react-antd.js",
@@ -8,7 +8,9 @@
   "saas": "dist/styles/index.scss",
   "types": "dist/types/index.d.ts",
   "files": [
-    "dist", "src", "config"
+    "dist",
+    "src",
+    "config"
   ],
   "scripts": {
     "pack-icons": "rimraf ./src/icons && svgr --config-file ./config/svgr.config.js --ext tsx --filename-case kebab --out-dir ./src/icons ./assets/icons",
@@ -55,8 +57,8 @@
     "typescript": "3.1.6"
   },
   "dependencies": {
-    "@oida/core": "^0.3.0",
-    "@oida/ui-react-core": "^0.0.1",
+    "@oida/core": "^1.0.0",
+    "@oida/ui-react-core": "^1.0.0",
     "moment": "^2.22.2"
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "@oida/core",
-  "version": "0.3.0",
+  "version": "1.0.0",
   "description": "core utils and definitions",
   "module": "dist/core.js",
   "main": "dist/core.cjs.js",

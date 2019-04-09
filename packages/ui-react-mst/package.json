@@ -1,6 +1,6 @@
 {
   "name": "@oida/ui-react-mst",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "app components and state management",
   "module": "dist/ui-react-mst.js",
   "main": "dist/ui-react-mst.cjs.js",
@@ -56,9 +56,9 @@
     "typescript": "3.1.6"
   },
   "dependencies": {
-    "@oida/core": "^0.3.0",
-    "@oida/state-mst": "^0.2.0",
-    "@oida/ui-react-core": "^0.0.1",
+    "@oida/core": "^1.0.0",
+    "@oida/state-mst": "^1.0.0",
+    "@oida/ui-react-core": "^1.0.0",
     "chroma-js": "^2.0.2"
   }
 }
