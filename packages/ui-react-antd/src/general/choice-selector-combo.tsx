@@ -6,7 +6,9 @@ import { ChoiceSelectorProps } from '@oida/ui-react-core';
 
 const Option = Select.Option;
 
-export class ChoiceSelectorCombo extends React.Component<ChoiceSelectorProps> {
+export class ChoiceSelectorCombo extends React.Component<ChoiceSelectorProps<{
+    itemContent?: React.ReactNode
+}>> {
 
     onSelectChange(value) {
         if (value !== this.props.value) {
@@ -17,7 +19,7 @@ export class ChoiceSelectorCombo extends React.Component<ChoiceSelectorProps> {
     render() {
 
         let options = this.props.items.map((item) => {
-            return (<Option key={item.value} title={item.description}>{item.name}</Option>);
+            return (<Option key={item.value} title={item.description}>{item.itemContent ? item.itemContent : item.name}</Option>);
         });
 
         return (

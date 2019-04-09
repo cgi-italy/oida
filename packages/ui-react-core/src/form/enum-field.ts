@@ -12,10 +12,10 @@ export type EnumField = FormField<typeof ENUM_FIELD_ID, string | string[], {
 setFormFieldSerializer(ENUM_FIELD_ID, {
     toString: (formField) => {
         let selection = [];
-        if (typeof(formField.value) === 'string') {
-            selection = [formField.value];
-        } else {
+        if (Array.isArray(formField.value)) {
             selection = [...formField.value];
+        } else {
+            selection = [formField.value];
         }
 
         if (selection.length <= 2) {

@@ -90,12 +90,6 @@ export const DataPaging = types.model('DataPaging', {
 export type IDataPaging = Instance<typeof DataPaging>;
 
 
-export type QueryData = {
-    paging?: {page: number, pageSize: number, offset: number};
-    filters?: Array<{key: string, value: any}>;
-    sortBy?: {key: string, order: SortOrder};
-};
-
 export const QueryParams = types.model('QueryParams', {
     filters: types.optional(DataFilters, {}),
     paging: types.optional(DataPaging, {}),
