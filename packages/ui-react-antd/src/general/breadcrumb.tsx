@@ -13,7 +13,10 @@ export class AntdBreadcrumb extends React.Component<BreadcrumbProps> {
         let breadcrumbItems = items.map((item, idx) => {
             return (
                 <Breadcrumb.Item key={item.key}>
-                    {idx !== items.length - 1 ? <LinkItem {...item}></LinkItem> : item.title}
+                    {idx !== items.length - 1
+                        ? (item.onClick ? <a onClick={item.onClick}>{item.title}</a> : <LinkItem {...item}></LinkItem>)
+                        : item.title
+                    }
                 </Breadcrumb.Item>
             );
         });

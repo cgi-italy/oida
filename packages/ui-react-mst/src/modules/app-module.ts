@@ -1,41 +1,32 @@
-import { types, Instance, IAnyModelType, ModelProperties, IModelType } from 'mobx-state-tree';
+import { types, Instance, ModelProperties, IModelType, SnapshotIn } from 'mobx-state-tree';
 
 import { TaggedUnion } from '@oida/state-mst';
 
-const AppModuleBase = types.model(
+const AppModuleStateModelBase = types.model(
     'AppModule',
     {
         id: types.identifier
     }
 ).volatile((self) => {
     return {
-        env: {},
-        config: {}
+        config: {} as any
     };
 }).actions((self) => {
     return {
-        setConfig: (config: Object) => {
+        setConfig: (config) => {
             self.config = config;
         }
     };
 });
 
-export const AppModule = TaggedUnion('appModuleType', AppModuleBase);
+export const AppModuleStateModel = TaggedUnion('appModuleType', AppModuleStateModelBase);
 
+const AppModuleBase = AppModuleStateModel.addModel(types.model('AppModule', {}));
+export type AppModuleStateModelType = typeof AppModuleBase;
 
-export const registerAppModule = <PROPS extends ModelProperties, OTHERS>
-(moduleModel: IModelType<PROPS, OTHERS>, defaultId: string, initEnv?: (config) => any) => {
-    let model = moduleModel;
-
-    if (initEnv) {
-        model = moduleModel.actions((self) => {
-            return {
-                afterAttach: () => {
-                    self.env = initEnv(self.config);
-                }
-            };
-        });
-    }
-
-    return AppModule.addModel(model.named(defaultId));
+export type AppModule<STATE_MODEL extends AppModuleStateModelType, CONFIG> = {
+    stateModel: STATE_MODEL;
+    defaultInitState: SnapshotIn<STATE_MODEL>
 };
+
+export type IAppModuleStateModel = Instance<typeof AppModuleBase>;

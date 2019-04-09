@@ -6,16 +6,14 @@ import { IFeatureStyle } from '@oida/core';
 
 import { FeatureLayer } from '@oida/state-mst';
 import { AOICollection } from './types/aoi';
-import { MapModule, MAP_MODULE_DEFAULT_ID } from '../map';
+import { MapModuleStateModel, DefaultMapModule } from '../map';
 
-import { registerAppModule } from '../app-module';
+import { AppModule, AppModuleStateModel } from '../app-module';
 
-export const AOI_MODULE_DEFAULT_ID = 'aoi';
-
-export const AoiModule = registerAppModule(
+export const AoiModuleStateModel = AppModuleStateModel.addModel(
     types.model('AoiModule', {
-        aois: types.optional(AOICollection, {id: 'aois'}),
-        mapModule: types.optional(types.reference(MapModule), MAP_MODULE_DEFAULT_ID)
+        aois: AOICollection,
+        mapModule: types.reference(MapModuleStateModel)
     })
     .views((self) => {
         return {
@@ -39,6 +37,21 @@ export const AoiModule = registerAppModule(
                 self.map.layers.children.removeItemWithId('aoiLayer');
             }
         };
-    }),
-    AOI_MODULE_DEFAULT_ID
+    })
 );
+
+export type AoiModuleConfig = {
+};
+
+export type AoiModule = AppModule<typeof AoiModuleStateModel, AoiModuleConfig>;
+
+export const DefaultAoiModule : AoiModule = {
+    stateModel: AoiModuleStateModel,
+    defaultInitState: {
+        id: 'aoi',
+        mapModule: DefaultMapModule.defaultInitState.id,
+        aois: {
+            id: 'aois'
+        }
+    }
+};

@@ -6,8 +6,9 @@ import { IMapView } from '@oida/state-mst';
 
 import { ChoiceSelectorRenderer } from '@oida/ui-react-core';
 
-import { MAP_MODULE_DEFAULT_ID } from '../map-module';
-import { inject } from '../../../utils/inject';
+import { MapModule, DefaultMapModule } from '../map-module';
+import { injectFromModuleState, injectFromModuleConfig } from '../../with-app-module';
+
 
 export type ProjectionItem<T> = {
     name: string;
@@ -55,8 +56,18 @@ class ProjSelectorBase<T> extends React.Component<ProjSelectorProps<T>> {
 
 export const MapProjSelector = observer(ProjSelectorBase);
 
-export const MapProjSelectorS = inject(({appState}) => {
+export const injectMapProjSelectorStateFromModule = (mapModule: MapModule) => injectFromModuleState(mapModule, (moduleState) => {
     return {
-        mapView: appState[MAP_MODULE_DEFAULT_ID].map.view
+        mapView: moduleState.map.view
     };
-})(MapProjSelector);
+});
+
+
+export const injectMapProjectionsFromModuleConfig = (mapModule: MapModule) => injectFromModuleConfig(mapModule, (moduleConfig) => {
+    return {
+        projections: moduleConfig.projections
+    };
+});
+
+export const MapProjSelectorS = injectMapProjSelectorStateFromModule(DefaultMapModule)(MapProjSelector);
+export const MapProjSelectorSC = injectMapProjectionsFromModuleConfig(DefaultMapModule)(MapProjSelectorS);

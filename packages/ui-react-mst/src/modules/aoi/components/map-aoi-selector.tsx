@@ -6,9 +6,9 @@ import { FeatureDrawMode, FeatureDrawEvent, SelectionMode, FEATURE_DRAW_INTERACT
 import { IMap, IFeatureDrawInteraction, IEntitySelection } from '@oida/state-mst';
 import { FormFieldRenderer, AoiField, AoiAction }  from '@oida/ui-react-core';
 
-import { AOI_MODULE_DEFAULT_ID } from '../aoi-module';
+import { AoiModule, DefaultAoiModule } from '../aoi-module';
+import { injectFromModuleState } from '../../with-app-module';
 
-import { inject } from '../../../utils';
 import { IAOICollection, IAOI } from '../types/aoi';
 
 
@@ -170,19 +170,20 @@ class AoiSelectorBase extends React.Component<AoiSelectorProps, {aoi: IAOI, acti
 
 export const MapAoiSelector = observer(AoiSelectorBase);
 
-export const MapAoiSelectorS = inject(({appState}) => {
+export const injectAoiSelectorStateFromModule = (aoiModule: AoiModule) => injectFromModuleState(aoiModule, (moduleState) => {
 
-    let aoiModule = appState[AOI_MODULE_DEFAULT_ID];
-    let map = aoiModule.map;
+    let mapModule = moduleState.mapModule;
 
-    let drawInteraction = map.interactions.items.find((interaction) => {
+    let drawInteraction = mapModule.map.interactions.items.find((interaction) => {
         return interaction.mapInteractionType === FEATURE_DRAW_INTERACTION_ID;
     });
 
     return {
-        mapState: map,
+        mapState: mapModule.map,
         drawInteraction: drawInteraction,
-        mapSelection: aoiModule.mapModule.selection,
-        aois: aoiModule.aois
+        mapSelection: mapModule.selection,
+        aois: moduleState.aois
     };
-})(MapAoiSelector);
+});
+
+export const MapAoiSelectorS = injectAoiSelectorStateFromModule(DefaultAoiModule)(MapAoiSelector);

@@ -4,8 +4,8 @@ import { observer } from 'mobx-react';
 import { IMapView } from '@oida/state-mst';
 import { MapNavControlsRenderer } from '@oida/ui-react-core';
 
-import { MAP_MODULE_DEFAULT_ID } from '../map-module';
-import { inject } from '../../../utils/inject';
+import { MapModule, DefaultMapModule } from '../map-module';
+import { injectFromModuleState } from '../../with-app-module';
 
 export type MapNavControlsProps = {
     mapView: IMapView;
@@ -44,8 +44,10 @@ class MapNavControlsBase extends React.Component<MapNavControlsProps> {
 
 export const MapNavControls = observer(MapNavControlsBase);
 
-export const MapNavControlsS = inject(({appState}) => {
+export const injectMapNavControlsStateFromModule = (mapModule: MapModule) => injectFromModuleState(mapModule, (moduleState) => {
     return {
-        mapView: appState[MAP_MODULE_DEFAULT_ID].map.view
+        mapView: moduleState.map.view
     };
-})(MapNavControls);
+});
+
+export const MapNavControlsS = injectMapNavControlsStateFromModule(DefaultMapModule)(MapNavControls);

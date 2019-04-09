@@ -29,7 +29,7 @@ export const hasSelectableItems = <T extends IAnyModelType>(
         };
 
         return {
-            modifySelection: (item, mode: SelectionMode) => {
+            modifySelection: (item, mode: SelectionMode = SelectionMode.Replace) => {
 
                 if (mode === SelectionMode.Replace) {
                     self.selectedItems.clear();

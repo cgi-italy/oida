@@ -7,7 +7,7 @@ import { MOUSE_COORDS_INTERACTION_ID } from '@oida/core';
 export const MouseCoordsInteraction = MapInteractionType.addModel(types.model(
     MOUSE_COORDS_INTERACTION_ID,
     {
-        mouseCoords: types.frozen(),
+        mouseCoords: types.maybe(types.frozen()),
     }
 ).actions((self) => {
     return {

@@ -4,11 +4,17 @@ export const BreadcrumbItem = types.model('BreadcrumbItem', {
     key: types.identifier,
     title: types.string,
     link: types.maybe(types.string)
-}).actions((self) => {
+}).volatile((self) => {
+    return {
+        onClick: null
+    };
+})
+.actions((self) => {
     return {
         update: (data) => {
-            self.title = data.title || self.link;
+            self.title = data.title || self.title || self.link;
             self.link = data.link || self.link;
+            self.onClick = data.onClick || self.onClick;
         }
     };
 });

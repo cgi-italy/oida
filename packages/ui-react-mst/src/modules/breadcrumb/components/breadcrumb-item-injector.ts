@@ -2,13 +2,12 @@ import React from 'react';
 
 import { BreadcrumbItemProps } from '@oida/ui-react-core';
 
-
-import { IBreadcrumb, BREADCRUMB_MODULE_DEFAULT_ID } from '../breadcrumb-module';
 import { IBreadcrumbItem } from '../types/breadcrumb-item';
-import { inject } from '../../../utils';
+import { IBreadcrumbModuleStateModel, DefaultBreadcrumbModule } from '../breadcrumb-module';
+import { injectBreadcrumbStateFromModule } from './breadcrumb';
 
 export type BreadcrumbItemInjectorProps = {
-    breadcrumb: IBreadcrumb,
+    breadcrumb: IBreadcrumbModuleStateModel,
     breadcrumbData: BreadcrumbItemProps
 };
 
@@ -20,8 +19,16 @@ export class BreadcrumbItemInjector extends React.Component<BreadcrumbItemInject
 
     componentDidMount() {
         this.props.breadcrumb.add(this.props.breadcrumbData);
+
+        let breadcrumItem = this.props.breadcrumb.itemWithId(this.props.breadcrumbData.key);
+
+        if (this.props.breadcrumbData.onClick) {
+            breadcrumItem.update({
+                onClick: this.props.breadcrumbData.onClick
+            });
+        }
         this.setState({
-            breadcrumbItem: this.props.breadcrumb.itemWithId(this.props.breadcrumbData.key)
+            breadcrumbItem: breadcrumItem
         });
     }
 
@@ -29,7 +36,8 @@ export class BreadcrumbItemInjector extends React.Component<BreadcrumbItemInject
 
         if (
             prevProps.breadcrumbData.title !== this.props.breadcrumbData.title ||
-            prevProps.breadcrumbData.link !== this.props.breadcrumbData.link
+            prevProps.breadcrumbData.link !== this.props.breadcrumbData.link ||
+            prevProps.breadcrumbData.onClick !== this.props.breadcrumbData.onClick
         ) {
 
             this.state.breadcrumbItem.update(this.props.breadcrumbData);
@@ -48,8 +56,4 @@ export class BreadcrumbItemInjector extends React.Component<BreadcrumbItemInject
     }
 }
 
-export const BreadcrumbItemInjectorS = inject(({appState}) => {
-    return {
-        breadcrumb: appState[BREADCRUMB_MODULE_DEFAULT_ID]
-    };
-})(BreadcrumbItemInjector);
+export const BreadcrumbItemInjectorS = injectBreadcrumbStateFromModule(DefaultBreadcrumbModule)(BreadcrumbItemInjector);

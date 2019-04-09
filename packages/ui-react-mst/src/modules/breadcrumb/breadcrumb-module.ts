@@ -4,31 +4,35 @@ import { Instance, addDisposer } from 'mobx-state-tree';
 import { IndexedCollection } from '@oida/state-mst';
 import { BreadcrumbItem } from './types/breadcrumb-item';
 
-import { registerAppModule } from '../app-module';
+import { AppModule, AppModuleStateModel } from '../app-module';
 
-export const BREADCRUMB_MODULE_DEFAULT_ID = 'breadcrumb';
-
-export const BreadcrumbModule = registerAppModule(
-    IndexedCollection(BreadcrumbItem).actions((self) => {
+export const BreadcrumbModuleStateModel = AppModuleStateModel.addModel(
+    IndexedCollection(BreadcrumbItem, (id, collection) => collection.items.find((item) => item.key === id)).actions((self) => {
         return {
             afterAttach: () => {
                 const titleUpdateDisposer = autorun(() => {
                     let title = self.items.reduce((title, breadcrumbItem) => {
                         return `${title} - ${breadcrumbItem.title}`;
-                    }, (self as any).env.title);
+                    }, (self as any).config.pageTitle);
                     document.title = title;
                 });
 
                 addDisposer(self, titleUpdateDisposer);
             }
         };
-    }),
-    BREADCRUMB_MODULE_DEFAULT_ID,
-    (config) => {
-        return {
-            title: config.pageTitle
-        };
-    }
+    })
 );
 
-export type IBreadcrumb = Instance<typeof BreadcrumbModule>;
+export type BreadcrumbModuleConfig = {
+    pageTitle: string;
+};
+
+export type BreadcrumbModule = AppModule<typeof BreadcrumbModuleStateModel, BreadcrumbModuleConfig>;
+export const DefaultBreadcrumbModule: BreadcrumbModule = {
+    stateModel: BreadcrumbModuleStateModel,
+    defaultInitState: {
+        id: 'breadcrumb'
+    }
+};
+
+export type IBreadcrumbModuleStateModel = Instance<typeof BreadcrumbModuleStateModel>;

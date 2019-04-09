@@ -13,6 +13,9 @@ const LayerBase = types.compose(
         return {
             setRenderer(renderer) {
                 self.renderer = renderer;
+            },
+            setName(name) {
+                self.name = name;
             }
         };
     }),

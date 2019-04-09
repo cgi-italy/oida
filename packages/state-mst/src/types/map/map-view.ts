@@ -4,7 +4,7 @@ import { MapViewport } from './map-viewport';
 
 export const MapView = types
     .model('MapView', {
-        projection: MapProjection,
+        projection: types.optional(MapProjection, {code: 'EPSG:4326'}),
         viewport: MapViewport,
         updating: types.optional(types.boolean, false),
         animateOnChange: types.optional(types.boolean, true)

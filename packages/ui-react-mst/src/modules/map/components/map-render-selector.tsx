@@ -5,8 +5,9 @@ import { IMap } from '@oida/state-mst';
 
 import { ChoiceSelectorRenderer } from '@oida/ui-react-core';
 
-import { MAP_MODULE_DEFAULT_ID } from '../map-module';
-import { inject } from '../../../utils/inject';
+import { MapModule, DefaultMapModule } from '../map-module';
+import { injectFromModuleState, injectFromModuleConfig } from '../../with-app-module';
+
 
 export type MapRendererItem<T> = {
     id: string;
@@ -53,8 +54,18 @@ class MapRendererSelectorBase<T> extends React.Component<MapRendererSelectorProp
 
 export const MapRendererSelector = observer(MapRendererSelectorBase);
 
-export const MapRendererSelectorS = inject(({appState}) => {
+export const injectMapRendererSelectorStateFromModule = (mapModule: MapModule) => injectFromModuleState(mapModule, (moduleState) => {
     return {
-        mapState: appState[MAP_MODULE_DEFAULT_ID].map
+        mapState: moduleState.map
     };
-})(MapRendererSelector);
+});
+
+
+export const injectMapRenderersFromModuleConfig = (mapModule: MapModule) => injectFromModuleConfig(mapModule, (moduleConfig) => {
+    return {
+        renderers: moduleConfig.renderers
+    };
+});
+
+export const MapRendererSelectorS = injectMapRendererSelectorStateFromModule(DefaultMapModule)(MapRendererSelector);
+export const MapRendererSelectorSC = injectMapRenderersFromModuleConfig(DefaultMapModule)(MapRendererSelectorS);

@@ -4,6 +4,7 @@ export type BreadcrumbItemProps = {
     key: string;
     title: string;
     link?: string;
+    onClick?: () => void;
 };
 
 export type BreadcrumbProps = {

@@ -1,14 +1,14 @@
 import React from 'react';
 import { observer } from 'mobx-react';
 
-import { IBreadcrumb, BREADCRUMB_MODULE_DEFAULT_ID } from '../breadcrumb-module';
 import { BreadcrumbItemProps, BreadcrumbRenderer } from '@oida/ui-react-core';
 
-import { inject } from '../../../utils';
+import { IBreadcrumbModuleStateModel, DefaultBreadcrumbModule, BreadcrumbModule } from '../breadcrumb-module';
+import { injectFromModuleState } from '../../with-app-module';
 
 export type BreadcrumbProps = {
     render: BreadcrumbRenderer,
-    state: IBreadcrumb,
+    breadcrumb: IBreadcrumbModuleStateModel,
     linkItem: React.ComponentType<BreadcrumbItemProps>
 };
 
@@ -16,14 +16,15 @@ export type BreadcrumbProps = {
 class BreadcrumbBase extends React.Component<BreadcrumbProps> {
 
     render() {
-        let {render, state, linkItem} = this.props;
+        let {render, breadcrumb, linkItem} = this.props;
 
         return render({
-            items: state.items.map((item) => {
+            items: breadcrumb.items.map((item) => {
                 return {
                     key: item.key,
                     title: item.title,
-                    link: item.link
+                    link: item.link,
+                    onClick: item.onClick
                 };
             }),
             linkItem: linkItem
@@ -33,8 +34,11 @@ class BreadcrumbBase extends React.Component<BreadcrumbProps> {
 
 export const Breadcrumb = observer(BreadcrumbBase);
 
-export const BreadcrumbS = inject(({appState}) => {
+export const injectBreadcrumbStateFromModule =
+(breadcrumbModule: BreadcrumbModule) => injectFromModuleState(breadcrumbModule, (moduleState) => {
     return {
-        state: appState[BREADCRUMB_MODULE_DEFAULT_ID]
+        breadcrumb: moduleState
     };
-})(observer(BreadcrumbBase));
+});
+
+export const BreadcrumbS = injectBreadcrumbStateFromModule(DefaultBreadcrumbModule)(Breadcrumb);
