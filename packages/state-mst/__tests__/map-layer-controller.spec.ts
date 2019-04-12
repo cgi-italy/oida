@@ -4,7 +4,7 @@ import { IMapRenderer, ILayerRenderer } from '@oida/core';
 import { MapLayerController } from '../src/controllers/layers/map-layer-controller';
 import { MapLayer } from '../src/types/layers/map-layer';
 
-const MapRendererMock = jest.fn<IMapRenderer>();
+const MapRendererMock = jest.fn();
 
 
 const LayerRendererMock = jest.fn(() => ({
@@ -72,7 +72,7 @@ describe('MapLayerController', () => {
 
         mapLayerController.setMapRenderer(mapRendererMockInstance);
 
-        mapLayerController.setMapRenderer(null);
+        mapLayerController.setMapRenderer(undefined);
         expect(layerRendererMockInstance.destroy).toBeCalledTimes(1);
 
         layerRendererMockInstance.setVisible.mockClear();

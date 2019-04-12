@@ -82,7 +82,6 @@ export const AOI = Entity.addModel(types.compose('AOI',
     })
 );
 
-
 export const AOICollection = createEntityCollectionType(AOI);
 
 export type IAOI = Instance<typeof AOI>;

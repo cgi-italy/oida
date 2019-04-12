@@ -2,10 +2,10 @@ import { types, Instance } from 'mobx-state-tree';
 
 import { FEATURE_DRAW_INTERACTION_ID, FeatureDrawMode, FeatureDrawOptions } from '@oida/core';
 
-import { MapInteractionType } from './map-interaction';
+import { MapInteraction } from './map-interaction';
 import { enumFromType } from '../mst/enum-from-type';
 
-export const FeatureDrawInteraction = MapInteractionType.addModel(types.model(
+export const FeatureDrawInteraction = MapInteraction.addModel(types.model(
     FEATURE_DRAW_INTERACTION_ID,
     {
         drawMode: types.optional(enumFromType<FeatureDrawMode>(FeatureDrawMode), FeatureDrawMode.Off)

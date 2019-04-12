@@ -24,7 +24,7 @@ describe('Tagged union type', () => {
         });
 
         expect(() => typecheck(Square, mySquare)).not.toThrow();
-        expect(() => typecheck(Shape, mySquare)).not.toThrow();
+        expect(() => typecheck(Shape.Type, mySquare)).not.toThrow();
     });
 
     it('Should set tag on instance creation', () => {
@@ -89,8 +89,8 @@ describe('Tagged union type', () => {
         });
 
         expect(() => typecheck(IsoscelesTriangle, myTriangle)).not.toThrow();
-        expect(() => typecheck(Triangle, myTriangle)).not.toThrow();
-        expect(() => typecheck(Shape, myTriangle)).not.toThrow();
+        expect(() => typecheck(Triangle.Type, myTriangle)).not.toThrow();
+        expect(() => typecheck(Shape.Type, myTriangle)).not.toThrow();
 
         expect(myTriangle.type).toBe('triangle');
         expect(myTriangle.triangleType).toBe('isosceles');

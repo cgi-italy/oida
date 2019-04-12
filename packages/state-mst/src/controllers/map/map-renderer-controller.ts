@@ -10,7 +10,7 @@ import { InteractionListController } from '../interactions/interactions-list-con
 export class MapRendererController {
 
     private mapState_: IMap;
-    private mapRenderer_: IMapRenderer;
+    private mapRenderer_: IMapRenderer | undefined;
     private domTarget_: IObservableValue<HTMLElement>;
     private subscriptionTracker_: SubscriptionTracker = new SubscriptionTracker();
     private layersController_: GroupLayerController;
@@ -21,7 +21,6 @@ export class MapRendererController {
 
         this.domTarget_ = observable.box(config.target || null, { deep: false });
         this.mapState_ = config.state;
-        this.mapRenderer_ = null;
 
         this.layersController_ = new GroupLayerController({
             mapLayer: this.mapState_.layers
@@ -88,7 +87,10 @@ export class MapRendererController {
             this.interactionsController_.setMapRenderer(this.mapRenderer_);
 
             if (this.mapRenderer_) {
-                this.mapRenderer_.setLayerGroup(this.layersController_.getLayerRenderer());
+                let groupRenderer = this.layersController_.getLayerRenderer();
+                if (groupRenderer) {
+                    this.mapRenderer_.setLayerGroup(groupRenderer);
+                }
             }
 
             this.mapState_.renderer.setImplementation(this.mapRenderer_);

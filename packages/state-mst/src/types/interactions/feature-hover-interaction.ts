@@ -2,11 +2,11 @@ import { types, Instance } from 'mobx-state-tree';
 
 import { FEATURE_HOVER_INTERACTION_ID } from '@oida/core';
 
-import { MapInteractionType } from './map-interaction';
+import { MapInteraction } from './map-interaction';
 import { ReferenceOrType } from '../mst/reference-or-type';
 import { EntitySelection } from '../entity/entity-selection';
 
-export const FeatureHoverInteraction = MapInteractionType.addModel(types.model(
+export const FeatureHoverInteraction = MapInteraction.addModel(types.model(
     FEATURE_HOVER_INTERACTION_ID,
     {
         selection: ReferenceOrType(EntitySelection)

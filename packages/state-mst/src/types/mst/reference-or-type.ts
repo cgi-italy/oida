@@ -1,4 +1,4 @@
-import { types, IAnyModelType, IReferenceType, IMaybe } from 'mobx-state-tree';
+import { types, IAnyModelType, IReferenceType, IMaybe, UnionOptions } from 'mobx-state-tree';
 
 export const ReferenceOrType = <T extends IAnyModelType>(Type: T, referenceType?: IMaybe<IReferenceType<T>>) => {
 
@@ -14,9 +14,9 @@ export const ReferenceOrType = <T extends IAnyModelType>(Type: T, referenceType?
                     return types.maybe(Type);
                 }
             }
-        },
+        } as UnionOptions,
         referenceType,
         types.maybe(Type)
-    );
+    ) as IMaybe<T>;
 };
 

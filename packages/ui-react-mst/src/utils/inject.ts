@@ -11,5 +11,6 @@ type Result<D extends object> = <A extends D>(
 ) => React.SFC<Omit<A, keyof D> & Partial<D>>;
 
 export function inject<D extends object>(mapper: Argument<D>): Result<D> {
+     // @ts-ignore
     return mobxInject.call(null, mapper);
 }

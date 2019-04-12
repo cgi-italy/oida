@@ -1,25 +1,24 @@
 import { SubscriptionTracker, IMapRenderer } from '@oida/core';
 
 import { Collection } from '../../types/core/collection';
-import { MapInteractionType, IMapInteraction } from '../../types/interactions/map-interaction';
+import { MapInteraction, IMapInteraction } from '../../types/interactions/map-interaction';
 import { MapInteractionController } from './map-interaction-controller';
 import { interactionControllersFactory } from './interaction-controllers-factory';
 
 import { ArrayTracker } from '../../utils/array-tracker';
 
 //only for typings
-const CollectionInstance = Collection(MapInteractionType).create({});
+const CollectionInstance = Collection(MapInteraction.Type).create({items: []});
 
 export class InteractionListController {
 
     private interactions_: typeof CollectionInstance;
-    private mapRenderer_: IMapRenderer;
+    private mapRenderer_: IMapRenderer | undefined;
 
-    private interactionsTracker_: ArrayTracker<MapInteractionController>;
+    private interactionsTracker_: ArrayTracker<MapInteractionController | undefined, typeof MapInteraction.Type>;
 
     constructor(config) {
         this.interactions_ = config.interactions;
-        this.mapRenderer_ = null;
 
         this.interactionsTracker_ = new ArrayTracker({
             items: this.interactions_.items,
@@ -28,7 +27,7 @@ export class InteractionListController {
         });
     }
 
-    setMapRenderer(renderer: IMapRenderer) {
+    setMapRenderer(renderer: IMapRenderer | undefined) {
         this.mapRenderer_ = renderer;
         this.interactionsTracker_.forEachItem((controller) => {
             if (controller) {
@@ -53,7 +52,7 @@ export class InteractionListController {
         return interactionController;
     }
 
-    private destroyInteractionController_(controller: MapInteractionController) {
+    private destroyInteractionController_(controller: MapInteractionController | undefined) {
         if (controller) {
             controller.destroy();
         }

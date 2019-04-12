@@ -17,36 +17,36 @@ export interface MapComponentProps {
 
 export class MapComponent extends React.PureComponent<MapComponentProps> {
 
-    private mapContainer_: HTMLElement;
-    private rendererController_: MapRendererController;
+    private mapContainer_: HTMLElement | null = null;
+    private rendererController_: MapRendererController | undefined;
 
     constructor(props: MapComponentProps) {
         super(props);
     }
 
     getRenderer() {
-        return this.rendererController_.getMapRenderer();
+        return this.rendererController_!.getMapRenderer();
     }
 
     componentDidMount() {
         this.rendererController_ = new MapRendererController({
             state: this.props.mapState
         });
-        this.rendererController_.setDomTarget(this.mapContainer_);
+        this.rendererController_.setDomTarget(this.mapContainer_!);
     }
 
     componentDidUpdate(prevProps) {
         if (prevProps.mapState !== this.props.mapState) {
-            this.rendererController_.destroy();
+            this.rendererController_!.destroy();
             this.rendererController_ = new MapRendererController({
                 state: this.props.mapState
             });
         }
-        this.rendererController_.setDomTarget(this.mapContainer_);
+        this.rendererController_!.setDomTarget(this.mapContainer_!);
     }
 
     componentWillUnmount() {
-        this.rendererController_.destroy();
+        this.rendererController_!.destroy();
     }
 
     render() {

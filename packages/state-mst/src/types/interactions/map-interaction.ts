@@ -11,6 +11,6 @@ const MapInteractionBase = types.compose(
     isActivable,
 );
 
-export const MapInteractionType = TaggedUnion('mapInteractionType', MapInteractionBase);
+export const MapInteraction = TaggedUnion('mapInteractionType', MapInteractionBase);
 
-export type IMapInteraction = Instance<typeof MapInteractionType>;
+export type IMapInteraction = Instance<typeof MapInteraction.Type>;

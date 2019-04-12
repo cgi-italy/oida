@@ -6,7 +6,7 @@ const registeredSections : Map<string, DynamicSection> = new Map();
 
 export type DynamicSectionState = {
     components: ComponentSelectorItem[];
-    activeChild: string;
+    activeChild?: string;
 };
 
 export type DynamicSectionProps = {
@@ -24,14 +24,13 @@ export class DynamicSection extends React.Component<DynamicSectionProps, Dynamic
         super(props);
         this.state = {
             components: [],
-            activeChild: null,
+            activeChild: undefined,
         };
 
         registeredSections.set(props.sectionId, this);
     }
 
-    addComponent(component: ComponentSelectorItem, options: ComponentInjectionOptions) {
-        options = options || {};
+    addComponent(component: ComponentSelectorItem, options: ComponentInjectionOptions = {}) {
 
         this.setState((prevState, props) => {
             return {
@@ -70,10 +69,10 @@ export class DynamicSection extends React.Component<DynamicSectionProps, Dynamic
             });
             if (idx !== -1) {
                 components.splice(idx, 1, component);
-                return {
-                    components: components
-                };
             }
+            return {
+                components: components
+            };
         });
 
     }
@@ -110,17 +109,26 @@ export class SectionInjector extends React.Component<SectionInjectorProps> {
 
     componentDidMount() {
         let {sectionId, options, ...component} = this.props;
-        registeredSections.get(sectionId).addComponent(component, options);
+        let section = registeredSections.get(sectionId);
+        if (section) {
+            section.addComponent(component, options);
+        }
     }
 
     componentWillUnmount() {
         let {sectionId, options, ...component} = this.props;
-        registeredSections.get(sectionId).removeComponent(component);
+        let section = registeredSections.get(sectionId);
+        if (section) {
+            section.removeComponent(component);
+        }
     }
 
     componentDidUpdate() {
         let {sectionId, options, ...component} = this.props;
-        registeredSections.get(sectionId).updateComponent(component, options);
+        let section = registeredSections.get(sectionId);
+        if (section) {
+            section.updateComponent(component, options);
+        }
     }
 
     render() {

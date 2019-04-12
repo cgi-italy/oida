@@ -18,7 +18,7 @@ export class FeatureDrawInteractionController extends
     protected bindToInteractionState_() {
         super.bindToInteractionState_();
         this.subscriptionTracker_.addSubscription(autorun(() => {
-            this.interactionImpl_.setDrawMode(this.interaction_.drawMode, this.interaction_.drawOptions);
+            this.interactionImpl_!.setDrawMode(this.interaction_.drawMode, this.interaction_.drawOptions);
         }));
     }
 }

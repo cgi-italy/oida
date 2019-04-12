@@ -9,15 +9,14 @@ export class MapInteractionController<
     I extends IMapInteraction = IMapInteraction
 > {
     protected interaction_: I;
-    protected interactionImpl_: T;
+    protected interactionImpl_: T | undefined;
     protected subscriptionTracker_: SubscriptionTracker = new SubscriptionTracker();
 
     constructor(config) {
         this.interaction_ = config.interaction;
-        this.interactionImpl_ = null;
     }
 
-    setMapRenderer(mapRenderer: IMapRenderer) {
+    setMapRenderer(mapRenderer: IMapRenderer | undefined) {
         this.destroy();
         if (mapRenderer) {
             this.interactionImpl_ = this.createInteractionImpl_(mapRenderer);
@@ -31,13 +30,13 @@ export class MapInteractionController<
         if (this.interactionImpl_) {
             this.interactionImpl_.destroy();
             this.unbindFromInteractionState_();
-            this.interactionImpl_ = null;
+            delete this.interactionImpl_;
         }
     }
 
     protected bindToInteractionState_() {
         this.subscriptionTracker_.addSubscription(autorun(() => {
-            this.interactionImpl_.setActive(this.interaction_.active);
+            this.interactionImpl_!.setActive(this.interaction_.active);
         }));
     }
 

@@ -23,7 +23,7 @@ export class FeatureHoverInteractionController extends
                 if (featureId) {
                     entity = resolveEntityReference(entityReferenceFromFeatureId(featureId), this.interaction_);
                 }
-                this.interaction_.selection.setHovered(entity);
+                this.interaction_.selection!.setHovered(entity);
             }
         };
     }

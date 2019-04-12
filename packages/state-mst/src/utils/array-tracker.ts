@@ -14,7 +14,7 @@ export class ArrayTracker<T, ITEM extends IAnyType = IAnyType> {
     protected itemTracker_: {[id: string] : T} = {};
     protected idGetter_: (item: SnapshotOrInstance<ITEM>) => string;
 
-    constructor(config: ArrayTrackerConfig<T>) {
+    constructor(config: ArrayTrackerConfig<T, ITEM>) {
         this.trackerConfig_ = config;
         this.idGetter_ = this.trackerConfig_.idGetter || (item => item['id']);
         this.bindToCollectionState_();

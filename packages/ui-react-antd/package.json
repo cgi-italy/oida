@@ -27,38 +27,14 @@
     "registry": "https://nexus.dev.eoss-cloud.it/repository/npm-cgi-eo/"
   },
   "peerDependencies": {
-    "antd": "^3.12.3",
+    "antd": "^3.16.2",
     "classnames": "^2.2.6",
-    "react": "^16.6.3",
-    "react-dom": "^16.6.3"
-  },
-  "devDependencies": {
-    "@svgr/cli": "^4.1.0",
-    "@types/geojson": "^7946.0.4",
-    "@types/jest": "^23.3.2",
-    "@types/react": "^16.7.18",
-    "@types/react-dom": "^16.0.9",
-    "antd": "^3.12.3",
-    "classnames": "^2.2.6",
-    "jest": "^23.6.0",
-    "node-sass": "^4.10.0",
-    "react": "^16.6.3",
-    "react-dom": "^16.6.3",
-    "rimraf": "^2.6.2",
-    "rollup": "^1.5.0",
-    "rollup-plugin-commonjs": "^9.1.6",
-    "rollup-plugin-copy-glob": "^0.3.0",
-    "rollup-plugin-json": "^3.1.0",
-    "rollup-plugin-node-resolve": "^4.0.1",
-    "rollup-plugin-postcss": "^2.0.3",
-    "rollup-plugin-typescript2": "^0.19.3",
-    "ts-jest": "^23.1.4",
-    "tslint": "^5.11.0",
-    "typescript": "3.1.6"
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6"
   },
   "dependencies": {
-    "@oida/core": "^1.0.0",
-    "@oida/ui-react-core": "^1.0.0",
+    "@oida/core": "file:../core",
+    "@oida/ui-react-core": "file:../ui-react-core",
     "moment": "^2.22.2"
   }
 }

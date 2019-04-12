@@ -20,7 +20,7 @@ export class InputFieldRenderer extends React.Component<StringField & InputField
         changeDelay: 1000
     };
 
-    private debounceTimeout_ = null;
+    private debounceTimeout_: any | undefined;
 
     constructor(props) {
         super(props);

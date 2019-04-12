@@ -27,16 +27,14 @@ class ProjSelectorBase<T> extends React.Component<ProjSelectorProps<T>> {
             return projection.code === code;
         });
 
-        this.props.mapView.setProjection(projection);
+        if (projection) {
+            this.props.mapView.setProjection(projection);
+        }
     }
 
     render() {
 
         let { render, projections, mapView, ...props } = this.props;
-
-        let value = projections.find((projection) => {
-            return projection.code === mapView.projection.code;
-        }).code;
 
         let items = projections.map((projection) => {
 
@@ -47,7 +45,7 @@ class ProjSelectorBase<T> extends React.Component<ProjSelectorProps<T>> {
         });
 
         return render({
-            value: value,
+            value: mapView.projection.code,
             items: items,
             onSelect: this.onProjectionSelect.bind(this)
         });

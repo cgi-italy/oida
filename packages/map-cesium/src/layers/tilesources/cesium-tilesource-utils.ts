@@ -33,7 +33,7 @@ export const getTileGridFromSRS = (srs, tileGridConfig?) => {
         }
     }
 
-    let tileGrid = null;
+    let tileGrid;
     let projection = getProjectionType(srs);
 
     if (projection === ProjectionType.GlobalGeodetic) {

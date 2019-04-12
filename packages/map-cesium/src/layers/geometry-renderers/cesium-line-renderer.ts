@@ -20,7 +20,7 @@ export class CesiumLineRenderer implements CesiumGeometryRenderer {
     }
 
     addFeature(id, geometry, style) {
-        let feature = null;
+        let feature: any = null;
         if (geometry.type === 'LineString') {
             feature = this.createPolyline_(id, geometry.coordinates, style);
         } else if (geometry.type === 'MultiLineString') {

@@ -6,6 +6,8 @@ import { Map, EntitySelection, TileLayer, ReferenceOrType } from '@oida/state-ms
 
 import { AppModule, AppModuleStateModel } from '../app-module';
 
+import { SelectionMode } from  '@oida/core';
+
 export const MapModuleStateModel = AppModuleStateModel.addModel(
     types.model('map', {
         map: Map,
@@ -15,10 +17,11 @@ export const MapModuleStateModel = AppModuleStateModel.addModel(
             afterAttach: () => {
                 let config = ((self as any).config as MapModuleConfig);
                 if (config.initialOptions) {
-                    if (config.initialOptions.baseLayer) {
+                    let baseLayerId = config.initialOptions.baseLayer;
+                    if (baseLayerId) {
                         let baseLayers = config.baseLayers || [];
                         let baseLayer = baseLayers.find((layer) => {
-                            return layer.id === config.initialOptions.baseLayer;
+                            return layer.id === baseLayerId;
                         });
                         if (baseLayer) {
                             self.map.layers.children.add(
@@ -30,19 +33,21 @@ export const MapModuleStateModel = AppModuleStateModel.addModel(
                             );
                         }
                     }
-                    if (config.initialOptions.projection) {
+                    let projectionCode = config.initialOptions.projection;
+                    if (projectionCode) {
                         let projections = config.projections || [];
                         let projection = projections.find((projection) => {
-                            return projection.code === config.initialOptions.projection;
+                            return projection.code === projectionCode;
                         });
                         if (projection) {
                             self.map.view.setProjection(projection);
                         }
                     }
-                    if (config.initialOptions.renderer) {
+                    let rendererId = config.initialOptions.renderer;
+                    if (rendererId) {
                         let renderers = config.renderers || [];
                         let renderer = renderers.find((renderer) => {
-                            return renderer.id === config.initialOptions.renderer;
+                            return renderer.id === rendererId;
                         });
                         if (renderer) {
                             self.map.setRenderer(renderer);

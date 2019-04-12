@@ -2,7 +2,7 @@
 import { types } from 'mobx-state-tree';
 
 //imported to avoid an issue with generated typings declaration
-import { IFeatureStyle } from '@oida/core';
+//import { IFeatureStyle } from '@oida/core';
 
 import { FeatureLayer } from '@oida/state-mst';
 import { AOICollection } from './types/aoi';

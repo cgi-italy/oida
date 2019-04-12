@@ -11,7 +11,7 @@ import * as components from './samples';
 
 const initApp = () => {
 
-    let routes = [];
+    let routes: Array<{path: string, title: string, component: React.ComponentType<any> }> = [];
 
     for (let id in components) {
         routes.push({

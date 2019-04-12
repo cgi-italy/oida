@@ -1,3 +1,5 @@
+import { IMapRenderer } from '@oida/core';
+
 import { types } from 'mobx-state-tree';
 
 export const MapRenderer = types
@@ -14,10 +16,10 @@ export const MapRenderer = types
             }
         };
     }).volatile(self => ({
-        implementation: null
+        implementation: undefined as (IMapRenderer | undefined)
     })).actions((self) => {
         return {
-            setImplementation(implementation) {
+            setImplementation(implementation: IMapRenderer | undefined) {
                 self.implementation = implementation;
             }
         };

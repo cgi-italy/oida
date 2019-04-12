@@ -80,4 +80,8 @@ export const Collection = <T extends IAnyType>(itemsType: T) => {
     }).named(`${itemsType.name}Collection`);
 };
 
-export type ICollection = Instance<ReturnType<typeof Collection>>;
+class CollectionTypeHelper<T extends IAnyType> {
+    Return = Collection<T>({} as T);
+}
+
+export type ICollection<T extends IAnyType = IAnyType> = Instance<CollectionTypeHelper<T>['Return']>;

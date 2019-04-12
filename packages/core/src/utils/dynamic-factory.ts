@@ -1,6 +1,6 @@
 export interface IDynamicFactory<T> {
     register: (id: string, objectCreator: (...args: Array<any>) => T) => void;
-    create: (id: string, ...args: Array<any>) => T;
+    create: (id: string, ...args: Array<any>) => T | undefined;
     isRegistered: (id: string) => boolean;
 }
 
@@ -18,7 +18,7 @@ export const createDynamicFactory = <T = any>(factoryId: string): IDynamicFactor
             }
             REGISTERED_TYPES[id] = objectCreator;
         },
-        create: (id: string, ...args: Array<any>) : T => {
+        create: (id: string, ...args: Array<any>) : T | undefined => {
             let objectCreator = getRegisteredType(id);
             if (objectCreator) {
                 return objectCreator.apply(null, args);

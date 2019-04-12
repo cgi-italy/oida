@@ -40,6 +40,8 @@ export const FunctionType = types.custom<string, Function>({
     getValidationMessage(snapshot) {
         if (typeof snapshot !== 'string' || !registeredFunctions[snapshot]) {
             return `No function with id  ${snapshot} found`;
+        } else {
+            return '';
         }
     }
 });

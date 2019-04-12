@@ -2,7 +2,7 @@ import React from 'react';
 import { Provider } from 'mobx-react';
 import { Button } from 'antd';
 
-import { ChoiceSelectorCombo } from '@oida/ui-react-antd/src/general/choice-selector-combo';
+import { ChoiceSelectorCombo } from '@oida/ui-react-antd';
 import { inject, MapComponent, MapProjSelector, MapRendererSelector } from '@oida/ui-react-mst';
 
 import { getAppState } from './store';

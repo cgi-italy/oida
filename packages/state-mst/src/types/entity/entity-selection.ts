@@ -4,7 +4,7 @@ import { Entity } from './entity';
 import { EntityReference, createEntityReference, resolveEntityReference } from './entity-reference';
 import { hasSelectableItems } from '../mixins/has-selectable-items';
 
-import { SelectionMode } from  '@oida/core';
+//import { SelectionMode } from  '@oida/core';
 
 const EntityHovered = types.model({
     hoveredItem: EntityReference
@@ -32,7 +32,7 @@ const EntityHovered = types.model({
 
 export const EntitySelection = types.compose(
     'EntitySelection',
-    hasSelectableItems(Entity as IAnyModelType, {
+    hasSelectableItems(Entity.Type as IAnyModelType, {
         referenceType: EntityReference,
         idGetter: createEntityReference
     }),

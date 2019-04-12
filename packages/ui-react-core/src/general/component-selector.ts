@@ -9,7 +9,7 @@ export type ComponentSelectorItem = {
 
 export type ComponentSelectorProps = {
     components: ComponentSelectorItem[];
-    activeChild: string;
+    activeChild?: string;
     onChildActivation: (string) => void;
 };
 

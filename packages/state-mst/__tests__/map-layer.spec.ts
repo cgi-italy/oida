@@ -10,12 +10,12 @@ describe('Map layer type', () => {
             types.model('TestLayer', {})
         );
 
-        const layer = TestLayerType.create({
+        const TestLayer = TestLayerType.create({
             id: 'testLayer'
         });
 
-        expect(() => typecheck(MapLayer, layer)).not.toThrow();
-        expect(() => typecheck(Entity, layer)).not.toThrow();
+        expect(() => typecheck(MapLayer.Type, TestLayer)).not.toThrow();
+        expect(() => typecheck(Entity.Type, TestLayer)).not.toThrow();
 
     });
 });

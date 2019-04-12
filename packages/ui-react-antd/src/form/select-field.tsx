@@ -12,7 +12,7 @@ export class SelectEnumRenderer extends React.Component<EnumField> {
 
     onSelectChange(value) {
         if (!value || (Array.isArray(value) && !value.length)) {
-            this.props.onChange(null);
+            this.props.onChange(undefined);
         } else {
             this.props.onChange(value);
         }

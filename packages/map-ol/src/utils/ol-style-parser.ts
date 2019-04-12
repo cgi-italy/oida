@@ -38,9 +38,9 @@ export class OLStyleParser {
         return olColor;
     }
 
-    protected getPointStyle_(pointStyle: IPointStyle) {
+    protected getPointStyle_(pointStyle: IPointStyle | undefined) {
 
-        if (!pointStyle.visible) {
+        if (!pointStyle || !pointStyle.visible) {
             return null;
         }
 
@@ -63,9 +63,9 @@ export class OLStyleParser {
         return style;
     }
 
-    protected getLineStyle_(lineStyle: ILineStyle) {
+    protected getLineStyle_(lineStyle: ILineStyle | undefined) {
 
-        if (!lineStyle.visible) {
+        if (!lineStyle || !lineStyle.visible) {
             return null;
         }
 
@@ -79,9 +79,9 @@ export class OLStyleParser {
         return style;
     }
 
-    protected getPolygonStyle_(polygonStyle: IPolygonStyle) {
+    protected getPolygonStyle_(polygonStyle: IPolygonStyle | undefined) {
 
-        if (!polygonStyle.visible) {
+        if (!polygonStyle || !polygonStyle.visible) {
             return null;
         }
 

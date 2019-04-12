@@ -54,7 +54,7 @@ export type IDataSorting = Instance<typeof DataSorting>;
 export const DataPaging = types.model('DataPaging', {
     page: types.optional(types.integer, 0),
     pageSize: types.optional(types.integer, 20),
-    total: types.maybe(types.integer)
+    total: types.optional(types.integer, 0)
 }).views((self: any) => {
     return {
         get offset() {
@@ -104,10 +104,10 @@ export const QueryParams = types.model('QueryParams', {
                     offset: self.paging.offset
                 },
                 filters: Array.from(self.filters.items, item => ({key: item[0], value: item[1].value})),
-                sortBy: {
+                sortBy: self.sorting.key ? {
                     key: self.sorting.key,
                     order: self.sorting.order
-                }
+                } : undefined
             };
         }
     };

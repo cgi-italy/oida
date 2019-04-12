@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { observer, Observer } from 'mobx-react';
+import { TypeOfValue } from 'mobx-state-tree';
 
 import { LoadingState } from '@oida/core';
 import { IEntitySelection, IEntityCollection, IEntity, IDataPaging, IDataSorting, IDataFilters } from '@oida/state-mst';
@@ -15,7 +16,7 @@ type EntityUserAction<T> = {
 } & DataCollectionItemAction<T>;
 
 export type EntityCollectionProps<T extends IEntity> = {
-    collection: IEntityCollection;
+    collection: IEntityCollection<TypeOfValue<T>>;
     loadingState: LoadingState;
     entitySelection?: IEntitySelection;
     iconGetter?: (entity: T) => string | Promise<string>;
@@ -42,7 +43,7 @@ class EntityCollectionBase<T extends IEntity = IEntity>
         super(props);
 
         if (!props.entitySelection) {
-            let selectedId = null;
+            let selectedId: string;
             this.onSelectAction_ = (item, mode) => {
                 if (selectedId) {
                     let selected = this.props.collection.itemWithId(selectedId);
@@ -55,7 +56,7 @@ class EntityCollectionBase<T extends IEntity = IEntity>
             };
         } else {
             this.onSelectAction_ = (item, mode) => {
-                props.entitySelection.modifySelection(item, mode);
+                props.entitySelection!.modifySelection(item, mode);
             };
         }
     }
@@ -100,9 +101,9 @@ class EntityCollectionBase<T extends IEntity = IEntity>
                     itemHOC: Observer,
                     onSelectAction: this.onSelectAction_
                 },
-                paging: getPagerPropsFromState(paging),
-                sorting: getSorterPropsFromState(sorting.fields, sorting.state),
-                filters: getFiltererPropsFromState(filtering.filters, filtering.state)
+                paging: paging ? getPagerPropsFromState(paging) : undefined,
+                sorting: sorting ? getSorterPropsFromState(sorting.fields, sorting.state) : undefined,
+                filters: filtering ? getFiltererPropsFromState(filtering.filters, filtering.state) : undefined
             })
         );
     }

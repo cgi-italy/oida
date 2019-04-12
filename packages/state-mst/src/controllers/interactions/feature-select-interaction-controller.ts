@@ -25,7 +25,7 @@ export class FeatureSelectInteractionController extends
                 if (featureId) {
                     entity = resolveEntityReference(entityReferenceFromFeatureId(featureId), this.interaction_);
                 }
-                this.interaction_.selection.modifySelection(entity, mode);
+                this.interaction_.selection!.modifySelection(entity, mode);
             }
         };
     }
@@ -33,7 +33,7 @@ export class FeatureSelectInteractionController extends
     protected bindToInteractionState_() {
         super.bindToInteractionState_();
         this.subscriptionTracker_.addSubscription(autorun(() => {
-            this.interactionImpl_.setMultiple(this.interaction_.multiple);
+            this.interactionImpl_!.setMultiple(this.interaction_.multiple);
         }));
     }
 }

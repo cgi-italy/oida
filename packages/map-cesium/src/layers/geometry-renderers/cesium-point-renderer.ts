@@ -35,7 +35,7 @@ export class CesiumPointRenderer implements CesiumGeometryRenderer {
 
     addFeature(id, geometry, style) {
 
-        let feature = null;
+        let feature: any = null;
 
         if (geometry.type === 'Point') {
             feature = this.createBillboard_(id, geometry.coordinates, style);

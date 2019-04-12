@@ -16,6 +16,8 @@ export const IsoDate = types.custom<string, Date>({
     getValidationMessage(snapshot) {
         if (!moment.utc(snapshot, undefined, true).isValid()) {
             return `value ${snapshot} is not assignable to type IsoDate`;
+        } else {
+            return '';
         }
     }
 });

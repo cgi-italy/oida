@@ -6,7 +6,7 @@ export const BreadcrumbItem = types.model('BreadcrumbItem', {
     link: types.maybe(types.string)
 }).volatile((self) => {
     return {
-        onClick: null
+        onClick: undefined as (() => void) | undefined
     };
 })
 .actions((self) => {

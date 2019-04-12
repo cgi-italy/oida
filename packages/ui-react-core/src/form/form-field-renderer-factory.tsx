@@ -14,7 +14,7 @@ export const formFieldRendererFactory = () => {
         }
 
         let renderers = REGISTERED_RENDERERS.get(fieldId);
-        renderers.set(rendererId, renderer);
+        renderers!.set(rendererId, renderer);
 
     };
 

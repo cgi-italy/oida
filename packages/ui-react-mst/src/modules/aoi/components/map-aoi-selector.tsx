@@ -22,7 +22,7 @@ export type AoiSelectorProps = Pick<AoiField, Exclude<keyof AoiField, 'config' |
 
 let nextAoiId = 1;
 
-class AoiSelectorBase extends React.Component<AoiSelectorProps, {aoi: IAOI, activeAction: AoiAction}> {
+class AoiSelectorBase extends React.Component<AoiSelectorProps, {aoi: IAOI | undefined, activeAction: AoiAction}> {
 
     private aoiId_: string;
 
@@ -31,7 +31,7 @@ class AoiSelectorBase extends React.Component<AoiSelectorProps, {aoi: IAOI, acti
         this.aoiId_ = `${nextAoiId++}`;
 
         this.state = {
-            aoi: null,
+            aoi: undefined,
             activeAction: AoiAction.None
         };
     }
@@ -120,7 +120,7 @@ class AoiSelectorBase extends React.Component<AoiSelectorProps, {aoi: IAOI, acti
                 } else {
                     this.props.aois.remove(aoi);
                     this.setState({
-                        aoi: null
+                        aoi: undefined
                     });
                 }
             } else {

@@ -40,14 +40,14 @@ export class DataCollectionList<T> extends React.Component<DataCollectionListPro
         return  (
             <div className='data-collection-list'>
                 <div className='filter-section'>
-                    {sortRender(sorting)}
-                    {filtererRender(filters)}
+                    {sorting && sortRender!(sorting)}
+                    {filters && filtererRender!(filters)}
                 </div>
-                <DataCollectionItemsList
+                <DataCollectionItemsList<T>
                     {...items}
                     {...listProps}
                 ></DataCollectionItemsList>
-                {pagerRender(paging)}
+                {paging && pagerRender!(paging)}
             </div>
         );
     }

@@ -30,6 +30,16 @@ const config = (env = {}) => {
             module: {
                 rules: [
                     {
+                        include: /oida[\/\\]packages/,
+                        test: /\.jsx?$/,
+                        enforce: 'pre',
+                        use: [
+                            {
+                                loader: 'source-map-loader'
+                            }
+                        ]
+                    },
+                    {
                         test: /\.(png|jpe?g|gif|svg)$/i,
                         use: [
                             {

@@ -27,15 +27,13 @@ class MapRendererSelectorBase<T> extends React.Component<MapRendererSelectorProp
             return renderer.id === id;
         });
 
-        this.props.mapState.setRenderer(renderer);
+        if (renderer) {
+            this.props.mapState.setRenderer(renderer);
+        }
     }
 
     render() {
         let { render, renderers, mapState, ...props } = this.props;
-
-        let value = renderers.find((renderer) => {
-            return renderer.id === mapState.renderer.id;
-        }).id;
 
         let items = renderers.map((renderer) => {
 
@@ -45,7 +43,7 @@ class MapRendererSelectorBase<T> extends React.Component<MapRendererSelectorProp
         });
 
         return render({
-            value: value,
+            value: mapState.renderer.id,
             items: items,
             onSelect: this.onRendererSelect.bind(this)
         });

@@ -37,6 +37,10 @@ export function canBeScrolledIntoView<T extends object>(WrappedComponent: React.
         }
 
         scrollIntoView_() {
+            if (!this.domRef_.current) {
+                return;
+            }
+
             if (this.domRef_.current instanceof HTMLElement) {
                 scrollIntoView(this.domRef_.current, {
                     scrollMode: 'if-needed'

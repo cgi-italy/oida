@@ -7,7 +7,7 @@ import { IndexedCollection } from '../core';
 
 export const GroupLayer = MapLayer.addModel(
     types.model(GROUP_LAYER_ID, {
-        children: types.optional(IndexedCollection(MapLayer), {})
+        children: types.optional(IndexedCollection(MapLayer.Type), {})
     })
 );
 

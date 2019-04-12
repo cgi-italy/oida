@@ -17,11 +17,11 @@ import ImageryLayer from 'cesium/Source/Scene/ImageryLayer';
 
 import 'cesium/Source/Widgets/CesiumWidget/CesiumWidget.css';
 
-import { mapRendererFactory, IMapRenderer, IMapRendererProps, IMapViewport, BBox, Size } from '@oida/core';
+import { mapRendererFactory, IMapRenderer, IMapRendererProps, IMapViewport, IDynamicFactory, ILayerRenderer, BBox, Size } from '@oida/core';
 
 import { cesiumLayersFactory } from '../layers/cesium-layers-factory';
 import { cesiumInteractionsFactory } from '../interactions/cesium-interactions-factory';
-import { CesiumGroupLayer } from '../layers/cesium-group-layer';
+import { CesiumGroupLayer } from '../layers';
 import { getProjectionFromSRS } from '../utils/projection';
 
 
@@ -30,7 +30,7 @@ export const CESIUM_RENDERER_ID = 'cesium';
 export class CesiumMapRenderer implements IMapRenderer {
 
     private viewer_: CesiumWidget;
-    private layerGroup_: CesiumGroupLayer;
+    private layerGroup_: CesiumGroupLayer | undefined;
 
     constructor(props: IMapRendererProps) {
         this.initRenderer_(props);
@@ -94,7 +94,7 @@ export class CesiumMapRenderer implements IMapRenderer {
     }
 
     getLayersFactory() {
-        return cesiumLayersFactory;
+        return cesiumLayersFactory as IDynamicFactory<ILayerRenderer>;
     }
 
     getInteractionsFactory() {
@@ -141,7 +141,7 @@ export class CesiumMapRenderer implements IMapRenderer {
             parent.removeChild(this.viewer_.container);
         }
         this.viewer_.imageryLayers.removeAll(false);
-        this.viewer_.scene.primitives.remove(this.layerGroup_.getPrimitives());
+        this.viewer_.scene.primitives.remove(this.layerGroup_!.getPrimitives());
         this.viewer_.destroy();
     }
 
@@ -178,14 +178,14 @@ export class CesiumMapRenderer implements IMapRenderer {
         if (props.onViewUpdating) {
 
             let duringMove = (evt) => {
-                props.onViewUpdating(this.computeCurrentView_());
+                props.onViewUpdating!(this.computeCurrentView_());
             };
 
             this.viewer_.camera.moveStart.addEventListener((evt) => {
                 if (this.viewer_.scene.mode === SceneMode.MORPHING) {
                     return;
                 }
-                props.onViewUpdating();
+                props.onViewUpdating!();
                 this.viewer_.scene.postRender.addEventListener(duringMove);
             });
 
@@ -194,7 +194,7 @@ export class CesiumMapRenderer implements IMapRenderer {
                     return;
                 }
                 this.viewer_.scene.postRender.removeEventListener(duringMove);
-                props.onViewUpdated(this.computeCurrentView_());
+                props.onViewUpdated!(this.computeCurrentView_());
             });
 
         }

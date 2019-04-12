@@ -29,9 +29,11 @@ class TileSourceSelectorBase<T> extends React.Component<TileSourceSelectorProps<
             return source.id === id;
         });
 
-        let layer = this.props.group.children.itemAt(this.props.layerIdx) as ITileLayer;
-        layer.setSource(source.config);
-        layer.setName(source.id);
+        if (source) {
+            let layer = this.props.group.children.itemAt(this.props.layerIdx) as ITileLayer;
+            layer.setSource(source.config);
+            layer.setName(source.id);
+        }
     }
 
     render() {

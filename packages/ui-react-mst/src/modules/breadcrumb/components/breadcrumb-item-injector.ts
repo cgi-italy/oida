@@ -12,7 +12,7 @@ export type BreadcrumbItemInjectorProps = {
 };
 
 type BreadcrumbItemInjectorState = {
-    breadcrumbItem: IBreadcrumbItem
+    breadcrumbItem: IBreadcrumbItem | undefined
 };
 
 export class BreadcrumbItemInjector extends React.Component<BreadcrumbItemInjectorProps, BreadcrumbItemInjectorState> {
@@ -40,14 +40,14 @@ export class BreadcrumbItemInjector extends React.Component<BreadcrumbItemInject
             prevProps.breadcrumbData.onClick !== this.props.breadcrumbData.onClick
         ) {
 
-            this.state.breadcrumbItem.update(this.props.breadcrumbData);
+            this.state.breadcrumbItem!.update(this.props.breadcrumbData);
         }
     }
 
     componentWillUnmount() {
         this.props.breadcrumb.remove(this.state.breadcrumbItem);
         this.setState({
-            breadcrumbItem: null
+            breadcrumbItem: undefined
         });
     }
 

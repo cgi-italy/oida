@@ -3,12 +3,12 @@ import { types, SnapshotIn, Instance } from 'mobx-state-tree';
 import { MapView } from './map-view';
 import { MapRenderer } from './map-renderer';
 import { GroupLayer } from '../layers/group-layer';
-import { MapInteractionType } from '../interactions/map-interaction';
+import { MapInteraction } from '../interactions/map-interaction';
 import { IndexedCollection } from '../core/indexed-collection';
 
 export const Map = types.model('Map', {
     layers: types.optional(GroupLayer, {id: 'rootGroup'}),
-    interactions: types.optional(IndexedCollection(MapInteractionType), {}),
+    interactions: types.optional(IndexedCollection(MapInteraction.Type), {}),
     renderer: MapRenderer,
     view: MapView
 })

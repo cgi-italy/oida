@@ -1,6 +1,6 @@
 import {
     types,
-    IType, IModelType, ISimpleType, IOptionalIType, IAnyType,
+    IType, IModelType, ISimpleType, IOptionalIType, IAnyType, _NotCustomized,
     ModelProperties, ModelPropertiesDeclarationToProperties
  } from 'mobx-state-tree';
 
@@ -51,7 +51,7 @@ export const TaggedUnion =
                 SubBaseModel.props(keyTypeProp)
             ));
 
-            REGISTERED_TYPES.push(union);
+            REGISTERED_TYPES.push(union.Type);
 
             return union;
         },
@@ -62,27 +62,19 @@ export const TaggedUnion =
         }
     };
 
-    type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
-
-    type BaseProp = PROPS & ModelPropertiesDeclarationToProperties<{ [K in TAG_KEY]: IOptionalIType<ISimpleType<string>>; }>;
+    type BaseProp = PROPS & ModelPropertiesDeclarationToProperties<{ [K in TAG_KEY]: IOptionalIType<ISimpleType<string>, any>; }>;
 
     let UnionType = types.late(() => {
         UnionType.name = `${BaseModel.name}: Union(${REGISTERED_TYPES.map(type => type.name).join()})`;
         return types.union(...REGISTERED_TYPES);
-    }) as Omit<
-        IModelType<
-            BaseProp
-            , OTHERS
-        >,
-        'extend' | 'views' | 'actions' | 'volatile' | 'named' | 'props' | 'properties' | 'postProcessSnapshot' | 'preProcessSnapshot'
-    > & Partial<typeof methods>;
+    }) as IModelType<BaseProp, OTHERS>;
 
     UnionType.name = BaseModel.name;
 
-    UnionType.addModel = methods.addModel;
-    UnionType.addUnion = methods.addUnion;
-    UnionType.getSpecificType = methods.getSpecificType;
+    return {
+        Type: UnionType,
+        ...methods
+    };
 
-    return UnionType;
 };
 

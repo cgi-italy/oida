@@ -19,6 +19,7 @@ export class OLFeatureSelectInteraction  implements IFeatureSelectInteractionImp
     private multiple_: boolean;
 
     constructor(config: IFeatureSelectInteractionProps<OLMapRenderer>) {
+        this.multiple_ = false;
         this.viewer_ = config.mapRenderer.getViewer();
         this.initInteraction_(config.onFeatureSelect);
     }

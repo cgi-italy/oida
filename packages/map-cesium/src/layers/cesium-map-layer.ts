@@ -9,7 +9,7 @@ import { CesiumMapRenderer } from '../map/cesium-map-renderer';
 export class CesiumMapLayer implements ILayerRenderer {
 
     protected mapRenderer_: CesiumMapRenderer;
-    protected parent_: CesiumMapLayer = null;
+    protected parent_: CesiumMapLayer | undefined;
     protected visible_: boolean = true;
     protected alpha_: number = 1.0;
     protected imageries_;
@@ -36,7 +36,7 @@ export class CesiumMapLayer implements ILayerRenderer {
     setParent(parent) {
         this.parent_ = parent;
 
-        if (parent) {
+        if (this.parent_) {
             this.updateImageryOpacity_(this.imageries_);
             this.updateImageryVisibility_(this.imageries_, this.parent_.isVisible());
         }

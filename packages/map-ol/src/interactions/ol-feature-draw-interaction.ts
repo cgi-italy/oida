@@ -77,7 +77,7 @@ export class OLFeatureDrawInteraction implements IFeatureDrawInteractionImplemen
 
                     if (options.onDrawChange) {
                         evt.feature.getGeometry().on('change', (evt) => {
-                            options.onDrawChange(evt);
+                            options.onDrawChange!(evt);
                         });
                     }
                     if (options.onDrawStart) {
@@ -89,7 +89,7 @@ export class OLFeatureDrawInteraction implements IFeatureDrawInteractionImplemen
             if (options.onDrawEnd) {
                 this.olInteraction_.on('drawend', (evt) => {
                     setTimeout(() => {
-                        options.onDrawEnd({
+                        options.onDrawEnd!({
                             geometry: this.getGeoJSONGeometry(mode, evt.feature.getGeometry())
                         });
                     }, 0);

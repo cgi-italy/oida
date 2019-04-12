@@ -1,25 +1,37 @@
 {
+  "extends": "../../config/tsconfig.default.json",
   "compilerOptions": {
-    "declaration": true,
-    "declarationDir": "./dist/types",
-    "module": "es2015",
-    "lib": ["es6", "dom"],
-    "sourceMap": true,
-    "jsx": "react",
-    "noImplicitAny": false,
-    "experimentalDecorators": true,
+    "composite": false,
+    "declaration": false,
+    "declarationMap": false,
     "outDir": "./dist",
-    "target": "es5",
-    "moduleResolution": "node",
-    "esModuleInterop": true
+    "jsx": "react",
+    "rootDir": "../"
   },
-  "typeRoots": [
-    "node_modules/@types"
-  ],
   "include": [
     "src/**/*"
   ],
-  "exclude": [
-    "node_modules"
+  "references": [
+    {
+      "path": "../core"
+    },
+    {
+      "path": "../map-cesium"
+    },
+    {
+      "path": "../map-ol"
+    },
+    {
+      "path": "../state-mst"
+    },
+    {
+      "path": "../ui-react-core"
+    },
+    {
+      "path": "../ui-react-antd"
+    },
+    {
+      "path": "../ui-react-mst"
+    }
   ]
 }

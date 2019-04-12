@@ -29,7 +29,7 @@ const config = (config = {}) => {
         plugins: [
             new webpack.DefinePlugin({
                 // Define relative base path in cesium for loading assets
-                CESIUM_BASE_URL: JSON.stringify(`/${cesiumBaseUrl}`)
+                CESIUM_BASE_URL: JSON.stringify(`${cesiumBaseUrl}`)
             }),
             new CopyWebpackPlugin([
                 { from: path.join(nodeModulesDir, cesiumSource, cesiumWorkers), to: `${cesiumBaseUrl}/Workers` },

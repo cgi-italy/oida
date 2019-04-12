@@ -10,7 +10,7 @@ export type AsyncImageProps = {
 };
 
 type AsyncImageState = {
-    src: string,
+    src: string | null,
     loadingState: LoadingState
 };
 
@@ -50,7 +50,7 @@ export class AsyncImage extends React.Component<AsyncImageProps, AsyncImageState
                 return null;
             }
         } else if (this.state.loadingState === LoadingState.Loading) {
-            let children = [];
+            let children: React.ReactNode[] = [];
             if (this.state.src) {
                 children.push(
                     <img
@@ -66,7 +66,7 @@ export class AsyncImage extends React.Component<AsyncImageProps, AsyncImageState
             }
             return children;
         } else if (this.state.loadingState === LoadingState.Success) {
-            return <img src={this.state.src}></img>;
+            return <img src={this.state.src!}></img>;
         } else {
             return null;
         }

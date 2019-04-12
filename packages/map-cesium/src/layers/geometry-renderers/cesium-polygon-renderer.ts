@@ -28,8 +28,8 @@ export class CesiumPolygonRenderer implements CesiumGeometryRenderer {
     }
 
     addFeature(id, geometry, style) {
-        let fillInstances = null;
-        let outlineInstances = null;
+        let fillInstances: any = null;
+        let outlineInstances: any = null;
 
         if (geometry.type === 'Polygon') {
 
@@ -141,7 +141,7 @@ export class CesiumPolygonRenderer implements CesiumGeometryRenderer {
         let outlineInstance = null;
 
         let outer = coordinates[0];
-        let holes = [];
+        let holes: any[] = [];
         for (let i = 1; i < coordinates.length; ++i) {
             if (coordinates[i].length > 2) {
                 holes.push(new PolygonHierarchy(

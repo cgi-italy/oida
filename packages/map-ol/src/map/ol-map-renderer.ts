@@ -6,7 +6,10 @@ import { register } from 'ol/proj/proj4';
 import proj4 from 'proj4';
 import { getCenter as getExtentCenter } from 'ol/extent';
 
-import { mapRendererFactory, IMapRenderer, IMapRendererProps, IMapViewport, IMapProjection } from '@oida/core';
+import {
+    mapRendererFactory, IMapRenderer, IMapRendererProps, IMapViewport, IMapProjection,
+    IDynamicFactory, ILayerRenderer
+} from '@oida/core';
 
 import { olLayersFactory } from '../layers/ol-layers-factory';
 import { olInteractionsFactory } from '../interactions/ol-interactions-factory';
@@ -18,7 +21,7 @@ export const OL_RENDERER_ID = 'ol';
 export class OLMapRenderer implements IMapRenderer {
 
     private viewer_: Map;
-    private layerGroup_: OLGroupLayer;
+    private layerGroup_: OLGroupLayer | undefined;
 
     constructor(props: IMapRendererProps) {
         this.initRenderer_(props);
@@ -69,7 +72,7 @@ export class OLMapRenderer implements IMapRenderer {
     }
 
     getLayersFactory() {
-        return olLayersFactory;
+        return olLayersFactory as IDynamicFactory<ILayerRenderer>;
     }
 
     getInteractionsFactory() {
@@ -99,13 +102,13 @@ export class OLMapRenderer implements IMapRenderer {
             view: this.createViewFromProps_(props.viewport, props.projection)
         });
 
-        if (typeof(props.onViewUpdating) === 'function') {
+        if (props.onViewUpdating) {
             this.viewer_.on('movestart', () => {
 
-                props.onViewUpdating();
+                props.onViewUpdating!();
 
                 let duringMove = (evt) => {
-                    props.onViewUpdating(this.computeCurrentView_());
+                    props.onViewUpdating!(this.computeCurrentView_());
                 };
 
                 this.viewer_.on('postrender', duringMove);
@@ -117,9 +120,9 @@ export class OLMapRenderer implements IMapRenderer {
             });
         }
 
-        if (typeof(props.onViewUpdated) === 'function') {
+        if (props.onViewUpdated) {
             this.viewer_.on('moveend', () => {
-                props.onViewUpdated(this.computeCurrentView_());
+                props.onViewUpdated!(this.computeCurrentView_());
             });
         }
 

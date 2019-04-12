@@ -1,9 +1,10 @@
-import { types, IAnyModelType, Instance, getType } from 'mobx-state-tree';
+import { types, Instance, IModelType } from 'mobx-state-tree';
 
 import { TaggedUnion } from '../mst/tagged-union';
-import { Entity, IEntity } from './entity';
+import { Entity } from './entity';
 
 import { IndexedCollection } from '../core';
+import { ExtractPropsFromModel, ExtractOthersFromModel } from '../../utils';
 
 let nextCollectionId = 1;
 
@@ -13,22 +14,29 @@ const EntityCollectionBase = types.model({
 
 export const EntityCollection = TaggedUnion('entityCollectionType', EntityCollectionBase);
 
+type EntityProps = ExtractPropsFromModel<typeof Entity.Type>;
+type EntityOthers = ExtractOthersFromModel<typeof Entity.Type>;
 
-export function EntityCollectionFactory<T extends typeof Entity>(entityType: T) {
+export function EntityCollectionFactory<PROPS extends EntityProps, OTHERS extends EntityOthers>(entityType: IModelType<PROPS, OTHERS>) {
     return IndexedCollection(entityType);
 }
 
-export const createEntityCollectionType = <T extends typeof Entity>(type: T, collectionFactory = EntityCollectionFactory) => {
+export const createEntityCollectionType = <PROPS extends EntityProps, OTHERS extends EntityOthers>
+(type: IModelType<PROPS, OTHERS>, collectionFactory = EntityCollectionFactory) => {
     let collectionTypeName = `${type.name}Collection`;
     return EntityCollection.addModel(collectionFactory(type).named(collectionTypeName));
 };
 
-//only for typings
-const EntityCollectionType = types.compose(EntityCollectionBase, IndexedCollection(Entity));
-
 export const getEntityCollectionType = () => {
-    return <unknown>EntityCollection as typeof EntityCollectionType;
+    return <unknown>EntityCollection.Type as EntityCollectionType<typeof Entity.Type>;
 };
 
+class EntityCollectionTypeHelper<PROPS extends EntityProps, OTHERS extends EntityOthers> {
+    Return = createEntityCollectionType<PROPS, OTHERS>({} as IModelType<PROPS, OTHERS>);
+}
 
-export type IEntityCollection = Instance<typeof EntityCollectionType>;
+type EntityCollectionType<T extends IModelType<any, any>> =
+EntityCollectionTypeHelper<ExtractPropsFromModel<T>, ExtractOthersFromModel<T>>['Return'];
+
+export type IEntityCollection<T extends IModelType<any, any>> =
+Instance<EntityCollectionType<T>>;

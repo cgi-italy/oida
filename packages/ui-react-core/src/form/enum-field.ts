@@ -9,9 +9,9 @@ export type EnumField = FormField<typeof ENUM_FIELD_ID, string | string[], {
     multiple?: boolean;
 }>;
 
-setFormFieldSerializer(ENUM_FIELD_ID, {
+setFormFieldSerializer<EnumField>(ENUM_FIELD_ID, {
     toString: (formField) => {
-        let selection = [];
+        let selection: string[] = [];
         if (Array.isArray(formField.value)) {
             selection = [...formField.value];
         } else {

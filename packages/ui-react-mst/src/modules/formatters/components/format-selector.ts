@@ -28,14 +28,18 @@ class FormatSelectorBase<VALUE_TYPE, FORMATTER_OPTIONS> extends React.Component<
             return options.id === id;
         });
 
-        formattersModule.setDefaultFormatterOptions(quantity, options);
+        if (options) {
+            formattersModule.setDefaultFormatterOptions(quantity, options);
+        }
     }
 
     render() {
 
         let { render, quantity, formatterOptions, formattersModule} = this.props;
 
-        let value = formattersModule.defaultFormatterOptions.get(quantity.id).id;
+        let selectedOptions = formattersModule.defaultFormatterOptions.get(quantity.id);
+
+        let value = selectedOptions ? selectedOptions.id : '';
 
         let items = formatterOptions.map((options) => {
             return Object.assign({
@@ -67,6 +71,9 @@ export const injectFormattersFromModuleConfig =
         return item.quantity === quantity;
     });
 
+    if (!quantityConfig) {
+        throw 'No config for quantity';
+    }
     return {
         formatterOptions: quantityConfig.formatterOptions
     };

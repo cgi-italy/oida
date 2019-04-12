@@ -29,10 +29,10 @@ export class AoiFieldRenderer extends React.Component<AoiField & AoiFieldRendere
                 <Tag
                     closable
                     color={color}
-                    onMouseOver={() => onHoverAction(true)}
-                    onMouseOut={() => onHoverAction(false)}
-                    onClick={() => onSelectAction(true)}
-                    onClose={this.onAoiChange.bind(this, null)}>{this.props.value.name}</Tag>
+                    onMouseOver={onHoverAction ? () => onHoverAction!(true) : undefined}
+                    onMouseOut={onHoverAction ? () => onHoverAction!(false) : undefined}
+                    onClick={onSelectAction ? () => onSelectAction!(true) : undefined}
+                    onClose={this.onAoiChange.bind(this, null)}>{value.name}</Tag>
                 }
                 {!value &&
                 <Tag
@@ -40,28 +40,34 @@ export class AoiFieldRenderer extends React.Component<AoiField & AoiFieldRendere
                 >No area specified</Tag>
                 }
                 <Button.Group>
-                    <Tooltip
-                        title='Draw bbox'
-                    >
-                        <Button
-                            type={activeAction === AoiAction.DrawBBox ? 'primary' : 'default'}
-                            size='small'
-                            onClick={() => onDrawBBoxAction()}
+                    {
+                        onDrawBBoxAction &&
+                        <Tooltip
+                            title='Draw bbox'
                         >
-                            <DrawBboxIcon/>
-                        </Button>
-                    </Tooltip>
-                    <Tooltip
-                        title='Draw polygon'
-                    >
-                        <Button
-                            type={activeAction === AoiAction.DrawPolygon ? 'primary' : 'default'}
-                            size='small'
-                            onClick={() => onDrawPolygonAction()}
+                            <Button
+                                type={activeAction === AoiAction.DrawBBox ? 'primary' : 'default'}
+                                size='small'
+                                onClick={() => onDrawBBoxAction!()}
+                            >
+                                <DrawBboxIcon/>
+                            </Button>
+                        </Tooltip>
+                    }
+                    {
+                        onDrawPolygonAction &&
+                        <Tooltip
+                            title='Draw polygon'
                         >
-                            <DrawPolygonIcon/>
-                        </Button>
-                    </Tooltip>
+                            <Button
+                                type={activeAction === AoiAction.DrawPolygon ? 'primary' : 'default'}
+                                size='small'
+                                onClick={() => onDrawPolygonAction!()}
+                            >
+                                <DrawPolygonIcon/>
+                            </Button>
+                        </Tooltip>
+                    }
                 </Button.Group>
             </React.Fragment>
         );

@@ -17,8 +17,8 @@ export type FormFieldConfig<TYPE extends string, CONFIG> = {
 
 
 export type FormFieldState<T> = {
-    value: T;
-    onChange: (value: T) => void;
+    value: T | undefined;
+    onChange: (value: T | undefined) => void;
 };
 
 export type FormField<TYPE extends string, T, CONFIG> = FormFieldConfig<TYPE, CONFIG> & FormFieldState<T>;
@@ -31,13 +31,13 @@ export type FormFieldDefinitionWithWrapper<TYPE extends string, T, CONFIG> = {
     config?: Partial<CONFIG>
 };
 
+export type FormFieldDefinition<TYPE extends string, T, CONFIG> =
+    FormFieldConfig<TYPE, CONFIG> | FormFieldDefinitionWithWrapper<TYPE, T, CONFIG>;
+
 export const isFormFieldDefinitionWithWrapper = <TYPE extends string, T, CONFIG>(config: FormFieldDefinition<TYPE, T, CONFIG>):
     config is FormFieldDefinitionWithWrapper<TYPE, T, CONFIG> => {
-    return (<FormFieldDefinitionWithWrapper<TYPE, T, CONFIG>>config).wrapper !== undefined;
+    return (config as FormFieldDefinitionWithWrapper<TYPE, T, CONFIG>).wrapper !== undefined;
 };
-
-export type FormFieldDefinition<TYPE extends string, T, CONFIG> =
-    FormFieldConfig<TYPE, CONFIG> | FormFieldDefinitionWithWrapper<string, T, CONFIG>;
 
 export type FormFieldValues = Map<string, any>;
 

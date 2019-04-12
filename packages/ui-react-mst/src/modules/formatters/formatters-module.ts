@@ -39,10 +39,13 @@ export const FormattersModuleStateModel = AppModuleStateModel.addModel(
             )  => {
                 let formatter = self.registeredFormatters.get(quantity.id);
                 if (formatter) {
-                    return formatter(value, {
-                        ...self.defaultFormatterOptions.get(quantity.id).options,
-                        ...(options as any)
-                    });
+                    let formatterOptions = self.defaultFormatterOptions.get(quantity.id);
+                    if (formatterOptions) {
+                        return formatter(value, {
+                            ...formatterOptions.options,
+                            ...(options)
+                        });
+                    }
                 } else {
                     return value.toString();
                 }

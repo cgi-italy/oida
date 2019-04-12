@@ -5,18 +5,18 @@ import { layerControllersFactory } from './layer-controllers-factory';
 
 import { ArrayTracker } from '../../utils';
 
-import { IGroupLayer } from '../../types/layers/group-layer';
+import { MapLayer, IMapLayer, IGroupLayer } from '../../types';
 
 export class GroupLayerController extends MapLayerController<IGroupLayerRenderer, IGroupLayer> {
 
-    private mapRenderer_: IMapRenderer = null;
-    private layersTracker_: ArrayTracker<MapLayerController<IGroupLayerRenderer, IGroupLayer>>;
+    private mapRenderer_: IMapRenderer | undefined;
+    private layersTracker_: ArrayTracker<MapLayerController | undefined, typeof MapLayer.Type> | undefined;
 
     constructor(config) {
         super(config);
     }
 
-    setMapRenderer(mapRenderer) {
+    setMapRenderer(mapRenderer: IMapRenderer | undefined) {
         this.mapRenderer_ = mapRenderer;
         super.setMapRenderer(mapRenderer);
     }
@@ -40,28 +40,32 @@ export class GroupLayerController extends MapLayerController<IGroupLayerRenderer
 
     protected unbindFromLayerState_() {
         super.unbindFromLayerState_();
-        this.layersTracker_.destroy();
+        this.layersTracker_!.destroy();
         delete this.layersTracker_;
     }
 
-    protected createChildLayer_(mapLayer, idx?: number) {
+    protected createChildLayer_(mapLayer: IMapLayer, idx?: number) {
         let childLayerController = layerControllersFactory.create(mapLayer.layerType, {
             mapLayer
         });
-        childLayerController.setMapRenderer(this.mapRenderer_);
-        let childLayerRenderer = childLayerController.getLayerRenderer();
-        if (childLayerRenderer) {
-            this.layerRenderer_.addLayer(childLayerRenderer, idx);
+        if (childLayerController) {
+            childLayerController.setMapRenderer(this.mapRenderer_!);
+            let childLayerRenderer = childLayerController.getLayerRenderer();
+            if (childLayerRenderer) {
+                this.layerRenderer_!.addLayer(childLayerRenderer, idx);
+            }
         }
         return childLayerController;
     }
 
-    protected destroyChildLayer_(childLayerController: MapLayerController<IGroupLayerRenderer, IGroupLayer>) {
-        let childLayerRenderer = childLayerController.getLayerRenderer();
-        if (childLayerRenderer) {
-            this.layerRenderer_.removeLayer(childLayerRenderer);
+    protected destroyChildLayer_(childLayerController: MapLayerController | undefined) {
+        if (childLayerController) {
+            let childLayerRenderer = childLayerController.getLayerRenderer();
+            if (childLayerRenderer) {
+                this.layerRenderer_!.removeLayer(childLayerRenderer);
+            }
+            childLayerController.destroy();
         }
-        childLayerController.destroy();
     }
 
 }

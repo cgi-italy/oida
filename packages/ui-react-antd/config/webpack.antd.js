@@ -22,7 +22,7 @@ const config = (config = {}) => {
     return {
         resolve: {
             alias: {
-                "@oida/ui-react-antd": '@oida/ui-react-antd/src'
+                '@oida/ui-react-antd': '@oida/ui-react-antd/src'
             }
         },
         module: {

@@ -21,8 +21,8 @@ export class CesiumFeatureSelectInteraction implements IFeatureSelectInteraction
 
     constructor(props: IFeatureSelectInteractionProps<CesiumMapRenderer>) {
         this.viewer_ = props.mapRenderer.getViewer();
-
         this.onFeatureSelect_ = props.onFeatureSelect;
+        this.multiple_ = false;
     }
 
     setActive(active) {

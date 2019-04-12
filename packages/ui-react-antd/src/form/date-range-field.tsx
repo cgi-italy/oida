@@ -16,7 +16,7 @@ export class DateRangeFieldRenderer extends React.Component<DateRangeField> {
                 end: range[1].toDate(),
             });
         } else {
-            this.props.onChange(null);
+            this.props.onChange(undefined);
         }
     }
 
@@ -24,7 +24,7 @@ export class DateRangeFieldRenderer extends React.Component<DateRangeField> {
 
         let { value, onChange, config, ...renderProps } = this.props;
 
-        let disabledDates = null;
+        let disabledDates;
         if (config.minDate || config.maxDate) {
             disabledDates = (current: moment.Moment) => {
                 return current.isBefore(config.minDate) || current.isAfter(config.maxDate);
@@ -35,7 +35,7 @@ export class DateRangeFieldRenderer extends React.Component<DateRangeField> {
         return (
             <DatePicker.RangePicker
                 size='small'
-                value={value ? [moment(value.start), moment(value.end)] : null}
+                value={value ? [moment(value.start), moment(value.end)] : undefined}
                 onChange={this.onDateChange.bind(this)}
                 disabledDate={disabledDates}
                 {...renderProps}

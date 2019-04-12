@@ -7,15 +7,14 @@ import { IMapLayer } from '../../types/layers/map-layer';
 export abstract class MapLayerController<T extends ILayerRenderer = ILayerRenderer, U extends IMapLayer = IMapLayer> {
 
     protected mapLayer_: U;
-    protected layerRenderer_: T;
+    protected layerRenderer_: T | undefined;
     protected subscriptionTracker_: SubscriptionTracker = new SubscriptionTracker();
 
     constructor(config) {
         this.mapLayer_ = config.mapLayer;
-        this.layerRenderer_ = null;
     }
 
-    setMapRenderer(mapRenderer: IMapRenderer) {
+    setMapRenderer(mapRenderer: IMapRenderer | undefined) {
         this.destroy();
         if (mapRenderer) {
             this.layerRenderer_ = this.createLayerRenderer_(mapRenderer);
@@ -26,7 +25,7 @@ export abstract class MapLayerController<T extends ILayerRenderer = ILayerRender
         }
     }
 
-    getLayerRenderer() : T {
+    getLayerRenderer() {
         return this.layerRenderer_;
     }
 
@@ -34,7 +33,7 @@ export abstract class MapLayerController<T extends ILayerRenderer = ILayerRender
         if (this.layerRenderer_) {
             this.unbindFromLayerState_();
             this.layerRenderer_.destroy();
-            this.layerRenderer_ = null;
+            delete this.layerRenderer_;
         }
     }
 
@@ -42,8 +41,10 @@ export abstract class MapLayerController<T extends ILayerRenderer = ILayerRender
 
     protected bindToLayerState_() {
         this.subscriptionTracker_.addSubscription(autorun(() => {
-            this.layerRenderer_.setVisible(this.mapLayer_.visible);
-            this.layerRenderer_.setOpacity(this.mapLayer_.opacity);
+            if (this.layerRenderer_) {
+                this.layerRenderer_.setVisible(this.mapLayer_.visible);
+                this.layerRenderer_.setOpacity(this.mapLayer_.opacity);
+            }
         }));
     }
 

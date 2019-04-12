@@ -24,7 +24,7 @@ export class TileLayerController extends MapLayerController<ITileLayerRenderer, 
 
         this.subscriptionTracker_.addSubscription(
             observe(this.mapLayer_, 'source', (change) => {
-                this.layerRenderer_.updateSource(change.newValue.value);
+                this.layerRenderer_!.updateSource(change.newValue.value);
             })
         );
 

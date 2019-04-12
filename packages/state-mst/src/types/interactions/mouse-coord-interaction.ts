@@ -1,10 +1,10 @@
 import { types, Instance } from 'mobx-state-tree';
 
-import { MapInteractionType } from './map-interaction';
+import { MapInteraction } from './map-interaction';
 
 import { MOUSE_COORDS_INTERACTION_ID } from '@oida/core';
 
-export const MouseCoordsInteraction = MapInteractionType.addModel(types.model(
+export const MouseCoordsInteraction = MapInteraction.addModel(types.model(
     MOUSE_COORDS_INTERACTION_ID,
     {
         mouseCoords: types.maybe(types.frozen()),

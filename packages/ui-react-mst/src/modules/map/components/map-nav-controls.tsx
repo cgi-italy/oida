@@ -21,13 +21,13 @@ class MapNavControlsBase extends React.Component<MapNavControlsProps> {
 
     onZoomIn() {
         this.props.mapView.viewport.setResolution(
-            this.props.mapView.viewport.resolution / this.props.zoomFactor
+            this.props.mapView.viewport.resolution / this.props.zoomFactor!
         );
     }
 
     onZoomOut() {
         this.props.mapView.viewport.setResolution(
-            this.props.mapView.viewport.resolution * this.props.zoomFactor
+            this.props.mapView.viewport.resolution * this.props.zoomFactor!
         );
     }
 

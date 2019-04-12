@@ -29,16 +29,18 @@ export class DataCollectionTable<T> extends React.Component<DataCollectionTableP
 
         let tableColumns = columns.map((column) => {
 
-            let isSortable = !!sorting.sortableFields.find((field) => {
+            let isSortable = sorting && !!sorting.sortableFields.find((field) => {
                 return field.key === column.dataIndex;
             });
 
+            let sortOrder: string | boolean = false;
+            if (sorting && sorting.sortKey === column.dataIndex) {
+                sortOrder = sorting.sortOrder === SortOrder.Ascending ? 'ascend' : 'descend';
+            }
             return {
                 ...column,
                 sorter: isSortable,
-                sortOrder: sorting.sortKey === column.dataIndex
-                    ? sorting.sortOrder === SortOrder.Ascending ? 'ascend' : 'descend'
-                    : false,
+                sortOrder: sortOrder,
                 key: column.dataIndex,
                 dataIndex: column.dataIndex
             };
@@ -69,17 +71,19 @@ export class DataCollectionTable<T> extends React.Component<DataCollectionTableP
                     pagination={false}
                     columns={tableColumns}
                     onChange={(pagination, filters, sortProps) => {
-                        if (sortProps && sortProps.columnKey) {
-                            sorting.onSortChange({
-                                key: sortProps.columnKey,
-                                order: sortProps.order === 'ascend' ? SortOrder.Ascending : SortOrder.Descending
-                            });
-                        } else {
-                            sorting.onSortClear();
+                        if (sorting) {
+                            if (sortProps && sortProps.columnKey) {
+                                sorting.onSortChange({
+                                    key: sortProps.columnKey,
+                                    order: sortProps.order === 'ascend' ? SortOrder.Ascending : SortOrder.Descending
+                                });
+                            } else {
+                                sorting.onSortClear();
+                            }
                         }
                     }}
                 ></Table>
-                {pagerRender(paging)}
+                {paging && pagerRender!(paging)}
             </React.Fragment>
         );
     }
