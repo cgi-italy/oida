@@ -72,5 +72,10 @@
       "check-separator",
       "check-type"
     ]
+  },
+  "linterOptions": {
+    "exclude": [
+      "packages/ui-react-antd/src/icons/*"
+    ]
   }
 }
