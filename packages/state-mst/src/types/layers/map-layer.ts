@@ -7,12 +7,16 @@ const LayerBase = types.compose(
     'mapLayer',
     types.model({
         name: types.optional(types.string, ''),
+        zIndex: types.maybe(types.number)
     }).volatile(self => ({
         renderer: null
     })).actions((self) => {
         return {
             setRenderer(renderer) {
                 self.renderer = renderer;
+            },
+            setZIndex: (zIndex: number) => {
+                self.zIndex = zIndex;
             },
             setName(name) {
                 self.name = name;

@@ -10,6 +10,7 @@ const MapRendererMock = jest.fn();
 const LayerRendererMock = jest.fn(() => ({
     setVisible: jest.fn(),
     setOpacity: jest.fn(),
+    setZIndex: jest.fn(),
     destroy: jest.fn()
 }));
 

@@ -23,6 +23,10 @@ export abstract class OLMapLayer<T extends LayerBase = LayerBase> implements ILa
         this.olImpl_.setOpacity(opacity);
     }
 
+    setZIndex(zIndex) {
+        this.olImpl_.setZIndex(zIndex);
+    }
+
     destroy() {
         this.destroyOLObject_();
     }

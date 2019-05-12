@@ -33,6 +33,10 @@ export class CesiumMapLayer implements ILayerRenderer {
         this.updateImageryOpacity_(this.imageries_);
     }
 
+    setZIndex(zIndex) {
+        console.warn('layer zIndex not supported');
+    }
+
     setParent(parent) {
         this.parent_ = parent;
 

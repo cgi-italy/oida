@@ -27,7 +27,9 @@ export class OLTileLayer  extends OLMapLayer<TileLayer> {
             source: olTileSourcesFactory.create(config.source.id, {
                 ...config.source,
                 wrapX: this.mapRenderer_.getViewer().getView()['wrapX']
-            })
+            }),
+            extent: config.extent,
+            zIndex: config.zIndex || 0
         });
     }
 

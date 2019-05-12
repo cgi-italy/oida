@@ -41,10 +41,12 @@ export abstract class MapLayerController<T extends ILayerRenderer = ILayerRender
 
     protected bindToLayerState_() {
         this.subscriptionTracker_.addSubscription(autorun(() => {
-            if (this.layerRenderer_) {
-                this.layerRenderer_.setVisible(this.mapLayer_.visible);
-                this.layerRenderer_.setOpacity(this.mapLayer_.opacity);
-            }
+            this.layerRenderer_!.setVisible(this.mapLayer_.visible);
+            this.layerRenderer_!.setOpacity(this.mapLayer_.opacity);
+        }));
+
+        this.subscriptionTracker_.addSubscription(autorun(() => {
+            this.layerRenderer_!.setZIndex(this.mapLayer_.zIndex || 0);
         }));
     }
 

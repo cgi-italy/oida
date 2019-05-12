@@ -1,4 +1,5 @@
 import ImageryLayer from 'cesium/Source/Scene/ImageryLayer';
+import Rectangle from 'cesium/Source/Core/Rectangle';
 
 import { TILE_LAYER_ID } from '@oida/core';
 
@@ -27,6 +28,10 @@ export class CesiumTileLayer  extends CesiumMapLayer {
         try {
             let source = cesiumTileSourcesFactory.create(config.id, config);
             if (source) {
+                let options: any = {};
+                if (config.extent) {
+                    options.rectangle = Rectangle.fromDegrees(...config.extent);
+                }
                 this.imageries_.add(new ImageryLayer(source));
             }
         } catch (e) {
