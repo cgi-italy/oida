@@ -15,7 +15,8 @@
   "scripts": {
     "pack-icons": "rimraf ./src/icons && svgr --config-file ./config/svgr.config.js --ext tsx --filename-case kebab --out-dir ./src/icons ./assets/icons",
     "prebuild": "npm run pack-icons",
-    "build": "rollup --config rollup.config.js && rollup --config rollup.config.js --environment FORMAT:cjs",
+    "build": "rollup --config rollup.config.js",
+    "build:cjs": "rollup --config rollup.config.js --environment FORMAT:cjs",
     "clean": "rimraf ./dist ./.rpt2_cache",
     "watch": "rollup --config rollup.config.js --watch",
     "lint": "tslint --project ./tsconfig.json",
