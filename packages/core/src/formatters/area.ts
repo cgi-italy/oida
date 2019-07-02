@@ -38,7 +38,7 @@ export const formatArea = (
     if (typeof area !== 'number') {
         formattedArea = 'N/A';
     } else {
-        formattedArea = area * options.inputUnits.toSquareMeters / options.inputUnits.toSquareMeters;
+        formattedArea = area * options.inputUnits.toSquareMeters / options.outputUnits.toSquareMeters;
         if (options.precision) {
             formattedArea = parseFloat(formattedArea.toFixed(options.precision));
         }

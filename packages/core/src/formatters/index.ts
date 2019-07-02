@@ -3,3 +3,4 @@ export * from './map-coord';
 export * from './area';
 export * from './length';
 export * from './date';
+export * from './file-size';

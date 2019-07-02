@@ -40,7 +40,7 @@ export const formatLength = (
     if (typeof length !== 'number') {
         formattedLength = 'N/A';
     } else {
-        formattedLength = length * options.inputUnits.toMeters / options.inputUnits.toMeters;
+        formattedLength = length * options.inputUnits.toMeters / options.outputUnits.toMeters;
         if (options.precision) {
             formattedLength = parseFloat(formattedLength.toFixed(options.precision));
         }
