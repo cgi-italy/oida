@@ -8,121 +8,85 @@ import { LoadingState, SelectionMode } from '@oida/core';
 import { DataCollectionItemsProps, canBeScrolledIntoView } from '@oida/ui-react-core';
 
 export type DataCollectionItemsListProps<T> = {
-    meta?(item: T): {avatar?: React.ReactNode, description?: React.ReactNode, title?: React.ReactNode};
-    extra?(item: T): React.ReactNode;
-    content?(item: T): React.ReactNode;
+    autoScrollOnSelection?: boolean;
+    meta: (item: T) => {avatar?: React.ReactNode, description?: React.ReactNode, title?: React.ReactNode};
+    extra?: (item: T) => React.ReactNode;
+    content?: (item: T) => React.ReactNode;
 };
 
-export class DataCollectionItemsList<T> extends React.Component<DataCollectionItemsListProps<T> & DataCollectionItemsProps<T>> {
 
-    private renderItem;
+export function DataCollectionItemsList<T>(props: DataCollectionItemsListProps<T> & DataCollectionItemsProps<T>) {
 
-    constructor(props) {
-        super(props);
-
-        let {
-            itemHOC: ItemHOC,
-            isItemHovered,
-            getItemKey,
-            isItemSelected,
-            getItemIcon,
-            getItemActions,
-            meta,
-            content,
-            extra,
-            onHoverAction,
-            onSelectAction
-        } = props;
+    let {
+        autoScrollOnSelection,
+        meta,
+        content,
+        extra,
+        itemSelector,
+        onHoverAction,
+        onSelectAction,
+        keyGetter,
+        ...renderProps
+    } = props;
 
 
-        let renderItem = (item: T) => {
+    let ItemRenderer = ({item}) => {
 
-            let actions = [];
-            if (getItemActions)
-                actions = getItemActions(item).map((action) => {
-                    return (
-                        <Tooltip title={action.name}>
-                            <a onClick={
-                                () => {
-                                    action.callback(item);
-                            }
-                            }>
-                                {action.icon}
-                            </a>
-                        </Tooltip>
-                    );
-                });
+        let {hovered, selected, actions: actions, icon} =  itemSelector(item);
 
-            let itemMeta = (
-                <List.Item.Meta avatar={
-                    getItemIcon &&
-                    (
-                        <span className='ant-avatar ant-avatar-circle ant-avatar-image'>
-                            {getItemIcon(item)}
-                        </span>
-                    )} {...meta(item)}>
-                </List.Item.Meta>
-            );
-
-            let ListItem = canBeScrolledIntoView(List.Item);
-
-            return (
-                    <ListItem
-                        scrollToItem={isItemHovered(item) || isItemSelected(item)}
-                        extra={extra && extra(item)}
-                        actions={actions}
-                        className={classnames({'hovered': isItemHovered(item), 'selected': isItemSelected(item)})}
-                        onMouseEnter={() => {
-                            onHoverAction(item, true);
-                        }}
-                        onMouseLeave={() => {
-                            onHoverAction(item, false);
-                        }}
-                        onClick={() => {
-                            onSelectAction(item, SelectionMode.Replace);
-                        }}
-                        >
-                            {content ? [content(item), itemMeta] : itemMeta}
-                    </ListItem>
-            );
-        };
-
-        if (ItemHOC) {
-            this.renderItem = (item: T) => (
-                <ItemHOC>{() => renderItem(item)}</ItemHOC>
-            );
-        } else {
-            this.renderItem = renderItem;
-        }
-    }
-
-    render() {
-
-        let {
-            itemHOC: ItemHOC,
-            isItemHovered,
-            getItemKey,
-            getItemIcon,
-            getItemActions,
-            isItemSelected,
-            meta,
-            content,
-            extra,
-            onHoverAction,
-            onSelectAction,
-            ...renderProps
-        } = this.props;
-
-        let {data, loadingState, ...props} = renderProps;
-
-        return  (
-            <List
-                size='small'
-                loading={loadingState === LoadingState.Loading}
-                dataSource={data}
-                renderItem={this.renderItem}
-                {...props}
-            />
+        let itemMeta = (
+            <List.Item.Meta avatar={
+                icon &&
+                (
+                    <span className='ant-avatar ant-avatar-circle ant-avatar-image'>
+                        {icon}
+                    </span>
+                )} {...meta(item)}>
+            </List.Item.Meta>
         );
-    }
+
+        let ListItem;
+        if (autoScrollOnSelection) {
+            ListItem = canBeScrolledIntoView(List.Item);
+        } else {
+            ListItem = List.Item;
+        }
+
+        return (
+                <ListItem
+                    scrollToItem={hovered || selected}
+                    extra={props.extra && props.extra(item)}
+                    actions={actions}
+                    className={classnames({'hovered': hovered, 'selected': selected})}
+                    onMouseEnter={() => {
+                        onHoverAction(item, true);
+                    }}
+                    onMouseLeave={() => {
+                        onHoverAction(item, false);
+                    }}
+                    onClick={() => {
+                        onSelectAction(item, SelectionMode.Replace);
+                    }}
+                    >
+                        {props.content ? [props.content(item), itemMeta] : itemMeta}
+                </ListItem>
+        );
+    };
+
+    let {data, loadingState, ...listProps} = renderProps;
+
+    return  (
+        <List
+            size='small'
+            loading={loadingState === LoadingState.Loading}
+            dataSource={data}
+            rowKey={keyGetter}
+            renderItem={(item: T) => (<ItemRenderer item={item}></ItemRenderer>)} //allow usage of hooks inside ItemRenderer
+            {...listProps}
+        />
+    );
 }
+
+DataCollectionItemsList.defaultProps = {
+    autoScrollOnSelection: false
+};

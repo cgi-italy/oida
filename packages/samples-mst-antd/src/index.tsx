@@ -9,6 +9,8 @@ import {
 
 import * as components from './samples';
 
+import '../style/app.scss';
+
 const initApp = () => {
 
     let routes: Array<{path: string, title: string, component: React.ComponentType<any> }> = [];

@@ -8,7 +8,6 @@ export type DataCollectionItemAction<T> = {
 };
 
 export type DataCollectionItemProps<T> = {
-    key: string;
     selected: boolean;
     hovered: boolean;
     icon?: React.ReactNode;
@@ -17,15 +16,10 @@ export type DataCollectionItemProps<T> = {
 
 export type DataCollectionItemsProps<T> = {
     data: T[];
-    getItemKey: (item: T) => string;
-    isItemHovered: (item: T) => boolean;
-    isItemSelected: (item: T) => boolean;
-    getItemActions?: (item: T) => DataCollectionItemAction<T>[];
-    getItemIcon?: (item: T) => React.ReactNode;
-    itemHOC?: React.ReactNode,
+    keyGetter: (item: T) => string;
+    itemSelector: (item: T) => DataCollectionItemProps<T>;
     onHoverAction: (item: T, hovered: boolean) => void;
     onSelectAction: (item:  T, mode: SelectionMode) => void;
     loadingState?: LoadingState;
 };
 
-export type DataCollectionItemsRenderer<T> = (props: DataCollectionItemsProps<T>) => React.ReactNode;
