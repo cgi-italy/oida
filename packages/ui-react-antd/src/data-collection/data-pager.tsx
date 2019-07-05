@@ -5,25 +5,24 @@ import { PaginationProps } from 'antd/lib/pagination';
 
 import { DataPagerProps } from '@oida/ui-react-core';
 
-export class DataPager extends React.Component<PaginationProps & DataPagerProps> {
-    render() {
+export const DataPager = (props: PaginationProps & DataPagerProps) => {
 
-        let {page, pageSize, total, onPageChange, onPageSizeChange, ...props} = this.props;
+    let {page, pageSize, total, onPageChange, onPageSizeChange, ...renderProps} = props;
 
-        return (
-            <Pagination
-                size='small'
-                current={page + 1}
-                pageSize={pageSize}
-                total={total}
-                onChange={(page, pageSize) => {
-                    onPageChange(page - 1);
-                }}
-                onShowSizeChange={(page, size) => {
-                    onPageSizeChange(size);
-                }}
-                {...props}
-            ></Pagination>
-        );
-    }
-}
+    return (
+        <Pagination
+            size='small'
+            current={page + 1}
+            pageSize={pageSize}
+            total={total}
+            onChange={(page, pageSize) => {
+                onPageChange(page - 1);
+            }}
+            onShowSizeChange={(page, size) => {
+                onPageSizeChange(size);
+            }}
+            {...renderProps}
+        ></Pagination>
+    );
+
+};

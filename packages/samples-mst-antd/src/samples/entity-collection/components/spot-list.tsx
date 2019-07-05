@@ -1,11 +1,13 @@
 import React from 'react';
 
-import { ISpotCollection, ISpot } from '../store';
+import { ISpotCollection, ISpot, generateIconForStyle } from '../../../common';
 
 import { LoadingState } from '@oida/core';
 import { IEntitySelection, IQueryParams } from '@oida/state-mst';
 import { useEntityCollectionList, useDataPaging, useDataFiltering, useDataSorting } from '@oida/ui-react-mst';
 import { DataCollectionList, DataCollectionTable } from '@oida/ui-react-antd';
+
+import './spot-list.scss';
 
 export type SpotListProps = {
     spots: ISpotCollection,
@@ -18,7 +20,13 @@ export const SpotList = ({spots, selection, loadingState, queryParams}: SpotList
 
     let { data, keyGetter, itemSelector, onHoverAction, onSelectAction } = useEntityCollectionList<ISpot>({
         collection: spots,
-        entitySelection: selection
+        entitySelection: selection,
+        iconGetter: (item) => {
+            return generateIconForStyle({
+                style: item.style.point!,
+                geometryType: 'Point'
+            });
+        }
     });
 
     let paging = useDataPaging(queryParams.paging);
@@ -32,12 +40,19 @@ export const SpotList = ({spots, selection, loadingState, queryParams}: SpotList
     });
 
     let sorting = useDataSorting({
-        sortableFields: [{key: 'name', name: 'Name'}],
+        sortableFields: [{key: 'name', name: 'Name'}, {key: 'type', name: 'Type'}],
         sortingState: queryParams.sorting
     });
 
+    const TypeCell = ({item}) => {
+        let { icon } = itemSelector(item);
+        return  (
+            <span>{icon}{item.type}</span>
+        );
+    };
+
     return (
-        <React.Fragment>
+        <div className='spot-list'>
             {<DataCollectionTable<ISpot>
                 items={{data, keyGetter, itemSelector, onHoverAction, onSelectAction, loadingState}}
                 columns={[
@@ -48,6 +63,13 @@ export const SpotList = ({spots, selection, loadingState, queryParams}: SpotList
                     {
                         title: 'Name',
                         dataIndex: 'name'
+                    },
+                    {
+                        title: 'Type',
+                        key: 'type',
+                        render: (item) => {
+                            return <TypeCell item={item}/>;
+                        }
                     }
                 ]}
                 paging={paging}
@@ -57,7 +79,7 @@ export const SpotList = ({spots, selection, loadingState, queryParams}: SpotList
                 meta={(item) => {
                     return {
                         title: item.name,
-                        description: item.name
+                        description: item.id
                     };
                 }}
                 items={{data, keyGetter, itemSelector, onHoverAction, onSelectAction, loadingState: loadingState}}
@@ -66,6 +88,6 @@ export const SpotList = ({spots, selection, loadingState, queryParams}: SpotList
                 sorting={sorting}
 
             />
-        </React.Fragment>
+        </div>
     );
 };

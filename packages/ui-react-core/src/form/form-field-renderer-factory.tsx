@@ -1,9 +1,12 @@
 
-import { FormField, FormFieldRenderer, FormFieldDefinition, isFormFieldDefinitionWithWrapper } from './form-field';
+import React from 'react';
+
+import { FormField, FormFieldRenderer, FormFieldDefinition, isFormFieldConfigWithGenerator } from './form-field';
 
 type ExtractType<IT extends FormField<any, any, any>> = IT extends FormField<infer TYPE, any, any> ? TYPE : never;
 type ExtractValue<IT extends FormField<any, any, any>> = IT extends FormField<any, infer T, any> ? T : never;
 type ExtractConfig<IT extends FormField<any, any, any>> = IT extends FormField<any, any, infer CONFIG> ? CONFIG : never;
+
 
 export const formFieldRendererFactory = () => {
     const REGISTERED_RENDERERS = new Map<string, Map<string, FormFieldRenderer<any>>>();
@@ -19,31 +22,45 @@ export const formFieldRendererFactory = () => {
     };
 
     const getRenderer = <T extends FormField<any, any, any>>
-    (config: FormFieldDefinition<ExtractType<T>, ExtractValue<T>, ExtractConfig<T>>) => {
-        let renderers = REGISTERED_RENDERERS.get(config.type);
+    (definition: FormFieldDefinition<ExtractType<T>, ExtractValue<T>, ExtractConfig<T>>) => {
+        let renderers = REGISTERED_RENDERERS.get(definition.type);
         if (!renderers) {
             return null;
         }
 
-        let renderer;
-        if (config.rendererConfig && config.rendererConfig.id) {
-            renderer = renderers.get(config.rendererConfig.id);
+        let FormFieldRenderer;
+        if (definition.rendererConfig && definition.rendererConfig.id) {
+            FormFieldRenderer = renderers.get(definition.rendererConfig.id);
         } else {
-            renderer = renderers.values().next().value;
+            FormFieldRenderer = renderers.values().next().value;
         }
 
-        if (!renderer) {
-            return null;
+        if (!FormFieldRenderer) {
+            FormFieldRenderer = (props) => null;
         }
 
-        if (isFormFieldDefinitionWithWrapper(config)) {
-            const finalRenderer = renderer;
-            renderer = (props) => config.wrapper({
-                render: finalRenderer,
-                ...props
-            });
+        if (isFormFieldConfigWithGenerator(definition)) {
+            let Renderer = FormFieldRenderer;
+            FormFieldRenderer = (props) => {
+
+                let { config, ...renderProps} = props;
+
+                let fieldConfig = config({
+                    onChange: props.onChange,
+                    value: props.value
+                });
+
+                if (fieldConfig) {
+                    return (
+                        <Renderer {...renderProps} config={fieldConfig}/>
+                    );
+                } else {
+                    return null;
+                }
+            };
         }
-        return renderer as FormFieldRenderer<T>;
+
+        return FormFieldRenderer as FormFieldRenderer<T>;
     };
 
     return {
@@ -51,3 +68,5 @@ export const formFieldRendererFactory = () => {
         getRenderer
     };
 };
+
+export type FormFieldRendererFactory = ReturnType<typeof formFieldRendererFactory>;

@@ -1,0 +1,22 @@
+.spot-list {
+    padding: 10px;
+    display: flex;
+
+    .data-collection-table, .data-collection-list {
+        flex-grow: 1;
+        padding: 0 5px;
+        max-height: calc(100vh - 20px);
+    }
+
+    .data-collection-table {
+        td {
+            padding: 4px 8px !important;
+
+            img {
+                height: 16px;
+                padding-right: 10px;
+            }
+        }
+    }
+
+}

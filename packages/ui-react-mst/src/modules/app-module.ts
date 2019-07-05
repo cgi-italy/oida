@@ -9,7 +9,7 @@ const AppModuleStateModelBase = types.model(
     }
 ).volatile((self) => {
     return {
-        config: {} as any
+        config: undefined
     };
 }).actions((self) => {
     return {

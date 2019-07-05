@@ -51,7 +51,8 @@ export const FormattersModuleStateModel = AppModuleStateModel.addModel(
                 }
             }
         };
-    }).actions((self) => {
+    })
+    .actions((self) => {
         return {
             afterAttach: () => {
                 let formatters = (self as any).config as FormattersModuleConfig;

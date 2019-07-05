@@ -1,2 +1,2 @@
-export * from './breadcrumb';
-export * from './breadcrumb-item-injector';
+export * from './use-breadcrumb';
+export * from './breadcrumb-item';

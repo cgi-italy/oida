@@ -1,1 +1,1 @@
-export * from './map-aoi-selector';
+export * from './use-map-aoi-drawer';

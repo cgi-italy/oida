@@ -19,19 +19,21 @@ export function DataCollectionTable<T>(props: DataCollectionTableProps<T>) {
 
     let tableColumns = columns.map((column) => {
 
+        let columnKey = column.key || column.dataIndex;
+
         let isSortable = sorting && !!sorting.sortableFields.find((field) => {
-            return field.key === column.dataIndex;
+            return field.key === columnKey;
         });
 
         let sortOrder: string | boolean = false;
-        if (sorting && sorting.sortKey === column.dataIndex) {
+        if (sorting && sorting.sortKey === columnKey) {
             sortOrder = sorting.sortOrder === SortOrder.Ascending ? 'ascend' : 'descend';
         }
         return {
             ...column,
             sorter: isSortable,
             sortOrder: sortOrder,
-            key: column.dataIndex
+            key:  columnKey
         };
     });
 
@@ -57,7 +59,7 @@ export function DataCollectionTable<T>(props: DataCollectionTableProps<T>) {
     };
 
     return  (
-        <React.Fragment>
+        <div className='data-collection-table'>
             <Table
                 components={components}
                 loading={items.loadingState === LoadingState.Loading}
@@ -90,7 +92,7 @@ export function DataCollectionTable<T>(props: DataCollectionTableProps<T>) {
                 }}
             ></Table>
             {paging && pagerRender!(paging)}
-        </React.Fragment>
+        </div>
     );
 
 }

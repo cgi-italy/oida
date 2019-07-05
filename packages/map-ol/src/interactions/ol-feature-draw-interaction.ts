@@ -88,11 +88,9 @@ export class OLFeatureDrawInteraction implements IFeatureDrawInteractionImplemen
 
             if (options.onDrawEnd) {
                 this.olInteraction_.on('drawend', (evt) => {
-                    setTimeout(() => {
-                        options.onDrawEnd!({
-                            geometry: this.getGeoJSONGeometry(mode, evt.feature.getGeometry())
-                        });
-                    }, 0);
+                    setTimeout(() => options.onDrawEnd!({
+                        geometry: this.getGeoJSONGeometry(mode, evt.feature.getGeometry())
+                    }), 0);
                 });
             }
         }

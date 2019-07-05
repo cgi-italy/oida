@@ -2,12 +2,12 @@ import { autorun } from 'mobx';
 import { Instance, addDisposer } from 'mobx-state-tree';
 
 import { IndexedCollection } from '@oida/state-mst';
-import { BreadcrumbItem } from './types/breadcrumb-item';
+import { BreadcrumbItemModel } from './types/breadcrumb-item-model';
 
 import { AppModule, AppModuleStateModel } from '../app-module';
 
 export const BreadcrumbModuleStateModel = AppModuleStateModel.addModel(
-    IndexedCollection(BreadcrumbItem, (id, collection) => collection.items.find((item) => item.key === id)).actions((self) => {
+    IndexedCollection(BreadcrumbItemModel, (id, collection) => collection.items.find((item) => item.key === id)).actions((self) => {
         return {
             afterAttach: () => {
                 const titleUpdateDisposer = autorun(() => {

@@ -20,15 +20,18 @@
     "@oida/ui-react-antd": "file:../ui-react-antd",
     "@oida/ui-react-core": "file:../ui-react-core",
     "@oida/ui-react-mst": "file:../ui-react-mst",
+    "@turf/bbox-polygon": "^6.0.1",
+    "@turf/boolean-point-in-polygon": "^6.0.1",
     "antd": "^3.16.2",
     "cesium": "^1.53.0",
     "classnames": "^2.2.6",
+    "faker": "^4.1.0",
     "mobx": "^4.9.4",
-    "mobx-react": "^5.4.3",
+    "mobx-react": "^6.1.1",
     "mobx-state-tree": "^3.14.0",
     "ol": "^5.3.1",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
-    "react-router-dom": "^5.0.0"
+    "react-router-dom": "^5.0.1"
   }
 }

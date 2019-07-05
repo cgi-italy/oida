@@ -4,23 +4,13 @@ import { Button } from 'antd';
 
 import { MapNavControlsProps } from '@oida/ui-react-core';
 
-export class MapNavControls extends React.Component<MapNavControlsProps> {
+export const MapNavControls = (props: MapNavControlsProps) => {
 
-    onZoomInClick() {
-        this.props.onZoomIn();
-    }
+    return (
+        <div className={'map-nav-controls'}>
+            <Button className='zoom-ctrl' size='small' icon='plus' onClick={props.onZoomIn}/>
+            <Button className='zoom-ctrl' size='small' icon='minus' onClick={props.onZoomOut} />
+        </div>
+    );
+};
 
-    onZoomOutClick() {
-        this.props.onZoomOut();
-    }
-
-    render() {
-
-        return (
-            <div className={'map-nav-controls'}>
-                <Button className='zoom-ctrl' size='small' icon='plus' onClick={this.onZoomInClick.bind(this)}/>
-                <Button className='zoom-ctrl' size='small' icon='minus' onClick={this.onZoomOutClick.bind(this)} />
-            </div>
-        );
-    }
-}

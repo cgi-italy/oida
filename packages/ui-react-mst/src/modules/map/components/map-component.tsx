@@ -1,13 +1,12 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import  classNames from 'classnames';
 
-//imported to avoid an issue with generated typings declaration
-import { IMapRenderer } from '@oida/core';
+import { useObserver } from 'mobx-react-lite';
 
+import { Omit } from '@oida/core';
 import { IMap, MapRendererController } from '@oida/state-mst';
 
-import { MapModule, DefaultMapModule } from '../map-module';
-import { injectFromModuleState } from '../../with-app-module';
+import { useMapModuleState } from '../use-map-module-state';
 
 
 export interface MapComponentProps {
@@ -15,55 +14,48 @@ export interface MapComponentProps {
     className?: string;
 }
 
-export class MapComponent extends React.PureComponent<MapComponentProps> {
+export const MapComponent = ({mapState, className}: MapComponentProps) => {
 
-    private mapContainer_: HTMLElement | null = null;
-    private rendererController_: MapRendererController | undefined;
+    const mapContainer = useRef<HTMLDivElement>(null);
+    let rendererController: MapRendererController;
 
-    constructor(props: MapComponentProps) {
-        super(props);
-    }
-
-    getRenderer() {
-        return this.rendererController_!.getMapRenderer();
-    }
-
-    componentDidMount() {
-        this.rendererController_ = new MapRendererController({
-            state: this.props.mapState
+    useEffect(() => {
+        rendererController = new MapRendererController({
+            state: mapState
         });
-        this.rendererController_.setDomTarget(this.mapContainer_!);
-    }
-
-    componentDidUpdate(prevProps) {
-        if (prevProps.mapState !== this.props.mapState) {
-            this.rendererController_!.destroy();
-            this.rendererController_ = new MapRendererController({
-                state: this.props.mapState
-            });
+        if (mapContainer.current) {
+            rendererController.setDomTarget(mapContainer.current);
         }
-        this.rendererController_!.setDomTarget(this.mapContainer_!);
-    }
 
-    componentWillUnmount() {
-        this.rendererController_!.destroy();
-    }
+        return () => {
+            rendererController.destroy();
+        };
+    }, [mapState]);
 
-    render() {
-        return (
-            <div
-                className={classNames('map-widget', this.props.className)}
-                style={{ width: '100%', height: '100%' }}
-                ref={(element) => this.mapContainer_ = element}
-            ></div>
-        );
-    }
-}
+    useEffect(() => {
+        if (rendererController)
+            if (mapContainer.current) {
+                rendererController.setDomTarget(mapContainer.current);
+            }
+    }, [mapContainer]);
 
-export const injectMapComponentStateFromModule = (mapModule: MapModule) => injectFromModuleState(mapModule, (moduleState) => {
-    return {
-        mapState: moduleState.map
-    };
-});
+    return (
+        <div
+            className={classNames('map-widget', className)}
+            ref={mapContainer}
+        ></div>
+    );
+};
 
-export const MapComponentS = injectMapComponentStateFromModule(DefaultMapModule)(MapComponent);
+export const MapComponentFromModule = (props: Omit<MapComponentProps, 'mapState'>) => {
+
+    let mapModuleState = useMapModuleState();
+
+    let mapState = useObserver(() => {
+        return mapModuleState.map;
+    });
+
+    return (
+        <MapComponent mapState={mapState} {...props}></MapComponent>
+    );
+};

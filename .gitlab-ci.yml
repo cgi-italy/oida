@@ -29,7 +29,6 @@ install_dependencies:
     policy: pull-push
   script:
     - npm ci
-    - node_modules/.bin/lerna bootstrap
   only:
     - branches
 

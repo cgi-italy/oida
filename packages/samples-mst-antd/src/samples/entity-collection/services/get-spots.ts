@@ -30,6 +30,7 @@ export const getSpots = (params: QueryParams) => {
         }
     }
 
+    let total = results.length;
     if (params.paging) {
         results = results.slice(params.paging.offset, params.paging.offset + params.paging.pageSize);
     }
@@ -37,7 +38,7 @@ export const getSpots = (params: QueryParams) => {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
             resolve({
-                total: spots.length,
+                total: total,
                 results: results
             });
         }, 500);

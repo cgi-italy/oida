@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 import { Input } from 'antd';
 
@@ -14,76 +14,60 @@ export type InputFieldRendererProps = {
     changeDelay?: number
 };
 
-export class InputFieldRenderer extends React.Component<StringField & InputFieldRendererProps, any> {
+export const InputFieldRenderer = (props: StringField & InputFieldRendererProps) => {
 
-    static defaultProps = {
-        changeDelay: 1000
+    let [inputValue, setInputValue] = useState(props.value);
+
+    useEffect(() => {
+        setInputValue(props.value);
+    }, [props.value]);
+
+    useEffect(() => {
+        if (props.changeDelay) {
+            let debounceTimeout: number | undefined = window.setTimeout(() => {
+                props.onChange(inputValue);
+                debounceTimeout = undefined;
+            }, props.changeDelay);
+
+            return () => {
+                if (debounceTimeout) {
+                    window.clearTimeout(debounceTimeout);
+                }
+            };
+        } else {
+            props.onChange(inputValue);
+        }
+    }, [inputValue]);
+
+    const onInputChange = (evt) => {
+        setInputValue(evt.target.value);
     };
 
-    private debounceTimeout_: any | undefined;
+    const onEnterPress = () => {
+        props.onChange(inputValue);
+    };
 
-    constructor(props) {
-        super(props);
 
-        this.state = {
-            inputValue: props.value
-        };
-    }
+    let { value, onChange, changeDelay, ...renderProps } =  props;
 
-    componentDidUpdate(prevProps) {
-        if (prevProps.value !== this.props.value) {
-            this.setState({
-                inputValue: this.props.value
-            });
-        }
-    }
+        return (
+        <Input
+            size='small'
+            value={inputValue}
+            onPressEnter={onEnterPress}
+            onChange={onInputChange}
+            {...renderProps}
+        >
+        </Input>
+    );
+};
 
-    onInputChange(evt) {
 
-        this.setState({
-            inputValue: evt.target.value
-        });
-
-        if (this.debounceTimeout_) {
-            clearTimeout(this.debounceTimeout_);
-        }
-
-        if (this.props.changeDelay) {
-            this.debounceTimeout_ = setTimeout(() => {
-            this.props.onChange(this.state.inputValue);
-                this.debounceTimeout_ = null;
-            }, this.props.changeDelay);
-        } else {
-            this.props.onChange(this.state.inputValue);
-        }
-    }
-
-    onEnterPress() {
-        if (this.debounceTimeout_) {
-            clearTimeout(this.debounceTimeout_);
-            this.debounceTimeout_ = null;
-        }
-        this.props.onChange(this.state.inputValue);
-    }
-
-    render() {
-
-        let { value, onChange, changeDelay, ...renderProps } = this.props;
-
-         return (
-            <Input
-                size='small'
-                value={this.state.inputValue}
-                onPressEnter={this.onEnterPress.bind(this)}
-                onChange={this.onInputChange.bind(this)}
-                {...renderProps}
-            >
-            </Input>
-        );
-    }
-}
+InputFieldRenderer.defaultProps = {
+    changeDelay: 1000
+};
 
 antdFormFieldRendererFactory.register<StringField>(
     STRING_FIELD_ID, 'input',
-    (props) => <InputFieldRenderer {...props}></InputFieldRenderer>
+    InputFieldRenderer
 );

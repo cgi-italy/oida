@@ -45,6 +45,20 @@ export function DataCollectionItemsList<T>(props: DataCollectionItemsListProps<T
             </List.Item.Meta>
         );
 
+        let itemActions = actions ? actions.map((action) => {
+            return (
+                <Tooltip title={action.name}>
+                    <a onClick={
+                        () => {
+                            action.callback(item);
+                    }
+                    }>
+                        {action.icon}
+                    </a>
+                </Tooltip>
+            );
+        }) : undefined;
+
         let ListItem;
         if (autoScrollOnSelection) {
             ListItem = canBeScrolledIntoView(List.Item);
@@ -56,7 +70,7 @@ export function DataCollectionItemsList<T>(props: DataCollectionItemsListProps<T
                 <ListItem
                     scrollToItem={hovered || selected}
                     extra={props.extra && props.extra(item)}
-                    actions={actions}
+                    actions={itemActions}
                     className={classnames({'hovered': hovered, 'selected': selected})}
                     onMouseEnter={() => {
                         onHoverAction(item, true);

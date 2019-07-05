@@ -6,9 +6,7 @@ import { types, addDisposer, applySnapshot } from 'mobx-state-tree';
 import { LoadingState } from '@oida/core';
 import { QueryParams, EntitySelection, hasLoadingState } from '@oida/state-mst';
 
-import { SpotCollection } from './spot';
-import { getSpots } from '../services/get-spots';
-
+import { SpotCollection, getSpots } from '../../../common';
 
 export const AppStateModel = types.compose(
     types.model('AppState', {

@@ -5,13 +5,15 @@ import { IMapProjection } from '@oida/core';
 import { Map, EntitySelection, TileLayer, ReferenceOrType } from '@oida/state-mst';
 
 import { AppModule, AppModuleStateModel } from '../app-module';
+import { FormattersModuleStateModel, DefaultFormattersModule } from '../formatters';
 
 import { SelectionMode } from  '@oida/core';
 
 export const MapModuleStateModel = AppModuleStateModel.addModel(
-    types.model('map', {
+    types.model('MapModule', {
         map: Map,
-        selection: ReferenceOrType(EntitySelection)
+        selection: ReferenceOrType(EntitySelection),
+        formattersModule: types.maybe(types.reference(FormattersModuleStateModel))
     }).actions((self) => {
         return {
             afterAttach: () => {
@@ -62,7 +64,7 @@ export const MapModuleStateModel = AppModuleStateModel.addModel(
 
 export type MapModuleConfig = {
     baseLayers?: Array<{id: string, name: string, config: any}>
-    renderers?: Array<{id: string, props?: any}>,
+    renderers?: Array<{id: string, name: string, props?: any}>,
     projections?: Array<IMapProjection & {name: string}>,
     initialOptions?: {
         baseLayer?: string;
