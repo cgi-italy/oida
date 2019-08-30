@@ -13,9 +13,9 @@ export const AreaQuantity: FormatterQuantity<number, AreaFormatterOptions> = {
 
 export class AreaUnit {
 
-    static METERS2 = new AreaUnit(1, 'm&sup2;');
-    static KM2 = new AreaUnit(1000 * 1000, 'km&sup2;');
-    static NM2 = new AreaUnit(1852 * 1852, 'NM&sup2;');
+    static METERS2 = new AreaUnit(1, `m${String.fromCharCode(178)}`);
+    static KM2 = new AreaUnit(1000 * 1000, `km${String.fromCharCode(178)}`);
+    static NM2 = new AreaUnit(1852 * 1852, `NM${String.fromCharCode(178)}`);
 
     constructor(private toSquareMeters_: number, private symbol_: string) {}
 
