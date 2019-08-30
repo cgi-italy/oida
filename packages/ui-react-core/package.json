@@ -4,6 +4,7 @@
   "description": "ui core components",
   "module": "dist/ui-react-core.js",
   "main": "dist/ui-react-core.cjs.js",
+  "saas": "dist/styles/index.scss",
   "types": "dist/types/index.d.ts",
   "files": [
     "dist"

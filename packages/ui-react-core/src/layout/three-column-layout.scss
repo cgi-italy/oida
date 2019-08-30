@@ -1,0 +1,32 @@
+
+.three-col-layout {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+
+    .layout-content {
+        display: flex;
+        flex-direction: row;
+        flex-grow: 1;
+        flex-shrink: 1;
+        overflow: hidden;
+
+        .layout-left {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .layout-main {
+            flex-grow: 1;
+            flex-shrink: 1;
+        }
+
+        .layout-right {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+    }
+
+}
