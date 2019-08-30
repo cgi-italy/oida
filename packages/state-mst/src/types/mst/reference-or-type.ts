@@ -17,6 +17,6 @@ export const ReferenceOrType = <T extends IAnyModelType>(Type: T, referenceType?
         } as UnionOptions,
         referenceType,
         types.maybe(Type)
-    ) as IMaybe<T>;
+    ) as IMaybe<T> | IMaybe<IReferenceType<T>>;
 };
 

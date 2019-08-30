@@ -26,6 +26,13 @@ export const DataFilters = types.model('DataFilters', {
             self.items.clear();
         }
     };
+}).views((self) => {
+    return {
+        get: (key: string) => {
+            let item = self.items.get(key);
+            return item ? item.value : undefined;
+        }
+    };
 });
 
 export type IDataFilters = Instance<typeof DataFilters>;

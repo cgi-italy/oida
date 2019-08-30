@@ -102,7 +102,7 @@ export class FeatureLayerController extends MapLayerController<IFeatureLayerRend
         let geometry = geometryGetter(entity);
         let style = styleGetter(entity);
 
-        if (geometry.type === 'GeometryCollection') {
+        if (geometry && geometry.type === 'GeometryCollection') {
             let geometries = geometry.geometries;
 
             let featureIds: string[] = [];
@@ -146,8 +146,8 @@ export class FeatureLayerController extends MapLayerController<IFeatureLayerRend
 
             this.layerRenderer_!.addFeature(
                 featureId,
-                geometryGetter(entity),
-                styleGetter(entity)
+                geometry,
+                style
             );
 
             let disposeGeometryObserver = reaction(() => geometryGetter(entity), (geometry) => {
@@ -156,6 +156,8 @@ export class FeatureLayerController extends MapLayerController<IFeatureLayerRend
 
             let disposeStyleObserver = reaction(() => styleGetter(entity), (style) => {
                 this.layerRenderer_!.updateFeatureStyle(featureId, style);
+            }, {
+                fireImmediately: true
             });
 
             return {
