@@ -1,7 +1,7 @@
 import { types, Instance } from 'mobx-state-tree';
 
 import { Entity } from '../entity/entity';
-import { hasOpacity } from '../mixins';
+import { hasOpacity, hasLoadingState } from '../mixins';
 
 const LayerBase = types.compose(
     'mapLayer',
@@ -23,7 +23,8 @@ const LayerBase = types.compose(
             }
         };
     }),
-    hasOpacity
+    hasOpacity,
+    hasLoadingState
 );
 
 export const MapLayer = Entity.addUnion('layerType', LayerBase);

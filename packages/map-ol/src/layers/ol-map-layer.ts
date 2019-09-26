@@ -11,8 +11,13 @@ export abstract class OLMapLayer<T extends LayerBase = LayerBase> implements ILa
     protected olImpl_: T;
 
     constructor(config) {
-        this.mapRenderer_ = config.mapRenderer;
-        this.olImpl_ = this.createOLObject_(config.mapLayer);
+        let {mapRenderer, mapLayer, ...other} = config;
+
+        this.mapRenderer_ = mapRenderer;
+        this.olImpl_ = this.createOLObject_({
+            ...mapLayer,
+            ...other
+        });
     }
 
     setVisible(visible) {

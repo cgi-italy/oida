@@ -10,17 +10,23 @@ import { CesiumMapLayer } from './cesium-map-layer';
 
 export class CesiumTileLayer  extends CesiumMapLayer {
 
+    protected onTileLoadStart_;
+    protected onTileLoadEnd_;
+
+
     constructor(config) {
         super(config);
 
-        try {
-            let source = cesiumTileSourcesFactory.create(config.mapLayer.source.id, config.mapLayer.source);
-            if (source) {
-                this.imageries_.add(new ImageryLayer(source));
-            }
-        } catch (e) {
+        this.onTileLoadStart_ = () => {
+            config.onTileLoadStart();
+        };
 
-        }
+        this.onTileLoadEnd_ = () => {
+            config.onTileLoadEnd();
+        };
+
+        this.updateSource(config.mapLayer.source);
+
     }
 
     updateSource(config) {
@@ -32,6 +38,25 @@ export class CesiumTileLayer  extends CesiumMapLayer {
                 if (config.extent) {
                     options.rectangle = Rectangle.fromDegrees(...config.extent);
                 }
+
+                let onTileLoadStart = this.onTileLoadStart_;
+                let onTileLoadEnd = this.onTileLoadEnd_;
+
+                // wrap source requestImage to track tile requests
+                let originalRequestImage = source.requestImage;
+                source.requestImage = function() {
+                    let request = originalRequestImage.apply(this, arguments);
+                    if (request) {
+                        onTileLoadStart();
+                        request.then(() => {
+                            onTileLoadEnd();
+                        }, () => {
+                            onTileLoadEnd();
+                        });
+                    }
+                    return request;
+                };
+
                 this.imageries_.add(new ImageryLayer(source));
             }
         } catch (e) {
