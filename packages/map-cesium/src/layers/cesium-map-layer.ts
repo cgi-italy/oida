@@ -26,11 +26,13 @@ export class CesiumMapLayer implements ILayerRenderer {
         this.visible_ = visible;
         this.primitives_.show = visible;
         this.updateImageryVisibility_(this.imageries_, this.parent_ ? this.parent_.isVisible() : true);
+        this.mapRenderer_.getViewer().scene.requestRender();
     }
 
     setOpacity(opacity) {
         this.alpha_ = opacity;
         this.updateImageryOpacity_(this.imageries_);
+        this.mapRenderer_.getViewer().scene.requestRender();
     }
 
     setZIndex(zIndex) {
