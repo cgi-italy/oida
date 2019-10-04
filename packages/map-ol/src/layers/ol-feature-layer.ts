@@ -83,6 +83,8 @@ export class OLFeatureLayer extends OLMapLayer<VectorLayer> implements IFeatureL
 
         return new VectorLayer({
             source: source,
+            extent: config.extent,
+            zIndex: config.zIndex || 0,
             style: () => {
                 return null;
             }

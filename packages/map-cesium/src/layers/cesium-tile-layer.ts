@@ -12,6 +12,8 @@ export class CesiumTileLayer  extends CesiumMapLayer {
 
     protected onTileLoadStart_;
     protected onTileLoadEnd_;
+    protected source_;
+    protected extent_;
 
 
     constructor(config) {
@@ -25,6 +27,8 @@ export class CesiumTileLayer  extends CesiumMapLayer {
             config.onTileLoadEnd();
         };
 
+        this.extent_ = config.mapLayer.extent;
+
         this.updateSource(config.mapLayer.source);
 
     }
@@ -34,10 +38,6 @@ export class CesiumTileLayer  extends CesiumMapLayer {
         try {
             let source = cesiumTileSourcesFactory.create(config.id, config);
             if (source) {
-                let options: any = {};
-                if (config.extent) {
-                    options.rectangle = Rectangle.fromDegrees(...config.extent);
-                }
 
                 let onTileLoadStart = this.onTileLoadStart_;
                 let onTileLoadEnd = this.onTileLoadEnd_;
@@ -57,11 +57,27 @@ export class CesiumTileLayer  extends CesiumMapLayer {
                     return request;
                 };
 
-                this.imageries_.add(new ImageryLayer(source));
+                this.imageries_.add(new ImageryLayer(source, this.getLayerOptions_()));
+
+                this.source_ = source;
             }
         } catch (e) {
 
         }
+    }
+
+    setExtent(extent) {
+        this.extent_ = extent;
+        this.imageries_.removeAll(false);
+        this.imageries_.add(new ImageryLayer(this.source_, this.getLayerOptions_()));
+    }
+
+    protected getLayerOptions_() {
+        let options: any = {};
+        if (this.extent_) {
+            options.rectangle = Rectangle.fromDegrees(...this.extent_);
+        }
+        return options;
     }
 
 }

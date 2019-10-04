@@ -25,6 +25,8 @@ export class OLGroupLayer extends OLMapLayer<Group> implements IGroupLayerRender
 
     protected createOLObject_(config) {
         return new Group({
+            extent: config.extent,
+            zIndex: config.zIndex,
             layers: []
         });
     }

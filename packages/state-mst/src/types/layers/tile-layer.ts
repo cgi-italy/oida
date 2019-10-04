@@ -7,7 +7,6 @@ import { MapLayer } from './map-layer';
 export const TileLayer = MapLayer.addModel(
     types.model(TILE_LAYER_ID, {
         source: types.frozen(),
-        extent: types.maybe(types.frozen<number[]>())
     }).actions((self) => {
         return {
             setSource: (source) => {

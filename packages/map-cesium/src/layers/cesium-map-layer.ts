@@ -39,6 +39,10 @@ export class CesiumMapLayer implements ILayerRenderer {
         console.warn('layer zIndex not supported');
     }
 
+    setExtent(extent) {
+        console.warn('layer extent not supported');
+    }
+
     setParent(parent) {
         this.parent_ = parent;
 

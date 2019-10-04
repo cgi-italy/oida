@@ -48,6 +48,10 @@ export abstract class MapLayerController<T extends ILayerRenderer = ILayerRender
         this.subscriptionTracker_.addSubscription(autorun(() => {
             this.layerRenderer_!.setZIndex(this.mapLayer_.zIndex || 0);
         }));
+
+        this.subscriptionTracker_.addSubscription(autorun(() => {
+            this.layerRenderer_!.setExtent(this.mapLayer_.extent);
+        }));
     }
 
     protected unbindFromLayerState_() {
