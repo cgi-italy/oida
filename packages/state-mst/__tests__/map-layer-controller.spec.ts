@@ -11,6 +11,7 @@ const LayerRendererMock = jest.fn(() => ({
     setVisible: jest.fn(),
     setOpacity: jest.fn(),
     setZIndex: jest.fn(),
+    setExtent: jest.fn(),
     destroy: jest.fn()
 }));
 
@@ -56,11 +57,19 @@ describe('MapLayerController', () => {
 
         layerRendererMockInstance.setVisible.mockClear();
         mapLayer.setVisible(false);
-        expect(layerRendererMockInstance.setVisible).toBeCalledTimes(1);
+        expect(layerRendererMockInstance.setVisible).toBeCalledWith(false);
 
         layerRendererMockInstance.setOpacity.mockClear();
         mapLayer.setOpacity(0.5);
-        expect(layerRendererMockInstance.setOpacity).toBeCalledTimes(1);
+        expect(layerRendererMockInstance.setOpacity).toBeCalledWith(0.5);
+
+        layerRendererMockInstance.setZIndex.mockClear();
+        mapLayer.setZIndex(10);
+        expect(layerRendererMockInstance.setZIndex).toBeCalledWith(10);
+
+        layerRendererMockInstance.setExtent.mockClear();
+        mapLayer.setExtent([-20, -40, 20, 40]);
+        expect(layerRendererMockInstance.setExtent).toBeCalledWith([-20, -40, 20, 40]);
     });
 
     it('Should destroy layer renderer on map render change', () => {
