@@ -1,7 +1,9 @@
+import { Geometry } from '../../types';
 import { ILayerRenderer } from './map-layer-renderer';
 
 interface IGeometryStyle {
     visible: boolean;
+    zIndex?: number;
 }
 
 export type Color = [number, number, number, number?];
@@ -43,9 +45,9 @@ export interface IFeatureStyle {
 }
 
 export interface IFeatureLayerRenderer extends ILayerRenderer {
-    addFeature(id: string, geometry: GeoJSON.GeometryObject, style: IFeatureStyle);
+    addFeature(id: string, geometry: Geometry, style: IFeatureStyle);
     getFeature(id: string);
-    updateFeatureGeometry(id: string, geometry: GeoJSON.GeometryObject);
+    updateFeatureGeometry(id: string, geometry: Geometry);
     updateFeatureStyle(id: string, style: IFeatureStyle);
     removeFeature(id: string);
     removeAllFeatures();

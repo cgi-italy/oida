@@ -6,6 +6,8 @@ import GeoJSON from 'ol/format/GeoJSON';
 
 import { createBox } from 'ol/interaction/Draw';
 
+import { transformExtent } from 'ol/proj';
+
 import {
     IFeatureDrawInteractionProps,
     FEATURE_DRAW_INTERACTION_ID,
@@ -104,6 +106,22 @@ export class OLFeatureDrawInteraction implements IFeatureDrawInteractionImplemen
     }
 
     protected getGeoJSONGeometry(mode, geometry) {
+
+        if (mode === FeatureDrawMode.BBox) {
+            let extent = geometry.getExtent();
+            let projection = this.viewer_.getView().getProjection();
+            if (projection.getCode() !== 'EPSG:4326') {
+                extent = transformExtent(extent, projection, 'EPSG:4326');
+                if (isNaN(extent[0]) || isNaN(extent[1]) || isNaN(extent[2]) || isNaN(extent[3])) {
+                    return null;
+                }
+            }
+            return {
+                type: 'BBox',
+                bbox: extent
+            };
+        }
+
         if (mode === FeatureDrawMode.Polygon) {
             geometry = new Polygon([geometry.getCoordinates()]);
         }

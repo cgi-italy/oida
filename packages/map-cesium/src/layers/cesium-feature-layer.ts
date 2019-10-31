@@ -1,7 +1,7 @@
 import { CesiumMapLayer } from './cesium-map-layer';
 import { cesiumLayersFactory } from './cesium-layers-factory';
 
-import { FEATURE_LAYER_ID, IFeatureLayerRenderer, IFeatureStyle } from '@oida/core';
+import { FEATURE_LAYER_ID, IFeatureLayerRenderer, IFeatureStyle, GeometryTypes } from '@oida/core';
 
 import { CesiumGeometryRenderer, CesiumPointRenderer, CesiumLineRenderer, CesiumPolygonRenderer } from './geometry-renderers';
 
@@ -106,7 +106,7 @@ export class CesiumFeatureLayer extends CesiumMapLayer implements IFeatureLayerR
         }
     }
 
-    protected getStyleForGeometry_(style: IFeatureStyle, geometryType: GeoJSON.GeoJsonGeometryTypes) {
+    protected getStyleForGeometry_(style: IFeatureStyle, geometryType: GeometryTypes) {
 
         let geometryStyle;
 
@@ -121,6 +121,8 @@ export class CesiumFeatureLayer extends CesiumMapLayer implements IFeatureLayerR
                 break;
             case 'Polygon':
             case 'MultiPolygon':
+            case 'BBox':
+            case 'Circle':
                 geometryStyle = style.polygon;
                 break;
         }
@@ -128,7 +130,7 @@ export class CesiumFeatureLayer extends CesiumMapLayer implements IFeatureLayerR
         return geometryStyle;
     }
 
-    protected getOrCreateGeometryRenderer_(geometryType: GeoJSON.GeoJsonGeometryTypes) {
+    protected getOrCreateGeometryRenderer_(geometryType: GeometryTypes) {
 
         let geometryRenderer;
 
@@ -156,6 +158,8 @@ export class CesiumFeatureLayer extends CesiumMapLayer implements IFeatureLayerR
                 break;
             case 'Polygon':
             case 'MultiPolygon':
+            case 'BBox':
+            case 'Circle':
                 if (!this.polygonRenderer_) {
                     this.polygonRenderer_ = new CesiumPolygonRenderer({
                         clampToGround: this.clampToGround_

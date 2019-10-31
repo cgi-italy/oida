@@ -4,11 +4,11 @@ import Circle from 'ol/style/Circle';
 import Stroke from 'ol/style/Stroke';
 import Fill from 'ol/style/Fill';
 
-import { IFeatureStyle, IPointStyle, isIcon, ILineStyle, IPolygonStyle } from '@oida/core';
+import { GeometryTypes, IFeatureStyle, IPointStyle, isIcon, ILineStyle, IPolygonStyle } from '@oida/core';
 
 export class OLStyleParser {
 
-    getStyleForGeometry(geometryType: GeoJSON.GeoJsonGeometryTypes, style: IFeatureStyle) {
+    getStyleForGeometry(geometryType: GeometryTypes, style: IFeatureStyle) {
 
         let olStyle: Style = null;
 
@@ -23,6 +23,8 @@ export class OLStyleParser {
                 break;
             case 'Polygon':
             case 'MultiPolygon':
+            case 'BBox':
+            case 'Circle':
                 olStyle = this.getPolygonStyle_(style.polygon);
                 break;
         }
@@ -60,6 +62,10 @@ export class OLStyleParser {
             }));
         }
 
+        if (pointStyle.zIndex !== undefined) {
+            style.setZIndex(pointStyle.zIndex);
+        }
+
         return style;
     }
 
@@ -75,6 +81,10 @@ export class OLStyleParser {
             color: this.parseColor_(lineStyle.color),
             width: lineStyle.width
         }));
+
+        if (lineStyle.zIndex !== undefined) {
+            style.setZIndex(lineStyle.zIndex);
+        }
 
         return style;
     }
@@ -95,6 +105,10 @@ export class OLStyleParser {
                 color: polygonStyle.strokeColor ? this.parseColor_(polygonStyle.strokeColor) : undefined,
                 width: polygonStyle.strokeWidth
             }));
+        }
+
+        if (polygonStyle.zIndex !== undefined) {
+            style.setZIndex(polygonStyle.zIndex);
         }
 
         return style;

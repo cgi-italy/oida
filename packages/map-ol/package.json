@@ -23,7 +23,8 @@
     "registry": "https://nexus.dev.eoss-cloud.it/repository/npm-cgi-eo/"
   },
   "dependencies": {
-    "@oida/core": "file:../core"
+    "@oida/core": "file:../core",
+    "@turf/bbox-polygon": "^6.0.1"
   },
   "peerDependencies": {
     "ol": "^5.3.1",

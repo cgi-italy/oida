@@ -3,6 +3,7 @@ import VectorLayer from 'ol/layer/Vector';
 import Feature from 'ol/Feature';
 import GeoJSON from 'ol/format/GeoJSON';
 
+import bboxPolygon from '@turf/bbox-polygon';
 
 import { FEATURE_LAYER_ID, IFeatureLayerRenderer } from '@oida/core';
 
@@ -70,6 +71,10 @@ export class OLFeatureLayer extends OLMapLayer<VectorLayer> implements IFeatureL
     }
 
     protected parseGeometry_(geometry) {
+        if (geometry.type === 'BBox') {
+            geometry = bboxPolygon(geometry.bbox).geometry;
+        }
+
         return this.geomParser_.readGeometryFromObject(geometry, {
             dataProjection: 'EPSG:4326',
             featureProjection: this.mapRenderer_.getViewer().getView().getProjection()

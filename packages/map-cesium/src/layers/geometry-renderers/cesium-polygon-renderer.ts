@@ -5,6 +5,11 @@ import GeometryInstance from 'cesium/Source/Core/GeometryInstance';
 import PolygonGeometry from 'cesium/Source/Core/PolygonGeometry';
 import PolygonOutlineGeometry from 'cesium/Source/Core/PolygonOutlineGeometry';
 import PolygonHierarchy from 'cesium/Source/Core/PolygonHierarchy';
+import RectangleGeometry from 'cesium/Source/Core/RectangleGeometry';
+import RectangleOutlineGeometry from 'cesium/Source/Core/RectangleOutlineGeometry';
+import Rectangle from 'cesium/Source/Core/Rectangle';
+import CircleGeometry from 'cesium/Source/Core/CircleGeometry';
+import CircleOutlineGeometry from 'cesium/Source/Core/CircleOutlineGeometry';
 import ColorGeometryInstanceAttribute from 'cesium/Source/Core/ColorGeometryInstanceAttribute';
 import GroundPrimitive from 'cesium/Source/Scene/GroundPrimitive';
 import Primitive from 'cesium/Source/Scene/Primitive';
@@ -44,6 +49,14 @@ export class CesiumPolygonRenderer implements CesiumGeometryRenderer {
                 fillInstances.push(instance.fill);
                 outlineInstances.push(instance.outline);
             }
+        } else if (geometry.type === 'BBox') {
+            let instance = this.createRectangleInstance_(id, geometry.bbox, style);
+            fillInstances = instance.fill;
+            outlineInstances = instance.outline;
+        } else if (geometry.type === 'Circle') {
+            let instance = this.createCircleInstance_(id, geometry.center, geometry.radius, style);
+            fillInstances = instance.fill;
+            outlineInstances = instance.outline;
         }
 
         let fill;
@@ -186,4 +199,67 @@ export class CesiumPolygonRenderer implements CesiumGeometryRenderer {
         };
     }
 
+    protected createRectangleInstance_(id, extent, style) {
+
+        let rectangleInstance = new GeometryInstance({
+            geometry: new RectangleGeometry({
+                rectangle: Rectangle.fromDegrees(...extent),
+                vertexFormat : PerInstanceColorAppearance.VERTEX_FORMAT
+            }),
+            attributes: {
+                color: new ColorGeometryInstanceAttribute(...style.fillColor)
+            },
+            id: id
+        });
+
+        let outlineInstance = new GeometryInstance({
+            geometry: new RectangleOutlineGeometry({
+                rectangle: Rectangle.fromDegrees(...extent),
+                vertexFormat : PerInstanceColorAppearance.VERTEX_FORMAT
+            }),
+            attributes: {
+                color: new ColorGeometryInstanceAttribute(...style.strokeColor)
+            },
+            id: id
+        });
+
+
+        return {
+            fill: rectangleInstance,
+            outline: outlineInstance
+        };
+    }
+
+    protected createCircleInstance_(id, center, radius, style) {
+
+        let circleInstance = new GeometryInstance({
+            geometry: new CircleGeometry({
+                center: Cartesian3.fromDegrees(...center),
+                radius: radius,
+                vertexFormat : PerInstanceColorAppearance.VERTEX_FORMAT
+            }),
+            attributes: {
+                color: new ColorGeometryInstanceAttribute(...style.fillColor)
+            },
+            id: id
+        });
+
+        let outlineInstance = new GeometryInstance({
+            geometry: new CircleOutlineGeometry({
+                center: Cartesian3.fromDegrees(...center),
+                radius: radius,
+                vertexFormat : PerInstanceColorAppearance.VERTEX_FORMAT
+            }),
+            attributes: {
+                color: new ColorGeometryInstanceAttribute(...style.strokeColor)
+            },
+            id: id
+        });
+
+
+        return {
+            fill: circleInstance,
+            outline: outlineInstance
+        };
+    }
 }

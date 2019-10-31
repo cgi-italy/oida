@@ -3,3 +3,4 @@ export * from './sort-order';
 export * from './query-params';
 export * from './selection-mode';
 export * from './date-range';
+export * from './geometry';
