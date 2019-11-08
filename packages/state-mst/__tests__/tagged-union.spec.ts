@@ -97,7 +97,8 @@ describe('Tagged union type', () => {
     });
 
     it('Should return sub type by name', () => {
-        let Shape = TaggedUnion('type', types.model({
+
+        let Shape = TaggedUnion('shapeType', types.model('Shape', {
             centerX: types.number,
             centerY: types.number
         }));
@@ -109,6 +110,18 @@ describe('Tagged union type', () => {
             }
         ));
 
-        expect(Shape.getSpecificType('square')).toBe(Square);
+        let Triangle = Shape.addUnion('triangleType', types.model('Triangle', {
+
+        }));
+
+        let IsoscelesTriangle = Triangle.addModel(types.model('isosceles', {
+            base: types.number,
+            height: types.number
+        }));
+
+        expect(Shape.getSpecificType(Square.name)).toBe(Square);
+        expect(Triangle.getSpecificType(IsoscelesTriangle.name)).toBe(IsoscelesTriangle);
+        expect(Shape.getSpecificType(IsoscelesTriangle.name)).toBe(IsoscelesTriangle);
     });
+
 });

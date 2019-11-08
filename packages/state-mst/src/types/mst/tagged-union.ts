@@ -1,7 +1,7 @@
 import {
     types,
     IType, IModelType, ISimpleType, IOptionalIType, IAnyType, _NotCustomized,
-    ModelProperties, ModelPropertiesDeclarationToProperties
+    ModelProperties, ModelPropertiesDeclarationToProperties, isUnionType, isLateType
  } from 'mobx-state-tree';
 
 export const TaggedUnion =
@@ -56,9 +56,28 @@ export const TaggedUnion =
             return union;
         },
         getSpecificType: (name: string) => {
-            return REGISTERED_TYPES.find((type) => {
-                return type.name === name;
-            });
+
+            let specificType;
+            let i = 0;
+            while (!specificType && i < REGISTERED_TYPES.length) {
+                if (isLateType(REGISTERED_TYPES[i]) || isUnionType(REGISTERED_TYPES[i])) {
+                    let subTypes = REGISTERED_TYPES[i];
+                    do {
+                        //@ts-ignore
+                        subTypes = subTypes.getSubTypes();
+                    } while (!Array.isArray(subTypes));
+
+                    specificType = subTypes.find(type => type.name === name);
+
+                } else {
+                    if (REGISTERED_TYPES[i].name === name) {
+                        specificType = REGISTERED_TYPES[i];
+                    }
+                }
+                i++;
+            }
+
+            return specificType;
         }
     };
 
