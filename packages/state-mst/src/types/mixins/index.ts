@@ -7,3 +7,4 @@ export * from './has-loading-state';
 export * from './has-selectable-items';
 export * from './has-geometry';
 export * from './has-style';
+export * from './needs-config';
