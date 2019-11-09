@@ -4,7 +4,7 @@ import { Entity } from '../entity/entity';
 import { hasOpacity, hasLoadingState } from '../mixins';
 
 const LayerBase = types.compose(
-    'mapLayer',
+    'MapLayer',
     types.model({
         name: types.optional(types.string, ''),
         zIndex: types.maybe(types.number),
