@@ -1,22 +1,41 @@
-import { types, IAnyModelType, IReferenceType, IMaybe, UnionOptions } from 'mobx-state-tree';
+import { types, IAnyModelType, IReferenceType, IMaybe, isStateTreeNode, hasParent } from 'mobx-state-tree';
 
-export const ReferenceOrType = <T extends IAnyModelType>(Type: T, referenceType?: IMaybe<IReferenceType<T>>) => {
+export function ReferenceOrType<T extends IAnyModelType>(
+    Type: T,
+    referenceType?: undefined
+): T | IReferenceType<T>;
+export function ReferenceOrType<T extends IAnyModelType>(
+    Type: T,
+    referenceType?: IReferenceType<T>
+): T | IReferenceType<T>;
+export function ReferenceOrType<T extends IAnyModelType>(
+    Type: T,
+    referenceType?: IMaybe<IReferenceType<T>>
+): T | IMaybe<IReferenceType<T>>;
+export function ReferenceOrType<T extends IAnyModelType>(Type: T, referenceType?: IReferenceType<T> | IMaybe<IReferenceType<T>>) {
 
     if (!referenceType) {
-        referenceType =  types.maybe(types.reference(Type));
+        referenceType =  types.reference(Type);
     }
+
+    let refType = referenceType || types.reference(Type);
     return types.union(
         {
-            dispatcher: (snapshot) => {
-                if (!snapshot || typeof(snapshot) === 'string') {
-                    return referenceType;
-                } else if (snapshot) {
-                    return types.maybe(Type);
+            dispatcher: (snapshotOrInstance) => {
+                if (!snapshotOrInstance) {
+                    return refType;
                 }
+                if (typeof(snapshotOrInstance) === 'string') {
+                    return refType;
+                }
+                if (isStateTreeNode(snapshotOrInstance) && hasParent(snapshotOrInstance)) {
+                    return refType;
+                }
+                return Type;
             }
-        } as UnionOptions,
+        },
         referenceType,
-        types.maybe(Type)
-    ) as IMaybe<T> | IMaybe<IReferenceType<T>>;
-};
+        Type
+    ) as T | typeof refType;
+}
 
