@@ -8,9 +8,9 @@ function defaultIdentifierResolver(id: string, collection: ICollection) {
     });
 }
 
-export const IndexedCollection = <T extends IAnyType>(itemsType: T, identifierResolver = defaultIdentifierResolver) => {
+export const IndexedCollection = <T extends IAnyType>(itemsType: T, identifierResolver = defaultIdentifierResolver, name?: string) => {
 
-    return Collection(itemsType).actions((self) => {
+    return Collection(itemsType, name).actions((self) => {
         return {
             itemWithId: (id: string) : Instance<T> => {
                 return identifierResolver(id, self);

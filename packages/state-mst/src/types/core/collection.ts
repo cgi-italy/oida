@@ -1,10 +1,10 @@
-import { types, detach, flow, resolveIdentifier, IAnyType, SnapshotOrInstance, Instance } from 'mobx-state-tree';
+import { types, detach, flow, getSnapshot, IAnyType, SnapshotOrInstance, Instance } from 'mobx-state-tree';
 
 function isArray<T>(type: T | T[]): type is T[] {
     return Array.isArray(type);
 }
 
-export const Collection = <T extends IAnyType>(itemsType: T) => {
+export const Collection = <T extends IAnyType>(itemsType: T, name?: string) => {
     return types.model({
         items: types.optional(types.array(itemsType), [])
     }).actions((self) => {
@@ -44,7 +44,14 @@ export const Collection = <T extends IAnyType>(itemsType: T) => {
                 }
             }),
             remove: (item) => {
-                self.items.remove(item);
+                if (typeof item === 'string') {
+                    let idx = getSnapshot(self.items).indexOf(item);
+                    if (idx !== -1) {
+                        self.items.splice(idx, 1);
+                    }
+                } else {
+                    self.items.remove(item);
+                }
             },
             move: (item, position) => {
                 let currentPosition = self.items.indexOf(item);
@@ -77,7 +84,7 @@ export const Collection = <T extends IAnyType>(itemsType: T) => {
                 return itemsType;
             }
         };
-    }).named(`${itemsType.name}Collection`);
+    }).named(name || `${itemsType.name}Collection`);
 };
 
 class CollectionTypeHelper<T extends IAnyType> {
