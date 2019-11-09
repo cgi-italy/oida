@@ -1,3 +1,4 @@
+import { Geometry } from '@oida/core';
 
 import { FormField } from './form-field';
 import { setFormFieldSerializer } from './form-field-serialization';
@@ -6,7 +7,8 @@ export const AOI_FIELD_ID = 'aoi';
 
 export type AoiValue = {
     name: string;
-    geometry: GeoJSON.Geometry;
+    geometry: Geometry;
+    props?: {[x: string]: any}
 };
 
 export enum AoiAction {
@@ -19,6 +21,7 @@ export enum AoiAction {
 export type AoiFieldConfig = {
     onDrawBBoxAction?: () => void;
     onDrawPolygonAction?: () => void;
+    onLinkToViewportAction?: () => void;
     activeAction: AoiAction;
     color?: string;
     onHoverAction?: (hovered: boolean) => void;

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Tag, Button, Tooltip } from 'antd';
+import { Tag, Button, Tooltip, Icon } from 'antd';
 
 import { AoiField, AoiAction, AOI_FIELD_ID } from '@oida/ui-react-core';
 
@@ -16,8 +16,9 @@ export type AoiFieldRendererProps = {
 export const AoiFieldRenderer = (props: AoiField & AoiFieldRendererProps) => {
 
     let { value, onChange, config, ...renderProps } = props;
-    let { onDrawBBoxAction, onDrawPolygonAction, onHoverAction, onSelectAction, activeAction, color } = config;
-        return (
+    let { onDrawBBoxAction, onDrawPolygonAction, onLinkToViewportAction, onHoverAction, onSelectAction, activeAction, color } = config;
+
+    return (
         <React.Fragment>
             {value &&
             <Tag
@@ -26,7 +27,18 @@ export const AoiFieldRenderer = (props: AoiField & AoiFieldRendererProps) => {
                 onMouseOver={onHoverAction ? () => onHoverAction!(true) : undefined}
                 onMouseOut={onHoverAction ? () => onHoverAction!(false) : undefined}
                 onClick={onSelectAction ? () => onSelectAction!(true) : undefined}
-                onClose={() => props.onChange(undefined)}>{value.name}</Tag>
+                onClose={() => {
+                    if (activeAction === AoiAction.LinkToViewport) {
+                        if (onLinkToViewportAction) {
+                            onLinkToViewportAction();
+                        }
+                    } else {
+                        props.onChange(undefined);
+                    }
+                }}
+            >
+                {value.name}
+            </Tag>
             }
             {!value &&
             <Tag
@@ -59,6 +71,20 @@ export const AoiFieldRenderer = (props: AoiField & AoiFieldRendererProps) => {
                             onClick={() => onDrawPolygonAction!()}
                         >
                             <DrawPolygonIcon/>
+                        </Button>
+                    </Tooltip>
+                }
+                {
+                    onLinkToViewportAction &&
+                    <Tooltip
+                        title='Link to viewport'
+                    >
+                        <Button
+                            type={activeAction === AoiAction.LinkToViewport ? 'primary' : 'default'}
+                            size='small'
+                            onClick={() => onLinkToViewportAction!()}
+                        >
+                            <Icon type='link'/>
                         </Button>
                     </Tooltip>
                 }
