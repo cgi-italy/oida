@@ -12,6 +12,7 @@ olTileSourcesFactory.register('wms', function(config) {
           LAYERS: config.layers,
           ...config.parameters
         },
+        crossOrigin: config.crossOrigin,
         tileGrid: config.tileGrid ? getTileGridFromConfig(config.srs, config.tileGrid) : null,
         projection: config.srs,
         wrapX: config.wrapX

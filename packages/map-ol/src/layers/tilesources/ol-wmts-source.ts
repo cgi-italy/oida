@@ -12,6 +12,7 @@ olTileSourcesFactory.register('wmts', function(config) {
         style: config.style,
         format: config.format,
         requestEncoding: config.requestEncoding,
+        crossOrigin: config.crossOrigin,
         dimensions: config.dimensions,
         matrixSet: config.matrixSet,
         tileGrid: getTileGridFromConfig(config.srs, {
