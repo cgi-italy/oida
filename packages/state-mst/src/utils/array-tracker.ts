@@ -1,10 +1,10 @@
-import { IMSTArray, IAnyType, Instance, SnapshotOrInstance } from 'mobx-state-tree';
+import { IMSTArray, IAnyType, Instance, SnapshotOrInstance, isReferenceType, getType } from 'mobx-state-tree';
 
 export type ArrayTrackerConfig<T, ITEM extends IAnyType = IAnyType> = {
     idGetter?: (item: SnapshotOrInstance<ITEM>) => string;
     items: IMSTArray<ITEM>;
-    onItemAdd(item: Instance<ITEM>, idx?: number): T;
-    onItemRemove(trackerState: T): void;
+    onItemAdd: (item: Instance<ITEM>, idx: number) => T;
+    onItemRemove: (trackerState: T) => void;
 };
 
 export class ArrayTracker<T, ITEM extends IAnyType = IAnyType> {
@@ -36,22 +36,34 @@ export class ArrayTracker<T, ITEM extends IAnyType = IAnyType> {
                 let idx = change.index;
 
                 change.removed.forEach((item) => {
-                    this.onItemRemoved_(this.idGetter_(item.snapshot));
+                    if (isReferenceType(item.type)) {
+                        this.onItemRemoved_(item.snapshot);
+                    } else {
+                        this.onItemRemoved_(this.idGetter_(item.snapshot));
+                    }
                 });
 
                 change.added.forEach((item) => {
-                    this.onItemAdd_(item.value, idx++);
+                    if (isReferenceType(item.type)) {
+                        this.onItemAdd_(item.snapshot, item.value, idx++);
+                    } else {
+                        this.onItemAdd_(this.idGetter_(item.value), item.value, idx++);
+                    }
                 });
 
             } else if (change.type === 'update') {
                 let idx = change.index;
                 this.onItemRemoved_(this.idGetter_(change.oldValue));
-                this.onItemAdd_(change.newValue, idx);
+                this.onItemAdd_(this.idGetter_(change.newValue), change.newValue, idx);
             }
         });
 
         this.trackerConfig_.items.forEach((item, idx) => {
-            this.onItemAdd_(item, idx);
+            if (isReferenceType(getType(item))) {
+                this.onItemAdd_(item.snapshot, item, idx);
+            } else {
+                this.onItemAdd_(this.idGetter_(item), item, idx);
+            }
         });
     }
 
@@ -62,8 +74,8 @@ export class ArrayTracker<T, ITEM extends IAnyType = IAnyType> {
         this.stateSubscription_();
     }
 
-    protected onItemAdd_(item, idx) {
-        this.itemTracker_[this.idGetter_(item)] = this.trackerConfig_.onItemAdd(item, idx);
+    protected onItemAdd_(id, item, idx) {
+        this.itemTracker_[id] = this.trackerConfig_.onItemAdd(item, idx);
     }
 
     protected onItemRemoved_(id) {
