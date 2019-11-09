@@ -3,11 +3,13 @@ import React from 'react';
 import { DatePicker } from 'antd';
 import moment from 'moment';
 
+import { Omit } from '@oida/core';
+
 import { DateRangeField, DATE_RANGE_FIELD_ID } from '@oida/ui-react-core';
 
 import { antdFormFieldRendererFactory } from './antd-form-field-renderer-factory';
 
-export const DateRangeFieldRenderer = (props: DateRangeField) => {
+export const DateRangeFieldRenderer = (props: Omit<DateRangeField, 'name' | 'type'>) => {
 
     let { value, onChange, config, rendererConfig } = props;
 
@@ -17,12 +19,14 @@ export const DateRangeFieldRenderer = (props: DateRangeField) => {
                 range[0].set({
                     hour: 0,
                     minute: 0,
-                    second: 0
+                    second: 0,
+                    millisecond: 0,
                 });
                 range[1].set({
                     hour: 23,
                     minute: 59,
-                    second: 59
+                    second: 59,
+                    millisecond: 999
                 });
             }
             onChange({
@@ -48,11 +52,11 @@ export const DateRangeFieldRenderer = (props: DateRangeField) => {
     return (
         <DatePicker.RangePicker
             size='small'
-            value={value ? [moment(value.start), moment(value.end)] : undefined}
+            value={value ? [moment.utc(value.start), moment.utc(value.end)] : undefined}
             onChange={onDateChange}
             disabledDate={disabledDates}
             showTime={config.withTime ? {
-                defaultValue: [moment('00:00:00', 'HH:mm:ss'), moment('23:59:59', 'HH:mm:ss')]
+                defaultValue: [moment.utc('00:00:00', 'HH:mm:ss'), moment.utc('23:59:59', 'HH:mm:ss')]
             } : false}
             {...renderProps}
         >

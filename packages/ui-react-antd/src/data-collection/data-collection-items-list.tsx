@@ -9,9 +9,10 @@ import { DataCollectionItemsProps, canBeScrolledIntoView } from '@oida/ui-react-
 
 export type DataCollectionItemsListProps<T> = {
     autoScrollOnSelection?: boolean;
-    meta: (item: T) => {avatar?: React.ReactNode, description?: React.ReactNode, title?: React.ReactNode};
+    meta?: (item: T) => {avatar?: React.ReactNode, description?: React.ReactNode, title?: React.ReactNode};
     extra?: (item: T) => React.ReactNode;
     content?: (item: T) => React.ReactNode;
+    itemLayout?: 'horizontal' | 'vertical';
 };
 
 
@@ -34,6 +35,8 @@ export function DataCollectionItemsList<T>(props: DataCollectionItemsListProps<T
 
         let {hovered, selected, actions: actions, icon} =  itemSelector(item);
 
+        let metaProps = meta ? meta(item) : {};
+
         let itemMeta = (
             <List.Item.Meta avatar={
                 icon &&
@@ -41,7 +44,7 @@ export function DataCollectionItemsList<T>(props: DataCollectionItemsListProps<T
                     <span className='ant-avatar ant-avatar-circle ant-avatar-image'>
                         {icon}
                     </span>
-                )} {...meta(item)}>
+                )} {...metaProps}>
             </List.Item.Meta>
         );
 
@@ -68,7 +71,7 @@ export function DataCollectionItemsList<T>(props: DataCollectionItemsListProps<T
 
         return (
                 <ListItem
-                    scrollToItem={hovered || selected}
+                    scrollToItem={autoScrollOnSelection ? hovered || selected : undefined}
                     extra={props.extra && props.extra(item)}
                     actions={itemActions}
                     className={classnames({'hovered': hovered, 'selected': selected})}
@@ -82,7 +85,8 @@ export function DataCollectionItemsList<T>(props: DataCollectionItemsListProps<T
                         onSelectAction(item, SelectionMode.Replace);
                     }}
                     >
-                        {props.content ? [props.content(item), itemMeta] : itemMeta}
+                        {(icon || meta) && itemMeta}
+                        {props.content && props.content(item)}
                 </ListItem>
         );
     };

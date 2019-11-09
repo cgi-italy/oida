@@ -3,40 +3,46 @@
 
 .ant-list {
 
-    @include scrollbar(10px, $primary-color, $primary-2);
+    @include scrollbar(8px, $primary-color, $primary-2);
 
     overflow: auto;
     scroll-behavior: smooth;
 
-    .ant-list-item {
+    .ant-list-items {
 
-        cursor: pointer;
-        padding-top: 5px;
-        padding-bottom: 1px;
+        margin-right: 0.5rem;
 
-        &.hovered {
-            background-color: $table-row-hover-bg;
-        }
+        .ant-list-item {
 
-        &.selected {
-
-            &:not(.hovered) {
-                background-color: $table-selected-row-bg;
-            }
+            cursor: pointer;
+            padding-top: 5px;
+            padding-bottom: 1px;
 
             &.hovered {
-                background-color: lighten($table-selected-row-bg, 10%);
+                background-color: $table-row-hover-bg;
             }
-        }
 
-        .ant-list-item-meta-title {
-            margin-bottom: 0px;
-        }
+            &.selected {
 
-        .ant-list-item-meta-description {
-            font-size: $font-size-sm;
-        }
+                &:not(.hovered) {
+                    background-color: $table-selected-row-bg;
+                }
 
+                &.hovered {
+                    background-color: lighten($table-selected-row-bg, 10%);
+                }
+            }
+
+            .ant-list-item-meta-title {
+                margin-bottom: 0px;
+            }
+
+            .ant-list-item-meta-description {
+                font-size: $font-size-sm;
+            }
+
+
+        }
 
     }
 

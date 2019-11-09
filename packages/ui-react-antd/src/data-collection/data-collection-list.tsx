@@ -1,4 +1,5 @@
 import React from 'react';
+import classnames from 'classnames';
 
 import { Collapse, Button, Icon } from 'antd';
 
@@ -13,6 +14,7 @@ export type DataCollectionListProps<T> = {
     pagerRender?: DataPagerRenderer;
     sortRender?: DataSorterRenderer;
     filtererRender?: DataFiltererRenderer;
+    className?: string;
 } & DataCollectionProps<T> & DataCollectionItemsListProps<T>;
 
 export class DataCollectionList<T> extends React.Component<DataCollectionListProps<T>> {
@@ -36,9 +38,9 @@ export class DataCollectionList<T> extends React.Component<DataCollectionListPro
     };
 
     render() {
-        let {items, paging, sorting, filters, pagerRender, sortRender, filtererRender, ...listProps} = this.props;
+        let {items, paging, sorting, filters, pagerRender, sortRender, filtererRender, className, ...listProps} = this.props;
         return  (
-            <div className='data-collection-list'>
+            <div className={classnames('data-collection-list', className)}>
                 <div className='filter-section'>
                     {sorting && sortRender!(sorting)}
                     {filters && filtererRender!(filters)}
