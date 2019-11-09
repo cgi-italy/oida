@@ -4,16 +4,13 @@ import { SelectionMode } from  '@oida/core';
 
 export const hasSelectableItems = <T extends IAnyModelType>(
     itemsType: T,
-    options: {
-        idGetter?: (item: Instance<T>) => string,
-        referenceType?: IMaybe<IReferenceType<T>>
-    } = {}
+    referenceType?: IReferenceType<T>
 ) => {
 
-    let {idGetter = (item) => item.id, referenceType = types.safeReference(itemsType)} = options;
+    let refType = referenceType || types.safeReference(itemsType, {acceptsUndefined: false});
 
     return types.model({
-        selectedItems: types.array(referenceType)
+        selectedItems: types.array(refType)
     }).actions((self) => {
 
         const getItemIndex = (item) => {
@@ -21,11 +18,11 @@ export const hasSelectableItems = <T extends IAnyModelType>(
         };
 
         const addItem = (item) => {
-            self.selectedItems.push(idGetter(item));
+            self.selectedItems.push(item);
         };
 
         const removeItem = (item) => {
-            self.selectedItems.remove(idGetter(item));
+            self.selectedItems.remove(item);
         };
 
         return {

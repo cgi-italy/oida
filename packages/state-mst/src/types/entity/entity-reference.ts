@@ -39,11 +39,27 @@ export const resolveEntityReference = (reference: string, parent: IAnyStateTreeN
     }
 };
 
-export const EntityReference = types.safeReference(Entity.Type, {
-    get(reference: string, parent) {
-        return resolveEntityReference(reference, parent);
-    },
-    set(entity, parent) {
-        return createEntityReference(entity);
-    }
-});
+export const EntityReference =
+<T extends typeof Entity.Type>(entityType: T) => {
+    return types.safeReference(entityType, {
+        get(reference: string, parent) {
+            return resolveEntityReference(reference, parent);
+        },
+        set(entity, parent) {
+            return createEntityReference(entity);
+        }
+    });
+};
+
+export const EntitySafeReference =
+<T extends typeof Entity.Type>(entityType: T) => {
+    return types.safeReference(entityType, {
+        get(reference: string, parent) {
+            return resolveEntityReference(reference, parent);
+        },
+        set(entity, parent) {
+            return createEntityReference(entity);
+        },
+        acceptsUndefined: false
+    });
+};

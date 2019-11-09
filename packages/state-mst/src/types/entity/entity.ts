@@ -8,6 +8,7 @@ import { hasVisibility, isSelectable, isHoverable } from '../mixins';
 
 
 const EntityBase = types.compose(
+    'Entity',
     types.model({
         id: types.identifier,
     }),

@@ -1,13 +1,13 @@
 import { types, addDisposer, Instance, getSnapshot, resolveIdentifier, IAnyModelType } from 'mobx-state-tree';
 
 import { Entity } from './entity';
-import { EntityReference, createEntityReference, resolveEntityReference } from './entity-reference';
+import { EntityReference, EntitySafeReference, createEntityReference, resolveEntityReference } from './entity-reference';
 import { hasSelectableItems } from '../mixins/has-selectable-items';
 
 //import { SelectionMode } from  '@oida/core';
 
 const EntityHovered = types.model({
-    hoveredItem: EntityReference
+    hoveredItem: EntityReference(Entity.Type)
 }).actions((self) => {
     return {
         setHovered: (item) => {
@@ -32,10 +32,7 @@ const EntityHovered = types.model({
 
 export const EntitySelection = types.compose(
     'EntitySelection',
-    hasSelectableItems(Entity.Type as IAnyModelType, {
-        referenceType: EntityReference,
-        idGetter: createEntityReference
-    }),
+    hasSelectableItems(Entity.Type, EntitySafeReference(Entity.Type)),
     EntityHovered,
     types.model({
         id: types.identifier
