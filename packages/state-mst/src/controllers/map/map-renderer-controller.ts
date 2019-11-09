@@ -11,7 +11,6 @@ export class MapRendererController {
 
     private mapState_: IMap;
     private mapRenderer_: IMapRenderer | undefined;
-    private domTarget_: IObservableValue<HTMLElement>;
     private subscriptionTracker_: SubscriptionTracker = new SubscriptionTracker();
     private layersController_: GroupLayerController;
     private interactionsController_: InteractionListController;
@@ -19,7 +18,6 @@ export class MapRendererController {
 
     constructor(config) {
 
-        this.domTarget_ = observable.box(config.target || null, { deep: false });
         this.mapState_ = config.state;
 
         this.layersController_ = new GroupLayerController({
@@ -32,18 +30,6 @@ export class MapRendererController {
 
         this.bindTMapState_();
 
-    }
-
-    setDomTarget(target: HTMLElement) : void {
-        if (this.mapRenderer_) {
-            this.mapRenderer_.setTarget(target);
-        }
-        this.domTarget_.set(target);
-        this.mapState_.view.setCurrentTarget(target);
-    }
-
-    getDomMTarget() : HTMLElement {
-        return this.domTarget_.get();
     }
 
     getMapRenderer() {
@@ -67,7 +53,7 @@ export class MapRendererController {
         }
         if (rendererConfig) {
             this.mapRenderer_ = mapRendererFactory.create(rendererConfig.id, {
-                target: this.domTarget_.get(),
+                target: this.mapState_.view.target,
                 viewport: this.mapState_.view.viewport,
                 projection: this.mapState_.view.projection,
                 onViewUpdating: (optView) => {
@@ -108,6 +94,16 @@ export class MapRendererController {
                 };
             }, (config) => {
                 this.initMapRenderer_(config.renderer);
+            })
+        );
+
+        this.subscriptionTracker_.addSubscription(
+            reaction(() => {
+                return this.mapState_.view.target;
+            }, (target) => {
+                if (target && this.mapRenderer_) {
+                    this.mapRenderer_.setTarget(target);
+                }
             })
         );
 

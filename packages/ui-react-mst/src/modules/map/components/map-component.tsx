@@ -23,9 +23,6 @@ export const MapComponent = ({mapState, className}: MapComponentProps) => {
         rendererController = new MapRendererController({
             state: mapState
         });
-        if (mapContainer.current) {
-            rendererController.setDomTarget(mapContainer.current);
-        }
 
         return () => {
             rendererController.destroy();
@@ -33,11 +30,12 @@ export const MapComponent = ({mapState, className}: MapComponentProps) => {
     }, [mapState]);
 
     useEffect(() => {
-        if (rendererController)
-            if (mapContainer.current) {
-                rendererController.setDomTarget(mapContainer.current);
-            }
-    }, [mapContainer]);
+        mapState.view.setDomTarget(mapContainer.current || undefined);
+
+        return () => {
+            mapState.view.setDomTarget(undefined);
+        };
+    }, [mapState, mapContainer]);
 
     return (
         <div

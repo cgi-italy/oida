@@ -23,22 +23,19 @@ export const MapView = types
                 self.animateOnChange = animate;
             }
         };
-    }).extend((self) => {
-
-        let currentTarget: HTMLElement;
-
-        return {
-            actions: {
-                setCurrentTarget: (target: HTMLElement) => {
-                    currentTarget = target;
-                }
-            },
-            views: {
-                get size() {
-                    return currentTarget ? [currentTarget.clientWidth, currentTarget.clientHeight] : null;
-                }
-            }
-        };
-    });
+    })
+    .volatile(() => ({
+        target: undefined as (HTMLElement | undefined)
+    }))
+    .actions((self) => ({
+        setDomTarget: (target: HTMLElement | undefined) => {
+            self.target = target;
+        }
+    }))
+    .views((self) => ({
+        get size() {
+            return self.target ? [self.target.clientWidth, self.target.clientHeight] : null;
+        }
+    }));
 
 export type IMapView = Instance<typeof MapView>;
