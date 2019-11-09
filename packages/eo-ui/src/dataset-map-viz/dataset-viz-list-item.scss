@@ -1,0 +1,22 @@
+.viz-item-content {
+    display: flex;
+    align-items: center;
+
+    .viz-item-name {
+        flex-grow: 1;
+        flex-shrink: 1;
+    }
+    .viz-item-actions {
+        justify-self: flex-end;
+
+        .ant-btn {
+            padding: 0 4px;
+        }
+    }
+}
+
+.viz-item-pane {
+    margin-left: 0.5rem;
+    margin-bottom: 0.5rem;
+    padding: 0.2rem 0.5rem;
+}

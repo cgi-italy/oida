@@ -1,0 +1,20 @@
+{
+  "extends": "../../config/tsconfig.default.json",
+  "compilerOptions": {
+    "declarationDir": "./dist/types",
+    "outDir": "./dist",
+    "rootDir": "./src"
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "references": [
+    {
+      "path": "../core"
+    },
+    {
+      "path": "../state-mst"
+    }
+  ]
+}
+

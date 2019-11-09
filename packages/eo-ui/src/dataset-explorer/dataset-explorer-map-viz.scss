@@ -1,0 +1,26 @@
+.dataset-explorer-viz {
+    margin: 6px;
+    position: relative;
+
+    .viz-filters {
+        text-align: right;
+    }
+
+    .ant-list-item {
+
+        padding-bottom: 2px;
+
+        .viz-item-content {
+            .viz-drag-button {
+                display: inline-block;
+                cursor: grab;
+            }
+        }
+
+        .ant-progress {
+            margin-top: 2px;
+            display: inherit;
+            line-height: 0;
+        }
+    }
+}

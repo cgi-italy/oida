@@ -1,0 +1,33 @@
+{
+  "extends": "../../config/tsconfig.default.json",
+  "compilerOptions": {
+    "declarationDir": "./dist/types",
+    "jsx": "react",
+    "outDir": "./dist",
+    "rootDir": "./src"
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "references": [
+    {
+      "path": "../core"
+    },
+    {
+      "path": "../state-mst"
+    },
+    {
+      "path": "../eo"
+    },
+    {
+      "path": "../ui-react-antd"
+    },
+    {
+      "path": "../ui-react-core"
+    },
+    {
+      "path": "../ui-react-mst"
+    }
+  ]
+}
+

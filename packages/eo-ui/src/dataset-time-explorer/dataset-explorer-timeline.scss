@@ -1,0 +1,10 @@
+.dataset-explorer-timeline {
+    position: relative;
+
+    .ant-btn-group {
+        position: absolute;
+        left: 5px;
+        top: 2px;
+        z-index: 10;
+    }
+}
