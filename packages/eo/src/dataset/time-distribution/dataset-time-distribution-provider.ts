@@ -8,6 +8,6 @@ export type STimeDistributionItem = SnapshotIn<typeof TimeDistributionItem>;
 
 export interface DatasetTimeDistributionProvider {
     supportsHistograms: () => boolean;
-    getTimeDistribution: (timeRange, filters) => CancelablePromise<STimeDistributionItem[]>;
+    getTimeDistribution: (timeRange, filters, resolution?) => CancelablePromise<STimeDistributionItem[]>;
     getTimeExtent: (filters) => Promise<STimeDistributionItem | null>;
 }

@@ -121,7 +121,8 @@ export const DatasetsExplorer = types.compose(
                     dataset: dataset.id,
                     searchParams: {
                         start: range.start,
-                        end: range.end
+                        end: range.end,
+                        resolution: self.timeExplorer.visibleRange.resolution
                     }
                 });
 
@@ -143,11 +144,6 @@ export const DatasetsExplorer = types.compose(
         moveDataset: (idx, newIdx) => {
             let datasetView = self.datasetViews[idx];
             if (datasetView) {
-                // let itemsSnapshot = getSnapshot(self.datasetViews).slice();
-                // let itemSnapshot = itemsSnapshot[idx];
-                // itemsSnapshot.splice(idx, 1);
-                // itemsSnapshot.splice(newIdx, 0, itemSnapshot);
-                // applySnapshot(self.datasetViews, itemsSnapshot);
                 detach(datasetView);
                 self.datasetViews.splice(newIdx, 0, datasetView);
             }

@@ -77,13 +77,13 @@ export class WmtsTimeDistributionProvider implements DatasetTimeDistributionProv
         }
     }
 
-    getTimeDistribution(timeRange, filters, stepDuration?) {
+    getTimeDistribution(timeRange, filters, resolution?) {
 
         let isoPeriod = `${timeRange.start.toISOString()}/${timeRange.end.toISOString()}`;
 
-        let resolution;
-        if (stepDuration) {
-            resolution = moment.duration(stepDuration).toISOString();
+        let resParam;
+        if (resolution) {
+            resParam = moment.duration(resolution).toISOString();
         }
 
         return this.wmtsService_.getHistogram({
@@ -91,7 +91,7 @@ export class WmtsTimeDistributionProvider implements DatasetTimeDistributionProv
             layer: this.layer_,
             tileMatrix: this.tileMatrix_,
             dimension: 'time',
-            resolution: resolution,
+            resolution: resParam,
             restrictions: [{dimension: 'time', range: isoPeriod}],
             ...this.filterSerializer_(filters)
         }).then((response) => {

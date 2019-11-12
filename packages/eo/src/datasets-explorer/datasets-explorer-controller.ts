@@ -116,10 +116,14 @@ export class DatasetsExplorerController {
 
                 if (datasetView.timeDistributionViz) {
                     disposers.push(autorun(() => {
-                        let active = this.datasetsExplorer_.timeExplorer.active;
-                        let timeRange = this.datasetsExplorer_.timeExplorer.visibleRange.range;
+                        let timeExplorer = this.datasetsExplorer_.timeExplorer;
+                        let active = timeExplorer.active;
+                        let timeRange = timeExplorer.visibleRange.range;
                         if (active) {
-                            datasetView.timeDistributionViz!.setSearchParams(timeRange);
+                            datasetView.timeDistributionViz!.setSearchParams({
+                                ...timeRange,
+                                resolution: timeExplorer.visibleRange.resolution
+                            });
                         }
                     }));
                 }

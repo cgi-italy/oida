@@ -21,9 +21,9 @@ const timeDistributionUpdater = (timeDistributionViz: IDatasetTimeDistributionVi
         }]);
 
         let stepDuration = searchParams.resolution ||
-            Math.round((searchParams.end.getTime() - searchParams.start.getTime()) / (50 * 1000 * 3600)) * 1000 * 3600;
+            Math.round((searchParams.end.getTime() - searchParams.start.getTime()) / (4 * 1000 * 3600)) * 1000 * 60;
 
-        timeDistributionViz.config.provider.getTimeDistribution(searchParams, filters).then((items) => {
+        timeDistributionViz.config.provider.getTimeDistribution(searchParams, filters, stepDuration).then((items) => {
             timeDistributionViz.timeDistribution.setItems(items);
         }).catch((e) => {
 

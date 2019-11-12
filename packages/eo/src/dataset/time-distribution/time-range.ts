@@ -5,7 +5,8 @@ export const TimeRange = types.model(
     'TimeRange',
     {
         start: types.Date,
-        end: types.Date
+        end: types.Date,
+        resolution: types.maybe(types.number)
     }
 ).actions((self) => {
 
@@ -62,6 +63,9 @@ export const TimeRange = types.model(
             } else {
                 animatRange(start, end);
             }
+        },
+        setResolution: (resolution) => {
+            self.resolution = resolution;
         },
         makeRangeVisible: (start: Date, end: Date, marginRatio: number, animate: boolean) => {
             if (start.getTime() < self.start.getTime() || end.getTime() > self.end.getTime()) {
