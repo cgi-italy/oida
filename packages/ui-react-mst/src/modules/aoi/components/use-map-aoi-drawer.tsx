@@ -19,12 +19,10 @@ export type MapAoiDrawerProps = {
     aois: IAOICollection;
 } & FormFieldState<AoiValue>;
 
-let nextAoiId = 1;
 
 export const useMapAoiDrawer = ({drawInteraction, mapSelection, aois, map, value, onChange}: MapAoiDrawerProps) => {
 
     let [activeAction, setActiveAction] = useState(AoiAction.None);
-    let [aoiInstance, setAoiInstance] = useState<IAOI | undefined>(undefined);
 
     useEffect(() => {
 
@@ -32,52 +30,39 @@ export const useMapAoiDrawer = ({drawInteraction, mapSelection, aois, map, value
 
             let valueProps = value.props || {};
 
-            if (valueProps.mode === 'viewport') {
+            if (valueProps.fromViewport) {
                 setActiveAction(AoiAction.LinkToViewport);
                 return;
             }
 
-            let aoiId = valueProps.id || `drawnAoi${nextAoiId++}`;
 
-            let aoi = aois.add({
-                id: aoiId,
-                name: value.name,
-                defaultColor: valueProps.color,
-                geometry: value.geometry
-            });
-
-            setAoiInstance(aoi);
-
-            if (!valueProps.color || !valueProps.id) {
-                onChange({
-                    ...value,
-                    props: {
-                        ...valueProps,
-                        color: aoi.defaultColor,
-                        id: aoi.id
-                    }
-                });
+            let aoiInstance = getAoiInstance();
+            if (aoiInstance) {
+                aoiInstance.setVisible(true);
             }
 
             return () => {
-                aois.remove(aoi);
-                setAoiInstance(undefined);
+                let aoiInstance = getAoiInstance();
+                if (aoiInstance) {
+                    aoiInstance.setVisible(false);
+                }
             };
 
         }
     }, [value]);
 
+    const getAoiInstance = () => {
+        if (value && value.props && value.props.id) {
+            return aois.itemWithId(value.props.id);
+        } else {
+            return undefined;
+        }
+    };
+
     const onDrawEnd = (evt: FeatureDrawEvent) => {
 
-        let currentProps = value ? value.props || {} : {};
-
         onChange({
-            name: `${evt.geometry.type}`,
             geometry: evt.geometry,
-            props: {
-                ...currentProps,
-                mode: 'manual'
-            }
         });
 
         setActiveAction(AoiAction.None);
@@ -103,59 +88,24 @@ export const useMapAoiDrawer = ({drawInteraction, mapSelection, aois, map, value
 
     const linkToViewport = () => {
         if (activeAction === AoiAction.LinkToViewport) {
+            onChange(undefined);
             setActiveAction(AoiAction.None);
         } else {
-            setActiveAction(AoiAction.LinkToViewport);
-        }
-    };
-
-
-    const debouncedOnchange = debounce((aoi) => {
-        onChange(aoi);
-    }, 500);
-
-    let mapViewport = useMapViewport({
-        map: map,
-        debounce: 500
-    });
-
-    const setCurrentViewport = () => {
-        if (mapViewport) {
-
-            let currentProps = value ? value.props || {} : {};
-
             onChange({
-                name: `Current viewport`,
                 geometry: {
                     type: 'BBox',
-                    bbox: mapViewport,
+                    bbox: map.renderer.implementation!.getViewportExtent()
                 },
                 props: {
-                    ...currentProps,
-                    mode: 'viewport'
+                    fromViewport: true
                 }
             });
         }
     };
 
     useEffect(() => {
-        if (activeAction === AoiAction.LinkToViewport) {
-            setCurrentViewport();
-        }
-    }, [mapViewport]);
 
-
-    useEffect(() => {
-
-        if (activeAction === AoiAction.LinkToViewport) {
-
-            setCurrentViewport();
-
-            return () => {
-                 onChange(undefined);
-            };
-
-        } else if (activeAction === AoiAction.DrawBBox) {
+        if (activeAction === AoiAction.DrawBBox) {
             drawInteraction.setDrawMode(FeatureDrawMode.BBox, {
                 onDrawEnd
             });
@@ -177,21 +127,33 @@ export const useMapAoiDrawer = ({drawInteraction, mapSelection, aois, map, value
 
     const onAoiHover = (hovered) => {
         if (hovered) {
-            mapSelection.setHovered(aoiInstance);
+            mapSelection.setHovered(getAoiInstance());
         } else {
             mapSelection.setHovered(null);
         }
     };
 
     const onAoiSelect = (selected) => {
+        let aoiInstance = getAoiInstance();
         mapSelection.modifySelection(aoiInstance, SelectionMode.Replace);
         if (aoiInstance) {
             map.renderer.implementation!.fitExtent(getGeometryExtent(aoiInstance.geometry), true);
         }
     };
 
-    let color = useObserver(() => {
-        return aoiInstance ? aoiInstance.color : null;
+    let aoiProps = useObserver(() => {
+        let aoiInstance = getAoiInstance();
+        if (aoiInstance) {
+            return {
+                color: aoiInstance.color,
+                name: aoiInstance.name
+            };
+        } else {
+            return {
+                color: null,
+                name: value && value.props && value.props.fromViewport ? 'Current viewport' : 'None'
+            };
+        }
     });
 
     return {
@@ -201,7 +163,8 @@ export const useMapAoiDrawer = ({drawInteraction, mapSelection, aois, map, value
         activeAction: activeAction,
         onHoverAction: onAoiHover,
         onSelectAction: onAoiSelect,
-        color: color
+        color: aoiProps.color,
+        name: aoiProps.name
     };
 };
 

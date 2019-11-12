@@ -16,7 +16,8 @@ export type AoiFieldRendererProps = {
 export const AoiFieldRenderer = (props: AoiField & AoiFieldRendererProps) => {
 
     let { value, onChange, config, ...renderProps } = props;
-    let { onDrawBBoxAction, onDrawPolygonAction, onLinkToViewportAction, onHoverAction, onSelectAction, activeAction, color } = config;
+    let { onDrawBBoxAction, onDrawPolygonAction, onLinkToViewportAction,
+         onHoverAction, onSelectAction, activeAction, color, name } = config;
 
     return (
         <React.Fragment>
@@ -27,7 +28,8 @@ export const AoiFieldRenderer = (props: AoiField & AoiFieldRendererProps) => {
                 onMouseOver={onHoverAction ? () => onHoverAction!(true) : undefined}
                 onMouseOut={onHoverAction ? () => onHoverAction!(false) : undefined}
                 onClick={onSelectAction ? () => onSelectAction!(true) : undefined}
-                onClose={() => {
+                onClose={(evt) => {
+                    evt.stopPropagation();
                     if (activeAction === AoiAction.LinkToViewport) {
                         if (onLinkToViewportAction) {
                             onLinkToViewportAction();
@@ -37,7 +39,7 @@ export const AoiFieldRenderer = (props: AoiField & AoiFieldRendererProps) => {
                     }
                 }}
             >
-                {value.name}
+                {name}
             </Tag>
             }
             {!value &&

@@ -6,9 +6,11 @@ import { setFormFieldSerializer } from './form-field-serialization';
 export const AOI_FIELD_ID = 'aoi';
 
 export type AoiValue = {
-    name: string;
     geometry: Geometry;
-    props?: {[x: string]: any}
+    props?: {
+        id?: string;
+        fromViewport?: boolean;
+    }
 };
 
 export enum AoiAction {
@@ -23,6 +25,7 @@ export type AoiFieldConfig = {
     onDrawPolygonAction?: () => void;
     onLinkToViewportAction?: () => void;
     activeAction: AoiAction;
+    name: string;
     color?: string;
     onHoverAction?: (hovered: boolean) => void;
     onSelectAction?: (selected: boolean) => void;
