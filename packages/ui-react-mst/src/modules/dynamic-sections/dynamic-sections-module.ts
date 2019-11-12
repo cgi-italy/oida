@@ -3,8 +3,8 @@ import { types, Instance } from 'mobx-state-tree';
 import { AppModule, AppModuleStateModel } from '../app-module';
 import { Section } from './types';
 
-export const DynamicLayoutStateModel = AppModuleStateModel.addModel(
-    types.model('DynamicLayoutModule', {
+export const DynamicSectionsStateModel = AppModuleStateModel.addModel(
+    types.model('DynamicSectionsModule', {
         sections: types.map(Section)
     })
     .actions((self) => ({
@@ -24,16 +24,17 @@ export const DynamicLayoutStateModel = AppModuleStateModel.addModel(
     }))
 );
 
-export type DynamicLayoutModuleConfig = {
+export type DynamicSectionsModuleConfig = {
 };
 
-export type DynamicLayoutModule = AppModule<typeof DynamicLayoutStateModel, DynamicLayoutModuleConfig>;
-export const DefaultDynamicLayoutModule: DynamicLayoutModule = {
-    stateModel: DynamicLayoutStateModel,
+export type DynamicSectionsModule = AppModule<typeof DynamicSectionsStateModel, DynamicSectionsModuleConfig>;
+
+export const DefaultDynamicSectionsModule: DynamicSectionsModule = {
+    stateModel: DynamicSectionsStateModel,
     defaultInitState: {
-        id: 'dynamicLayout',
+        id: 'dynamicSections',
         sections: {}
     }
 };
 
-export type IDynamicLayoutStateModel = Instance<typeof DynamicLayoutStateModel>;
+export type IDynamicSectionsStateModel = Instance<typeof DynamicSectionsStateModel>;

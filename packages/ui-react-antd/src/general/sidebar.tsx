@@ -3,11 +3,11 @@ import classnames from 'classnames';
 
 import { Tabs, Tooltip } from 'antd';
 
-import { ComponentPaneProps } from '@oida/ui-react-core';
+import { LayoutSectionProps } from '@oida/ui-react-core';
 
 const TabPane = Tabs.TabPane;
 
-export type SidebarProps = ComponentPaneProps & {
+export type SidebarProps = LayoutSectionProps & {
     isRight?: boolean;
     isBottom?: boolean;
 };

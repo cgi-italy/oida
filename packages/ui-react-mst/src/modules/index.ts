@@ -2,7 +2,7 @@ export * from './app-module';
 
 export * from './formatters';
 export * from './breadcrumb';
-export * from './dynamic-layout';
+export * from './dynamic-sections';
 export * from './map';
 export * from './aoi';
 

@@ -2,12 +2,12 @@ import { useEffect, useState } from 'react';
 
 import { Omit } from '@oida/core';
 
-import { IDynamicLayoutStateModel } from '../dynamic-layout-module';
-import { useDynamicLayoutModuleState } from '../use-dynamic-layout-state-model';
+import { IDynamicSectionsStateModel } from '../dynamic-sections-module';
+import { useDynamicSectionsModuleState } from '../use-dynamic-sections-module-state';
 import { ISectionItem, LayoutOptions } from '../types';
 
 export type DynamicSectionInjectorProps = {
-    dynamicSectionModule: IDynamicLayoutStateModel,
+    dynamicSectionsModule: IDynamicSectionsStateModel,
     sectionId: string,
     layoutOptions?: LayoutOptions,
     id: string,
@@ -18,9 +18,9 @@ export type DynamicSectionInjectorProps = {
 
 const DynamicSectionInjectorBase = (props: DynamicSectionInjectorProps) => {
 
-    let {dynamicSectionModule, sectionId, id, layoutOptions, children, ...renderProps} = props;
+    let {dynamicSectionsModule, sectionId, id, layoutOptions, children, ...renderProps} = props;
 
-    let section = dynamicSectionModule.getOrCreateSection(sectionId)!;
+    let section = dynamicSectionsModule.getOrCreateSection(sectionId)!;
     let [sectionItem, setSectionItem] = useState<ISectionItem | undefined>(undefined);
 
     useEffect(() => {
@@ -31,11 +31,11 @@ const DynamicSectionInjectorBase = (props: DynamicSectionInjectorProps) => {
             section.removeComponent(component);
             setSectionItem(undefined);
         };
-    }, [sectionId, dynamicSectionModule]);
+    }, [sectionId, dynamicSectionsModule]);
 
     useEffect(() => {
         if (sectionItem) {
-            sectionItem.setRenderingConfig({...renderProps, content: children});
+            sectionItem.init({...renderProps, content: children});
         }
     }, [renderProps.title, renderProps.icon, children]);
 
@@ -43,11 +43,11 @@ const DynamicSectionInjectorBase = (props: DynamicSectionInjectorProps) => {
 };
 
 
-export const DynamicSectionInjector = (props: Omit<DynamicSectionInjectorProps, 'dynamicSectionModule'>) => {
-    const dynamicSectionModule = useDynamicLayoutModuleState();
+export const DynamicSectionInjector = (props: Omit<DynamicSectionInjectorProps, 'dynamicSectionsModule'>) => {
+    const dynamicSectionsModule = useDynamicSectionsModuleState();
 
     return DynamicSectionInjectorBase({
-        dynamicSectionModule,
+        dynamicSectionsModule,
         ...props
     });
 };
