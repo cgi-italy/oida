@@ -1,7 +1,7 @@
 const webpackMerge = require('webpack-merge');
 const commonConfig = require('./webpack.common.js');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
-const CleanWebpackPlugin = require('clean-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 const config = (env = {}) => {
@@ -34,7 +34,7 @@ const config = (env = {}) => {
                 reportFilename: '../bundle-report.html',
                 openAnalyzer: false
             }),
-            new CleanWebpackPlugin([env.outpath || 'dist']),
+            new CleanWebpackPlugin(),
             new MiniCssExtractPlugin({
                 filename: "[name].[hash].bundle.css",
                 chunkFilename: "[id].[hash].css"

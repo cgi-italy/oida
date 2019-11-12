@@ -5,13 +5,11 @@ import { useDynamicLayoutSection } from '@oida/ui-react-mst';
 
 export const SideSection = () => {
 
-    let {components, activeComponent, showComponent} = useDynamicLayoutSection({sectionId: 'sidebar'});
+    let dynamicSectionProps = useDynamicLayoutSection({sectionId: 'sidebar'});
 
     return (
         <SideBar
-            components={components}
-            activeComponent={activeComponent}
-            showComponent={showComponent}
+            {...dynamicSectionProps}
         />
     );
 };

@@ -14,7 +14,7 @@ import { createEntityReference } from '../../types/entity/entity-reference';
 
 
 type FeatureTracker = {
-    id: string,
+    id: any,
     disposeGeometryObserver: IReactionDisposer,
     disposeStyleObserver: IReactionDisposer
 };
@@ -157,7 +157,7 @@ export class FeatureLayerController extends MapLayerController<IFeatureLayerRend
             let disposeStyleObserver = reaction(() => styleGetter(entity), (style) => {
                 this.layerRenderer_!.updateFeatureStyle(featureId, style);
             }, {
-                fireImmediately: true
+                //fireImmediately: true
             });
 
             return {

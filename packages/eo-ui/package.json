@@ -2,8 +2,10 @@
   "name": "@oida/eo-ui",
   "version": "1.0.0",
   "description": "oida EO analyst UI library",
+  "typescript:main": "src/index.ts",
   "module": "dist/eo-ui.js",
   "main": "dist/eo-ui.cjs.js",
+  "saas": "dist/styles/index.scss",
   "types": "dist/types/index.d.ts",
   "files": [
     "dist",
@@ -22,6 +24,15 @@
   "publishConfig": {
     "registry": "https://nexus.dev.eoss-cloud.it/repository/npm-cgi-eo/"
   },
+  "peerDependencies": {
+    "antd": "^3.23.2",
+    "classnames": "^2.2.6",
+    "mobx": "^4.9.4",
+    "mobx-react": "^6.1.1",
+    "mobx-state-tree": "^3.14.0",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6"
+  },
   "dependencies": {
     "@oida/core": "file:../core",
     "@oida/eo": "file:../eo",
@@ -31,6 +42,7 @@
     "@oida/ui-react-mst": "file:../ui-react-mst",
     "echarts": "^4.3.0",
     "lodash": "^4.17.15",
+    "moment": "^2.22.0",
     "react-sortable-hoc": "^1.10.1",
     "vis-timeline": "^5.1.0"
   }

@@ -22,9 +22,15 @@
   "publishConfig": {
     "registry": "https://nexus.dev.eoss-cloud.it/repository/npm-cgi-eo/"
   },
+  "peerDependencies": {
+    "mobx": "^4.9.4",
+    "mobx-state-tree": "^3.14.0"
+  },
   "dependencies": {
     "@oida/core": "file:../core",
     "@oida/state-mst": "file:../state-mst",
-    "lodash": "^4.17.15"
+    "chroma-js": "^2.0.2",
+    "lodash": "^4.17.15",
+    "moment": "^2.22.0"
   }
 }

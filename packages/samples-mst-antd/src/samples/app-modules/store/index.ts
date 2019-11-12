@@ -6,7 +6,7 @@ import '@oida/map-ol';
 import '@oida/map-cesium';
 
 import { withAppModules,
-    DefaultMapModule, DefaultAoiModule, DefaultFormattersModule, DefaultBreadcrumbModule, DefaultDynamicLayoutModule,
+    DefaultMapModule, DefaultAoiModule, DefaultFormattersModule, DefaultBreadcrumbModule, DefaultDynamicSectionsModule,
     createAppStoreContext } from '@oida/ui-react-mst';
 
 
@@ -64,7 +64,7 @@ appState.addModule(DefaultAoiModule, {});
 
 appState.addModule(DefaultBreadcrumbModule, {pageTitle: 'App modules sample'});
 
-appState.addModule(DefaultDynamicLayoutModule, {});
+appState.addModule(DefaultDynamicSectionsModule, {});
 
 export const AppContext = createAppStoreContext(appState);
 
