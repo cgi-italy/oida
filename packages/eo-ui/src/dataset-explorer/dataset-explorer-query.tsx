@@ -73,7 +73,8 @@ export const DatasetExplorerQuery = (props: DatasetExplorerQueryProps) => {
 
     let commmonFiltersProps = useDataFiltering({filters: props.filters!, filteringState: props.explorerState.commonFilters});
 
-    let datasetFilters = props.discoveryState.datasets.map((datasetConfig) => {
+
+    let datasetFilters = useObserver(() => props.discoveryState.datasets.map((datasetConfig) => {
 
         return (
             <DatasetExplorerSelection
@@ -82,7 +83,7 @@ export const DatasetExplorerQuery = (props: DatasetExplorerQueryProps) => {
                 explorerState={props.explorerState}
             />
         );
-    });
+    }));
 
     return (
         <div>

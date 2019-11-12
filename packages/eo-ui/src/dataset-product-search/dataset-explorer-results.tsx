@@ -45,11 +45,18 @@ export const DatasetExplorerResults = (props: DatasetExplorerResultsProps) => {
     });
 
     return (
-        <Tabs className='explorer-results'
-            tabBarExtraContent={props.tabsExtraContent}
-        >
-            {panes}
-        </Tabs>
+        <React.Fragment>
+            {!panes.length &&
+                <div>No dataset selected</div>
+            }
+            {!!panes.length &&
+                <Tabs className='explorer-results'
+                    tabBarExtraContent={props.tabsExtraContent}
+                >
+                    {panes}
+                </Tabs>
+            }
+        </React.Fragment>
     );
 };
 

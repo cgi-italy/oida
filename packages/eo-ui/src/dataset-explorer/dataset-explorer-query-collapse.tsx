@@ -5,17 +5,17 @@ import { useObserver } from 'mobx-react-lite';
 
 import { DatasetExplorerQuery, DatasetExplorerQueryProps } from './dataset-explorer-query';
 
-export type DatasetExplorerQueryCollapseProps = DatasetExplorerQueryProps;
+export type DatasetExplorerQueryCollapseProps = DatasetExplorerQueryProps & {
+    visible: boolean;
+    setVisible: (visible: boolean) => void
+};
 
 export const DatasetExplorerQueryCollapse = (props: DatasetExplorerQueryCollapseProps) => {
 
-    let filterVisible = useObserver(() => {
-        return props.explorerState.showFilters;
-    });
 
     return (
         <Collapse
-            activeKey={filterVisible ? 'filters' : undefined}
+            activeKey={props.visible ? 'filters' : undefined}
         >
             <Collapse.Panel
                 key='filters'
@@ -25,10 +25,10 @@ export const DatasetExplorerQueryCollapse = (props: DatasetExplorerQueryCollapse
                     shape='circle'
                     type='primary'
                     style={{alignSelf: 'flex-end'}}
-                    title={props.explorerState.showFilters ? 'Close filter settings' : 'Show dataset filters'}
-                    onClick={() => props.explorerState.setFilterVisibility(!props.explorerState.showFilters)}
+                    title={props.visible ? 'Close filter settings' : 'Show dataset filters'}
+                    onClick={() => props.setVisible(!props.visible)}
                 >
-                    <Icon type={props.explorerState.showFilters ? 'close' : 'control'}></Icon>
+                    <Icon type={props.visible ? 'close' : 'control'}></Icon>
                 </Button>
                 }
             >

@@ -45,21 +45,26 @@ export const DatasetExplorerMapViz = (props: DatasetExplorerMapVizProps) => {
 
     return (
             <div className='dataset-explorer-viz' ref={componentRef}>
-                <SortableList
-                    useDragHandle={true}
-                    helperContainer={() => {
-                        return componentRef.current
-                            ? componentRef.current.querySelector('.ant-spin-container') || document.body
-                            : document.body;
-                    }}
-                    onSortEnd={(data) => {
-                        props.explorerState.moveDataset(data.oldIndex, data.newIndex);
-                    }}
-                    size='small'
-                    itemLayout='vertical'
-                >
-                    {items}
-                </SortableList>
+                {!items.length &&
+                    <div>No dataset selected</div>
+                }
+                {!!items.length &&
+                    <SortableList
+                        useDragHandle={true}
+                        helperContainer={() => {
+                            return componentRef.current
+                                ? componentRef.current.querySelector('.ant-spin-container') || document.body
+                                : document.body;
+                        }}
+                        onSortEnd={(data) => {
+                            props.explorerState.moveDataset(data.oldIndex, data.newIndex);
+                        }}
+                        size='small'
+                        itemLayout='vertical'
+                    >
+                        {items}
+                    </SortableList>
+                }
             </div>
     );
 };

@@ -26,7 +26,6 @@ export const DatasetsExplorer = types.compose(
     types.model( {
         datasetViews: types.array(DatasetExplorerView),
         commonFilters: types.optional(DataFilters, {}),
-        showFilters: types.optional(types.boolean, true),
         timeExplorer: types.model({
             active: types.optional(types.boolean, false),
             visibleRange: TimeRange
@@ -63,9 +62,6 @@ export const DatasetsExplorer = types.compose(
         },
         setToi: (toi) => {
             self.commonFilters.set(self.config.toiFilterKey, toi);
-        },
-        setFilterVisibility: (visible: boolean) => {
-            self.showFilters = visible;
         },
         setProductExplorerActive: (active: boolean) => {
             if (active && self.config.disableProductSearch) {

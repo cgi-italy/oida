@@ -92,6 +92,7 @@ export const DatasetDiscoveryTimeline = (props: DatasetExplorerTimelineProps) =>
                         let itemUpdateDisposer = autorun(() => {
                             timelineItems.current.update({
                                 id: itemId,
+                                className: item.data && item.data.loading ? 'is-loading' : '',
                                 group: datasetView.dataset.id,
                                 start: item.start,
                                 end: item.end,

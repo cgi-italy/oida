@@ -78,6 +78,11 @@ export const Timeline = (props: TimelineProps) => {
     let [ timeline, setTimeline ] = useState<VisTimeline>();
     let [ wasRangeChangedFromTimeline, setWasRangeChangedFromTimeline] = useState(false);
 
+    const getMillisecondsPerPixel = () => {
+        let range =  timeline.range;
+        return (range.end - range.start) / range.body.dom.center.clientWidth;
+    };
+
     useEffect(() => {
 
         if (containerRef.current) {

@@ -53,6 +53,21 @@
                         .vis-item-content {
                             padding: 0;
                         }
+
+                    }
+
+                    &.is-loading {
+
+                        display: flex;
+                        padding: 1px;
+                        opacity: 0.6;
+
+                        .vis-item-overflow {
+                            background: rgba(black, 0.4);
+                            animation: range-load-animation 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+                            height: 2px;
+                        }
+
                     }
                 }
 
@@ -82,3 +97,9 @@
         }
     }
 }
+
+@keyframes range-load-animation {
+    0% { margin-left: 0px; margin-right: 100%; }
+    50% { margin-left: 25%; margin-right: 0%; }
+    100% { margin-left: 100%; margin-right: 0; }
+  }
