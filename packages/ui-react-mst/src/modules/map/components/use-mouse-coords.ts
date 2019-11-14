@@ -1,4 +1,4 @@
-import { useObserver } from 'mobx-react-lite';
+import { useObserver } from 'mobx-react';
 
 
 import { MOUSE_COORDS_INTERACTION_ID } from '@oida/core';

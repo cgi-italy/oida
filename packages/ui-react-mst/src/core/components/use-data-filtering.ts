@@ -1,4 +1,4 @@
-import { useObserver } from 'mobx-react-lite';
+import { useObserver } from 'mobx-react';
 
 import { IDataFilters } from '@oida/state-mst';
 import { AnyFormFieldDefinition, DataFiltererProps } from '@oida/ui-react-core';

@@ -1,6 +1,6 @@
 import React from 'react';
 import { autorun } from 'mobx';
-import { useObserver } from 'mobx-react-lite';
+import { useObserver } from 'mobx-react';
 
 import { Checkbox, message } from 'antd';
 

@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { useObserver } from 'mobx-react-lite';
+import { useObserver } from 'mobx-react';
 
 import { AppContext } from './store';
 import { SpotList } from './components';

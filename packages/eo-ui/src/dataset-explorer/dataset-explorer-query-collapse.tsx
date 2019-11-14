@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { Collapse, Button, Icon } from 'antd';
-import { useObserver } from 'mobx-react-lite';
+import { useObserver } from 'mobx-react';
 
 import { DatasetExplorerQuery, DatasetExplorerQueryProps } from './dataset-explorer-query';
 

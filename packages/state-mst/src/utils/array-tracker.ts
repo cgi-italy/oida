@@ -1,8 +1,8 @@
-import { IMSTArray, IAnyType, Instance, SnapshotOrInstance, isReferenceType, getType } from 'mobx-state-tree';
+import { IAnyType, IArrayType, Instance, SnapshotOrInstance, isReferenceType, getType } from 'mobx-state-tree';
 
 export type ArrayTrackerConfig<T, ITEM extends IAnyType = IAnyType> = {
     idGetter?: (item: SnapshotOrInstance<ITEM>) => string;
-    items: IMSTArray<ITEM>;
+    items: Instance<IArrayType<ITEM>>;
     onItemAdd: (item: Instance<ITEM>, idx: number) => T;
     onItemRemove: (trackerState: T) => void;
 };

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 
-import { useObserver } from 'mobx-react-lite';
+import { useObserver } from 'mobx-react';
 
 import { Geometry, centerOnMap, CenterOnMapOptions, IMapRenderer } from '@oida/core';
 import { IMap } from '@oida/state-mst';

@@ -1,4 +1,4 @@
-import { useObserver } from 'mobx-react-lite';
+import { useObserver } from 'mobx-react';
 
 import { IBreadcrumbModuleStateModel } from '../breadcrumb-module';
 import { useBreadcrumbModuleState } from '../use-breadcrumb-module-state';

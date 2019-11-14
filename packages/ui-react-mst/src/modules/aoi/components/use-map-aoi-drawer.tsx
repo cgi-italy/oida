@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useObserver } from 'mobx-react-lite';
+import { useObserver } from 'mobx-react';
 import { autorun } from 'mobx';
 import debounce from 'lodash/debounce';
 

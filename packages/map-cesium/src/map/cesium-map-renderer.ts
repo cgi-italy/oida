@@ -94,7 +94,7 @@ export class CesiumMapRenderer implements IMapRenderer {
     }
 
     getLayersFactory() {
-        return cesiumLayersFactory as IDynamicFactory<ILayerRenderer>;
+        return cesiumLayersFactory as unknown as IDynamicFactory<ILayerRenderer>;
     }
 
     getInteractionsFactory() {

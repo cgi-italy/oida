@@ -52,8 +52,8 @@ export const DatasetTimeDistributionViz = DatasetViz.addModel(
             }), {})
         }),
         needsConfig<DatasetTimeDistributionConfig>()
-    ).actions((self) => (
-        {
+    ).actions((self) => {
+        return {
             setSearchParams: (params) => {
                 self.searchParams = params;
             },
@@ -63,8 +63,8 @@ export const DatasetTimeDistributionViz = DatasetViz.addModel(
                     timeDistributionUpdaterDisposer();
                 });
             }
-        }
-    ))
+        };
+    })
 );
 
 export type IDatasetTimeDistributionViz = Instance<typeof DatasetTimeDistributionViz>;

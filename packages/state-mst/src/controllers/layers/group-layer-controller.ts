@@ -1,3 +1,5 @@
+import { IReferenceType } from 'mobx-state-tree';
+
 import { GROUP_LAYER_ID, IGroupLayerRenderer, IMapRenderer } from '@oida/core';
 
 import { MapLayerController } from './map-layer-controller';
@@ -10,7 +12,10 @@ import { MapLayer, IMapLayer, IGroupLayer } from '../../types';
 export class GroupLayerController extends MapLayerController<IGroupLayerRenderer, IGroupLayer> {
 
     private mapRenderer_: IMapRenderer | undefined;
-    private layersTracker_: ArrayTracker<MapLayerController | undefined, typeof MapLayer.Type> | undefined;
+    private layersTracker_: ArrayTracker<
+        MapLayerController | undefined,
+        typeof MapLayer.Type | IReferenceType<typeof MapLayer.Type>
+    > | undefined;
 
     constructor(config) {
         super(config);

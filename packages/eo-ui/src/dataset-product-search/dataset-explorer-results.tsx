@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 
-import { useObserver } from 'mobx-react-lite';
+import { useObserver } from 'mobx-react';
 import { Tabs, Badge } from 'antd';
 
 import { IEntitySelection } from '@oida/state-mst';

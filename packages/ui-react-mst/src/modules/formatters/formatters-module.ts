@@ -47,7 +47,7 @@ export const FormattersModuleStateModel = AppModuleStateModel.addModel(
                         });
                     }
                 } else {
-                    return value.toString();
+                    return value;
                 }
             }
         };

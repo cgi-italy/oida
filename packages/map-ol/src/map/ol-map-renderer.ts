@@ -72,7 +72,7 @@ export class OLMapRenderer implements IMapRenderer {
     }
 
     getLayersFactory() {
-        return olLayersFactory as IDynamicFactory<ILayerRenderer>;
+        return olLayersFactory as unknown as IDynamicFactory<ILayerRenderer>;
     }
 
     getInteractionsFactory() {

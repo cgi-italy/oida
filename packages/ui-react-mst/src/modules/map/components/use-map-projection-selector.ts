@@ -1,4 +1,4 @@
-import { useObserver } from 'mobx-react-lite';
+import { useObserver } from 'mobx-react';
 
 import { IMapProjection } from '@oida/core';
 import { IMapView } from '@oida/state-mst';

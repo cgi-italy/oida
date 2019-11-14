@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from 'react';
-import { useObserver } from 'mobx-react-lite';
+import { useObserver } from 'mobx-react';
 import { List } from 'antd';
 
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';

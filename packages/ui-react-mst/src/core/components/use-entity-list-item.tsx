@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { useObserver } from 'mobx-react-lite';
+import { useObserver } from 'mobx-react';
 
 import { IEntity } from '@oida/state-mst';
 import { AsyncImage, DataCollectionItemProps } from '@oida/ui-react-core';

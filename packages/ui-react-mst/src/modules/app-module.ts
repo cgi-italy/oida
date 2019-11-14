@@ -1,23 +1,14 @@
-import { types, Instance, ModelProperties, IModelType, IAnyModelType, ISimpleType, SnapshotIn } from 'mobx-state-tree';
+import { types, Instance, SnapshotIn } from 'mobx-state-tree';
 
-import { ExtractPropsFromModel, ExtractOthersFromModel, TaggedUnion } from '@oida/state-mst';
+import { ExtractPropsFromModel, ExtractOthersFromModel, TaggedUnion, needsConfig } from '@oida/state-mst';
 
-const AppModuleStateModelBase = types.model(
+const AppModuleStateModelBase = types.compose(
     'AppModule',
-    {
+    types.model({
         id: types.identifier
-    }
-).volatile((self) => {
-    return {
-        config: undefined
-    };
-}).actions((self) => {
-    return {
-        setConfig: (config) => {
-            self.config = config;
-        }
-    };
-});
+    }),
+    needsConfig<any>()
+);
 
 
 export const AppModuleStateModel = TaggedUnion('appModuleType', AppModuleStateModelBase);

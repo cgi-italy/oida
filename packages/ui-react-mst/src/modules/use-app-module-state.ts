@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 
-import { Instance, IModelType } from 'mobx-state-tree';
-import { AppModule, AppModuleStateModel, AppModuleProps, AppModuleOthers } from './app-module';
+import { IModelType } from 'mobx-state-tree';
+import { AppModule, AppModuleProps, AppModuleOthers } from './app-module';
 import { IAppWithModules } from './with-app-modules';
 
 

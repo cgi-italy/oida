@@ -1,4 +1,4 @@
-import { useObserver } from 'mobx-react-lite';
+import { useObserver } from 'mobx-react';
 
 import { IDataPaging } from '@oida/state-mst';
 import { DataPagerProps } from '@oida/ui-react-core';

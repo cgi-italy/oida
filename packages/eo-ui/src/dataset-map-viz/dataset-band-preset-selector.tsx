@@ -2,7 +2,7 @@ import React from 'react';
 import classnames from 'classnames';
 
 import { Instance } from 'mobx-state-tree';
-import { useObserver } from 'mobx-react-lite';
+import { useObserver } from 'mobx-react';
 
 import { List, Avatar, Popover, Button, Icon, Collapse, Dropdown } from 'antd';
 

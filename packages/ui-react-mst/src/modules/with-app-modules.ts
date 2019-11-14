@@ -18,7 +18,7 @@ export const withAppModules = types.model({
         };
 
         let appModuleState = appModule.stateModel.create(initState);
-        appModuleState.setConfig(config);
+        appModuleState.init(config);
 
         self.modules.put(appModuleState);
 
@@ -31,9 +31,10 @@ export const withAppModules = types.model({
         let moduleState = self.modules.get(appModule.defaultInitState.id!);
         //@ts-ignore
         typecheck(appModule.stateModel, moduleState);
-        return self.modules.get(appModule.defaultInitState.id!) as Instance<IModelType<PROPS, {
+
+        return self.modules.get(appModule.defaultInitState.id!) as Instance<IModelType<PROPS, Omit<OTHERS, 'config'> & {
             config: CONFIG;
-        } & OTHERS>>;
+        }>>;
     }
 }));
 

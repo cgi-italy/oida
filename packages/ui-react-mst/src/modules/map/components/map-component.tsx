@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import  classNames from 'classnames';
 
-import { useObserver } from 'mobx-react-lite';
+import { useObserver } from 'mobx-react';
 
 import { Omit } from '@oida/core';
 import { IMap, MapRendererController } from '@oida/state-mst';

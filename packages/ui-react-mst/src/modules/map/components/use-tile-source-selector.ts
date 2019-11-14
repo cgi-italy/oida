@@ -1,4 +1,4 @@
-import { useObserver } from 'mobx-react-lite';
+import { useObserver } from 'mobx-react';
 
 import { IGroupLayer, ITileLayer } from '@oida/state-mst';
 

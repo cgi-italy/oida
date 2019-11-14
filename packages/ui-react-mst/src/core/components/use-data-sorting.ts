@@ -1,4 +1,4 @@
-import { useObserver } from 'mobx-react-lite';
+import { useObserver } from 'mobx-react';
 
 import { IDataSorting } from '@oida/state-mst';
 import { DataSortField, DataSorterProps } from '@oida/ui-react-core';

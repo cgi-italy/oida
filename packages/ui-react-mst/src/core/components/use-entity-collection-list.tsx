@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { TypeOfValue } from 'mobx-state-tree';
-import { useObserver } from 'mobx-react-lite';
+import { useObserver } from 'mobx-react';
 
 import { SelectionMode } from '@oida/core';
 import { IEntityCollection, IEntity, IEntitySelection } from '@oida/state-mst';

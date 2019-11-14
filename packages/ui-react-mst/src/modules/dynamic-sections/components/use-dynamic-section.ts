@@ -1,4 +1,4 @@
-import { useObserver } from 'mobx-react-lite';
+import { useObserver } from 'mobx-react';
 
 import { Omit } from '@oida/core';
 import { LayoutSectionProps } from '@oida/ui-react-core';

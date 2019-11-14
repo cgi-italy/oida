@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 import { isAlive, getParentOfType } from 'mobx-state-tree';
-import { useObserver } from 'mobx-react-lite';
+import { useObserver } from 'mobx-react';
 
 import { List, Button, Icon, Badge, Tooltip, message } from 'antd';
 import { SortableHandle } from 'react-sortable-hoc';
