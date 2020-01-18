@@ -1,0 +1,110 @@
+.dataset-colormap-presets {
+
+    border: solid 1px $border-color-base;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.dataset-colormap-preset {
+
+    display: flex;
+    align-items: center;
+
+    cursor: pointer;
+    padding-left: 10px;
+    padding: 0.5rem 0.5rem;
+    border-bottom: solid 1px $border-color-base;
+
+    .dataset-colormap-preset-content {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+
+        .dataset-colormap-preset-legend {
+            img {
+                height: 20px;
+                width: 100%
+            }
+        }
+    }
+
+    &.selected {
+        background: $item-active-bg;
+    }
+
+    &:hover {
+        background: $item-hover-bg
+    }
+}
+
+.dataset-var-selector {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    > span {
+        flex-grow: 0;
+        flex-shrink: 0;
+        margin-right: 0.5rem;
+    };
+}
+
+
+.dataset-colormap-selector {
+
+    .dataset-colormap-range {
+        .dataset-colormap-range-inputs {
+            display: flex;
+            justify-content: space-between;
+            margin: 0.5rem -0.5rem -0 -0.5rem;
+        }
+    }
+}
+
+.ant-dropdown-trigger.dataset-colormap-preset {
+
+
+    border: solid 1px $border-color-base;
+    border-radius: $border-radius-base;
+    padding: 0;
+    overflow: hidden;
+    line-height: 0;
+
+    &.ant-dropdown-open {
+        border-color: $primary-color;
+    }
+
+    .dataset-colormap-preset-title {
+        display: none;
+    }
+
+    .ant-btn {
+        position: absolute;
+        right: 0.5rem;
+        visibility: hidden;
+    }
+
+    &:hover {
+        .ant-btn {
+            visibility: visible
+        }
+    }
+
+}
+
+
+.ant-dropdown.dataset-colormap-preset-dropdown {
+
+    .dataset-colormap-presets {
+        max-height: 300px;
+        overflow-y: auto;
+
+        background: $component-background;
+        box-shadow: $shadow-1-down;
+        border: none;
+
+        .dataset-colormap-preset {
+            border-bottom: none;
+        }
+    }
+
+}

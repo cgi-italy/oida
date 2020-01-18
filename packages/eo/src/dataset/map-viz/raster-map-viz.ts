@@ -1,7 +1,7 @@
 import { autorun } from 'mobx';
-import { types, Instance, addDisposer, SnapshotIn, SnapshotOrInstance } from 'mobx-state-tree';
+import { types, Instance, addDisposer, SnapshotIn, SnapshotOrInstance, cast } from 'mobx-state-tree';
 
-import { needsConfig, TileLayer } from '@oida/state-mst';
+import { needsConfig, TileLayer, ImageLayer, ITileLayer, IImageLayer } from '@oida/state-mst';
 
 import { DatasetMapViz } from '../dataset-viz';
 
@@ -38,19 +38,38 @@ export enum ColormapConfigMode {
     Customizable = 'Customizable'
 }
 
+export type DataDomain = {
+    min: number;
+    max: number;
+};
+
+export type DataVar = {
+    id: string;
+    name: string;
+    domain: DataDomain;
+    units?: string;
+    description?: string;
+};
+
+export type ColorMapConfigPreset = {
+    id: string;
+    name: string;
+    legend: React.ReactNode;
+};
+
 export type ColorMapConfig = {
     mode: ColormapConfigMode;
-    presets?: Array<{
-        id: string;
-        name: string;
-        legend: React.ReactNode;
-    }>
+    colorMaps?: Array<ColorMapConfigPreset>
+    variables?: DataVar | DataVar[];
+    default?: SnapshotIn<typeof ColorMap>
 };
 
 export type DatasetRasterMapVizConfig = {
     bandMathConfig?: BandMathConfig;
     colorMapConfig?: ColorMapConfig;
+    nonTiled?: boolean;
     rasterSourceProvider: (rasterViz) => any;
+    afterInit?: (rasterViz) => void;
 };
 
 export const BandMathPreset = types.model('BandMathPreset', {
@@ -72,9 +91,46 @@ export const BandMathFormula = types.model('BandMathFormula', {
 
 const BandMath = types.union(BandMathPreset, BandMathCombination, BandMathFormula);
 
-export const ColorMap = types.model('ColorMap', {
-    preset: types.maybe(types.string)
-});
+
+const ColorMapBase = types.model({
+    preset: types.string,
+    variable: types.maybe(types.string)
+}).actions(self => ({
+    setPreset: (preset: string) => {
+        self.preset = preset;
+    },
+    setVariable: (variable: string | undefined) => {
+        self.variable = variable;
+    }
+}));
+
+export const ColorMapPreset = types.compose(
+    'ColorMapPreset',
+    ColorMapBase,
+    types.model({
+        mode: types.literal('preset')
+    })
+);
+
+export const ColorMapCustom = types.compose(
+    'ColorMapCustom',
+    ColorMapBase,
+    types.model({
+        mode: types.literal('custom'),
+        domain: types.frozen<DataDomain>(),
+        clamp: types.optional(types.boolean, true)
+    }).actions(self => ({
+        setDomain: (domain: DataDomain) => {
+            self.domain = domain;
+        },
+        setClamp: (clamp: boolean) => {
+            self.clamp = clamp;
+        }
+    }))
+);
+
+
+export const ColorMap = types.union(ColorMapPreset, ColorMapCustom);
 
 
 export const DatasetRasterViz = DatasetMapViz.addModel(
@@ -83,7 +139,7 @@ export const DatasetRasterViz = DatasetMapViz.addModel(
         types.model({
             bandMath: types.maybe(BandMath),
             colorMap: types.maybe(ColorMap),
-            mapLayer: types.maybe(TileLayer)
+            mapLayer: types.maybe(types.union(TileLayer, ImageLayer))
         }),
         needsConfig<DatasetRasterMapVizConfig>()
     )
@@ -94,6 +150,9 @@ export const DatasetRasterViz = DatasetMapViz.addModel(
             },
             setBandMath: (bandMath: SnapshotOrInstance<typeof BandMath> | undefined) => {
                 self.bandMath = bandMath;
+            },
+            setColorMap: (colorMap: SnapshotOrInstance<typeof ColorMap> | undefined) => {
+                self.colorMap = cast(colorMap);
             }
         };
     })
@@ -103,23 +162,36 @@ export const DatasetRasterViz = DatasetMapViz.addModel(
             if (self.config.bandMathConfig) {
                 self.setBandMath(self.config.bandMathConfig.default);
             }
+            if (self.config.colorMapConfig) {
+                self.setColorMap(self.config.colorMapConfig.default);
+            }
 
-            let tileLayer = TileLayer.create({
-                id: `${(self as IDatasetRasterViz).dataset.id}rasterView`
-            });
+            let mapLayer: ITileLayer | IImageLayer;
+            if (self.config.nonTiled) {
+                mapLayer = ImageLayer.create({
+                    id: `${(self as IDatasetRasterViz).dataset.id}rasterView`
+                });
+            } else {
+                mapLayer = TileLayer.create({
+                    id: `${(self as IDatasetRasterViz).dataset.id}rasterView`
+                });
+            }
 
-            self.setMapLayer(tileLayer);
-
+            self.setMapLayer(mapLayer);
 
             let visibilityUpdateDisposer = autorun(() => {
-                tileLayer.setVisible((self as IDatasetRasterViz).active);
+                mapLayer.setVisible((self as IDatasetRasterViz).active);
             });
 
             let sourceUpdateDisposer = autorun(() => {
                 let sourceConfig = self.config.rasterSourceProvider(self);
-                tileLayer.setSource(sourceConfig);
-                tileLayer.setExtent(sourceConfig.extent);
+                mapLayer.setSource(sourceConfig);
+                mapLayer.setExtent(sourceConfig.extent);
             });
+
+            if (self.config.afterInit) {
+                self.config.afterInit(self);
+            }
 
             addDisposer(self, () => {
                 visibilityUpdateDisposer();

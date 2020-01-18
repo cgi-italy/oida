@@ -5,9 +5,13 @@
     .viz-item-name {
         flex-grow: 1;
         flex-shrink: 1;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
     }
     .viz-item-actions {
         justify-self: flex-end;
+        flex-shrink: 0;
 
         .ant-btn {
             padding: 0 4px;
