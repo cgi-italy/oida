@@ -14,18 +14,16 @@ export class OLTileLayer  extends OLMapLayer<TileLayer> {
     }
 
     updateSource(config) {
-        let source = this.createTileSource_(config);
 
-        if (source) {
-
-            let prevSource = this.olImpl_.getSource();
-            if (prevSource) {
-                prevSource.un('tileloadstart', this.onTileLoadStart_);
-                prevSource.un('tileloadend', this.onTileLoadEnd_);
-                prevSource.un('tileloaderror', this.onTileLoadEnd_);
-            }
-            this.olImpl_.setSource(source);
+        let prevSource = this.olImpl_.getSource();
+        if (prevSource) {
+            prevSource.un('tileloadstart', this.onTileLoadStart_);
+            prevSource.un('tileloadend', this.onTileLoadEnd_);
+            prevSource.un('tileloaderror', this.onTileLoadEnd_);
         }
+
+        let source = config ? this.createTileSource_(config) : undefined;
+        this.olImpl_.setSource(source);
     }
 
 

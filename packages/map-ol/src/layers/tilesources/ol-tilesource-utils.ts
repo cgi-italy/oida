@@ -1,5 +1,5 @@
 import { get as getProjection } from 'ol/proj.js';
-import { getWidth, getTopLeft } from 'ol/extent.js';
+import { getWidth, getHeight } from 'ol/extent.js';
 
 import WMTSTileGrid from 'ol/tilegrid/WMTS';
 import TileGrid from 'ol/tilegrid/TileGrid';
@@ -31,6 +31,9 @@ export const getTileGridFromConfig = (srs, tileGridConfig) => {
     let tileSize = tileGridConfig.tileSize || 256;
 
     let rootResolution = (getWidth(extent) / gridSize[0]) / tileSize;
+    let rootYResolution = (getHeight(extent) / gridSize[1]) / tileSize;
+
+    tileSize = [tileSize, (tileSize * rootYResolution / rootResolution)];
 
     let matrixIds = tileGridConfig.matrixIds;
     if (!matrixIds) {
