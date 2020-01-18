@@ -15,12 +15,14 @@ export type AoiValue = {
 
 export enum AoiAction {
     None,
+    DrawPoint,
     DrawBBox,
     DrawPolygon,
     LinkToViewport
 }
 
 export type AoiFieldConfig = {
+    onDrawPointAction?: () => void;
     onDrawBBoxAction?: () => void;
     onDrawPolygonAction?: () => void;
     onLinkToViewportAction?: () => void;

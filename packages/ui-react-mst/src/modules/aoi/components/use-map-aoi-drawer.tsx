@@ -68,6 +68,15 @@ export const useMapAoiDrawer = ({drawInteraction, mapSelection, aois, map, value
         setActiveAction(AoiAction.None);
     };
 
+    const drawPoint = () => {
+
+        if (activeAction === AoiAction.DrawPoint) {
+            setActiveAction(AoiAction.None);
+        } else {
+            setActiveAction(AoiAction.DrawPoint);
+        }
+    };
+
     const drawBBox = () => {
 
         if (activeAction === AoiAction.DrawBBox) {
@@ -105,7 +114,15 @@ export const useMapAoiDrawer = ({drawInteraction, mapSelection, aois, map, value
 
     useEffect(() => {
 
-        if (activeAction === AoiAction.DrawBBox) {
+        if (activeAction === AoiAction.DrawPoint) {
+            drawInteraction.setDrawMode(FeatureDrawMode.Point, {
+                onDrawEnd
+            });
+
+            return () => {
+                drawInteraction.setDrawMode(FeatureDrawMode.Off, {});
+            };
+        } else if (activeAction === AoiAction.DrawBBox) {
             drawInteraction.setDrawMode(FeatureDrawMode.BBox, {
                 onDrawEnd
             });
@@ -157,6 +174,7 @@ export const useMapAoiDrawer = ({drawInteraction, mapSelection, aois, map, value
     });
 
     return {
+        onDrawPointAction: drawPoint,
         onDrawBBoxAction: drawBBox,
         onDrawPolygonAction: drawPolygon,
         onLinkToViewportAction: linkToViewport,

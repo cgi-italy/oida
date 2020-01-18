@@ -9,14 +9,10 @@ import { antdFormFieldRendererFactory } from './antd-form-field-renderer-factory
 import { DrawBboxIcon } from '../icons/draw-bbox';
 import { DrawPolygonIcon } from '../icons/draw-polygon';
 
-export type AoiFieldRendererProps = {
-
-};
-
-export const AoiFieldRenderer = (props: AoiField & AoiFieldRendererProps) => {
+export const AoiFieldRenderer = (props:  Omit<AoiField, 'name' | 'type'>) => {
 
     let { value, onChange, config, ...renderProps } = props;
-    let { onDrawBBoxAction, onDrawPolygonAction, onLinkToViewportAction,
+    let { onDrawPointAction, onDrawBBoxAction, onDrawPolygonAction, onLinkToViewportAction,
          onHoverAction, onSelectAction, activeAction, color, name } = config;
 
     return (
@@ -48,6 +44,20 @@ export const AoiFieldRenderer = (props: AoiField & AoiFieldRendererProps) => {
             >No area specified</Tag>
             }
             <Button.Group>
+                {
+                    onDrawPointAction &&
+                    <Tooltip
+                        title='Select coordinate'
+                    >
+                        <Button
+                            type={activeAction === AoiAction.DrawPoint ? 'primary' : 'default'}
+                            size='small'
+                            onClick={() => onDrawPointAction!()}
+                        >
+                            <DrawBboxIcon/>
+                        </Button>
+                    </Tooltip>
+                }
                 {
                     onDrawBBoxAction &&
                     <Tooltip
