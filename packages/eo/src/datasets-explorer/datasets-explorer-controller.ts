@@ -60,6 +60,24 @@ export class DatasetsExplorerController {
                 });
             }
 
+            let geometryLayer = this.datasetsExplorer_.analyses.geometryLayer;
+            if (geometryLayer) {
+
+                let analysisLayerReference = createEntityReference(geometryLayer);
+
+                layerGroup.children.add(analysisLayerReference);
+
+                let analysisLayerVisibilityDisposer = autorun(() => {
+                    geometryLayer!.setVisible(this.datasetsExplorer_.analyses.active);
+                });
+
+                addDisposer(this.datasetsExplorer_, () => {
+                    analysisLayerVisibilityDisposer();
+                    this.datasetsExplorer_.mapLayer.children.remove(analysisLayerReference);
+                });
+
+            }
+
             this.bindToExplorerState_();
 
         });

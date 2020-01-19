@@ -4,9 +4,14 @@ import { TaggedUnion, MapLayer, isActivable } from '@oida/state-mst';
 
 import { Dataset } from './dataset';
 
+const gerateRandomId = () => {
+    return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+};
+
 export const DatasetVizBase = types.compose(
     types.model({
-        dataset: types.reference(Dataset)
+        dataset: types.reference(Dataset),
+        id: types.optional(types.string, gerateRandomId)
     }),
     isActivable
 );

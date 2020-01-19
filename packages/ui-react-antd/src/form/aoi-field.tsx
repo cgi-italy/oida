@@ -54,7 +54,7 @@ export const AoiFieldRenderer = (props:  Omit<AoiField, 'name' | 'type'>) => {
                             size='small'
                             onClick={() => onDrawPointAction!()}
                         >
-                            <DrawBboxIcon/>
+                            <Icon type='environment'/>
                         </Button>
                     </Tooltip>
                 }

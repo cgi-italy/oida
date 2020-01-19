@@ -3,6 +3,8 @@ import { types, Instance, detach, addDisposer, SnapshotIn, SnapshotOrInstance, g
 import { GroupLayer, DataFilters, needsConfig } from '@oida/state-mst';
 import { Dataset, DatasetConfig, DatasetTimeDistributionViz, DatasetProductSearchViz, DatasetMapViz, TimeRange } from '../dataset';
 
+import { DatasetAnalyses } from '../dataset/analysis/dataset-analysis';
+
 import { DatasetsExplorerController } from './datasets-explorer-controller';
 
 
@@ -38,7 +40,10 @@ export const DatasetsExplorer = types.compose(
             active: types.optional(types.boolean, false),
             mapLayer: types.maybe(GroupLayer)
         }), {}),
-        mapLayer: types.reference(GroupLayer)
+        mapLayer: types.reference(GroupLayer),
+        analyses: types.optional(DatasetAnalyses, {
+            collection: {}
+        })
     }),
     needsConfig<DatasetsExplorerConfig>()
 )

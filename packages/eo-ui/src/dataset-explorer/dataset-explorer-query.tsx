@@ -5,7 +5,7 @@ import { useObserver } from 'mobx-react';
 import { Checkbox, message } from 'antd';
 
 import { AnyFormFieldDefinition } from '@oida/ui-react-core';
-import { useMapAoiDrawerFromModule, useDataFiltering } from '@oida/ui-react-mst';
+import { useMapAoiDrawerFromModule, useMapAoiInstanceFromModule, useDataFiltering } from '@oida/ui-react-mst';
 import { DatasetConfig, IDataset, IDatasetsExplorer, IDatasetDiscovery } from '@oida/eo';
 import { DataFilterer } from '@oida/ui-react-antd';
 
@@ -104,7 +104,16 @@ DatasetExplorerQuery.defaultProps = {
             type: 'aoi',
             name: 'aoi',
             title: 'Area of interest',
-            config: (filterState) => useMapAoiDrawerFromModule(filterState)
+            config: (filterState) => {
+                let drawerProps = useMapAoiDrawerFromModule(filterState);
+                delete drawerProps.onDrawPointAction;
+                delete drawerProps.onLinkToViewportAction;
+
+                return {
+                    ...drawerProps,
+                    ...useMapAoiInstanceFromModule(filterState)
+                };
+            }
         },
         {
             type: 'daterange',

@@ -10,7 +10,7 @@ import { IDatasetMapViz, DatasetsExplorer } from '@oida/eo';
 
 import { DatasetVizProgressControl } from './dataset-viz-progress-control';
 import { DatasetVizSettingsFactory } from './dataset-viz-settings-factory';
-
+import { DatasetTools } from './dataset-tools';
 
 export type DatasetVizListItemProps = {
     datasetViz: IDatasetMapViz;
@@ -110,7 +110,7 @@ export const DatasetVizListItem = (props: DatasetVizListItemProps) => {
             id: 'tools',
             icon: <Icon type='bar-chart'></Icon>,
             title: 'Toggle dataset tools',
-            content: <div>Analytics tools</div>,
+            content: <DatasetTools dataset={props.datasetViz.dataset}/>,
             callback: () => {
                 if (activeAction !== 'tools') {
                     setActiveAction('tools');
@@ -141,7 +141,7 @@ export const DatasetVizListItem = (props: DatasetVizListItemProps) => {
                     <Icon type={vizState.visible ? 'eye' : 'eye-invisible'}></Icon>
                 </Button>
                 <Badge color={vizState.color}></Badge>
-                <div className='viz-item-name'>{vizState.name}</div>
+                <div className='viz-item-name' title={vizState.name}>{vizState.name}</div>
                 <div className='viz-item-actions'>
                 {
                     actions.map((action) => {

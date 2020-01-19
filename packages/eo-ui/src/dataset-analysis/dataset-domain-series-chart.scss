@@ -1,0 +1,15 @@
+.dataset-chart {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+
+    .ant-form {
+        flex-grow: 0;
+        flex-shrink: 0;
+    }
+
+    .chart {
+        flex-grow: 1;
+    }
+}

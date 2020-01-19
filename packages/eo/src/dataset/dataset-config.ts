@@ -15,4 +15,5 @@ export type DatasetConfig = {
     search?: DatasetProductSearchConfig;
     timeDistribution?: DatasetTimeDistributionConfig;
     mapView?: {type: string, config: any};
+    tools?: {type: string, config: any}[];
 };
