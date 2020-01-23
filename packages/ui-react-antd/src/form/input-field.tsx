@@ -14,7 +14,7 @@ export type InputFieldRendererProps = {
     changeDelay?: number
 };
 
-export const InputFieldRenderer = (props: StringField & InputFieldRendererProps) => {
+export const InputFieldRenderer = (props: Omit<StringField, 'name' | 'type'> & InputFieldRendererProps) => {
 
     let [inputValue, setInputValue] = useState(props.value);
 

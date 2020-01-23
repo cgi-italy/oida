@@ -8,7 +8,11 @@ import { antdFormFieldRendererFactory } from './antd-form-field-renderer-factory
 
 const Option = Select.Option;
 
-export const SelectEnumRenderer = (props: EnumField) => {
+export type SelectFieldRendererProps = {
+    placeholder?: string;
+};
+
+export const SelectEnumRenderer = (props: Omit<EnumField, 'name' | 'type'> & SelectFieldRendererProps) => {
 
     const onSelectChange = (value) => {
         if (!value || (Array.isArray(value) && !value.length)) {
@@ -29,6 +33,7 @@ export const SelectEnumRenderer = (props: EnumField) => {
             value={props.value}
             onChange={onSelectChange}
             allowClear={!props.required}
+            placeholder={props.placeholder}
             mode={props.config.multiple ? 'multiple' : 'default'}
         >
             {options}
