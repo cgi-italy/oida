@@ -6,3 +6,4 @@ export * from './dataset-band-preset-selector';
 export * from './dataset-viz-list-item';
 export * from './dataset-raster-viz-settings';
 export * from './dataset-volume-viz-settings';
+export * from './dataset-viz-download';

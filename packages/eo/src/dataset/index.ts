@@ -5,3 +5,4 @@ export * from './product-search';
 export * from './time-distribution';
 export * from './map-viz';
 export * from './analysis';
+export * from './download';

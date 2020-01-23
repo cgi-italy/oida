@@ -11,6 +11,7 @@ import { IDatasetMapViz, DatasetsExplorer } from '@oida/eo';
 import { DatasetVizProgressControl } from './dataset-viz-progress-control';
 import { DatasetVizSettingsFactory } from './dataset-viz-settings-factory';
 import { DatasetTools } from './dataset-tools';
+import { DatasetVizDownloadModal } from './dataset-viz-download';
 
 export type DatasetVizListItemProps = {
     datasetViz: IDatasetMapViz;
@@ -47,6 +48,7 @@ export const DatasetVizListItem = (props: DatasetVizListItemProps) => {
     });
 
     let [activeAction, setActiveAction] = useState<string>();
+    let [downloadVisible, setDownloadVisible] = useState(false);
 
     let actions = [
         {
@@ -121,6 +123,17 @@ export const DatasetVizListItem = (props: DatasetVizListItemProps) => {
         }
     ];
 
+    if (props.datasetViz.dataset.config.download) {
+        actions.push(        {
+            id: 'download',
+            icon: <Icon type='download'></Icon>,
+            title: 'Download',
+            callback: () => {
+                setDownloadVisible(true);
+            }
+        });
+    }
+
 
     let DragHandle = SortableHandle(() => <div className='viz-drag-button'><Icon type='drag'></Icon></div>);
 
@@ -170,6 +183,9 @@ export const DatasetVizListItem = (props: DatasetVizListItemProps) => {
                     </div>
                 );
             })}
+            {downloadVisible &&
+                <DatasetVizDownloadModal onClose={() => setDownloadVisible(false)} datasetViz={props.datasetViz}></DatasetVizDownloadModal>
+            }
         </List.Item>
     );
 };

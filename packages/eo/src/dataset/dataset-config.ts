@@ -2,7 +2,7 @@ import { AnyFormFieldDefinition } from '@oida/ui-react-core';
 
 import { DatasetProductSearchConfig } from './product-search';
 import { DatasetTimeDistributionConfig } from './time-distribution';
-
+import { DatasetDownloadConfig } from './download';
 
 export type DatasetConfig = {
     id: string;
@@ -16,4 +16,5 @@ export type DatasetConfig = {
     timeDistribution?: DatasetTimeDistributionConfig;
     mapView?: {type: string, config: any};
     tools?: {type: string, config: any}[];
+    download?: DatasetDownloadConfig;
 };
