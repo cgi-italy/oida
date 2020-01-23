@@ -12,21 +12,23 @@ export class OLStyleParser {
 
         let olStyle: Style = null;
 
-        switch (geometryType) {
-            case 'Point':
-            case 'MultiPoint':
-                olStyle = this.getPointStyle_(style.point);
-                break;
-            case 'LineString':
-            case 'MultiLineString':
-                olStyle = this.getLineStyle_(style.line);
-                break;
-            case 'Polygon':
-            case 'MultiPolygon':
-            case 'BBox':
-            case 'Circle':
-                olStyle = this.getPolygonStyle_(style.polygon);
-                break;
+        if (style) {
+            switch (geometryType) {
+                case 'Point':
+                case 'MultiPoint':
+                    olStyle = this.getPointStyle_(style.point);
+                    break;
+                case 'LineString':
+                case 'MultiLineString':
+                    olStyle = this.getLineStyle_(style.line);
+                    break;
+                case 'Polygon':
+                case 'MultiPolygon':
+                case 'BBox':
+                case 'Circle':
+                    olStyle = this.getPolygonStyle_(style.polygon);
+                    break;
+            }
         }
 
         return olStyle;

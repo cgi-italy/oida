@@ -151,11 +151,27 @@ export class FeatureLayerController extends MapLayerController<IFeatureLayerRend
             );
 
             let disposeGeometryObserver = reaction(() => geometryGetter(entity), (geometry) => {
-                this.layerRenderer_!.updateFeatureGeometry(featureId, geometry);
+                if (this.layerRenderer_!.getFeature(featureId)) {
+                    if (geometry) {
+                        this.layerRenderer_!.updateFeatureGeometry(featureId, geometry);
+                    } else {
+                        this.layerRenderer_!.removeFeature(featureId);
+                    }
+                } else {
+                    if (geometry) {
+                        this.layerRenderer_!.addFeature(
+                            featureId,
+                            geometry,
+                            styleGetter(entity)
+                        );
+                    }
+                }
             });
 
             let disposeStyleObserver = reaction(() => styleGetter(entity), (style) => {
-                this.layerRenderer_!.updateFeatureStyle(featureId, style);
+                if (this.layerRenderer_!.getFeature(featureId)) {
+                    this.layerRenderer_!.updateFeatureStyle(featureId, style);
+                }
             }, {
                 //fireImmediately: true
             });

@@ -71,6 +71,11 @@ export class OLFeatureLayer extends OLMapLayer<VectorLayer> implements IFeatureL
     }
 
     protected parseGeometry_(geometry) {
+
+        if (!geometry || !geometry.type) {
+            return;
+        }
+
         if (geometry.type === 'BBox') {
             geometry = bboxPolygon(geometry.bbox).geometry;
         }

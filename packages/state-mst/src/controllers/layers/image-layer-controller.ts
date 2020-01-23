@@ -49,10 +49,14 @@ export class ImageLayerController extends MapLayerController<IImageLayerRenderer
                     state: LoadingState.Success,
                     percentage: 100
                 });
-                this.layerRenderer_!.updateSource({
-                    type: this.mapLayer_.sourceType,
-                    config: this.mapLayer_.sourceConfig
-                });
+                if (this.mapLayer_.sourceType) {
+                    this.layerRenderer_!.updateSource({
+                        type: this.mapLayer_.sourceType,
+                        config: this.mapLayer_.sourceConfig
+                    });
+                } else {
+                    this.layerRenderer_!.updateSource(undefined);
+                }
             })
         );
     }
