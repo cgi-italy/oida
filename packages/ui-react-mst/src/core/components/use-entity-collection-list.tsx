@@ -11,7 +11,7 @@ import { useEntityListItem } from './use-entity-list-item';
 
 
 export type EntityCollectionListProps<T extends IEntity> = {
-    collection: IEntityCollection<TypeOfValue<T>>;
+    collection?: IEntityCollection<TypeOfValue<T>>;
     actions?: DataCollectionItemAction<T>[];
     iconGetter?: (entity: T) => string | Promise<string>;
     entitySelection?: IEntitySelection;
@@ -28,6 +28,9 @@ export const useEntityCollectionList = <T extends IEntity>({
     let hoveredItem: T | undefined, selectedItem: T | undefined;
 
     return useObserver(() => {
+        if (!collection) {
+            return;
+        }
         return {
             data: collection.items.slice(),
             keyGetter: (entity: T) => entity.id,

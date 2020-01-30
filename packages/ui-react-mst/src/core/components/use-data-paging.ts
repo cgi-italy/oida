@@ -3,8 +3,11 @@ import { useObserver } from 'mobx-react';
 import { IDataPaging } from '@oida/state-mst';
 import { DataPagerProps } from '@oida/ui-react-core';
 
-export const useDataPaging = (state: IDataPaging) => {
+export const useDataPaging = (state?: IDataPaging) => {
     return useObserver(() => {
+        if (!state) {
+            return;
+        }
         return {
             pageSize: state.pageSize,
             page: state.page,

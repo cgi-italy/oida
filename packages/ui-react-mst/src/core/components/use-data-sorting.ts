@@ -4,12 +4,17 @@ import { IDataSorting } from '@oida/state-mst';
 import { DataSortField, DataSorterProps } from '@oida/ui-react-core';
 
 export type DataSortingProps = {
-    sortingState: IDataSorting;
+    sortingState?: IDataSorting;
     sortableFields: DataSortField[];
 };
 
 export const useDataSorting = ({sortableFields, sortingState}: DataSortingProps) => {
     return useObserver(() => {
+
+        if (!sortingState) {
+            return;
+        }
+
         return {
             sortableFields: sortableFields,
             sortKey: sortingState.key,
