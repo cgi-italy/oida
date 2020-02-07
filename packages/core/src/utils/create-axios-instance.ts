@@ -65,3 +65,38 @@ export const createAxiosInstance = (config?: AxiosRequestConfig) => {
     instance['cancelableRequest'] = cancelableRequest.bind(instance);
     return <AxiosInstanceWithCancellation>(instance);
 };
+
+export const wrapInCancelablePromise = <T>(promise: Promise<T>) => {
+
+    let onPromiseCancel;
+
+    let promiseWrapper = new Promise((resolve, reject) => {
+
+        let isCanceled = false;
+
+        onPromiseCancel = () => {
+            isCanceled = true;
+            reject({
+                status: 499,
+                statusText: 'Canceled'
+            });
+        };
+
+        promise.then((response) => {
+            if (!isCanceled) {
+                resolve(response);
+            }
+        }).catch((reason) => {
+            if (!isCanceled) {
+                reject(reason);
+            }
+        });
+    });
+
+    promiseWrapper['cancel'] = () => {
+        onPromiseCancel();
+    };
+
+    return promiseWrapper as CancelablePromise<T>;
+
+};
