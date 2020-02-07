@@ -1,6 +1,6 @@
 import ImageryLayer from 'cesium/Source/Scene/ImageryLayer';
 import Rectangle from 'cesium/Source/Core/Rectangle';
-
+import Event from 'cesium/Source/Core/Event';
 import { TILE_LAYER_ID } from '@oida/core';
 
 import { cesiumTileSourcesFactory } from './tilesources/cesium-tilesources-factory';
@@ -34,33 +34,43 @@ export class CesiumTileLayer  extends CesiumMapLayer {
     }
 
     updateSource(config) {
+
+        if (this.source_) {
+            this.source_.tileLoadStartEvent.removeEventListener(this.onTileLoadStart_, this);
+            this.source_.tileLoadEndEvent.removeEventListener(this.onTileLoadEnd_, this);
+        }
+
         this.imageries_.removeAll(false);
+        this.source_ = undefined;
+
         try {
             let source = cesiumTileSourcesFactory.create(config.id, config);
             if (source) {
 
-                let onTileLoadStart = this.onTileLoadStart_;
-                let onTileLoadEnd = this.onTileLoadEnd_;
+                source.tileLoadStartEvent = new Event();
+                source.tileLoadEndEvent = new Event();
 
                 // wrap source requestImage to track tile requests
                 let originalRequestImage = source.requestImage;
                 source.requestImage = function() {
                     let request = originalRequestImage.apply(this, arguments);
                     if (request) {
-                        onTileLoadStart();
+                        this.tileLoadStartEvent.raiseEvent();
                         request.then(() => {
-                            onTileLoadEnd();
+                            this.tileLoadEndEvent.raiseEvent();
                         }, () => {
-                            onTileLoadEnd();
+                            this.tileLoadEndEvent.raiseEvent();
                         });
                     }
                     return request;
                 };
+                source.tileLoadStartEvent.addEventListener(this.onTileLoadStart_, this);
+                source.tileLoadEndEvent.addEventListener(this.onTileLoadEnd_, this);
 
                 this.imageries_.add(new ImageryLayer(source, this.getLayerOptions_()));
-
-                this.source_ = source;
             }
+
+            this.source_ = source;
         } catch (e) {
 
         }
