@@ -134,6 +134,51 @@ export class CesiumMapRenderer implements IMapRenderer {
         });
     }
 
+    refreshImageriesFromEvent(evt) {
+
+        if (!this.layerGroup_) {
+            return;
+        }
+
+        let {type, collection, item, idx} = evt;
+
+        if (type === 'add') {
+            let globalindexFound = false;
+
+            let rootCollection = this.layerGroup_.getImageries()._layers;
+
+            const reduceFunction = ((globalIndex, item) => {
+                if (globalindexFound) {
+                    return globalIndex;
+                }
+                if (item === collection) {
+                    globalindexFound = true;
+                    return globalIndex + idx;
+                } else if (item instanceof ImageryLayer) {
+                    return globalIndex + 1;
+                } else {
+                    return item._layers.reduce(reduceFunction, globalIndex);
+                }
+            });
+
+            let globalIndex = rootCollection.reduce(reduceFunction, 0);
+            if (!globalindexFound) {
+                return;
+            }
+
+            let imageriesToAdd = this.getImageryLayers_(item);
+
+            imageriesToAdd.forEach((imagery) => {
+                this.viewer_.imageryLayers.add(imagery, globalIndex++);
+            });
+
+        } else if (type === 'remove') {
+            let imageriesToRemove = this.getImageryLayers_(item);
+            imageriesToRemove.forEach((imagery) => {
+                this.viewer_.imageryLayers.remove(imagery, false);
+            });
+        }
+    }
 
     destroy() {
         let parent = this.viewer_.container.parentNode;
@@ -143,6 +188,22 @@ export class CesiumMapRenderer implements IMapRenderer {
         this.viewer_.imageryLayers.removeAll(false);
         this.viewer_.scene.primitives.remove(this.layerGroup_!.getPrimitives());
         this.viewer_.destroy();
+    }
+
+    protected getImageryLayers_(imageryOrCollection) {
+        let reduceFunction = (imageries, item) => {
+            if (item instanceof ImageryLayer) {
+                return [...imageries, item];
+            } else {
+                return item._layers.reduce(reduceFunction, imageries);
+            }
+        };
+
+        if (imageryOrCollection instanceof ImageryLayer) {
+            return [imageryOrCollection];
+        } else {
+            return imageryOrCollection._layers.reduce(reduceFunction, []);
+        }
     }
 
     protected initRenderer_(props: IMapRendererProps) {

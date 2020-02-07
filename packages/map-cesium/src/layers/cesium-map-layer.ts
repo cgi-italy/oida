@@ -98,17 +98,27 @@ export class CesiumMapLayer implements ILayerRenderer {
     }
 
 
-    protected onAddImageries_(imageries) {
+    protected onAddImageries_(imageries, idx) {
 
         if (imageries instanceof ImageryLayer || imageries.length) {
-            this.mapRenderer_.refreshImageries();
+            this.mapRenderer_.refreshImageriesFromEvent({
+                type: 'add',
+                collection: this.imageries_,
+                item: imageries,
+                idx: idx
+            });
         }
     }
 
-    protected onRemoveImageries_(imageries) {
+    protected onRemoveImageries_(imageries, idx) {
 
         if (imageries instanceof ImageryLayer || imageries.length) {
-            this.mapRenderer_.refreshImageries();
+            this.mapRenderer_.refreshImageriesFromEvent({
+                type: 'remove',
+                collection: this.imageries_,
+                item: imageries,
+                idx: idx
+            });
         }
     }
 
