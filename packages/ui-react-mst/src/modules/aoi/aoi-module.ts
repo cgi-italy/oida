@@ -1,8 +1,8 @@
+import { autorun } from 'mobx';
+import { types, addDisposer, SnapshotIn } from 'mobx-state-tree';
 
-import { types } from 'mobx-state-tree';
-
-import { FeatureLayer } from '@oida/state-mst';
-import { AOICollection } from './types/aoi';
+import { FeatureLayer, IndexedCollection } from '@oida/state-mst';
+import { AOI, AOICollection, AoiSource } from './types';
 import { MapModuleStateModel, DefaultMapModule } from '../map';
 
 import { AppModule, AppModuleStateModel } from '../app-module';
@@ -10,6 +10,8 @@ import { AppModule, AppModuleStateModel } from '../app-module';
 export const AoiModuleStateModel = AppModuleStateModel.addModel(
     types.model('AoiModule', {
         aois: AOICollection,
+        aoiSources: types.optional(IndexedCollection(AoiSource), {}),
+        activeSource: types.optional(types.safeReference(AoiSource), undefined),
         mapModule: types.reference(MapModuleStateModel)
     })
     .views((self) => {
@@ -21,6 +23,9 @@ export const AoiModuleStateModel = AppModuleStateModel.addModel(
     })
     .actions((self) => {
         return {
+            setActiveSource: (aoiSource?) => {
+                self.activeSource = aoiSource;
+            },
             afterAttach: () => {
                 let aoiLayer = FeatureLayer.create({
                     id: 'aoiLayer',
@@ -28,7 +33,17 @@ export const AoiModuleStateModel = AppModuleStateModel.addModel(
                     config: {}
                 });
                 self.map.layers.children.add(aoiLayer);
-                aoiLayer.setSource(self.aois.id);
+
+                let aoiSourceUpdateDisposer = autorun(() => {
+                    if (!self.activeSource) {
+                        aoiLayer.setSource(self.aois.id);
+                    } else {
+                        aoiLayer.setSource(self.activeSource.aois.id);
+                    }
+                });
+
+                addDisposer(self, aoiSourceUpdateDisposer);
+
             },
             beforeDetach: () => {
                 self.map.layers.children.removeItemWithId('aoiLayer');
@@ -37,7 +52,15 @@ export const AoiModuleStateModel = AppModuleStateModel.addModel(
     })
 );
 
+export type AoiParser = (input: string | File) => Promise<SnapshotIn<typeof AOI>[]>;
+
 export type AoiModuleConfig = {
+    aoiParsers?: Array<{
+        id: string;
+        name?: string;
+        supportedFileTypes: string[];
+        parse: AoiParser;
+    }>;
 };
 
 export type AoiModule = AppModule<typeof AoiModuleStateModel, AoiModuleConfig>;

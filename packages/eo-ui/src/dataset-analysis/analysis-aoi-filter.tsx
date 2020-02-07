@@ -26,26 +26,15 @@ export const AnalysisAoiFilter = (props: AnalysisAoiFilterProps) => {
         }
     });
 
-    let drawerConfig: any = {
-        activeAction: aoiDrawerConfig.activeAction
-    };
-
-    props.supportedGeometries.forEach((geometryType) => {
-        if (geometryType === 'Point') {
-            drawerConfig.onDrawPointAction = aoiDrawerConfig.onDrawPointAction;
-        } else if (geometryType === 'BBox') {
-            drawerConfig.onDrawBBoxAction = aoiDrawerConfig.onDrawBBoxAction;
-        } else if (geometryType === 'Polygon') {
-            drawerConfig.onDrawPolygonAction = aoiDrawerConfig.onDrawPolygonAction;
-        }
-    });
-
     let analysisGeometryState = useAnalysisGeometryFromModule(props.analysis);
 
     let aoiFilterConfig = {
-        ...drawerConfig,
-        ...analysisGeometryState
+        ...aoiDrawerConfig,
+        ...analysisGeometryState,
+        supportedGeometries: props.supportedGeometries
     };
+
+    delete aoiFilterConfig.onLinkToViewportAction;
 
     return (
         <AoiFieldRenderer

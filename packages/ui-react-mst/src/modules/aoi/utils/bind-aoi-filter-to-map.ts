@@ -2,7 +2,7 @@ import { autorun, reaction } from 'mobx';
 import debounce from 'lodash/debounce';
 
 import { IDataFilters, IMap } from '@oida/state-mst';
-import { AoiValue } from '@oida/ui-react-core';
+import { AoiValue, AOI_FIELD_ID } from '@oida/ui-react-core';
 
 import { IAOICollection, IAOI } from '../types';
 
@@ -27,7 +27,7 @@ export const bindAoiFilterToMap = (props: bindAoiFilterToMapProps) => {
     let viewportObserverDisposer: (() => void) | undefined;
 
     const debouncedAoiUpdate = debounce((aoiValue: AoiValue) => {
-        props.filters.set(props.aoiFieldKey, aoiValue);
+        props.filters.set(props.aoiFieldKey, aoiValue, AOI_FIELD_ID);
     }, props.viewportChangeDebounce || 1000);
 
 
@@ -45,7 +45,7 @@ export const bindAoiFilterToMap = (props: bindAoiFilterToMapProps) => {
             if (!aoiInstance) {
                 aoiInstance = props.aois.add({
                     id: `filterAoi${nextAoiId++}`,
-                    name: value.geometry.type,
+                    name: valueProps.name ? valueProps.name : value.geometry.type,
                     geometry: value.geometry
                 });
 
@@ -54,11 +54,11 @@ export const bindAoiFilterToMap = (props: bindAoiFilterToMapProps) => {
                     props: {
                         ...valueProps,
                         id: aoiInstance.id
-                    }
-                });
+                    },
+                }, AOI_FIELD_ID);
             } else {
                 aoiInstance.setGeometry(value.geometry);
-                aoiInstance.setName(value.geometry.type);
+                aoiInstance.setName(valueProps.name ? valueProps.name : value.geometry.type);
 
                 if (!valueProps.id) {
                     props.filters.set(props.aoiFieldKey, {
@@ -67,7 +67,7 @@ export const bindAoiFilterToMap = (props: bindAoiFilterToMapProps) => {
                             ...valueProps,
                             id: aoiInstance.id
                         }
-                    });
+                    }, AOI_FIELD_ID);
                 }
             }
         } else {

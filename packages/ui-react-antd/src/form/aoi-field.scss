@@ -1,0 +1,15 @@
+.aoi-import-drawer {
+    .ant-drawer-header {
+        background: $primary-color;
+        border-bottom: none;
+
+        .ant-drawer-close {
+            line-height: 38px;
+            height: 38px;
+        }
+    }
+}
+
+.aoi-draw-actions {
+    margin-right: 0.5rem;
+}

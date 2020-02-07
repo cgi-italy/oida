@@ -1,0 +1,21 @@
+.aoi-import {
+    min-width: 320px;
+
+    .aoi-source-selector {
+        display: flex;
+
+        .ant-select {
+            flex-grow: 1;
+        }
+    }
+
+    .data-collection-list {
+        border: solid 1px $border-color-base;
+        padding: 0.5rem;
+        margin-top: 0.5rem;
+
+        .ant-list {
+            max-height: 300px;
+        }
+    }
+}

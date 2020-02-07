@@ -15,6 +15,17 @@ let aoiStyleGetter = (aoiInstance): IFeatureStyle => {
     }
 
     return {
+        point: {
+            visible: aoiInstance.visible,
+            radius: 5,
+            fillColor: color.gl(),
+            strokeColor: color.alpha(1).gl()
+        },
+        line: {
+            visible: aoiInstance.visible,
+            color: color.alpha(1).gl(),
+            width: aoiInstance.hovered ? 3 : 2
+        },
         polygon: {
             visible: aoiInstance.visible,
             fillColor: color.gl(),
@@ -57,7 +68,8 @@ let getAoiColor = () => {
 export const AOI = Entity.addModel(types.compose('AOI',
         types.model({
             name: types.string,
-            defaultColor: types.optional(types.string, getAoiColor)
+            defaultColor: types.optional(types.string, getAoiColor),
+            properties: types.maybe(types.frozen<GeoJSON.GeoJsonProperties>())
         }),
         hasGeometry,
         hasStyleAsGetter(aoiStyleGetter)
