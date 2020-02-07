@@ -27,14 +27,11 @@ export const DatasetVolumeVizSettings = (props: DatasetVolumeVizSettingsProps) =
                 verticalDomain={props.datasetViz.config!.verticalDomain}
             />
             {props.datasetViz.colorMap &&
-                <React.Fragment>
-                    <Divider orientation='left'>Colormap</Divider>
-                    <DatasetColormapPresetSelector
+                <DatasetColormapPresetSelector
                     variables={props.datasetViz.config.colorMapConfig!.variables!}
                     colorMap={props.datasetViz.colorMap}
                     presets={props.datasetViz.config.colorMapConfig!.colorMaps!}
-                    />
-                </React.Fragment>
+                />
             }
         </div>
     );

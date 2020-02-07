@@ -26,5 +26,14 @@
         .raster-sequence-thumb {
             margin: auto;
         }
+
+        .ant-slider {
+            margin-left: 6rem;
+            margin-right: 6rem;
+
+            .ant-slider-mark-text {
+                white-space: nowrap;
+            }
+        }
     }
 }

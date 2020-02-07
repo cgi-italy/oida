@@ -6,7 +6,9 @@ import { useObserver } from 'mobx-react';
 import { List, Button, Icon, Badge, Tooltip, message } from 'antd';
 import { SortableHandle } from 'react-sortable-hoc';
 
+import { useCenterOnMapFromModule } from '@oida/ui-react-mst';
 import { IDatasetMapViz, DatasetsExplorer } from '@oida/eo';
+
 
 import { DatasetVizProgressControl } from './dataset-viz-progress-control';
 import { DatasetVizSettingsFactory } from './dataset-viz-settings-factory';
@@ -50,6 +52,8 @@ export const DatasetVizListItem = (props: DatasetVizListItemProps) => {
     let [activeAction, setActiveAction] = useState<string>();
     let [downloadVisible, setDownloadVisible] = useState(false);
 
+    let centerOnMap = useCenterOnMapFromModule();
+
     let actions = [
         {
             id: 'timeZoom',
@@ -79,18 +83,15 @@ export const DatasetVizListItem = (props: DatasetVizListItemProps) => {
             title: 'Zoom to dataset area',
             callback: () => {
                 let dataset = props.datasetViz.dataset;
-                /*
-                dataset.config!.spatialExtentGetter(dataset.productSearchParams.data.filters).then((extent) => {
-                    if (extent) {
-                        let datasetExplorer = getParentOfType(dataset, DatasetExplorer);
-                        if (datasetExplorer) {
-                            datasetExplorer.visibleTimeRange.makeRangeVisible(new Date(range.start), new Date(range.end!), 0.1, true);
-                        }
-                    } else {
-                        message.warning('No data available in the selected area');
-                    }
-                });
-                */
+                if (dataset.config.spatialCoverageProvider) {
+                    dataset.config.spatialCoverageProvider().then(extent => {
+                        centerOnMap({
+                            type: 'BBox',
+                            bbox: extent as GeoJSON.BBox
+                        }, {animate: true});
+                    });
+                }
+
             }
         },
         {

@@ -106,7 +106,16 @@ export const DatasetColormapPresetSelector = (props: DatasetColormapPresetSelect
                     <span>Variable: </span>
                     <Select
                         value={selectedVariable}
-                        onChange={(variable) => props.colorMap.setVariable(variable)}
+                        onChange={(variable) => {
+                            props.colorMap.setVariable(variable);
+                            if (props.colorMap.mode === 'custom') {
+                                let varConfig = (props.variables as DataVar[]).find(v => v.id === variable);
+                                if (varConfig) {
+                                    props.colorMap.setDomain(varConfig.domain);
+                                    props.colorMap.setNoDataValue(varConfig.domain.noDataValue);
+                                }
+                            }
+                        }}
                     >
                         {dataVarOptions}
                     </Select>

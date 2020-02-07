@@ -8,12 +8,15 @@ import { IDatasetTimeSeries, IDatasetDomainSeries, TIME_SERIES_TYPE } from '@oid
 import { SelectEnumRenderer } from '@oida/ui-react-antd';
 
 import { AnalysisAoiFilter } from './analysis-aoi-filter';
+import { AnalysisLoadingStateMessage } from './analysis-loading-state-message';
+
 import { ChartWidget } from './chart-widget';
 
 import 'echarts/lib/chart/line';
 import 'echarts/lib/component/tooltip';
 import 'echarts/lib/component/legend';
 import 'echarts/lib/component/axisPointer';
+import { EChartOption } from 'echarts';
 
 export type DatasetSeriesFiltersProps = {
     series: IDatasetDomainSeries | IDatasetTimeSeries
@@ -101,6 +104,8 @@ export function DatasetSeriesChartWidget<T extends IDatasetTimeSeries | IDataset
             loadingState = LoadingState.Loading;
         } else if (series.loadingState === LoadingState.Success && loadingState !== LoadingState.Loading) {
             loadingState = LoadingState.Success;
+        } else if (series.loadingState === LoadingState.Error && loadingState !== LoadingState.Loading) {
+            loadingState = LoadingState.Error;
         }
 
         return {
@@ -113,8 +118,13 @@ export function DatasetSeriesChartWidget<T extends IDatasetTimeSeries | IDataset
         };
     })).filter(series => series !== undefined);
 
-    if (loadingState === LoadingState.Init) {
-        return null;
+    if (loadingState === LoadingState.Init || loadingState === LoadingState.Error) {
+        return (
+            <AnalysisLoadingStateMessage
+                loadingState={loadingState}
+                initMessage='Specify a point and a range to retrieve the data'
+            />
+        );
     }
 
     let yAxes = Object.keys(axes).map((axisName) => {
@@ -133,7 +143,6 @@ export function DatasetSeriesChartWidget<T extends IDatasetTimeSeries | IDataset
 
     return (
         <ChartWidget
-            // @ts-ignore
             options={{
                 color: colors,
                 legend: {
@@ -145,7 +154,7 @@ export function DatasetSeriesChartWidget<T extends IDatasetTimeSeries | IDataset
                     transitionDuration: 0,
 
                     axisPointer: {
-                        type: 'cross',
+                        type: 'line',
                         snap: true
                     }
                 },
@@ -165,7 +174,7 @@ export function DatasetSeriesChartWidget<T extends IDatasetTimeSeries | IDataset
                 series: chartSeries,
                 useUTC: true,
                 backgroundColor: 'transparent'
-            }}
+            } as EChartOption}
             isLoading={loadingState === LoadingState.Loading}
         />
     );

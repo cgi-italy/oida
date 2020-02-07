@@ -7,35 +7,44 @@ import { Icon, Button } from 'antd';
 import { LoadingState } from '@oida/core';
 import { IEntitySelection, IQueryParams } from '@oida/state-mst';
 import { IDatasetProducts, IDatasetProduct } from '@oida/eo';
-import { useEntityCollectionList, useDataPaging, useDataSorting } from '@oida/ui-react-mst';
+import { useEntityCollectionList, useDataPaging, useDataSorting, useCenterOnMapFromModule } from '@oida/ui-react-mst';
 import { DataCollectionList } from '@oida/ui-react-antd';
 
 
 import { DatasetSearchResultsItem } from './dataset-search-results-item';
 
+//TODO: allow to pass the filter list from outside
 
 export type DatasetSearchResultsListProps = {
     results: IDatasetProducts,
     loadingState: LoadingState,
     selection: IEntitySelection,
     queryParams: IQueryParams,
+    onVisualizeItemAction: (item: IDatasetProduct) => void;
     itemContent?: (item: IDatasetProduct) => React.ReactNode
 };
 
-export const DatasetSearchResultsList = ({results, loadingState, selection, queryParams, itemContent}: DatasetSearchResultsListProps) => {
+export const DatasetSearchResultsList = ({
+    results, loadingState, selection, queryParams, itemContent, onVisualizeItemAction
+}: DatasetSearchResultsListProps) => {
 
-    let { data, keyGetter, itemSelector, onHoverAction, onSelectAction } = useEntityCollectionList<IDatasetProduct>({
+    let centerOnMap = useCenterOnMapFromModule();
+
+    let items = useEntityCollectionList<IDatasetProduct>({
         collection: results,
         entitySelection: selection,
         actions: [
             {
                 name: 'Visualize',
-                callback: () => alert('test'),
+                callback: (item) => {
+                    centerOnMap(item.geometry, {animate: true});
+                    onVisualizeItemAction(item);
+                },
                 icon: <Button size='small' type='primary'><Icon type='picture'/></Button>
             },
             {
                 name: 'Center on map',
-                callback: () => alert('test'),
+                callback: (item) => centerOnMap(item.geometry, {animate: true}),
                 icon: <Button size='small' type='primary'><Icon type='fullscreen-exit'/></Button>
             }
         ]
@@ -44,16 +53,23 @@ export const DatasetSearchResultsList = ({results, loadingState, selection, quer
     let paging = useDataPaging(queryParams.paging);
 
     let sorting = useDataSorting({
-        sortableFields: [{key: 'acq_time', name: 'Acquisition time'}],
+        sortableFields: [{key: 'dc:date', name: 'Acquisition time'}],
         sortingState: queryParams.sorting
     });
+
+    if (!items) {
+        return null;
+    }
 
     return (
         <DataCollectionList<IDatasetProduct>
             className='dataset-search-results-list'
             content={itemContent}
             extra={(item) => <img style={{maxHeight: '128px'}} src={item.preview}/>}
-            items={{data, keyGetter, itemSelector, onHoverAction, onSelectAction, loadingState: loadingState}}
+            items={{
+                ...items,
+                loadingState: loadingState
+            }}
             itemLayout='vertical'
             paging={paging}
             sorting={sorting}

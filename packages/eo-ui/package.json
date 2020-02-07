@@ -40,6 +40,7 @@
     "@oida/ui-react-antd": "file:../ui-react-antd",
     "@oida/ui-react-core": "file:../ui-react-core",
     "@oida/ui-react-mst": "file:../ui-react-mst",
+    "downloadjs": "^1.4.7",
     "echarts": "^4.3.0",
     "lodash": "^4.17.15",
     "moment": "^2.22.0",

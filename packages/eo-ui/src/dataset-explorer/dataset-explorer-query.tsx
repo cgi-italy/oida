@@ -5,7 +5,10 @@ import { useObserver } from 'mobx-react';
 import { Checkbox, message } from 'antd';
 
 import { AnyFormFieldDefinition } from '@oida/ui-react-core';
-import { useMapAoiDrawerFromModule, useMapAoiInstanceFromModule, useDataFiltering } from '@oida/ui-react-mst';
+import {
+    useCenterOnMapFromModule, useMapAoiDrawerFromModule, useMapAoiInstanceFromModule,
+    useMapAoiImporterFromModule, useDataFiltering
+} from '@oida/ui-react-mst';
 import { DatasetConfig, IDataset, IDatasetsExplorer, IDatasetDiscovery } from '@oida/eo';
 import { DataFilterer } from '@oida/ui-react-antd';
 
@@ -17,9 +20,13 @@ export type DatasetFiltersProps = {
 export const DatasetFilters = ({dataset}: DatasetFiltersProps) => {
 
     let filteringProps = useDataFiltering({filters: dataset.config.filters, filteringState: dataset.searchParams.filters});
-    return <DataFilterer
-        {...filteringProps}
-    />;
+    if (filteringProps) {
+        return <DataFilterer
+            {...filteringProps}
+        />;
+    } else {
+        return null;
+    }
 };
 
 export type DatasetExplorerSelectionProps = {
@@ -32,6 +39,8 @@ export const DatasetExplorerSelection = ({datasetConfig, explorerState}: Dataset
     let datasetView = useObserver(() => {
         return explorerState.getDatasetView(datasetConfig.id);
     });
+
+    let centerOnMap = useCenterOnMapFromModule();
 
     return (
         <div key={datasetConfig.id}>
@@ -52,6 +61,15 @@ export const DatasetExplorerSelection = ({datasetConfig, explorerState}: Dataset
                         }).catch((e) => {
                             message.error(`Unable to get time range for dataset ${datasetConfig.name}: ${e}`);
                         });
+
+                        if (datasetConfig.spatialCoverageProvider) {
+                            datasetConfig.spatialCoverageProvider().then((extent) => {
+                                centerOnMap({
+                                    type: 'BBox',
+                                    bbox: extent as GeoJSON.BBox
+                                }, {animate: true, notIfInViewport: true});
+                            });
+                        }
                     } else {
                         explorerState.removeDataset(datasetConfig.id);
                     }
@@ -87,9 +105,11 @@ export const DatasetExplorerQuery = (props: DatasetExplorerQueryProps) => {
 
     return (
         <div>
-            <DataFilterer
-                {...commmonFiltersProps}
-            />
+            {commmonFiltersProps &&
+                <DataFilterer
+                    {...commmonFiltersProps}
+                />
+            }
             <div>
                 {datasetFilters}
             </div>
@@ -110,6 +130,8 @@ DatasetExplorerQuery.defaultProps = {
                 delete drawerProps.onLinkToViewportAction;
 
                 return {
+                    supportedGeometries: ['BBox', 'Polygon', 'MultiPolygon'],
+                    aoiImport: useMapAoiImporterFromModule(filterState),
                     ...drawerProps,
                     ...useMapAoiInstanceFromModule(filterState)
                 };

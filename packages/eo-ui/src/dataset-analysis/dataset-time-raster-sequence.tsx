@@ -4,16 +4,17 @@ import { getSnapshot } from 'mobx-state-tree';
 
 import { Checkbox, Slider, Form } from 'antd';
 
-import { LoadingState } from '@oida/core';
-import { IDatasetDomainRasterSequence, DOMAIN_RASTER_SEQUENCE_TYPE, DatasetVariable } from '@oida/eo';
-import { NumericRangeFieldRenderer } from '@oida/ui-react-antd';
+import { IDatasetTimeRasterSequence, TIME_RASTER_SEQUENCE_TYPE, DatasetVariable } from '@oida/eo';
+import { DateRangeFieldRenderer } from '@oida/ui-react-antd';
 
 import { DatasetAnalysisWidgetFactory } from './dataset-analysis-widget-factory';
 import { AnalysisAoiFilter } from './analysis-aoi-filter';
+import { AnalysisLoadingStateMessage } from './analysis-loading-state-message';
+
 import { DatasetColormapPresetSelector } from '../dataset-map-viz/dataset-colormap-selector';
 
 
-export type DatasetRasterSequenceThumbProps = {
+export type DatasetTimeRasterSequenceThumbProps = {
     data: any;
     colorMap;
     imageGenerator;
@@ -21,7 +22,7 @@ export type DatasetRasterSequenceThumbProps = {
     domainConfig;
 };
 
-export const DatasetRasterSequenceThumb = (props) => {
+export const DatasetTimeRasterSequenceThumb = (props: DatasetTimeRasterSequenceThumbProps) => {
     let canvasRef = useRef<HTMLCanvasElement>(null);
 
     useEffect(() => {
@@ -33,17 +34,17 @@ export const DatasetRasterSequenceThumb = (props) => {
     return (
         <div className='raster-sequence-thumb'>
             <canvas ref={canvasRef}></canvas>
-            <div>{props.domainConfig.name} = {props.domainValue} {props.domainConfig.units}</div>
+            <div>{props.domainConfig.name} = {props.domainValue.toISOString()} {props.domainConfig.units}</div>
         </div>
     );
 };
 
-export type DatasetRasterSequenceProps = {
-    dataDomain?: DatasetVariable<number>;
-    sequence: IDatasetDomainRasterSequence;
+export type DatasetTimeRasterSequenceProps = {
+    dataDomain?: DatasetVariable<Date>;
+    sequence: IDatasetTimeRasterSequence;
 };
 
-export const DatasetRasterSequence = (props: DatasetRasterSequenceProps) => {
+export const DatasetTimeRasterSequence = (props: DatasetTimeRasterSequenceProps) => {
 
     let [activeThumb, setActiveThumb] = useState(-1);
 
@@ -60,8 +61,8 @@ export const DatasetRasterSequence = (props: DatasetRasterSequenceProps) => {
 
     let thumbs = data.map((item) => {
         return (
-            <DatasetRasterSequenceThumb
-                key={item.x}
+            <DatasetTimeRasterSequenceThumb
+                key={item.x.getTime()}
                 domainValue={item.x}
                 domainConfig={dataDomain}
                 colorMap={colorMap}
@@ -71,28 +72,21 @@ export const DatasetRasterSequence = (props: DatasetRasterSequenceProps) => {
         );
     });
 
-    // let thumbs = useObserver(() => props.sequence.thumbs.map((item) => {
-    //     return <img key={item.x} src={item.src}></img>;
-    // }));
+    let loadingState = useObserver(() => props.sequence.loadingState);
 
     return (
         <div className='dataset-raster-sequence'>
             <Form layout='inline'>
                 <Form.Item>
-                    <NumericRangeFieldRenderer
-                        value={range ? {from: range.start, to: range.end} : undefined}
+                    <DateRangeFieldRenderer
+                        value={range}
                         onChange={(value) => {
-                            props.sequence.setRange(value ? {start: value.from, end: value.to} : undefined);
+                            props.sequence.setRange(value);
                         }}
                         config={{
-                            min: dataRange ? dataRange.min : undefined,
-                            max: dataRange ? dataRange.max : undefined
+                            minDate: dataRange ? dataRange.min : undefined,
+                            maxDate: dataRange ? dataRange.max : undefined
                         }}
-                        rendererConfig={{props: {
-                            tipFormatter: (value) => {
-                                return props.dataDomain ? `${value} ${props.dataDomain.units}` : value;
-                            }
-                        }}}
                     />
                 </Form.Item>
                 <Form.Item>
@@ -121,9 +115,13 @@ export const DatasetRasterSequence = (props: DatasetRasterSequenceProps) => {
             >
                 Slider mode
             </Checkbox>
+            <AnalysisLoadingStateMessage
+                loadingState={loadingState}
+                initMessage='Specify an area and a time range to retrieve the data'
+            />
             {activeThumb !== -1 && range &&
                 <div className='dataset-raster-sequence-player'>
-                    <DatasetRasterSequenceThumb
+                    <DatasetTimeRasterSequenceThumb
                         domainValue={data[activeThumb].x}
                         domainConfig={dataDomain}
                         colorMap={colorMap}
@@ -131,15 +129,16 @@ export const DatasetRasterSequence = (props: DatasetRasterSequenceProps) => {
                         imageGenerator={props.sequence.config.imageGenerator}
                     />
                     <Slider
-                        value={range.start + activeThumb}
-                        min={range.start}
-                        max={range.end}
+                        value={activeThumb}
+                        min={0}
+                        max={thumbs.length - 1}
                         marks={{
-                            [range.start]: `${range.start} ${dataDomain ? dataDomain.units : ''}`,
-                            [range.end]: `${range.end} ${dataDomain ? dataDomain.units : ''}`
+                            0: `${range.start.toISOString()}`,
+                            [(thumbs.length - 1)]: `${range.end.toISOString()}`
                         }}
+                        tooltipVisible={false}
                         step={1}
-                        onChange={(value) => setActiveThumb((value as number) - range!.start)}
+                        onChange={(value) => setActiveThumb(value as number)}
                     />
                 </div>
             }
@@ -152,22 +151,33 @@ export const DatasetRasterSequence = (props: DatasetRasterSequenceProps) => {
     );
 };
 
-DatasetAnalysisWidgetFactory.register(DOMAIN_RASTER_SEQUENCE_TYPE, (config) => {
+DatasetAnalysisWidgetFactory.register(TIME_RASTER_SEQUENCE_TYPE, (config) => {
 
-    let analysis = config.analysis as IDatasetDomainRasterSequence;
+    let analysis = config.analysis as IDatasetTimeRasterSequence;
     if (!analysis.colorMap) {
         analysis.setColorMap(analysis.config.colorMap.default);
     }
-
-    let dataDomain = analysis.config.domain.range;
-    if (!analysis.range && dataDomain) {
-        analysis.setRange({
-            start: dataDomain.min,
-            end: dataDomain.max
-        });
+    if (!analysis.range) {
+        let toi = analysis.dataset.searchParams.filters.get('time');
+        if (toi) {
+            analysis.setRange({
+                start: toi.start.getTime(),
+                end: toi.end.getTime()
+            });
+        } else if (analysis.dataset.config!.timeDistribution) {
+            let timeProvider = analysis.dataset.config!.timeDistribution.provider;
+            timeProvider.getTimeExtent({}).then((range) => {
+                if (range) {
+                    analysis.setRange({
+                        start: range.start,
+                        end: range.end
+                    });
+                }
+            });
+        }
     }
 
-    return <DatasetRasterSequence
+    return <DatasetTimeRasterSequence
         sequence={analysis}
         dataDomain={analysis.config.domain}
     />;

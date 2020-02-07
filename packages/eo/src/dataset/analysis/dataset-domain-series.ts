@@ -19,6 +19,7 @@ export type DatasetVariable<T> = {
         min: T,
         max: T
     };
+    noDataValue?: number;
     units?: string;
     description?: string;
 };

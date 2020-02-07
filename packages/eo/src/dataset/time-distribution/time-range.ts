@@ -48,7 +48,13 @@ export const TimeRange = types.model(
     return {
         setRange: (start: Date, end: Date, animate?: boolean) => {
 
-            if (start.getTime() >= end.getTime()) {
+            if (start.getTime() > end.getTime()) {
+                return;
+            }
+
+            if (start.getTime() === end.getTime()) {
+                // @ts-ignore
+                self.setDate(start, animate);
                 return;
             }
 

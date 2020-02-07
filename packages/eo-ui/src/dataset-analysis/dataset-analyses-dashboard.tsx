@@ -42,12 +42,17 @@ export const DatasetAnalysesDashboard = (props: DatasetAnalysesDashboardProps) =
 
     let components = useObserver(() => props.analyses.collection.items.map((analysis) => {
         if (DatasetAnalysisWidgetFactory.isRegistered(analysis.analysisType)) {
+
+            let toolConfig = analysis.dataset.config!.tools!.find(tool => {
+                return tool.type === analysis.analysisType;
+            });
+
             let chartWidget = DatasetAnalysisWidgetFactory.create(analysis.analysisType, {
                 analysis: analysis
             });
             return {
                 id: analysis.id,
-                title: '',
+                title: `${analysis.dataset.config!.name}: ${toolConfig ? toolConfig.name : ''}`,
                 content: chartWidget
             };
         }

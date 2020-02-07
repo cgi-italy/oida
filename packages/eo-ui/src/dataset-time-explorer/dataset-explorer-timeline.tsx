@@ -27,6 +27,7 @@ export const DatasetExplorerTimelineToolbar = (props) => {
             >
                 <Button
                     onClick={action.callback}
+                    disabled={action.disabled}
                     size='small'
                     type='link'
                 >{action.icon}</Button>
@@ -192,6 +193,7 @@ export const DatasetDiscoveryTimeline = (props: DatasetExplorerTimelineProps) =>
         id: 'zoomToQueryRange',
         icon: <Icon type='clock-circle' />,
         title: 'Zoom to query time range',
+        disabled: !props.explorerState.toi,
         callback: () => {
             let queryRange = props.explorerState.toi;
             props.explorerState.timeExplorer.visibleRange.makeRangeVisible(

@@ -32,12 +32,13 @@ export type DatasetRasterSequenceItem<T> = {
 export type DatasetRasterSequenceProvider<T> =
 (request: DatasetRasterSequenceRequest<T>) => CancelablePromise<DatasetRasterSequenceItem<T>[]>;
 
+export type DatasetRasterSequenceThumbGenerator =
+(data: any, colorMap: SnapshotOut<typeof ColorMap>, canvas: HTMLCanvasElement) => void;
 
-export type DatasetRasterSeriesConfig<T = number> = {
+export type DatasetRasterSequenceConfig<T = number> = {
     domain: DatasetVariable<T>;
     provider: DatasetRasterSequenceProvider<T>;
-    processor: (data: any, sequenceAnalysis) => string;
-    imageGenerator: (data: any, colorMap: SnapshotOut<typeof ColorMap>, canvas: HTMLCanvasElement) => void;
+    imageGenerator: DatasetRasterSequenceThumbGenerator;
     supportedGeometries: GeometryTypes[];
     colorMap: ColorMapConfig;
 };
@@ -50,7 +51,7 @@ const createRasterSequenceType = <T>(typeName: string) => {
             colorMap: types.maybe(ColorMap)
         }),
         isDataProvider,
-        needsConfig<DatasetRasterSeriesConfig<T>>()
+        needsConfig<DatasetRasterSequenceConfig<T>>()
     ).volatile((self) => ({
         data: [] as DatasetRasterSequenceItem<T>[]
     })).actions((self) => {
@@ -105,15 +106,7 @@ const createRasterSequenceType = <T>(typeName: string) => {
                 });
             }
         };
-    })
-    .views((self) => ({
-        get thumbs() {
-            return self.data.map((item) => ({
-                x: item.x,
-                src: self.config!.processor(item.data, self),
-            }));
-        }
-    })));
+    }));
 };
 
 export const DatasetDomainRasterSequence = createRasterSequenceType<number>(DOMAIN_RASTER_SEQUENCE_TYPE);

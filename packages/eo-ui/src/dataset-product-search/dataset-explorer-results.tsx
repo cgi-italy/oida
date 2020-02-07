@@ -13,7 +13,8 @@ import { DatasetSearchResultsList } from './dataset-search-results-list';
 export type DatasetExplorerResultsProps = {
     explorerState: IDatasetsExplorer;
     selection: IEntitySelection,
-    tabsExtraContent?: React.ReactNode
+    tabsExtraContent?: React.ReactNode,
+    onVisualizeProduct: (dataset, item) => void;
 };
 
 export const DatasetExplorerResults = (props: DatasetExplorerResultsProps) => {
@@ -38,6 +39,9 @@ export const DatasetExplorerResults = (props: DatasetExplorerResultsProps) => {
                         loadingState={productSearchViz!.loadingState}
                         selection={props.selection}
                         itemContent={dataset.config.search!.searchItemContent}
+                        onVisualizeItemAction={(item) => {
+                            props.onVisualizeProduct(dataset, item);
+                        }}
                     />
                 </Tabs.TabPane>
             );

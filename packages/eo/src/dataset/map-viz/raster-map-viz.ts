@@ -41,6 +41,7 @@ export enum ColormapConfigMode {
 export type DataDomain = {
     min: number;
     max: number;
+    noDataValue?: number;
 };
 
 export type DataVar = {
@@ -118,13 +119,17 @@ export const ColorMapCustom = types.compose(
     types.model({
         mode: types.literal('custom'),
         domain: types.frozen<DataDomain>(),
-        clamp: types.optional(types.boolean, true)
+        clamp: types.optional(types.boolean, true),
+        noDataValue: types.maybe(types.number)
     }).actions(self => ({
         setDomain: (domain: DataDomain) => {
             self.domain = domain;
         },
         setClamp: (clamp: boolean) => {
             self.clamp = clamp;
+        },
+        setNoDataValue: (noDataValue: number | undefined) => {
+            self.noDataValue = noDataValue;
         }
     }))
 );

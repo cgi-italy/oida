@@ -11,5 +11,11 @@
 
     .chart {
         flex-grow: 1;
+
+        .chart-ops {
+            position: absolute;
+            top: 7px;
+            right: 50px;
+        }
     }
 }

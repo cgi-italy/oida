@@ -17,18 +17,28 @@ let analysisStyleGetter = (analysis): IFeatureStyle => {
         color = color.alpha(0.1);
     }
 
+    let zIndex = 0;
+    if (analysis.selected) {
+        zIndex = 1;
+    }
+    if (analysis.hovered) {
+        zIndex = 2;
+    }
+
     return {
         point: {
             visible: analysis.visible,
-            radius: 5,
-            fillColor: color.gl(),
-            strokeColor: color.alpha(1).gl()
+            url: 'assets/images/placeholder.png',
+            scale: 0.5,
+            color: color.alpha(1).gl(),
+            zIndex: zIndex
         },
         polygon: {
             visible: analysis.visible,
             fillColor: color.gl(),
             strokeColor: color.alpha(1).gl(),
-            strokeWidth: analysis.hovered ? 3 : 2
+            strokeWidth: analysis.hovered ? 3 : 2,
+            zIndex: zIndex
         }
     };
 };
