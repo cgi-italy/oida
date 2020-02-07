@@ -33,7 +33,7 @@ export const getTileGridFromConfig = (srs, tileGridConfig) => {
     let rootResolution = (getWidth(extent) / gridSize[0]) / tileSize;
     let rootYResolution = (getHeight(extent) / gridSize[1]) / tileSize;
 
-    tileSize = [tileSize, (tileSize * rootYResolution / rootResolution)];
+    tileSize = [tileSize, Math.ceil(tileSize * rootYResolution / rootResolution)];
 
     let matrixIds = tileGridConfig.matrixIds;
     if (!matrixIds) {

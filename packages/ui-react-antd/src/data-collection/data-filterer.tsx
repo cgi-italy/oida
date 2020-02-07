@@ -43,7 +43,7 @@ export const DataFilterer = (props: DataFiltererProps) => {
     });
 
     return (
-        <div className='antd-data-filterer ant-form ant-form-inline'>
+        <div className='antd-data-filterer ant-form'>
             {filters}
         </div>
     );

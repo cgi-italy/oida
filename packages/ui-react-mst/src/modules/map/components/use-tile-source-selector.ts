@@ -3,6 +3,7 @@ import { useObserver } from 'mobx-react';
 import { IGroupLayer, ITileLayer } from '@oida/state-mst';
 
 import { useMapModuleState } from '../use-map-module-state';
+import { MapModule } from '../map-module';
 
 export type TileSourceItem = {
     id: string;
@@ -41,7 +42,7 @@ export const useTileSourceSelector = ({sources, group, layerIdx}: TileSourceSele
     }));
 };
 
-export const useMapBaseLayerSelectorFromModule = (mapModule?) => {
+export const useMapBaseLayerSelectorFromModule = (mapModule?: MapModule) => {
     let moduleState = useMapModuleState(mapModule);
     return useTileSourceSelector({
         group: moduleState.map.layers,

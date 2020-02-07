@@ -15,6 +15,7 @@
             position: relative;
             border: none;
             margin-bottom: 5px;
+            background: transparent;
 
             .ant-collapse-item {
 
@@ -34,7 +35,7 @@
                 }
 
                 .ant-collapse-content {
-                    border: 1px solid rgb(217, 217, 217);
+                    border: 1px solid $border-color-base;
                     margin: 3px 5px 0px 0px;
                     background: $background-color-base;
                     border-radius: 4px 0 4px 4px;
