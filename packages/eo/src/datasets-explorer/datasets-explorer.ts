@@ -1,4 +1,5 @@
 import { types, Instance, detach, addDisposer, SnapshotIn, SnapshotOrInstance, getSnapshot, applySnapshot } from 'mobx-state-tree';
+import moment from 'moment';
 
 import { GroupLayer, DataFilters, needsConfig } from '@oida/state-mst';
 import { Dataset, DatasetConfig, DatasetTimeDistributionViz, DatasetProductSearchViz, DatasetMapViz, TimeRange } from '../dataset';
@@ -30,7 +31,11 @@ export const DatasetsExplorer = types.compose(
         commonFilters: types.optional(DataFilters, {}),
         timeExplorer: types.model({
             active: types.optional(types.boolean, false),
-            visibleRange: TimeRange
+            visibleRange: types.optional(TimeRange, {
+                start: moment().subtract(1, 'month').toDate(),
+                end: moment().toDate(),
+                resolution: undefined
+            })
         }),
         productExplorer: types.optional(types.model({
             active: types.optional(types.boolean, false),
@@ -63,10 +68,10 @@ export const DatasetsExplorer = types.compose(
 .actions((self) => {
     return {
         setAoi: (aoi) => {
-            self.commonFilters.set(self.config.aoiFilterKey, aoi);
+            self.commonFilters.set(self.config.aoiFilterKey, aoi, 'aoi');
         },
         setToi: (toi) => {
-            self.commonFilters.set(self.config.toiFilterKey, toi);
+            self.commonFilters.set(self.config.toiFilterKey, toi, 'daterange');
         },
         setProductExplorerActive: (active: boolean) => {
             if (active && self.config.disableProductSearch) {

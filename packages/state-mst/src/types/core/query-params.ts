@@ -6,17 +6,19 @@ import { enumFromType } from '../mst';
 
 export const DataFilter = types.model('DataFilter', {
     key: types.identifier,
-    value: types.frozen()
+    value: types.frozen(),
+    type: types.string
 });
 
 export const DataFilters = types.model('DataFilters', {
     items: types.map(DataFilter)
 }).actions((self) => {
     return {
-        set: (key: string, value: any) => {
+        set: (key: string, value: any, type: string) => {
             self.items.put(DataFilter.create({
                 key,
-                value
+                value,
+                type
             }));
         },
         unset: (key) => {
@@ -110,7 +112,7 @@ export const QueryParams = types.model('QueryParams', {
                     pageSize: self.paging.pageSize,
                     offset: self.paging.offset
                 },
-                filters: Array.from(self.filters.items, item => ({key: item[0], value: item[1].value})),
+                filters: Array.from(self.filters.items, item => ({key: item[0], value: item[1].value, type: item[1].type})),
                 sortBy: self.sorting.key ? {
                     key: self.sorting.key,
                     order: self.sorting.order

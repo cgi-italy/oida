@@ -100,7 +100,7 @@ export class DatasetsExplorerController {
             this.datasetsExplorer_.datasetViews.forEach((datasetView) => {
                 if (change.type === 'add' || change.type === 'update') {
                     let filter = change.newValue.value;
-                    datasetView.dataset.searchParams.filters.set(filter.key, filter.value);
+                    datasetView.dataset.searchParams.filters.set(filter.key, filter.value, filter.type);
                 } else if (change.type === 'delete') {
                     let filter = change.oldValue.value;
                     datasetView.dataset.searchParams.filters.unset(filter.key);
