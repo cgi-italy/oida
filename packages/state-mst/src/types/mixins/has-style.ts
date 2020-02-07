@@ -16,10 +16,19 @@ export const hasStyle = HasStyleBaseModel.props({
 
 
 export const hasStyleAsGetter = (styleGetter: (modelInstance, options?) => IFeatureStyle) => {
-    let model = HasStyleBaseModel.views((self) => {
+    let model = HasStyleBaseModel
+    .volatile((self) => ({
+        styleGetter: styleGetter
+    })).actions((self) => {
+        return {
+            setStyleGetter: (styleGetter) => {
+                self.styleGetter = styleGetter;
+            }
+        };
+    }).views((self) => {
         return {
             get style() {
-                return styleGetter(self);
+                return self.styleGetter(self);
             },
             getStyle: (options) => {
                 return styleGetter(self, options);

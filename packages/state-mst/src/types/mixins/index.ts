@@ -8,3 +8,5 @@ export * from './has-selectable-items';
 export * from './has-geometry';
 export * from './has-style';
 export * from './needs-config';
+export * from './has-config';
+export * from './is-data-provider';

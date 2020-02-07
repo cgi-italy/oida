@@ -7,25 +7,30 @@ import { hasSelectableItems } from '../mixins/has-selectable-items';
 //import { SelectionMode } from  '@oida/core';
 
 const EntityHovered = types.model({
-    hoveredItem: EntityReference(Entity.Type)
+    hoveredItems: types.array(EntitySafeReference(Entity.Type))
 }).actions((self) => {
     return {
-        setHovered: (item) => {
-            if (self.hoveredItem === item) {
+        setHovered: (items) => {
+            if (self.hoveredItems.length === 1 && items === self.hoveredItems[0]) {
                 return;
             }
-            if (self.hoveredItem) {
-                self.hoveredItem.setHovered(false);
-            }
-            self.hoveredItem = item || undefined;
-            if (self.hoveredItem) {
-                self.hoveredItem.setHovered(true);
+
+            self.hoveredItems.forEach((item) => {
+                item.setHovered(false);
+            });
+
+            //@ts-ignore
+            self.hoveredItems = Array.isArray(items) ? items : (items ? [items] : []);
+            if (self.hoveredItems) {
+                self.hoveredItems.forEach((item) => {
+                    item.setHovered(true);
+                });
             }
         },
         beforeDestroy: () => {
-            if (self.hoveredItem) {
-                self.hoveredItem.setHovered(false);
-            }
+            self.hoveredItems.forEach((item) => {
+                item.setHovered(false);
+            });
         }
     };
 });

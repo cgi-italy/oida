@@ -10,7 +10,7 @@ const LayerBase = types.compose(
         zIndex: types.maybe(types.number),
         extent: types.maybe(types.frozen<number[]>())
     }).volatile(self => ({
-        renderer: null
+        renderer: undefined as any
     })).actions((self) => {
         return {
             setRenderer(renderer) {
