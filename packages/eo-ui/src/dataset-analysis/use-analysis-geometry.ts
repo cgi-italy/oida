@@ -1,7 +1,6 @@
-import { useEffect } from 'react';
 import { useObserver } from 'mobx-react';
 
-import { SelectionMode, getGeometryCenter } from '@oida/core';
+import { SelectionMode } from '@oida/core';
 import { useMapModuleState } from '@oida/ui-react-mst';
 import { IDatasetAnalysis } from '@oida/eo';
 import { IMap, IEntitySelection } from '@oida/state-mst';
