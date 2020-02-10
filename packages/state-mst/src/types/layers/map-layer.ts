@@ -33,4 +33,7 @@ const LayerBase = types.compose(
 
 export const MapLayer = Entity.addUnion('layerType', LayerBase);
 
-export type IMapLayer = Instance<typeof MapLayer.Type>;
+type MapLayerType = typeof MapLayer.Type;
+export interface MapLayerInterface extends MapLayerType {}
+export const MapLayerType: MapLayerInterface = MapLayer.Type;
+export interface IMapLayer extends Instance<MapLayerInterface> {}

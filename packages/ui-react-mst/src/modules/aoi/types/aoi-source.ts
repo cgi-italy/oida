@@ -2,7 +2,7 @@ import { reaction } from 'mobx';
 import { types, Instance, addDisposer, flow } from 'mobx-state-tree';
 
 import { QueryParams, Geometry, CancelablePromise, LoadingState } from '@oida/core';
-import { QueryParams as QueryParamsState, hasConfig, isDataProvider } from '@oida/state-mst';
+import { QueryParams as QueryParamsState, hasConfig, isDataProvider, IndexedCollection } from '@oida/state-mst';
 
 import { AOICollection } from './aoi';
 
@@ -24,7 +24,7 @@ export type AoiSourceConfig = {
     lazy?: boolean;
 };
 
-export const AoiSource = types.compose('AoiSource',
+const AoiSourceDecl = types.compose('AoiSource',
     types.model('AoiSource', {
         id: types.identifier,
         name: types.string,
@@ -75,3 +75,14 @@ export const AoiSource = types.compose('AoiSource',
     }
 }));
 
+
+type AoiSourceType = typeof AoiSourceDecl;
+export interface AoiSourceInterface extends AoiSourceType {}
+export const AoiSource: AoiSourceInterface = AoiSourceDecl;
+export interface IAoiSource extends Instance<AoiSourceInterface> {}
+
+const AoiSourceCollectionDecl = IndexedCollection(AoiSource);
+type AoiSourceCollectionType = typeof AoiSourceCollectionDecl;
+export interface AoiSourceCollectionInterface extends AoiSourceCollectionType {}
+export const AoiSourceCollection: AoiSourceCollectionInterface = AoiSourceCollectionDecl;
+export interface IAoiSourceCollection extends Instance<AoiSourceCollectionInterface> {}

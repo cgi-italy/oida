@@ -2,7 +2,7 @@ import { types, SnapshotIn, Instance } from 'mobx-state-tree';
 import { MapProjection } from './map-projection';
 import { MapViewport } from './map-viewport';
 
-export const MapView = types
+export const MapViewDecl = types
     .model('MapView', {
         projection: types.optional(MapProjection, {code: 'EPSG:4326'}),
         viewport: MapViewport,
@@ -38,4 +38,9 @@ export const MapView = types
         }
     }));
 
-export type IMapView = Instance<typeof MapView>;
+
+type MapViewType = typeof MapViewDecl;
+export interface MapViewInterface extends MapViewType {}
+export const MapView: MapViewInterface = MapViewDecl;
+export interface IMapView extends Instance<MapViewInterface> {}
+

@@ -2,11 +2,11 @@ import { autorun } from 'mobx';
 import { Instance, addDisposer } from 'mobx-state-tree';
 
 import { IndexedCollection } from '@oida/state-mst';
-import { BreadcrumbItemModel } from './types/breadcrumb-item-model';
+import { BreadcrumbItemModel } from './types';
 
 import { AppModule, AppModuleStateModel } from '../app-module';
 
-export const BreadcrumbModuleStateModel = AppModuleStateModel.addModel(
+const BreadcrumbModuleStateModelDecl = AppModuleStateModel.addModel(
     IndexedCollection(BreadcrumbItemModel, (id, collection) => collection.items.find((item) => item.key === id)).actions((self) => {
         return {
             afterAttach: () => {
@@ -27,7 +27,13 @@ export type BreadcrumbModuleConfig = {
     pageTitle: string;
 };
 
-export type BreadcrumbModule = AppModule<typeof BreadcrumbModuleStateModel, BreadcrumbModuleConfig>;
+type BreadcrumbModuleStateModelType = typeof BreadcrumbModuleStateModelDecl;
+export interface BreadcrumbModuleStateModelInterface extends BreadcrumbModuleStateModelType {}
+export const BreadcrumbModuleStateModel: BreadcrumbModuleStateModelInterface = BreadcrumbModuleStateModelDecl;
+export interface IBreadcrumbModuleStateModel extends Instance<BreadcrumbModuleStateModelInterface> {}
+
+export type BreadcrumbModule = AppModule<BreadcrumbModuleStateModelInterface, BreadcrumbModuleConfig>;
+
 export const DefaultBreadcrumbModule: BreadcrumbModule = {
     stateModel: BreadcrumbModuleStateModel,
     defaultInitState: {
@@ -35,4 +41,3 @@ export const DefaultBreadcrumbModule: BreadcrumbModule = {
     }
 };
 
-export type IBreadcrumbModuleStateModel = Instance<typeof BreadcrumbModuleStateModel>;

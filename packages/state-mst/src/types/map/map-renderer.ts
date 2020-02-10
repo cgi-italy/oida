@@ -2,7 +2,7 @@ import { IMapRenderer } from '@oida/core';
 
 import { types } from 'mobx-state-tree';
 
-export const MapRenderer = types
+const MapRendererDecl = types
     .model('MapRenderer', {
         id: types.string,
         props: types.optional(types.frozen(), {})
@@ -24,3 +24,8 @@ export const MapRenderer = types
             }
         };
     });
+
+
+type MapRendererType = typeof MapRendererDecl;
+export interface MapRendererInterface extends MapRendererType {}
+export const MapRenderer: MapRendererInterface = MapRendererDecl;

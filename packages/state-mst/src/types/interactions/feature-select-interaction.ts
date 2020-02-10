@@ -6,7 +6,7 @@ import { MapInteraction } from './map-interaction';
 import { ReferenceOrType } from '../mst/reference-or-type';
 import { EntitySelection } from '../entity/entity-selection';
 
-export const FeatureSelectInteraction = MapInteraction.addModel(types.model(
+const FeatureSelectInteractionDecl = MapInteraction.addModel(types.model(
     FEATURE_SELECT_INTERACTION_ID,
     {
         selection: ReferenceOrType(EntitySelection),
@@ -23,4 +23,8 @@ export const FeatureSelectInteraction = MapInteraction.addModel(types.model(
     };
 }));
 
-export type IFeatureSelectInteraction = Instance<typeof FeatureSelectInteraction>;
+type FeatureSelectInteractionType = typeof FeatureSelectInteractionDecl;
+export interface FeatureSelectInteractionInterface extends FeatureSelectInteractionType {}
+export const FeatureSelectInteraction: FeatureSelectInteractionInterface = FeatureSelectInteractionDecl;
+export interface IFeatureSelectInteraction extends Instance<FeatureSelectInteractionInterface> {}
+

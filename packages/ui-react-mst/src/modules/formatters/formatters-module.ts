@@ -5,7 +5,7 @@ import { FormatterQuantity, Formatter } from '@oida/core';
 
 import { AppModule, AppModuleStateModel } from '../app-module';
 
-export const FormattersModuleStateModel = AppModuleStateModel.addModel(
+const FormattersModuleStateModelDecl = AppModuleStateModel.addModel(
     types.model('FormattersModule', {
         defaultFormatterOptions: types.map(types.model({
             id: types.string,
@@ -77,11 +77,14 @@ type FormatterQuantityConfig<TYPE, OPTIONS> = {
     initialOptions: string;
 };
 
-export type IFormattersModule = Instance<typeof FormattersModuleStateModel>;
+type FormattersModuleStateModelType = typeof FormattersModuleStateModelDecl;
+export interface FormattersModuleStateModelInterface extends FormattersModuleStateModelType {}
+export const FormattersModuleStateModel: FormattersModuleStateModelInterface = FormattersModuleStateModelDecl;
+export interface IFormattersModule extends Instance<FormattersModuleStateModelInterface> {}
+
 
 export type FormattersModuleConfig =  FormatterQuantityConfig<any, any>[];
-
-export type FormattersModule = AppModule<typeof FormattersModuleStateModel, FormattersModuleConfig>;
+export type FormattersModule = AppModule<FormattersModuleStateModelInterface, FormattersModuleConfig>;
 
 export const DefaultFormattersModule : FormattersModule = {
     stateModel: FormattersModuleStateModel,

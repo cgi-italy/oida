@@ -4,7 +4,7 @@ import debounce from 'lodash/debounce';
 
 import { LoadingState, CancelablePromise } from '@oida/core';
 
-import { MapLayer, hasLoadingState,
+import { MapLayerType, hasLoadingState,
     needsConfig
 } from '@oida/state-mst';
 
@@ -27,12 +27,12 @@ const datasetProductResultsUpdater = (datasetProductSearchViz: IDatasetProductSe
 };
 
 
-export const DatasetProductSearchViz = DatasetViz.addModel(
+export const DatasetProductSearchVizDecl = DatasetViz.addModel(
     types.compose(
         'DatasetProductSearchViz',
         types.model({
             products: types.optional(DatasetProducts, {}),
-            mapLayer: types.maybe(MapLayer.Type)
+            mapLayer: types.maybe(MapLayerType)
         }),
         hasLoadingState,
         needsConfig<DatasetProductSearchConfig>()
@@ -78,4 +78,8 @@ export const DatasetProductSearchViz = DatasetViz.addModel(
     }))
 );
 
-export type IDatasetProductSearchViz = Instance<typeof DatasetProductSearchViz>;
+type DatasetProductSearchVizType = typeof DatasetProductSearchVizDecl;
+export interface DatasetProductSearchVizInterface extends DatasetProductSearchVizType {}
+export const DatasetProductSearchViz: DatasetProductSearchVizInterface = DatasetProductSearchVizDecl;
+export interface IDatasetProductSearchViz extends Instance<DatasetProductSearchVizInterface> {}
+

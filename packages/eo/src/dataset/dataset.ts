@@ -4,7 +4,7 @@ import { needsConfig, QueryParams } from '@oida/state-mst';
 
 import { DatasetConfig } from './dataset-config';
 
-export const Dataset = types.compose(
+const DatasetDecl = types.compose(
     'EODataset',
     types.model({
         id: types.identifier,
@@ -13,5 +13,7 @@ export const Dataset = types.compose(
     needsConfig<DatasetConfig>()
 );
 
-export type IDataset = Instance<typeof Dataset>;
-
+type DatasetType = typeof DatasetDecl;
+export interface DatasetInterface extends DatasetType {}
+export const Dataset: DatasetInterface = DatasetDecl;
+export interface IDataset extends Instance<DatasetInterface> {}

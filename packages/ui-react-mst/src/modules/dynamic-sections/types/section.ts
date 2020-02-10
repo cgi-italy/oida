@@ -1,4 +1,4 @@
-import { types } from 'mobx-state-tree';
+import { types, Instance } from 'mobx-state-tree';
 
 import { Omit } from '@oida/core';
 import { LayoutSectionItem } from '@oida/ui-react-core';
@@ -10,7 +10,7 @@ export type LayoutOptions = {
     show?: boolean;
 };
 
-export const Section = types.model('LayoutSection', {
+export const SectionDecl = types.model('LayoutSection', {
     id: types.identifier,
     components: types.optional(types.array(SectionItem), []),
     activeComponent: types.safeReference(SectionItem),
@@ -46,3 +46,9 @@ export const Section = types.model('LayoutSection', {
         self.expanded = expanded;
     }
 }));
+
+
+type SectionType = typeof SectionDecl;
+export interface SectionInterface extends SectionType {}
+export const Section: SectionInterface = SectionDecl;
+export interface ISection extends Instance<SectionInterface> {}

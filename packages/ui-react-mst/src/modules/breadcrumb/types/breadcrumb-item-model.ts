@@ -1,6 +1,6 @@
 import { types, Instance } from 'mobx-state-tree';
 
-export const BreadcrumbItemModel = types.model('BreadcrumbItem', {
+const BreadcrumbItemModelDecl = types.model('BreadcrumbItem', {
     key: types.identifier,
     title: types.string,
     link: types.maybe(types.string)
@@ -19,4 +19,8 @@ export const BreadcrumbItemModel = types.model('BreadcrumbItem', {
     };
 });
 
-export type IBreadcrumbItem = Instance<typeof BreadcrumbItemModel>;
+type BreadcrumbItemModelType = typeof BreadcrumbItemModelDecl;
+export interface BreadcrumbItemModelInterface extends BreadcrumbItemModelType {}
+export const BreadcrumbItemModel: BreadcrumbItemModelInterface = BreadcrumbItemModelDecl;
+export interface IBreadcrumbItemModel extends Instance<BreadcrumbItemModelInterface> {}
+

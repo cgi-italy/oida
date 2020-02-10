@@ -2,10 +2,10 @@ import { types, SnapshotIn, Instance, IModelType, typecheck } from 'mobx-state-t
 
 import { Omit } from '@oida/core';
 
-import { AppModule, AppModuleStateModel, AppModuleProps, AppModuleOthers } from './app-module';
+import { AppModule, AppModuleStateModelType, AppModuleProps, AppModuleOthers } from './app-module';
 
 export const withAppModules = types.model({
-    modules: types.late(() => types.map(AppModuleStateModel.Type))
+    modules: types.late(() => types.map(AppModuleStateModelType))
 }).actions((self) => ({
     addModule: <PROPS extends AppModuleProps, OTHERS extends AppModuleOthers, CONFIG>(
         appModule: AppModule<IModelType<PROPS, OTHERS>, CONFIG>,
@@ -38,4 +38,6 @@ export const withAppModules = types.model({
     }
 }));
 
-export type IAppWithModules = Instance<typeof withAppModules>;
+type AppWithModulesType = typeof withAppModules;
+export interface AppWithModulesInterface extends AppWithModulesType {}
+export type IAppWithModules = Instance<AppWithModulesInterface>;

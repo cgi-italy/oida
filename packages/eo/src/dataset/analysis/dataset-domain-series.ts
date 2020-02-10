@@ -115,8 +115,17 @@ const createSeriesType = <T>(typeName: string) => {
     }));
 };
 
-export const DatasetDomainSeries = createSeriesType<number>(DOMAIN_SERIES_TYPE);
-export const DatasetTimeSeries = createSeriesType<Date>(TIME_SERIES_TYPE);
+const DatasetDomainSeriesDecl = createSeriesType<number>(DOMAIN_SERIES_TYPE);
 
-export type IDatasetDomainSeries = Instance<typeof DatasetDomainSeries>;
-export type IDatasetTimeSeries = Instance<typeof DatasetTimeSeries>;
+type DatasetDomainSeriesType = typeof DatasetDomainSeriesDecl;
+export interface DatasetDomainSeriesInterface extends DatasetDomainSeriesType {}
+export const DatasetDomainSeries: DatasetDomainSeriesInterface = DatasetDomainSeriesDecl;
+export interface IDatasetDomainSeries extends Instance<DatasetDomainSeriesInterface> {}
+
+
+const DatasetTimeSeriesDecl = createSeriesType<Date>(TIME_SERIES_TYPE);
+
+type  DatasetTimeSeriesType = typeof  DatasetTimeSeriesDecl;
+export interface  DatasetTimeSeriesInterface extends  DatasetTimeSeriesType {}
+export const  DatasetTimeSeries:  DatasetTimeSeriesInterface =  DatasetTimeSeriesDecl;
+export interface IDatasetTimeSeries extends Instance< DatasetTimeSeriesInterface> {}

@@ -40,7 +40,7 @@ const timeDistributionUpdater = (timeDistributionViz: IDatasetTimeDistributionVi
     return disposer;
 };
 
-export const DatasetTimeDistributionViz = DatasetViz.addModel(
+export const DatasetTimeDistributionVizDecl = DatasetViz.addModel(
     types.compose(
         'DatasetTimeDistributionViz',
         types.model({
@@ -67,4 +67,8 @@ export const DatasetTimeDistributionViz = DatasetViz.addModel(
     })
 );
 
-export type IDatasetTimeDistributionViz = Instance<typeof DatasetTimeDistributionViz>;
+
+type DatasetTimeDistributionVizType = typeof DatasetTimeDistributionVizDecl;
+export interface DatasetTimeDistributionVizInterface extends DatasetTimeDistributionVizType {}
+export const DatasetTimeDistributionViz: DatasetTimeDistributionVizInterface = DatasetTimeDistributionVizDecl;
+export interface IDatasetTimeDistributionViz extends Instance<DatasetTimeDistributionVizInterface> {}

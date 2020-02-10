@@ -12,12 +12,21 @@ const Product = types.compose('DatasetProduct',
     hasGeometry
 );
 
-export const DatasetProduct = Entity.addModel(
+const DatasetProductDecl = Entity.addModel(
     Product
 );
 
-export const DatasetProducts = createEntityCollectionType(DatasetProduct);
 
-export type IDatasetProduct = Instance<typeof DatasetProduct>;
-export type IDatasetProducts = Instance<typeof DatasetProducts>;
-export type ProductSearchRecord = SnapshotIn<typeof DatasetProduct>;
+type DatasetProductType = typeof DatasetProductDecl;
+export interface DatasetProductInterface extends DatasetProductType {}
+export const DatasetProduct: DatasetProductInterface = DatasetProductDecl;
+export interface IDatasetProduct extends Instance<DatasetProductInterface> {}
+export type ProductSearchRecord = SnapshotIn<DatasetProductInterface>;
+
+
+const DatasetProductsDecl = createEntityCollectionType(DatasetProduct);
+
+type DatasetProductsType = typeof DatasetProductsDecl;
+export interface DatasetProductsInterface extends DatasetProductsType {}
+export const DatasetProducts: DatasetProductsInterface = DatasetProductsDecl;
+export interface IDatasetProducts extends Instance<DatasetProductsInterface> {}

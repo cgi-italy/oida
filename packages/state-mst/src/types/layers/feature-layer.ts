@@ -7,7 +7,7 @@ import { FunctionType } from '../mst/function-type';
 import { getEntityCollectionType } from '../entity/entity-collection';
 import { ReferenceOrType } from '../mst/reference-or-type';
 
-export const FeatureLayer = MapLayer.addModel(
+const FeatureLayerDecl = MapLayer.addModel(
     types.model(FEATURE_LAYER_ID, {
         config: types.frozen(),
         source: ReferenceOrType(getEntityCollectionType()),
@@ -29,4 +29,8 @@ export const FeatureLayer = MapLayer.addModel(
     })
 );
 
-export type IFeatureLayer = Instance<typeof FeatureLayer>;
+type FeatureLayerType = typeof FeatureLayerDecl;
+export interface FeatureLayerInterface extends FeatureLayerType {}
+export const FeatureLayer: FeatureLayerInterface = FeatureLayerDecl;
+export interface IFeatureLayer extends Instance<FeatureLayerInterface> {}
+

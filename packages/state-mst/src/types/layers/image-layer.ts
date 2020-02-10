@@ -4,7 +4,7 @@ import { IMAGE_LAYER_ID, ImageSourceConfig } from '@oida/core';
 
 import { MapLayer } from './map-layer';
 
-export const ImageLayer = MapLayer.addModel(
+const ImageLayerDecl = MapLayer.addModel(
     types.model(IMAGE_LAYER_ID, {
         sourceType: types.maybe(types.string)
     })
@@ -28,4 +28,8 @@ export const ImageLayer = MapLayer.addModel(
     })
 );
 
-export type IImageLayer = Instance<typeof ImageLayer>;
+type ImageLayerType = typeof ImageLayerDecl;
+export interface ImageLayerInterface extends ImageLayerType {}
+export const ImageLayer: ImageLayerInterface = ImageLayerDecl;
+export interface IImageLayer extends Instance<ImageLayerInterface> {}
+

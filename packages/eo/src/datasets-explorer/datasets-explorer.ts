@@ -2,19 +2,28 @@ import { types, Instance, detach, addDisposer, SnapshotIn, SnapshotOrInstance, g
 import moment from 'moment';
 
 import { GroupLayer, DataFilters, needsConfig } from '@oida/state-mst';
-import { Dataset, DatasetConfig, DatasetTimeDistributionViz, DatasetProductSearchViz, DatasetMapViz, TimeRange } from '../dataset';
+import {
+    Dataset, DatasetConfig, IDataset,
+    DatasetTimeDistributionViz, DatasetProductSearchViz,
+    DatasetMapViz, DatasetMapVizType, TimeRange
+} from '../dataset';
 
 import { DatasetAnalyses } from '../dataset/analysis/dataset-analysis';
 
 import { DatasetsExplorerController } from './datasets-explorer-controller';
 
 
-const DatasetExplorerView = types.model('DatasetExplorerViews', {
+const DatasetExplorerViewDecl = types.model('DatasetExplorerViews', {
     dataset: Dataset,
     timeDistributionViz: types.maybe(DatasetTimeDistributionViz),
     productSearchViz: types.maybe(DatasetProductSearchViz),
-    mapViz: types.maybe(DatasetMapViz.Type)
+    mapViz: types.maybe(DatasetMapVizType)
 });
+
+type DatasetExplorerViewType = typeof DatasetExplorerViewDecl;
+export interface DatasetExplorerViewInterface extends DatasetExplorerViewType {}
+const DatasetExplorerView: DatasetExplorerViewInterface = DatasetExplorerViewDecl;
+export interface IDatasetExplorerView extends Instance<DatasetExplorerViewInterface> {}
 
 export type DatasetsExplorerConfig = {
     aoiFilterKey: string;
@@ -24,7 +33,7 @@ export type DatasetsExplorerConfig = {
     disableMapView?: boolean;
 };
 
-export const DatasetsExplorer = types.compose(
+const DatasetsExplorerDecl = types.compose(
     'DatasetsExplorer',
     types.model( {
         datasetViews: types.array(DatasetExplorerView),
@@ -55,7 +64,7 @@ export const DatasetsExplorer = types.compose(
 .views((self) => {
     return {
         getDatasetView: (id: string) => {
-            return self.datasetViews.find(datasetView => datasetView.dataset.id === id);
+            return self.datasetViews.find(datasetView => datasetView.dataset.id === id) as IDatasetExplorerView | undefined;
         },
         get aoi() {
             return self.commonFilters.get(self.config.aoiFilterKey);
@@ -139,7 +148,7 @@ export const DatasetsExplorer = types.compose(
 
             let datasetView = DatasetExplorerView.create(datasetViewConfig);
             self.datasetViews.push(datasetView);
-            return datasetView;
+            return datasetView as IDatasetExplorerView;
         },
         removeDataset: (id: string) => {
             let datasetView = self.getDatasetView(id);
@@ -163,5 +172,8 @@ export const DatasetsExplorer = types.compose(
     };
 });
 
-export type IDatasetsExplorer = Instance<typeof DatasetsExplorer>;
+type DatasetsExplorerType = typeof DatasetsExplorerDecl;
+export interface DatasetsExplorerInterface extends DatasetsExplorerType {}
+export const DatasetsExplorer: DatasetsExplorerInterface = DatasetsExplorerDecl;
+export interface IDatasetsExplorer extends Instance<DatasetsExplorerInterface> {}
 

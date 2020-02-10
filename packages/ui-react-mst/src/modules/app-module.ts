@@ -13,16 +13,20 @@ const AppModuleStateModelBase = types.compose(
 
 export const AppModuleStateModel = TaggedUnion('appModuleType', AppModuleStateModelBase);
 
-const AppModuleBase = AppModuleStateModel.addModel(types.model('AppModule', {}));
-
-export type AppModuleStateModelType = typeof AppModuleBase;
-
-export type AppModuleProps = ExtractPropsFromModel<AppModuleStateModelType>;
-export type AppModuleOthers = ExtractOthersFromModel<AppModuleStateModelType>;
 
 export type AppModule<STATE_MODEL, CONFIG> = {
     stateModel: STATE_MODEL;
     defaultInitState: SnapshotIn<STATE_MODEL>
 };
 
-export type IAppModuleStateModel = Instance<typeof AppModuleBase>;
+type AppModuleStateModelType = typeof AppModuleStateModel.Type;
+export interface AppModuleStateModelInterface extends AppModuleStateModelType {}
+export const AppModuleStateModelType: AppModuleStateModelInterface = AppModuleStateModel.Type;
+export interface IAppModuleStateModel extends Instance<AppModuleStateModelInterface> {}
+
+
+const AppModuleBase = AppModuleStateModel.addModel(types.model('AppModule', {}));
+type AppModuleBaseType = typeof AppModuleBase;
+export interface AppModuleBaseInterface extends AppModuleBaseType {}
+export type AppModuleProps = ExtractPropsFromModel<AppModuleBaseInterface>;
+export type AppModuleOthers = ExtractOthersFromModel<AppModuleBaseInterface>;

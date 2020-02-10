@@ -18,7 +18,7 @@ const getSpotGeometry = (spot) => (
     {
         type: 'Point',
         coordinates: [spot.location.lon, spot.location.lat]
-    }
+    } as GeoJSON.Point
 );
 
 const spotIcons = {

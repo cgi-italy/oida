@@ -5,7 +5,7 @@ import { BreadcrumbItemProps } from '@oida/ui-react-core';
 
 import { useBreadcrumbModuleState } from '../use-breadcrumb-module-state';
 
-import { IBreadcrumbItem } from '../types/breadcrumb-item-model';
+import { IBreadcrumbItemModel } from '../types/breadcrumb-item-model';
 import { IBreadcrumbModuleStateModel } from '../breadcrumb-module';
 
 export type BreadcrumbItemInjectorProps = {
@@ -15,7 +15,7 @@ export type BreadcrumbItemInjectorProps = {
 
 export const BreadcrumbItemBase = ({breadcrumbState, data}: BreadcrumbItemInjectorProps) => {
 
-    const [breadcrumbItem, setBreadcrumbItem] = useState<IBreadcrumbItem>();
+    const [breadcrumbItem, setBreadcrumbItem] = useState<IBreadcrumbItemModel>();
 
     useEffect(() => {
 

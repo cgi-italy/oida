@@ -1,7 +1,7 @@
 import { types, Instance, IModelType } from 'mobx-state-tree';
 
 import { TaggedUnion } from '../mst/tagged-union';
-import { Entity } from './entity';
+import { Entity, EntityType } from './entity';
 
 import { IndexedCollection } from '../core';
 import { ExtractPropsFromModel, ExtractOthersFromModel } from '../../utils';
@@ -14,8 +14,8 @@ const EntityCollectionBase = types.model({
 
 export const EntityCollection = TaggedUnion('entityCollectionType', EntityCollectionBase);
 
-type EntityProps = ExtractPropsFromModel<typeof Entity.Type>;
-type EntityOthers = ExtractOthersFromModel<typeof Entity.Type>;
+type EntityProps = ExtractPropsFromModel<typeof EntityType>;
+type EntityOthers = ExtractOthersFromModel<typeof EntityType>;
 
 export function EntityCollectionFactory<PROPS extends EntityProps, OTHERS extends EntityOthers>(entityType: IModelType<PROPS, OTHERS>) {
     return IndexedCollection(entityType);
@@ -28,7 +28,7 @@ export const createEntityCollectionType = <PROPS extends EntityProps, OTHERS ext
 };
 
 export const getEntityCollectionType = () => {
-    return <unknown>EntityCollection.Type as EntityCollectionType<typeof Entity.Type>;
+    return <unknown>EntityCollection.Type as EntityCollectionType<typeof EntityType>;
 };
 
 class EntityCollectionTypeHelper<PROPS extends EntityProps, OTHERS extends EntityOthers> {

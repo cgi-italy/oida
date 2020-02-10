@@ -65,7 +65,7 @@ let getAoiColor = () => {
     return color;
 };
 
-export const AOI = Entity.addModel(types.compose('AOI',
+const AOIDecl = Entity.addModel(types.compose('AOI',
         types.model({
             name: types.string,
             defaultColor: types.optional(types.string, getAoiColor),
@@ -94,7 +94,14 @@ export const AOI = Entity.addModel(types.compose('AOI',
     })
 );
 
-export const AOICollection = createEntityCollectionType(AOI);
 
-export type IAOI = Instance<typeof AOI>;
-export type IAOICollection = Instance<typeof AOICollection>;
+type AOIType = typeof AOIDecl;
+export interface AOIInterface extends AOIType {}
+export const AOI: AOIInterface = AOIDecl;
+export interface IAOI extends Instance<AOIInterface> {}
+
+const AOICollectionDecl = createEntityCollectionType(AOI);
+type AOICollectionType = typeof AOICollectionDecl;
+export interface AOICollectionInterface extends AOICollectionType {}
+export const AOICollection: AOICollectionInterface = AOICollectionDecl;
+export interface IAOICollection extends Instance<AOICollectionInterface> {}

@@ -1,15 +1,13 @@
 
-import { types } from 'mobx-state-tree';
+import { types, Instance } from 'mobx-state-tree';
 
 import { IMapProjection } from '@oida/core';
 import { Map, EntitySelection, TileLayer, ReferenceOrType } from '@oida/state-mst';
 
 import { AppModule, AppModuleStateModel } from '../app-module';
-import { FormattersModuleStateModel, DefaultFormattersModule } from '../formatters';
+import { FormattersModuleStateModel } from '../formatters';
 
-import { SelectionMode } from  '@oida/core';
-
-export const MapModuleStateModel = AppModuleStateModel.addModel(
+const MapModuleStateModelDecl = AppModuleStateModel.addModel(
     types.model('MapModule', {
         map: Map,
         selection: ReferenceOrType(EntitySelection),
@@ -73,7 +71,12 @@ export type MapModuleConfig = {
     }
 };
 
-export type MapModule = AppModule<typeof MapModuleStateModel, MapModuleConfig>;
+type MapModuleStateModelType = typeof MapModuleStateModelDecl;
+export interface MapModuleStateModelInterface extends MapModuleStateModelType {}
+export const MapModuleStateModel: MapModuleStateModelInterface = MapModuleStateModelDecl;
+export interface IMapModule extends Instance<MapModuleStateModelInterface> {}
+
+export type MapModule = AppModule<MapModuleStateModelInterface, MapModuleConfig>;
 
 const defaultInitState = {
     id: 'map',

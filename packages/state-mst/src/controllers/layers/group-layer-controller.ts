@@ -7,14 +7,14 @@ import { layerControllersFactory } from './layer-controllers-factory';
 
 import { ArrayTracker } from '../../utils';
 
-import { MapLayer, IMapLayer, IGroupLayer } from '../../types';
+import { MapLayerInterface, IMapLayer, IGroupLayer } from '../../types';
 
 export class GroupLayerController extends MapLayerController<IGroupLayerRenderer, IGroupLayer> {
 
     private mapRenderer_: IMapRenderer | undefined;
     private layersTracker_: ArrayTracker<
         MapLayerController | undefined,
-        typeof MapLayer.Type | IReferenceType<typeof MapLayer.Type>
+        MapLayerInterface | IReferenceType<MapLayerInterface>
     > | undefined;
 
     constructor(config) {

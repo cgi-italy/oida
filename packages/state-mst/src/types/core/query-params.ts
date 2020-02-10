@@ -4,13 +4,18 @@ import { SortOrder } from '@oida/core';
 
 import { enumFromType } from '../mst';
 
-export const DataFilter = types.model('DataFilter', {
+const DataFilterDecl = types.model('DataFilter', {
     key: types.identifier,
     value: types.frozen(),
     type: types.string
 });
 
-export const DataFilters = types.model('DataFilters', {
+type DataFilterType = typeof DataFilterDecl;
+export interface DataFilterInterface extends DataFilterType {}
+export const DataFilter: DataFilterInterface = DataFilterDecl;
+export interface IDataFilter extends Instance<DataFilterInterface> {}
+
+const DataFiltersDecl = types.model('DataFilters', {
     items: types.map(DataFilter)
 }).actions((self) => {
     return {
@@ -37,9 +42,13 @@ export const DataFilters = types.model('DataFilters', {
     };
 });
 
-export type IDataFilters = Instance<typeof DataFilters>;
+type DataFiltersType = typeof DataFiltersDecl;
+export interface DataFiltersInterface extends DataFiltersType {}
+export const DataFilters: DataFiltersInterface = DataFiltersDecl;
+export interface IDataFilters extends Instance<DataFiltersInterface> {}
 
-export const DataSorting = types.model('DataSorting', {
+
+const DataSortingDecl = types.model('DataSorting', {
     key: types.maybe(types.string),
     order: types.optional(enumFromType<SortOrder>(SortOrder), SortOrder.Ascending)
 }).actions((self) => {
@@ -58,9 +67,13 @@ export const DataSorting = types.model('DataSorting', {
     };
 });
 
-export type IDataSorting = Instance<typeof DataSorting>;
+type DataSortingType = typeof DataSortingDecl;
+export interface DataSortingInterface extends DataSortingType {}
+export const DataSorting: DataSortingInterface = DataSortingDecl;
+export interface IDataSorting extends Instance<DataSortingInterface> {}
 
-export const DataPaging = types.model('DataPaging', {
+
+const DataPagingDecl = types.model('DataPaging', {
     page: types.optional(types.integer, 0),
     pageSize: types.optional(types.integer, 20),
     total: types.optional(types.integer, 0)
@@ -96,10 +109,13 @@ export const DataPaging = types.model('DataPaging', {
     };
 });
 
-export type IDataPaging = Instance<typeof DataPaging>;
+type DataPagingType = typeof DataPagingDecl;
+export interface DataPagingInterface extends DataPagingType {}
+export const DataPaging: DataPagingInterface = DataPagingDecl;
+export interface IDataPaging extends Instance<DataPagingInterface> {}
 
 
-export const QueryParams = types.model('QueryParams', {
+const QueryParamsDecl = types.model('QueryParams', {
     filters: types.optional(DataFilters, {}),
     paging: types.optional(DataPaging, {}),
     sorting: types.optional(DataSorting, {})
@@ -132,4 +148,7 @@ export const QueryParams = types.model('QueryParams', {
     };
 });
 
-export type IQueryParams = Instance<typeof QueryParams>;
+type QueryParamsType = typeof QueryParamsDecl;
+export interface QueryParamsInterface extends QueryParamsType {}
+export const QueryParams: QueryParamsInterface = QueryParamsDecl;
+export interface IQueryParams extends Instance<QueryParamsInterface> {}

@@ -3,7 +3,7 @@ import { types, Instance } from 'mobx-state-tree';
 import { AppModule, AppModuleStateModel } from '../app-module';
 import { Section } from './types';
 
-export const DynamicSectionsStateModel = AppModuleStateModel.addModel(
+const DynamicSectionsStateModelDecl = AppModuleStateModel.addModel(
     types.model('DynamicSectionsModule', {
         sections: types.map(Section)
     })
@@ -27,7 +27,12 @@ export const DynamicSectionsStateModel = AppModuleStateModel.addModel(
 export type DynamicSectionsModuleConfig = {
 };
 
-export type DynamicSectionsModule = AppModule<typeof DynamicSectionsStateModel, DynamicSectionsModuleConfig>;
+type DynamicSectionsStateModelType = typeof DynamicSectionsStateModelDecl;
+export interface DynamicSectionsStateModelInterface extends DynamicSectionsStateModelType {}
+export const DynamicSectionsStateModel: DynamicSectionsStateModelInterface = DynamicSectionsStateModelDecl;
+export interface IDynamicSectionsStateModel extends Instance<DynamicSectionsStateModelInterface> {}
+
+export type DynamicSectionsModule = AppModule<DynamicSectionsStateModelInterface, DynamicSectionsModuleConfig>;
 
 export const DefaultDynamicSectionsModule: DynamicSectionsModule = {
     stateModel: DynamicSectionsStateModel,
@@ -37,4 +42,3 @@ export const DefaultDynamicSectionsModule: DynamicSectionsModule = {
     }
 };
 
-export type IDynamicSectionsStateModel = Instance<typeof DynamicSectionsStateModel>;

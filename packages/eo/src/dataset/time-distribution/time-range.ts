@@ -1,7 +1,7 @@
 import { types, flow, Instance } from 'mobx-state-tree';
 import { easeOut } from 'ol/easing';
 
-export const TimeRange = types.model(
+const TimeRangeDecl = types.model(
     'TimeRange',
     {
         start: types.Date,
@@ -99,4 +99,8 @@ export const TimeRange = types.model(
     };
 });
 
-export type ITimeRange = Instance<typeof TimeRange>;
+
+type TimeRangeType = typeof TimeRangeDecl;
+export interface TimeRangeInterface extends TimeRangeType {}
+export const TimeRange: TimeRangeInterface = TimeRangeDecl;
+export interface ITimeRange extends Instance<TimeRangeInterface> {}

@@ -1,7 +1,4 @@
-import {
-    types, Instance,
-    ModelProperties, IModelType, ISimpleType, IOptionalIType, ModelPropertiesDeclarationToProperties, IType, _NotCustomized
-} from 'mobx-state-tree';
+import { types, Instance } from 'mobx-state-tree';
 
 import { TaggedUnion } from '../mst/tagged-union';
 import { hasVisibility, isSelectable, isHoverable } from '../mixins';
@@ -29,4 +26,7 @@ const EntityBase = types.compose(
 
 export const Entity = TaggedUnion('entityType', EntityBase);
 
-export interface IEntity extends Instance<typeof Entity.Type> {}
+type EntityType = typeof Entity.Type;
+export interface EntityInterface extends EntityType {}
+export const EntityType: EntityInterface = Entity.Type;
+export interface IEntity extends Instance<EntityInterface> {}

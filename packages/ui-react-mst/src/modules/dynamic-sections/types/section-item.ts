@@ -4,7 +4,7 @@ import { Omit } from '@oida/core';
 import { needsConfig } from '@oida/state-mst';
 import { LayoutSectionItem } from '@oida/ui-react-core';
 
-export const SectionItem = types.compose(
+const SectionItemDecl = types.compose(
     'SectionItem',
     types.model({
         id: types.identifier,
@@ -19,4 +19,8 @@ export const SectionItem = types.compose(
     }
 }));
 
-export type ISectionItem = Instance<typeof SectionItem>;
+
+type SectionItemType = typeof SectionItemDecl;
+export interface SectionItemInterface extends SectionItemType {}
+export const SectionItem: SectionItemInterface = SectionItemDecl;
+export interface ISectionItem extends Instance<SectionItemInterface> {}

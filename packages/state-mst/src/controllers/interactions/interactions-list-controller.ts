@@ -1,21 +1,17 @@
-import { SubscriptionTracker, IMapRenderer } from '@oida/core';
+import { IMapRenderer } from '@oida/core';
 
-import { Collection } from '../../types/core/collection';
-import { MapInteraction, IMapInteraction } from '../../types/interactions/map-interaction';
+import { MapInteractionInterface, IMapInteraction, IMapInteractionCollection } from '../../types/interactions/map-interaction';
 import { MapInteractionController } from './map-interaction-controller';
 import { interactionControllersFactory } from './interaction-controllers-factory';
 
 import { ArrayTracker } from '../../utils/array-tracker';
 
-//only for typings
-const CollectionInstance = Collection(MapInteraction.Type).create({items: []});
-
 export class InteractionListController {
 
-    private interactions_: typeof CollectionInstance;
+    private interactions_: IMapInteractionCollection;
     private mapRenderer_: IMapRenderer | undefined;
 
-    private interactionsTracker_: ArrayTracker<MapInteractionController | undefined, typeof MapInteraction.Type>;
+    private interactionsTracker_: ArrayTracker<MapInteractionController | undefined, MapInteractionInterface>;
 
     constructor(config) {
         this.interactions_ = config.interactions;

@@ -108,8 +108,14 @@ export const DatasetAnalysis = Entity.addUnion('analysisType', types.compose(
     hasStyleAsGetter(analysisStyleGetter)
 ));
 
-export const DatasetAnalyses = types.model('DatasetAnalyses', {
-    collection: createEntityCollectionType(DatasetAnalysis.Type),
+type DatasetAnalysisType = typeof DatasetAnalysis.Type;
+export interface DatasetAnalysisInterface extends DatasetAnalysisType {}
+export const DatasetAnalysisType: DatasetAnalysisInterface = DatasetAnalysis.Type;
+export interface IDatasetAnalysis extends Instance<DatasetAnalysisInterface> {}
+
+
+const DatasetAnalysesDecl = types.model('DatasetAnalyses', {
+    collection: createEntityCollectionType(DatasetAnalysisType),
     geometryLayer: types.maybe(FeatureLayer),
     active: types.optional(types.boolean, false)
 }).actions(self => ({
@@ -124,6 +130,7 @@ export const DatasetAnalyses = types.model('DatasetAnalyses', {
     }
 }));
 
-
-export type IDatasetAnalysis = Instance<typeof DatasetAnalysis.Type>;
-export type IDatasetAnalyses = Instance<typeof DatasetAnalyses>;
+type DatasetAnalysesType = typeof DatasetAnalysesDecl;
+export interface DatasetAnalysesInterface extends DatasetAnalysesType {}
+export const DatasetAnalyses: DatasetAnalysesInterface = DatasetAnalysesDecl;
+export interface IDatasetAnalyses extends Instance<DatasetAnalysesInterface> {}

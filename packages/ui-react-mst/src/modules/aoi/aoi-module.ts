@@ -1,8 +1,8 @@
 import { autorun } from 'mobx';
 import { types, addDisposer, SnapshotIn } from 'mobx-state-tree';
 
-import { FeatureLayer, IndexedCollection } from '@oida/state-mst';
-import { AOI, AOICollection, AoiSource } from './types';
+import { FeatureLayer } from '@oida/state-mst';
+import { AOI, AOICollection, AoiSourceCollection, AoiSource } from './types';
 import { MapModuleStateModel, DefaultMapModule } from '../map';
 
 import { AppModule, AppModuleStateModel } from '../app-module';
@@ -10,7 +10,7 @@ import { AppModule, AppModuleStateModel } from '../app-module';
 export const AoiModuleStateModel = AppModuleStateModel.addModel(
     types.model('AoiModule', {
         aois: AOICollection,
-        aoiSources: types.optional(IndexedCollection(AoiSource), {}),
+        aoiSources: types.optional(AoiSourceCollection, {}),
         activeSource: types.optional(types.safeReference(AoiSource), undefined),
         mapModule: types.reference(MapModuleStateModel)
     })

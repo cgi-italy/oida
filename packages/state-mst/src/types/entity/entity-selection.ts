@@ -1,13 +1,11 @@
-import { types, addDisposer, Instance, getSnapshot, resolveIdentifier, IAnyModelType } from 'mobx-state-tree';
+import { types, addDisposer, Instance } from 'mobx-state-tree';
 
-import { Entity } from './entity';
-import { EntityReference, EntitySafeReference, createEntityReference, resolveEntityReference } from './entity-reference';
+import { EntityType } from './entity';
+import { EntitySafeReference, resolveEntityReference } from './entity-reference';
 import { hasSelectableItems } from '../mixins/has-selectable-items';
 
-//import { SelectionMode } from  '@oida/core';
-
 const EntityHovered = types.model({
-    hoveredItems: types.array(EntitySafeReference(Entity.Type))
+    hoveredItems: types.array(EntitySafeReference(EntityType))
 }).actions((self) => {
     return {
         setHovered: (items) => {
@@ -35,9 +33,9 @@ const EntityHovered = types.model({
     };
 });
 
-export const EntitySelection = types.compose(
+const EntitySelectionDecl = types.compose(
     'EntitySelection',
-    hasSelectableItems(Entity.Type, EntitySafeReference(Entity.Type)),
+    hasSelectableItems(EntityType, EntitySafeReference(EntityType)),
     EntityHovered,
     types.model({
         id: types.identifier
@@ -68,4 +66,8 @@ export const EntitySelection = types.compose(
     };
 });
 
-export type IEntitySelection = Instance<typeof EntitySelection>;
+type EntitySelectionType = typeof EntitySelectionDecl;
+export interface EntitySelectionInterface extends EntitySelectionType {}
+export const EntitySelection: EntitySelectionInterface = EntitySelectionDecl;
+export interface IEntitySelection extends Instance<EntitySelectionInterface> {}
+

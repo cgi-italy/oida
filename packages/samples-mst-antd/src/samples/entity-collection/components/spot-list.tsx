@@ -18,7 +18,7 @@ export type SpotListProps = {
 
 export const SpotList = ({spots, selection, loadingState, queryParams}: SpotListProps) => {
 
-    let { data, keyGetter, itemSelector, onHoverAction, onSelectAction } = useEntityCollectionList<ISpot>({
+    const collectionData = useEntityCollectionList<ISpot>({
         collection: spots,
         entitySelection: selection,
         iconGetter: (item) => {
@@ -44,8 +44,12 @@ export const SpotList = ({spots, selection, loadingState, queryParams}: SpotList
         sortingState: queryParams.sorting
     });
 
+    if (!collectionData) {
+        return null;
+    }
+
     const TypeCell = ({item}) => {
-        let { icon } = itemSelector(item);
+        let { icon } = collectionData.itemSelector(item);
         return  (
             <span>{icon}{item.type}</span>
         );
@@ -54,7 +58,7 @@ export const SpotList = ({spots, selection, loadingState, queryParams}: SpotList
     return (
         <div className='spot-list'>
             {<DataCollectionTable<ISpot>
-                items={{data, keyGetter, itemSelector, onHoverAction, onSelectAction, loadingState}}
+                items={{...collectionData, loadingState}}
                 columns={[
                     {
                         title: 'ID',
@@ -82,7 +86,7 @@ export const SpotList = ({spots, selection, loadingState, queryParams}: SpotList
                         description: item.id
                     };
                 }}
-                items={{data, keyGetter, itemSelector, onHoverAction, onSelectAction, loadingState: loadingState}}
+                items={{...collectionData, loadingState: loadingState}}
                 paging={paging}
                 filters={filtering}
                 sorting={sorting}

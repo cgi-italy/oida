@@ -5,7 +5,7 @@ import { FEATURE_DRAW_INTERACTION_ID, FeatureDrawMode, FeatureDrawOptions } from
 import { MapInteraction } from './map-interaction';
 import { enumFromType } from '../mst/enum-from-type';
 
-export const FeatureDrawInteraction = MapInteraction.addModel(types.model(
+const FeatureDrawInteractionDecl = MapInteraction.addModel(types.model(
     FEATURE_DRAW_INTERACTION_ID,
     {
         drawMode: types.optional(enumFromType<FeatureDrawMode>(FeatureDrawMode), FeatureDrawMode.Off)
@@ -21,4 +21,8 @@ export const FeatureDrawInteraction = MapInteraction.addModel(types.model(
     };
 }));
 
-export type IFeatureDrawInteraction = Instance<typeof FeatureDrawInteraction>;
+type FeatureDrawInteractionType = typeof FeatureDrawInteractionDecl;
+export interface FeatureDrawInteractionInterface extends FeatureDrawInteractionType {}
+export const FeatureDrawInteraction: FeatureDrawInteractionInterface = FeatureDrawInteractionDecl;
+export interface IFeatureDrawInteraction extends Instance<FeatureDrawInteractionInterface> {}
+

@@ -109,8 +109,16 @@ const createRasterSequenceType = <T>(typeName: string) => {
     }));
 };
 
-export const DatasetDomainRasterSequence = createRasterSequenceType<number>(DOMAIN_RASTER_SEQUENCE_TYPE);
-export const DatasetTimeRasterSequence = createRasterSequenceType<Date>(TIME_RASTER_SEQUENCE_TYPE);
+const DatasetDomainRasterSequenceDecl = createRasterSequenceType<number>(DOMAIN_RASTER_SEQUENCE_TYPE);
 
-export type IDatasetDomainRasterSequence = Instance<typeof DatasetDomainRasterSequence>;
-export type IDatasetTimeRasterSequence = Instance<typeof DatasetTimeRasterSequence>;
+type DatasetDomainRasterSequenceType = typeof DatasetDomainRasterSequenceDecl;
+export interface DatasetDomainRasterSequenceInterface extends DatasetDomainRasterSequenceType {}
+export const DatasetDomainRasterSequence: DatasetDomainRasterSequenceInterface = DatasetDomainRasterSequenceDecl;
+export interface IDatasetDomainRasterSequence extends Instance<DatasetDomainRasterSequenceInterface> {}
+
+const DatasetTimeRasterSequenceDecl = createRasterSequenceType<Date>(TIME_RASTER_SEQUENCE_TYPE);
+
+type DatasetTimeRasterSequenceType = typeof DatasetTimeRasterSequenceDecl;
+export interface DatasetTimeRasterSequenceInterface extends DatasetTimeRasterSequenceType {}
+export const DatasetTimeRasterSequence: DatasetTimeRasterSequenceInterface = DatasetTimeRasterSequenceDecl;
+export interface IDatasetTimeRasterSequence extends Instance<DatasetTimeRasterSequenceInterface> {}

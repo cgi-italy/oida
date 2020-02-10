@@ -1,6 +1,6 @@
 import { types, resolveIdentifier, getRoot, getType, getParent, typecheck, IAnyStateTreeNode, TypeOfValue } from 'mobx-state-tree';
 
-import { Entity, IEntity } from './entity';
+import { Entity, EntityType, IEntity } from './entity';
 import {
     getEntityCollectionType,
     IEntityCollection
@@ -40,7 +40,7 @@ export const resolveEntityReference = (reference: string, parent: IAnyStateTreeN
 };
 
 export const EntityReference =
-<T extends typeof Entity.Type>(entityType: T) => {
+<T extends typeof EntityType>(entityType: T) => {
     return types.safeReference(entityType, {
         get(reference: string, parent) {
             return resolveEntityReference(reference, parent);
@@ -52,7 +52,7 @@ export const EntityReference =
 };
 
 export const EntitySafeReference =
-<T extends typeof Entity.Type>(entityType: T) => {
+<T extends typeof EntityType>(entityType: T) => {
     return types.safeReference(entityType, {
         get(reference: string, parent) {
             return resolveEntityReference(reference, parent);

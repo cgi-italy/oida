@@ -13,7 +13,7 @@ export type DatasetDiscoveryConfig = {
     provider: DatasetDiscoveryProvider
 };
 
-export const DatasetDiscovery = types.compose(
+const DatasetDiscoveryDecl = types.compose(
     'EODatasetDiscovery',
     types.model({
         queryParams: types.optional(QueryParams, {})
@@ -44,4 +44,8 @@ export const DatasetDiscovery = types.compose(
     }
 }));
 
-export type IDatasetDiscovery = Instance<typeof DatasetDiscovery>;
+
+type DatasetDiscoveryType = typeof DatasetDiscoveryDecl;
+export interface DatasetDiscoveryInterface extends DatasetDiscoveryType {}
+export const DatasetDiscovery: DatasetDiscoveryInterface = DatasetDiscoveryDecl;
+export interface IDatasetDiscovery extends Instance<DatasetDiscoveryInterface> {}

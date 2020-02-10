@@ -1,6 +1,6 @@
-import { types } from 'mobx-state-tree';
+import { types, Instance } from 'mobx-state-tree';
 
-export const TimeDistributionItem = types.model('TimeInterval', {
+const TimeDistributionItemDecl = types.model('TimeInterval', {
     start: types.Date,
     end: types.maybe(types.Date),
     data: types.frozen()
@@ -14,7 +14,13 @@ export const TimeDistributionItem = types.model('TimeInterval', {
     }
 }));
 
-export const TimeDistribution = types.model('TimeDistribution', {
+type TimeDistributionItemType = typeof TimeDistributionItemDecl;
+export interface TimeDistributionItemInterface extends TimeDistributionItemType {}
+export const TimeDistributionItem: TimeDistributionItemInterface = TimeDistributionItemDecl;
+export interface ITimeDistributionItem extends Instance<TimeDistributionItemInterface> {}
+
+
+const TimeDistributionDecl = types.model('TimeDistribution', {
     items: types.array(TimeDistributionItem)
 }).volatile((self) => ({
     cachedIntervals: null
@@ -25,10 +31,20 @@ export const TimeDistribution = types.model('TimeDistribution', {
     }
 }));
 
-export const TimeDimension = types.model('TimeDimension', {
+type TimeDistributionType = typeof TimeDistributionDecl;
+export interface TimeDistributionInterface extends TimeDistributionType {}
+export const TimeDistribution: TimeDistributionInterface = TimeDistributionDecl;
+export interface ITimeDistribution extends Instance<TimeDistributionInterface> {}
+
+const TimeDimensionDecl = types.model('TimeDimension', {
     range: types.frozen(),
     levels: types.array(types.model({
         durationStep: types.number,
         distribution: TimeDistribution
     }))
 });
+
+type TimeDimensionType = typeof TimeDimensionDecl;
+export interface TimeDimensionInterface extends TimeDimensionType {}
+export const TimeDimension: TimeDimensionInterface = TimeDimensionDecl;
+export interface ITimeDimension extends Instance<TimeDimensionInterface> {}

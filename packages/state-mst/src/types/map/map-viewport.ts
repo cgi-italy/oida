@@ -1,6 +1,6 @@
-import { types } from 'mobx-state-tree';
+import { types, Instance } from 'mobx-state-tree';
 
-export const MapViewport = types
+export const MapViewportDecl = types
     .model('MapViewport', {
         center: types.array(types.number),
         resolution: types.number,
@@ -22,3 +22,10 @@ export const MapViewport = types
             }
         };
     });
+
+
+type MapViewportType = typeof MapViewportDecl;
+export interface MapViewportInterface extends MapViewportType {}
+export const MapViewport: MapViewportInterface = MapViewportDecl;
+export interface IMapViewport extends Instance<MapViewportInterface> {}
+
