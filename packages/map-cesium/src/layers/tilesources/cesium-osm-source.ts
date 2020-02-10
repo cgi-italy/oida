@@ -1,7 +1,7 @@
-import createOpenStreetMapImageryProvider from 'cesium/Source/Scene/createOpenStreetMapImageryProvider';
+import OpenStreetMapImageryProvider  from 'cesium/Source/Scene/OpenStreetMapImageryProvider';
 
 import { cesiumTileSourcesFactory } from './cesium-tilesources-factory';
 
 cesiumTileSourcesFactory.register('osm', (config) => {
-    return createOpenStreetMapImageryProvider(config);
+    return new OpenStreetMapImageryProvider(config);
 });

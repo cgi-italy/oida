@@ -297,6 +297,7 @@ export class CesiumMapRenderer implements IMapRenderer {
                 scene.drawingBufferWidth,
                 scene.drawingBufferHeight,
                 distance,
+                scene.pixelRatio,
                 pixelSize
             );
 
@@ -321,6 +322,7 @@ export class CesiumMapRenderer implements IMapRenderer {
                 scene.drawingBufferWidth,
                 scene.drawingBufferHeight,
                 distance,
+                scene.pixelRatio,
                 pixelSize
             );
 
@@ -342,6 +344,7 @@ export class CesiumMapRenderer implements IMapRenderer {
                 scene.drawingBufferWidth,
                 scene.drawingBufferHeight,
                 camera.positionCartographic.height,
+                scene.pixelRatio,
                 pixelSize
             );
 
@@ -363,6 +366,7 @@ export class CesiumMapRenderer implements IMapRenderer {
                 this.viewer_.scene.drawingBufferWidth,
                 this.viewer_.scene.drawingBufferHeight,
                 1,
+                this.viewer_.scene.pixelRatio,
                 pixelSize
             );
             distance = viewProps.resolution / Math.max(pixelSize.x, pixelSize.y);
