@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.1.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/map-cesium@1.0.0...@oida/map-cesium@1.1.0) (2020-02-12)
+
+
+### Bug Fixes
+
+* fix cesium layers not updating on visibility/opacity change ([56c9c83](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/56c9c832dda06049b6b56f2aa881a4d6d6847ff7))
+* fix samples and feature-layer-controller typing error ([441f677](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/441f677df296dba458e536702dcde3e16966ecbb))
+* fix tileload event reset on source change ([13d9bc7](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/13d9bc75167dc3bdaa5cc6c4e0a1e070b8dff727))
+* optimize imagery layer updates ([a81307d](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/a81307d809587786a89ed9b1dc7fb6840893cc6b))
+
+
+### Features
+
+* add maplayer loading state ([5f01f84](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/5f01f84c82d63dc55c6d13826988546c35e06335))
+* add support for layer extent ([7e62e06](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/7e62e065e28573e11968ad848b20b922d40c3ab1))
+* add support for map layer zIndex ([b6ec75b](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/b6ec75b3d4a3b53f5f59c34ce2c2156852265fbd))
+* extend geometry with bbox and circle types ([0612690](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/0612690fdf26a53fd236d2de3d36a04953503043))
+
+
+
+
+
 # 1.0.0 (2019-04-09)
 
 

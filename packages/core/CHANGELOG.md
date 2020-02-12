@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.1.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/core@1.0.0...@oida/core@1.1.0) (2020-02-12)
+
+
+### Bug Fixes
+
+* fix area unit labels ([22f5543](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/22f5543d72cdbd836f62eea6a98eef889929448a))
+
+
+### Features
+
+* **core:** add file size formatter ([1ebdffe](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/1ebdffe9faf2baf6467d4c59d76994795bf9c036))
+* **state-mst:** add MaybeType ([e8a0518](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/e8a051824ad0392885b6cf4d5cf62da477d41172))
+* add filter type in data filtering state ([2819562](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/2819562cdedb9ba1ebdd1c36b790878e41deff0c))
+* add initial support for image layers ([6aab5fd](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/6aab5fd56c3709bb21b95fd5d71227fc7e1b8d71))
+* add promise wrapper helper function ([17f5bdb](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/17f5bdb146a6545769235ed6becb1f5b3706a305))
+* add support for layer extent ([7e62e06](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/7e62e065e28573e11968ad848b20b922d40c3ab1))
+* add support for map layer zIndex ([b6ec75b](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/b6ec75b3d4a3b53f5f59c34ce2c2156852265fbd))
+* extend axios instance with cancelable request ([b4c520b](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/b4c520b9c37e54683c616323238c8515cfdeb0ed))
+* extend geometry with bbox and circle types ([0612690](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/0612690fdf26a53fd236d2de3d36a04953503043))
+
+
+
+
+
 # 1.0.0 (2019-04-09)
 
 

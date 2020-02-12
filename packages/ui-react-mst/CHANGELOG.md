@@ -3,6 +3,41 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.0.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/ui-react-mst@1.0.0...@oida/ui-react-mst@2.0.0) (2020-02-12)
+
+
+### Bug Fixes
+
+* allow undefined in custom hooks ([23a300f](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/23a300f81c82e6d9695b83821e0e61b31ef5418a))
+* minor fixes ([470fa4a](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/470fa4aa19578e6a2bcb77fe12c8cd1e560bf688))
+
+
+### Code Refactoring
+
+* dynamiclayout module renamings ([0f79a43](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/0f79a4344fea852ce0cb27f3bb6e6e91a2e958e2))
+* use react hooks in data collection state management ([626e14d](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/626e14d20d4460b327b1f502e39ae8a7ca7b925f))
+
+
+### Features
+
+* add filter type in data filtering state ([2819562](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/2819562cdedb9ba1ebdd1c36b790878e41deff0c))
+* add initial dataset tools support ([8d0cb1f](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/8d0cb1fba2a47c211fe56b61baaf2501b547de9e))
+* add linkToViewport action on AoiField ([153033c](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/153033cba2b60725a578f9c3bdd0e1e8e0e9b5b6))
+* add point support to aoi drawer ([e569b25](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/e569b253e195eca08a9ae608355d9de28aed0dca))
+* add preliminary aoi import support ([1e11eb3](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/1e11eb3fd026c134fbd62ddc39463557edd8c2f5))
+* add some useful map hooks ([d579671](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/d57967138baf7cac0020053e27d2638fb41dad8b))
+
+
+### BREAKING CHANGES
+
+* use DynamicSections new namings in place of old DynamicLayout ones
+* data collection related components are now based on hooks. Old renderProps based
+components were removed
+
+
+
+
+
 # 1.0.0 (2019-04-09)
 
 

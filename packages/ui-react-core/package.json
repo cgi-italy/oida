@@ -1,6 +1,6 @@
 {
   "name": "@oida/ui-react-core",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "ui core components",
   "module": "dist/ui-react-core.js",
   "main": "dist/ui-react-core.cjs.js",

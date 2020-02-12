@@ -1,6 +1,6 @@
 {
   "name": "@oida/ui-react-antd",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "antd components",
   "typescript:main": "src/index.ts",
   "module": "dist/ui-react-antd.js",

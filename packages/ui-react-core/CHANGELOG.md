@@ -3,6 +3,34 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.0.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/ui-react-core@1.0.0...@oida/ui-react-core@2.0.0) (2020-02-12)
+
+
+### Code Refactoring
+
+* dynamiclayout module renamings ([0f79a43](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/0f79a4344fea852ce0cb27f3bb6e6e91a2e958e2))
+* use react hooks in data collection state management ([626e14d](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/626e14d20d4460b327b1f502e39ae8a7ca7b925f))
+
+
+### Features
+
+* add linkToViewport action on AoiField ([153033c](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/153033cba2b60725a578f9c3bdd0e1e8e0e9b5b6))
+* add numeric range field ([e005475](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/e005475744a4cee15fc665dc2ffc906c6e1919b3))
+* add point support to aoi drawer ([e569b25](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/e569b253e195eca08a9ae608355d9de28aed0dca))
+* add preliminary aoi import support ([1e11eb3](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/1e11eb3fd026c134fbd62ddc39463557edd8c2f5))
+* add reusable app layouts ([48ad1e9](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/48ad1e9fdb11916184083e0cf43e2e216cac7406))
+
+
+### BREAKING CHANGES
+
+* use DynamicSections new namings in place of old DynamicLayout ones
+* data collection related components are now based on hooks. Old renderProps based
+components were removed
+
+
+
+
+
 # 1.0.0 (2019-04-09)
 
 

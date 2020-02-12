@@ -1,6 +1,6 @@
 {
   "name": "@oida/state-mst",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "oida mst state management library",
   "module": "dist/state-mst.js",
   "main": "dist/state-mst.cjs.js",

@@ -1,6 +1,6 @@
 {
   "name": "@oida/core",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "core utils and definitions",
   "module": "dist/core.js",
   "main": "dist/core.cjs.js",
@@ -25,9 +25,9 @@
   "dependencies": {
     "@turf/bbox": "^6.0.1",
     "@turf/bbox-polygon": "^6.0.1",
+    "@turf/boolean-disjoint": "^6.0.2",
     "@turf/circle": "^6.0.1",
     "@turf/flip": "^5.1.5",
-    "@turf/boolean-disjoint": "^6.0.2",
     "axios": "^0.18.1",
     "browser-bunyan": "^1.4.0",
     "geodesy": "^1.1.3",

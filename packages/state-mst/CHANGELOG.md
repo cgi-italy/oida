@@ -3,6 +3,48 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.0.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/state-mst@1.0.0...@oida/state-mst@2.0.0) (2020-02-12)
+
+
+### Bug Fixes
+
+* fix samples and feature-layer-controller typing error ([441f677](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/441f677df296dba458e536702dcde3e16966ecbb))
+* fix some feature layer error conditions ([d38162b](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/d38162bb983c377b5dbcb324b55f086210da8012))
+* fix TaggedUnion getSpecificType with search for child Unions ([7ed3514](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/7ed3514f90ddcffa932170d0cb4a8a316e43548a))
+* minor fixes ([c681a1a](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/c681a1a619fd626c44d766f07bfa61343d8e5e63))
+* use reference snapshot as key for reference types in ArrayTracker ([5a72dc5](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/5a72dc5b115098593965f595bc6e52ca61db333e))
+
+
+### Code Refactoring
+
+* improve EntityReference type ([37cfb2b](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/37cfb2bddbcf7196270b12ef7d055f8c761131a5))
+
+
+### Features
+
+* accept existing tree node instances as input for ReferenceOrType ([ea811ec](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/ea811ec6fb3f54e865927656b25729f7f382fb65))
+* **state-mst:** add MaybeType ([e8a0518](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/e8a051824ad0392885b6cf4d5cf62da477d41172))
+* add filter type in data filtering state ([2819562](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/2819562cdedb9ba1ebdd1c36b790878e41deff0c))
+* add generic MST non serializable object type ([688c723](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/688c7233757597e3d501d6521f8952b59cb44001))
+* add hasConfig and isDataProvider mixin types ([6f1ac27](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/6f1ac277c6ca9f822dec658b443bc7583c1cb84e))
+* add initial support for image layers ([6aab5fd](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/6aab5fd56c3709bb21b95fd5d71227fc7e1b8d71))
+* add maplayer loading state ([5f01f84](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/5f01f84c82d63dc55c6d13826988546c35e06335))
+* add needsConfig mixin ([5c4e1f7](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/5c4e1f71c5bfb97541300048be8de66a2970e6da))
+* add percentage to loadingState mixin ([3c320ec](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/3c320ecce8da8e776e1058a07d06c61b61400323))
+* add support for layer extent ([7e62e06](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/7e62e065e28573e11968ad848b20b922d40c3ab1))
+* add support for map layer zIndex ([b6ec75b](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/b6ec75b3d4a3b53f5f59c34ce2c2156852265fbd))
+* allow to set a custom name for collection type ([91be618](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/91be61836545ca9380e84f0d97c8d068c870f4d3))
+* allow usage of layer references as GroupLayer children ([4ca7929](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/4ca7929b560af7a6f496485f26466ca65447053e))
+
+
+### BREAKING CHANGES
+
+* EntityReference now is a function that takes the entity type as input
+
+
+
+
+
 # 1.0.0 (2019-04-09)
 
 

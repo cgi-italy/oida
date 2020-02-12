@@ -3,6 +3,29 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.1.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/map-ol@1.0.0...@oida/map-ol@1.1.0) (2020-02-12)
+
+
+### Bug Fixes
+
+* fix ol tilegrid computation for non uniform resolution extents ([a68e036](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/a68e0363562233e274c1b6d58f33a7aad713018e))
+* fix some feature layer error conditions ([d38162b](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/d38162bb983c377b5dbcb324b55f086210da8012))
+* minor fixes ([470fa4a](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/470fa4aa19578e6a2bcb77fe12c8cd1e560bf688))
+
+
+### Features
+
+* add crossOrigin option to wms and wmts tile sources ([1f53fbb](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/1f53fbbed5484b74a136b80e2769c4bd90f38e4e))
+* add initial support for image layers ([6aab5fd](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/6aab5fd56c3709bb21b95fd5d71227fc7e1b8d71))
+* add maplayer loading state ([5f01f84](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/5f01f84c82d63dc55c6d13826988546c35e06335))
+* add support for layer extent ([7e62e06](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/7e62e065e28573e11968ad848b20b922d40c3ab1))
+* add support for map layer zIndex ([b6ec75b](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/b6ec75b3d4a3b53f5f59c34ce2c2156852265fbd))
+* extend geometry with bbox and circle types ([0612690](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/0612690fdf26a53fd236d2de3d36a04953503043))
+
+
+
+
+
 # 1.0.0 (2019-04-09)
 
 
