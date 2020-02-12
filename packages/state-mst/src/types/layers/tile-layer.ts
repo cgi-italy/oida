@@ -7,10 +7,15 @@ import { MapLayer } from './map-layer';
 const TileLayerDecl = MapLayer.addModel(
     types.model(TILE_LAYER_ID, {
         source: types.frozen(),
+        sourceRevision: types.optional(types.number, 0)
     }).actions((self) => {
         return {
             setSource: (source) => {
                 self.source = source;
+                self.sourceRevision = 0;
+            },
+            forceRefresh: () => {
+                self.sourceRevision++;
             }
         };
     })

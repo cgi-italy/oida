@@ -1,19 +1,20 @@
 import ImageryLayer from 'cesium/Source/Scene/ImageryLayer';
 import Rectangle from 'cesium/Source/Core/Rectangle';
 import Event from 'cesium/Source/Core/Event';
-import { TILE_LAYER_ID } from '@oida/core';
+
+import { TILE_LAYER_ID, ITileLayerRenderer } from '@oida/core';
 
 import { cesiumTileSourcesFactory } from './tilesources/cesium-tilesources-factory';
-
 import { cesiumLayersFactory } from './cesium-layers-factory';
 import { CesiumMapLayer } from './cesium-map-layer';
 
-export class CesiumTileLayer  extends CesiumMapLayer {
+export class CesiumTileLayer extends CesiumMapLayer implements ITileLayerRenderer {
 
     protected onTileLoadStart_;
     protected onTileLoadEnd_;
     protected source_;
     protected extent_;
+    protected sourceConfig_;
 
 
     constructor(config) {
@@ -74,6 +75,12 @@ export class CesiumTileLayer  extends CesiumMapLayer {
         } catch (e) {
 
         }
+
+        this.sourceConfig_ = config;
+    }
+
+    forceRefresh() {
+        this.updateSource(this.sourceConfig_);
     }
 
     setExtent(extent) {

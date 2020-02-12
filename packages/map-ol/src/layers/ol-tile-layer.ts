@@ -1,10 +1,13 @@
 import TileLayer from 'ol/layer/Tile';
+
+import { TILE_LAYER_ID, ITileLayerRenderer } from '@oida/core';
+
 import { olTileSourcesFactory } from './tilesources/ol-tilesources-factory';
 
 import { olLayersFactory } from './ol-layers-factory';
 import { OLMapLayer } from './ol-map-layer';
 
-export class OLTileLayer  extends OLMapLayer<TileLayer> {
+export class OLTileLayer extends OLMapLayer<TileLayer> implements ITileLayerRenderer {
 
     protected onTileLoadStart_;
     protected onTileLoadEnd_;
@@ -24,6 +27,16 @@ export class OLTileLayer  extends OLMapLayer<TileLayer> {
 
         let source = config ? this.createTileSource_(config) : undefined;
         this.olImpl_.setSource(source);
+    }
+
+    forceRefresh() {
+        let source = this.olImpl_.getSource();
+        if (source) {
+            for (const id in source.tileCacheForProjection) {
+                source.tileCacheForProjection[id].pruneExceptNewestZ();
+            }
+            source.setKey(new Date().toISOString());
+        }
     }
 
 
@@ -65,6 +78,6 @@ export class OLTileLayer  extends OLMapLayer<TileLayer> {
 
 }
 
-olLayersFactory.register('tile', (config) => {
+olLayersFactory.register(TILE_LAYER_ID, (config) => {
     return new OLTileLayer(config);
 });

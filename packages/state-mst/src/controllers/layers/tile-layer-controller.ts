@@ -69,6 +69,12 @@ export class TileLayerController extends MapLayerController<ITileLayerRenderer, 
             })
         );
 
+        this.subscriptionTracker_.addSubscription(
+            observe(this.mapLayer_, 'sourceRevision', (change) => {
+                this.layerRenderer_!.forceRefresh();
+            })
+        );
+
     }
 
 }
