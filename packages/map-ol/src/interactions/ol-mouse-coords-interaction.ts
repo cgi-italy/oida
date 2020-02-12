@@ -1,4 +1,4 @@
-import { listen, unlisten } from 'ol/events';
+import { listen, unlistenByKey } from 'ol/events';
 import EventType from 'ol/events/EventType';
 import { transform } from 'ol/proj';
 
@@ -24,7 +24,7 @@ export class OLMouseCoordsInteraction implements IMouseCoordsInteraction {
             this.bindMove_(this.onMouseCoords_);
         } else {
             this.evtSubscriptions_.forEach((subscription) => {
-                unlisten(subscription.target, subscription.type, subscription.listener);
+                unlistenByKey(subscription);
             });
             this.evtSubscriptions_ = [];
         }

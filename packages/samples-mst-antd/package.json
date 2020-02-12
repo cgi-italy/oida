@@ -29,7 +29,7 @@
     "mobx": "^4.9.4",
     "mobx-react": "^6.1.1",
     "mobx-state-tree": "^3.14.1",
-    "ol": "^5.3.1",
+    "ol": "^6.2.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-router": "^5.1.2",

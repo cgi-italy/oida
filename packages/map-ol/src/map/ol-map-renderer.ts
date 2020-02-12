@@ -16,6 +16,8 @@ import { olInteractionsFactory } from '../interactions/ol-interactions-factory';
 
 import { OLGroupLayer } from '../layers';
 
+import 'ol/ol.css';
+
 export const OL_RENDERER_ID = 'ol';
 
 export class OLMapRenderer implements IMapRenderer {
