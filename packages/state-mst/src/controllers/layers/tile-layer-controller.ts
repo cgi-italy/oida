@@ -29,7 +29,7 @@ export class TileLayerController extends MapLayerController<ITileLayerRenderer, 
 
         const onTileLoadEnd = () => {
             this.tileLoadingState_.loaded++;
-            if (this.tileLoadingState_.pending === this.tileLoadingState_.loaded) {
+            if (this.tileLoadingState_.pending <= this.tileLoadingState_.loaded) {
                 this.mapLayer_.setLoadingProps({
                     state: LoadingState.Success,
                     percentage: 100
@@ -59,22 +59,27 @@ export class TileLayerController extends MapLayerController<ITileLayerRenderer, 
 
         this.subscriptionTracker_.addSubscription(
             observe(this.mapLayer_, 'source', (change) => {
-                this.tileLoadingState_.pending = 0;
-                this.tileLoadingState_.loaded = 0;
-                this.mapLayer_.setLoadingProps({
-                    state: LoadingState.Success,
-                    percentage: 100
-                });
+                this.resetLoadingState_();
                 this.layerRenderer_!.updateSource(change.newValue.value);
             })
         );
 
         this.subscriptionTracker_.addSubscription(
             observe(this.mapLayer_, 'sourceRevision', (change) => {
+                this.resetLoadingState_();
                 this.layerRenderer_!.forceRefresh();
             })
         );
 
+    }
+
+    protected resetLoadingState_() {
+        this.tileLoadingState_.pending = 0;
+        this.tileLoadingState_.loaded = 0;
+        this.mapLayer_.setLoadingProps({
+            state: LoadingState.Success,
+            percentage: 100
+        });
     }
 
 }
