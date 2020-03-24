@@ -103,6 +103,7 @@
     "@oida/eo": "file:packages\\eo",
     "@oida/eo-ui": "file:packages\\eo-ui",
     "@oida/map-cesium": "file:packages\\map-cesium",
+    "@oida/map-cesium-ol-tile-source": "file:packages\\map-cesium-ol-tile-source",
     "@oida/map-ol": "file:packages\\map-ol",
     "@oida/samples-mst-antd": "file:packages\\samples-mst-antd",
     "@oida/state-mst": "file:packages\\state-mst",

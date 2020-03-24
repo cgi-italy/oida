@@ -1,0 +1,29 @@
+{
+  "name": "@oida/map-cesium-ol-tile-source",
+  "version": "0.0.1",
+  "description": "Cesium map renderer wrapper library",
+  "module": "dist/map-cesium-ol-tile-source.js",
+  "main": "dist/map-cesium-ol-tile-source.cjs.js",
+  "types": "dist/types/index.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "rollup --config rollup.config.js",
+    "build:cjs": "rollup --config rollup.config.js --environment FORMAT:cjs",
+    "clean": "rimraf ./dist ./.rpt2_cache",
+    "watch": "rollup --config rollup.config.js --watch",
+    "lint": "tslint --project ./tsconfig.json",
+    "test": "jest --config jest.config.js"
+  },
+  "author": "stefano marra",
+  "license": "UNLICENSED",
+  "publishConfig": {
+    "registry": "https://nexus.dev.eoss-cloud.it/repository/npm-cgi-eo/"
+  },
+  "dependencies": {
+    "@oida/map-cesium": "file:../map-cesium",
+    "@oida/map-ol": "file:../map-ol"
+  }
+}
