@@ -3,9 +3,9 @@ import Color from 'cesium/Source/Core/Color';
 import Material from 'cesium/Source/Scene/Material';
 import PolylineCollection from 'cesium/Source/Scene/PolylineCollection';
 
-import { CesiumGeometryRenderer } from './cesium-geometry-renderer';
+import { CesiumGeometryPrimitiveRenderer } from './cesium-geometry-primitive-renderer';
 
-export class CesiumLineRenderer implements CesiumGeometryRenderer {
+export class CesiumLinePrimitiveRenderer implements CesiumGeometryPrimitiveRenderer {
 
     protected polylines_: PolylineCollection;
     protected clampToGround_: boolean = false;
@@ -23,12 +23,15 @@ export class CesiumLineRenderer implements CesiumGeometryRenderer {
         let feature: any = null;
         if (geometry.type === 'LineString') {
             feature = this.createPolyline_(id, geometry.coordinates, style);
+            feature.entityId_ = id;
         } else if (geometry.type === 'MultiLineString') {
             feature = [];
-            let points = geometry.coordinates;
-            for (let i = 0; i < geometry.coordinates.length; ++i) {
-                let point_feature = this.createPolyline_(`${id}_${i}`, geometry.coordinates[i], style);
-                feature.push(point_feature);
+            let lines = geometry.coordinates;
+            for (let i = 0; i < lines.length; ++i) {
+                let lineFeature = this.createPolyline_(`${id}_${i}`, lines[i], style);
+                feature.push(lineFeature);
+
+                lineFeature.entityId_ = id;
             }
 
             feature.id = id;
@@ -51,7 +54,9 @@ export class CesiumLineRenderer implements CesiumGeometryRenderer {
                 }
             }
             for (let j = i; j < geometry.coordinates.length; ++j) {
-                feature.push(this.createPolyline_(`${feature.id}_${i}`, geometry.coordinates[j], feature.style));
+                let lineFeature = this.createPolyline_(`${feature.id}_${i}`, geometry.coordinates[j], feature.style);
+                feature.push(lineFeature);
+                lineFeature.entityId_ = feature.id;
             }
         } else {
             this.updatePolylineGeometry_(feature, geometry.coordinates);

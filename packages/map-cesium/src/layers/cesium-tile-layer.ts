@@ -2,10 +2,9 @@ import ImageryLayer from 'cesium/Source/Scene/ImageryLayer';
 import Rectangle from 'cesium/Source/Core/Rectangle';
 import Event from 'cesium/Source/Core/Event';
 
-import { TILE_LAYER_ID, ITileLayerRenderer } from '@oida/core';
+import { ITileLayerRenderer } from '@oida/core';
 
 import { cesiumTileSourcesFactory } from './tilesources/cesium-tilesources-factory';
-import { cesiumLayersFactory } from './cesium-layers-factory';
 import { CesiumMapLayer } from './cesium-map-layer';
 
 export class CesiumTileLayer extends CesiumMapLayer implements ITileLayerRenderer {
@@ -98,7 +97,3 @@ export class CesiumTileLayer extends CesiumMapLayer implements ITileLayerRendere
     }
 
 }
-
-cesiumLayersFactory.register(TILE_LAYER_ID, (config) => {
-    return new CesiumTileLayer(config);
-});

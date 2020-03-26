@@ -15,9 +15,9 @@ import GroundPrimitive from 'cesium/Source/Scene/GroundPrimitive';
 import Primitive from 'cesium/Source/Scene/Primitive';
 import PerInstanceColorAppearance from 'cesium/Source/Scene/PerInstanceColorAppearance';
 
-import { CesiumGeometryRenderer } from './cesium-geometry-renderer';
+import { CesiumGeometryPrimitiveRenderer } from './cesium-geometry-primitive-renderer';
 
-export class CesiumPolygonRenderer implements CesiumGeometryRenderer {
+export class CesiumPolygonPrimitiveRenderer implements CesiumGeometryPrimitiveRenderer {
 
     protected polygons_: PrimitiveCollection;
     protected clampToGround_: boolean = false;
@@ -88,6 +88,9 @@ export class CesiumPolygonRenderer implements CesiumGeometryRenderer {
                 }
             })
         }));
+
+        fill.entityId_ = id;
+        stroke.entityId_  = id;
 
         let feature = {
             id: id,

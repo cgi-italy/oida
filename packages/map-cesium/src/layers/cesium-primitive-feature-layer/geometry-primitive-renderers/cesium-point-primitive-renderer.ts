@@ -4,9 +4,12 @@ import Color from 'cesium/Source/Core/Color';
 import HeightReference from 'cesium/Source/Scene/HeightReference';
 import BillboardCollection from 'cesium/Source/Scene/BillboardCollection';
 import PointPrimitiveCollection  from 'cesium/Source/Scene/PointPrimitiveCollection';
-import { CesiumGeometryRenderer } from './cesium-geometry-renderer';
 
-export class CesiumPointRenderer implements CesiumGeometryRenderer {
+import { IPointStyle, isIcon } from '@oida/core';
+
+import { CesiumGeometryPrimitiveRenderer } from './cesium-geometry-primitive-renderer';
+
+export class CesiumPointPrimitiveRenderer implements CesiumGeometryPrimitiveRenderer {
     private billboards_: BillboardCollection;
     private points_: PointPrimitiveCollection;
     private primitives_: PrimitiveCollection;
@@ -33,17 +36,32 @@ export class CesiumPointRenderer implements CesiumGeometryRenderer {
         return this.primitives_;
     }
 
-    addFeature(id, geometry, style) {
+    addFeature(id, geometry, style: IPointStyle) {
 
         let feature: any = null;
 
         if (geometry.type === 'Point') {
-            feature = this.createBillboard_(id, geometry.coordinates, style);
+            if (isIcon(style)) {
+                feature = this.createBillboard_(id, geometry.coordinates, style);
+            } else {
+                feature = this.createPoint_(id, geometry.coordinates, style);
+            }
+
+            feature.entityId_ = id;
+
         } else if (geometry.type === 'MultiPoint') {
             feature = [];
             let points = geometry.coordinates;
-            for (let i = 0; i < geometry.coordinates.length; ++i) {
-                let pointFeature = this.createBillboard_(`${id}_${i}`, geometry.coordinates[i], style);
+            for (let i = 0; i < points.length; ++i) {
+                let pointFeature;
+                if (isIcon(style)) {
+                    pointFeature = this.createBillboard_(`${id}_${i}`, points[i], style);
+                } else {
+                    pointFeature = this.createPoint_(`${id}_${i}`, points[i], style);
+                }
+
+                pointFeature.entityId_ = id;
+
                 feature.push(pointFeature);
             }
 
@@ -62,10 +80,19 @@ export class CesiumPointRenderer implements CesiumGeometryRenderer {
                     this.updateBillboardGeometry_(feature[i], geometry.coordinates[i]);
                 else {
                     this.billboards_.remove(feature[i]);
+                    this.points_.remove(feature[i]);
                 }
             }
             for (let j = i; j < geometry.coordinates.length; ++j) {
-                feature.push(this.createBillboard_(`${feature.id}_${i}`, geometry.coordinates[j], feature.style));
+                let pointFeature;
+                if (isIcon(feature.style)) {
+                    pointFeature = this.createBillboard_(`${feature.id}_${i}`, geometry.coordinates[j], feature.style);
+                } else {
+                    pointFeature = this.createPoint_(`${feature.id}_${i}`, geometry.coordinates[j], feature.style);
+                }
+
+                pointFeature.entityId_ = feature.id;
+                feature.push(pointFeature);
             }
         } else {
             this.updateBillboardGeometry_(feature, geometry.coordinates);
@@ -75,10 +102,19 @@ export class CesiumPointRenderer implements CesiumGeometryRenderer {
     updateStyle(feature, style) {
         if (this.isMultiPoint_(feature)) {
             for (let point of feature) {
-                this.updateBillboardStyle_(point, style);
+                if (isIcon(style)) {
+                    this.updateBillboardStyle_(point, style);
+                } else {
+                    this.updatePointStyle_(point, style);
+                }
             }
+            feature.style = style;
         } else {
-            this.updateBillboardStyle_(feature, style);
+            if (isIcon(style)) {
+                this.updateBillboardStyle_(feature, style);
+            } else {
+                this.updatePointStyle_(feature, style);
+            }
         }
     }
 
@@ -86,9 +122,11 @@ export class CesiumPointRenderer implements CesiumGeometryRenderer {
         if (this.isMultiPoint_(feature)) {
             for (let point of feature) {
                 this.billboards_.remove(point);
+                this.points_.remove(point);
             }
         } else {
             this.billboards_.remove(feature);
+            this.points_.remove(feature);
         }
     }
 
@@ -140,6 +178,36 @@ export class CesiumPointRenderer implements CesiumGeometryRenderer {
         if (style.rotation) {
             billboard.rotation = style.rotation;
         }
+    }
+
+    protected createPoint_(id, coordinates, style) {
+        return this.points_.add({
+            id: id,
+            show: style.visible,
+            position: Cartesian3.fromDegrees(...coordinates),
+            pixelSize: style.radius ? style.radius * 2 : 1,
+            color: style.fillColor ? new Color(...style.fillColor) : undefined,
+            outlineColor: style.strokeColor ? new Color(...style.strokeColor) : undefined
+        });
+    }
+
+    protected updatePointStyle_(point, style) {
+
+        point.show = style.visible;
+
+        if (style.fillColor) {
+            point.color = new Color(...style.fillColor);
+        }
+        if (style.strokeColor) {
+            point.outlineColor = new Color(...style.strokeColor);
+        }
+
+        if (style.radius) {
+            point.pixelSize = style.radius * 2;
+        } else {
+            point.pixelSize = 1;
+        }
+
     }
 
     protected isMultiPoint_(feature) {

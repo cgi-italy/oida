@@ -1,4 +1,7 @@
 import PrimitiveCollection from 'cesium/Source/Scene/PrimitiveCollection';
+
+import DataSourceCollection from 'cesium/Source/DataSources/DataSourceCollection';
+import CustomDataSource from 'cesium/Source/DataSources/CustomDataSource';
 import ImageryLayerCollection from 'cesium/Source/Scene/ImageryLayerCollection';
 import ImageryLayer from 'cesium/Source/Scene/ImageryLayer';
 
@@ -14,18 +17,22 @@ export class CesiumMapLayer implements ILayerRenderer {
     protected alpha_: number = 1.0;
     protected imageries_;
     protected primitives_;
+    protected dataSources_;
 
     constructor(config) {
         this.mapRenderer_ = config.mapRenderer;
 
         this.initImageries_();
         this.initPrimitives_();
+        this.initDataSources_();
     }
 
     setVisible(visible) {
         this.visible_ = visible;
         this.primitives_.show = visible;
         this.updateImageryVisibility_(this.imageries_, this.parent_ ? this.parent_.isVisible() : true);
+        this.updateDataSourcesVisibility_(this.dataSources_, this.parent_ ? this.parent_.isVisible() : true);
+
         this.mapRenderer_.getViewer().scene.requestRender();
     }
 
@@ -36,11 +43,15 @@ export class CesiumMapLayer implements ILayerRenderer {
     }
 
     setZIndex(zIndex) {
-        console.warn('layer zIndex not supported');
+        this.imageries_.zIndex = zIndex;
+        this.mapRenderer_.refreshImageriesFromEvent({
+            type: 'zIndex',
+            collection: this.imageries_,
+            zIndex: zIndex
+        });
     }
 
     setExtent(extent) {
-        console.warn('layer extent not supported');
     }
 
     setParent(parent) {
@@ -49,6 +60,7 @@ export class CesiumMapLayer implements ILayerRenderer {
         if (this.parent_) {
             this.updateImageryOpacity_(this.imageries_);
             this.updateImageryVisibility_(this.imageries_, this.parent_.isVisible());
+            this.updateDataSourcesVisibility_(this.dataSources_, this.parent_.isVisible());
         }
     }
 
@@ -76,11 +88,19 @@ export class CesiumMapLayer implements ILayerRenderer {
         return this.primitives_;
     }
 
+    getDataSources() {
+        return this.dataSources_;
+    }
+
     destroy() {
         this.imageries_.layerAdded.removeEventListener(this.onAddImageries_, this);
         this.imageries_.layerRemoved.removeEventListener(this.onRemoveImageries_, this);
 
+        this.dataSources_.dataSourceAdded.removeEventListener(this.onAddDataSources_, this);
+        this.dataSources_.dataSourceRemoved.removeEventListener(this.onRemoveDataSources_, this);
+
         this.primitives_.destroy();
+        this.dataSources_.destroy();
         this.imageries_.destroy();
     }
 
@@ -97,6 +117,12 @@ export class CesiumMapLayer implements ILayerRenderer {
         });
     }
 
+    protected initDataSources_() {
+        this.dataSources_ = new DataSourceCollection();
+
+        this.dataSources_.dataSourceAdded.addEventListener(this.onAddDataSources_, this);
+        this.dataSources_.dataSourceRemoved.addEventListener(this.onRemoveDataSources_, this);
+    }
 
     protected onAddImageries_(imageries, idx) {
 
@@ -121,6 +147,31 @@ export class CesiumMapLayer implements ILayerRenderer {
             });
         }
     }
+
+    protected onAddDataSources_(dataSources, idx) {
+
+        if (dataSources instanceof CustomDataSource || dataSources.length) {
+            this.mapRenderer_.refreshDataSourcesFromEvent({
+                type: 'add',
+                collection: this.dataSources_,
+                item: dataSources,
+                idx: idx
+            });
+        }
+    }
+
+    protected onRemoveDataSources_(dataSources, idx) {
+
+        if (dataSources instanceof CustomDataSource || dataSources.length) {
+            this.mapRenderer_.refreshDataSourcesFromEvent({
+                type: 'remove',
+                collection: this.dataSources_,
+                item: dataSources,
+                idx: idx
+            });
+        }
+    }
+
 
     protected updateImageryVisibility_(imageries, parentVisible) {
 
@@ -147,6 +198,17 @@ export class CesiumMapLayer implements ILayerRenderer {
                 this.updateImageryOpacity_(imageries.get(i));
             }
         }
+    }
 
+    protected updateDataSourcesVisibility_(dataSources, parentVisible) {
+        dataSources = dataSources || this.dataSources_;
+
+        if (dataSources instanceof CustomDataSource) {
+            dataSources.show = this.visible_ && parentVisible;
+        } else {
+            for (let i = 0; i < dataSources.length; ++i) {
+                this.updateDataSourcesVisibility_(dataSources.get(i), this.visible_ && parentVisible);
+            }
+        }
     }
 }

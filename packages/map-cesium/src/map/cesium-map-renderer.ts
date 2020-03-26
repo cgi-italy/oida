@@ -14,6 +14,11 @@ import IntersectionTests from 'cesium/Source/Core/IntersectionTests';
 import Plane from 'cesium/Source/Core/Plane';
 
 import ImageryLayer from 'cesium/Source/Scene/ImageryLayer';
+import CustomDataSource from 'cesium/Source/DataSources/CustomDataSource';
+import DataSourceCollection from 'cesium/Source/DataSources/DataSourceCollection';
+import DataSourceDisplay from 'cesium/Source/DataSources/DataSourceDisplay';
+
+import { updateDataSource } from '../utils';
 
 import 'cesium/Source/Widgets/CesiumWidget/CesiumWidget.css';
 
@@ -31,6 +36,8 @@ export class CesiumMapRenderer implements IMapRenderer {
 
     private viewer_: CesiumWidget;
     private layerGroup_: CesiumGroupLayer | undefined;
+    private dataSourceCollection_;
+    private dataSourceDisplay_;
 
     constructor(props: IMapRendererProps) {
         this.initRenderer_(props);
@@ -90,7 +97,9 @@ export class CesiumMapRenderer implements IMapRenderer {
     setLayerGroup(group: CesiumGroupLayer) {
         this.layerGroup_ = group;
         this.viewer_.scene.primitives.add(group.getPrimitives());
+
         this.refreshImageries();
+        this.refreshDataSources();
     }
 
     getLayersFactory() {
@@ -180,6 +189,86 @@ export class CesiumMapRenderer implements IMapRenderer {
         }
     }
 
+    refreshDataSources() {
+
+        if (!this.layerGroup_) {
+            return;
+        }
+        let rootCollection = this.layerGroup_.getDataSources()._dataSources;
+
+        let reduceFunction = (datasources, item) => {
+            if (item instanceof CustomDataSource) {
+                return [...datasources, item];
+            } else {
+                return item._dataSources.reduce(reduceFunction, datasources);
+            }
+        };
+
+        let dataSources = rootCollection.reduce(reduceFunction, []);
+
+        this.dataSourceCollection_.removeAll(false);
+
+        dataSources.forEach((item) => {
+            this.dataSourceCollection_.add(item);
+        });
+    }
+
+    refreshDataSourcesFromEvent(evt) {
+
+        if (!this.layerGroup_) {
+            return;
+        }
+
+        let {type, collection, item, idx} = evt;
+
+        if (type === 'add') {
+            let globalindexFound = false;
+
+            let rootCollection = this.layerGroup_.getDataSources()._dataSources;
+
+            const reduceFunction = ((globalIndex, item) => {
+                if (globalindexFound) {
+                    return globalIndex;
+                }
+                if (item === collection) {
+                    globalindexFound = true;
+                    return globalIndex + idx;
+                } else if (item instanceof CustomDataSource) {
+                    return globalIndex + 1;
+                } else {
+                    return item._dataSources.reduce(reduceFunction, globalIndex);
+                }
+            });
+
+            let globalIndex = rootCollection.reduce(reduceFunction, 0);
+            if (!globalindexFound) {
+                return;
+            }
+
+            let dataSourcesToAdd = this.getDataSources_(item);
+
+            dataSourcesToAdd.forEach((dataSource) => {
+                this.dataSourceCollection_.add(dataSource, globalIndex++);
+            });
+
+        } else if (type === 'remove') {
+            let dataSourcesToRemove = this.getDataSources_(item);
+            dataSourcesToRemove.forEach((dataSource) => {
+                this.dataSourceCollection_.remove(dataSource, false);
+            });
+        }
+    }
+
+    getDefaultDataSource() {
+        return this.dataSourceDisplay_.defaultDataSource;
+    }
+
+    defaultDataSourceUpdate() {
+        if (this.viewer_.scene) {
+            updateDataSource(this.dataSourceDisplay_.defaultDataSource, this.viewer_.scene);
+        }
+    }
+
     destroy() {
         let parent = this.viewer_.container.parentNode;
         if (parent) {
@@ -187,6 +276,10 @@ export class CesiumMapRenderer implements IMapRenderer {
         }
         this.viewer_.imageryLayers.removeAll(false);
         this.viewer_.scene.primitives.remove(this.layerGroup_!.getPrimitives());
+        this.dataSourceCollection_.removeAll(false);
+
+        this.dataSourceDisplay_.destroy();
+
         this.viewer_.destroy();
     }
 
@@ -205,6 +298,23 @@ export class CesiumMapRenderer implements IMapRenderer {
             return imageryOrCollection._layers.reduce(reduceFunction, []);
         }
     }
+
+    protected getDataSources_(dataSourceOrCollection) {
+        let reduceFunction = (dataSources, item) => {
+            if (item instanceof CustomDataSource) {
+                return [...dataSources, item];
+            } else {
+                return item._dataSources.reduce(reduceFunction, dataSources);
+            }
+        };
+
+        if (dataSourceOrCollection instanceof CustomDataSource) {
+            return [dataSourceOrCollection];
+        } else {
+            return dataSourceOrCollection._dataSources.reduce(reduceFunction, []);
+        }
+    }
+
 
     protected initRenderer_(props: IMapRendererProps) {
 
@@ -234,6 +344,13 @@ export class CesiumMapRenderer implements IMapRenderer {
         } else {
             this.viewer_.pendingViewport_ = props.viewport;
         }
+
+        this.dataSourceCollection_ =  new DataSourceCollection();
+
+        this.dataSourceDisplay_ = new DataSourceDisplay({
+            scene : this.viewer_.scene,
+            dataSourceCollection : this.dataSourceCollection_
+        });
 
 
         if (props.onViewUpdating) {

@@ -1,7 +1,6 @@
-import { CesiumMapLayer } from './cesium-map-layer';
-import { cesiumLayersFactory } from './cesium-layers-factory';
+import { IGroupLayerRenderer } from '@oida/core';
 
-import { GROUP_LAYER_ID, IGroupLayerRenderer } from '@oida/core';
+import { CesiumMapLayer } from './cesium-map-layer';
 
 export class CesiumGroupLayer extends CesiumMapLayer implements IGroupLayerRenderer {
     constructor(config) {
@@ -16,6 +15,7 @@ export class CesiumGroupLayer extends CesiumMapLayer implements IGroupLayerRende
 
         this.imageries_.add(layerImageries, idx);
         this.primitives_.add(layer.getPrimitives());
+        this.dataSources_.add(layer.getDataSources());
 
     }
 
@@ -24,13 +24,10 @@ export class CesiumGroupLayer extends CesiumMapLayer implements IGroupLayerRende
         let layerImageries = layer.getImageries();
 
         this.primitives_.remove(layer.getPrimitives());
+        this.dataSources_.remove(layer.getDataSources());
         this.imageries_.remove(layerImageries, false);
 
         layer.setParent(null);
     }
 
 }
-
-cesiumLayersFactory.register(GROUP_LAYER_ID, (config) => {
-    return new CesiumGroupLayer(config);
-});
