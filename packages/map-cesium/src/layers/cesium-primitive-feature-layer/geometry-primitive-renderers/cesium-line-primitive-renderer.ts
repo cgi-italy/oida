@@ -1,18 +1,24 @@
 import Cartesian3 from 'cesium/Source/Core/Cartesian3';
 import Color from 'cesium/Source/Core/Color';
-import Material from 'cesium/Source/Scene/Material';
-import PolylineCollection from 'cesium/Source/Scene/PolylineCollection';
+import PrimitiveCollection from 'cesium/Source/Scene/PrimitiveCollection';
+import GeometryInstance from 'cesium/Source/Core/GeometryInstance';
+import PolylineGeometry from 'cesium/Source/Core/PolylineGeometry';
+import GroundPolylineGeometry from 'cesium/Source/Core/GroundPolylineGeometry';
+import ColorGeometryInstanceAttribute from 'cesium/Source/Core/ColorGeometryInstanceAttribute';
+import GroundPolylinePrimitive from 'cesium/Source/Scene/GroundPolylinePrimitive';
+import Primitive from 'cesium/Source/Scene/Primitive';
+import PolylineColorAppearance from 'cesium/Source/Scene/PolylineColorAppearance';
 
 import { CesiumGeometryPrimitiveRenderer } from './cesium-geometry-primitive-renderer';
 
 export class CesiumLinePrimitiveRenderer implements CesiumGeometryPrimitiveRenderer {
 
-    protected polylines_: PolylineCollection;
+    protected polylines_: PrimitiveCollection;
     protected clampToGround_: boolean = false;
 
     constructor(config) {
         this.clampToGround_ = config.clampToGround || false;
-        this.polylines_ = new PolylineCollection();
+        this.polylines_ = new PrimitiveCollection();
     }
 
     getPrimitives() {
@@ -20,69 +26,86 @@ export class CesiumLinePrimitiveRenderer implements CesiumGeometryPrimitiveRende
     }
 
     addFeature(id, geometry, style) {
-        let feature: any = null;
+
+        let instances;
         if (geometry.type === 'LineString') {
-            feature = this.createPolyline_(id, geometry.coordinates, style);
-            feature.entityId_ = id;
+            instances = this.createPolylineInstance_(id, geometry.coordinates, style);
         } else if (geometry.type === 'MultiLineString') {
-            feature = [];
+            instances = [];
             let lines = geometry.coordinates;
             for (let i = 0; i < lines.length; ++i) {
-                let lineFeature = this.createPolyline_(`${id}_${i}`, lines[i], style);
-                feature.push(lineFeature);
-
-                lineFeature.entityId_ = id;
+                instances.push(this.createPolylineInstance_(`${id}_${i}`, lines[i], style));
             }
-
-            feature.id = id;
         }
 
-        feature.style = style;
+        let primitiveProps = {
+            show: style.visible,
+            geometryInstances: instances,
+            appearance: new PolylineColorAppearance({
+                translucent: false
+            })
+        };
+
+        let primitive;
+        if (this.clampToGround_) {
+            primitive = this.polylines_.add(new GroundPolylinePrimitive(primitiveProps));
+        } else {
+            primitive = this.polylines_.add(new Primitive(primitiveProps));
+        }
+
+        primitive.entityId_ = id;
+
+        let feature = {
+            id: id,
+            primitive: primitive,
+            numGeometries: instances.length,
+            style: style,
+            geometry: geometry
+        };
 
         return feature;
     }
 
 
     updateGeometry(feature, geometry) {
-        if (this.isMultiLine_(feature)) {
-            let i = 0;
-            for (i = 0; i < feature.length; ++i) {
-                if (geometry.coordinates[i])
-                    this.updatePolylineGeometry_(feature[i], geometry.coordinates[i]);
-                else {
-                    this.polylines_.remove(feature[i]);
-                }
-            }
-            for (let j = i; j < geometry.coordinates.length; ++j) {
-                let lineFeature = this.createPolyline_(`${feature.id}_${i}`, geometry.coordinates[j], feature.style);
-                feature.push(lineFeature);
-                lineFeature.entityId_ = feature.id;
-            }
-        } else {
-            this.updatePolylineGeometry_(feature, geometry.coordinates);
-        }
+
+        this.removeFeature(feature);
+
+        let updatedFeature = this.addFeature(feature.id, geometry, feature.style);
+        feature.primitive = updatedFeature.primitive;
+        feature.numGeometries = updatedFeature.numGeometries;
+        feature.geometry = geometry;
     }
 
     updateStyle(feature, style) {
-        if (this.isMultiLine_(feature)) {
-            for (let line of feature) {
-                this.updatePolylineStyle_(line, style);
-            }
+
+        if (style.width !== feature.style.width) {
+            let updatedFeature = this.addFeature(feature.id, feature.geometry, style);
+
+            updatedFeature.primitive.readyPromise.then(() => {
+                this.polylines_.remove(feature.primitive);
+                feature.primitive = updatedFeature.primitive;
+            });
+
         } else {
-            this.updatePolylineStyle_(feature, style);
+            if (feature.numGeometries) {
+                for (let i = 0; i < feature.numGeometries; ++i) {
+                    let attributes = feature.primitive.getGeometryInstanceAttributes(`${feature.id}_${i}`);
+                    attributes.color = ColorGeometryInstanceAttribute.toValue(new Color(...style.color));
+                }
+            } else {
+                let attributes = feature.primitive.getGeometryInstanceAttributes(feature.id);
+                attributes.color = ColorGeometryInstanceAttribute.toValue(new Color(...style.color));
+            }
+
+            feature.primitive.show = style.visible;
         }
 
         feature.style = style;
     }
 
     removeFeature(feature) {
-        if (this.isMultiLine_(feature)) {
-            for (let line of feature) {
-                this.polylines_.remove(line);
-            }
-        } else {
-            this.polylines_.remove(feature);
-        }
+        this.polylines_.remove(feature.primitive);
     }
 
 
@@ -100,33 +123,30 @@ export class CesiumLinePrimitiveRenderer implements CesiumGeometryPrimitiveRende
     }
 
 
-    protected createPolyline_(id, coordinates, style) {
-        let polyline = this.polylines_.add({
-            id: id,
+    protected createPolylineInstance_(id, coordinates, style) {
+
+        let polylineGeometry;
+        let polylineProps = {
             positions: Cartesian3.fromDegreesArray([].concat(...coordinates)),
-            width: style.width || 1,
-            show: style.visible,
-            material: new Material({
-                fabric: {
-                    type: 'Color',
-                    uniforms: {
-                        color: new Color(...style.color)
-                    }
-                }
-            })
+            width: style.width,
+            vertexFormat : PolylineColorAppearance.VERTEX_FORMAT
+        };
+
+        if (this.clampToGround_) {
+            polylineGeometry = new GroundPolylineGeometry(polylineProps);
+        } else {
+            polylineGeometry = new PolylineGeometry(polylineProps);
+        }
+
+        let polygonInstance = new GeometryInstance({
+            geometry: polylineGeometry,
+            attributes : {
+                color : new ColorGeometryInstanceAttribute(...style.color)
+            },
+            id: id
         });
 
-        return polyline;
-    }
-
-    protected updatePolylineStyle_(polyline, style) {
-        polyline.material.uniforms.color = new Color(...style.color);
-        polyline.show = style.visible;
-        polyline.width = style.width;
-    }
-
-    protected updatePolylineGeometry_(polyline, coordinates) {
-        polyline.positions = Cartesian3.fromDegreesArray([].concat(...coordinates));
+        return polygonInstance;
     }
 
 }
