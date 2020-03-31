@@ -1,11 +1,19 @@
 import React, { useState } from 'react';
-import { Select, Slider, Form, InputNumber, Modal } from 'antd';
+import { Select, Slider, Form, InputNumber, Modal, Icon, Typography } from 'antd';
 
 import { IDatasetMapViz } from '@oida/eo';
+
+enum FormSubmitState {
+    Ready = 'Ready',
+    Pending = 'Pending',
+    Success = 'Success',
+    Error = 'Error'
+}
 
 export type DatasetDownloadProps = {
     datasetViz: IDatasetMapViz
     formId?: string;
+    onSubmitStateChange: (submitState: FormSubmitState) => void
 };
 
 export const DatasetVizDownload = (props: DatasetDownloadProps) => {
@@ -14,7 +22,7 @@ export const DatasetVizDownload = (props: DatasetDownloadProps) => {
 
     let [downloadScale, setDownloadScale] = useState(1);
     let [downloadFormat, setDownloadFormat] = useState(downloadConfig!.supportedFormats[0].id);
-
+    let [downloadError, setDownloadError] = useState('');
     let formatOptions = downloadConfig!.supportedFormats.map((format) => {
         return (<Select.Option key={format.id} value={format.id}>{format.name || format.id}</Select.Option>);
     });
@@ -25,11 +33,21 @@ export const DatasetVizDownload = (props: DatasetDownloadProps) => {
                 id={props.formId || 'dataset-viz-download-form'}
                 onSubmit={(evt) => {
                     evt.preventDefault();
+
+                    setDownloadError('');
+                    props.onSubmitStateChange(FormSubmitState.Pending);
+
                     downloadConfig.downloadProvider.downloadMapViz({
                         datasetViz: props.datasetViz,
                         format: downloadFormat,
                         scale: downloadScale
+                    }).then(() => {
+                        props.onSubmitStateChange(FormSubmitState.Success);
+                    }).catch((error) => {
+                        setDownloadError(`Unable to download data: ${error.message}`);
+                        props.onSubmitStateChange(FormSubmitState.Error);
                     });
+
                 }}
             >
                 <Form.Item label='Format'>
@@ -62,35 +80,49 @@ export const DatasetVizDownload = (props: DatasetDownloadProps) => {
                     />
                 </Form.Item>
             </Form>
+            {downloadError &&
+                <Typography.Paragraph className='error-message'>
+                    <Icon type='close-circle'></Icon>
+                    <span>{downloadError}</span>
+                </Typography.Paragraph>
+            }
         </div>
     );
 };
 
 export type DatasetVizDownloadModalProps = {
     onClose?: () => void;
-} & DatasetDownloadProps;
+} & Omit<DatasetDownloadProps, 'onSubmitStateChange'>;
 
 export const DatasetVizDownloadModal = (props: DatasetVizDownloadModalProps) => {
 
     let formId = 'dataset-viz-download-form';
 
     let [visible, setVisible] = useState(true);
+    let [isPending, setPending] = useState(false);
+
+    const onSubmitStateChange = (submitState: FormSubmitState) => {
+        setPending(submitState === FormSubmitState.Pending);
+        if (submitState === FormSubmitState.Success) {
+            setVisible(false);
+        }
+    };
 
     return (
         <Modal
             title={`${props.datasetViz.dataset.config!.name} download`}
             okButtonProps={{
                 htmlType: 'submit',
-                form: formId
+                form: formId,
+                loading: isPending
             }}
             visible={visible}
             zIndex={1040}
-            onOk={() => setVisible(false)}
             onCancel={() => setVisible(false)}
             afterClose={props.onClose}
             destroyOnClose={true}
         >
-            <DatasetVizDownload formId={formId} {...props}/>
+            <DatasetVizDownload formId={formId} onSubmitStateChange={onSubmitStateChange} {...props}/>
         </Modal>
     );
 };

@@ -9,6 +9,6 @@ export type DownloaMapVizRequest = {
 };
 
 export interface DatasetDownloadProvider {
-    downloadMapViz: (request: DownloaMapVizRequest) => void;
+    downloadMapViz: (request: DownloaMapVizRequest) => CancelablePromise<void>;
 }
 
