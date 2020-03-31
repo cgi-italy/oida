@@ -22,6 +22,10 @@ export class CesiumEntityFeatureLayer extends CesiumMapLayer implements IFeature
 
     addFeature(id: string, geometry: Geometry, style: IFeatureStyle) {
 
+        if (!geometry) {
+            return;
+        }
+
         let geometryRenderer = geometryEntityRendererFactory.create(geometry.type);
 
         if (geometryRenderer) {

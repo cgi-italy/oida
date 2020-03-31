@@ -79,6 +79,8 @@ export class CesiumTileLayer extends CesiumMapLayer implements ITileLayerRendere
     }
 
     forceRefresh() {
+        //TODO: check how to refresh the images without recreating the imagerylayer
+        //investigate about this.source_._reload() defined in GlobeSurfaceTileProvider.prototype._onLayerAdded
         this.updateSource(this.sourceConfig_);
     }
 

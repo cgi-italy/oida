@@ -22,6 +22,10 @@ export class CesiumPrimitiveFeatureLayer extends CesiumMapLayer implements IFeat
 
     addFeature(id, geometry, style) {
 
+        if (!geometry) {
+            return;
+        }
+
         let geometryRenderer = this.getOrCreateGeometryRenderer_(geometry.type);
 
         if (geometryRenderer) {
