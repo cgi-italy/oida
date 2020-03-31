@@ -2,6 +2,8 @@ import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
 import Feature from 'ol/Feature';
 import GeoJSON from 'ol/format/GeoJSON';
+import Circle from 'ol/geom/Circle';
+import { transform } from 'ol/proj';
 
 import bboxPolygon from '@turf/bbox-polygon';
 
@@ -74,6 +76,18 @@ export class OLFeatureLayer extends OLMapLayer<VectorLayer> implements IFeatureL
 
         if (!geometry || !geometry.type) {
             return;
+        }
+
+        if (geometry.type === 'Circle') {
+            let center = geometry.center;
+            let mapProjection = this.mapRenderer_.getViewer().getView().getProjection();
+            if (mapProjection.getCode() !== 'EPSG:4326') {
+                center = transform(center, 'EPSG:4326', mapProjection);
+                if (isNaN(center[0]) || isNaN(center[1])) {
+                    return;
+                }
+            }
+            return new Circle(center, geometry.radius);
         }
 
         if (geometry.type === 'BBox') {

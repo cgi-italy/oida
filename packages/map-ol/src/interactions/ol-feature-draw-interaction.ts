@@ -6,7 +6,7 @@ import GeoJSON from 'ol/format/GeoJSON';
 
 import { createBox } from 'ol/interaction/Draw';
 
-import { transformExtent } from 'ol/proj';
+import { transform, transformExtent } from 'ol/proj';
 
 import {
     IFeatureDrawInteractionProps,
@@ -119,6 +119,18 @@ export class OLFeatureDrawInteraction implements IFeatureDrawInteractionImplemen
             return {
                 type: 'BBox',
                 bbox: extent
+            };
+        } else if (mode === FeatureDrawMode.Circle) {
+            let center = geometry.getCenter();
+            let projection = this.viewer_.getView().getProjection();
+            if (projection.getCode() !== 'EPSG:4326') {
+                center = transform(center, projection, 'EPSG:4326');
+            }
+
+            return {
+                type: 'Circle',
+                center: center,
+                radius: geometry.getRadius()
             };
         }
 
