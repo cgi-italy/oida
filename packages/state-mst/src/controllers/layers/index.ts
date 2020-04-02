@@ -4,3 +4,4 @@ export * from './group-layer-controller';
 export * from './tile-layer-controller';
 export * from './image-layer-controller';
 export * from './feature-layer-controller';
+export * from './vertical-profile-layer-controller';

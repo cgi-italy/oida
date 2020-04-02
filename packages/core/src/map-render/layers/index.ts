@@ -3,3 +3,4 @@ export * from './group-layer-renderer';
 export * from './tile-layer-renderer';
 export * from './feature-layer-renderer';
 export * from './image-layer-renderer';
+export * from './vertical-profile-layer-renderer';
