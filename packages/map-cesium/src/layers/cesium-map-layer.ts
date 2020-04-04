@@ -8,6 +8,7 @@ import ImageryLayer from 'cesium/Source/Scene/ImageryLayer';
 import { ILayerRenderer } from '@oida/core';
 
 import { CesiumMapRenderer } from '../map/cesium-map-renderer';
+import { updateDataSource } from '../utils/render';
 
 export class CesiumMapLayer implements ILayerRenderer {
 
@@ -148,7 +149,9 @@ export class CesiumMapLayer implements ILayerRenderer {
         }
     }
 
-    protected onAddDataSources_(dataSources, idx) {
+    protected onAddDataSources_(parentCollection, dataSources) {
+
+        let idx = parentCollection.indexOf(dataSources);
 
         if (dataSources instanceof CustomDataSource || dataSources.length) {
             this.mapRenderer_.refreshDataSourcesFromEvent({
@@ -160,14 +163,13 @@ export class CesiumMapLayer implements ILayerRenderer {
         }
     }
 
-    protected onRemoveDataSources_(dataSources, idx) {
+    protected onRemoveDataSources_(parentCollection, dataSources) {
 
         if (dataSources instanceof CustomDataSource || dataSources.length) {
             this.mapRenderer_.refreshDataSourcesFromEvent({
                 type: 'remove',
                 collection: this.dataSources_,
-                item: dataSources,
-                idx: idx
+                item: dataSources
             });
         }
     }
@@ -205,6 +207,7 @@ export class CesiumMapLayer implements ILayerRenderer {
 
         if (dataSources instanceof CustomDataSource) {
             dataSources.show = this.visible_ && parentVisible;
+            updateDataSource(dataSources, this.mapRenderer_.getViewer().scene);
         } else {
             for (let i = 0; i < dataSources.length; ++i) {
                 this.updateDataSourcesVisibility_(dataSources.get(i), this.visible_ && parentVisible);
