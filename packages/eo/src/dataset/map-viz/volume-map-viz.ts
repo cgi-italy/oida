@@ -1,7 +1,7 @@
 import { autorun } from 'mobx';
 import { types, Instance, addDisposer, SnapshotIn, SnapshotOrInstance, cast } from 'mobx-state-tree';
 
-import { needsConfig, TileLayer } from '@oida/state-mst';
+import { hasConfig, TileLayer } from '@oida/state-mst';
 
 import { DatasetMapViz } from '../dataset-viz';
 import { ColorMap, ColorMapConfig } from './raster-map-viz';
@@ -46,7 +46,7 @@ export const DatasetVolumeViz = DatasetMapViz.addModel(
             mapLayer: types.maybe(TileLayer),
             verticalStack: types.maybe(VerticalStack)
         }),
-        needsConfig<DatasetVolumeMapVizConfig>()
+        hasConfig<DatasetVolumeMapVizConfig>()
     )
     .actions((self) => {
         return {

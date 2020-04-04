@@ -113,8 +113,8 @@ const DatasetsExplorerDecl = types.compose(
                 if (DatasetViewType) {
                     let mapViz = DatasetViewType.create({
                         dataset: dataset.id,
+                        config: datasetConfig.mapView.config
                     });
-                    mapViz.init(datasetConfig.mapView.config);
 
                     datasetViewConfig.mapViz = mapViz;
                 }

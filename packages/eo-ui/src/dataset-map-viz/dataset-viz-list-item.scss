@@ -23,4 +23,23 @@
     margin-left: 0.5rem;
     margin-bottom: 0.5rem;
     padding: 0.2rem 0.5rem;
+
+    .dataset-slider-selector {
+        display: flex;
+        align-items: center;
+
+        .ant-slider {
+            flex-grow: 1;
+            margin: 10px 20px;
+
+            .ant-slider-mark-text {
+                min-width: 40px;
+            }
+        };
+
+        &.has-marks {
+            margin-bottom: 1.5rem;
+        }
+    }
+
 }

@@ -1,7 +1,7 @@
 import { autorun } from 'mobx';
 import { types, Instance, addDisposer, SnapshotIn, SnapshotOrInstance, cast } from 'mobx-state-tree';
 
-import { needsConfig, TileLayer, ImageLayer, ITileLayer, IImageLayer } from '@oida/state-mst';
+import { hasConfig, TileLayer, ImageLayer, ITileLayer, IImageLayer } from '@oida/state-mst';
 
 import { DatasetMapViz } from '../dataset-viz';
 
@@ -146,7 +146,7 @@ export const DatasetRasterViz = DatasetMapViz.addModel(
             colorMap: types.maybe(ColorMap),
             mapLayer: types.maybe(types.union(TileLayer, ImageLayer))
         }),
-        needsConfig<DatasetRasterMapVizConfig>()
+        hasConfig<DatasetRasterMapVizConfig>()
     )
     .actions((self) => {
         return {

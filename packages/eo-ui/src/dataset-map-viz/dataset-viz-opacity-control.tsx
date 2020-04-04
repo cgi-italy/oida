@@ -24,7 +24,7 @@ export const DatasetVizOpacityControl = (props: DatasetVizOpacityControlProps) =
     let mapLayer = props.datasetViz.mapLayer;
 
     return (
-        <div className='dataset-viz-opacity'>
+        <div className='dataset-viz-opacity dataset-slider-selector'>
             <span>Opacity:</span>
             <Slider
                 value={Math.round(opacity * 100)}
