@@ -32,6 +32,11 @@ import { getProjectionFromSRS } from '../utils/projection';
 
 export const CESIUM_RENDERER_ID = 'cesium';
 
+export type CesiumMapRendererProps = {
+    allowFreeCameraRotation: boolean;
+    sceneMode: string
+};
+
 export class CesiumMapRenderer implements IMapRenderer {
 
     private viewer_: CesiumWidget;
@@ -39,7 +44,7 @@ export class CesiumMapRenderer implements IMapRenderer {
     private dataSourceCollection_;
     private dataSourceDisplay_;
 
-    constructor(props: IMapRendererProps) {
+    constructor(props: IMapRendererProps & CesiumMapRendererProps) {
         this.initRenderer_(props);
     }
 
@@ -69,6 +74,17 @@ export class CesiumMapRenderer implements IMapRenderer {
             });
         } else {
             this.viewer_.camera.setView(view);
+        }
+    }
+
+    updateRendererProps(props: Partial<CesiumMapRendererProps>) {
+        if (props.sceneMode !== undefined) {
+            let sceneMode = this.getSceneMode_(props);
+            this.viewer_.scene.mode = sceneMode;
+        }
+        if (props.allowFreeCameraRotation !== undefined) {
+            let contrainedAxis = props.allowFreeCameraRotation ? undefined : new Cartesian3(0, 0, 1);
+            this.viewer_.camera.constrainedAxis = contrainedAxis;
         }
     }
 
@@ -316,33 +332,40 @@ export class CesiumMapRenderer implements IMapRenderer {
     }
 
 
-    protected initRenderer_(props: IMapRendererProps) {
+    protected initRenderer_(props: IMapRendererProps & CesiumMapRendererProps) {
+
+        const {projection, viewport, target, onViewUpdating, onViewUpdated, ...renderProps} = props;
 
         let container = document.createElement('div');
         container.style.width = '100%';
         container.style.height = '100%';
 
 
-        if (props.target) {
-            props.target.appendChild(container);
+        if (target) {
+            target.appendChild(container);
         }
 
-        let mapProjection = getProjectionFromSRS(props.projection.code, true);
+        let mapProjection = getProjectionFromSRS(projection.code, true);
 
         this.viewer_ = new CesiumWidget(container, {
+            ...renderProps,
             imageryProvider: false,
-            sceneMode: this.getSceneMode_(props),
+            sceneMode: this.getSceneMode_(renderProps),
             mapProjection: mapProjection,
             requestRenderMode : true,
-            mapMode2D: props.projection.wrapX ? MapMode2D.INFINITE_SCROLL : MapMode2D.ROTATE
+            mapMode2D: projection.wrapX ? MapMode2D.INFINITE_SCROLL : MapMode2D.ROTATE
         });
 
         this.viewer_.scene.primitives.destroyPrimitives = false;
 
         if (props.target) {
-            this.viewer_.camera.setView(this.getViewFromProps_(props.viewport));
+            this.viewer_.camera.setView(this.getViewFromProps_(viewport));
         } else {
-            this.viewer_.pendingViewport_ = props.viewport;
+            this.viewer_.pendingViewport_ = viewport;
+        }
+
+        if (renderProps.allowFreeCameraRotation) {
+            this.viewer_.camera.constrainedAxis = undefined;
         }
 
         this.dataSourceCollection_ =  new DataSourceCollection();
@@ -352,18 +375,17 @@ export class CesiumMapRenderer implements IMapRenderer {
             dataSourceCollection : this.dataSourceCollection_
         });
 
-
-        if (props.onViewUpdating) {
+        if (onViewUpdating) {
 
             let duringMove = (evt) => {
-                props.onViewUpdating!(this.computeCurrentView_());
+                onViewUpdating(this.computeCurrentView_());
             };
 
             this.viewer_.camera.moveStart.addEventListener((evt) => {
                 if (this.viewer_.scene.mode === SceneMode.MORPHING) {
                     return;
                 }
-                props.onViewUpdating!();
+                onViewUpdating();
                 this.viewer_.scene.postRender.addEventListener(duringMove);
             });
 
@@ -372,11 +394,11 @@ export class CesiumMapRenderer implements IMapRenderer {
                     return;
                 }
                 this.viewer_.scene.postRender.removeEventListener(duringMove);
-                props.onViewUpdated!(this.computeCurrentView_());
+                if (onViewUpdated) {
+                    onViewUpdated(this.computeCurrentView_());
+                }
             });
-
         }
-
     }
 
     protected getSceneMode_(props) {

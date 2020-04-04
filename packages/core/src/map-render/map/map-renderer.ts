@@ -35,6 +35,7 @@ export interface IMapRenderer {
 
     setTarget(target: HTMLElement): void;
     setViewport(viewport: IMapViewport, animate?: boolean): void;
+    updateRendererProps(props: {[key: string]: any}): void;
     fitExtent(extent: BBox, animate?: boolean): void;
     getViewportExtent(): BBox;
     getLayersFactory(): IDynamicFactory<ILayerRenderer>;

@@ -98,6 +98,14 @@ export class MapRendererController {
         );
 
         this.subscriptionTracker_.addSubscription(
+            reaction(() => this.mapState_.renderer.props, (rendererProps) => {
+                if (this.mapRenderer_) {
+                    this.mapRenderer_.updateRendererProps(rendererProps);
+                }
+            })
+        );
+
+        this.subscriptionTracker_.addSubscription(
             reaction(() => {
                 return this.mapState_.view.target;
             }, (target) => {

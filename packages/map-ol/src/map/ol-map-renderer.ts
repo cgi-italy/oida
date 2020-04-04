@@ -37,6 +37,10 @@ export class OLMapRenderer implements IMapRenderer {
         this.updateViewFromProps_(this.viewer_.getView(), viewport, animate);
     }
 
+    updateRendererProps(props) {
+
+    }
+
     fitExtent(extent, animate?: boolean) {
         let view = this.viewer_.getView();
         let projection = view.getProjection();
