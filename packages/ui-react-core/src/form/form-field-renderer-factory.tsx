@@ -28,16 +28,17 @@ export const formFieldRendererFactory = () => {
             return null;
         }
 
-        let FormFieldRenderer;
-        if (definition.rendererConfig && definition.rendererConfig.id) {
-            FormFieldRenderer = renderers.get(definition.rendererConfig.id);
+        let rendererId: string;
+        if (definition.rendererConfig && definition.rendererConfig.id && renderers.has(definition.rendererConfig.id)) {
+            rendererId = definition.rendererConfig.id;
         } else {
-            FormFieldRenderer = renderers.values().next().value;
+            rendererId = renderers.keys().next().value;
+        }
+        if (!rendererId) {
+            return null;
         }
 
-        if (!FormFieldRenderer) {
-            FormFieldRenderer = (props) => null;
-        }
+        let FormFieldRenderer =  renderers.get(rendererId)!;
 
         if (isFormFieldConfigWithGenerator(definition)) {
             let Renderer = FormFieldRenderer;
@@ -60,7 +61,10 @@ export const formFieldRendererFactory = () => {
             };
         }
 
-        return FormFieldRenderer as FormFieldRenderer<T>;
+        return {
+            rendererId: rendererId,
+            FormFieldRenderer: FormFieldRenderer as FormFieldRenderer<T>
+        };
     };
 
     return {

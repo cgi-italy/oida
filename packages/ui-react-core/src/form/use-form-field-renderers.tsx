@@ -4,26 +4,27 @@ import { AnyFormFieldDefinition } from './form-field';
 
 export type FormFieldRenderersProps = {
     factory: FormFieldRendererFactory,
-    filters: AnyFormFieldDefinition[]
+    fields: AnyFormFieldDefinition[]
 };
 
-export const useFormFieldRenderers = ({factory, filters}: FormFieldRenderersProps) => {
+export const useFormFieldRenderers = ({factory, fields}: FormFieldRenderersProps) => {
 
-    return useMemo(() => filters.map((filterProps) => {
+    return useMemo(() => fields.map((fieldProps) => {
 
-        let {rendererConfig = {id: undefined, props: {}}, ...filter} = filterProps;
+        let {rendererConfig = {id: undefined, props: {}}, ...field} = fieldProps;
 
-        let FilterRenderer = factory.getRenderer(filterProps);
+        let fieldRenderer = factory.getRenderer(fieldProps);
 
-        if (FilterRenderer) {
+        if (fieldRenderer) {
             return {
-                FilterRenderer: FilterRenderer,
+                FieldRenderer: fieldRenderer.FormFieldRenderer,
                 renderProps: {
-                    ...filter,
+                    rendererId: fieldRenderer.rendererId,
+                    ...field,
                     ...rendererConfig.props
                 }
             };
         }
-    }), [filters]);
+    }), [fields]);
 };
 
