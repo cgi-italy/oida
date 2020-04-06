@@ -4,7 +4,7 @@ import { getSnapshot } from 'mobx-state-tree';
 
 import { Checkbox, Slider, Form } from 'antd';
 
-import { IDatasetDomainRasterSequence, DOMAIN_RASTER_SEQUENCE_TYPE, DatasetVariable } from '@oida/eo';
+import { IDatasetAnalysis, IDatasetDomainRasterSequence, DOMAIN_RASTER_SEQUENCE_TYPE, DatasetVariable } from '@oida/eo';
 import { NumericRangeFieldRenderer } from '@oida/ui-react-antd';
 
 import { DatasetAnalysisWidgetFactory } from './dataset-analysis-widget-factory';
@@ -42,6 +42,7 @@ export const DatasetDomainRasterSequenceThumb = (props: DatasetDomainRasterSeque
 export type DatasetDomainRasterSequenceProps = {
     dataDomain?: DatasetVariable<number>;
     sequence: IDatasetDomainRasterSequence;
+    analysis: IDatasetAnalysis
 };
 
 export const DatasetDomainRasterSequence = (props: DatasetDomainRasterSequenceProps) => {
@@ -96,7 +97,7 @@ export const DatasetDomainRasterSequence = (props: DatasetDomainRasterSequencePr
                 </Form.Item>
                 <Form.Item>
                     <AnalysisAoiFilter
-                        analysis={props.sequence}
+                        analysis={props.analysis}
                         supportedGeometries={['BBox']}
                     />
                 </Form.Item>
@@ -157,21 +158,23 @@ export const DatasetDomainRasterSequence = (props: DatasetDomainRasterSequencePr
 
 DatasetAnalysisWidgetFactory.register(DOMAIN_RASTER_SEQUENCE_TYPE, (config) => {
 
-    let analysis = config.analysis as IDatasetDomainRasterSequence;
-    if (!analysis.colorMap) {
-        analysis.setColorMap(analysis.config.colorMap.default);
+    let analysis = config.analysis as IDatasetAnalysis;
+    let rasterSequence = analysis.datasetViz as IDatasetDomainRasterSequence;
+    if (!rasterSequence.colorMap) {
+        rasterSequence.setColorMap(rasterSequence.config.colorMap.default);
     }
 
-    let dataDomain = analysis.config.domain.range;
-    if (!analysis.range && dataDomain) {
-        analysis.setRange({
+    let dataDomain = rasterSequence.config.domain.range;
+    if (!rasterSequence.range && dataDomain) {
+        rasterSequence.setRange({
             start: dataDomain.min,
             end: dataDomain.max
         });
     }
 
     return <DatasetDomainRasterSequence
-        sequence={analysis}
-        dataDomain={analysis.config.domain}
+        analysis={analysis}
+        sequence={rasterSequence}
+        dataDomain={rasterSequence.config.domain}
     />;
 });

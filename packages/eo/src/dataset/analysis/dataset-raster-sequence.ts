@@ -2,10 +2,10 @@ import { autorun } from 'mobx';
 import { types, addDisposer, flow, Instance, SnapshotOut } from 'mobx-state-tree';
 
 import { QueryFilter, Geometry, GeometryTypes, CancelablePromise, LoadingState } from '@oida/core';
-import { needsConfig } from '@oida/state-mst';
+import { hasConfig, hasGeometry } from '@oida/state-mst';
 
-import { ColorMap, ColorMapConfig } from '../map-viz/raster-map-viz';
-import { DatasetAnalysis } from './dataset-analysis';
+import { ColorMap, ColorMapConfig } from '../map-viz/color-map';
+import { DatasetViz } from '../dataset-viz';
 import { DatasetVariable } from './dataset-domain-series';
 import { isDataProvider } from '../../datasets-explorer/is-data-provider';
 
@@ -44,14 +44,15 @@ export type DatasetRasterSequenceConfig<T = number> = {
 };
 
 const createRasterSequenceType = <T>(typeName: string) => {
-    return DatasetAnalysis.addModel(types.compose(
+    return DatasetViz.addModel(types.compose(
         typeName,
         types.model(typeName, {
             range: types.maybe(types.frozen<{start: T, end: T}>()),
             colorMap: types.maybe(ColorMap)
         }),
         isDataProvider,
-        needsConfig<DatasetRasterSequenceConfig<T>>()
+        hasGeometry,
+        hasConfig<DatasetRasterSequenceConfig<T>>()
     ).volatile((self) => ({
         data: [] as DatasetRasterSequenceItem<T>[]
     })).actions((self) => {
@@ -91,7 +92,6 @@ const createRasterSequenceType = <T>(typeName: string) => {
 
                     let params = {
                         range: self.range,
-                        //@ts-ignore
                         geometry: self.geometry,
                         variable: self.colorMap ? self.colorMap.variable : undefined,
                         //@ts-ignore

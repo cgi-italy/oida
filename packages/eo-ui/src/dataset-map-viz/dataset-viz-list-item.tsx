@@ -7,7 +7,7 @@ import { List, Button, Icon, Badge, Tooltip, message } from 'antd';
 import { SortableHandle } from 'react-sortable-hoc';
 
 import { useCenterOnMapFromModule } from '@oida/ui-react-mst';
-import { IDatasetMapViz, DatasetsExplorer } from '@oida/eo';
+import { IDatasetViz, DatasetsExplorer } from '@oida/eo';
 
 
 import { DatasetVizProgressControl } from './dataset-viz-progress-control';
@@ -16,7 +16,7 @@ import { DatasetTools } from './dataset-tools';
 import { DatasetVizDownloadModal } from './dataset-viz-download';
 
 export type DatasetVizListItemProps = {
-    datasetViz: IDatasetMapViz;
+    datasetViz: IDatasetViz;
 };
 
 export const DatasetVizListItem = (props: DatasetVizListItemProps) => {
@@ -98,7 +98,7 @@ export const DatasetVizListItem = (props: DatasetVizListItemProps) => {
             id: 'settings',
             icon: <Icon type='setting'></Icon>,
             title: 'Toggle visualization settings',
-            content: DatasetVizSettingsFactory.create(props.datasetViz.datasetMapVizType, {
+            content: DatasetVizSettingsFactory.create(props.datasetViz.datasetVizType, {
                 datasetViz: props.datasetViz
             }),
             callback: () => {

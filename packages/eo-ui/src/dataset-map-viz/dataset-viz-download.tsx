@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Select, Slider, Form, InputNumber, Modal, Icon, Typography } from 'antd';
 
-import { IDatasetMapViz } from '@oida/eo';
+import { IDatasetViz } from '@oida/eo';
 
 enum FormSubmitState {
     Ready = 'Ready',
@@ -11,7 +11,7 @@ enum FormSubmitState {
 }
 
 export type DatasetDownloadProps = {
-    datasetViz: IDatasetMapViz
+    datasetViz: IDatasetViz
     formId?: string;
     onSubmitStateChange: (submitState: FormSubmitState) => void
 };

@@ -3,15 +3,10 @@ import { getParentOfType } from 'mobx-state-tree';
 
 import { Button, Tooltip } from 'antd';
 
-import { IDataset, DatasetsExplorer, DatasetAnalysis } from '@oida/eo';
+import { IDataset, DatasetsExplorer, DatasetViz, DatasetAnalysis } from '@oida/eo';
 
 export type DatasetToolsProps = {
     dataset: IDataset
-};
-
-
-const gerateRandomId = () => {
-    return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 };
 
 export const DatasetTools = (props: DatasetToolsProps) => {
@@ -27,15 +22,18 @@ export const DatasetTools = (props: DatasetToolsProps) => {
             >
                 <Button
                     onClick={() => {
-                        let AnalysisType = DatasetAnalysis.getSpecificType(tool.type);
-                        if (AnalysisType) {
-                            let analysis = AnalysisType.create({
-                                id: gerateRandomId(),
-                                dataset: props.dataset.id
+                        let DatasetVizType = DatasetViz.getSpecificType(tool.type);
+                        if (DatasetVizType) {
+                            let datasetViz = DatasetVizType.create({
+                                dataset: props.dataset.id,
+                                config: tool.config,
+                                name: tool.name
                             });
-                            analysis.init(tool.config);
 
-                            datasetExplorer.analyses.collection.add(analysis);
+                            datasetExplorer.analyses.collection.add({
+                                datasetViz: datasetViz,
+                                id: `${datasetViz.id}analysis`
+                            });
                         }
                     }}
                 >{tool.icon} {tool.name}

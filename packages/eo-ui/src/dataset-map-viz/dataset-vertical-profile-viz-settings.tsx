@@ -6,7 +6,7 @@ import { DatasetColormapPresetSelector } from './dataset-colormap-selector';
 import { DatasetVizSettingsFactory } from './dataset-viz-settings-factory';
 import { DatasetVerticalScaleSelector } from './dataset-vertical-scale-selector';
 
-import { IDatasetVerticalProfileViz, IDatasetMapViz } from '@oida/eo';
+import { IDatasetVerticalProfileViz } from '@oida/eo';
 
 export type DatasetVerticalProfileVizSettingsProps = {
     datasetViz: IDatasetVerticalProfileViz
@@ -17,7 +17,7 @@ export const DatasetVerticalProfileVizSettings = (props: DatasetVerticalProfileV
     return (
         <div>
             <DatasetVizOpacityControl
-                datasetViz={props.datasetViz as IDatasetMapViz}
+                datasetViz={props.datasetViz}
             />
             <DatasetVerticalScaleSelector
                 datasetViz={props.datasetViz}

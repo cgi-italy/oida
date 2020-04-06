@@ -6,7 +6,7 @@ import { DatasetColormapPresetSelector } from './dataset-colormap-selector';
 
 import { DatasetVizSettingsFactory } from './dataset-viz-settings-factory';
 
-import { IDatasetRasterViz, IDatasetMapViz } from '@oida/eo';
+import { IDatasetRasterViz } from '@oida/eo';
 
 export type DatasetRasterVizSettingsProps = {
     datasetViz: IDatasetRasterViz
@@ -19,7 +19,7 @@ export const DatasetRasterVizSettings = (props: DatasetRasterVizSettingsProps) =
     return (
         <div>
             <DatasetVizOpacityControl
-                datasetViz={props.datasetViz as IDatasetMapViz}
+                datasetViz={props.datasetViz}
             />
             {props.datasetViz.bandMath &&
                 <DatasetBandPresetSelector

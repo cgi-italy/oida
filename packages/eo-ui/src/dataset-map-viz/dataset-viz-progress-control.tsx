@@ -5,10 +5,10 @@ import { useObserver } from 'mobx-react';
 import { Progress } from 'antd';
 
 import { LoadingState } from '@oida/core';
-import { IDatasetMapViz } from '@oida/eo';
+import { IDatasetViz } from '@oida/eo';
 
 export type DatasetVizProgressControlProps = {
-    datasetViz: IDatasetMapViz;
+    datasetViz: IDatasetViz;
 };
 
 export const DatasetVizProgressControl = (props: DatasetVizProgressControlProps) => {

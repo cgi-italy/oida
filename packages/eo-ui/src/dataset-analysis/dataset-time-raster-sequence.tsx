@@ -4,7 +4,7 @@ import { getSnapshot } from 'mobx-state-tree';
 
 import { Checkbox, Slider, Form } from 'antd';
 
-import { IDatasetTimeRasterSequence, TIME_RASTER_SEQUENCE_TYPE, DatasetVariable } from '@oida/eo';
+import { IDatasetAnalysis, IDatasetTimeRasterSequence, TIME_RASTER_SEQUENCE_TYPE, DatasetVariable } from '@oida/eo';
 import { DateRangeFieldRenderer } from '@oida/ui-react-antd';
 
 import { DatasetAnalysisWidgetFactory } from './dataset-analysis-widget-factory';
@@ -42,6 +42,7 @@ export const DatasetTimeRasterSequenceThumb = (props: DatasetTimeRasterSequenceT
 export type DatasetTimeRasterSequenceProps = {
     dataDomain?: DatasetVariable<Date>;
     sequence: IDatasetTimeRasterSequence;
+    analysis: IDatasetAnalysis;
 };
 
 export const DatasetTimeRasterSequence = (props: DatasetTimeRasterSequenceProps) => {
@@ -91,7 +92,7 @@ export const DatasetTimeRasterSequence = (props: DatasetTimeRasterSequenceProps)
                 </Form.Item>
                 <Form.Item>
                     <AnalysisAoiFilter
-                        analysis={props.sequence}
+                        analysis={props.analysis}
                         supportedGeometries={['BBox']}
                     />
                 </Form.Item>
@@ -153,22 +154,23 @@ export const DatasetTimeRasterSequence = (props: DatasetTimeRasterSequenceProps)
 
 DatasetAnalysisWidgetFactory.register(TIME_RASTER_SEQUENCE_TYPE, (config) => {
 
-    let analysis = config.analysis as IDatasetTimeRasterSequence;
-    if (!analysis.colorMap) {
-        analysis.setColorMap(analysis.config.colorMap.default);
+    let analysis = config.analysis as IDatasetAnalysis;
+    let rasterSequenceViz = analysis.datasetViz as IDatasetTimeRasterSequence;
+    if (!rasterSequenceViz.colorMap) {
+        rasterSequenceViz.setColorMap(rasterSequenceViz.config.colorMap.default);
     }
-    if (!analysis.range) {
-        let toi = analysis.dataset.searchParams.filters.get('time');
+    if (!rasterSequenceViz.range) {
+        let toi = rasterSequenceViz.dataset.searchParams.filters.get('time');
         if (toi) {
-            analysis.setRange({
+            rasterSequenceViz.setRange({
                 start: toi.start.getTime(),
                 end: toi.end.getTime()
             });
-        } else if (analysis.dataset.config!.timeDistribution) {
-            let timeProvider = analysis.dataset.config!.timeDistribution.provider;
+        } else if (rasterSequenceViz.dataset.config.timeDistribution) {
+            let timeProvider = rasterSequenceViz.dataset.config.timeDistribution.provider;
             timeProvider.getTimeExtent({}).then((range) => {
                 if (range) {
-                    analysis.setRange({
+                    rasterSequenceViz.setRange({
                         start: range.start,
                         end: range.end
                     });
@@ -178,7 +180,8 @@ DatasetAnalysisWidgetFactory.register(TIME_RASTER_SEQUENCE_TYPE, (config) => {
     }
 
     return <DatasetTimeRasterSequence
-        sequence={analysis}
-        dataDomain={analysis.config.domain}
+        analysis={analysis}
+        sequence={rasterSequenceViz}
+        dataDomain={rasterSequenceViz.config.domain}
     />;
 });

@@ -2,7 +2,7 @@ import { autorun } from 'mobx';
 import { types, Instance, addDisposer } from 'mobx-state-tree';
 import debounce from 'lodash/debounce';
 
-import { needsConfig } from '@oida/state-mst';
+import { hasConfig } from '@oida/state-mst';
 
 import { DatasetViz } from '../dataset-viz';
 import { TimeDistribution } from './time-dimension';
@@ -51,7 +51,7 @@ export const DatasetTimeDistributionVizDecl = DatasetViz.addModel(
                 resolution: types.maybe(types.number)
             }), {})
         }),
-        needsConfig<DatasetTimeDistributionConfig>()
+        hasConfig<DatasetTimeDistributionConfig>()
     ).actions((self) => {
         return {
             setSearchParams: (params) => {

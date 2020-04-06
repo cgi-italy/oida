@@ -5,7 +5,7 @@ import { GroupLayer, DataFilters, needsConfig } from '@oida/state-mst';
 import {
     Dataset, DatasetConfig, IDataset,
     DatasetTimeDistributionViz, DatasetProductSearchViz,
-    DatasetMapViz, DatasetMapVizType, TimeRange
+    DatasetViz, DatasetVizType, TimeRange
 } from '../dataset';
 
 import { DatasetAnalyses } from '../dataset/analysis/dataset-analysis';
@@ -17,7 +17,7 @@ const DatasetExplorerViewDecl = types.model('DatasetExplorerViews', {
     dataset: Dataset,
     timeDistributionViz: types.maybe(DatasetTimeDistributionViz),
     productSearchViz: types.maybe(DatasetProductSearchViz),
-    mapViz: types.maybe(DatasetMapVizType)
+    mapViz: types.maybe(DatasetVizType)
 });
 
 type DatasetExplorerViewType = typeof DatasetExplorerViewDecl;
@@ -101,49 +101,53 @@ const DatasetsExplorerDecl = types.compose(
             self.vizExplorer.mapLayer = mapLayer;
         },
         addDataset: (datasetConfig: DatasetConfig) => {
-            let dataset = Dataset.create({id: datasetConfig.id, searchParams: {}});
-            dataset.init(datasetConfig);
+
+            let dataset = Dataset.create({
+                id: datasetConfig.id,
+                searchParams: {},
+                config: datasetConfig
+            });
 
             let datasetViewConfig: any = {
                 dataset: dataset
             };
 
             if (!self.config.disableMapView && datasetConfig.mapView) {
-                let DatasetViewType = DatasetMapViz.getSpecificType(datasetConfig.mapView.type);
+                let DatasetViewType = DatasetViz.getSpecificType(datasetConfig.mapView.type);
                 if (DatasetViewType) {
-                    let mapViz = DatasetViewType.create({
+                    datasetViewConfig.mapViz = DatasetViewType.create({
                         dataset: dataset.id,
                         config: datasetConfig.mapView.config
                     });
 
-                    datasetViewConfig.mapViz = mapViz;
+                    self.analyses.collection.add({
+                        datasetViz: datasetViewConfig.mapViz.id,
+                        id: `${datasetViewConfig.mapViz.id}analysis`,
+                        destroyOnClose: false
+                    });
                 }
             }
 
             if (!self.config.disableProductSearch && datasetConfig.search) {
-                let productSearchViz = DatasetProductSearchViz.create({
-                    dataset: dataset.id
+                datasetViewConfig.productSearchViz = DatasetProductSearchViz.create({
+                    dataset: dataset.id,
+                    config: datasetConfig.search
                 });
-
-                productSearchViz.init(datasetConfig.search);
-                datasetViewConfig.productSearchViz = productSearchViz;
             }
 
             if (!self.config.disableTimeExplorer && datasetConfig.timeDistribution) {
 
                 let range = self.timeExplorer.visibleRange.range;
-                let timeDistributionViz = DatasetTimeDistributionViz.create({
+
+                datasetViewConfig.timeDistributionViz = DatasetTimeDistributionViz.create({
                     dataset: dataset.id,
                     searchParams: {
                         start: range.start,
                         end: range.end,
                         resolution: self.timeExplorer.visibleRange.resolution
-                    }
+                    },
+                    config: datasetConfig.timeDistribution
                 });
-
-                timeDistributionViz.init(datasetConfig.timeDistribution);
-
-                datasetViewConfig.timeDistributionViz = timeDistributionViz;
             }
 
             let datasetView = DatasetExplorerView.create(datasetViewConfig);

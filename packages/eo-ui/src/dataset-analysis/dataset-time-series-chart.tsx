@@ -3,8 +3,7 @@ import { useObserver } from 'mobx-react';
 
 import { Button, Form } from 'antd';
 
-import { LoadingState } from '@oida/core';
-import { IDatasetTimeSeries, TIME_SERIES_TYPE } from '@oida/eo';
+import { IDatasetAnalysis, IDatasetTimeSeries, TIME_SERIES_TYPE } from '@oida/eo';
 import { DateRangeFieldRenderer } from '@oida/ui-react-antd';
 
 import { DatasetAnalysisWidgetFactory } from './dataset-analysis-widget-factory';
@@ -15,6 +14,7 @@ export type DatasetTimeSeriesProps = {
     timeRange?: {start: Date, end: Date}
     onTimeRangeChange?: (timeRange) => void;
     timeDomain?: {min: Date, max: Date}
+    analysis: IDatasetAnalysis;
     series: IDatasetTimeSeries[];
     onSeriesAdd?: () => void;
 };
@@ -46,6 +46,7 @@ export const DatasetTimeSeriesChart = (props: DatasetTimeSeriesProps) => {
                 <DatasetSeriesFilters
                     key={series.dataset.id}
                     series={series}
+                    analysis={props.analysis}
                 />
                 {props.onSeriesAdd && idx === lastSeriesIdx &&
                     <Button
@@ -55,6 +56,8 @@ export const DatasetTimeSeriesChart = (props: DatasetTimeSeriesProps) => {
             </React.Fragment>
         );
     });
+
+    let color = useObserver(() => props.analysis.color);
 
     return (
         <div className='dataset-chart'>
@@ -73,6 +76,7 @@ export const DatasetTimeSeriesChart = (props: DatasetTimeSeriesProps) => {
             </Form>
             <DatasetSeriesChartWidget
                 series={props.series}
+                color={color}
             />
         </div>
     );
@@ -80,24 +84,25 @@ export const DatasetTimeSeriesChart = (props: DatasetTimeSeriesProps) => {
 
 DatasetAnalysisWidgetFactory.register(TIME_SERIES_TYPE, (config) => {
 
-    let analysis = config.analysis as IDatasetTimeSeries;
-    if (!analysis.variable) {
-        analysis.setVariable(analysis.config.variables[0].id);
+    let analysis = config.analysis as IDatasetAnalysis;
+    let timeSeriesViz = analysis.datasetViz as IDatasetTimeSeries;
+    if (!timeSeriesViz.variable) {
+        timeSeriesViz.setVariable(timeSeriesViz.config.variables[0].id);
     }
-    if (!analysis.range) {
-        let toi = analysis.dataset.searchParams.filters.get('time');
+    if (!timeSeriesViz.range) {
+        let toi = timeSeriesViz.dataset.searchParams.filters.get('time');
         if (toi) {
             let start = new Date(toi.end.getTime());
             start.setMonth(start.getMonth() - 1);
-            analysis.setRange({
+            timeSeriesViz.setRange({
                 start: start,
                 end: toi.end
             });
-        } else if (analysis.dataset.config!.timeDistribution) {
-            let timeProvider = analysis.dataset.config!.timeDistribution.provider;
+        } else if (timeSeriesViz.dataset.config!.timeDistribution) {
+            let timeProvider = timeSeriesViz.dataset.config!.timeDistribution.provider;
             timeProvider.getTimeExtent({}).then((range) => {
                 if (range) {
-                    analysis.setRange({
+                    timeSeriesViz.setRange({
                         start: range.start,
                         end: range.end
                     });
@@ -106,10 +111,11 @@ DatasetAnalysisWidgetFactory.register(TIME_SERIES_TYPE, (config) => {
         }
     }
     return <DatasetTimeSeriesChart
-        series={[analysis]}
-        timeRange={analysis.range}
+        series={[timeSeriesViz]}
+        analysis={analysis}
+        timeRange={timeSeriesViz.range}
         onTimeRangeChange={(range) => {
-            config.analysis.setRange(range);
+            timeSeriesViz.setRange(range);
         }}
     />;
 });

@@ -40,24 +40,34 @@ export const DatasetAnalysesDashboard = (props: DatasetAnalysesDashboardProps) =
         };
     }, []);
 
-    let components = useObserver(() => props.analyses.collection.items.map((analysis) => {
-        if (DatasetAnalysisWidgetFactory.isRegistered(analysis.analysisType)) {
+    let components = useObserver(
+        () => props.analyses.collection.items.filter(analysis => analysis.visible).map((analysis) => {
 
-            let toolConfig = analysis.dataset.config!.tools!.find(tool => {
-                return tool.type === analysis.analysisType;
-            });
+            let analysisType = analysis.datasetViz.datasetVizType;
+            if (DatasetAnalysisWidgetFactory.isRegistered(analysisType)) {
 
-            let chartWidget = DatasetAnalysisWidgetFactory.create(analysis.analysisType, {
-                analysis: analysis
-            });
-            return {
-                id: analysis.id,
-                title: `${analysis.dataset.config!.name}: ${toolConfig ? toolConfig.name : ''}`,
-                content: chartWidget
-            };
+                let chartWidget = DatasetAnalysisWidgetFactory.create(analysisType, {
+                    analysis: analysis
+                });
+                return {
+                    id: analysis.id,
+                    title: `${analysis.datasetViz.dataset.config.name}: ${analysis.datasetViz.name || ''}`,
+                    content: chartWidget
+                };
+            }
         }
-    }));
+    ));
 
+    const onWidgetClose = (widgetId: string) => {
+        let analysis = props.analyses.collection.itemWithId(widgetId);
+        if (analysis) {
+            if (analysis.destroyOnClose) {
+                props.analyses.collection.remove(analysis);
+            } else {
+                analysis.setVisible(false);
+            }
+        }
+    };
 
     return (
         <DashboardPane
@@ -69,7 +79,7 @@ export const DatasetAnalysesDashboard = (props: DatasetAnalysesDashboardProps) =
             style={props.style}
             // @ts-ignore
             components={components.filter((component) => component !== undefined)}
-            onWidgetClose={(id: string) => props.analyses.collection.removeItemWithId(id)}
+            onWidgetClose={onWidgetClose}
         />
     );
 };

@@ -3,8 +3,7 @@ import { useObserver } from 'mobx-react';
 
 import { Button, Form } from 'antd';
 
-import { LoadingState } from '@oida/core';
-import { IDatasetDomainSeries, DOMAIN_SERIES_TYPE, DatasetVariable } from '@oida/eo';
+import { IDatasetAnalysis, IDatasetDomainSeries, DOMAIN_SERIES_TYPE, DatasetVariable } from '@oida/eo';
 import { NumericRangeFieldRenderer } from '@oida/ui-react-antd';
 
 import { DatasetAnalysisWidgetFactory } from './dataset-analysis-widget-factory';
@@ -15,6 +14,7 @@ export type DatasetDomainSeriesProps = {
     range?: {start: number, end: number}
     onRangeChange?: (range) => void;
     dataDomain?: DatasetVariable<number>;
+    analysis: IDatasetAnalysis;
     series: IDatasetDomainSeries[];
     onSeriesAdd?: () => void;
 };
@@ -46,6 +46,7 @@ export const DatasetDomainSeriesChart = (props: DatasetDomainSeriesProps) => {
                 <DatasetSeriesFilters
                     key={series.dataset.id}
                     series={series}
+                    analysis={props.analysis}
                 />
                 {props.onSeriesAdd && idx === lastSeriesIdx &&
                     <Button
@@ -55,6 +56,8 @@ export const DatasetDomainSeriesChart = (props: DatasetDomainSeriesProps) => {
             </React.Fragment>
         );
     });
+
+    let color = useObserver(() => props.analysis.color);
 
     let dataDomain = props.dataDomain;
     let dataRange = dataDomain ? dataDomain.range : undefined;
@@ -81,6 +84,7 @@ export const DatasetDomainSeriesChart = (props: DatasetDomainSeriesProps) => {
             </Form>
             <DatasetSeriesChartWidget
                 series={props.series}
+                color={color}
             />
         </div>
     );
@@ -88,25 +92,29 @@ export const DatasetDomainSeriesChart = (props: DatasetDomainSeriesProps) => {
 
 DatasetAnalysisWidgetFactory.register(DOMAIN_SERIES_TYPE, (config) => {
 
-    let analysis = config.analysis as IDatasetDomainSeries;
-    if (!analysis.variable) {
-        analysis.setVariable(analysis.config.variables[0].id);
+    let analysis: IDatasetAnalysis = config.analysis;
+
+    let series = analysis.datasetViz as IDatasetDomainSeries;
+
+    if (!series.variable) {
+        series.setVariable(series.config.variables[0].id);
     }
 
-    let dataDomain = analysis.config.domain.range;
-    if (!analysis.range && dataDomain) {
-        analysis.setRange({
+    let dataDomain = series.config.domain.range;
+    if (!series.range && dataDomain) {
+        series.setRange({
             start: dataDomain.min,
             end: dataDomain.max
         });
     }
 
     return <DatasetDomainSeriesChart
-        series={[analysis]}
-        range={analysis.range}
-        dataDomain={analysis.config.domain}
+        analysis={analysis}
+        series={[series]}
+        range={series.range}
+        dataDomain={series.config.domain}
         onRangeChange={(range) => {
-            config.analysis.setRange(range);
+            series.setRange(range);
         }}
     />;
 });

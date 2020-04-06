@@ -3,67 +3,11 @@ import { types, Instance, addDisposer, SnapshotIn, SnapshotOrInstance, cast } fr
 
 import { hasConfig, TileLayer, ImageLayer, ITileLayer, IImageLayer } from '@oida/state-mst';
 
-import { DatasetMapViz } from '../dataset-viz';
+import { DatasetViz } from '../dataset-viz';
+import { ColorMapConfig, ColorMap } from './color-map';
+import { BandMathConfig, BandMath } from './band-math';
 
 export const RASTER_VIZ_TYPE = 'raster';
-
-export enum BandMathConfigMode {
-    None = 'None',
-    Presets = 'Presets',
-    Combination = 'Combination',
-    Formula = 'Formula'
-}
-
-export type BandMathConfigPreset = {
-    id: string;
-    name: string;
-    preview: string;
-    description?: string;
-};
-
-export type BandMathConfig = {
-    mode: BandMathConfigMode;
-    presets?: Array<BandMathConfigPreset>;
-    bands?: Array<{
-        id: string;
-        name: string;
-        color: string;
-    }>;
-    default?: SnapshotIn<typeof BandMath>
-};
-
-export enum ColormapConfigMode {
-    None = 'None',
-    Presets = 'Presets',
-    Customizable = 'Customizable'
-}
-
-export type DataDomain = {
-    min: number;
-    max: number;
-    noDataValue?: number;
-};
-
-export type DataVar = {
-    id: string;
-    name: string;
-    domain: DataDomain;
-    units?: string;
-    description?: string;
-};
-
-export type ColorMapConfigPreset = {
-    id: string;
-    name: string;
-    legend: React.ReactNode;
-};
-
-export type ColorMapConfig = {
-    mode: ColormapConfigMode;
-    colorMaps?: Array<ColorMapConfigPreset>
-    variables?: DataVar | DataVar[];
-    default?: SnapshotIn<typeof ColorMap>
-};
 
 export type DatasetRasterMapVizConfig = {
     bandMathConfig?: BandMathConfig;
@@ -73,86 +17,23 @@ export type DatasetRasterMapVizConfig = {
     afterInit?: (rasterViz) => void;
 };
 
-export const BandMathPreset = types.model('BandMathPreset', {
-    mode: types.literal('preset'),
-    preset: types.string
-});
+const DatasetRasterVizLayerDecl = types.union(TileLayer, ImageLayer);
+type DatasetRasterVizLayerType = typeof DatasetRasterVizLayerDecl;
+export interface DatasetRasterVizLayerInterface extends DatasetRasterVizLayerType {}
+const DatasetRasterVizLayer: DatasetRasterVizLayerInterface = DatasetRasterVizLayerDecl;
 
-export const BandMathCombination = types.model('BandMathCombination', {
-    mode: types.literal('combination'),
-    red: types.string,
-    green: types.string,
-    blue: types.string
-});
-
-export const BandMathFormula = types.model('BandMathFormula', {
-    mode: types.literal('formula'),
-    formula: types.string
-});
-
-const BandMath = types.union(BandMathPreset, BandMathCombination, BandMathFormula);
-
-
-const ColorMapBase = types.model({
-    preset: types.string,
-    variable: types.maybe(types.string)
-}).actions(self => ({
-    setPreset: (preset: string) => {
-        self.preset = preset;
-    },
-    setVariable: (variable: string | undefined) => {
-        self.variable = variable;
-    }
-}));
-
-export const ColorMapPreset = types.compose(
-    'ColorMapPreset',
-    ColorMapBase,
-    types.model({
-        mode: types.literal('preset')
-    })
-);
-
-export const ColorMapCustom = types.compose(
-    'ColorMapCustom',
-    ColorMapBase,
-    types.model({
-        mode: types.literal('custom'),
-        domain: types.frozen<DataDomain>(),
-        clamp: types.optional(types.boolean, true),
-        noDataValue: types.maybe(types.number)
-    }).actions(self => ({
-        setDomain: (domain: DataDomain) => {
-            self.domain = domain;
-        },
-        setClamp: (clamp: boolean) => {
-            self.clamp = clamp;
-        },
-        setNoDataValue: (noDataValue: number | undefined) => {
-            self.noDataValue = noDataValue;
-        }
-    }))
-);
-
-
-export const ColorMap = types.union(ColorMapPreset, ColorMapCustom);
-
-
-export const DatasetRasterViz = DatasetMapViz.addModel(
+const DatasetRasterVizDecl = DatasetViz.addModel(
     types.compose(
         RASTER_VIZ_TYPE,
         types.model({
             bandMath: types.maybe(BandMath),
             colorMap: types.maybe(ColorMap),
-            mapLayer: types.maybe(types.union(TileLayer, ImageLayer))
+            mapLayer: types.maybe(DatasetRasterVizLayer)
         }),
         hasConfig<DatasetRasterMapVizConfig>()
     )
     .actions((self) => {
         return {
-            setMapLayer: (layer) => {
-                self.mapLayer = layer;
-            },
             setBandMath: (bandMath: SnapshotOrInstance<typeof BandMath> | undefined) => {
                 self.bandMath = bandMath;
             },
@@ -182,7 +63,7 @@ export const DatasetRasterViz = DatasetMapViz.addModel(
                 });
             }
 
-            self.setMapLayer(mapLayer);
+            self.mapLayer = mapLayer;
 
             let visibilityUpdateDisposer = autorun(() => {
                 mapLayer.setVisible((self as IDatasetRasterViz).active);
@@ -208,4 +89,8 @@ export const DatasetRasterViz = DatasetMapViz.addModel(
 
 );
 
-export type IDatasetRasterViz = Instance<typeof DatasetRasterViz>;
+type DatasetRasterVizType = typeof DatasetRasterVizDecl;
+export interface DatasetRasterVizInterface extends DatasetRasterVizType {}
+export const DatasetRasterViz: DatasetRasterVizInterface = DatasetRasterVizDecl;
+export interface IDatasetRasterViz extends Instance<DatasetRasterVizInterface> {}
+

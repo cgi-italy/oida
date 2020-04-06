@@ -4,10 +4,10 @@ import { useObserver } from 'mobx-react';
 
 import { Slider } from 'antd';
 
-import { IDatasetMapViz } from '@oida/eo';
+import { IDatasetViz } from '@oida/eo';
 
 export type DatasetVizOpacityControlProps = {
-    datasetViz: IDatasetMapViz;
+    datasetViz: IDatasetViz;
 };
 
 export const DatasetVizOpacityControl = (props: DatasetVizOpacityControlProps) => {
@@ -21,7 +21,11 @@ export const DatasetVizOpacityControl = (props: DatasetVizOpacityControlProps) =
         }
     });
 
-    let mapLayer = props.datasetViz.mapLayer;
+    const mapLayer = props.datasetViz.mapLayer;
+
+    if (!mapLayer) {
+        return null;
+    }
 
     return (
         <div className='dataset-viz-opacity dataset-slider-selector'>

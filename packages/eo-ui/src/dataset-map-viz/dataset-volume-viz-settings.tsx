@@ -6,7 +6,7 @@ import { DatasetVizOpacityControl } from './dataset-viz-opacity-control';
 
 import { DatasetVizSettingsFactory } from './dataset-viz-settings-factory';
 
-import { IDatasetVolumeViz, IDatasetMapViz } from '@oida/eo';
+import { IDatasetVolumeViz } from '@oida/eo';
 
 import { DatasetVolumeStackSelector } from './dataset-volume-stack-selector';
 import { DatasetColormapPresetSelector } from './dataset-colormap-selector';
@@ -20,7 +20,7 @@ export const DatasetVolumeVizSettings = (props: DatasetVolumeVizSettingsProps) =
     return (
         <div>
             <DatasetVizOpacityControl
-                datasetViz={props.datasetViz as IDatasetMapViz}
+                datasetViz={props.datasetViz}
             />
             <DatasetVolumeStackSelector
                 volumeViz={props.datasetViz}

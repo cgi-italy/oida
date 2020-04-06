@@ -1,4 +1,4 @@
-import { types, Instance } from 'mobx-state-tree';
+import { types, Instance, IAnyModelType, getParentOfType } from 'mobx-state-tree';
 
 import { TaggedUnion, MapLayerType, isActivable } from '@oida/state-mst';
 
@@ -10,8 +10,11 @@ const gerateRandomId = () => {
 
 const DatasetVizBase = types.compose(
     types.model({
+        id: types.optional(types.identifier, gerateRandomId),
+        name: types.maybe(types.string),
         dataset: types.reference(Dataset),
-        id: types.optional(types.string, gerateRandomId)
+        mapLayer: types.maybe(MapLayerType),
+        parent: types.maybe(types.reference(types.late((): IAnyModelType => DatasetVizBase))),
     }),
     isActivable
 );
@@ -19,17 +22,7 @@ const DatasetVizBase = types.compose(
 export const DatasetViz = TaggedUnion('datasetVizType', DatasetVizBase);
 
 type DatasetVizType = typeof DatasetViz.Type;
-export interface DatasetVizInterface extends DatasetVizType {}
+export interface DatasetVizInterface extends DatasetVizType { }
 export const DatasetVizType: DatasetVizInterface = DatasetViz.Type;
-export interface IDatasetViz extends Instance<DatasetVizInterface> {}
+export interface IDatasetViz extends Instance<DatasetVizInterface> { }
 
-export const DatasetMapVizBase = types.model({
-    mapLayer: MapLayerType,
-});
-
-export const DatasetMapViz = DatasetViz.addUnion('datasetMapVizType', DatasetMapVizBase);
-
-type DatasetMapVizType = typeof DatasetMapViz.Type;
-export interface DatasetMapVizInterface extends DatasetMapVizType {}
-export const DatasetMapVizType: DatasetMapVizInterface = DatasetMapViz.Type;
-export interface IDatasetMapViz extends Instance<DatasetMapVizInterface> {}

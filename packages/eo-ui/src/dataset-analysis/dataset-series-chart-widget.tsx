@@ -4,7 +4,7 @@ import { useObserver } from 'mobx-react';
 import { Form } from 'antd';
 
 import { LoadingState } from '@oida/core';
-import { IDatasetTimeSeries, IDatasetDomainSeries, TIME_SERIES_TYPE } from '@oida/eo';
+import { IDatasetAnalysis, IDatasetTimeSeries, IDatasetDomainSeries, TIME_SERIES_TYPE } from '@oida/eo';
 import { SelectEnumRenderer } from '@oida/ui-react-antd';
 
 import { AnalysisAoiFilter } from './analysis-aoi-filter';
@@ -20,6 +20,7 @@ import { EChartOption } from 'echarts';
 
 export type DatasetSeriesFiltersProps = {
     series: IDatasetDomainSeries | IDatasetTimeSeries
+    analysis: IDatasetAnalysis
 };
 
 export const DatasetSeriesFilters = (props: DatasetSeriesFiltersProps) => {
@@ -49,7 +50,7 @@ export const DatasetSeriesFilters = (props: DatasetSeriesFiltersProps) => {
             </Form.Item>
             <Form.Item>
             <AnalysisAoiFilter
-                analysis={props.series}
+                analysis={props.analysis}
                 supportedGeometries={props.series.config.supportedGeometries}
             />
             </Form.Item>
@@ -59,6 +60,7 @@ export const DatasetSeriesFilters = (props: DatasetSeriesFiltersProps) => {
 
 export type DatasetSeriesChartWidgetProps<T extends IDatasetTimeSeries | IDatasetDomainSeries> = {
     series: T[];
+    color: string;
 };
 
 export function DatasetSeriesChartWidget<T extends IDatasetTimeSeries | IDatasetDomainSeries>(props: DatasetSeriesChartWidgetProps<T>)  {
@@ -74,7 +76,7 @@ export function DatasetSeriesChartWidget<T extends IDatasetTimeSeries | IDataset
     let series = props.series;
     let isTime = false;
     if (series.length) {
-        isTime = props.series[0].analysisType === TIME_SERIES_TYPE;
+        isTime = props.series[0].datasetVizType === TIME_SERIES_TYPE;
     }
 
     let chartSeries = useObserver(() => series.map((series) => {
@@ -97,7 +99,7 @@ export function DatasetSeriesChartWidget<T extends IDatasetTimeSeries | IDataset
             };
         }
 
-        colors.push(series.color);
+        colors.push(props.color);
         legendData.push(variableConfig.name);
 
         if (series.loadingState === LoadingState.Loading) {

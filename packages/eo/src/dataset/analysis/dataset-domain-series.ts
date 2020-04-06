@@ -2,9 +2,9 @@ import { autorun } from 'mobx';
 import { types, addDisposer, flow, Instance } from 'mobx-state-tree';
 
 import { QueryFilter, Geometry, GeometryTypes, CancelablePromise, LoadingState } from '@oida/core';
-import { needsConfig } from '@oida/state-mst';
+import { hasConfig, hasGeometry } from '@oida/state-mst';
 
-import { DatasetAnalysis } from './dataset-analysis';
+import { DatasetViz } from '../dataset-viz';
 import { isDataProvider } from '../../datasets-explorer/is-data-provider';
 
 import debounce from 'lodash/debounce';
@@ -50,14 +50,15 @@ export type DatasetDomainSeriesConfig<T = number> = {
 };
 
 const createSeriesType = <T>(typeName: string) => {
-    return DatasetAnalysis.addModel(types.compose(
+    return DatasetViz.addModel(types.compose(
         typeName,
         types.model(typeName, {
             variable: types.maybe(types.string),
             range: types.maybe(types.frozen<{start: T, end: T}>())
         }),
+        hasGeometry,
         isDataProvider,
-        needsConfig<DatasetDomainSeriesConfig<T>>()
+        hasConfig<DatasetDomainSeriesConfig<T>>()
     ).volatile((self) => ({
         data: [] as DatasetDomainSeriesItem<T>[]
     })).actions((self) => {

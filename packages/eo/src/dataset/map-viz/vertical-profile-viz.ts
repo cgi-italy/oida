@@ -3,8 +3,8 @@ import { types, addDisposer, applySnapshot, Instance } from 'mobx-state-tree';
 
 import { hasConfig, VerticalProfileLayer } from '@oida/state-mst';
 
-import { DatasetMapViz } from '../dataset-viz';
-import { ColorMapConfig, ColorMap } from './raster-map-viz';
+import { DatasetViz } from '../dataset-viz';
+import { ColorMapConfig, ColorMap } from './color-map';
 
 import { DatasetVerticalProfiles, VerticalProfileItem } from './dataset-vertical-profile';
 import { LoadingState } from '@oida/core';
@@ -26,7 +26,7 @@ export type VerticalProfileVizConfig = {
     afterInit?: (verticalProfileViz) => void;
 };
 
-const DatasetVerticalProfileVizDecl = DatasetMapViz.addModel(
+const DatasetVerticalProfileVizDecl = DatasetViz.addModel(
     types.compose(
         VERTICAL_PROFILE_VIZ_TYPE,
         types.model({

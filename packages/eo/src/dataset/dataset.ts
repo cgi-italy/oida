@@ -1,6 +1,6 @@
 import { types, Instance } from 'mobx-state-tree';
 
-import { needsConfig, QueryParams } from '@oida/state-mst';
+import { hasConfig, QueryParams } from '@oida/state-mst';
 
 import { DatasetConfig } from './dataset-config';
 
@@ -10,7 +10,7 @@ const DatasetDecl = types.compose(
         id: types.identifier,
         searchParams: QueryParams
     }),
-    needsConfig<DatasetConfig>()
+    hasConfig<DatasetConfig>()
 );
 
 type DatasetType = typeof DatasetDecl;

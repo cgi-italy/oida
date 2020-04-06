@@ -3,8 +3,8 @@ import { types, Instance, addDisposer, SnapshotIn, SnapshotOrInstance, cast } fr
 
 import { hasConfig, TileLayer } from '@oida/state-mst';
 
-import { DatasetMapViz } from '../dataset-viz';
-import { ColorMap, ColorMapConfig } from './raster-map-viz';
+import { DatasetViz } from '../dataset-viz';
+import { ColorMap, ColorMapConfig } from './color-map';
 
 export const VOLUME_VIZ_TYPE = 'volume';
 
@@ -38,7 +38,7 @@ export const VerticalStack = types.model({
     }
 }));
 
-export const DatasetVolumeViz = DatasetMapViz.addModel(
+const DatasetVolumeVizDecl = DatasetViz.addModel(
     types.compose(
         VOLUME_VIZ_TYPE,
         types.model({
@@ -102,4 +102,7 @@ export const DatasetVolumeViz = DatasetMapViz.addModel(
 
 );
 
-export type IDatasetVolumeViz = Instance<typeof DatasetVolumeViz>;
+type DatasetVolumeVizType = typeof DatasetVolumeVizDecl;
+export interface DatasetVolumeVizInterface extends DatasetVolumeVizType {}
+export const DatasetVolumeViz: DatasetVolumeVizInterface = DatasetVolumeVizDecl;
+export interface IDatasetVolumeViz extends Instance<DatasetVolumeVizInterface> {}

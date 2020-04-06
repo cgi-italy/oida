@@ -4,9 +4,7 @@ import debounce from 'lodash/debounce';
 
 import { LoadingState, CancelablePromise } from '@oida/core';
 
-import { MapLayerType, hasLoadingState,
-    needsConfig
-} from '@oida/state-mst';
+import { hasLoadingState, hasConfig } from '@oida/state-mst';
 
 import { DatasetProducts } from './dataset-product';
 import { DatasetProductSearchConfig } from './dataset-product-search-config';
@@ -31,11 +29,10 @@ export const DatasetProductSearchVizDecl = DatasetViz.addModel(
     types.compose(
         'DatasetProductSearchViz',
         types.model({
-            products: types.optional(DatasetProducts, {}),
-            mapLayer: types.maybe(MapLayerType)
+            products: types.optional(DatasetProducts, {})
         }),
         hasLoadingState,
-        needsConfig<DatasetProductSearchConfig>()
+        hasConfig<DatasetProductSearchConfig>()
     ).actions((self) => {
         let pendingSearchRequest: CancelablePromise<any> | undefined = undefined;
 
@@ -67,7 +64,7 @@ export const DatasetProductSearchVizDecl = DatasetViz.addModel(
         afterAttach: () => {
             let productUpdaterDisposer = datasetProductResultsUpdater(self as IDatasetProductSearchViz);
 
-            self.mapLayer = self.config.mapLayerFactory
+            (self as IDatasetProductSearchViz).mapLayer = self.config.mapLayerFactory
                 ? self.config.mapLayerFactory(self)
                 : createGeometrySearchResultsLayer({
                     productSearchViz: self as IDatasetProductSearchViz
