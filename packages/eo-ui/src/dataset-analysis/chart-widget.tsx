@@ -10,7 +10,18 @@ import { Menu, Dropdown, Icon } from 'antd';
 
 export type ChartWidgetProps = {
     options: echarts.EChartOption,
-    isLoading?: boolean
+    isLoading?: boolean,
+    showTip?: {
+        x?: number,
+        y?: number,
+        position?: Array<number>| string | Function
+        seriesIndex?: number,
+        dataIndex?: number,
+        name?: string,
+    },
+    onMouseEnter?: (evt) => void;
+    onMouseLeave?: (evt) => void;
+    onItemClick?: (evt) => void;
 };
 
 export const ChartWidget = (props: ChartWidgetProps) => {
@@ -31,6 +42,21 @@ export const ChartWidget = (props: ChartWidgetProps) => {
             };
         }
     }, [chartContainer]);
+
+    useEffect(() => {
+
+        const onItemClick = props.onItemClick;
+
+        if (chart && onItemClick) {
+            let clickHandler = (evt) => {
+                onItemClick(evt);
+            };
+            chart.on('click', clickHandler);
+            return () => {
+                chart!.off('click', clickHandler);
+            };
+        }
+    }, [chart, props.onItemClick]);
 
     useEffect(() => {
         if (chart) {
@@ -62,61 +88,84 @@ export const ChartWidget = (props: ChartWidgetProps) => {
         }
     }, [chart, props.isLoading]);
 
-    return <div className='chart'>
-        {resizeListener}
-        <div style={{width: '100%', height: '100%'}}
-            ref={chartContainer}
-        >
-        </div>
-        <div className='chart-ops'>
-            <Dropdown overlay={
-                <Menu>
-                    <Menu.Item>
-                        <a onClick={(evt) => {
-                            if (chartContainer.current) {
-                                let canvas = chartContainer.current.getElementsByTagName('canvas')[0];
-                                let img = canvas.toDataURL('image/png');
-                                download(img, 'chart.png', 'image/png');
-                            }
-                        }}>PNG</a>
-                    </Menu.Item>
-                    <Menu.Item>
-                        <a onClick={(evt) => {
-                            if (chartContainer.current) {
-
-                                let csvData;
-                                let series: EChartOption.SeriesLine | undefined = props.options.series
-                                    ? props.options.series[0] as EChartOption.SeriesLine
-                                    : undefined;
-
-                                if (series) {
-                                    let xAxis = props.options.xAxis![series.xAxisIndex || 0];
-
-                                    csvData = `${xAxis.name},${series.name}\n`;
-
-                                    let csvLines = (series.data as number[]).map((item) => {
-                                        if (item[0] instanceof Date) {
-                                            return `${item[0].toISOString()},${item[1]}`;
-                                        } else {
-                                            return `${item[0]},${item[1]}`;
-                                        }
-                                    });
-
-                                    csvData += csvLines.join('\n');
-
-                                    download(csvData, 'chart.csv', 'text/csv');
-                                }
-                            }
-
-                        }}>CSV</a>
-                    </Menu.Item>
-                </Menu>
+    useEffect(() => {
+        if (chart) {
+            if (!props.showTip) {
+                chart.dispatchAction({
+                    type: 'hideTip'
+                });
+                chart.dispatchAction({
+                    type: 'downplay'
+                });
+            } else {
+                chart.dispatchAction({
+                    type: 'showTip',
+                    ...props.showTip
+                });
             }
+        }
+    }, [props.showTip]);
+
+    return (
+        <div className='chart'
+            onMouseEnter={props.onMouseEnter}
+            onMouseLeave={props.onMouseLeave}
+        >
+            {resizeListener}
+            <div style={{width: '100%', height: '100%'}}
+                ref={chartContainer}
             >
-                <a className='ant-dropdown-link'>
-                    Export <Icon type='down' />
-                </a>
-            </Dropdown>
+            </div>
+            <div className='chart-ops'>
+                <Dropdown overlay={
+                    <Menu>
+                        <Menu.Item>
+                            <a onClick={(evt) => {
+                                if (chartContainer.current) {
+                                    let canvas = chartContainer.current.getElementsByTagName('canvas')[0];
+                                    let img = canvas.toDataURL('image/png');
+                                    download(img, 'chart.png', 'image/png');
+                                }
+                            }}>PNG</a>
+                        </Menu.Item>
+                        <Menu.Item>
+                            <a onClick={(evt) => {
+                                if (chartContainer.current) {
+
+                                    let csvData;
+                                    let series: EChartOption.SeriesLine | undefined = props.options.series
+                                        ? props.options.series[0] as EChartOption.SeriesLine
+                                        : undefined;
+
+                                    if (series) {
+                                        let xAxis = props.options.xAxis![series.xAxisIndex || 0];
+
+                                        csvData = `${xAxis.name},${series.name}\n`;
+
+                                        let csvLines = (series.data as number[]).map((item) => {
+                                            if (item[0] instanceof Date) {
+                                                return `${item[0].toISOString()},${item[1]}`;
+                                            } else {
+                                                return `${item[0]},${item[1]}`;
+                                            }
+                                        });
+
+                                        csvData += csvLines.join('\n');
+
+                                        download(csvData, 'chart.csv', 'text/csv');
+                                    }
+                                }
+
+                            }}>CSV</a>
+                        </Menu.Item>
+                    </Menu>
+                }
+                >
+                    <a className='ant-dropdown-link'>
+                        Export <Icon type='down' />
+                    </a>
+                </Dropdown>
+            </div>
         </div>
-    </div>;
+    );
 };

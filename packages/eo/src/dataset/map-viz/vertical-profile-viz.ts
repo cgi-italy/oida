@@ -1,22 +1,47 @@
 import { reaction, autorun } from 'mobx';
 import { types, addDisposer, applySnapshot, Instance } from 'mobx-state-tree';
 
+import { LoadingState } from '@oida/core';
 import { hasConfig, VerticalProfileLayer } from '@oida/state-mst';
 
 import { DatasetViz } from '../dataset-viz';
+import { DatasetDomainSeriesProvider, DatasetDomainSeriesItem } from '../analysis';
 import { ColorMapConfig, ColorMap } from './color-map';
 
-import { DatasetVerticalProfiles, VerticalProfileItem } from './dataset-vertical-profile';
-import { LoadingState } from '@oida/core';
+import { DatasetVerticalProfiles, IDatasetVerticalProfile, VerticalProfileItem } from './dataset-vertical-profile';
 
 export const VERTICAL_PROFILE_VIZ_TYPE = 'vertical_profile';
 
-
 export type VerticalProfileDataProvider = (verticalProfileViz) => Promise<VerticalProfileItem[]>;
+
+export type VerticalProfileSeriesProviderRequest = {
+    profileId: string,
+    direction: 'horizontal' | 'vertical',
+    coordIndex: number;
+};
+
+export type VerticalProfileLineSeriesItem = DatasetDomainSeriesItem<number> & {
+    imageCoord: {
+        x: number,
+        y: number
+    }
+};
+
+export type VerticalProfileLineSeriesItemResponse = {
+    subsample: number;
+    data: VerticalProfileLineSeriesItem[];
+};
+
 
 export type VerticalProfileVizConfig = {
     colorMapConfig: ColorMapConfig;
     dataProvider: VerticalProfileDataProvider;
+    tileSourceProvider?: (verticalProfileViz, profileId: string) => void;
+    profileCoordTransform?: {
+        forward: (profileId: string, profileCoord: number[]) => Promise<number[] | undefined>,
+        inverse: (profileId: string, geographicCoord: number[]) => Promise<number[] | undefined>
+    },
+    lineSeriesProvider?: (request: VerticalProfileSeriesProviderRequest) => Promise<VerticalProfileLineSeriesItemResponse>,
     verticalScaleConfig?: {
         min: number,
         max: number,
@@ -33,7 +58,8 @@ const DatasetVerticalProfileVizDecl = DatasetViz.addModel(
             colorMap: types.maybe(ColorMap),
             mapLayer: types.maybe(VerticalProfileLayer),
             verticalScale: types.optional(types.number, 1),
-            verticalProfiles: types.optional(DatasetVerticalProfiles, {})
+            verticalProfiles: types.optional(DatasetVerticalProfiles, {}),
+            tileSourceRevision: types.optional(types.number, 0)
         }),
         hasConfig<VerticalProfileVizConfig>()
     ).actions((self) => {
@@ -61,6 +87,9 @@ const DatasetVerticalProfileVizDecl = DatasetViz.addModel(
                 }).catch(() => {
                     mapLayer.setLoadingState(LoadingState.Error);
                 });
+            },
+            refreshTileView: () => {
+                self.tileSourceRevision++;
             }
         };
     })
@@ -124,7 +153,6 @@ const DatasetVerticalProfileVizDecl = DatasetViz.addModel(
                         mapLayer.setLoadingState(LoadingState.Error);
                     });
                 });
-
 
                 if (self.config.afterInit) {
                     self.config.afterInit(self);

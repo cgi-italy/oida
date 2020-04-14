@@ -4,4 +4,5 @@ export * from './dataset-time-series-chart';
 export * from './dataset-time-raster-sequence';
 export * from './dataset-domain-series-chart';
 export * from './dataset-domain-raster-sequence';
+export * from './dataset-vertical-profile-chart';
 export * from './dashboard-pane';
