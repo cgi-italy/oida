@@ -14,6 +14,12 @@ export type IVerticalProfileStyle = {
     fillColor?: Color
 };
 
+export type VerticalProfileCoordinate = {
+    profileId: string;
+    geographic?: GeoJSON.Position;
+    unprojected?: GeoJSON.Position;
+};
+
 export interface IVerticalProfileLayerRenderer extends ILayerRenderer {
     addProfile(id: string, profile: IVerticalProfile, style: IVerticalProfileStyle);
     getProfile(id: string);
@@ -21,6 +27,9 @@ export interface IVerticalProfileLayerRenderer extends ILayerRenderer {
     updateProfileStyle(id: string, style: IVerticalProfileStyle);
     removeProfile(id: string);
     removeAllProfiles();
+    setHighlightedCoordinate(coord: VerticalProfileCoordinate | undefined);
+    setSelectedCoordinate(coord: VerticalProfileCoordinate | undefined);
+    setHighlightedRegion(bbox: GeoJSON.BBox | undefined);
 }
 
 export const VERTICAL_PROFILE_LAYER_ID = 'vertical_profile';

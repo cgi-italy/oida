@@ -6,7 +6,8 @@ import { MapLayer } from './map-layer';
 
 const ImageLayerDecl = MapLayer.addModel(
     types.model(IMAGE_LAYER_ID, {
-        sourceType: types.maybe(types.string)
+        sourceType: types.maybe(types.string),
+        sourceRevision: types.optional(types.number, 0)
     })
     .volatile((self) => {
         return {
@@ -23,6 +24,9 @@ const ImageLayerDecl = MapLayer.addModel(
                     self.sourceType = undefined;
                     self.sourceConfig = undefined;
                 }
+            },
+            forceRefresh: () => {
+                self.sourceRevision++;
             }
         };
     })

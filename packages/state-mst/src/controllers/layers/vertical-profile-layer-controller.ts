@@ -22,14 +22,45 @@ export class VerticalProfileLayerController extends MapLayerController<IVertical
     private sourceTracker_: ArrayTracker<ProfileTracker> | undefined;
 
     protected createLayerRenderer_(mapRenderer: IMapRenderer) {
+
+        const onCoordinateSelect = (coordinate) => {
+
+            let selectedProfile = this.mapLayer_.source.items.find(item => item.selected);
+            if (selectedProfile) {
+                this.mapLayer_.setSelectedCoordinate({
+                    profileId: selectedProfile.id,
+                    geographic: coordinate
+                });
+            } else {
+                this.mapLayer_.setSelectedCoordinate(undefined);
+            }
+        };
+
+        const onCoordinateHover = (coordinate) => {
+
+            let selectedProfile = this.mapLayer_.source.items.find(item => item.selected);
+            if (selectedProfile) {
+                this.mapLayer_.setHighlihgtedCoordinate({
+                    profileId: selectedProfile.id,
+                    geographic: coordinate
+                });
+            } else {
+                this.mapLayer_.setHighlihgtedCoordinate(undefined);
+            }
+        };
+
         return <IVerticalProfileLayerRenderer>mapRenderer.getLayersFactory().create(VERTICAL_PROFILE_LAYER_ID, {
             mapRenderer: mapRenderer,
+            onCoordinateSelect: onCoordinateSelect,
+            onCoordinateHover: onCoordinateHover,
             ...this.mapLayer_.config
         });
     }
 
     protected bindToLayerState_() {
         super.bindToLayerState_();
+
+        const layerRenderer = this.layerRenderer_!;
 
         this.subscriptionTracker_.addSubscription(
             reaction(() => {
@@ -44,6 +75,46 @@ export class VerticalProfileLayerController extends MapLayerController<IVertical
             }, (source) => {
                 this.onSourceChange_(source);
             }, {fireImmediately: true})
+        );
+
+        this.subscriptionTracker_.addSubscription(
+            reaction(() => this.mapLayer_.highlightedCoordinate, (coord) => {
+                if (coord) {
+                    let profile = this.mapLayer_.source.itemWithId(coord.profileId);
+                    if (profile) {
+                        coord = {
+                            ...coord,
+                            profileId: createEntityReference(profile)
+                        };
+                    } else {
+                        coord = undefined;
+                    }
+                }
+                layerRenderer.setHighlightedCoordinate(coord);
+            })
+        );
+
+        this.subscriptionTracker_.addSubscription(
+            reaction(() => this.mapLayer_.selectedCoordinate, (coord) => {
+                if (coord) {
+                    let profile = this.mapLayer_.source.itemWithId(coord.profileId);
+                    if (profile) {
+                        coord = {
+                            ...coord,
+                            profileId: createEntityReference(profile)
+                        };
+                    } else {
+                        coord = undefined;
+                    }
+                }
+                layerRenderer.setSelectedCoordinate(coord);
+            })
+        );
+
+        this.subscriptionTracker_.addSubscription(
+            reaction(() => this.mapLayer_.highlightedRegion, (bbox) => {
+                layerRenderer.setHighlightedRegion(bbox);
+            })
         );
 
     }

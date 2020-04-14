@@ -15,6 +15,7 @@ export type ImageLayerConfig = {
 
 export interface IImageLayerRenderer extends ILayerRenderer {
     updateSource(source?: ImageSourceConfig);
+    forceRefresh() : void;
 }
 
 export const IMAGE_LAYER_ID = 'image';

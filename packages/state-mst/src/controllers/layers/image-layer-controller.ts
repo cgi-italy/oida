@@ -1,4 +1,4 @@
-import { autorun } from 'mobx';
+import { autorun, observe } from 'mobx';
 
 import { IMAGE_LAYER_ID, IImageLayerRenderer, IMapRenderer, LoadingState } from '@oida/core';
 
@@ -57,6 +57,12 @@ export class ImageLayerController extends MapLayerController<IImageLayerRenderer
                 } else {
                     this.layerRenderer_!.updateSource(undefined);
                 }
+            })
+        );
+
+        this.subscriptionTracker_.addSubscription(
+            observe(this.mapLayer_, 'sourceRevision', (change) => {
+                this.layerRenderer_!.forceRefresh();
             })
         );
     }

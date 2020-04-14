@@ -34,6 +34,10 @@ export class OLImageLayer extends OLMapLayer<ImageLayer> implements IImageLayerR
 
     }
 
+    forceRefresh() {
+        //TODO
+    }
+
     protected createOLObject_(config: ImageLayerConfig) {
 
         this.onImageLoadStart_ = () => {
