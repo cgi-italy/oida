@@ -25,4 +25,18 @@ export const getPickedFeatureEntity = (pickInfo) => {
     return entityId;
 };
 
+export const getPickedLayer = (pickInfo) => {
+    let entity = pickInfo.id;
+    let layer;
+    if (pickInfo.id instanceof Entity) {
+        if (entity.parent) {
+            entity = entity.parent;
+        }
+        layer = entity.layer_;
+    } else if (pickInfo.primitive.layer_) {
+        layer = pickInfo.primitive.layer_;
+    }
+    return layer;
+};
+
 export { CesiumPrimitiveFeatureLayer, CesiumEntityFeatureLayer };

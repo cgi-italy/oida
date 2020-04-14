@@ -89,13 +89,21 @@ export class CesiumMapRenderer implements IMapRenderer {
     }
 
     fitExtent(extent, animate?: boolean) {
+        let eps = 0.01;
+
+        let destination;
+        if (extent[2] - extent[0] <= eps || extent[3] - extent[1] <= eps) {
+            destination = Cartesian3.fromDegrees(extent[0], extent[1], this.viewer_.camera.positionCartographic.height);
+        } else {
+            destination = Rectangle.fromDegrees(...extent);
+        }
         if (animate) {
             this.viewer_.camera.flyTo({
-                destination : Rectangle.fromDegrees(...extent)
+                destination : destination
             });
         } else {
             this.viewer_.camera.setView({
-                destination : Rectangle.fromDegrees(...extent)
+                destination : destination
             });
         }
     }

@@ -6,7 +6,7 @@ import { IFeatureHoverInteractionImplementation, IFeatureHoverInteractionProps, 
 
 import { cesiumInteractionsFactory } from './cesium-interactions-factory';
 import { CesiumMapRenderer } from '../map/cesium-map-renderer';
-import { getPickedFeatureEntity } from '../layers';
+import { getPickedFeatureEntity, getPickedLayer } from '../layers';
 
 export class CesiumFeatureHoverInteraction implements IFeatureHoverInteractionImplementation {
 
@@ -49,6 +49,11 @@ export class CesiumFeatureHoverInteraction implements IFeatureHoverInteractionIm
                 if (entityId !== hoveredFeature) {
                     onFeatureHover(entityId);
                     hoveredFeature = entityId;
+                }
+                let layer = getPickedLayer(pickInfo);
+                if (layer && layer.onLayerHover) {
+                    let coordinate = this.viewer_.scene.pickPosition(movement.endPosition);
+                    layer.onLayerHover(coordinate, entityId, pickInfo);
                 }
             } else {
                 this.viewer_.container .style.cursor = '';

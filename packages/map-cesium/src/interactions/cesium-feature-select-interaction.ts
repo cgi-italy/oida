@@ -11,7 +11,7 @@ import {
 
 import { cesiumInteractionsFactory } from './cesium-interactions-factory';
 import { CesiumMapRenderer } from '../map/cesium-map-renderer';
-import { getPickedFeatureEntity } from '../layers';
+import { getPickedFeatureEntity, getPickedLayer } from '../layers';
 
 export class CesiumFeatureSelectInteraction implements IFeatureSelectInteractionImplementation {
 
@@ -81,6 +81,13 @@ export class CesiumFeatureSelectInteraction implements IFeatureSelectInteraction
         let pickInfo = this.viewer_.scene.pick(movement.position);
         if (pickInfo) {
             let entityId = getPickedFeatureEntity(pickInfo);
+
+            let layer = getPickedLayer(pickInfo);
+            if (layer && layer.onLayerPick) {
+                let coordinate = this.viewer_.scene.pickPosition(movement.position);
+                layer.onLayerPick(coordinate, entityId, pickInfo);
+            }
+
             this.onFeatureSelect_(entityId, selectionMode);
         } else {
             this.onFeatureSelect_( null, selectionMode);
