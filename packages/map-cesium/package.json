@@ -27,6 +27,7 @@
     "@oida/core": "file:../core"
   },
   "peerDependencies": {
-    "cesium": "^1.66.0"
+    "cesium": "^1.68.0",
+    "proj4": "^2.6.0"
   }
 }

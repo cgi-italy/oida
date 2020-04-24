@@ -44,7 +44,7 @@ export class CesiumTileLayer extends CesiumMapLayer implements ITileLayerRendere
         this.source_ = undefined;
 
         try {
-            let source = cesiumTileSourcesFactory.create(config.id, config);
+            let source = config ? cesiumTileSourcesFactory.create(config.id, config) : undefined;
             if (source) {
 
                 source.tileLoadStartEvent = new Event();

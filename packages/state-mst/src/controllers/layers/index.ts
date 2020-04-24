@@ -5,3 +5,5 @@ export * from './tile-layer-controller';
 export * from './image-layer-controller';
 export * from './feature-layer-controller';
 export * from './vertical-profile-layer-controller';
+export * from './volume-layer-controller';
+export * from './volume-view-mode';

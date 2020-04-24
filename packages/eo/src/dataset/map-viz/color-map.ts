@@ -23,7 +23,7 @@ export type DataVar = {
 export type ColorMapConfigPreset = {
     id: string;
     name: string;
-    legend: React.ReactNode;
+    legend: HTMLImageElement | HTMLCanvasElement;
 };
 
 export type ColorMapConfig = {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import classnames from 'classnames';
 import { Instance } from 'mobx-state-tree';
 
@@ -14,16 +14,20 @@ export type DatasetColormapPresetSelectorItemProps = {
 
 export const DatasetColormapPresetSelectorItem = (props: DatasetColormapPresetSelectorItemProps) => {
 
-    let legend = props.preset.legend;
-    if (legend instanceof Image) {
-        legend = <img src={legend.src}></img>;
-    }
+    let legendRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (legendRef.current) {
+            legendRef.current.innerHTML = '';
+            legendRef.current.appendChild(props.preset.legend.cloneNode(false));
+        }
+    }, [legendRef.current, props.preset]);
 
     return (
         <React.Fragment>
             <div className='dataset-colormap-preset-content'>
                 <div className='dataset-colormap-preset-title'>{props.preset.name}</div>
-                <div className='dataset-colormap-preset-legend'>{legend}</div>
+                <div className='dataset-colormap-preset-legend' ref={legendRef}></div>
             </div>
         </React.Fragment>
     );
