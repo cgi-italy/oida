@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useObserver } from 'mobx-react';
+import { getSnapshot } from 'mobx-state-tree';
+
 import { Select } from 'antd';
 
 import { IDatasetVolumetricViz, VOLUMETRIC_VIZ_TYPE } from '@oida/eo';
@@ -15,6 +17,15 @@ export type DatasetVolumetricVizSettingsProps = {
 };
 
 export const DatasetVolumetricVizSettings = (props: DatasetVolumetricVizSettingsProps) => {
+
+    let [viewModeSnapshot, setViewModeSnapshot] = useState({
+        stackView: {
+            numSlices: 8
+        },
+        sliceView: {
+            zSlice: 0
+        }
+    });
 
     let viewModeSettings: React.ReactNode;
 
@@ -54,9 +65,19 @@ export const DatasetVolumetricVizSettings = (props: DatasetVolumetricVizSettings
                     <span>View mode: </span>
                     <Select
                         value={viewMode?.mode}
-                        onChange={(value) => props.datasetViz.mapLayer?.setViewMode({
-                            mode: value
-                        })}
+                        onChange={(value) => {
+                            if (props.datasetViz.mapLayer) {
+                                let currentViewMode = getSnapshot(props.datasetViz.mapLayer.viewMode);
+                                setViewModeSnapshot({
+                                    ...viewModeSnapshot,
+                                    [currentViewMode.mode]: currentViewMode
+                                });
+                                props.datasetViz.mapLayer.setViewMode({
+                                    mode: value,
+                                    ...viewModeSnapshot[value]
+                                });
+                            }
+                        }}
                     >
                         {viewModeOptions}
                     </Select>
