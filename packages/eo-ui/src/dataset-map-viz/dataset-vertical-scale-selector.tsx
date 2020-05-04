@@ -4,10 +4,10 @@ import { useObserver } from 'mobx-react';
 
 import { Slider } from 'antd';
 
-import { IDatasetVerticalProfileViz } from '@oida/eo';
+import { IDatasetVerticalProfileViz, IDatasetVolumetricViz } from '@oida/eo';
 
 export type DatasetVerticalScaleSelectorProps = {
-    datasetViz: IDatasetVerticalProfileViz;
+    datasetViz: IDatasetVerticalProfileViz | IDatasetVolumetricViz;
     rangeConfig: {
         min: number,
         max: number,
@@ -37,7 +37,7 @@ export const DatasetVerticalScaleSelector = (props: DatasetVerticalScaleSelector
                 step={range.step || 1}
                 value={verticalScale}
                 marks={marks}
-                onChange={(value) => props.datasetViz.setVerticalScale(value)}
+                onChange={(value) => props.datasetViz.setVerticalScale(value as number)}
                 tipFormatter={(value) => `${value}x`}
             >
             </Slider>

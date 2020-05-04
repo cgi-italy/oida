@@ -42,4 +42,19 @@
         }
     }
 
+    .dataset-combo-selector {
+        display: flex;
+        align-items: center;
+
+        > span {
+            flex-grow: 0;
+            flex-shrink: 0;
+            margin-right: 0.5rem;
+        };
+
+        .ant-select-selection-selected-value {
+            margin-right: 0.5em;
+        }
+    }
+
 }
