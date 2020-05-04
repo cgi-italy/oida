@@ -28,7 +28,8 @@ export type VolumeSliceData = HTMLImageElement | HTMLCanvasElement | ArrayBuffer
 
 export type VolumeSliceUrl = {
     z: number,
-    url: string
+    url: string,
+    postData?: any
 };
 
 export type VolumeSourceConfig = {

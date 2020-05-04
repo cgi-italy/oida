@@ -7,11 +7,16 @@ export type CesiumVolumeSlice = {
     data: VolumeSliceData
 };
 
+export type CesiumVolumeSourceConfig = {
+    onSliceLoadStart?: () => void;
+    onSliceLoadEnd?: () => void;
+} & VolumeSourceConfig;
+
 export class CesiumVolumeSource {
 
-    protected config_: VolumeSourceConfig;
+    protected config_: CesiumVolumeSourceConfig;
 
-    constructor(config: VolumeSourceConfig) {
+    constructor(config: CesiumVolumeSourceConfig) {
         this.config_ = config;
     }
 
@@ -22,6 +27,7 @@ export class CesiumVolumeSource {
     loadTileData(key: VolumeTileKey, onSliceReady: (slice: CesiumVolumeSlice) => void) {
 
         const sliceLoader = this.config_.tileSliceLoader;
+        const {onSliceLoadStart, onSliceLoadEnd} = this.config_;
 
         let tileExtent = this.getTileExtentForKey(key);
         let slices = this.config_.tileSliceUrls(key, tileExtent);
@@ -36,13 +42,41 @@ export class CesiumVolumeSource {
                         });
                     });
                 } else {
-                    Resource.createIfNeeded(slice.url).fetchArrayBuffer().then(sliceData => {
+                    let resource: Resource;
+
+                    if (slice.postData) {
+                        resource = Resource.createIfNeeded(slice.url).post(slice.postData, {
+                            responseType: 'arraybuffer',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            }
+                        });
+                    } else {
+                        resource = Resource.createIfNeeded(slice.url).fetchArrayBuffer();
+                    }
+
+                    if (onSliceLoadStart) {
+                        onSliceLoadStart();
+                    }
+                    resource.then(sliceData => {
                         sliceLoader(slice, sliceData).then(textureData => {
                             onSliceReady({
                                 z: slice.z,
                                 data: textureData
                             });
+
+                            if (onSliceLoadEnd) {
+                                onSliceLoadEnd();
+                            }
+                        }, () => {
+                            if (onSliceLoadEnd) {
+                                onSliceLoadEnd();
+                            }
                         });
+                    }, () => {
+                        if (onSliceLoadEnd) {
+                            onSliceLoadEnd();
+                        }
                     });
                 }
             });

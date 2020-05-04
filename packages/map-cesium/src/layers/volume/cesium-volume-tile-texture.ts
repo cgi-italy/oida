@@ -12,8 +12,6 @@ import { CesiumVolumeSource, CesiumVolumeSlice } from './cesium-volume-source';
 export type CesiumVolumeTileTextureConfig = {
     source: CesiumVolumeSource;
     tileKey: VolumeTileKey;
-    onSliceLoadStart?: () => void;
-    onSliceLoadEnd?: () => void;
 };
 
 export class CesiumVolumeTileTexture {
@@ -62,18 +60,12 @@ export class CesiumVolumeTileTexture {
     load(context) {
 
         return new Promise((resolve, reject) => {
-            const {onSliceLoadStart, onSliceLoadEnd} = this.config_;
+
             let slices = this.config_.source.loadTileData(this.config_.tileKey, (slice) => {
                 this.updateTextureSlice_(slice, context);
-                if (onSliceLoadEnd) {
-                    onSliceLoadEnd();
-                }
                 resolve();
             });
 
-            if (onSliceLoadStart) {
-                slices.forEach(slice => onSliceLoadStart());
-            }
             this.computeSliceGridSize_(slices.length);
         });
     }

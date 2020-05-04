@@ -24,7 +24,11 @@ export class CesiumVolumeLayer extends CesiumMapLayer implements IVolumeLayerRen
         let colorMap = config.mapLayer.colorMap;
 
         this.volumeTileSet_ = new CesiumVolumeTileSet({
-            source: config.mapLayer.source ? new CesiumVolumeSource(config.mapLayer.source) : undefined,
+            source: config.mapLayer.source ? new CesiumVolumeSource({
+                ...config.mapLayer.source,
+                onSliceLoadStart: config.onSliceLoadStart,
+                onSliceLoadEnd: config.onSliceLoadEnd
+            }) : undefined,
             colorMap: colorMap ? {
                 clamp: colorMap.clamp,
                 colorMap: colorMap.image,
@@ -36,7 +40,11 @@ export class CesiumVolumeLayer extends CesiumMapLayer implements IVolumeLayerRen
     }
 
     updateSource(sourceConfig?: VolumeSourceConfig) {
-        this.volumeTileSet_.setSource(sourceConfig ? new CesiumVolumeSource(sourceConfig) : undefined);
+        this.volumeTileSet_.setSource(sourceConfig ? new CesiumVolumeSource({
+            ...sourceConfig,
+            onSliceLoadStart: this.onSliceLoadStart_,
+            onSliceLoadEnd: this.onSliceLoadEnd_
+        }) : undefined);
     }
 
     forceRefresh() {
