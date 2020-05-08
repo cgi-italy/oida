@@ -33,9 +33,11 @@ export const DatasetVolumetricVizSettings = (props: DatasetVolumetricVizSettings
         return props.datasetViz.mapLayer ? props.datasetViz.mapLayer.viewMode : undefined;
     });
 
+
     if (viewMode) {
         viewModeSettings = DatasetVolumetricViewModeSettingsFactory.create(viewMode.mode, {
-            viewMode: viewMode
+            viewMode: viewMode,
+            tileGrid: props.datasetViz.mapLayer?.source?.tileGrid
         });
     }
 

@@ -1,4 +1,3 @@
-import defineProperties from 'cesium/Source/Core/defineProperties';
 import Event from 'cesium/Source/Core/Event';
 import GeographicTilingScheme from 'cesium/Source/Core/GeographicTilingScheme';
 import WebMercatorTilingScheme from 'cesium/Source/Core/WebMercatorTilingScheme';
@@ -39,7 +38,7 @@ export const CesiumOLImageryProvider = function(this: any, olSource, options) {
     this.handleSourceChanged_();
 };
 
-defineProperties(CesiumOLImageryProvider.prototype, {
+Object.defineProperties(CesiumOLImageryProvider.prototype, {
     ready: {
         get: function(this: any) {
             return this.ready_;

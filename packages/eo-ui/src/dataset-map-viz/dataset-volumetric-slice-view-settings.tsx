@@ -2,14 +2,16 @@ import React, { useState } from 'react';
 import { useObserver } from 'mobx-react';
 
 import { Slider, Checkbox } from 'antd';
+import proj4 from 'proj4';
 
-import { SLICE_VOLUME_VIEW_ID } from '@oida/core';
+import { SLICE_VOLUME_VIEW_ID, VolumeTileGrid } from '@oida/core';
 import { ISliceVolumeMode } from '@oida/state-mst';
 
 import { DatasetVolumetricViewModeSettingsFactory } from './dataset-volumetric-view-mode-settings-factory';
 
 export type DatasetVolumetricSliceViewSettingsProps = {
-    viewMode: ISliceVolumeMode
+    viewMode: ISliceVolumeMode,
+    tileGrid: VolumeTileGrid
 };
 
 export const DatasetVolumetricSliceViewSettings = (props: DatasetVolumetricSliceViewSettingsProps) => {
@@ -27,6 +29,31 @@ export const DatasetVolumetricSliceViewSettings = (props: DatasetVolumetricSlice
         y: slices.y,
         z: slices.z
     });
+
+    const srs = props.tileGrid.srs;
+
+    const extent = props.tileGrid.extent;
+    const xToLon = (value) => {
+        let x = extent.minX + value * (extent.maxX - extent.minX);
+        if (srs !== 'EPSG:4326') {
+            let outputCoord = proj4(srs, 'EPSG:4326', [x, (extent.minY + extent.maxY) / 2]);
+            x = outputCoord[0];
+        }
+        return `Lon: ${x.toFixed(3)} °`;
+    };
+    const yToLat = (value) => {
+        let y = extent.minY + value * (extent.maxY - extent.minY);
+        if (srs !== 'EPSG:4326') {
+            let outputCoord = proj4(srs, 'EPSG:4326', [(extent.minX + extent.maxX) / 2, y]);
+            y = outputCoord[1];
+        }
+        return `Lat: ${y.toFixed(3)} °`;
+    };
+
+    const zToHeight = (value) => {
+        let height = extent.minZ + value * (extent.maxZ - extent.minZ);
+        return `Height: ${height.toFixed(3)} m`;
+    };
 
     return (
         <div>
@@ -46,8 +73,9 @@ export const DatasetVolumetricSliceViewSettings = (props: DatasetVolumetricSlice
                     disabled={slices.x === undefined}
                     min={0}
                     max={1}
-                    step={0.01}
+                    step={0.005}
                     value={slices.x}
+                    tipFormatter={xToLon}
                     onChange={(value) => props.viewMode.setXSlice(value as number)}
                 >
                 </Slider>
@@ -68,8 +96,9 @@ export const DatasetVolumetricSliceViewSettings = (props: DatasetVolumetricSlice
                     disabled={slices.y === undefined}
                     min={0}
                     max={1}
-                    step={0.01}
+                    step={0.005}
                     value={slices.y}
+                    tipFormatter={yToLat}
                     onChange={(value) => props.viewMode.setYSlice(value as number)}
                 >
                 </Slider>
@@ -90,8 +119,9 @@ export const DatasetVolumetricSliceViewSettings = (props: DatasetVolumetricSlice
                     disabled={slices.z === undefined}
                     min={0}
                     max={1}
-                    step={0.01}
+                    step={0.005}
                     value={slices.z}
+                    tipFormatter={zToHeight}
                     onChange={(value) => props.viewMode.setZSlice(value as number)}
                 >
                 </Slider>

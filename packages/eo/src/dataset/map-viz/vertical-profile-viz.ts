@@ -36,7 +36,7 @@ export type VerticalProfileLineSeriesItemResponse = {
 export type VerticalProfileVizConfig = {
     colorMapConfig: ColorMapConfig;
     dataProvider: VerticalProfileDataProvider;
-    tileSourceProvider?: (verticalProfileViz, profileId: string) => void;
+    tileSourceProvider?: (verticalProfileViz, profileId: string) => Promise<any>;
     profileCoordTransform?: {
         forward: (profileId: string, profileCoord: number[]) => Promise<number[] | undefined>,
         inverse: (profileId: string, geographicCoord: number[]) => Promise<number[] | undefined>

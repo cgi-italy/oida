@@ -86,7 +86,7 @@ export class DatasetsExplorerController {
 
     protected applyCommonFilters_(datasetView) {
         this.datasetsExplorer_.commonFilters.items.forEach((filter) => {
-            datasetView.dataset.searchParams.filters.set(filter.key, filter.value);
+            datasetView.dataset.searchParams.filters.set(filter.key, filter.value, filter.type);
         });
     }
 
