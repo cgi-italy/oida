@@ -77,10 +77,11 @@ export const AoiImportRenderer = (props: AoiImportRendererProps) => {
                                 options.onError(error);
                             });
                         }}
+                        accept={props.supportedFileTypes.map(fileType => `.${fileType}`).join(',')}
                         fileList={[]}
                     >
                         <Tooltip
-                            title='Upload shapefile'
+                            title='Upload AOI'
                         >
                             <Button
                                 size='small'

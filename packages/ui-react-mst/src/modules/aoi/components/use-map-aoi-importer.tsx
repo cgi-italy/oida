@@ -81,52 +81,52 @@ export const useMapAoiImporter = (props: MapAoiImporterProps) => {
             let extensionRegex = /\.([^\.]*)$/;
             let fileExtensionMatch = file.name.match(extensionRegex);
             if (fileExtensionMatch) {
-                let fileExtension = fileExtensionMatch[1];
+                let fileExtension = fileExtensionMatch[1].toLowerCase();
 
                 let nextParserIdx = 0;
 
-                const tryParse = (parser) => {
-                    parser.parse(file).then((data) => {
-                        let aoiSourceProvider = createInMemoryAoiProvider(data);
+                const tryParse = () => {
+                    let parser;
+                    do {
+                        parser = aoiParsers[nextParserIdx];
+                        nextParserIdx++;
+                    } while (parser && !parser.supportedFileTypes.includes(fileExtension));
 
-                        let propertyKeys;
-                        if (data.length) {
-                            let properties = data[0].properties || {};
-                            propertyKeys = Object.keys(properties);
-                        }
-                        props.aoiModule.aoiSources.add({
-                            id: file.name,
-                            name: file.name,
-                            queryParams: {
-                                paging: {
-                                    pageSize: 50
-                                }
-                            },
-                            config: {
-                                provider: aoiSourceProvider,
-                                propertyKeys: propertyKeys
+                    if (!parser) {
+                        reject('Unrecognized file format');
+                    } else {
+                        parser.parse(file).then((data) => {
+                            let aoiSourceProvider = createInMemoryAoiProvider(data);
+
+                            let propertyKeys;
+                            if (data.length) {
+                                let properties = data[0].properties || {};
+                                propertyKeys = Object.keys(properties);
                             }
+                            props.aoiModule.aoiSources.add({
+                                id: file.name,
+                                name: file.name,
+                                queryParams: {
+                                    paging: {
+                                        pageSize: 50
+                                    }
+                                },
+                                config: {
+                                    provider: aoiSourceProvider,
+                                    propertyKeys: propertyKeys
+                                }
+                            });
+
+                            props.aoiModule.setActiveSource(file.name);
+
+                            resolve();
+                        }).catch(() => {
+                            tryParse();
                         });
-
-                        props.aoiModule.setActiveSource(file.name);
-
-                        resolve();
-                    }).catch(() => {
-                        let parser;
-                        do {
-                            nextParserIdx++;
-                            parser = aoiParsers[nextParserIdx];
-                        } while (parser && !parser.supportedFileTypes.includes(fileExtension));
-
-                        if (parser) {
-                            tryParse(parser);
-                        } else {
-                            reject('Unrecognized file format');
-                        }
-                    });
+                    }
                 };
 
-                tryParse(aoiParsers[nextParserIdx]);
+                tryParse();
             } else {
                 reject('Unrecognized file format');
             }
@@ -154,7 +154,8 @@ export const useMapAoiImporter = (props: MapAoiImporterProps) => {
                 {name: 'MultiPoint', value: 'MultiPoint'},
                 {name: 'MultiLineString', value: 'MultiLineString'},
                 {name: 'MultiPolygon', value: 'MultiPolygon'}
-            ]
+            ],
+            multiple: true
         }
     }] as any;
 
@@ -214,6 +215,10 @@ export const useMapAoiImporter = (props: MapAoiImporterProps) => {
         };
     }
 
+    let supportedFileTypes = aoiParsers.reduce((fileTypes, parser) => {
+        return [...fileTypes, ...parser.supportedFileTypes];
+    }, []);
+
     return {
         onAoiImportAction: onAoiImportAction,
         onFileImportAction: onFileImportAction,
@@ -222,7 +227,8 @@ export const useMapAoiImporter = (props: MapAoiImporterProps) => {
         onSourceGroupSelect: onSourceGroupSelect,
         sourceGroups: sourceGroups,
         selectedSourceGroup: selectedSourceGroup ? selectedSourceGroup.id : undefined,
-        selectedSourceGroupItems: selectedSourceGroupItems
+        selectedSourceGroupItems: selectedSourceGroupItems,
+        supportedFileTypes: supportedFileTypes
     } as AoiImportConfig;
 };
 

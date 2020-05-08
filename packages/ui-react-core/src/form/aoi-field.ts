@@ -31,7 +31,8 @@ export type AoiImportConfig = {
     onSourceGroupSelect: (group: string) => void;
     selectedSourceGroup: string;
     sourceGroups: any[];
-    selectedSourceGroupItems?: DataCollectionProps<any>
+    selectedSourceGroupItems?: DataCollectionProps<any>;
+    supportedFileTypes: string[]
 };
 
 export type AoiFieldConfig = {
