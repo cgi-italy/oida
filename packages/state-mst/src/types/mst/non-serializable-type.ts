@@ -56,7 +56,7 @@ export const NonSerializableType = <T>(options?: NonSerializableTypeOptions) => 
             return value[objIdKey];
         },
         isTargetType(value) {
-            return typeof(value) !== 'string';
+            return !!value && typeof(value) !== 'string';
         },
         getValidationMessage(snapshot) {
             if (typeof snapshot !== 'string' || !registeredObjects[snapshot]) {
