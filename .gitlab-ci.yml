@@ -1,4 +1,4 @@
-image: node:10.9
+image: node:12.16.3
 
 cache:
   untracked: true
