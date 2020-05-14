@@ -39,6 +39,7 @@
     "@oida/core": "file:../core",
     "@oida/eo": "file:../eo",
     "@oida/state-mst": "file:../state-mst",
+    "@oida/map-ol": "file:../map-ol",
     "@oida/ui-react-antd": "file:../ui-react-antd",
     "@oida/ui-react-core": "file:../ui-react-core",
     "@oida/ui-react-mst": "file:../ui-react-mst",

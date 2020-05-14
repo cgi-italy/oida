@@ -36,6 +36,7 @@
   "dependencies": {
     "@oida/core": "file:../core",
     "@oida/ui-react-core": "file:../ui-react-core",
+    "lodash": "4.17.15",
     "moment": "^2.22.2"
   }
 }

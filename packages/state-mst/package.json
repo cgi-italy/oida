@@ -28,6 +28,7 @@
   },
   "dependencies": {
     "@oida/core": "file:../core",
+    "lodash": "4.17.15",
     "moment": "^2.22.2"
   }
 }
