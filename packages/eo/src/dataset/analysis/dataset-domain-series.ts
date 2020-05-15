@@ -1,7 +1,7 @@
 import { autorun } from 'mobx';
 import { types, addDisposer, flow, Instance } from 'mobx-state-tree';
 
-import { QueryFilter, Geometry, GeometryTypes, CancelablePromise, LoadingState } from '@oida/core';
+import { QueryFilter, Geometry, AoiSupportedGeometry, CancelablePromise, LoadingState } from '@oida/core';
 import { hasConfig, hasGeometry } from '@oida/state-mst';
 
 import { DatasetViz } from '../dataset-viz';
@@ -45,7 +45,7 @@ export type DatasetDomainSeriesProvider<T> = (request: DatasetDomainSeriesReques
 export type DatasetDomainSeriesConfig<T = number> = {
     domain: DatasetVariable<T>;
     provider: DatasetDomainSeriesProvider<T>;
-    supportedGeometries: GeometryTypes[],
+    supportedGeometries: AoiSupportedGeometry[],
     variables: DatasetVariable<number>[];
 };
 

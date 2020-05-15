@@ -2,7 +2,7 @@ import { types, Instance, addDisposer, flow } from 'mobx-state-tree';
 import { reaction } from 'mobx';
 
 import { QueryParams as QueryParamsCore, CancelablePromise } from '@oida/core';
-import { needsConfig, QueryParams } from '@oida/state-mst';
+import { hasConfig, QueryParams } from '@oida/state-mst';
 
 import { isDataProvider } from './is-data-provider';
 import { DatasetConfig } from '../dataset';
@@ -19,7 +19,7 @@ const DatasetDiscoveryDecl = types.compose(
         queryParams: types.optional(QueryParams, {})
     }),
     isDataProvider,
-    needsConfig<DatasetDiscoveryConfig>()
+    hasConfig<DatasetDiscoveryConfig>()
 ).volatile((self) => ({
     datasets: [] as DatasetConfig[]
 })

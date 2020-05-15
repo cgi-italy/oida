@@ -1,40 +1,57 @@
 import React from 'react';
 import { useObserver } from 'mobx-react';
 
-
-import { GeometryTypes } from '@oida/core';
+import { AoiSupportedGeometry, AoiAction } from '@oida/core';
 import { IDatasetAnalysis } from '@oida/eo';
 import { AoiFieldRenderer } from '@oida/ui-react-antd';
-import { useMapAoiDrawerFromModule } from '@oida/ui-react-mst';
+import { useMapAoiDrawerFromModule, useAoiAction } from '@oida/ui-react-mst';
 
 import { useAnalysisGeometryFromModule } from './use-analysis-geometry';
 
 export type AnalysisAoiFilterProps = {
     analysis: IDatasetAnalysis
-    supportedGeometries: GeometryTypes[];
+    supportedGeometries: AoiSupportedGeometry[];
 };
 
 export const AnalysisAoiFilter = (props: AnalysisAoiFilterProps) => {
     let geometryValue = useObserver(() => props.analysis.geometry);
 
-    let aoiDrawerConfig = useMapAoiDrawerFromModule({
-        value: geometryValue ? {
-            geometry: geometryValue
-        } : undefined,
-        onChange: (value) => {
-            props.analysis.setGeometry(value ? value.geometry : undefined);
-        }
+    let { activeAction, onActiveActionChange } = useAoiAction();
+
+    let value =  geometryValue ? {
+        geometry: geometryValue
+    } : undefined;
+
+    const onChange = (value) => {
+        props.analysis.setGeometry(value ? value.geometry : undefined);
+    };
+
+    const supportedActions = [
+        AoiAction.DrawPoint,
+        AoiAction.DrawLine,
+        AoiAction.DrawBBox,
+        AoiAction.Import
+    ];
+
+    useMapAoiDrawerFromModule({
+        value: value,
+        onChange: onChange,
+        supportedGeometries: props.supportedGeometries,
+        activeAction,
+        onActiveActionChange
     });
 
     let analysisGeometryState = useAnalysisGeometryFromModule(props.analysis);
 
     let aoiFilterConfig = {
-        ...aoiDrawerConfig,
         ...analysisGeometryState,
-        supportedGeometries: props.supportedGeometries
+        value,
+        onChange,
+        activeAction,
+        onActiveActionChange,
+        supportedGeometries: props.supportedGeometries,
+        supportedActions
     };
-
-    delete aoiFilterConfig.onLinkToViewportAction;
 
     return (
         <AoiFieldRenderer

@@ -4,10 +4,9 @@ import { useObserver } from 'mobx-react';
 
 import { Checkbox, message } from 'antd';
 
-import { AnyFormFieldDefinition } from '@oida/ui-react-core';
+import { AnyFormFieldDefinition, AoiAction } from '@oida/core';
 import {
-    useCenterOnMapFromModule, useMapAoiDrawerFromModule, useMapAoiInstanceFromModule,
-    useMapAoiImporterFromModule, useDataFiltering
+    useCenterOnMapFromModule, useMapAoiFieldFromModule, useDataFiltering
 } from '@oida/ui-react-mst';
 import { DatasetConfig, IDataset, IDatasetsExplorer, IDatasetDiscovery } from '@oida/eo';
 import { DataFilterer } from '@oida/ui-react-antd';
@@ -125,15 +124,24 @@ DatasetExplorerQuery.defaultProps = {
             name: 'aoi',
             title: 'Area of interest',
             config: (filterState) => {
-                let drawerProps = useMapAoiDrawerFromModule(filterState);
-                delete drawerProps.onDrawPointAction;
-                delete drawerProps.onLinkToViewportAction;
+
+                const supportedGeometries = [{
+                    type: 'BBox'
+                }, {
+                    type: 'Polygon'
+                }, {
+                    type: 'MultiPolygon'
+                }];
+
+                let aoiFieldConfig = useMapAoiFieldFromModule({
+                    ...filterState,
+                    supportedGeometries
+                });
 
                 return {
-                    supportedGeometries: ['BBox', 'Polygon', 'MultiPolygon'],
-                    aoiImport: useMapAoiImporterFromModule(filterState),
-                    ...drawerProps,
-                    ...useMapAoiInstanceFromModule(filterState)
+                    supportedGeometries: supportedGeometries,
+                    supportedActions: [AoiAction.DrawBBox, AoiAction.DrawPolygon, AoiAction.Import],
+                    ...aoiFieldConfig
                 };
             }
         },

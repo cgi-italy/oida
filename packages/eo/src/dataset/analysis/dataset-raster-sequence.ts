@@ -1,7 +1,7 @@
 import { autorun } from 'mobx';
 import { types, addDisposer, flow, Instance, SnapshotOut } from 'mobx-state-tree';
 
-import { QueryFilter, Geometry, GeometryTypes, CancelablePromise, LoadingState } from '@oida/core';
+import { QueryFilter, Geometry, AoiSupportedGeometry, CancelablePromise, LoadingState } from '@oida/core';
 import { hasConfig, hasGeometry } from '@oida/state-mst';
 
 import { ColorMap, ColorMapConfig } from '../map-viz/color-map';
@@ -39,7 +39,7 @@ export type DatasetRasterSequenceConfig<T = number> = {
     domain: DatasetVariable<T>;
     provider: DatasetRasterSequenceProvider<T>;
     imageGenerator: DatasetRasterSequenceThumbGenerator;
-    supportedGeometries: GeometryTypes[];
+    supportedGeometries: AoiSupportedGeometry[];
     colorMap: ColorMapConfig;
 };
 

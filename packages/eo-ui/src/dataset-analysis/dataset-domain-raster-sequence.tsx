@@ -98,7 +98,7 @@ export const DatasetDomainRasterSequence = (props: DatasetDomainRasterSequencePr
                 <Form.Item>
                     <AnalysisAoiFilter
                         analysis={props.analysis}
-                        supportedGeometries={['BBox']}
+                        supportedGeometries={props.sequence.config.supportedGeometries}
                     />
                 </Form.Item>
             </Form>

@@ -1,7 +1,7 @@
 import { types, Instance, detach, addDisposer, SnapshotIn, SnapshotOrInstance, getSnapshot, applySnapshot } from 'mobx-state-tree';
 import moment from 'moment';
 
-import { GroupLayer, DataFilters, needsConfig } from '@oida/state-mst';
+import { GroupLayer, DataFilters, hasConfig } from '@oida/state-mst';
 import {
     Dataset, DatasetConfig, IDataset,
     DatasetTimeDistributionViz, DatasetProductSearchViz,
@@ -59,7 +59,7 @@ const DatasetsExplorerDecl = types.compose(
             collection: {}
         })
     }),
-    needsConfig<DatasetsExplorerConfig>()
+    hasConfig<DatasetsExplorerConfig>()
 )
 .views((self) => {
     return {
