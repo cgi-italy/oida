@@ -24,15 +24,16 @@ export enum AoiAction {
     Import
 }
 
+export type AoiSupportedGeometry = {
+    type: GeometryTypes,
+    constraints?: {
+        maxCoords: number
+    }
+};
 
 export type AoiFieldConfig<IMPORT_CONFIG = any> = {
     supportedActions: AoiAction[];
-    supportedGeometries: Array<{
-        type: GeometryTypes,
-        constraints?: {
-            maxCoords: number
-        }
-    }>;
+    supportedGeometries: AoiSupportedGeometry[];
     onActiveActionChange: (action: AoiAction) => void;
     activeAction: AoiAction;
     name: string;

@@ -122,7 +122,11 @@ export class CesiumFeatureDrawInteraction implements IFeatureDrawInteractionImpl
                     let position = this.viewer_.camera.pickEllipsoid(evt.position);
                     if (position) {
                         positions[positions.length - 1] = position;
-                        positions.push(new Cartesian3());
+                        if (options.maxCoords && positions.length === options.maxCoords) {
+                            this.onDrawEnd_(mode, options);
+                        } else {
+                            positions.push(new Cartesian3());
+                        }
                     }
                 }, ScreenSpaceEventType.LEFT_CLICK);
 
@@ -227,7 +231,11 @@ export class CesiumFeatureDrawInteraction implements IFeatureDrawInteractionImpl
                     let position = this.viewer_.camera.pickEllipsoid(evt.position);
                     if (position) {
                         positions[positions.length - 1] = position;
-                        positions.push(new Cartesian3());
+                        if (options.maxCoords && positions.length === options.maxCoords) {
+                            this.onDrawEnd_(mode, options);
+                        } else {
+                            positions.push(new Cartesian3());
+                        }
                     }
                 }, ScreenSpaceEventType.LEFT_CLICK);
 

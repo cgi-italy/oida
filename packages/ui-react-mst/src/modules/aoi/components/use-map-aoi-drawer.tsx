@@ -1,20 +1,41 @@
-import { useState, useEffect } from 'react';
+import { useMemo, useEffect } from 'react';
 
-import { FeatureDrawMode, FeatureDrawEvent, FEATURE_DRAW_INTERACTION_ID } from '@oida/core';
+import { GeometryTypes, FeatureDrawMode, FeatureDrawEvent, FEATURE_DRAW_INTERACTION_ID } from '@oida/core';
 import { FeatureDrawInteraction, IFeatureDrawInteraction, IMap } from '@oida/state-mst';
-import { AoiAction, AoiValue, FormFieldState } from '@oida/core';
+import { AoiAction, AoiValue, AoiSupportedGeometry, FormFieldState } from '@oida/core';
 
 import { useAoiModuleState } from '../use-aoi-module-state';
 
+type GeometryConstraints = {
+    [type in GeometryTypes]: {
+        maxCoords: number
+    }
+};
+
 export type MapAoiDrawerProps = {
     drawInteraction: IFeatureDrawInteraction;
-    map: IMap;
     activeAction: AoiAction,
+    supportedGeometries: AoiSupportedGeometry[],
     onActiveActionChange: (action: AoiAction) => void
 } & FormFieldState<AoiValue>;
 
 
-export const useMapAoiDrawer = ({drawInteraction, map, activeAction, onActiveActionChange, onChange}: MapAoiDrawerProps) => {
+export const useMapAoiDrawer = ({
+    drawInteraction,
+    supportedGeometries,
+    activeAction,
+    onActiveActionChange,
+    onChange
+}: MapAoiDrawerProps) => {
+
+    const geometryConstraints = useMemo(() => {
+        return supportedGeometries.reduce((constraints, geometry) => {
+            return {
+                ...constraints,
+                [geometry.type]: geometry.constraints
+            };
+        }, {} as GeometryConstraints);
+    }, [supportedGeometries]);
 
     const onDrawEnd = (evt: FeatureDrawEvent) => {
 
@@ -33,13 +54,19 @@ export const useMapAoiDrawer = ({drawInteraction, map, activeAction, onActiveAct
             drawInteraction.setDrawMode(FeatureDrawMode.Point, {
                 onDrawEnd
             });
+        } else if (activeAction === AoiAction.DrawLine) {
+            drawInteraction.setDrawMode(FeatureDrawMode.Line, {
+                onDrawEnd,
+                ...geometryConstraints.LineString
+            });
         } else if (activeAction === AoiAction.DrawBBox) {
             drawInteraction.setDrawMode(FeatureDrawMode.BBox, {
                 onDrawEnd
             });
         } else if (activeAction === AoiAction.DrawPolygon) {
             drawInteraction.setDrawMode(FeatureDrawMode.Polygon, {
-                onDrawEnd
+                onDrawEnd,
+                ...geometryConstraints.Polygon
             });
         }
 
@@ -67,7 +94,6 @@ export const useMapAoiDrawerFromModule = (props: Omit<MapAoiDrawerProps, 'map' |
 
     return useMapAoiDrawer({
         drawInteraction,
-        map: moduleState.map,
         ...props
     });
 };

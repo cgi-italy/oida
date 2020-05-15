@@ -11,7 +11,7 @@ const FeatureDrawInteractionDecl = MapInteraction.addModel(types.model(
         drawMode: types.optional(enumFromType<FeatureDrawMode>(FeatureDrawMode), FeatureDrawMode.Off)
     }
 ).volatile((self) => ({
-    drawOptions: {}
+    drawOptions: {} as FeatureDrawOptions
 })).actions((self) => {
     return {
         setDrawMode: (mode: FeatureDrawMode, options: FeatureDrawOptions) => {

@@ -26,6 +26,8 @@ export type FeatureDrawOptions = {
     onDrawStart?: (evt: FeatureDrawEvent) => void;
     onDrawChange?: (evt: FeatureDrawEvent) => void;
     onDrawEnd?: (evt: FeatureDrawEvent) => void;
+    minCoords?: number;
+    maxCoords?: number
 };
 
 export interface IFeatureDrawInteractionImplementation extends IMapInteractionImplementation {

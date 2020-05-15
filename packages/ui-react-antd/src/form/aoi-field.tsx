@@ -6,6 +6,7 @@ import { AoiField, AoiAction, AOI_FIELD_ID } from '@oida/core';
 
 import { antdFormFieldRendererFactory } from './antd-form-field-renderer-factory';
 
+import { DrawLineIcon } from '../icons/draw-line';
 import { DrawBboxIcon } from '../icons/draw-bbox';
 import { DrawPolygonIcon } from '../icons/draw-polygon';
 
@@ -102,6 +103,26 @@ export const AoiFieldRenderer = (props:  AoiFieldRendererProps) => {
                             }}
                         >
                             <Icon type='environment'/>
+                        </Button>
+                    </Tooltip>
+                }
+                {
+                    aoiControls.line &&
+                    <Tooltip
+                        title='Draw line'
+                    >
+                        <Button
+                            type={activeAction === AoiAction.DrawLine ? 'primary' : 'default'}
+                            size='small'
+                            onClick={() => {
+                                if (activeAction === AoiAction.DrawLine) {
+                                    onActiveActionChange(AoiAction.None);
+                                } else {
+                                    onActiveActionChange(AoiAction.DrawLine);
+                                }
+                            }}
+                        >
+                            <DrawLineIcon/>
                         </Button>
                     </Tooltip>
                 }

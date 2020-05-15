@@ -49,7 +49,9 @@ export class OLFeatureDrawInteraction implements IFeatureDrawInteractionImplemen
         }
         if (mode === FeatureDrawMode.Line) {
             this.olInteraction_ = new DrawInteraction({
-                type: 'LineString'
+                type: 'LineString',
+                minPoints: options.minCoords,
+                maxPoints: options.maxCoords
             });
         } else if (mode === FeatureDrawMode.BBox) {
             this.olInteraction_ = new DrawInteraction({
@@ -63,7 +65,9 @@ export class OLFeatureDrawInteraction implements IFeatureDrawInteractionImplemen
                     geometry = geometry || new LineString([]);
                     geometry.setCoordinates([...coordinates, coordinates[0]]);
                     return geometry;
-                }
+                },
+                minPoints: options.minCoords,
+                maxPoints: options.maxCoords
             });
         } else if (mode === FeatureDrawMode.Circle) {
             this.olInteraction_ = new DrawInteraction({

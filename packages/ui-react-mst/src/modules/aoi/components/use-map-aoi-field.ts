@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-import { FormFieldState, AoiValue, AoiAction } from '@oida/core';
+import { GeometryTypes, AoiSupportedGeometry, AoiAction } from '@oida/core';
 
 import { useMapAoiDrawer, MapAoiDrawerProps, useMapAoiDrawerFromModule } from './use-map-aoi-drawer';
 import { useMapAoiInstance, MapAoiInstanceProps, useMapAoiInstanceFromModule } from './use-map-aoi-instance';
@@ -20,7 +20,8 @@ export const useAoiAction = () => {
     };
 };
 
-export type MapAoiFieldProps = Omit<MapAoiDrawerProps, 'activeAction' | 'onActiveActionChange'>
+export type MapAoiFieldProps =
+Omit<MapAoiDrawerProps, 'activeAction' | 'onActiveActionChange'>
 & MapAoiInstanceProps
 & Omit<MapAoiViewportProps, 'activeAction' | 'onActiveActionChange'>
 & Omit<MapAoiImporterProps, 'onActiveActionChange'>;
@@ -60,7 +61,7 @@ export const useMapAoiField = (props: MapAoiFieldProps) => {
 };
 
 export const useMapAoiFieldFromModule =
-(props: FormFieldState<AoiValue>, aoiModule?) => {
+(props: Omit<MapAoiFieldProps, 'map' | 'aois' | 'aoiModule' | 'mapSelection' | 'drawInteraction'>, aoiModule?) => {
 
     let {activeAction, onActiveActionChange} = useAoiAction();
 
