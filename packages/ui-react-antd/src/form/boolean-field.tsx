@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Checkbox, Switch } from 'antd';
 
-import { BooleanField, BOOLEAN_FIELD_ID } from '@oida/ui-react-core';
+import { BooleanField, BOOLEAN_FIELD_ID } from '@oida/core';
 
 import { antdFormFieldRendererFactory } from './antd-form-field-renderer-factory';
 

@@ -1,20 +1,19 @@
 import { useEffect } from 'react';
 import { useObserver } from 'mobx-react';
 
-import { LoadingState } from '@oida/core';
-import { AoiValue, FormFieldState, AoiImportConfig } from '@oida/ui-react-core';
+import { LoadingState, AoiValue, AoiAction, FormFieldState } from '@oida/core';
+
+import { AoiImportConfig } from '@oida/ui-react-core';
 
 import { useEntityCollectionList, useDataFiltering, useDataPaging, useDataSorting } from '../../../core/components';
 import { useCenterOnMap } from '../../map';
-
 import { IAOI } from '../types';
 import { createInMemoryAoiProvider } from '../utils';
-
-import { useAoiModuleState } from '../use-aoi-module-state';
-
+import { useAoiModuleState, IAoiModuleState } from '../use-aoi-module-state';
 
 export type MapAoiImporterProps = {
-    aoiModule
+    aoiModule: IAoiModuleState,
+    onActiveActionChange: (action: AoiAction) => void
 } & FormFieldState<AoiValue>;
 
 export const useMapAoiImporter = (props: MapAoiImporterProps) => {
@@ -42,6 +41,8 @@ export const useMapAoiImporter = (props: MapAoiImporterProps) => {
                 name: aoi.name
             }
         });
+
+        props.onActiveActionChange(AoiAction.None);
     };
 
     const onImportCancel = () => {
@@ -215,9 +216,9 @@ export const useMapAoiImporter = (props: MapAoiImporterProps) => {
         };
     }
 
-    let supportedFileTypes = aoiParsers.reduce((fileTypes, parser) => {
+    let supportedFileTypes = aoiParsers && aoiParsers.reduce((fileTypes, parser) => {
         return [...fileTypes, ...parser.supportedFileTypes];
-    }, []);
+    }, [] as string[]);
 
     return {
         onAoiImportAction: onAoiImportAction,
@@ -233,11 +234,11 @@ export const useMapAoiImporter = (props: MapAoiImporterProps) => {
 };
 
 
-export const useMapAoiImporterFromModule = (aoiFieldState: FormFieldState<AoiValue>, aoiModule?) => {
+export const useMapAoiImporterFromModule = (props: Omit<MapAoiImporterProps, 'aoiModule'>, aoiModule?) => {
     let moduleState = useAoiModuleState(aoiModule);
 
     return useMapAoiImporter({
         aoiModule: moduleState,
-        ...aoiFieldState
+        ...props
     });
 };

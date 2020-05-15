@@ -1,5 +1,5 @@
 import { autorun } from 'mobx';
-import { types, addDisposer, SnapshotIn } from 'mobx-state-tree';
+import { types, addDisposer, SnapshotIn, Instance } from 'mobx-state-tree';
 
 import { FeatureLayer } from '@oida/state-mst';
 import { AOI, AOICollection, AoiSourceCollection, AoiSource } from './types';
@@ -7,7 +7,7 @@ import { MapModuleStateModel, DefaultMapModule } from '../map';
 
 import { AppModule, AppModuleStateModel } from '../app-module';
 
-export const AoiModuleStateModel = AppModuleStateModel.addModel(
+const AoiModuleStateModelDecl = AppModuleStateModel.addModel(
     types.model('AoiModule', {
         aois: AOICollection,
         aoiSources: types.optional(AoiSourceCollection, {}),
@@ -62,6 +62,11 @@ export type AoiModuleConfig = {
         parse: AoiParser;
     }>;
 };
+
+type AoiModuleStateModelType = typeof AoiModuleStateModelDecl;
+export interface AoiModuleStateModelInterface extends AoiModuleStateModelType {}
+export const AoiModuleStateModel: AoiModuleStateModelInterface = AoiModuleStateModelDecl;
+export interface IAoiModule extends Instance<AoiModuleStateModelInterface> {}
 
 export type AoiModule = AppModule<typeof AoiModuleStateModel, AoiModuleConfig>;
 

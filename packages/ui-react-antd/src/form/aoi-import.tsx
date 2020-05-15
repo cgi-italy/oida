@@ -7,9 +7,7 @@ import { AoiImportConfig } from '@oida/ui-react-core';
 import { DataCollectionList } from '../data-collection';
 import { FocusIcon } from '../icons/focus';
 
-export type AoiImportRendererProps = AoiImportConfig;
-
-export const AoiImportRenderer = (props: AoiImportRendererProps) => {
+export const AoiImportRenderer = (props: AoiImportConfig) => {
 
     let groupOptions = props.sourceGroups.map((group) => {
         return (

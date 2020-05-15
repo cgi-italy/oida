@@ -1,12 +1,14 @@
 
 import React from 'react';
 
-import { FormField, FormFieldRenderer, FormFieldDefinition, isFormFieldConfigWithGenerator } from './form-field';
+import { FormField, FormFieldDefinition, isFormFieldConfigFromState } from '@oida/core';
 
 type ExtractType<IT extends FormField<any, any, any>> = IT extends FormField<infer TYPE, any, any> ? TYPE : never;
 type ExtractValue<IT extends FormField<any, any, any>> = IT extends FormField<any, infer T, any> ? T : never;
 type ExtractConfig<IT extends FormField<any, any, any>> = IT extends FormField<any, any, infer CONFIG> ? CONFIG : never;
 
+
+export type FormFieldRenderer<T extends FormField<any, any, any>> = (props: T) => JSX.Element | null;
 
 export const formFieldRendererFactory = () => {
     const REGISTERED_RENDERERS = new Map<string, Map<string, FormFieldRenderer<any>>>();
@@ -40,7 +42,7 @@ export const formFieldRendererFactory = () => {
 
         let FormFieldRenderer =  renderers.get(rendererId)!;
 
-        if (isFormFieldConfigWithGenerator(definition)) {
+        if (isFormFieldConfigFromState(definition)) {
             let Renderer = FormFieldRenderer;
             FormFieldRenderer = (props) => {
 

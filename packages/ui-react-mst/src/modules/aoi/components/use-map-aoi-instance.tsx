@@ -1,9 +1,10 @@
 import { useEffect } from 'react';
 import { useObserver } from 'mobx-react';
 
-import { getGeometryExtent, SelectionMode } from '@oida/core';
+import { getGeometryExtent, SelectionMode, AoiValue, FormFieldState } from '@oida/core';
 import { IEntitySelection, IMap } from '@oida/state-mst';
-import {  AoiValue, FormFieldState } from '@oida/ui-react-core';
+
+import { useCenterOnMap } from '../../map';
 
 import { useAoiModuleState } from '../use-aoi-module-state';
 import { IAOICollection } from '../types/aoi';
@@ -36,6 +37,10 @@ export const useMapAoiInstance = ({ mapSelection, aois, map, value}: MapAoiInsta
         }
     }, [value]);
 
+    const centerOnMap = useCenterOnMap({
+        map: map
+    });
+
     const getAoiInstance = () => {
         if (value && value.props && value.props.id) {
             return aois.itemWithId(value.props.id);
@@ -56,7 +61,9 @@ export const useMapAoiInstance = ({ mapSelection, aois, map, value}: MapAoiInsta
         let aoiInstance = getAoiInstance();
         mapSelection.modifySelection(aoiInstance, SelectionMode.Replace);
         if (aoiInstance) {
-            map.renderer.implementation!.fitExtent(getGeometryExtent(aoiInstance.geometry), true);
+            centerOnMap(aoiInstance.geometry, {
+                animate: true
+            });
         }
     };
 
@@ -67,19 +74,13 @@ export const useMapAoiInstance = ({ mapSelection, aois, map, value}: MapAoiInsta
                 color: aoiInstance.color,
                 name: aoiInstance.name
             };
-        } else {
-            return {
-                color: null,
-                name: value && value.props && value.props.fromViewport ? 'Current viewport' : 'None'
-            };
         }
     });
 
     return {
         onHoverAction: onAoiHover,
         onSelectAction: onAoiSelect,
-        color: aoiProps.color,
-        name: aoiProps.name
+        ...aoiProps
     };
 };
 

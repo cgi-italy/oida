@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { FormFieldRendererFactory } from './form-field-renderer-factory';
-import { AnyFormFieldDefinition } from './form-field';
+import { AnyFormFieldDefinition } from '@oida/core';
 
 export type FormFieldRenderersProps = {
     factory: FormFieldRendererFactory,

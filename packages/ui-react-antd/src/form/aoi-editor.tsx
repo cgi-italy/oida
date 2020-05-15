@@ -5,7 +5,7 @@ import debounce from 'lodash/debounce';
 import { Select, Button, Input, Form } from 'antd';
 
 import { Geometry, GeometryTypes } from '@oida/core';
-import { AoiValue, FormFieldState } from '@oida/ui-react-core';
+import { AoiValue, FormFieldState } from '@oida/core';
 
 
 const parseCoordString = (coordString: string = '') => {

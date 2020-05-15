@@ -1,7 +1,8 @@
 import React from 'react';
 import classnames from 'classnames';
 
-import { AnyFormFieldDefinition, FormFieldValues, useFormFieldRenderers } from '@oida/ui-react-core';
+import { AnyFormFieldDefinition, FormFieldValues } from '@oida/core';
+import { useFormFieldRenderers } from '@oida/ui-react-core';
 
 import { antdFormFieldRendererFactory } from '../form/antd-form-field-renderer-factory';
 

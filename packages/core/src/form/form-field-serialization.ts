@@ -1,5 +1,5 @@
 
-import { createDynamicFactory } from '@oida/core';
+import { createDynamicFactory } from '../utils';
 
 import { FormField } from './form-field';
 

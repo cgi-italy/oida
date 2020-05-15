@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 
 import { Tag, Button, Tooltip, Icon, Drawer, Popover } from 'antd';
 
-import { AoiField, AoiAction, AOI_FIELD_ID } from '@oida/ui-react-core';
+import { AoiField, AoiAction, AOI_FIELD_ID } from '@oida/core';
 
 import { antdFormFieldRendererFactory } from './antd-form-field-renderer-factory';
 
@@ -11,44 +11,54 @@ import { DrawPolygonIcon } from '../icons/draw-polygon';
 
 import { AoiImportRenderer } from './aoi-import';
 import { AoiEditor } from './aoi-editor';
+import { AoiImportConfig } from '@oida/ui-react-core';
 
-export const AoiFieldRenderer = (props:  Omit<AoiField, 'name' | 'type'>) => {
+export type AoiFieldRendererProps = Omit<AoiField<AoiImportConfig>, 'name' | 'type'>;
 
-    const [importVisible, setImportVisible] = useState(false);
+export const AoiFieldRenderer = (props:  AoiFieldRendererProps) => {
+
     const [editorVisible, setEditorVisible] = useState(false);
 
     const { value, onChange, config, ...renderProps } = props;
-    const { supportedGeometries, onDrawPointAction, onDrawBBoxAction, onDrawPolygonAction, onLinkToViewportAction,
-         aoiImport, onHoverAction, onSelectAction, activeAction, color, name } = config;
+    const {
+        supportedActions, supportedGeometries,
+        activeAction, color, name, importConfig,
+        onActiveActionChange, onHoverAction, onSelectAction
+    } = config;
 
     const aoiControls = useMemo(() => {
-        const point = onDrawPointAction && supportedGeometries.some(geometryType => {
-            return geometryType === 'Point' || geometryType === 'MultiPoint';
+        const point = supportedActions.indexOf(AoiAction.DrawPoint) !== -1 && supportedGeometries.some(geometry => {
+            return geometry.type === 'Point' || geometry.type === 'MultiPoint';
         });
 
-        const bbox = onDrawBBoxAction && supportedGeometries.some(geometryType => {
-            return geometryType === 'BBox';
+        const line = supportedActions.indexOf(AoiAction.DrawLine) !== -1 && supportedGeometries.some(geometry => {
+            return geometry.type === 'LineString' || geometry.type === 'MultiLineString';
         });
 
-        const polygon = onDrawPolygonAction && supportedGeometries.some(geometryType => {
-            return geometryType === 'Polygon' || geometryType === 'MultiPolygon';
+        const bbox = supportedActions.indexOf(AoiAction.DrawBBox) !== -1 && supportedGeometries.some(geometry => {
+            return geometry.type === 'BBox' || geometry.type === 'Polygon' || geometry.type === 'MultiPolygon';
         });
+
+        const polygon = supportedActions.indexOf(AoiAction.DrawPolygon) !== -1 && supportedGeometries.some(geometry => {
+            return geometry.type === 'Polygon' || geometry.type === 'MultiPolygon';
+        });
+
+        const linkToViewport = supportedActions.indexOf(AoiAction.LinkToMapViewport) !== -1 && supportedGeometries.some(geometry => {
+            return geometry.type === 'BBox' || geometry.type === 'Polygon' || geometry.type === 'MultiPolygon';
+        });
+
+        const importAction = importConfig && supportedActions.indexOf(AoiAction.Import) !== -1;
 
         return {
             point,
+            line,
             bbox,
-            polygon
+            polygon,
+            linkToViewport,
+            import: importAction
         };
 
-    }, [supportedGeometries, onDrawPointAction, onDrawBBoxAction, onDrawPolygonAction]);
-
-    if (aoiImport) {
-        let importAction = aoiImport.onAoiImportAction;
-        aoiImport.onAoiImportAction = (aoi) => {
-            importAction(aoi);
-            setImportVisible(false);
-        };
-    }
+    }, [supportedGeometries, supportedActions]);
 
     return (
         <React.Fragment>
@@ -61,13 +71,7 @@ export const AoiFieldRenderer = (props:  Omit<AoiField, 'name' | 'type'>) => {
                 onClick={onSelectAction ? () => onSelectAction!(true) : undefined}
                 onClose={(evt) => {
                     evt.stopPropagation();
-                    if (activeAction === AoiAction.LinkToViewport) {
-                        if (onLinkToViewportAction) {
-                            onLinkToViewportAction();
-                        }
-                    } else {
-                        props.onChange(undefined);
-                    }
+                    props.onChange(undefined);
                 }}
             >
                 {name}
@@ -89,7 +93,13 @@ export const AoiFieldRenderer = (props:  Omit<AoiField, 'name' | 'type'>) => {
                         <Button
                             type={activeAction === AoiAction.DrawPoint ? 'primary' : 'default'}
                             size='small'
-                            onClick={() => onDrawPointAction!()}
+                            onClick={() => {
+                                if (activeAction === AoiAction.DrawPoint) {
+                                    onActiveActionChange(AoiAction.None);
+                                } else {
+                                    onActiveActionChange(AoiAction.DrawPoint);
+                                }
+                            }}
                         >
                             <Icon type='environment'/>
                         </Button>
@@ -103,7 +113,13 @@ export const AoiFieldRenderer = (props:  Omit<AoiField, 'name' | 'type'>) => {
                         <Button
                             type={activeAction === AoiAction.DrawBBox ? 'primary' : 'default'}
                             size='small'
-                            onClick={() => onDrawBBoxAction!()}
+                            onClick={() => {
+                                if (activeAction === AoiAction.DrawBBox) {
+                                    onActiveActionChange(AoiAction.None);
+                                } else {
+                                    onActiveActionChange(AoiAction.DrawBBox);
+                                }
+                            }}
                         >
                             <DrawBboxIcon/>
                         </Button>
@@ -117,21 +133,33 @@ export const AoiFieldRenderer = (props:  Omit<AoiField, 'name' | 'type'>) => {
                         <Button
                             type={activeAction === AoiAction.DrawPolygon ? 'primary' : 'default'}
                             size='small'
-                            onClick={() => onDrawPolygonAction!()}
+                            onClick={() => {
+                                if (activeAction === AoiAction.DrawPolygon) {
+                                    onActiveActionChange(AoiAction.None);
+                                } else {
+                                    onActiveActionChange(AoiAction.DrawPolygon);
+                                }
+                            }}
                         >
                             <DrawPolygonIcon/>
                         </Button>
                     </Tooltip>
                 }
                 {
-                    aoiControls.bbox && onLinkToViewportAction &&
+                    aoiControls.linkToViewport &&
                     <Tooltip
-                        title='Link to viewport'
+                        title='Link to map viewport'
                     >
                         <Button
-                            type={activeAction === AoiAction.LinkToViewport ? 'primary' : 'default'}
+                            type={activeAction === AoiAction.LinkToMapViewport ? 'primary' : 'default'}
                             size='small'
-                            onClick={() => onLinkToViewportAction!()}
+                            onClick={() => {
+                                if (activeAction === AoiAction.LinkToMapViewport) {
+                                    onChange(undefined);
+                                } else {
+                                    onActiveActionChange(AoiAction.LinkToMapViewport);
+                                }
+                            }}
                         >
                             <Icon type='link'/>
                         </Button>
@@ -151,7 +179,7 @@ export const AoiFieldRenderer = (props:  Omit<AoiField, 'name' | 'type'>) => {
                             <AoiEditor
                                 value={value}
                                 onChange={onChange}
-                                supportedGeometries={supportedGeometries}
+                                supportedGeometries={supportedGeometries.map(geometry => geometry.type)}
                                 onDone={() => setEditorVisible(false)}
                             />
                         }
@@ -171,36 +199,40 @@ export const AoiFieldRenderer = (props:  Omit<AoiField, 'name' | 'type'>) => {
                     </Tooltip>
                 }
                 {
-                    aoiImport &&
+                    aoiControls.import &&
                     <Tooltip
                         title='Import area'
                     >
                         <Button
-                            type={importVisible ? 'primary' : 'default'}
+                            type={activeAction === AoiAction.Import ? 'primary' : 'default'}
                             size='small'
-                            onClick={() => setImportVisible(!importVisible)}
+                            onClick={() => {
+                                if (activeAction === AoiAction.Import) {
+                                    onActiveActionChange(AoiAction.None);
+                                } else {
+                                    onActiveActionChange(AoiAction.Import);
+                                }
+                            }}
                         >
                             <Icon type='import'/>
                         </Button>
                     </Tooltip>
                 }
             </Button.Group>
-            {aoiImport &&
+            {
+                aoiControls.import && importConfig &&
                 <Drawer
                     className='aoi-import-drawer'
-                    visible={importVisible}
+                    visible={activeAction === AoiAction.Import}
                     width={370}
                     placement='left'
                     onClose={() => {
-                        setImportVisible(false);
-                        if (aoiImport.onImportCancel) {
-                            aoiImport.onImportCancel();
-                        }
+                        onActiveActionChange(AoiAction.None);
                     }}
                     afterVisibleChange={(visible) => {
                         if (!visible) {
-                            if (aoiImport.onImportCancel) {
-                                aoiImport.onImportCancel();
+                            if (importConfig.onImportCancel) {
+                                importConfig.onImportCancel();
                             }
                         }
                     }}
@@ -209,7 +241,7 @@ export const AoiFieldRenderer = (props:  Omit<AoiField, 'name' | 'type'>) => {
                     mask={false}
                 >
                     <AoiImportRenderer
-                        {...aoiImport}
+                        {...importConfig}
                     />
                 </Drawer>
             }

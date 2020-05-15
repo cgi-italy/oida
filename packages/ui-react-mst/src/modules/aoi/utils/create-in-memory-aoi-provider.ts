@@ -61,8 +61,8 @@ const filterMemoryAoiSource = (data: AoiSourceItem[], queryParams: QueryParams) 
 
 export const createInMemoryAoiProvider = (aoiList: AoiSourceItem[]) => {
 
-    return (queryParams: QueryParams) => {
+    return ((queryParams: QueryParams) => {
         let promise = Promise.resolve(filterMemoryAoiSource(aoiList, queryParams));
         return wrapInCancelablePromise(promise);
-    };
+    }) as AoiSourceProvider;
 };

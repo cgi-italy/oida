@@ -4,10 +4,10 @@ export type FormFieldRendererConfig = {
 };
 
 export type FormFieldCommonConfig<TYPE extends string> = {
+    type: TYPE;
     name: string;
     title?: string;
     required?: boolean;
-    type: TYPE;
     rendererConfig?: FormFieldRendererConfig;
 };
 
@@ -21,7 +21,7 @@ export type FormFieldState<T> = {
     onChange: (value: T | undefined) => void;
 };
 
-export type FormFieldConfigWithGenerator<TYPE extends string, CONFIG, T> = {
+export type FormFieldConfigFromState<TYPE extends string, CONFIG, T> = {
     config: (state: FormFieldState<T>) => CONFIG;
 } & FormFieldCommonConfig<TYPE>;
 
@@ -29,14 +29,13 @@ export type FormField<TYPE extends string, T, CONFIG> = FormFieldConfig<TYPE, CO
 
 
 export type FormFieldDefinition<TYPE extends string, T, CONFIG> =
-    FormFieldConfig<TYPE, CONFIG> | FormFieldConfigWithGenerator<TYPE, T, CONFIG>;
+    FormFieldConfig<TYPE, CONFIG> | FormFieldConfigFromState<TYPE, T, CONFIG>;
 
-export const isFormFieldConfigWithGenerator = <TYPE extends string, T, CONFIG>(definition: FormFieldDefinition<TYPE, T, CONFIG>):
-definition is FormFieldConfigWithGenerator<TYPE, T, CONFIG> => {
+export const isFormFieldConfigFromState = <TYPE extends string, T, CONFIG>(definition: FormFieldDefinition<TYPE, T, CONFIG>):
+definition is FormFieldConfigFromState<TYPE, T, CONFIG> => {
     return typeof(definition.config) === 'function';
 };
 
-export type FormFieldRenderer<T extends FormField<any, any, any>> = (props: T) => JSX.Element | null;
 
 export type FormFieldValues = Map<string, any>;
 

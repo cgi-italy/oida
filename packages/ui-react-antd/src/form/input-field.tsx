@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 
 import { Input } from 'antd';
 
-import { StringField, STRING_FIELD_ID } from '@oida/ui-react-core';
+import { StringField, STRING_FIELD_ID } from '@oida/core';
 
 import { antdFormFieldRendererFactory } from './antd-form-field-renderer-factory';
 

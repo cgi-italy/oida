@@ -1,7 +1,8 @@
 import { useObserver } from 'mobx-react';
 
+import { AnyFormFieldDefinition } from '@oida/core';
 import { IDataFilters } from '@oida/state-mst';
-import { AnyFormFieldDefinition, DataFiltererProps } from '@oida/ui-react-core';
+import { DataFiltererProps } from '@oida/ui-react-core';
 
 export type DataFilteringProps = {
     filteringState?: IDataFilters;

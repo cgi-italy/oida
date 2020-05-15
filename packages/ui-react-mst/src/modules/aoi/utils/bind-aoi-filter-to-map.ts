@@ -1,8 +1,8 @@
 import { autorun, reaction } from 'mobx';
 import debounce from 'lodash/debounce';
 
+import { AoiValue, AOI_FIELD_ID } from '@oida/core';
 import { IDataFilters, IMap } from '@oida/state-mst';
-import { AoiValue, AOI_FIELD_ID } from '@oida/ui-react-core';
 
 import { IAOICollection, IAOI } from '../types';
 
@@ -35,11 +35,12 @@ export const bindAoiFilterToMap = (props: bindAoiFilterToMapProps) => {
 
         let valueProps = value ? value.props || {} : {};
 
-        if (value && !valueProps.fromViewport) {
+        if (value && !valueProps.fromMapViewport) {
 
             if (viewportObserverDisposer) {
                 viewportObserverDisposer();
                 viewportObserverDisposer = undefined;
+                debouncedAoiUpdate.cancel();
             }
 
             if (!aoiInstance) {
@@ -75,7 +76,7 @@ export const bindAoiFilterToMap = (props: bindAoiFilterToMapProps) => {
                 props.aois.remove(aoiInstance);
                 aoiInstance = undefined;
             }
-            if (value && valueProps.fromViewport) {
+            if (value && valueProps.fromMapViewport) {
                 if (!viewportObserverDisposer) {
                     viewportObserverDisposer = autorun(() => {
                         let renderer = props.map.renderer.implementation;
@@ -98,6 +99,7 @@ export const bindAoiFilterToMap = (props: bindAoiFilterToMapProps) => {
                 if (viewportObserverDisposer) {
                     viewportObserverDisposer();
                     viewportObserverDisposer = undefined;
+                    debouncedAoiUpdate.cancel();
                 }
             }
         }

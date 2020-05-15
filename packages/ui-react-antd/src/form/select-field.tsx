@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Select } from 'antd';
 
-import { EnumField, ENUM_FIELD_ID } from '@oida/ui-react-core';
+import { EnumField, ENUM_FIELD_ID } from '@oida/core';
 
 import { antdFormFieldRendererFactory } from './antd-form-field-renderer-factory';
 

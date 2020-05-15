@@ -15,6 +15,10 @@ export const createAppStoreContext = <APP_STATE extends IAppWithModules>(appStat
     return appStoreContext;
 };
 
+export const destroyAppStoreContext = () => {
+    appStoreContext = undefined;
+};
+
 export const useAppStore = <T = any>() => {
     if (!appStoreContext) {
         throw new Error('No app store context created.');
