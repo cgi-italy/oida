@@ -1,19 +1,33 @@
 import { autorun } from 'mobx';
 import { types, addDisposer, SnapshotIn, Instance } from 'mobx-state-tree';
 
-import { FeatureLayer } from '@oida/state-mst';
+import { FeatureLayer, hasConfig } from '@oida/state-mst';
 import { AOI, AOICollection, AoiSourceCollection, AoiSource } from './types';
 import { MapModuleStateModel, DefaultMapModule } from '../map';
 
 import { AppModule, AppModuleStateModel } from '../app-module';
 
+export type AoiParser = (input: string | File) => Promise<SnapshotIn<typeof AOI>[]>;
+
+export type AoiModuleConfig = {
+    aoiParsers?: Array<{
+        id: string;
+        name?: string;
+        supportedFileTypes: string[];
+        parse: AoiParser;
+    }>;
+};
+
 const AoiModuleStateModelDecl = AppModuleStateModel.addModel(
-    types.model('AoiModule', {
-        aois: AOICollection,
-        aoiSources: types.optional(AoiSourceCollection, {}),
-        activeSource: types.optional(types.safeReference(AoiSource), undefined),
-        mapModule: types.reference(MapModuleStateModel)
-    })
+    types.compose('AoiModule',
+        types.model('AoiModule', {
+            aois: AOICollection,
+            aoiSources: types.optional(AoiSourceCollection, {}),
+            activeSource: types.optional(types.safeReference(AoiSource), undefined),
+            mapModule: types.reference(MapModuleStateModel)
+        }),
+        hasConfig<AoiModuleConfig>()
+    )
     .views((self) => {
         return {
             get map() {
@@ -52,23 +66,13 @@ const AoiModuleStateModelDecl = AppModuleStateModel.addModel(
     })
 );
 
-export type AoiParser = (input: string | File) => Promise<SnapshotIn<typeof AOI>[]>;
-
-export type AoiModuleConfig = {
-    aoiParsers?: Array<{
-        id: string;
-        name?: string;
-        supportedFileTypes: string[];
-        parse: AoiParser;
-    }>;
-};
 
 type AoiModuleStateModelType = typeof AoiModuleStateModelDecl;
 export interface AoiModuleStateModelInterface extends AoiModuleStateModelType {}
 export const AoiModuleStateModel: AoiModuleStateModelInterface = AoiModuleStateModelDecl;
 export interface IAoiModule extends Instance<AoiModuleStateModelInterface> {}
 
-export type AoiModule = AppModule<typeof AoiModuleStateModel, AoiModuleConfig>;
+export type AoiModule = AppModule<typeof AoiModuleStateModel>;
 
 export const DefaultAoiModule : AoiModule = {
     stateModel: AoiModuleStateModel,
@@ -77,6 +81,7 @@ export const DefaultAoiModule : AoiModule = {
         mapModule: DefaultMapModule.defaultInitState.id,
         aois: {
             id: 'aois'
-        }
+        },
+        config: {}
     }
 };

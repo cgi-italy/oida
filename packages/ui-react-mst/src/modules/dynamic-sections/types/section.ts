@@ -10,15 +10,17 @@ export type LayoutOptions = {
     show?: boolean;
 };
 
-export const SectionDecl = types.model('LayoutSection', {
+const SectionDecl = types.model('LayoutSection', {
     id: types.identifier,
     components: types.optional(types.array(SectionItem), []),
     activeComponent: types.safeReference(SectionItem),
     expanded: types.optional(types.boolean, true)
 }).actions((self) => ({
     addComponent: (id: string, config: Omit<LayoutSectionItem, 'id'>, options: LayoutOptions = {}) => {
-        let component = SectionItem.create({id});
-        component.init(config);
+        let component = SectionItem.create({
+            id,
+            config: config
+        });
 
         let { idx, show } = options;
 

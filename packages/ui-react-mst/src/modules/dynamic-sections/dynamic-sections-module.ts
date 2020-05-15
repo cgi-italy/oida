@@ -24,15 +24,12 @@ const DynamicSectionsStateModelDecl = AppModuleStateModel.addModel(
     }))
 );
 
-export type DynamicSectionsModuleConfig = {
-};
-
 type DynamicSectionsStateModelType = typeof DynamicSectionsStateModelDecl;
 export interface DynamicSectionsStateModelInterface extends DynamicSectionsStateModelType {}
 export const DynamicSectionsStateModel: DynamicSectionsStateModelInterface = DynamicSectionsStateModelDecl;
 export interface IDynamicSectionsStateModel extends Instance<DynamicSectionsStateModelInterface> {}
 
-export type DynamicSectionsModule = AppModule<DynamicSectionsStateModelInterface, DynamicSectionsModuleConfig>;
+export type DynamicSectionsModule = AppModule<DynamicSectionsStateModelInterface>;
 
 export const DefaultDynamicSectionsModule: DynamicSectionsModule = {
     stateModel: DynamicSectionsStateModel,

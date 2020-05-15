@@ -2,20 +2,34 @@
 import { types, Instance } from 'mobx-state-tree';
 
 import { IMapProjection } from '@oida/core';
-import { Map, EntitySelection, TileLayer, ReferenceOrType } from '@oida/state-mst';
+import { Map, EntitySelection, TileLayer, ReferenceOrType, hasConfig } from '@oida/state-mst';
 
 import { AppModule, AppModuleStateModel } from '../app-module';
 import { FormattersModuleStateModel } from '../formatters';
 
+export type MapModuleConfig = {
+    baseLayers?: Array<{id: string, name: string, config: any}>
+    renderers?: Array<{id: string, name: string, props?: any}>,
+    projections?: Array<IMapProjection & {name: string}>,
+    initialOptions?: {
+        baseLayer?: string;
+        renderer?: string;
+        projection?: string;
+    }
+};
+
 const MapModuleStateModelDecl = AppModuleStateModel.addModel(
-    types.model('MapModule', {
-        map: Map,
-        selection: ReferenceOrType(EntitySelection),
-        formattersModule: types.maybe(types.reference(FormattersModuleStateModel))
-    }).actions((self) => {
+    types.compose(
+        'MapModule',
+        types.model({
+            map: Map,
+            selection: ReferenceOrType(EntitySelection),
+            formattersModule: types.maybe(types.reference(FormattersModuleStateModel))
+        }), hasConfig<MapModuleConfig>()
+    ).actions((self) => {
         return {
             afterAttach: () => {
-                let config = ((self as any).config as MapModuleConfig);
+                let config = self.config;
                 if (config.initialOptions) {
                     let baseLayerId = config.initialOptions.baseLayer;
                     if (baseLayerId) {
@@ -60,23 +74,12 @@ const MapModuleStateModelDecl = AppModuleStateModel.addModel(
     })
 );
 
-export type MapModuleConfig = {
-    baseLayers?: Array<{id: string, name: string, config: any}>
-    renderers?: Array<{id: string, name: string, props?: any}>,
-    projections?: Array<IMapProjection & {name: string}>,
-    initialOptions?: {
-        baseLayer?: string;
-        renderer?: string;
-        projection?: string;
-    }
-};
-
 type MapModuleStateModelType = typeof MapModuleStateModelDecl;
 export interface MapModuleStateModelInterface extends MapModuleStateModelType {}
 export const MapModuleStateModel: MapModuleStateModelInterface = MapModuleStateModelDecl;
 export interface IMapModule extends Instance<MapModuleStateModelInterface> {}
 
-export type MapModule = AppModule<MapModuleStateModelInterface, MapModuleConfig>;
+export type MapModule = AppModule<MapModuleStateModelInterface>;
 
 const defaultInitState = {
     id: 'map',
@@ -96,7 +99,8 @@ const defaultInitState = {
     },
     selection: {
         id: 'selection'
-    }
+    },
+    config: {}
 };
 
 export const DefaultMapModule : MapModule = {

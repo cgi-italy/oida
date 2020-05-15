@@ -2,16 +2,29 @@ import React from 'react';
 import { types, Instance } from 'mobx-state-tree';
 
 import { FormatterQuantity, Formatter } from '@oida/core';
+import { hasConfig } from '@oida/state-mst';
 
 import { AppModule, AppModuleStateModel } from '../app-module';
 
+type FormatterQuantityConfig<TYPE, OPTIONS> = {
+    quantity: FormatterQuantity<TYPE, OPTIONS>;
+    formatter: Formatter<TYPE, OPTIONS>;
+    formatterOptions: Array<{id: string, name: string, options: OPTIONS}>;
+    initialOptions: string;
+};
+
+export type FormattersModuleConfig =  FormatterQuantityConfig<any, any>[];
+
 const FormattersModuleStateModelDecl = AppModuleStateModel.addModel(
-    types.model('FormattersModule', {
-        defaultFormatterOptions: types.map(types.model({
-            id: types.string,
-            options: types.frozen()
-        }))
-    }).volatile((self) => {
+    types.compose('FormattersModule',
+        types.model({
+            defaultFormatterOptions: types.map(types.model({
+                id: types.string,
+                options: types.frozen()
+            }))
+        }),
+        hasConfig<FormattersModuleConfig>()
+    ).volatile((self) => {
         return {
             registeredFormatters: new Map<string, Formatter<any, any>>()
         };
@@ -55,7 +68,7 @@ const FormattersModuleStateModelDecl = AppModuleStateModel.addModel(
     .actions((self) => {
         return {
             afterAttach: () => {
-                let formatters = (self as any).config as FormattersModuleConfig;
+                let formatters = self.config;
                 formatters.forEach((formatterConfig) => {
                     self.addFormatter(formatterConfig.quantity, formatterConfig.formatter);
                     let options = formatterConfig.formatterOptions.find((options) => {
@@ -70,25 +83,17 @@ const FormattersModuleStateModelDecl = AppModuleStateModel.addModel(
     })
 );
 
-type FormatterQuantityConfig<TYPE, OPTIONS> = {
-    quantity: FormatterQuantity<TYPE, OPTIONS>;
-    formatter: Formatter<TYPE, OPTIONS>;
-    formatterOptions: Array<{id: string, name: string, options: OPTIONS}>;
-    initialOptions: string;
-};
-
 type FormattersModuleStateModelType = typeof FormattersModuleStateModelDecl;
 export interface FormattersModuleStateModelInterface extends FormattersModuleStateModelType {}
 export const FormattersModuleStateModel: FormattersModuleStateModelInterface = FormattersModuleStateModelDecl;
 export interface IFormattersModule extends Instance<FormattersModuleStateModelInterface> {}
 
-
-export type FormattersModuleConfig =  FormatterQuantityConfig<any, any>[];
-export type FormattersModule = AppModule<FormattersModuleStateModelInterface, FormattersModuleConfig>;
+export type FormattersModule = AppModule<FormattersModuleStateModelInterface>;
 
 export const DefaultFormattersModule : FormattersModule = {
     stateModel: FormattersModuleStateModel,
     defaultInitState: {
-        id: 'formatters'
-    }
+        id: 'formatters',
+        config: []
+    },
 };

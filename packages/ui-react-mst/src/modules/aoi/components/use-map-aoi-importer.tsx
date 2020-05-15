@@ -9,10 +9,11 @@ import { useEntityCollectionList, useDataFiltering, useDataPaging, useDataSortin
 import { useCenterOnMap } from '../../map';
 import { IAOI } from '../types';
 import { createInMemoryAoiProvider } from '../utils';
-import { useAoiModuleState, IAoiModuleState } from '../use-aoi-module-state';
+import { useAoiModuleState } from '../use-aoi-module-state';
+import { IAoiModule } from '../aoi-module';
 
 export type MapAoiImporterProps = {
-    aoiModule: IAoiModuleState,
+    aoiModule: IAoiModule,
     onActiveActionChange: (action: AoiAction) => void
 } & FormFieldState<AoiValue>;
 

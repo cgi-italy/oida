@@ -1,20 +1,14 @@
 import { types, Instance, SnapshotIn } from 'mobx-state-tree';
 
-import { ExtractPropsFromModel, ExtractOthersFromModel, TaggedUnion, needsConfig } from '@oida/state-mst';
+import { ExtractPropsFromModel, ExtractOthersFromModel, TaggedUnion, hasConfig } from '@oida/state-mst';
 
-const AppModuleStateModelBase = types.compose(
-    'AppModule',
-    types.model({
-        id: types.identifier
-    }),
-    needsConfig<any>()
-);
-
+const AppModuleStateModelBase = types.model('AppModule', {
+    id: types.identifier
+});
 
 export const AppModuleStateModel = TaggedUnion('appModuleType', AppModuleStateModelBase);
 
-
-export type AppModule<STATE_MODEL, CONFIG> = {
+export type AppModule<STATE_MODEL> = {
     stateModel: STATE_MODEL;
     defaultInitState: SnapshotIn<STATE_MODEL>
 };

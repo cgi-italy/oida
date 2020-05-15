@@ -28,9 +28,8 @@ export const useAppStore = <T = any>() => {
 
 export const useAppModuleState = <
     PROPS extends AppModuleProps,
-    OTHERS extends AppModuleOthers,
-    CONFIG
-> (appModule: AppModule<IModelType<PROPS, OTHERS>, CONFIG>) => {
+    OTHERS extends AppModuleOthers
+> (appModule: AppModule<IModelType<PROPS, OTHERS>>) => {
     let appStore = useAppStore<IAppWithModules>();
 
     return appStore.getModuleState(appModule);

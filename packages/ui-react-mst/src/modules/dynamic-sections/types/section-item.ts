@@ -1,7 +1,7 @@
 import { types, Instance } from 'mobx-state-tree';
 
 import { Omit } from '@oida/core';
-import { needsConfig } from '@oida/state-mst';
+import { hasConfig } from '@oida/state-mst';
 import { LayoutSectionItem } from '@oida/ui-react-core';
 
 const SectionItemDecl = types.compose(
@@ -9,7 +9,7 @@ const SectionItemDecl = types.compose(
     types.model({
         id: types.identifier,
     }),
-    needsConfig<Omit<LayoutSectionItem, 'id'>>()
+    hasConfig<Omit<LayoutSectionItem, 'id'>>()
 ).views((self) => ({
     get renderingConfig() {
         return {
