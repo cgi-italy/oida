@@ -1,7 +1,5 @@
 import { useEffect, useState } from 'react';
 
-import { Omit } from '@oida/core';
-
 import { IDynamicSectionsStateModel } from '../dynamic-sections-module';
 import { useDynamicSectionsModuleState } from '../use-dynamic-sections-module-state';
 import { ISectionItem, LayoutOptions } from '../types';
@@ -35,7 +33,10 @@ const DynamicSectionInjectorBase = (props: DynamicSectionInjectorProps) => {
 
     useEffect(() => {
         if (sectionItem) {
-            sectionItem.init({...renderProps, content: children});
+            sectionItem.updateItem({
+                ...renderProps,
+                content: children
+            });
         }
     }, [renderProps.title, renderProps.icon, children]);
 

@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from 'react';
 
-import { Omit } from '@oida/core';
 import { BreadcrumbItemProps } from '@oida/ui-react-core';
 
 import { useBreadcrumbModuleState } from '../use-breadcrumb-module-state';
-
 import { IBreadcrumbItemModel } from '../types/breadcrumb-item-model';
 import { IBreadcrumbModuleStateModel } from '../breadcrumb-module';
 

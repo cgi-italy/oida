@@ -35,7 +35,7 @@ export type UnprojectedImageLayerProps = {
 export const UnprojectedImageLayer = (props: UnprojectedImageLayerProps) => {
 
     const mapContainer = useRef<HTMLDivElement>(null);
-    const [map, setMap] = useState();
+    const [map, setMap] = useState<any>();
     const [resizeListener, size] = useResizeAware();
 
     useEffect(() => {

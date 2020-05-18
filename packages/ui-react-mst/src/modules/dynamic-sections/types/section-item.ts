@@ -1,23 +1,32 @@
 import { types, Instance } from 'mobx-state-tree';
 
-import { Omit } from '@oida/core';
 import { hasConfig } from '@oida/state-mst';
 import { LayoutSectionItem } from '@oida/ui-react-core';
+
+export type SectionItemConfig = Omit<LayoutSectionItem, 'id'>;
 
 const SectionItemDecl = types.compose(
     'SectionItem',
     types.model({
         id: types.identifier,
     }),
-    hasConfig<Omit<LayoutSectionItem, 'id'>>()
+    hasConfig<SectionItemConfig>()
 ).views((self) => ({
     get renderingConfig() {
         return {
             id: self.id,
-            ...self.config
+            title: self.config.title,
+            icon: self.config.icon,
+            content: self.config.content
         };
     }
-}));
+})).actions((self) => {
+    return {
+        updateItem: (item: SectionItemConfig) => {
+            self.config = item;
+        }
+    };
+});
 
 
 type SectionItemType = typeof SectionItemDecl;

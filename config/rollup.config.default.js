@@ -14,7 +14,8 @@ let externalDependencies = Object.keys(pkg.peerDependencies || {});
 let plugins = [
     typescript({
         typescript: require('typescript'),
-        useTsconfigDeclarationDir: true
+        useTsconfigDeclarationDir: true,
+        cacheRoot: '.rpt2_cache'
     })
 ];
 

@@ -4,7 +4,10 @@ const commonConfig = require('./webpack.common.js');
 const webpack = require('webpack');
 
 const config = (env = {}) => {
-    return webpackMerge(commonConfig(env),{
+    return webpackMerge(commonConfig({
+        mode: 'development',
+        ...env
+    }),{
         mode: 'development',
         devtool: 'cheap-module-eval-source-map',
         devServer: {
@@ -24,8 +27,7 @@ const config = (env = {}) => {
                                 importLoaders: 0,
                                 sourceMap: true,
                                 import: false,
-                                modules: false,
-                                minimize: true
+                                modules: false
                             }
                         }
                     ]

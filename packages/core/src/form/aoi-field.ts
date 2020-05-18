@@ -1,4 +1,4 @@
-import { Geometry, GeometryTypes } from '@oida/core';
+import { Geometry, GeometryTypes } from '../types/geometry';
 
 import { FormField } from './form-field';
 import { setFormFieldSerializer } from './form-field-serialization';

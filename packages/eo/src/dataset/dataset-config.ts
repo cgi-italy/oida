@@ -1,4 +1,4 @@
-import { AnyFormFieldDefinition } from '@oida/ui-react-core';
+import { AnyFormFieldDefinition } from '@oida/core';
 
 import { DatasetProductSearchConfig } from './product-search';
 import { DatasetTimeDistributionConfig } from './time-distribution';

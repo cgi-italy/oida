@@ -1,8 +1,6 @@
-import { Omit } from '@oida/core';
 import { IMapView } from '@oida/state-mst';
 
 import { useMapModuleState } from '../use-map-module-state';
-
 
 export type MapNavControlsProps = {
     mapView: IMapView;

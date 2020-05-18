@@ -3,8 +3,6 @@ import React from 'react';
 import { DatePicker } from 'antd';
 import moment from 'moment';
 
-import { Omit } from '@oida/core';
-
 import { DateRangeField, DATE_RANGE_FIELD_ID } from '@oida/core';
 
 import { antdFormFieldRendererFactory } from './antd-form-field-renderer-factory';

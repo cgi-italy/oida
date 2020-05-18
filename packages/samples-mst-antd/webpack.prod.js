@@ -5,7 +5,10 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 const config = (env = {}) => {
-    return webpackMerge(commonConfig(env),{
+    return webpackMerge(commonConfig({
+        mode: 'production',
+        ...env
+    }),{
         mode: 'production',
         devtool: 'source-map',
         module: {
@@ -20,8 +23,7 @@ const config = (env = {}) => {
                                 importLoaders: 0,
                                 sourceMap: true,
                                 import: false,
-                                modules: false,
-                                minimize: true
+                                modules: false
                             }
                         }
                     ]

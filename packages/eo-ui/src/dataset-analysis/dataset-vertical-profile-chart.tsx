@@ -33,7 +33,7 @@ export type VerticalProfileImageProps = {
 
 export const VerticalProfileImage = (props: VerticalProfileImageProps) => {
 
-    let [sourceConfig, setSourceConfig] = useState();
+    let [sourceConfig, setSourceConfig] = useState<any>();
 
     let vProfileViz = props.verticalProfileViz;
 
@@ -127,7 +127,7 @@ export type VerticalProfileSeriesProps = {
 
 export const VerticalProfileSeries = (props: VerticalProfileSeriesProps) => {
 
-    const [series, setSeries] = useState();
+    const [series, setSeries] = useState<any>();
     const [isLoading, setIsLoading] = useState(false);
     const [tipOptions, setTipOptions] = useState();
     const [trackCoordinate, setTrackCoordinate] = useState(false);

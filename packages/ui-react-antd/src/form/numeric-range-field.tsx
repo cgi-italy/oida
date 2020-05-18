@@ -2,7 +2,6 @@ import React from 'react';
 
 import { InputNumber, Slider, Row, Col } from 'antd';
 
-import { Omit } from '@oida/core';
 import { NumericRangeField, NUMERIC_RANGE_FIELD_ID } from '@oida/core';
 
 import { antdFormFieldRendererFactory } from './antd-form-field-renderer-factory';

@@ -19,7 +19,7 @@ export type CancelableAxiosPromise<T> = CancelablePromise<AxiosResponse<T>>;
 const cancelableRequest = function<T = any>(this: AxiosInstance, config: AxiosRequestConfig) {
     let source = axios.CancelToken.source();
 
-    let request = <CancelableAxiosPromise<T>><unknown>(this).request<T>({
+    let request = <CancelableAxiosPromise<T>>this.request<T>({
         ...config,
         cancelToken: source.token
     }).catch((error) => {
@@ -38,7 +38,7 @@ const cancelableRequest = function<T = any>(this: AxiosInstance, config: AxiosRe
         let newResponse =  Promise.prototype.then.apply(this, args);
         newResponse['cancel'] = source.cancel;
         newResponse.then = cancelableThen;
-        return newResponse;
+        return newResponse as CancelablePromise<any>;
     };
 
     const cancelableCatch = function(...args) {
@@ -46,7 +46,7 @@ const cancelableRequest = function<T = any>(this: AxiosInstance, config: AxiosRe
         let newResponse =  Promise.prototype.catch.apply(this, args);
         newResponse['cancel'] = source.cancel;
         newResponse.catch = cancelableCatch;
-        return newResponse;
+        return newResponse as CancelablePromise<any>;
     };
 
     request.then = cancelableThen;

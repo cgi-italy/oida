@@ -1,9 +1,6 @@
 import { types, Instance } from 'mobx-state-tree';
 
-import { Omit } from '@oida/core';
-import { LayoutSectionItem } from '@oida/ui-react-core';
-
-import { SectionItem, ISectionItem } from './section-item';
+import { SectionItem, ISectionItem, SectionItemConfig } from './section-item';
 
 export type LayoutOptions = {
     idx?: number;
@@ -16,7 +13,7 @@ const SectionDecl = types.model('LayoutSection', {
     activeComponent: types.safeReference(SectionItem),
     expanded: types.optional(types.boolean, true)
 }).actions((self) => ({
-    addComponent: (id: string, config: Omit<LayoutSectionItem, 'id'>, options: LayoutOptions = {}) => {
+    addComponent: (id: string, config: SectionItemConfig, options: LayoutOptions = {}) => {
         let component = SectionItem.create({
             id,
             config: config

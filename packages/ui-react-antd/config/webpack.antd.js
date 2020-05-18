@@ -1,28 +1,30 @@
-const webpack = require('webpack');
-const AntdScssThemePlugin = require('antd-scss-theme-plugin');
+const AntdScssThemePlugin = require('@inventium/antd-scss-theme-plugin');
 const tsImportPluginFactory = require('ts-import-plugin');
 
 const config = (config = {}) => {
 
     let tsLoaderOptions = config.tsLoaderOptions || {};
 
-    tsLoaderOptions.customTransformers = tsLoaderOptions.customTransformers || {};
+    let {getCustomTransformers, ...otherTsLoaderOptions} = tsLoaderOptions;
+
+    getCustomTransformers = getCustomTransformers || {};
 
     let styleLoader = config.styleLoader || 'style-loader';
 
     let cssLoaderOptions = config.cssLoaderOptions || {
         sourceMap: true,
-        modules: false,
-        minimize: true
+        modules: false
     };
 
     let sassLoadersOptions = config.sassLoaderOptions || {};
-    let lessLoaderOptions = config.lessLoaderOptions || {};
+    let lessLoaderOptions = config.lessLoaderOptions || {
+        javascriptEnabled: true
+    };
 
     return {
         resolve: {
             alias: {
-                '@oida/ui-react-antd': '@oida/ui-react-antd/src'
+                '@oida/ui-react-antd': '@oida/ui-react-antd/src' //do not use built library in order for theme to work
             }
         },
         module: {
@@ -31,7 +33,7 @@ const config = (config = {}) => {
                     test: /\.tsx?$/,
                     use: [
                         {
-                            loader: 'awesome-typescript-loader',
+                            loader: 'ts-loader',
                             options: {
                                 getCustomTransformers: () => ({
                                     before: [
@@ -40,13 +42,13 @@ const config = (config = {}) => {
                                             libraryDirectory: 'lib',
                                             style: true
                                         }),
-                                        ...tsLoaderOptions.customTransformers.before || []
+                                        ...getCustomTransformers.before || []
                                     ],
                                     after: [
-                                        ...tsLoaderOptions.customTransformers.after || []
+                                        ...getCustomTransformers.after || []
                                     ]
                                 }),
-                                ...tsLoaderOptions
+                                ...otherTsLoaderOptions
                             }
                         }
                     ],
@@ -88,7 +90,7 @@ const config = (config = {}) => {
             ]
         },
         plugins: [
-            new AntdScssThemePlugin(config.themePath),
+            new AntdScssThemePlugin(config.themePath)
         ]
     }
 }

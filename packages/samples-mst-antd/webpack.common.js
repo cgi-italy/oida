@@ -1,20 +1,23 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
 const cesiumConfig = require('@oida/map-cesium/config/webpack.cesium.js');
 const antdConfig = require('@oida/ui-react-antd/config/webpack.antd.js');
 
 const webpackMerge = require('webpack-merge');
 
-const nodeEnv = process.env.NODE_ENV;
 
 const config = (env = {}) => {
     return webpackMerge(
         cesiumConfig({ nodeModulesDir: '../../node_modules' }),
         antdConfig({
             themePath: path.join(__dirname, 'style', './theme.scss'),
-            styleLoader: nodeEnv === 'production' ? MiniCssExtractPlugin.loader : 'style-loader'
+            styleLoader: env.mode === 'production' ? MiniCssExtractPlugin.loader : 'style-loader',
+            tsLoderOptions: {
+                transpileOnly: true
+            }
         }),
         {
             entry: {
@@ -67,7 +70,8 @@ const config = (env = {}) => {
                 new HtmlWebpackPlugin({
                     template: './src/index.ejs',
                     baseUrl: env.baseUrl || '/'
-                })
+                }),
+                new ForkTsCheckerWebpackPlugin()
             ]
         })
 };
