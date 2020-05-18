@@ -6,8 +6,7 @@ import '@oida/map-ol';
 import '@oida/map-cesium';
 
 import { withAppModules,
-    DefaultMapModule, DefaultAoiModule, DefaultFormattersModule, DefaultBreadcrumbModule, DefaultDynamicSectionsModule,
-    createAppStoreContext } from '@oida/ui-react-mst';
+    DefaultMapModule, DefaultAoiModule, DefaultFormattersModule, DefaultBreadcrumbModule, DefaultDynamicSectionsModule } from '@oida/ui-react-mst';
 
 
 export const AppStateModel = types.compose(
@@ -50,21 +49,31 @@ let renderers = [{
     name: 'Cesium'
 }];
 
-let formattersModule = appState.addModule(DefaultFormattersModule, getFormatters());
+let formattersModule = appState.addModule(DefaultFormattersModule, {
+    config: getFormatters()
+});
 
-appState.addModule(DefaultMapModule, {projections: mapProjections, baseLayers, renderers, initialOptions: {
-    baseLayer: 'osm',
-    renderer: 'ol',
-    projection: 'EPSG:900913'
-}}, {
+appState.addModule(DefaultMapModule, {
+    config: {
+        projections: mapProjections,
+        baseLayers, renderers,
+        initialOptions: {
+            baseLayer: 'osm',
+            renderer: 'ol',
+            projection: 'EPSG:900913'
+        }
+    },
     formattersModule: formattersModule.id
 });
 
 appState.addModule(DefaultAoiModule, {});
 
-appState.addModule(DefaultBreadcrumbModule, {pageTitle: 'App modules sample'});
+appState.addModule(DefaultBreadcrumbModule, {
+    config: {
+        pageTitle: 'App modules sample'
+    }
+});
 
 appState.addModule(DefaultDynamicSectionsModule, {});
 
-export const AppContext = createAppStoreContext(appState);
-
+export { appState };

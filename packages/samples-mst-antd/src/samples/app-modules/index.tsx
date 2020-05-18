@@ -1,4 +1,4 @@
-import React, { useContext, useMemo } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 
 import {
     Route,
@@ -6,16 +6,27 @@ import {
 } from 'react-router-dom';
 
 import {
-    MapComponentFromModule as MapComponent, BreadcrumbItem
+    MapComponentFromModule as MapComponent, BreadcrumbItem, createAppStoreContext, destroyAppStoreContext
 } from '@oida/ui-react-mst';
 
-import { AppContext } from './store';
+import { appState } from './store';
+
 import { SideSection, SpotSection, MouseCoords, Breadcrumb, Settings } from './components';
 
 
 const AppModulesSample = () => {
 
-    const appState = useContext(AppContext);
+    let [isContextReady, setContextReady] = useState(false);
+
+    useEffect(() => {
+        let appContext = createAppStoreContext(appState);
+        setContextReady(true);
+        return () => destroyAppStoreContext();
+    }, []);
+
+    if (!isContextReady) {
+        return null;
+    }
 
     return (
         <React.Fragment>

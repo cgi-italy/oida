@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 
+import { AoiAction } from '@oida/core';
 import { DataFilterer } from '@oida/ui-react-antd';
-import { useMapAoiDrawerFromModule } from '@oida/ui-react-mst';
+import { useMapAoiFieldFromModule } from '@oida/ui-react-mst';
 
 
 let filters = [
@@ -9,7 +10,29 @@ let filters = [
         name: 'AOI',
         title: 'Aoi',
         type: 'aoi',
-        config: (state) => useMapAoiDrawerFromModule(state)
+        config: (state) => {
+            let supportedGeometries = [{
+                type: 'BBox'
+            }, {
+                type: 'Polygon'
+            }];
+
+            return {
+                ...useMapAoiFieldFromModule({
+                    ...state,
+                    supportedGeometries: supportedGeometries
+                }),
+                supportedGeometries: supportedGeometries,
+                supportedActions: [
+                    AoiAction.DrawPoint,
+                    AoiAction.DrawLine,
+                    AoiAction.DrawBBox,
+                    AoiAction.DrawPolygon,
+                    AoiAction.Import,
+                    AoiAction.LinkToMapViewport
+                ],
+            };
+        }
     },
     {
         name: 'text',
