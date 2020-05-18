@@ -93,6 +93,12 @@ export class OLMapRenderer implements IMapRenderer {
         return this.viewer_.getSize();
     }
 
+    updateSize() {
+        if (this.viewer_) {
+            this.viewer_.updateSize();
+        }
+    }
+
     destroy() {
         this.viewer_.setTarget(null);
     }

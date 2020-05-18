@@ -18,8 +18,6 @@ import CustomDataSource from 'cesium/Source/DataSources/CustomDataSource';
 import DataSourceCollection from 'cesium/Source/DataSources/DataSourceCollection';
 import DataSourceDisplay from 'cesium/Source/DataSources/DataSourceDisplay';
 
-import { updateDataSource } from '../utils';
-
 import 'cesium/Source/Widgets/CesiumWidget/CesiumWidget.css';
 
 import { mapRendererFactory, IMapRenderer, IMapRendererProps, IMapViewport, IDynamicFactory, ILayerRenderer, BBox, Size } from '@oida/core';
@@ -28,7 +26,7 @@ import { cesiumLayersFactory } from '../layers/cesium-layers-factory';
 import { cesiumInteractionsFactory } from '../interactions/cesium-interactions-factory';
 import { CesiumGroupLayer } from '../layers';
 import { getProjectionFromSRS } from '../utils/projection';
-
+import { updateDataSource } from '../utils';
 
 export const CESIUM_RENDERER_ID = 'cesium';
 
@@ -141,6 +139,12 @@ export class CesiumMapRenderer implements IMapRenderer {
     getSize() {
         let canvas: HTMLCanvasElement = this.viewer_.canvas;
         return <Size>[canvas.clientWidth, canvas.clientHeight];
+    }
+
+    updateSize() {
+        if (this.viewer_ && this.viewer_.scene) {
+            this.viewer_.scene.requestRender();
+        }
     }
 
     refreshImageries() {

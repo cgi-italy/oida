@@ -42,6 +42,7 @@ export interface IMapRenderer {
     getInteractionsFactory(): IDynamicFactory<IMapInteractionImplementation>;
     setLayerGroup(group: IGroupLayerRenderer);
     getSize(): Size;
+    updateSize(): void;
     destroy(): void;
 }
 

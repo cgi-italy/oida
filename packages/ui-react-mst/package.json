@@ -36,6 +36,7 @@
     "@oida/ui-react-core": "file:../ui-react-core",
     "chroma-js": "^2.0.2",
     "downloadjs": "^1.4.7",
-    "lodash": "^4.17.15"
+    "lodash": "^4.17.15",
+    "react-resize-aware": "^3.0.0"
   }
 }
