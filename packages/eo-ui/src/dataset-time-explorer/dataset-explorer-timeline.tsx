@@ -1,13 +1,15 @@
 import React, { useRef, useState, useEffect } from 'react';
 
-import { DataSet, TimelineGroup, TimelineItem } from 'vis-timeline';
+import { TimelineGroup, TimelineItem } from 'vis-timeline/esnext';
+import { DataSet } from 'vis-data/esnext';
 
 import { autorun } from 'mobx';
 
-import { Button, Icon, Tooltip } from 'antd';
+import { Button, Tooltip } from 'antd';
+import { ColumnWidthOutlined, ClockCircleOutlined } from '@ant-design/icons';
 
 import { ArrayTracker } from '@oida/state-mst';
-import { IDatasetsExplorer } from '@oida/eo';
+import { IDatasetsExplorer, IDatasetExplorerView } from '@oida/eo';
 
 import { Timeline } from './timeline';
 
@@ -46,9 +48,14 @@ export type DatasetExplorerTimelineProps = {
     explorerState: IDatasetsExplorer;
 };
 
+export type DatasetDiscoveryTimelineGroup = TimelineGroup & {
+    datasetView: IDatasetExplorerView,
+    zIndex: number
+};
+
 export const DatasetDiscoveryTimeline = (props: DatasetExplorerTimelineProps) => {
 
-    let timelineGroups = useRef(new DataSet<TimelineGroup>());
+    let timelineGroups = useRef(new DataSet<DatasetDiscoveryTimelineGroup>());
     let timelineItems = useRef(new DataSet<TimelineItem>());
 
     let [visibleRange, setVisibleRange] = useState(props.explorerState.timeExplorer.visibleRange.range);
@@ -160,7 +167,7 @@ export const DatasetDiscoveryTimeline = (props: DatasetExplorerTimelineProps) =>
 
     let toolbarActions = [{
         id: 'drawQueryRange',
-        icon: <Icon type='column-width' />,
+        icon: <ColumnWidthOutlined/>,
         title: 'Draw query time range',
         callback: () => {
             enableAction('drawQueryRange', () => {
@@ -191,7 +198,7 @@ export const DatasetDiscoveryTimeline = (props: DatasetExplorerTimelineProps) =>
         }
     }, {
         id: 'zoomToQueryRange',
-        icon: <Icon type='clock-circle' />,
+        icon: <ClockCircleOutlined/>,
         title: 'Zoom to query time range',
         disabled: !props.explorerState.toi,
         callback: () => {

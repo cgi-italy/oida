@@ -24,8 +24,7 @@ export const DatasetVolumetricStackViewSettings = (props: DatasetVolumetricStack
                 step={1}
                 value={numSlices}
                 onChange={(value) => props.viewMode.setNumSlices(value as number)}
-            >
-            </Slider>
+            />
         </div>
     );
 

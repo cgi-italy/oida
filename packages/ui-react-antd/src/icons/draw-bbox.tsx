@@ -1,5 +1,5 @@
 import React from 'react';
-import { Icon } from 'antd';
+import Icon from '@ant-design/icons';
 export const SvgDrawBbox = (props: React.SVGProps<SVGSVGElement>) => (
     <svg
         className='draw-bbox_svg__icon'

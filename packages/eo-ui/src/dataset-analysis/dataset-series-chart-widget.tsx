@@ -39,20 +39,20 @@ export const DatasetSeriesFilters = (props: DatasetSeriesFiltersProps) => {
     return (
         <React.Fragment>
             <Form.Item>
-            <SelectEnumRenderer
-                config={variableFieldConfig}
-                value={variableValue}
-                placeholder='Select variable'
-                onChange={(value) => {
-                    props.series.setVariable(value as string);
-                }}
-            />
+                <SelectEnumRenderer
+                    config={variableFieldConfig}
+                    value={variableValue}
+                    placeholder='Select variable'
+                    onChange={(value) => {
+                        props.series.setVariable(value as string);
+                    }}
+                />
             </Form.Item>
             <Form.Item>
-            <AnalysisAoiFilter
-                analysis={props.analysis}
-                supportedGeometries={props.series.config.supportedGeometries}
-            />
+                <AnalysisAoiFilter
+                    analysis={props.analysis}
+                    supportedGeometries={props.series.config.supportedGeometries}
+                />
             </Form.Item>
         </React.Fragment>
     );

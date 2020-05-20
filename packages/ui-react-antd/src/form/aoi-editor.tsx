@@ -132,7 +132,7 @@ export const PolygonEditor = (props) => {
     return (
         <Input.TextArea
             placeholder={`Longitude, Latidude\nLongitude, Latitude\n...`}
-            autosize={{maxRows: 10}}
+            autoSize={{maxRows: 10}}
             defaultValue={textValue}
         />
     );

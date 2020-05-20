@@ -61,7 +61,7 @@ export const DatasetTimeSeriesChart = (props: DatasetTimeSeriesProps) => {
 
     return (
         <div className='dataset-chart'>
-            <Form layout='inline'>
+            <Form layout='inline' size='small'>
                 <Form.Item>
                     <DateRangeFieldRenderer
                         value={timeRange}

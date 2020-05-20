@@ -64,7 +64,7 @@ export const DatasetDomainSeriesChart = (props: DatasetDomainSeriesProps) => {
 
     return (
         <div className='dataset-chart'>
-            <Form layout='inline'>
+            <Form layout='inline' size='small'>
                 <Form.Item>
                     <NumericRangeFieldRenderer
                         value={{from: range.start, to: range.end}}

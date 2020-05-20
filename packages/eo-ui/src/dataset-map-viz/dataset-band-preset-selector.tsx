@@ -4,8 +4,8 @@ import classnames from 'classnames';
 import { Instance } from 'mobx-state-tree';
 import { useObserver } from 'mobx-react';
 
-import { List, Avatar, Popover, Button, Icon, Collapse, Dropdown } from 'antd';
-
+import { List, Avatar, Popover, Button, Collapse, Dropdown } from 'antd';
+import { DownOutlined } from '@ant-design/icons';
 import { BandMathConfigPreset, BandMathPreset, IDatasetRasterViz } from '@oida/eo';
 
 export type DatasetBandPresetSelectorItemProps = {
@@ -87,7 +87,7 @@ export const DatasetBandPresetSelector = (props: DatasetBandPresetSelectorProps)
                 {selectedPresetConfig && <DatasetBandPresetSelectorItem
                     preset={selectedPresetConfig}
                 />}
-                <Button type='link'><Icon type='down'></Icon></Button>
+                <Button type='link'><DownOutlined/></Button>
             </div>
         </Dropdown>
     );

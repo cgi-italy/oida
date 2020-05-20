@@ -44,7 +44,6 @@ export const NumericRangeFieldRenderer = (props: Omit<NumericRangeField, 'name' 
             {!hasLimits &&
                 <React.Fragment>
                     <InputNumber
-                        size='small'
                         value={value ? value.from : undefined}
                         min={config.min}
                         max={config.max}
@@ -58,7 +57,6 @@ export const NumericRangeFieldRenderer = (props: Omit<NumericRangeField, 'name' 
                     />
                     <span> - </span>
                     <InputNumber
-                        size='small'
                         value={value ? value.to : undefined}
                         min={config.min}
                         max={config.max}

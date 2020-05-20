@@ -19,7 +19,15 @@ export class ChoiceSelectorCombo extends React.Component<ChoiceSelectorProps<{
     render() {
 
         let options = this.props.items.map((item) => {
-            return (<Option key={item.value} title={item.description}>{item.itemContent ? item.itemContent : item.name}</Option>);
+            return (
+                <Option
+                    key={item.value}
+                    value={item.value}
+                    title={item.description}
+                >
+                    {item.itemContent ? item.itemContent : item.name}
+                </Option>
+            );
         });
 
         return (

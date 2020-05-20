@@ -2,7 +2,8 @@ import React from 'react';
 
 import { useObserver } from 'mobx-react';
 
-import { Icon, Button } from 'antd';
+import { Button } from 'antd';
+import { PictureOutlined, FullscreenExitOutlined, ClockCircleOutlined } from '@ant-design/icons';
 
 import { LoadingState } from '@oida/core';
 import { IEntitySelection, IQueryParams } from '@oida/state-mst';
@@ -40,12 +41,12 @@ export const DatasetSearchResultsList = ({
                     centerOnMap(item.geometry, {animate: true});
                     onVisualizeItemAction(item);
                 },
-                icon: <Button size='small' type='primary'><Icon type='picture'/></Button>
+                icon: <Button size='small' type='primary'><PictureOutlined/></Button>
             },
             {
                 name: 'Center on map',
                 callback: (item) => centerOnMap(item.geometry, {animate: true}),
-                icon: <Button size='small' type='primary'><Icon type='fullscreen-exit'/></Button>
+                icon: <Button size='small' type='primary'><FullscreenExitOutlined/></Button>
             }
         ]
     });
@@ -82,7 +83,7 @@ DatasetSearchResultsList.defaultProps = {
     itemContent: (item) => (
         <DatasetSearchResultsItem
             metadata={[{
-                label: (<Icon type='clock-circle' />),
+                label: (<ClockCircleOutlined />),
                 value: item.start.toISOString(),
                 description: 'Sensing time'
             }]}

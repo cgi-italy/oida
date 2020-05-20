@@ -25,7 +25,7 @@ export const SideNav = (props: SideNavProps) => {
     let panes = components.map((component) => {
         return (
             <TabPane
-                tab={<Tooltip placement='right' title={component.title}>{component.icon}</Tooltip>}
+                tab={<Tooltip placement='right' title={component.title}>{component.icon as React.ReactElement}</Tooltip>}
                 key={component.id}
             >
                 {(component.id === activeComponent) && (

@@ -77,8 +77,7 @@ export const DatasetVolumetricSliceViewSettings = (props: DatasetVolumetricSlice
                     value={slices.x}
                     tipFormatter={xToLon}
                     onChange={(value) => props.viewMode.setXSlice(value as number)}
-                >
-                </Slider>
+                />
             </div>
             <div className='dataset-volume-slice-selector dataset-slider-selector'>
                 <Checkbox checked={slices.y !== undefined} onChange={(evt) => {
@@ -100,8 +99,7 @@ export const DatasetVolumetricSliceViewSettings = (props: DatasetVolumetricSlice
                     value={slices.y}
                     tipFormatter={yToLat}
                     onChange={(value) => props.viewMode.setYSlice(value as number)}
-                >
-                </Slider>
+                />
             </div>
             <div className='dataset-volume-slice-selector dataset-slider-selector'>
                 <Checkbox checked={slices.z !== undefined} onChange={(evt) => {
@@ -123,8 +121,7 @@ export const DatasetVolumetricSliceViewSettings = (props: DatasetVolumetricSlice
                     value={slices.z}
                     tipFormatter={zToHeight}
                     onChange={(value) => props.viewMode.setZSlice(value as number)}
-                >
-                </Slider>
+                />
             </div>
         </div>
     );

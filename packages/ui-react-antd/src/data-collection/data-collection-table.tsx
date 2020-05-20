@@ -13,7 +13,7 @@ export type DataCollectionTableProps<T> = {
     pagerRender?: DataPagerRenderer;
 } & DataCollectionProps<T>;
 
-export function DataCollectionTable<T>(props: DataCollectionTableProps<T>) {
+export function DataCollectionTable<T extends object>(props: DataCollectionTableProps<T>) {
 
     let {items, paging, sorting, pagerRender, columns} = props;
 
@@ -60,7 +60,7 @@ export function DataCollectionTable<T>(props: DataCollectionTableProps<T>) {
 
     return  (
         <div className='data-collection-table'>
-            <Table
+            <Table<T>
                 components={components}
                 loading={items.loadingState === LoadingState.Loading}
                 dataSource={items.data}
@@ -80,9 +80,9 @@ export function DataCollectionTable<T>(props: DataCollectionTableProps<T>) {
                 columns={tableColumns}
                 onChange={(pagination, filters, sortProps) => {
                     if (sorting) {
-                        if (sortProps && sortProps.columnKey) {
+                        if (sortProps && !Array.isArray(sortProps) && sortProps.columnKey) {
                             sorting.onSortChange({
-                                key: sortProps.columnKey,
+                                key: sortProps.columnKey.toString(),
                                 order: sortProps.order === 'ascend' ? SortOrder.Ascending : SortOrder.Descending
                             });
                         } else {

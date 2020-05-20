@@ -1,5 +1,5 @@
 import React from 'react';
-import { Icon } from 'antd';
+import Icon from '@ant-design/icons';
 export const SvgDrawLine = (props: React.SVGProps<SVGSVGElement>) => (
     <svg
         className='draw-line_svg__icon'

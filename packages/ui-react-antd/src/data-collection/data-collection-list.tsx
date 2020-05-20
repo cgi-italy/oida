@@ -1,7 +1,8 @@
 import React from 'react';
 import classnames from 'classnames';
 
-import { Collapse, Button, Icon } from 'antd';
+import { Collapse, Button } from 'antd';
+import { FilterOutlined } from '@ant-design/icons';
 
 import { DataCollectionProps, DataPagerRenderer, DataSorterRenderer, DataFiltererRenderer } from '@oida/ui-react-core';
 
@@ -30,7 +31,7 @@ export class DataCollectionList<T> extends React.Component<DataCollectionListPro
         ),
         filtererRender: (props) => (
             <Collapse destroyInactivePanel={true}>
-                <Collapse.Panel key='filter' header={<Button size='small'><Icon type='filter'></Icon></Button>} showArrow={false}>
+                <Collapse.Panel key='filter' header={<Button size='small'><FilterOutlined/></Button>} showArrow={false}>
                     <DataFilterer {...props}></DataFilterer>
                 </Collapse.Panel>
             </Collapse>

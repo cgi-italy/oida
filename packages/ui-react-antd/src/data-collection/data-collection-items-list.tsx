@@ -5,7 +5,7 @@ import classnames from 'classnames';
 import { List, Tooltip } from 'antd';
 
 import { LoadingState, SelectionMode } from '@oida/core';
-import { DataCollectionItemsProps, canBeScrolledIntoView } from '@oida/ui-react-core';
+import { DataCollectionItemsProps, canBeScrolledIntoView, CanBeScrolledIntoView } from '@oida/ui-react-core';
 
 export type DataCollectionItemsListProps<T> = {
     autoScrollOnSelection?: boolean;
@@ -62,33 +62,38 @@ export function DataCollectionItemsList<T>(props: DataCollectionItemsListProps<T
             );
         }) : undefined;
 
-        let ListItem;
+        let listItem = (
+            <List.Item
+                extra={props.extra && props.extra(item)}
+                actions={itemActions}
+                className={classnames({'hovered': hovered, 'selected': selected})}
+                onMouseEnter={() => {
+                    onHoverAction(item, true);
+                }}
+                onMouseLeave={() => {
+                    onHoverAction(item, false);
+                }}
+                onClick={() => {
+                    onSelectAction(item, SelectionMode.Replace);
+                }}
+            >
+                {(icon || meta) && itemMeta}
+                {props.content && props.content(item)}
+            </List.Item>
+        );
+
+        let itemRenderer = listItem;
         if (autoScrollOnSelection) {
-            ListItem = canBeScrolledIntoView(List.Item);
-        } else {
-            ListItem = List.Item;
+            itemRenderer = (
+                <CanBeScrolledIntoView
+                    scrollToItem={hovered || selected}
+                >
+                    {listItem}
+                </CanBeScrolledIntoView>
+            )
         }
 
-        return (
-                <ListItem
-                    scrollToItem={autoScrollOnSelection ? hovered || selected : undefined}
-                    extra={props.extra && props.extra(item)}
-                    actions={itemActions}
-                    className={classnames({'hovered': hovered, 'selected': selected})}
-                    onMouseEnter={() => {
-                        onHoverAction(item, true);
-                    }}
-                    onMouseLeave={() => {
-                        onHoverAction(item, false);
-                    }}
-                    onClick={() => {
-                        onSelectAction(item, SelectionMode.Replace);
-                    }}
-                    >
-                        {(icon || meta) && itemMeta}
-                        {props.content && props.content(item)}
-                </ListItem>
-        );
+        return itemRenderer;
     };
 
     let {data, loadingState, ...listProps} = renderProps;

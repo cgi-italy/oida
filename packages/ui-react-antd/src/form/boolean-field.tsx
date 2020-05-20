@@ -25,7 +25,6 @@ export const BooleanSwitchFieldRenderer = (props: Omit<BooleanField, 'name' | 't
         <Switch
             checked={props.value}
             onChange={onChange}
-            size='small'
         />
     );
 };

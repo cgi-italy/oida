@@ -4,7 +4,8 @@ import { Instance } from 'mobx-state-tree';
 
 import { useObserver } from 'mobx-react';
 
-import { Button, Icon, Dropdown, InputNumber, Slider, Checkbox, Select } from 'antd';
+import { Button, Dropdown, InputNumber, Slider, Checkbox, Select } from 'antd';
+import { DownOutlined } from '@ant-design/icons';
 
 import { ColorMap, DataVar, ColorMapConfigPreset } from '@oida/eo';
 
@@ -144,7 +145,7 @@ export const DatasetColormapPresetSelector = (props: DatasetColormapPresetSelect
                     {selectedPresetConfig && <DatasetColormapPresetSelectorItem
                         preset={selectedPresetConfig}
                     />}
-                    <Button type='link'><Icon type='down'></Icon></Button>
+                    <Button type='link'><DownOutlined/></Button>
                 </div>
             </Dropdown>
             {

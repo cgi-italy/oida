@@ -34,7 +34,7 @@ const filterMemoryAoiSource = (data: AoiSourceItem[], queryParams: QueryParams) 
         let key = queryParams.sortBy.key;
         outputData = outputData.sort((i1, i2) => {
             if (key === 'name') {
-                return i1.name > i2.name ? -1 : 1;
+                return i1.name < i2.name ? -1 : 1;
             }
             if (!i1.properties || !i1.properties[key]) {
                 return -1;
@@ -42,7 +42,7 @@ const filterMemoryAoiSource = (data: AoiSourceItem[], queryParams: QueryParams) 
             if (!i2.properties || !i2.properties[key]) {
                 return 1;
             }
-            return i1.properties[key] > i2.properties[key] ? -1 : 1;
+            return i1.properties[key] < i2.properties[key] ? -1 : 1;
         });
 
         if (queryParams.sortBy.order === SortOrder.Descending) {

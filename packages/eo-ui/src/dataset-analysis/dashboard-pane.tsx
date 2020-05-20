@@ -3,7 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { Responsive } from 'react-grid-layout';
 import useResizeAware from 'react-resize-aware';
 
-import { Icon, Button } from 'antd';
+import { Button } from 'antd';
+import { DragOutlined, CloseOutlined } from '@ant-design/icons';
 
 import { LayoutSectionProps } from '@oida/ui-react-core';
 
@@ -82,7 +83,7 @@ export const DashboardPane = (props: DashboardPaneProps) => {
                         type='link'
                         className='widget-drag-btn'
                     >
-                        <Icon type='drag'></Icon>
+                        <DragOutlined/>
                     </Button>
                     {component.title}
                     {props.onWidgetClose &&
@@ -91,7 +92,7 @@ export const DashboardPane = (props: DashboardPaneProps) => {
                             className='widget-close-btn'
                             onClick={() => props.onWidgetClose!(component.id)}
                         >
-                            <Icon type='close'></Icon>
+                            <CloseOutlined/>
                         </Button>
                     }
                 </div>

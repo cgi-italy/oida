@@ -77,7 +77,7 @@ export const DatasetDomainRasterSequence = (props: DatasetDomainRasterSequencePr
 
     return (
         <div className='dataset-raster-sequence'>
-            <Form layout='inline'>
+            <Form layout='inline' size='small'>
                 <Form.Item>
                     <NumericRangeFieldRenderer
                         value={range ? {from: range.start, to: range.end} : undefined}

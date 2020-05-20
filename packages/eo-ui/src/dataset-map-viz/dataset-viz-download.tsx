@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Select, Slider, Form, InputNumber, Modal, Icon, Typography } from 'antd';
+import { Select, Slider, Form, InputNumber, Modal, Typography } from 'antd';
+import { CloseCircleOutlined } from '@ant-design/icons';
 
 import { IDatasetViz } from '@oida/eo';
 
@@ -31,8 +32,8 @@ export const DatasetVizDownload = (props: DatasetDownloadProps) => {
         <div className='dataset-viz-download'>
             <Form
                 id={props.formId || 'dataset-viz-download-form'}
-                onSubmit={(evt) => {
-                    evt.preventDefault();
+                layout='vertical'
+                onFinish={(evt) => {
 
                     setDownloadError('');
                     props.onSubmitStateChange(FormSubmitState.Pending);
@@ -71,7 +72,7 @@ export const DatasetVizDownload = (props: DatasetDownloadProps) => {
                         value={downloadScale}
                         onChange={(value) => {
                             if (value) {
-                                setDownloadScale(value);
+                                setDownloadScale(value as number);
                             }
                         }}
                         min={0.05}
@@ -82,7 +83,7 @@ export const DatasetVizDownload = (props: DatasetDownloadProps) => {
             </Form>
             {downloadError &&
                 <Typography.Paragraph className='error-message'>
-                    <Icon type='close-circle'></Icon>
+                    <CloseCircleOutlined/>
                     <span>{downloadError}</span>
                 </Typography.Paragraph>
             }

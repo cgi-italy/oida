@@ -41,8 +41,7 @@ export const DatasetVolumeStackSelector = (props: DatasetVolumeStackSelectorProp
                 marks={marks}
                 onChange={(value) => props.volumeViz.setVerticalStack({min: value as number})}
                 tipFormatter={(value) => `${value} ${domainUnits}`}
-            >
-            </Slider>
+            />
         </div>
     );
 

@@ -1,6 +1,8 @@
 import React from 'react';
 import classnames from 'classnames';
 
+import { Form } from 'antd';
+
 import { AnyFormFieldDefinition, FormFieldValues } from '@oida/core';
 import { useFormFieldRenderers } from '@oida/ui-react-core';
 
@@ -10,16 +12,9 @@ export const FieldWrapper = (props) => {
 
     let { title, children, type, rendererId } = props;
     return (
-        <div className={classnames('ant-form-item', `${type.toLowerCase()}-field`, `${rendererId}-renderer`)}>
-            {title && <div className='ant-form-item-label'>
-                <label>{title}</label>
-            </div>}
-            <div className='ant-form-item-control-wrapper'>
-                <div className='ant-form-item-control'>
-                    {children}
-                </div>
-            </div>
-        </div>
+        <Form.Item label={title} className={classnames(`${type.toLowerCase()}-field`, `${rendererId}-renderer`)}>
+            {children}
+        </Form.Item>
     );
 };
 
@@ -59,9 +54,13 @@ export const FormRenderer = (props: FormRendererProps) => {
     });
 
     return (
-        <div className={classnames('antd-form-renderer ant-form', props.className)}>
+        <Form
+            className={classnames('antd-form-renderer', props.className)}
+            layout='vertical'
+            size='small'
+        >
             {fields}
-        </div>
+        </Form>
     );
 
 };

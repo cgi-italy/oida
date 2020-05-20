@@ -1,6 +1,7 @@
 import React from 'react';
 
-import { Select, Icon, Upload, Button, Tooltip } from 'antd';
+import { Select, Upload, Button, Tooltip } from 'antd';
+import { SelectOutlined, UploadOutlined } from '@ant-design/icons';
 
 import { AoiImportConfig } from '@oida/ui-react-core';
 
@@ -28,7 +29,7 @@ export const AoiImportRenderer = (props: AoiImportConfig) => {
             callback: (aoi) => {
                 props.onAoiImportAction(aoi);
             },
-            icon: (<Icon type='select'/>)
+            icon: (<SelectOutlined/>)
         }];
 
         const onAoiCenterOnMapAction = props.onAoiCenterOnMapAction;
@@ -84,7 +85,7 @@ export const AoiImportRenderer = (props: AoiImportConfig) => {
                             <Button
                                 size='small'
                             >
-                                <Icon type='upload'/>
+                                <UploadOutlined/>
                             </Button>
                         </Tooltip>
                     </Upload>

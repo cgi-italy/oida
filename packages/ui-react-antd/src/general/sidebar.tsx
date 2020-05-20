@@ -19,7 +19,7 @@ export const SideBar = (props: SidebarProps) => {
     let panes = components.map((component) => {
         return (
             <TabPane
-                tab={<Tooltip placement='right' title={component.title}>{component.icon}</Tooltip>}
+                tab={<Tooltip placement='right' title={component.title}>{component.icon as React.ReactElement}</Tooltip>}
                 key={component.id}
             >
                 <div className='side-component-title'>{component.title}</div>

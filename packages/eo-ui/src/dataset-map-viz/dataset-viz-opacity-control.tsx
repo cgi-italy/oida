@@ -34,8 +34,7 @@ export const DatasetVizOpacityControl = (props: DatasetVizOpacityControlProps) =
                 value={Math.round(opacity * 100)}
                 onChange={(value) => mapLayer.setOpacity(value as number / 100)}
                 tipFormatter={(value) => `${value}%`}
-            >
-            </Slider>
+            />
         </div>
     );
 

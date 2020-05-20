@@ -4,7 +4,8 @@ import download from 'downloadjs';
 import echarts, { EChartOption } from 'echarts/lib/echarts';
 import useResizeAware from 'react-resize-aware';
 
-import { Menu, Dropdown, Icon } from 'antd';
+import { Menu, Dropdown } from 'antd';
+import { DownOutlined } from '@ant-design/icons';
 
 //TODO: move chart export code out of here
 
@@ -162,7 +163,7 @@ export const ChartWidget = (props: ChartWidgetProps) => {
                 }
                 >
                     <a className='ant-dropdown-link'>
-                        Export <Icon type='down' />
+                        Export <DownOutlined/>
                     </a>
                 </Dropdown>
             </div>

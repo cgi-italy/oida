@@ -26,7 +26,7 @@ export const DatasetSearchResultsItem = (props: DatasetSearchResultsItemProps) =
             key={idx}
             label={m.label}
         >
-            <Tooltip title={m.description}>{m.value}</Tooltip>
+            <Tooltip title={m.description}>{m.value as React.ReactElement}</Tooltip>
         </Descriptions.Item>;
     });
 

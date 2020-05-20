@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 
-import { Icon } from 'antd';
+import { SmileOutlined } from '@ant-design/icons';
 
 import { BreadcrumbItem, DynamicSectionInjector } from '@oida/ui-react-mst';
 
@@ -23,7 +23,7 @@ export const SpotSection = () => {
                 sectionId='sidebar'
                 id='filters'
                 title='Filters'
-                icon={(<Icon type='smile'></Icon>)}
+                icon={(<SmileOutlined/>)}
             >
                  {filters}
             </DynamicSectionInjector>

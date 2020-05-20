@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { Popover, Button, Icon } from 'antd';
-import { useObserver } from 'mobx-react';
+import { Popover, Button } from 'antd';
+import { CloseOutlined, ControlOutlined } from '@ant-design/icons';
 
 
 import { DatasetExplorerQuery, DatasetExplorerQueryProps } from './dataset-explorer-query';
@@ -38,7 +38,7 @@ export const DatasetExplorerQueryPopover = (props: DatasetExplorerQueryPopoverPr
                 title={props.visible ? 'Close filter settings' : 'Show dataset filters'}
                 onClick={() => props.setVisible(!props.visible)}
             >
-                <Icon type={props.visible ? 'close' : 'control'}></Icon>
+               {props.visible ? <CloseOutlined/> : <ControlOutlined/>}
             </Button>
         </Popover>
 

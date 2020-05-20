@@ -1,7 +1,8 @@
 import React, { useState, useMemo } from 'react';
 
-import { Tag, Button, Tooltip, Icon, Drawer, Popover } from 'antd';
+import { Tag, Button, Tooltip, Drawer, Popover } from 'antd';
 
+import { EnvironmentOutlined, LinkOutlined, EditOutlined, ImportOutlined } from '@ant-design/icons';
 import { AoiField, AoiAction, AOI_FIELD_ID } from '@oida/core';
 
 import { antdFormFieldRendererFactory } from './antd-form-field-renderer-factory';
@@ -93,7 +94,6 @@ export const AoiFieldRenderer = (props:  AoiFieldRendererProps) => {
                     >
                         <Button
                             type={activeAction === AoiAction.DrawPoint ? 'primary' : 'default'}
-                            size='small'
                             onClick={() => {
                                 if (activeAction === AoiAction.DrawPoint) {
                                     onActiveActionChange(AoiAction.None);
@@ -102,7 +102,7 @@ export const AoiFieldRenderer = (props:  AoiFieldRendererProps) => {
                                 }
                             }}
                         >
-                            <Icon type='environment'/>
+                            <EnvironmentOutlined/>
                         </Button>
                     </Tooltip>
                 }
@@ -113,7 +113,6 @@ export const AoiFieldRenderer = (props:  AoiFieldRendererProps) => {
                     >
                         <Button
                             type={activeAction === AoiAction.DrawLine ? 'primary' : 'default'}
-                            size='small'
                             onClick={() => {
                                 if (activeAction === AoiAction.DrawLine) {
                                     onActiveActionChange(AoiAction.None);
@@ -133,7 +132,7 @@ export const AoiFieldRenderer = (props:  AoiFieldRendererProps) => {
                     >
                         <Button
                             type={activeAction === AoiAction.DrawBBox ? 'primary' : 'default'}
-                            size='small'
+
                             onClick={() => {
                                 if (activeAction === AoiAction.DrawBBox) {
                                     onActiveActionChange(AoiAction.None);
@@ -153,7 +152,6 @@ export const AoiFieldRenderer = (props:  AoiFieldRendererProps) => {
                     >
                         <Button
                             type={activeAction === AoiAction.DrawPolygon ? 'primary' : 'default'}
-                            size='small'
                             onClick={() => {
                                 if (activeAction === AoiAction.DrawPolygon) {
                                     onActiveActionChange(AoiAction.None);
@@ -173,7 +171,6 @@ export const AoiFieldRenderer = (props:  AoiFieldRendererProps) => {
                     >
                         <Button
                             type={activeAction === AoiAction.LinkToMapViewport ? 'primary' : 'default'}
-                            size='small'
                             onClick={() => {
                                 if (activeAction === AoiAction.LinkToMapViewport) {
                                     onChange(undefined);
@@ -182,7 +179,7 @@ export const AoiFieldRenderer = (props:  AoiFieldRendererProps) => {
                                 }
                             }}
                         >
-                            <Icon type='link'/>
+                            <LinkOutlined/>
                         </Button>
                     </Tooltip>
                 }
@@ -212,9 +209,8 @@ export const AoiFieldRenderer = (props:  AoiFieldRendererProps) => {
                     >
                         <Button
                             type={editorVisible ? 'primary' : 'default'}
-                            size='small'
                         >
-                            <Icon type='edit'/>
+                            <EditOutlined/>
                         </Button>
                     </Popover>
                     </Tooltip>
@@ -226,7 +222,6 @@ export const AoiFieldRenderer = (props:  AoiFieldRendererProps) => {
                     >
                         <Button
                             type={activeAction === AoiAction.Import ? 'primary' : 'default'}
-                            size='small'
                             onClick={() => {
                                 if (activeAction === AoiAction.Import) {
                                     onActiveActionChange(AoiAction.None);
@@ -235,7 +230,7 @@ export const AoiFieldRenderer = (props:  AoiFieldRendererProps) => {
                                 }
                             }}
                         >
-                            <Icon type='import'/>
+                            <ImportOutlined/>
                         </Button>
                     </Tooltip>
                 }
@@ -259,7 +254,8 @@ export const AoiFieldRenderer = (props:  AoiFieldRendererProps) => {
                     }}
                     destroyOnClose={true}
                     title='Import area of interest'
-                    mask={false}
+                    mask={true}
+                    maskStyle={{display: 'none'}} // to prevent a bug in ant when mask is set to false
                 >
                     <AoiImportRenderer
                         {...importConfig}

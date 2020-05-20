@@ -1,13 +1,32 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 
 import scrollIntoView from 'scroll-into-view-if-needed';
 
 export type canBeScrolledIntoViewProps = {
     scrollToItem: boolean;
+    children: React.ReactNode
 };
 
-export function canBeScrolledIntoView<T extends object>(WrappedComponent: React.ComponentClass<T>) {
+export const CanBeScrolledIntoView = (props: canBeScrolledIntoViewProps) => {
+    const wrapperRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (props.scrollToItem && wrapperRef.current) {
+            scrollIntoView(wrapperRef.current, {
+                scrollMode: 'if-needed'
+            });
+        }
+    }, [props.scrollToItem]);
+
+    return (
+        <div ref={wrapperRef}>
+            {props.children}
+        </div>
+    );
+};
+
+export function canBeScrolledIntoView<T extends object>(WrappedComponent: React.ComponentType<T>) {
     return class CanBeScrolledIntoView extends React.Component<T & canBeScrolledIntoViewProps> {
 
         public domRef_: React.RefObject<React.Component<T>>;

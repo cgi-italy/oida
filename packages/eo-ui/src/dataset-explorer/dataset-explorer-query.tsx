@@ -103,13 +103,13 @@ export const DatasetExplorerQuery = (props: DatasetExplorerQueryProps) => {
     }));
 
     return (
-        <div>
+        <div className='dataset-explorer-query'>
             {commmonFiltersProps &&
                 <DataFilterer
                     {...commmonFiltersProps}
                 />
             }
-            <div>
+            <div className='dataset-filters'>
                 {datasetFilters}
             </div>
         </div>

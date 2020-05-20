@@ -52,7 +52,6 @@ export const InputFieldRenderer = (props: Omit<StringField, 'name' | 'type'> & I
 
         return (
         <Input
-            size='small'
             value={inputValue}
             onPressEnter={onEnterPress}
             onChange={onInputChange}

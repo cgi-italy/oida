@@ -22,7 +22,7 @@
     "@oida/ui-react-mst": "file:../ui-react-mst",
     "@turf/bbox-polygon": "^6.0.1",
     "@turf/boolean-point-in-polygon": "^6.0.1",
-    "antd": "^3.23.2",
+    "antd": "^4.2.4",
     "cesium": "^1.68.0",
     "classnames": "^2.2.6",
     "faker": "^4.1.0",

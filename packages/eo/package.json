@@ -31,6 +31,6 @@
     "@oida/state-mst": "file:../state-mst",
     "chroma-js": "^2.0.2",
     "lodash": "^4.17.15",
-    "moment": "^2.22.0"
+    "moment": "^2.25.3"
   }
 }

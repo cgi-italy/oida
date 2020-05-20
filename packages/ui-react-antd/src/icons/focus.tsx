@@ -1,5 +1,5 @@
 import React from 'react';
-import { Icon } from 'antd';
+import Icon from '@ant-design/icons';
 export const SvgFocus = (props: React.SVGProps<SVGSVGElement>) => (
     <svg
         width='1em'

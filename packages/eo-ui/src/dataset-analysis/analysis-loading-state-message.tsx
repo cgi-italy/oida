@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { Empty, Icon } from 'antd';
-
+import { Empty } from 'antd';
+import { LoadingOutlined } from '@ant-design/icons';
 import { LoadingState } from '@oida/core';
 
 export type AnalysisLoadingStateMessageProps = {
@@ -21,7 +21,7 @@ export const AnalysisLoadingStateMessage = ({loadingState, initMessage}: Analysi
             }
             {(loadingState === LoadingState.Loading) &&
                 <Empty
-                    image={<Icon type='loading' style={{fontSize: '32px'}}/>}
+                    image={<LoadingOutlined style={{fontSize: '32px'}}/>}
                     description='Retrieving data...'
                 />
             }

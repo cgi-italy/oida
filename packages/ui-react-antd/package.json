@@ -28,7 +28,7 @@
     "registry": "https://nexus.dev.eoss-cloud.it/repository/npm-cgi-eo/"
   },
   "peerDependencies": {
-    "antd": "^3.23.2",
+    "antd": "^4.2.4",
     "classnames": "^2.2.6",
     "react": "^16.8.6",
     "react-dom": "^16.8.6"
@@ -37,6 +37,6 @@
     "@oida/core": "file:../core",
     "@oida/ui-react-core": "file:../ui-react-core",
     "lodash": "4.17.15",
-    "moment": "^2.22.2"
+    "moment": "^2.25.3"
   }
 }

@@ -49,7 +49,6 @@ export const DateRangeFieldRenderer = (props: Omit<DateRangeField, 'name' | 'typ
 
     return (
         <DatePicker.RangePicker
-            size='small'
             value={value ? [moment.utc(value.start), moment.utc(value.end)] : undefined}
             onChange={onDateChange}
             disabledDate={disabledDates}

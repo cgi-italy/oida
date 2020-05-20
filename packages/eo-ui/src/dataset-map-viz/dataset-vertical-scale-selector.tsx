@@ -39,8 +39,7 @@ export const DatasetVerticalScaleSelector = (props: DatasetVerticalScaleSelector
                 marks={marks}
                 onChange={(value) => props.datasetViz.setVerticalScale(value as number)}
                 tipFormatter={(value) => `${value}x`}
-            >
-            </Slider>
+            />
         </div>
     );
 

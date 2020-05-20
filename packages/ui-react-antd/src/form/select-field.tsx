@@ -28,13 +28,12 @@ export const SelectEnumRenderer = (props: Omit<EnumField, 'name' | 'type'> & Sel
 
     return (
         <Select
-            size='small'
             style={{minWidth: '150px', width: '100%'}}
             value={props.value}
             onChange={onSelectChange}
             allowClear={!props.required}
             placeholder={props.placeholder}
-            mode={props.config.multiple ? 'multiple' : 'default'}
+            mode={props.config.multiple ? 'multiple' : undefined}
         >
             {options}
         </Select>

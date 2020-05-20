@@ -1,5 +1,5 @@
 import React from 'react';
-import { Icon } from 'antd';
+import Icon from '@ant-design/icons';
 export const SvgDrawPolygon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg
         className='draw-polygon_svg__icon'

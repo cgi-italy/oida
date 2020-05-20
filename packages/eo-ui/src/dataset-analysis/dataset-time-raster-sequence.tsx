@@ -77,7 +77,7 @@ export const DatasetTimeRasterSequence = (props: DatasetTimeRasterSequenceProps)
 
     return (
         <div className='dataset-raster-sequence'>
-            <Form layout='inline'>
+            <Form layout='inline' size='small'>
                 <Form.Item>
                     <DateRangeFieldRenderer
                         value={range}

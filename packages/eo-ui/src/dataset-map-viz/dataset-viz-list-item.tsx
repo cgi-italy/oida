@@ -3,7 +3,11 @@ import React, { useState } from 'react';
 import { isAlive, getParentOfType } from 'mobx-state-tree';
 import { useObserver } from 'mobx-react';
 
-import { List, Button, Icon, Badge, Tooltip, message } from 'antd';
+import { List, Button, Badge, Tooltip, message } from 'antd';
+import {
+    ClockCircleOutlined, FullscreenExitOutlined, SettingOutlined, BarChartOutlined,
+    DownloadOutlined, EyeOutlined, EyeInvisibleOutlined, DragOutlined
+} from '@ant-design/icons';
 import { SortableHandle } from 'react-sortable-hoc';
 
 import { useCenterOnMapFromModule } from '@oida/ui-react-mst';
@@ -57,7 +61,7 @@ export const DatasetVizListItem = (props: DatasetVizListItemProps) => {
     let actions = [
         {
             id: 'timeZoom',
-            icon: <Icon type='clock-circle'></Icon>,
+            icon: <ClockCircleOutlined/>,
             title: 'Zoom to dataset time extent',
             callback: () => {
                 let dataset = props.datasetViz.dataset;
@@ -79,7 +83,7 @@ export const DatasetVizListItem = (props: DatasetVizListItemProps) => {
         },
         {
             id: 'areaZoom',
-            icon: <Icon type='fullscreen-exit'></Icon>,
+            icon: <FullscreenExitOutlined/>,
             title: 'Zoom to dataset area',
             callback: () => {
                 let dataset = props.datasetViz.dataset;
@@ -96,7 +100,7 @@ export const DatasetVizListItem = (props: DatasetVizListItemProps) => {
         },
         {
             id: 'settings',
-            icon: <Icon type='setting'></Icon>,
+            icon: <SettingOutlined/>,
             title: 'Toggle visualization settings',
             content: DatasetVizSettingsFactory.create(props.datasetViz.datasetVizType, {
                 datasetViz: props.datasetViz
@@ -111,7 +115,7 @@ export const DatasetVizListItem = (props: DatasetVizListItemProps) => {
         },
         {
             id: 'tools',
-            icon: <Icon type='bar-chart'></Icon>,
+            icon: <BarChartOutlined/>,
             title: 'Toggle dataset tools',
             content: <DatasetTools dataset={props.datasetViz.dataset}/>,
             callback: () => {
@@ -127,7 +131,7 @@ export const DatasetVizListItem = (props: DatasetVizListItemProps) => {
     if (props.datasetViz.dataset.config.download) {
         actions.push(        {
             id: 'download',
-            icon: <Icon type='download'></Icon>,
+            icon: <DownloadOutlined/>,
             title: 'Download',
             callback: () => {
                 setDownloadVisible(true);
@@ -136,7 +140,7 @@ export const DatasetVizListItem = (props: DatasetVizListItemProps) => {
     }
 
 
-    let DragHandle = SortableHandle(() => <div className='viz-drag-button'><Icon type='drag'></Icon></div>);
+    let DragHandle = SortableHandle(() => <div className='viz-drag-button'><DragOutlined/></div>);
 
 
     return (
@@ -152,7 +156,7 @@ export const DatasetVizListItem = (props: DatasetVizListItemProps) => {
                         vizState.tileLayer.setVisible(!vizState.visible);
                     }}
                 >
-                    <Icon type={vizState.visible ? 'eye' : 'eye-invisible'}></Icon>
+                    {vizState.visible ? <EyeOutlined/> : <EyeInvisibleOutlined/>}
                 </Button>
                 <Badge color={vizState.color}></Badge>
                 <div className='viz-item-name' title={vizState.name}>{vizState.name}</div>
