@@ -1,0 +1,149 @@
+.sidenav {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+
+    .top-bar {
+
+        position: relative;
+        background: @layout-header-background;
+        height: @layout-header-height;
+        flex-grow: 0;
+        flex-shrink: 0;
+
+        .top-content {
+            position: absolute;
+            display: none;
+            top: 5px;
+            right: 5px;
+        }
+
+        .logo {
+            height: 100%;
+            display: block;
+
+            &.logo-full {
+                display: none;
+            }
+
+            img {
+                padding: 0.5rem;
+                max-height: 100%;
+            }
+
+            &.logo-small {
+                img {
+                    max-width: @layout-header-height;
+                }
+            }
+        }
+    }
+
+    &.active {
+
+        .top-bar {
+            .logo-small {
+                display: none;
+            }
+
+            .logo-full {
+                display: block;
+            }
+
+            .top-content {
+                display: block;
+            }
+        }
+    }
+
+    &:not(.expanded) {
+        > .ant-tabs {
+            > .ant-tabs-content {
+                display: none;
+            }
+        }
+    }
+
+    > .ant-tabs {
+
+        flex-grow: 1;
+
+        > .ant-tabs-bar {
+            display: flex;
+            flex-direction: column;
+            background: @layout-sider-background;
+            padding-top: 0.5rem;
+
+            .ant-tabs-ink-bar {
+                left: 0px;
+            }
+
+            .ant-tabs-tab {
+                text-align: center;
+                padding: 4px 8px;
+                margin: 0px;
+                transition: background 0.5s;
+
+                &.ant-tabs-tab-active {
+                    background: @item-active-bg
+                }
+            }
+
+            .anticon {
+                font-size: 18px;
+                margin: 0px;
+                padding: 4px;
+            }
+
+            > .ant-tabs-extra-content {
+                line-height: initial;
+
+                .action {
+                    padding: 4px 8px;
+                    margin: 0px;
+
+                    .anticon {
+                        cursor: pointer;
+
+                        &:hover {
+                            color: @tabs-hover-color
+                        }
+                    }
+                }
+            }
+
+        }
+
+        > .ant-tabs-content {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            padding: 0;
+            border: none;
+            height: 100%;
+
+            > .ant-tabs-tabpane.ant-tabs-tabpane-active {
+                display: flex;
+                flex-direction: column;
+                overflow: hidden;
+                flex-grow: 1;
+
+                .side-component-title {
+                    background: @primary-color;
+                    padding: 0.4rem 0.6rem;
+                    font-size: 1rem;
+                }
+
+                .side-component-content {
+                    background: @component-background;
+                    display: flex;
+                    flex-direction: column;
+                    flex-grow: 1;
+                    overflow: hidden;
+                    padding: 0.5rem;
+                    padding-right: 0px;
+                }
+            }
+        }
+    }
+}

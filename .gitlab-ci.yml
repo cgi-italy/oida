@@ -37,9 +37,14 @@ build:
   artifacts:
     paths:
       - "packages/*/dist"
+      - "packages/*/es"
+      - "packages/*/lib"
+      - "packages/*/styles"
+      - "packages/*/types"
     expire_in: 1 hr
   script:
-    - npm run build
+    - npm run build:es
+    - npm run build:umd
     - npm run build:samples -- -- -- --env.baseUrl='{{ getenv "BASE_URL"}}'
   only:
     - branches

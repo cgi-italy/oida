@@ -1,0 +1,22 @@
+{
+  "extends": "../../config/tsconfig.default.umd.json",
+  "compilerOptions": {
+    "outDir": "./lib",
+    "jsx": "react",
+    "rootDir": "./src"
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "references": [
+    {
+      "path": "../core"
+    },
+    {
+      "path": "../state-mst"
+    },
+    {
+      "path": "../ui-react-core"
+    }
+  ]
+}

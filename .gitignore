@@ -1,3 +1,7 @@
 node_modules
-.rpt2_cache
-dist
+packages/**/.rpt2_cache
+packages/**/tsconfig.tsbuildinfo
+packages/**/dist
+packages/**/es
+packages/**/lib
+packages/**/types

@@ -40,16 +40,24 @@ export function DataCollectionTable<T extends object>(props: DataCollectionTable
     let itemSelector = items.itemSelector;
 
     let RowRenderer = (props) => {
-        let record = props.children[0].props.record;
+        if (props.children.length) {
+            let record = props.children[0].props.record;
 
-        let { selected, hovered } = itemSelector(record);
+            let { selected, hovered } = itemSelector(record);
 
-        return (
-            <tr
-                {...props}
-                className={classnames(props.className, {'hovered': hovered, 'selected': selected})}
-            />
-        );
+            return (
+                <tr
+                    {...props}
+                    className={classnames(props.className, {'hovered': hovered, 'selected': selected})}
+                />
+            );
+        } else {
+            return (
+                <tr
+                    {...props}
+                />
+            );
+        }
     };
 
     let components = {

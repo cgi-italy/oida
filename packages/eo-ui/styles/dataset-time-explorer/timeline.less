@@ -1,0 +1,105 @@
+.timeline {
+    background: @component-background;
+
+    .vis-timeline {
+        border: none;
+
+        .vis-panel {
+
+            border-color: @border-color-split;
+
+            &.vis-left {
+                display: none;
+            }
+
+            &.vis-bottom {
+                background: @layout-sider-background;
+            }
+
+            .vis-foreground .vis-group {
+                border-color: @border-color-split;
+            }
+
+            .vis-time-axis {
+                .vis-grid {
+                    &.vis-major {
+                        border-color: @border-color-split;
+                    }
+                    &.vis-minor {
+                        border-color: @border-color-base;
+                    }
+                }
+
+                .vis-text {
+
+                    padding: 1px;
+
+                    &.vis-major {
+                        color: @text-color;
+                        font-size: 0.8rem;
+                    }
+
+                    &.vis-minor {
+                        color: @text-color-secondary;
+                        font-size: 0.7rem;
+                    }
+                }
+            }
+
+            .vis-item {
+                &.vis-range {
+                    .vis-item-overflow {
+                        height: 6px;
+                        .vis-item-content {
+                            padding: 0;
+                        }
+
+                    }
+
+                    &.is-loading {
+
+                        display: flex;
+                        padding: 1px;
+                        opacity: 0.6;
+
+                        .vis-item-overflow {
+                            background: rgba(black, 0.4);
+                            animation: range-load-animation 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+                            height: 2px;
+                        }
+
+                    }
+                }
+
+                &.editable-range {
+
+                    background-color: rgba(@primary-color, 0.2);
+
+                    cursor: grab;
+
+                    &.dragging {
+                        cursor: grabbing
+                    }
+                }
+            }
+
+            .vis-custom-time {
+                background-color: @primary-color;
+                width: 3px;
+                cursor: ew-resize;
+
+
+                &:hover {
+                    width: 4px;
+                    z-index: 2;
+                }
+            }
+        }
+    }
+}
+
+@keyframes range-load-animation {
+    0% { margin-left: 0px; margin-right: 100%; }
+    50% { margin-left: 25%; margin-right: 0%; }
+    100% { margin-left: 100%; margin-right: 0; }
+  }

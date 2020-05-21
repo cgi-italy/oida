@@ -1,0 +1,46 @@
+.dashboard-pane {
+    position: relative;
+    max-height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    background: @layout-sider-background;
+
+    .dashboard-widget {
+        background: @component-background;
+        display: flex;
+        flex-direction: column;
+
+        .widget-header {
+
+            height: 24px;
+            flex-grow: 0;
+            flex-shrink: 0;
+
+            .widget-drag-btn {
+                cursor: grab;
+            }
+
+            .widget-close-btn {
+                position: absolute;
+                right: 0.2rem;
+                top: 0.2rem;
+            }
+        }
+
+        .widget-content {
+            flex-grow: 1;
+            overflow: auto;
+        }
+
+        .react-resizable-handle {
+            &::after {
+                border-right-color: @primary-color;
+                border-bottom-color: @primary-color;
+            }
+        }
+    }
+
+    .react-grid-placeholder {
+        background: @primary-color;
+    }
+}

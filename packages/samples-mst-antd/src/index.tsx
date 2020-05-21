@@ -9,7 +9,7 @@ import {
 
 import * as components from './samples';
 
-import '../style/app.scss';
+import '../style/app.less';
 
 const initApp = () => {
 

@@ -1,0 +1,49 @@
+
+@import '~@oida/ui-react-core/styles/utils/scrollbar';
+
+.ant-list {
+
+    .scrollbar(8px, @primary-color, @primary-2);
+
+    overflow: auto;
+    scroll-behavior: smooth;
+
+    .ant-list-items {
+
+        margin-right: 0.5rem;
+
+        .ant-list-item {
+
+            cursor: pointer;
+            padding-top: 5px;
+            padding-bottom: 1px;
+
+            &.hovered {
+                background-color: @table-row-hover-bg;
+            }
+
+            &.selected {
+
+                &:not(.hovered) {
+                    background-color: @table-selected-row-bg;
+                }
+
+                &.hovered {
+                    background-color: lighten(@table-selected-row-bg, 10%);
+                }
+            }
+
+            .ant-list-item-meta-title {
+                margin-bottom: 0px;
+            }
+
+            .ant-list-item-meta-description {
+                font-size: @font-size-sm;
+            }
+
+
+        }
+
+    }
+
+}

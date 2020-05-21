@@ -1,9 +1,9 @@
 {
-  "extends": "../../config/tsconfig.default.json",
+  "extends": "../../config/tsconfig.default.es6.json",
   "compilerOptions": {
-    "declarationDir": "./dist/types",
+    "declarationDir": "./types",
     "jsx": "react",
-    "outDir": "./dist",
+    "outDir": "./es",
     "rootDir": "./src"
   },
   "include": [

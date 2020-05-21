@@ -13,9 +13,8 @@ const config = (env = {}) => {
     return webpackMerge(
         cesiumConfig({ nodeModulesDir: '../../node_modules' }),
         antdConfig({
-            themePath: path.join(__dirname, 'style', './theme.scss'),
             styleLoader: env.mode === 'production' ? MiniCssExtractPlugin.loader : 'style-loader',
-            tsLoderOptions: {
+            tsLoaderOptions: {
                 transpileOnly: true
             }
         }),

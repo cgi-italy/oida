@@ -2,20 +2,23 @@
   "name": "@oida/ui-react-core",
   "version": "2.0.0",
   "description": "ui core components",
-  "module": "dist/ui-react-core.js",
-  "main": "dist/ui-react-core.cjs.js",
-  "saas": "dist/styles/index.scss",
-  "types": "dist/types/index.d.ts",
+  "module": "es/index.js",
+  "main": "lib/index.js",
+  "types": "types/index.d.ts",
+  "less": "styles/index.less",
   "files": [
-    "dist"
+    "es",
+    "lib",
+    "styles",
+    "types"
   ],
   "scripts": {
-    "build": "rollup --config rollup.config.js",
-    "build:cjs": "rollup --config rollup.config.js --environment FORMAT:cjs",
-    "clean": "rimraf ./dist ./.rpt2_cache",
-    "watch": "rollup --config rollup.config.js --watch",
+    "build:es": "tsc",
+    "build:umd": "tsc --project tsconfig.umd.json",
+    "clean": "rimraf ./lib ./es ./types ./tsconfig.tsbuildinfo",
+    "watch": "tsc --watch",
     "lint": "tslint --project ./tsconfig.json",
-    "test": "jest --config jest.config.js"
+    "test": "jest --config ./jest.config.js"
   },
   "author": "stefano marra",
   "license": "UNLICENSED",

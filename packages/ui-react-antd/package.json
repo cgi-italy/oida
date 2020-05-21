@@ -2,25 +2,25 @@
   "name": "@oida/ui-react-antd",
   "version": "2.0.0",
   "description": "antd components",
-  "typescript:main": "src/index.ts",
-  "module": "dist/ui-react-antd.js",
-  "main": "dist/ui-react-antd.cjs.js",
-  "saas": "dist/styles/index.scss",
-  "types": "dist/types/index.d.ts",
+  "module": "es/index.js",
+  "main": "lib/index.js",
+  "types": "types/index.d.ts",
+  "less": "styles/index.less",
   "files": [
-    "dist",
-    "src",
-    "config"
+    "es",
+    "lib",
+    "styles",
+    "types"
   ],
   "scripts": {
     "pack-icons": "rimraf ./src/icons && svgr --config-file ./config/svgr.config.js --ext tsx --filename-case kebab --out-dir ./src/icons ./assets/icons",
     "prebuild": "npm run pack-icons",
-    "build": "rollup --config rollup.config.js",
-    "build:cjs": "rollup --config rollup.config.js --environment FORMAT:cjs",
-    "clean": "rimraf ./dist ./.rpt2_cache",
-    "watch": "rollup --config rollup.config.js --watch",
+    "build:es": "tsc",
+    "build:umd": "tsc --project tsconfig.umd.json",
+    "clean": "rimraf ./lib ./es ./types ./tsconfig.tsbuildinfo",
+    "watch": "tsc --watch",
     "lint": "tslint --project ./tsconfig.json",
-    "test": "jest --config jest.config.js"
+    "test": "jest --config ./jest.config.js"
   },
   "author": "stefano marra",
   "license": "UNLICENSED",

@@ -1,0 +1,35 @@
+.antd-form-renderer {
+    .ant-form-item {
+
+        &.boolean-field.checkbox-renderer {
+            .ant-form-item-label {
+                label {
+                    display: none;
+                }
+            }
+        }
+    }
+
+    &.ant-form-small {
+        .ant-form-item {
+            .ant-form-item-label {
+                label {
+                    font-size: @font-size-sm;
+                    height: auto;
+                }
+            }
+
+            margin-bottom: @margin-sm;
+        }
+
+    }
+
+    &.ant-form-vertical {
+        .ant-form-item {
+            .ant-form-item-control {
+                margin-left: @margin-xss;
+            }
+        }
+    }
+
+}

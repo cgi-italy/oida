@@ -7,7 +7,7 @@ import { IEntitySelection, IQueryParams } from '@oida/state-mst';
 import { useEntityCollectionList, useDataPaging, useDataFiltering, useDataSorting } from '@oida/ui-react-mst';
 import { DataCollectionList, DataCollectionTable } from '@oida/ui-react-antd';
 
-import './spot-list.scss';
+import './spot-list.less';
 
 export type SpotListProps = {
     spots: ISpotCollection,

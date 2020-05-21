@@ -1,0 +1,44 @@
+.scrollbar-width(@size) when (@size <= 15px) and (@size > 1px) {
+    scrollbar-width: thin;
+}
+
+.scrollbar-width(@size) when (@size < 1px) {
+    scrollbar-width: none;
+}
+
+.scrollbar-width(@size) when (@size > 15px) {
+    scrollbar-width: auto;
+}
+
+
+.scrollbar(@size, @thumb, @track: lighten(@thumb, 25%)) {
+
+    //webkit
+    &::-webkit-scrollbar {
+        width:  @size;
+        height: @size;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: @thumb;
+        border-radius: @size / 2;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: @track;
+        border-radius: @size / 2;
+    }
+
+    //Firefox
+    scrollbar-color: @thumb @track;
+    .scrollbar-width(@size);
+
+    //IE
+    scrollbar-face-color: @thumb;
+    scrollbar-track-color: @track;
+    scrollbar-arrow-color: @thumb;
+    scrollbar-shadow-color: darken(@thumb, 20%);
+    scrollbar-darkshadow-color: darken(@thumb, 30%);
+    scrollbar-highlight-color: lighten(@thumb, 10%);
+
+}

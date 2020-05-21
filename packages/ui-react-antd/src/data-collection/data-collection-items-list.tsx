@@ -5,7 +5,7 @@ import classnames from 'classnames';
 import { List, Tooltip } from 'antd';
 
 import { LoadingState, SelectionMode } from '@oida/core';
-import { DataCollectionItemsProps, canBeScrolledIntoView, CanBeScrolledIntoView } from '@oida/ui-react-core';
+import { DataCollectionItemsProps, CanBeScrolledIntoView } from '@oida/ui-react-core';
 
 export type DataCollectionItemsListProps<T> = {
     autoScrollOnSelection?: boolean;
@@ -90,7 +90,7 @@ export function DataCollectionItemsList<T>(props: DataCollectionItemsListProps<T
                 >
                     {listItem}
                 </CanBeScrolledIntoView>
-            )
+            );
         }
 
         return itemRenderer;

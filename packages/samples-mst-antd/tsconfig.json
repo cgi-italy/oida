@@ -1,12 +1,10 @@
 {
-  "extends": "../../config/tsconfig.default.json",
+  "extends": "../../config/tsconfig.default.umd.json",
   "compilerOptions": {
-    "composite": false,
-    "declaration": false,
-    "declarationMap": false,
+    "module": "ES2015",
     "outDir": "./dist",
     "jsx": "react",
-    "rootDir": "../"
+    "rootDir": "./src"
   },
   "include": [
     "src/**/*"
