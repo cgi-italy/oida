@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.0.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/ui-react-mst@2.0.0...@oida/ui-react-mst@3.0.0) (2020-05-22)
+
+
+### Bug Fixes
+
+* switch from deprecated needsConfig to hasConfig in app modules ([d0439ca](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/d0439ca62efdd60c38df4c30bc70a1516e50a3a4))
+
+
+### Features
+
+* add extension filter on aoi import ([b21adb8](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/b21adb813b777f15f6832688a1cb14ed323cd723))
+* add support for line and draw constraints in aoi field ([45b6527](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/45b6527e3ae17e0958828f50da32228acd27846b))
+* listen for resize events in map component ([42fe879](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/42fe8791e757b4d0d82ef2fc55abdd916a2341b6))
+* move form field definition in core ([0509f7c](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/0509f7c0a191d6220d1cbfa04ac13a3504402a79))
+
+
+### BREAKING CHANGES
+
+* App module configuration shall be specified in the initial state snapshot
+
+
+
+
+
 # [2.0.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/ui-react-mst@1.0.0...@oida/ui-react-mst@2.0.0) (2020-02-12)
 
 

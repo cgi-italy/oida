@@ -1,6 +1,6 @@
 {
   "name": "@oida/core",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "core utils and definitions",
   "module": "es/index.js",
   "main": "lib/index.js",

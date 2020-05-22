@@ -1,6 +1,6 @@
 {
   "name": "@oida/eo-ui",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "oida EO analyst UI library",
   "module": "es/index.js",
   "main": "lib/index.js",
@@ -40,8 +40,8 @@
     "@egjs/hammerjs": "^2.0.17",
     "@oida/core": "file:../core",
     "@oida/eo": "file:../eo",
-    "@oida/state-mst": "file:../state-mst",
     "@oida/map-ol": "file:../map-ol",
+    "@oida/state-mst": "file:../state-mst",
     "@oida/ui-react-antd": "file:../ui-react-antd",
     "@oida/ui-react-core": "file:../ui-react-core",
     "@oida/ui-react-mst": "file:../ui-react-mst",

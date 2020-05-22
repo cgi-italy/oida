@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.0.1](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/samples-mst-antd@2.0.0...@oida/samples-mst-antd@2.0.1) (2020-05-22)
+
+**Note:** Version bump only for package @oida/samples-mst-antd
+
+
+
+
+
 # [2.0.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/samples-mst-antd@1.0.0...@oida/samples-mst-antd@2.0.0) (2020-02-12)
 
 

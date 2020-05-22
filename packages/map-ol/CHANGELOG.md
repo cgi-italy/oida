@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.2.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/map-ol@1.1.0...@oida/map-ol@1.2.0) (2020-05-22)
+
+
+### Bug Fixes
+
+* add missing circle feature support in ol renderer ([b80f756](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/b80f756523c8794e1f18dfee99daba3eb3b35f3f))
+* fix for mouse coord interaction not working after ol upgrade ([4d5d239](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/4d5d23947de5c8d7c3b01bd03bda59132e4598e9))
+
+
+### Features
+
+* add support for force refreshing a tile source ([8730093](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/87300931e5896b42108508ecefbd0f09292ba8c1))
+* add support for line and draw constraints in aoi field ([45b6527](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/45b6527e3ae17e0958828f50da32228acd27846b))
+* add support for rendering props update ([42a9703](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/42a97032ac9a5ba3071809a217e64d4c6e847d2a))
+* add vertical profile layer selection ([1a1da62](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/1a1da62589d3ac33267ce5a26dab571f71c47f55))
+* listen for resize events in map component ([42fe879](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/42fe8791e757b4d0d82ef2fc55abdd916a2341b6))
+
+
+
+
+
 # [1.1.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/map-ol@1.0.0...@oida/map-ol@1.1.0) (2020-02-12)
 
 

@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.1.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/ui-react-antd@2.0.0...@oida/ui-react-antd@2.1.0) (2020-05-22)
+
+
+### Features
+
+* add boolean form field ([1b7adea](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/1b7adea115d290ec2474a2e6f89b8675ac821c6d))
+* add extension filter on aoi import ([b21adb8](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/b21adb813b777f15f6832688a1cb14ed323cd723))
+* add generic form renderer ([4e29978](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/4e29978f774a0ae8fc2bf99fcb4cf44d63fa64c2))
+* add support for line and draw constraints in aoi field ([45b6527](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/45b6527e3ae17e0958828f50da32228acd27846b))
+* move form field definition in core ([0509f7c](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/0509f7c0a191d6220d1cbfa04ac13a3504402a79))
+
+
+
+
+
 # [2.0.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/ui-react-antd@1.0.0...@oida/ui-react-antd@2.0.0) (2020-02-12)
 
 

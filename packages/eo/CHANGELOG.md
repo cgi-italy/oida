@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.2.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/eo@1.1.0...@oida/eo@1.2.0) (2020-05-22)
+
+
+### Bug Fixes
+
+* update to latest aoi API ([1c06b12](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/1c06b12916ae0e4c1eea69236c57b93422ad300e))
+
+
+### Features
+
+* add 2d widget for vertical profile viz ([9f41429](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/9f41429242b2122685e9e228019067991a881229))
+* add eo volumetric viz ([3a80f26](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/3a80f263b74ce283379f7f26bceed930ca92d9b2))
+* add status monitoring in eo dataset download ([da6b6ac](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/da6b6ac2987efd4d11e05245be606958dccb78f9))
+* add support for volume layers ([97be351](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/97be351670c9d5fe38ab9a707d04722f5c874790))
+* add vertical profile datasets support ([36ec79e](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/36ec79ee5222bc2a05a8e9ba3d2f78c0fb8cd516))
+* minor eo improvements ([03c13c0](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/03c13c0f191de497608f0c746fa704151e57926e))
+* refactor eo mapViz/analysis ([07228a0](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/07228a05699450de30f493b65ffa369c590be94d))
+
+
+
+
+
 # 1.1.0 (2020-02-12)
 
 

@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.2.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/core@1.1.0...@oida/core@1.2.0) (2020-05-22)
+
+
+### Features
+
+* add support for force refreshing a tile source ([8730093](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/87300931e5896b42108508ecefbd0f09292ba8c1))
+* add support for line and draw constraints in aoi field ([45b6527](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/45b6527e3ae17e0958828f50da32228acd27846b))
+* add support for rendering props update ([42a9703](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/42a97032ac9a5ba3071809a217e64d4c6e847d2a))
+* add support for volume layers ([97be351](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/97be351670c9d5fe38ab9a707d04722f5c874790))
+* add vertical profile layer ([5cea9c9](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/5cea9c99a25412ee795fc869398f670ea43d8320))
+* add vertical profile layer selection ([1a1da62](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/1a1da62589d3ac33267ce5a26dab571f71c47f55))
+* enable slice loading function in volumesource ([c8403f7](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/c8403f79ef4a9a99b18e27fd0d815ce11b50ae96))
+* listen for resize events in map component ([42fe879](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/42fe8791e757b4d0d82ef2fc55abdd916a2341b6))
+* move form field definition in core ([0509f7c](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/0509f7c0a191d6220d1cbfa04ac13a3504402a79))
+
+
+
+
+
 # [1.1.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/core@1.0.0...@oida/core@1.1.0) (2020-02-12)
 
 

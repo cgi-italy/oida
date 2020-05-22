@@ -1,6 +1,6 @@
 {
   "name": "@oida/samples-mst-antd",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "oida samples based on mst for state management and antd for widgeting",
   "main": "src/index.tsx",
   "private": true,
