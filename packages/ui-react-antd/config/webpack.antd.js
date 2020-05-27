@@ -32,7 +32,7 @@ const config = (config = {}) => {
                                         tsImportPluginFactory({
                                             libraryName: 'antd',
                                             libraryDirectory: 'lib',
-                                            style: true
+                                            style: false
                                         }),
                                         ...getCustomTransformers.before || []
                                     ],
