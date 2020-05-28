@@ -89,12 +89,12 @@ publish_canary:
 
 publish_samples:
   stage: publish
-  image: docker:stable-git
+  image: docker:18.09.9
   variables:
     DOCKER_DRIVER: overlay2
     DOCKER_TLS_CERTDIR: ""
   services:
-    - docker:stable-dind
+    - docker:18.09.9-dind
   script:
     - setup_docker
     - build_docker_image
