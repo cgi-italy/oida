@@ -1,13 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import classnames from 'classnames';
-import { Instance } from 'mobx-state-tree';
 
 import { useObserver } from 'mobx-react';
 
 import { Button, Dropdown, InputNumber, Slider, Checkbox, Select } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
 
-import { ColorMap, DataVar, ColorMapConfigPreset } from '@oida/eo';
+import { IColorMapBase, IColorMapCustom, IColorMap, DatasetVariable, isValueDomain, ColorMapConfigPreset } from '@oida/eo';
 
 export type DatasetColormapPresetSelectorItemProps = {
     preset: ColorMapConfigPreset;
@@ -65,8 +64,7 @@ export const DatasetColormapPresetList = (props: DatasetColormapPresetListProps)
 
 export type DatasetColormapPresetSelectorProps = {
     presets: ColorMapConfigPreset[];
-    colorMap: Instance<typeof ColorMap>;
-    variables: DataVar | DataVar[];
+    colorMap: IColorMapBase;
 };
 
 export const DatasetColormapPresetSelector = (props: DatasetColormapPresetSelectorProps) => {
@@ -77,133 +75,217 @@ export const DatasetColormapPresetSelector = (props: DatasetColormapPresetSelect
         return props.colorMap.preset;
     });
 
+    let selectedPresetConfig = props.presets.find(preset => preset.id === selectedPreset);
+
+    return (
+        <Dropdown
+            trigger={['click']}
+            placement='bottomLeft'
+            onVisibleChange={(visible) => setDropDownVisible(visible)}
+            visible={dropDownVisible}
+            overlayClassName='dataset-colormap-preset-dropdown'
+            overlay={<DatasetColormapPresetList
+                presets={props.presets}
+                selectedPreset={selectedPreset}
+                onPresetSelect={(preset) => {
+                    props.colorMap.setPreset(preset);
+                    setDropDownVisible(false);
+                }}
+            />}
+        >
+            <div className='dataset-colormap-preset'>
+                {selectedPresetConfig && <DatasetColormapPresetSelectorItem
+                    preset={selectedPresetConfig}
+                />}
+                <Button type='link'><DownOutlined/></Button>
+            </div>
+        </Dropdown>
+    );
+};
+
+export type DatasetColormapRangeSelectorProps = {
+    colorMap: IColorMapCustom;
+    variable: DatasetVariable<number>;
+};
+
+export const DatasetColormapRangeSelector = (props: DatasetColormapRangeSelectorProps) => {
+
+    const domainConfig = props.variable.domain;
+
+    let domain = useObserver(() => props.colorMap.domain);
+    let clamp = useObserver(() => props.colorMap.clamp);
+
+    let domainSlider: JSX.Element | undefined;
+
+    const variableDomain = domainConfig && isValueDomain(domainConfig)
+        ? {
+            min: domainConfig.min,
+            max: domainConfig.max,
+            step: (domainConfig.max - domainConfig.min) / 100
+        }
+        : undefined;
+
+    if (variableDomain) {
+
+        let marks = {
+            [variableDomain.min]: `${variableDomain.min} ${props.variable.units || ''}`,
+            [variableDomain.max]: `${variableDomain.max} ${props.variable.units || ''}`,
+        };
+
+        domainSlider = <Slider
+            value={[domain.min, domain.max]}
+            min={variableDomain.min}
+            max={variableDomain.max}
+            step={variableDomain.step}
+            range={true}
+            marks={marks}
+            tooltipVisible={false}
+            onChange={(value) => {
+                props.colorMap.setDomain({min: value[0], max: value[1]});
+            }}
+        />;
+    }
+
+    return (
+        <div className='dataset-colormap-range'>
+            <div className='dataset-colormap-range-inputs'>
+                <InputNumber
+                    value={domain.min}
+                    min={variableDomain?.min}
+                    max={variableDomain?.max}
+                    step={variableDomain?.step}
+                    size='small'
+                    formatter={value => `${clamp ? '≤ ' : ''}${value}`}
+                    onChange={(value) => {
+                        if (typeof(value) === 'number') {
+                            props.colorMap.setDomain({
+                                min: value,
+                                max: Math.max(value, props.colorMap.domain.max)
+                            });
+                        }
+                    }}
+                />
+                <InputNumber
+                    value={domain.max}
+                    min={variableDomain?.min}
+                    max={variableDomain?.max}
+                    step={variableDomain?.step}
+                    onChange={(value) => {
+                        if (typeof(value) === 'number') {
+                            props.colorMap.setDomain({
+                                min: Math.min(props.colorMap.domain.min, value),
+                                max: value
+                            });
+                        }
+                    }}
+                    size='small'
+                    formatter={value => `${clamp ? '≥ ' : ''}${value}`}
+                />
+            </div>
+            {domainSlider}
+            <Checkbox
+                checked={clamp}
+                onChange={(evt) => {
+                    if (props.colorMap.mode === 'custom') {
+                        props.colorMap.setClamp(evt.target.checked);
+                    }
+                }}
+            >
+                Clamp to min/max
+            </Checkbox>
+        </div>
+    );
+};
+
+export type DatasetColormapVariableSelectorProps = {
+    colorMap: IColorMap;
+    variables: DatasetVariable<number>[];
+};
+
+export const DatasetColormapVariableSelector = (props: DatasetColormapVariableSelectorProps) => {
+
     let selectedVariable = useObserver(() => {
         return props.colorMap.variable;
     });
 
-    let selectedPresetConfig = props.presets.find(preset => preset.id === selectedPreset);
+    const findVariableConfig = (variable: string) => {
+        return props.variables.find((variableConfig) => variableConfig.id === variable);
+    };
 
-    let dataVar = props.variables instanceof Array
+    const dataVarOptions = props.variables.map((variable) => {
+        return (<Select.Option key={variable.id} value={variable.id}>{variable.name}</Select.Option>);
+    });
+
+    return (
+        <div className='dataset-var-selector'>
+            <span>Variable: </span>
+            <Select
+                value={selectedVariable}
+                onChange={(variable) => {
+                    props.colorMap.setVariable(variable);
+                    if (props.colorMap.mode === 'custom') {
+                        let varConfig = findVariableConfig(variable);
+                        if (varConfig) {
+                            if (varConfig.domain && isValueDomain(varConfig.domain)) {
+                                props.colorMap.setDomain({
+                                    min: varConfig.domain.min,
+                                    max: varConfig.domain.max
+                                });
+                                props.colorMap.setNoDataValue(varConfig.domain.noData);
+                            }
+                        }
+                    }
+                }}
+            >
+                {dataVarOptions}
+            </Select>
+        </div>
+    );
+};
+
+
+export type DatasetColormapSelectorProps = {
+    presets: ColorMapConfigPreset[];
+    colorMap: IColorMap;
+    variables?: DatasetVariable<number> | DatasetVariable<number>[];
+};
+
+export const DatasetColormapSelector = (props: DatasetColormapSelectorProps) => {
+
+    let selectedVariable = useObserver(() => {
+        return props.colorMap.variable;
+    });
+
+    const variableConfig = props.variables instanceof Array
         ? props.variables.find((variable) => variable.id === selectedVariable)
         : props.variables;
 
-    let dataVarOptions: any = undefined;
+
+    let variableSelector: JSX.Element | undefined;
+
     if (props.variables instanceof Array) {
-        dataVarOptions = props.variables.map((variable) => {
-            return (<Select.Option key={variable.id} value={variable.id}>{variable.name}</Select.Option>);
-        });
+        variableSelector = <DatasetColormapVariableSelector
+            colorMap={props.colorMap}
+            variables={props.variables}
+        />;
     }
 
-    let rangeStep = (dataVar!.domain.max - dataVar!.domain.min) / 100;
-
-    let domain = useObserver(() => props.colorMap.mode === 'custom' ? props.colorMap.domain : undefined);
-    let clamp = useObserver(() => props.colorMap.mode === 'custom' ? props.colorMap.clamp : undefined);
-
-    let marks = {
-        [dataVar!.domain.min]: `${dataVar!.domain.min} ${dataVar!.units || ''}`,
-        [dataVar!.domain.max]: `${dataVar!.domain.max} ${dataVar!.units || ''}`,
-    };
+    let colormapRangeSelector: JSX.Element | undefined;
+    if (variableConfig && props.colorMap.mode === 'custom') {
+        colormapRangeSelector = <DatasetColormapRangeSelector
+            colorMap={props.colorMap}
+            variable={variableConfig}
+        />;
+    }
 
     return (
         <div className='dataset-colormap-selector'>
-            {dataVarOptions &&
-                <div className='dataset-var-selector'>
-                    <span>Variable: </span>
-                    <Select
-                        value={selectedVariable}
-                        onChange={(variable) => {
-                            props.colorMap.setVariable(variable);
-                            if (props.colorMap.mode === 'custom') {
-                                let varConfig = (props.variables as DataVar[]).find(v => v.id === variable);
-                                if (varConfig) {
-                                    props.colorMap.setDomain(varConfig.domain);
-                                    props.colorMap.setNoDataValue(varConfig.domain.noDataValue);
-                                }
-                            }
-                        }}
-                    >
-                        {dataVarOptions}
-                    </Select>
-                </div>
-            }
-            <Dropdown
-                trigger={['click']}
-                placement='bottomLeft'
-                onVisibleChange={(visible) => setDropDownVisible(visible)}
-                visible={dropDownVisible}
-                overlayClassName='dataset-colormap-preset-dropdown'
-                overlay={<DatasetColormapPresetList
-                    presets={props.presets}
-                    selectedPreset={selectedPreset}
-                    onPresetSelect={(preset) => {
-                        props.colorMap.setPreset(preset);
-                        setDropDownVisible(false);
-                    }}
-                />}
-            >
-                <div className='dataset-colormap-preset'>
-                    {selectedPresetConfig && <DatasetColormapPresetSelectorItem
-                        preset={selectedPresetConfig}
-                    />}
-                    <Button type='link'><DownOutlined/></Button>
-                </div>
-            </Dropdown>
-            {
-                domain &&
-                <div className='dataset-colormap-range'>
-                    <div className='dataset-colormap-range-inputs'>
-                        <InputNumber
-                            value={domain.min}
-                            min={dataVar!.domain.min}
-                            max={dataVar!.domain.max}
-                            step={rangeStep}
-                            size='small'
-                            formatter={value => `${clamp ? '≤ ' : ''}${value}`}
-                            onChange={(value) => {
-                                if (props.colorMap.mode === 'custom' && typeof(value) === 'number') {
-                                    props.colorMap.setDomain({min: value, max: Math.max(value, props.colorMap.domain.max)});
-                                }
-                            }}
-                        />
-                        <InputNumber
-                            value={domain.max}
-                            min={dataVar!.domain.min}
-                            max={dataVar!.domain.max}
-                            onChange={(value) => {
-                                if (props.colorMap.mode === 'custom' && typeof(value) === 'number') {
-                                    props.colorMap.setDomain({min: Math.min(props.colorMap.domain.min, value), max: value});
-                                }
-                            }}
-                            step={rangeStep}
-                            size='small'
-                            formatter={value => `${clamp ? '≥ ' : ''}${value}`}
-                        />
-                    </div>
-                    <Slider
-                        value={[domain.min, domain.max]}
-                        min={dataVar!.domain.min}
-                        max={dataVar!.domain.max}
-                        step={rangeStep}
-                        range={true}
-                        marks={marks}
-                        tooltipVisible={false}
-                        onChange={(value) => {
-                            if (props.colorMap.mode === 'custom') {
-                                props.colorMap.setDomain({min: value[0], max: value[1]});
-                            }
-                        }}
-                    />
-                    <Checkbox
-                        checked={clamp}
-                        onChange={(evt) => {
-                            if (props.colorMap.mode === 'custom') {
-                                props.colorMap.setClamp(evt.target.checked);
-                            }
-                        }}
-                    >Clamp to min/max</Checkbox>
-                </div>
-            }
+            {variableSelector}
+            <DatasetColormapPresetSelector
+                colorMap={props.colorMap}
+                presets={props.presets}
+            />
+            {colormapRangeSelector}
         </div>
     );
-
 };

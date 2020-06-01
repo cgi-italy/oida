@@ -6,7 +6,7 @@ import { hasConfig, hasGeometry } from '@oida/state-mst';
 
 import { ColorMap, ColorMapConfig } from '../map-viz/color-map';
 import { DatasetViz } from '../dataset-viz';
-import { DatasetVariable } from './dataset-domain-series';
+import { DatasetDimension, DomainRange } from '../dataset-variable';
 import { isDataProvider } from '../../datasets-explorer/is-data-provider';
 
 import debounce from 'lodash/debounce';
@@ -15,10 +15,7 @@ export const DOMAIN_RASTER_SEQUENCE_TYPE = 'domain_raster_sequence';
 export const TIME_RASTER_SEQUENCE_TYPE = 'time_raster_sequence';
 
 export type DatasetRasterSequenceRequest<T> = {
-    range: {
-        start: T;
-        end: T;
-    },
+    range: DomainRange<T>,
     variable: string;
     geometry: Geometry;
     filters: QueryFilter[];
@@ -36,7 +33,7 @@ export type DatasetRasterSequenceThumbGenerator =
 (data: any, colorMap: SnapshotOut<typeof ColorMap>, canvas: HTMLCanvasElement) => void;
 
 export type DatasetRasterSequenceConfig<T = number> = {
-    domain: DatasetVariable<T>;
+    domain: DatasetDimension<T>;
     provider: DatasetRasterSequenceProvider<T>;
     imageGenerator: DatasetRasterSequenceThumbGenerator;
     supportedGeometries: AoiSupportedGeometry[];
@@ -47,7 +44,7 @@ const createRasterSequenceType = <T>(typeName: string) => {
     return DatasetViz.addModel(types.compose(
         typeName,
         types.model(typeName, {
-            range: types.maybe(types.frozen<{start: T, end: T}>()),
+            range: types.maybe(types.frozen<DomainRange<T>>()),
             colorMap: types.maybe(ColorMap)
         }),
         isDataProvider,
@@ -80,7 +77,7 @@ const createRasterSequenceType = <T>(typeName: string) => {
         const debouncedUpdate = debounce(self.updateData, 1000);
 
         return {
-            setRange: (range) => {
+            setRange: (range?: DomainRange<T>) => {
                 self.range = range;
             },
             setColorMap: (colorMap) => {

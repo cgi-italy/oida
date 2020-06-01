@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { DatasetVizOpacityControl } from './dataset-viz-opacity-control';
-import { DatasetColormapPresetSelector } from './dataset-colormap-selector';
+import { DatasetColormapSelector } from './dataset-colormap-selector';
 
 import { DatasetVizSettingsFactory } from './dataset-viz-settings-factory';
 import { DatasetVerticalScaleSelector } from './dataset-vertical-scale-selector';
@@ -23,12 +23,12 @@ export const DatasetVerticalProfileVizSettings = (props: DatasetVerticalProfileV
                 datasetViz={props.datasetViz}
                 rangeConfig={props.datasetViz.config.verticalScaleConfig}
             />
-            {props.datasetViz.colorMap &&
+            {props.datasetViz.colorMap && props.datasetViz.config.colorMapConfig &&
                 <React.Fragment>
-                    <DatasetColormapPresetSelector
-                        variables={props.datasetViz.config.colorMapConfig!.variables!}
+                    <DatasetColormapSelector
+                        variables={props.datasetViz.config.colorMapConfig.variables}
                         colorMap={props.datasetViz.colorMap}
-                        presets={props.datasetViz.config.colorMapConfig!.colorMaps!}
+                        presets={props.datasetViz.config.colorMapConfig.colorMaps}
                     />
                 </React.Fragment>
             }

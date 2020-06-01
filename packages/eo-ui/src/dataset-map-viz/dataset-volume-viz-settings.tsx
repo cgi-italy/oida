@@ -9,7 +9,7 @@ import { DatasetVizSettingsFactory } from './dataset-viz-settings-factory';
 import { IDatasetVolumeViz } from '@oida/eo';
 
 import { DatasetVolumeStackSelector } from './dataset-volume-stack-selector';
-import { DatasetColormapPresetSelector } from './dataset-colormap-selector';
+import { DatasetColormapSelector } from './dataset-colormap-selector';
 
 export type DatasetVolumeVizSettingsProps = {
     datasetViz: IDatasetVolumeViz
@@ -26,11 +26,11 @@ export const DatasetVolumeVizSettings = (props: DatasetVolumeVizSettingsProps) =
                 volumeViz={props.datasetViz}
                 verticalDomain={props.datasetViz.config!.verticalDomain}
             />
-            {props.datasetViz.colorMap &&
-                <DatasetColormapPresetSelector
-                    variables={props.datasetViz.config.colorMapConfig!.variables!}
+            {props.datasetViz.colorMap && props.datasetViz.config.colorMapConfig &&
+                <DatasetColormapSelector
+                    variables={props.datasetViz.config.colorMapConfig.variables}
                     colorMap={props.datasetViz.colorMap}
-                    presets={props.datasetViz.config.colorMapConfig!.colorMaps!}
+                    presets={props.datasetViz.config.colorMapConfig.colorMaps}
                 />
             }
         </div>

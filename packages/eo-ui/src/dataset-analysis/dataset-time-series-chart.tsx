@@ -11,7 +11,7 @@ import { DatasetSeriesFilters, DatasetSeriesChartWidget } from './dataset-series
 
 
 export type DatasetTimeSeriesProps = {
-    timeRange?: {start: Date, end: Date}
+    timeRange?: {min: Date, max: Date}
     onTimeRangeChange?: (timeRange) => void;
     timeDomain?: {min: Date, max: Date}
     analysis: IDatasetAnalysis;
@@ -64,8 +64,14 @@ export const DatasetTimeSeriesChart = (props: DatasetTimeSeriesProps) => {
             <Form layout='inline' size='small'>
                 <Form.Item>
                     <DateRangeFieldRenderer
-                        value={timeRange}
-                        onChange={onTimeRangeChange}
+                        value={{
+                            start: timeRange.min,
+                            end: timeRange.max
+                        }}
+                        onChange={(value) => onTimeRangeChange(value ? {
+                            min: value.start,
+                            max: value.end
+                        } : undefined)}
                         config={{
                             minDate: props.timeDomain ? props.timeDomain.min : undefined,
                             maxDate: props.timeDomain ? props.timeDomain.max : undefined
@@ -95,16 +101,16 @@ DatasetAnalysisWidgetFactory.register(TIME_SERIES_TYPE, (config) => {
             let start = new Date(toi.end.getTime());
             start.setMonth(start.getMonth() - 1);
             timeSeriesViz.setRange({
-                start: start,
-                end: toi.end
+                min: start,
+                max: toi.end
             });
         } else if (timeSeriesViz.dataset.config!.timeDistribution) {
             let timeProvider = timeSeriesViz.dataset.config!.timeDistribution.provider;
             timeProvider.getTimeExtent({}).then((range) => {
-                if (range) {
+                if (range && range.end) {
                     timeSeriesViz.setRange({
-                        start: range.start,
-                        end: range.end
+                        min: new Date(range.start),
+                        max: new Date(range.end)
                     });
                 }
             });

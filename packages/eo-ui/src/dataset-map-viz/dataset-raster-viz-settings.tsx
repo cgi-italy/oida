@@ -2,7 +2,7 @@ import React from 'react';
 
 import { DatasetVizOpacityControl } from './dataset-viz-opacity-control';
 import { DatasetBandPresetSelector } from './dataset-band-preset-selector';
-import { DatasetColormapPresetSelector } from './dataset-colormap-selector';
+import { DatasetColormapSelector } from './dataset-colormap-selector';
 
 import { DatasetVizSettingsFactory } from './dataset-viz-settings-factory';
 
@@ -14,7 +14,8 @@ export type DatasetRasterVizSettingsProps = {
 
 export const DatasetRasterVizSettings = (props: DatasetRasterVizSettingsProps) => {
 
-    let bandMathConfig = props.datasetViz.config!.bandMathConfig;
+    const bandMathConfig = props.datasetViz.config.bandMathConfig;
+    const colorMapConfig = props.datasetViz.config.colorMapConfig;
 
     return (
         <div>
@@ -27,12 +28,12 @@ export const DatasetRasterVizSettings = (props: DatasetRasterVizSettingsProps) =
                     presets={bandMathConfig ? bandMathConfig.presets || [] : []}
                 />
             }
-            {props.datasetViz.colorMap &&
+            {props.datasetViz.colorMap && colorMapConfig &&
                 <React.Fragment>
-                    <DatasetColormapPresetSelector
-                        variables={props.datasetViz.config.colorMapConfig!.variables!}
+                    <DatasetColormapSelector
+                        variables={props.datasetViz.config.colorMapConfig?.variables}
                         colorMap={props.datasetViz.colorMap}
-                        presets={props.datasetViz.config.colorMapConfig!.colorMaps!}
+                        presets={colorMapConfig.colorMaps}
                     />
                 </React.Fragment>
             }

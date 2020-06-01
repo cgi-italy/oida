@@ -4,14 +4,14 @@ import { getSnapshot } from 'mobx-state-tree';
 
 import { Checkbox, Slider, Form } from 'antd';
 
-import { IDatasetAnalysis, IDatasetTimeRasterSequence, TIME_RASTER_SEQUENCE_TYPE, DatasetVariable } from '@oida/eo';
+import { IDatasetAnalysis, IDatasetTimeRasterSequence, TIME_RASTER_SEQUENCE_TYPE, DatasetVariable, isValueDomain } from '@oida/eo';
 import { DateRangeFieldRenderer } from '@oida/ui-react-antd';
 
 import { DatasetAnalysisWidgetFactory } from './dataset-analysis-widget-factory';
 import { AnalysisAoiFilter } from './analysis-aoi-filter';
 import { AnalysisLoadingStateMessage } from './analysis-loading-state-message';
 
-import { DatasetColormapPresetSelector } from '../dataset-map-viz/dataset-colormap-selector';
+import { DatasetColormapSelector } from '../dataset-map-viz/dataset-colormap-selector';
 
 
 export type DatasetTimeRasterSequenceThumbProps = {
@@ -40,7 +40,7 @@ export const DatasetTimeRasterSequenceThumb = (props: DatasetTimeRasterSequenceT
 };
 
 export type DatasetTimeRasterSequenceProps = {
-    dataDomain?: DatasetVariable<Date>;
+    dataDomain: DatasetVariable<Date>;
     sequence: IDatasetTimeRasterSequence;
     analysis: IDatasetAnalysis;
 };
@@ -50,7 +50,6 @@ export const DatasetTimeRasterSequence = (props: DatasetTimeRasterSequenceProps)
     let [activeThumb, setActiveThumb] = useState(-1);
 
     let dataDomain = props.dataDomain;
-    let dataRange = dataDomain ? dataDomain.range : undefined;
 
     let range = useObserver(() => props.sequence.range);
 
@@ -75,19 +74,30 @@ export const DatasetTimeRasterSequence = (props: DatasetTimeRasterSequenceProps)
 
     let loadingState = useObserver(() => props.sequence.loadingState);
 
+    let rangeConfig;
+    if (props.dataDomain.domain && isValueDomain(props.dataDomain.domain)) {
+        rangeConfig = {
+            minDate: props.dataDomain.domain.min,
+            maxDate: props.dataDomain.domain.max
+        };
+    }
+
     return (
         <div className='dataset-raster-sequence'>
             <Form layout='inline' size='small'>
                 <Form.Item>
                     <DateRangeFieldRenderer
-                        value={range}
+                        value={range ? {
+                            start: range.min,
+                            end: range.max
+                        } : undefined}
                         onChange={(value) => {
-                            props.sequence.setRange(value);
+                            props.sequence.setRange(value ? {
+                                min: value.start,
+                                max: value.end
+                            } : undefined);
                         }}
-                        config={{
-                            minDate: dataRange ? dataRange.min : undefined,
-                            maxDate: dataRange ? dataRange.max : undefined
-                        }}
+                        config={rangeConfig || {}}
                     />
                 </Form.Item>
                 <Form.Item>
@@ -98,10 +108,10 @@ export const DatasetTimeRasterSequence = (props: DatasetTimeRasterSequenceProps)
                 </Form.Item>
             </Form>
             {props.sequence.colorMap &&
-                <DatasetColormapPresetSelector
+                <DatasetColormapSelector
                     colorMap={props.sequence.colorMap}
-                    presets={props.sequence.config.colorMap.colorMaps!}
-                    variables={props.sequence.config.colorMap.variables!}
+                    presets={props.sequence.config.colorMap.colorMaps}
+                    variables={props.sequence.config.colorMap.variables}
                 />
             }
             <Checkbox
@@ -134,8 +144,8 @@ export const DatasetTimeRasterSequence = (props: DatasetTimeRasterSequenceProps)
                         min={0}
                         max={thumbs.length - 1}
                         marks={{
-                            0: `${range.start.toISOString()}`,
-                            [(thumbs.length - 1)]: `${range.end.toISOString()}`
+                            0: `${range.min.toISOString()}`,
+                            [(thumbs.length - 1)]: `${range.max.toISOString()}`
                         }}
                         tooltipVisible={false}
                         step={1}
@@ -163,16 +173,16 @@ DatasetAnalysisWidgetFactory.register(TIME_RASTER_SEQUENCE_TYPE, (config) => {
         let toi = rasterSequenceViz.dataset.searchParams.filters.get('time');
         if (toi) {
             rasterSequenceViz.setRange({
-                start: toi.start.getTime(),
-                end: toi.end.getTime()
+                min: toi.start,
+                max: toi.end
             });
         } else if (rasterSequenceViz.dataset.config.timeDistribution) {
             let timeProvider = rasterSequenceViz.dataset.config.timeDistribution.provider;
             timeProvider.getTimeExtent({}).then((range) => {
-                if (range) {
+                if (range && range.end) {
                     rasterSequenceViz.setRange({
-                        start: range.start,
-                        end: range.end
+                        min: new Date(range.start),
+                        max: new Date(range.end)
                     });
                 }
             });

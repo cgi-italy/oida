@@ -3,7 +3,7 @@ import { useObserver } from 'mobx-react';
 
 import { Button, Form } from 'antd';
 
-import { IDatasetAnalysis, IDatasetDomainSeries, DOMAIN_SERIES_TYPE, DatasetVariable } from '@oida/eo';
+import { IDatasetAnalysis, IDatasetDomainSeries, DOMAIN_SERIES_TYPE, DatasetVariable, isValueDomain } from '@oida/eo';
 import { NumericRangeFieldRenderer } from '@oida/ui-react-antd';
 
 import { DatasetAnalysisWidgetFactory } from './dataset-analysis-widget-factory';
@@ -11,7 +11,7 @@ import { DatasetSeriesFilters, DatasetSeriesChartWidget } from './dataset-series
 
 
 export type DatasetDomainSeriesProps = {
-    range?: {start: number, end: number}
+    range?: {min: number, max: number}
     onRangeChange?: (range) => void;
     dataDomain?: DatasetVariable<number>;
     analysis: IDatasetAnalysis;
@@ -59,20 +59,22 @@ export const DatasetDomainSeriesChart = (props: DatasetDomainSeriesProps) => {
 
     let color = useObserver(() => props.analysis.color);
 
-    let dataDomain = props.dataDomain;
-    let dataRange = dataDomain ? dataDomain.range : undefined;
+    let rangeConfig;
+    if (props.dataDomain && props.dataDomain.domain && isValueDomain(props.dataDomain.domain)) {
+        rangeConfig = {
+            min: props.dataDomain.domain.min,
+            max: props.dataDomain.domain.max
+        };
+    }
 
     return (
         <div className='dataset-chart'>
             <Form layout='inline' size='small'>
                 <Form.Item>
                     <NumericRangeFieldRenderer
-                        value={{from: range.start, to: range.end}}
-                        onChange={(value) => onRangeChange(value ? {start: value.from, end: value.to} : undefined)}
-                        config={{
-                            min: dataRange ? dataRange.min : undefined,
-                            max: dataRange ? dataRange.max : undefined
-                        }}
+                        value={{from: range.min, to: range.max}}
+                        onChange={(value) => onRangeChange(value ? {min: value.from, max: value.to} : undefined)}
+                        config={rangeConfig}
                         rendererConfig={{props: {
                             tipFormatter: (value) => {
                                 return props.dataDomain ? `${value} ${props.dataDomain.units}` : value;
@@ -100,11 +102,11 @@ DatasetAnalysisWidgetFactory.register(DOMAIN_SERIES_TYPE, (config) => {
         series.setVariable(series.config.variables[0].id);
     }
 
-    let dataDomain = series.config.domain.range;
-    if (!series.range && dataDomain) {
+    let dataDomain = series.config.domain;
+    if (!series.range && dataDomain.domain && isValueDomain(dataDomain.domain) ) {
         series.setRange({
-            start: dataDomain.min,
-            end: dataDomain.max
+            min: dataDomain.domain.min,
+            max: dataDomain.domain.max
         });
     }
 

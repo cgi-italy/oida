@@ -1,3 +1,4 @@
+export * from './dataset-variable';
 export * from './dataset';
 export * from './dataset-config';
 export * from './dataset-viz';

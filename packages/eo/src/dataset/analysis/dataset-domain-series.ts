@@ -4,7 +4,9 @@ import { types, addDisposer, flow, Instance } from 'mobx-state-tree';
 import { QueryFilter, Geometry, AoiSupportedGeometry, CancelablePromise, LoadingState } from '@oida/core';
 import { hasConfig, hasGeometry } from '@oida/state-mst';
 
+import { DatasetVariable, DatasetDimension, DomainRange } from '../dataset-variable';
 import { DatasetViz } from '../dataset-viz';
+
 import { isDataProvider } from '../../datasets-explorer/is-data-provider';
 
 import debounce from 'lodash/debounce';
@@ -12,24 +14,9 @@ import debounce from 'lodash/debounce';
 export const DOMAIN_SERIES_TYPE = 'domain_series';
 export const TIME_SERIES_TYPE = 'time_series';
 
-export type DatasetVariable<T> = {
-    id: string;
-    name: string;
-    range?: {
-        min: T,
-        max: T
-    };
-    noDataValue?: number;
-    units?: string;
-    description?: string;
-};
-
 
 export type DatasetDomainSeriesRequest<T> = {
-    range: {
-        start: T;
-        end: T;
-    },
+    range: DomainRange<T>;
     variable: string;
     geometry: Geometry;
     filters: QueryFilter[];
@@ -43,7 +30,7 @@ export type DatasetDomainSeriesItem<T> = {
 export type DatasetDomainSeriesProvider<T> = (request: DatasetDomainSeriesRequest<T>) => CancelablePromise<DatasetDomainSeriesItem<T>[]>;
 
 export type DatasetDomainSeriesConfig<T = number> = {
-    domain: DatasetVariable<T>;
+    domain: DatasetDimension<T>;
     provider: DatasetDomainSeriesProvider<T>;
     supportedGeometries: AoiSupportedGeometry[],
     variables: DatasetVariable<number>[];
@@ -54,7 +41,7 @@ const createSeriesType = <T>(typeName: string) => {
         typeName,
         types.model(typeName, {
             variable: types.maybe(types.string),
-            range: types.maybe(types.frozen<{start: T, end: T}>())
+            range: types.maybe(types.frozen<DomainRange<T>>())
         }),
         hasGeometry,
         isDataProvider,
@@ -89,7 +76,7 @@ const createSeriesType = <T>(typeName: string) => {
             setVariable: (variable: string | undefined) => {
                 self.variable = variable;
             },
-            setRange: (range) => {
+            setRange: (range?: DomainRange<T>) => {
                 self.range = range;
             },
             afterAttach: () => {

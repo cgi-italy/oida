@@ -4,14 +4,14 @@ import { getSnapshot } from 'mobx-state-tree';
 
 import { Checkbox, Slider, Form } from 'antd';
 
-import { IDatasetAnalysis, IDatasetDomainRasterSequence, DOMAIN_RASTER_SEQUENCE_TYPE, DatasetVariable } from '@oida/eo';
+import { IDatasetAnalysis, IDatasetDomainRasterSequence, DOMAIN_RASTER_SEQUENCE_TYPE, DatasetVariable, isValueDomain } from '@oida/eo';
 import { NumericRangeFieldRenderer } from '@oida/ui-react-antd';
 
 import { DatasetAnalysisWidgetFactory } from './dataset-analysis-widget-factory';
 import { AnalysisAoiFilter } from './analysis-aoi-filter';
 import { AnalysisLoadingStateMessage } from './analysis-loading-state-message';
 
-import { DatasetColormapPresetSelector } from '../dataset-map-viz/dataset-colormap-selector';
+import { DatasetColormapSelector } from '../dataset-map-viz/dataset-colormap-selector';
 
 
 export type DatasetDomainRasterSequenceThumbProps = {
@@ -40,7 +40,7 @@ export const DatasetDomainRasterSequenceThumb = (props: DatasetDomainRasterSeque
 };
 
 export type DatasetDomainRasterSequenceProps = {
-    dataDomain?: DatasetVariable<number>;
+    dataDomain: DatasetVariable<number>;
     sequence: IDatasetDomainRasterSequence;
     analysis: IDatasetAnalysis
 };
@@ -50,9 +50,8 @@ export const DatasetDomainRasterSequence = (props: DatasetDomainRasterSequencePr
     let [activeThumb, setActiveThumb] = useState(-1);
 
     let dataDomain = props.dataDomain;
-    let dataRange = dataDomain ? dataDomain.range : undefined;
 
-    let range = useObserver(() => props.sequence.range);
+    const range = useObserver(() => props.sequence.range);
 
     let colorMap = useObserver(() => {
         return props.sequence.colorMap ? getSnapshot(props.sequence.colorMap) : undefined;
@@ -75,19 +74,23 @@ export const DatasetDomainRasterSequence = (props: DatasetDomainRasterSequencePr
 
     let loadingState = useObserver(() => props.sequence.loadingState);
 
+    let rangeConfig;
+    if (props.dataDomain.domain && isValueDomain(props.dataDomain.domain)) {
+        rangeConfig = {
+            min: props.dataDomain.domain.min,
+            max: props.dataDomain.domain.max
+        };
+    }
     return (
         <div className='dataset-raster-sequence'>
             <Form layout='inline' size='small'>
                 <Form.Item>
                     <NumericRangeFieldRenderer
-                        value={range ? {from: range.start, to: range.end} : undefined}
+                        value={range ? {from: range.min, to: range.max} : undefined}
                         onChange={(value) => {
-                            props.sequence.setRange(value ? {start: value.from, end: value.to} : undefined);
+                            props.sequence.setRange(value ? {min: value.from, max: value.to} : undefined);
                         }}
-                        config={{
-                            min: dataRange ? dataRange.min : undefined,
-                            max: dataRange ? dataRange.max : undefined
-                        }}
+                        config={rangeConfig}
                         rendererConfig={{props: {
                             tipFormatter: (value) => {
                                 return props.dataDomain ? `${value} ${props.dataDomain.units}` : value;
@@ -103,10 +106,10 @@ export const DatasetDomainRasterSequence = (props: DatasetDomainRasterSequencePr
                 </Form.Item>
             </Form>
             {props.sequence.colorMap &&
-                <DatasetColormapPresetSelector
+                <DatasetColormapSelector
                     colorMap={props.sequence.colorMap}
-                    presets={props.sequence.config.colorMap.colorMaps!}
-                    variables={props.sequence.config.colorMap.variables!}
+                    presets={props.sequence.config.colorMap.colorMaps}
+                    variables={props.sequence.config.colorMap.variables}
                 />
             }
             <Checkbox
@@ -135,15 +138,15 @@ export const DatasetDomainRasterSequence = (props: DatasetDomainRasterSequencePr
                         imageGenerator={props.sequence.config.imageGenerator}
                     />
                     <Slider
-                        value={range.start + activeThumb}
-                        min={range.start}
-                        max={range.end}
+                        value={range.min + activeThumb}
+                        min={range.min}
+                        max={range.max}
                         marks={{
-                            [range.start]: `${range.start} ${dataDomain ? dataDomain.units : ''}`,
-                            [range.end]: `${range.end} ${dataDomain ? dataDomain.units : ''}`
+                            [range.min]: `${range.min} ${dataDomain ? dataDomain.units : ''}`,
+                            [range.max]: `${range.max} ${dataDomain ? dataDomain.units : ''}`
                         }}
                         step={1}
-                        onChange={(value) => setActiveThumb((value as number) - range!.start)}
+                        onChange={(value) => setActiveThumb((value as number) - range.min)}
                     />
                 </div>
             }
@@ -164,11 +167,11 @@ DatasetAnalysisWidgetFactory.register(DOMAIN_RASTER_SEQUENCE_TYPE, (config) => {
         rasterSequence.setColorMap(rasterSequence.config.colorMap.default);
     }
 
-    let dataDomain = rasterSequence.config.domain.range;
-    if (!rasterSequence.range && dataDomain) {
+    let dataDomain = rasterSequence.config.domain;
+    if (!rasterSequence.range && dataDomain.domain && isValueDomain(dataDomain.domain)) {
         rasterSequence.setRange({
-            start: dataDomain.min,
-            end: dataDomain.max
+            min: dataDomain.domain.min,
+            max: dataDomain.domain.max
         });
     }
 

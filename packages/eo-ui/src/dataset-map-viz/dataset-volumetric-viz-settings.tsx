@@ -8,7 +8,7 @@ import { IDatasetVolumetricViz, VOLUMETRIC_VIZ_TYPE } from '@oida/eo';
 
 import { DatasetVizOpacityControl } from './dataset-viz-opacity-control';
 import { DatasetVizSettingsFactory } from './dataset-viz-settings-factory';
-import { DatasetColormapPresetSelector } from './dataset-colormap-selector';
+import { DatasetColormapSelector } from './dataset-colormap-selector';
 import { DatasetVerticalScaleSelector } from './dataset-vertical-scale-selector';
 import { DatasetVolumetricViewModeSettingsFactory } from './dataset-volumetric-view-mode-settings-factory';
 
@@ -55,11 +55,11 @@ export const DatasetVolumetricVizSettings = (props: DatasetVolumetricVizSettings
                 datasetViz={props.datasetViz}
                 rangeConfig={props.datasetViz.config.verticalScaleConfig}
             />
-            {props.datasetViz.colorMap &&
-                <DatasetColormapPresetSelector
-                    variables={props.datasetViz.config.colorMapConfig!.variables!}
+            {props.datasetViz.colorMap && props.datasetViz.config.colorMapConfig &&
+                <DatasetColormapSelector
+                    variables={props.datasetViz.config.colorMapConfig.variables}
                     colorMap={props.datasetViz.colorMap}
-                    presets={props.datasetViz.config.colorMapConfig!.colorMaps!}
+                    presets={props.datasetViz.config.colorMapConfig.colorMaps}
                 />
             }
             <div className='volumetric-view-mode'>
