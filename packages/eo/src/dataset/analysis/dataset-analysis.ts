@@ -33,6 +33,12 @@ let analysisStyleGetter = (analysis): IFeatureStyle => {
             color: color.alpha(1).gl(),
             zIndex: zIndex
         },
+        line: {
+            visible: analysis.visible,
+            color: color.gl(),
+            width: analysis.hovered ? 3 : 2,
+            zIndex: zIndex
+        },
         polygon: {
             visible: analysis.visible,
             fillColor: color.gl(),
