@@ -25,19 +25,6 @@ export const DatasetTimeSeriesChart = (props: DatasetTimeSeriesProps) => {
 
     let [localTimeRange, setLocalTimeRange] = useState();
 
-    if (props.timeRange) {
-        timeRange = props.timeRange;
-        onTimeRangeChange = props.onTimeRangeChange;
-    } else {
-        timeRange = localTimeRange;
-        onTimeRangeChange = (range) => {
-            setLocalTimeRange(range);
-            if (props.onTimeRangeChange) {
-                props.onTimeRangeChange(range);
-            }
-        };
-    }
-
     let lastSeriesIdx = props.series.length - 1;
 
     let seriesFilters = props.series.map((series, idx) => {
@@ -59,22 +46,36 @@ export const DatasetTimeSeriesChart = (props: DatasetTimeSeriesProps) => {
 
     let color = useObserver(() => props.analysis.color);
 
+    if (props.timeRange) {
+        timeRange = props.timeRange;
+        onTimeRangeChange = props.onTimeRangeChange;
+    } else {
+        timeRange = localTimeRange;
+        onTimeRangeChange = (range) => {
+            setLocalTimeRange(range);
+            if (props.onTimeRangeChange) {
+                props.onTimeRangeChange(range);
+            }
+        };
+    }
+
     return (
         <div className='dataset-chart'>
             <Form layout='inline' size='small'>
                 <Form.Item>
                     <DateRangeFieldRenderer
-                        value={{
+                        value={timeRange ? {
                             start: timeRange.min,
                             end: timeRange.max
-                        }}
+                        } : undefined}
                         onChange={(value) => onTimeRangeChange(value ? {
                             min: value.start,
                             max: value.end
                         } : undefined)}
                         config={{
                             minDate: props.timeDomain ? props.timeDomain.min : undefined,
-                            maxDate: props.timeDomain ? props.timeDomain.max : undefined
+                            maxDate: props.timeDomain ? props.timeDomain.max : undefined,
+                            withTime: true
                         }}
                     />
                 </Form.Item>

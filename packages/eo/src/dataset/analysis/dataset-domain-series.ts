@@ -22,12 +22,26 @@ export type DatasetDomainSeriesRequest<T> = {
     filters: QueryFilter[];
 };
 
-export type DatasetDomainSeriesItem<T> = {
+export type DatasetDomainSeriesValueItem<T> = {
     x: T;
     y: number;
 };
 
-export type DatasetDomainSeriesProvider<T> = (request: DatasetDomainSeriesRequest<T>) => CancelablePromise<DatasetDomainSeriesItem<T>[]>;
+export type DatasetDomainSeriesStatsItem<T> = {
+    x: T;
+    min: number;
+    max: number;
+    mean: number;
+};
+
+export type DatasetDomainSeriesData<T> = DatasetDomainSeriesValueItem<T>[] |  DatasetDomainSeriesStatsItem<T>[];
+
+export const isStatsDomainSeriesData = <T>(seriesData: DatasetDomainSeriesData<T>) : seriesData is DatasetDomainSeriesStatsItem<T>[] => {
+    return !!seriesData.length && (seriesData as DatasetDomainSeriesStatsItem<T>[])[0].min !== undefined;
+};
+
+
+export type DatasetDomainSeriesProvider<T> = (request: DatasetDomainSeriesRequest<T>) => CancelablePromise<DatasetDomainSeriesData<T>>;
 
 export type DatasetDomainSeriesConfig<T = number> = {
     domain: DatasetDimension<T>;
@@ -47,7 +61,7 @@ const createSeriesType = <T>(typeName: string) => {
         isDataProvider,
         hasConfig<DatasetDomainSeriesConfig<T>>()
     ).volatile((self) => ({
-        data: [] as DatasetDomainSeriesItem<T>[]
+        data: [] as DatasetDomainSeriesData<T>
     })).actions((self) => {
         return {
             updateData: flow(function*(params: Partial<DatasetDomainSeriesRequest<T>>) {
@@ -117,3 +131,8 @@ type  DatasetTimeSeriesType = typeof  DatasetTimeSeriesDecl;
 export interface  DatasetTimeSeriesInterface extends  DatasetTimeSeriesType {}
 export const  DatasetTimeSeries:  DatasetTimeSeriesInterface =  DatasetTimeSeriesDecl;
 export interface IDatasetTimeSeries extends Instance< DatasetTimeSeriesInterface> {}
+
+export const isDatasetTimeSeries = (series: IDatasetTimeSeries | IDatasetDomainSeries): series is IDatasetTimeSeries => {
+    return series.datasetVizType === TIME_SERIES_TYPE;
+};
+

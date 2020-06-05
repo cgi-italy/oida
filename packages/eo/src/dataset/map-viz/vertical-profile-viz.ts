@@ -5,7 +5,7 @@ import { LoadingState } from '@oida/core';
 import { hasConfig, VerticalProfileLayer } from '@oida/state-mst';
 
 import { DatasetViz } from '../dataset-viz';
-import { DatasetDomainSeriesProvider, DatasetDomainSeriesItem } from '../analysis';
+import { DatasetDomainSeriesProvider, DatasetDomainSeriesValueItem } from '../analysis';
 import { ColorMapConfig, ColorMap } from './color-map';
 
 import { DatasetVerticalProfiles, IDatasetVerticalProfile, VerticalProfileItem } from './dataset-vertical-profile';
@@ -20,7 +20,7 @@ export type VerticalProfileSeriesProviderRequest = {
     coordIndex: number;
 };
 
-export type VerticalProfileLineSeriesItem = DatasetDomainSeriesItem<number> & {
+export type VerticalProfileLineSeriesItem = DatasetDomainSeriesValueItem<number> & {
     imageCoord: {
         x: number,
         y: number
