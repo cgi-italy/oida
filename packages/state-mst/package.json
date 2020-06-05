@@ -25,11 +25,11 @@
   },
   "peerDependencies": {
     "mobx": "^4.9.4",
-    "mobx-state-tree": "^3.14.0"
+    "mobx-state-tree": "^3.14.0",
+    "moment": "^2.x"
   },
   "dependencies": {
     "@oida/core": "file:../core",
-    "lodash": "4.17.15",
-    "moment": "^2.25.3"
+    "lodash": "4.17.15"
   }
 }
