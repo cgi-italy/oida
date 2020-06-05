@@ -3,6 +3,7 @@ export * from './select-field';
 export * from './input-field';
 export * from './aoi-field';
 export * from './aoi-import';
+export * from './date-field';
 export * from './date-range-field';
 export * from './numeric-range-field';
 export * from './boolean-field';
