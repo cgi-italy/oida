@@ -3,7 +3,7 @@ import React from 'react';
 import { DatasetVizOpacityControl } from './dataset-viz-opacity-control';
 import { DatasetBandPresetSelector } from './dataset-band-preset-selector';
 import { DatasetColormapSelector } from './dataset-colormap-selector';
-
+import { DatasetRasterDimensionSelector } from './dataset-raster-dimension-selector';
 import { DatasetVizSettingsFactory } from './dataset-viz-settings-factory';
 
 import { IDatasetRasterViz } from '@oida/eo';
@@ -17,11 +17,26 @@ export const DatasetRasterVizSettings = (props: DatasetRasterVizSettingsProps) =
     const bandMathConfig = props.datasetViz.config.bandMathConfig;
     const colorMapConfig = props.datasetViz.config.colorMapConfig;
 
+    let dimensionSelectors: JSX.Element[] | undefined;
+
+    if (props.datasetViz.config.dimensions) {
+        dimensionSelectors = props.datasetViz.config.dimensions.map((dimension) => {
+            return (
+                <DatasetRasterDimensionSelector
+                    datasetViz={props.datasetViz}
+                    dimension={dimension}
+                    key={dimension.id}
+                />
+            );
+        });
+    }
+
     return (
         <div>
             <DatasetVizOpacityControl
                 datasetViz={props.datasetViz}
             />
+            {dimensionSelectors}
             {props.datasetViz.bandMath &&
                 <DatasetBandPresetSelector
                     rasterView={props.datasetViz}

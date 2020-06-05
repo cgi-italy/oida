@@ -6,12 +6,14 @@ import { hasConfig, TileLayer, ImageLayer, ITileLayer, IImageLayer } from '@oida
 import { DatasetViz } from '../dataset-viz';
 import { ColorMapConfig, ColorMap } from './color-map';
 import { BandMathConfig, BandMath } from './band-math';
+import { DatasetDimension, isValueDomain } from '../dataset-variable';
 
 export const RASTER_VIZ_TYPE = 'raster';
 
 export type DatasetRasterMapVizConfig = {
     bandMathConfig?: BandMathConfig;
     colorMapConfig?: ColorMapConfig;
+    dimensions?: DatasetDimension<string | number>[];
     nonTiled?: boolean;
     rasterSourceProvider: (rasterViz) => any;
     afterInit?: (rasterViz) => void;
@@ -28,7 +30,8 @@ const DatasetRasterVizDecl = DatasetViz.addModel(
         types.model({
             bandMath: types.maybe(BandMath),
             colorMap: types.maybe(ColorMap),
-            mapLayer: types.maybe(DatasetRasterVizLayer)
+            mapLayer: types.maybe(DatasetRasterVizLayer),
+            dimensionValues: types.map(types.union(types.string, types.number))
         }),
         hasConfig<DatasetRasterMapVizConfig>()
     )
@@ -39,6 +42,13 @@ const DatasetRasterVizDecl = DatasetViz.addModel(
             },
             setColorMap: (colorMap: SnapshotOrInstance<typeof ColorMap> | undefined) => {
                 self.colorMap = cast(colorMap);
+            },
+            setDimensionValue: (dimension: string, value?: string | number) => {
+                if (value) {
+                    self.dimensionValues.set(dimension, value);
+                } else {
+                    self.dimensionValues.delete(dimension);
+                }
             }
         };
     })
@@ -50,6 +60,17 @@ const DatasetRasterVizDecl = DatasetViz.addModel(
             }
             if (self.config.colorMapConfig) {
                 self.setColorMap(self.config.colorMapConfig.default);
+            }
+            if (self.config.dimensions) {
+                self.config.dimensions.forEach((dimension) => {
+                    if (dimension.domain) {
+                        if (isValueDomain(dimension.domain)) {
+                            self.setDimensionValue(dimension.id, dimension.domain.min);
+                        } else {
+                            self.setDimensionValue(dimension.id, dimension.domain[0].value);
+                        }
+                    }
+                });
             }
 
             let mapLayer: ITileLayer | IImageLayer;
