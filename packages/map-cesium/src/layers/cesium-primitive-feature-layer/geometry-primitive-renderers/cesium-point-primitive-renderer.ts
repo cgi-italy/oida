@@ -149,6 +149,7 @@ export class CesiumPointPrimitiveRenderer implements CesiumGeometryPrimitiveRend
             image: style.url,
             scale: style.scale || 1.0,
             rotation: style.rotation || 0.0,
+            eyeOffset: style.zIndex ? new Cartesian3(0, 0, -100 * style.zIndex) : Cartesian3.ZERO,
             heightReference:
                 this.clampToGround_ ? (coordinates.length === 2 ? HeightReference.CLAMP_TO_GROUND
                                                                 : HeightReference.RELATIVE_TO_GROUND)
@@ -177,6 +178,11 @@ export class CesiumPointPrimitiveRenderer implements CesiumGeometryPrimitiveRend
         }
         if (style.rotation) {
             billboard.rotation = style.rotation;
+        }
+        if (style.zIndex) {
+            billboard.eyeOffset = new Cartesian3(0, 0, -100 * style.zIndex);
+        } else {
+            billboard.eyeOffset = Cartesian3.ZERO;
         }
     }
 

@@ -50,7 +50,8 @@ export const createPointEntity = (id: string, geometry: GeoJSON.Point, featureSt
             image: style.url,
             scale: style.scale || 1.0,
             rotation: style.rotation || 0.0,
-            heightReference: heightReference
+            heightReference: heightReference,
+            eyeOffset: new Cartesian3(0, 0, -100 * (style.zIndex || 0))
         });
         pointEntity.billboard = billboard;
     } else {
@@ -93,6 +94,9 @@ export const updatePointEntityStyle = (pointEntity, featureStyle: IFeatureStyle)
         if (style.rotation) {
             billboard.rotation = style.rotation;
         }
+
+        billboard.eyeOffset = new Cartesian3(0, 0, -100 * (style.zIndex || 0));
+
     } else {
         pointEntity.billboard = undefined;
         let point = pointEntity.point;
