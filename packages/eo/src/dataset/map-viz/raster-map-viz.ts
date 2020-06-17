@@ -6,6 +6,7 @@ import { hasConfig, TileLayer, ImageLayer, ITileLayer, IImageLayer } from '@oida
 import { DatasetViz } from '../dataset-viz';
 import { ColorMapConfig, ColorMap } from './color-map';
 import { BandMathConfig, BandMath } from './band-math';
+import { hasDimensions } from '../has-dimensions';
 import { DatasetDimension, isValueDomain } from '../dataset-variable';
 
 export const RASTER_VIZ_TYPE = 'raster';
@@ -30,9 +31,9 @@ const DatasetRasterVizDecl = DatasetViz.addModel(
         types.model({
             bandMath: types.maybe(BandMath),
             colorMap: types.maybe(ColorMap),
-            mapLayer: types.maybe(DatasetRasterVizLayer),
-            dimensionValues: types.map(types.union(types.string, types.number))
+            mapLayer: types.maybe(DatasetRasterVizLayer)
         }),
+        hasDimensions,
         hasConfig<DatasetRasterMapVizConfig>()
     )
     .actions((self) => {
@@ -42,13 +43,6 @@ const DatasetRasterVizDecl = DatasetViz.addModel(
             },
             setColorMap: (colorMap: SnapshotOrInstance<typeof ColorMap> | undefined) => {
                 self.colorMap = cast(colorMap);
-            },
-            setDimensionValue: (dimension: string, value?: string | number) => {
-                if (value) {
-                    self.dimensionValues.set(dimension, value);
-                } else {
-                    self.dimensionValues.delete(dimension);
-                }
             }
         };
     })

@@ -1,4 +1,5 @@
 export * from './dataset-variable';
+export * from './has-dimensions';
 export * from './dataset';
 export * from './dataset-config';
 export * from './dataset-viz';

@@ -17,7 +17,7 @@ export type ValueDomain<T, S = T> = DomainRange<T> & {
 
 export type DataDomain<T, S = T> = ValueDomain<T, S> | CategoricalDomain<T>;
 
-export const isValueDomain = <T, S>(domain: DataDomain<T, S>): domain is ValueDomain<T, S> => {
+export const isValueDomain = <T, S, C>(domain: ValueDomain<T, S> | CategoricalDomain<C>): domain is ValueDomain<T, S> => {
     return !Array.isArray(domain);
 };
 
