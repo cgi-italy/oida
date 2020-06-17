@@ -13,10 +13,9 @@ import { SortableHandle } from 'react-sortable-hoc';
 import { useCenterOnMapFromModule } from '@oida/ui-react-mst';
 import { IDatasetViz, DatasetsExplorer } from '@oida/eo';
 
-
 import { DatasetVizProgressControl } from './dataset-viz-progress-control';
 import { DatasetVizSettingsFactory } from './dataset-viz-settings-factory';
-import { DatasetTools } from './dataset-tools';
+import { DatasetToolsMenu } from './dataset-tools-menu';
 import { DatasetVizDownloadModal } from './dataset-viz-download';
 
 export type DatasetVizListItemProps = {
@@ -117,14 +116,11 @@ export const DatasetVizListItem = (props: DatasetVizListItemProps) => {
             id: 'tools',
             icon: <BarChartOutlined/>,
             title: 'Toggle dataset tools',
-            content: <DatasetTools dataset={props.datasetViz.dataset}/>,
-            callback: () => {
-                if (activeAction !== 'tools') {
-                    setActiveAction('tools');
-                } else {
-                    setActiveAction(undefined);
-                }
-            }
+            menu: <DatasetToolsMenu
+                datasetViz={props.datasetViz}
+                icon={<BarChartOutlined/>}
+                key='tools'
+            />
         }
     ];
 
@@ -163,17 +159,21 @@ export const DatasetVizListItem = (props: DatasetVizListItemProps) => {
                 <div className='viz-item-actions'>
                 {
                     actions.map((action) => {
-                        return (
-                            <Tooltip title={action.title} key={action.id}>
-                                <Button
-                                    size='small'
-                                    type={action.id === activeAction ? 'primary' : 'link'}
-                                    onClick={() => action.callback()}
-                                >
-                                    {action.icon}
-                                </Button>
-                            </Tooltip>
-                        );
+                        if (action.menu) {
+                            return action.menu;
+                        } else {
+                            return (
+                                <Tooltip title={action.title} key={action.id}>
+                                    <Button
+                                        size='small'
+                                        type={action.id === activeAction ? 'primary' : 'link'}
+                                        onClick={() => action.callback()}
+                                    >
+                                        {action.icon}
+                                    </Button>
+                                </Tooltip>
+                            );
+                        }
                     })
                 }
                 </div>
