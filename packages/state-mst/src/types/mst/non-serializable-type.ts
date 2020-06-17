@@ -9,12 +9,12 @@ const generateObjectKey = () => {
     return `mst_obj_${nextObjId++}`;
 };
 
-export const registerObject = <T>(obj: T, id?: string) => {
+export const registerObject = <T>(obj: T) => {
     //already registered
     if (obj[objIdKey]) {
         return;
     }
-    let objId = id || generateObjectKey();
+    let objId = generateObjectKey();
 
     registeredObjects[objId] = obj;
 
@@ -26,23 +26,8 @@ export const registerObject = <T>(obj: T, id?: string) => {
     });
 };
 
-export type NonSerializableTypeOptions = {
-    fixedKey?: string | boolean
-};
 
-export const NonSerializableType = <T>(options?: NonSerializableTypeOptions) => {
-
-    let fixedKey: string | undefined = undefined;
-
-    if (options) {
-        if (typeof(options.fixedKey) === 'boolean') {
-            if (options.fixedKey === true) {
-                fixedKey = generateObjectKey();
-            }
-        } else {
-            fixedKey = options.fixedKey;
-        }
-    }
+export const NonSerializableType = <T>() => {
 
     return types.custom<string, T>({
         name: 'NonSerializableObject',
@@ -51,7 +36,7 @@ export const NonSerializableType = <T>(options?: NonSerializableTypeOptions) => 
         },
         toSnapshot(value) {
             if (!value[objIdKey]) {
-                registerObject(value, fixedKey);
+                registerObject(value);
             }
             return value[objIdKey];
         },

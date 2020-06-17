@@ -6,7 +6,7 @@ import { NonSerializableType } from '../mst';
 import { MapLayer } from './map-layer';
 
 const VolumeColorMapDecl = types.model('VolumeColorMap', {
-    image: NonSerializableType<HTMLCanvasElement | HTMLImageElement>({fixedKey: true}),
+    image: NonSerializableType<HTMLCanvasElement | HTMLImageElement>(),
     range: types.model({
         min: types.number,
         max: types.number
@@ -98,7 +98,7 @@ export const VolumeMode: VolumeModeInterface = VolumeModeDecl;
 
 const VolumeLayerDecl = MapLayer.addModel(
     types.model(VOLUME_LAYER_ID, {
-        source: types.maybe(NonSerializableType<VolumeSourceConfig>({fixedKey: true})),
+        source: types.maybe(NonSerializableType<VolumeSourceConfig>()),
         sourceRevision: types.optional(types.number, 0),
         colorMap: types.maybe(VolumeColorMap),
         viewMode: VolumeMode,
