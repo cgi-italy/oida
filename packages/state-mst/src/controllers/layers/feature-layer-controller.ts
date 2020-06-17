@@ -1,6 +1,6 @@
 import { reaction, IReactionDisposer } from 'mobx';
 
-import { FEATURE_LAYER_ID, IFeatureLayerRenderer, IMapRenderer, IFeatureStyle } from '@oida/core';
+import { FEATURE_LAYER_ID, IFeatureLayerRenderer, IMapRenderer, IFeatureStyle, Geometry, GeometryCollection } from '@oida/core';
 
 import { IEntity } from '../../types';
 
@@ -14,13 +14,14 @@ import { createEntityReference } from '../../types/entity/entity-reference';
 
 
 type FeatureTracker = {
-    id: any,
-    disposeGeometryObserver: IReactionDisposer,
-    disposeStyleObserver: IReactionDisposer
+    ids: Set<string>,
+    geometryType?: string;
+    disposeGeometryObserver?: IReactionDisposer,
+    disposeStyleObserver?: IReactionDisposer
 };
 
-type EntityStyleGetter = (entity: IEntity) => IFeatureStyle;
-type EntityGeometryGetter = (entity: IEntity) => any;
+type EntityStyleGetter = (entity: IEntity) => IFeatureStyle | IFeatureStyle[];
+type EntityGeometryGetter = (entity: IEntity) => Geometry | undefined;
 
 const defaultGeometryGetter: EntityGeometryGetter = (entity) => (entity as any).geometry;
 const defaultStyleGetter: EntityStyleGetter = (entity) => (entity as any).style;
@@ -91,108 +92,144 @@ export class FeatureLayerController extends MapLayerController<IFeatureLayerRend
         }
     }
 
-    protected addFeature_(entity) {
+    protected addFeature_(entity: IEntity) {
 
 
         let geometryGetter: EntityGeometryGetter = this.mapLayer_.geometryGetter as EntityGeometryGetter || defaultGeometryGetter;
-        let styleGetter: EntityStyleGetter = this.mapLayer_.styleGetter as EntityStyleGetter || defaultStyleGetter;
-
-        let entityReference = createEntityReference(entity);
 
         let geometry = geometryGetter(entity);
-        let style = styleGetter(entity);
 
-        if (geometry && geometry.type === 'GeometryCollection') {
-            let geometries = geometry.geometries;
-
-            let featureIds: string[] = [];
-
-            geometries.forEach((geometry, idx) => {
-
-                let id = featureIdFromEntityReference(entityReference, idx);
-
-                this.layerRenderer_!.addFeature(
-                    id,
-                    geometry,
-                    style[idx] || style
-                );
-
-                featureIds.push(id);
-            });
-
-            let disposeGeometryObserver = reaction(() => geometryGetter(entity), (geometry) => {
-                let geometries = geometry.geometries;
-
-                featureIds.forEach((id, idx) => {
-                    this.layerRenderer_!.updateFeatureGeometry(id, geometries[idx]);
-                });
-
-            });
-
-            let disposeStyleObserver = reaction(() => styleGetter(entity), (style) => {
-                featureIds.forEach((id, idx) => {
-                    this.layerRenderer_!.updateFeatureStyle(id, style[idx] || style);
-                });
-            });
-
-            return {
-                id: featureIds,
-                disposeGeometryObserver,
-                disposeStyleObserver
-            };
+        if (geometry && (geometry.type === 'GeometryCollection' || geometry.type === 'GeometryCollectionEx')) {
+            return this.addGeometryCollectionFeature_(entity);
         } else {
-
-            let featureId = featureIdFromEntityReference(entityReference);
-
-            this.layerRenderer_!.addFeature(
-                featureId,
-                geometry,
-                style
-            );
-
-            let disposeGeometryObserver = reaction(() => geometryGetter(entity), (geometry) => {
-                if (this.layerRenderer_!.getFeature(featureId)) {
-                    if (geometry) {
-                        this.layerRenderer_!.updateFeatureGeometry(featureId, geometry);
-                    } else {
-                        this.layerRenderer_!.removeFeature(featureId);
-                    }
-                } else {
-                    if (geometry) {
-                        this.layerRenderer_!.addFeature(
-                            featureId,
-                            geometry,
-                            styleGetter(entity)
-                        );
-                    }
-                }
-            });
-
-            let disposeStyleObserver = reaction(() => styleGetter(entity), (style) => {
-                if (this.layerRenderer_!.getFeature(featureId)) {
-                    this.layerRenderer_!.updateFeatureStyle(featureId, style);
-                }
-            }, {
-                //fireImmediately: true
-            });
-
-            return {
-                id: featureId,
-                disposeGeometryObserver,
-                disposeStyleObserver
-            };
+            return this.addSimpleGeometryFeature_(entity);
         }
     }
 
-    protected removeFeature_(featureTracker) {
-        featureTracker.disposeGeometryObserver();
-        featureTracker.disposeStyleObserver();
-        if (Array.isArray(featureTracker.id)) {
-            featureTracker.id.forEach((id) => {
-                this.layerRenderer_!.removeFeature(id);
+    protected addSimpleGeometryFeature_(
+        entity: IEntity,
+        existingFeatureTracker?: FeatureTracker
+    ) {
+
+        const featureTracker = existingFeatureTracker || {
+            ids: new Set()
+        };
+
+        const layerRenderer = this.layerRenderer_;
+        if (!layerRenderer) {
+            return featureTracker;
+        }
+
+        const geometryGetter: EntityGeometryGetter = this.mapLayer_.geometryGetter as EntityGeometryGetter || defaultGeometryGetter;
+        const styleGetter: EntityStyleGetter = this.mapLayer_.styleGetter as EntityStyleGetter || defaultStyleGetter;
+        const entityReference = createEntityReference(entity);
+        const featureId = featureIdFromEntityReference(entityReference);
+
+        featureTracker.disposeStyleObserver = reaction(() => styleGetter(entity), (style) => {
+            if (layerRenderer.getFeature(featureId)) {
+                layerRenderer.updateFeatureStyle(featureId, style[0] || style);
+            }
+        });
+
+        featureTracker.disposeGeometryObserver = reaction(() => geometryGetter(entity), (geometry) => {
+            if (geometry && (geometry.type === 'GeometryCollection' || geometry.type === 'GeometryCollectionEx')) {
+                this.removeFeature_(featureTracker);
+                this.addGeometryCollectionFeature_(entity, featureTracker);
+            } else {
+                if (geometry) {
+                    if (geometry.type === featureTracker.geometryType && layerRenderer.getFeature(featureId)) {
+                        layerRenderer.updateFeatureGeometry(featureId, geometry);
+                    } else {
+                        layerRenderer.removeFeature(featureId);
+                        const style = styleGetter(entity);
+                        layerRenderer.addFeature(featureId, geometry, style[0] || style);
+                    }
+                    featureTracker.ids.add(featureId);
+                    featureTracker.geometryType = geometry.type;
+                } else {
+                    layerRenderer.removeFeature(featureId);
+                    featureTracker.ids.delete(featureId);
+                    featureTracker.geometryType = undefined;
+                }
+            }
+        }, {
+            fireImmediately: true
+        });
+
+        return featureTracker;
+    }
+
+    protected addGeometryCollectionFeature_(
+        entity: IEntity,
+        existingFeatureTracker?: FeatureTracker
+    ) {
+
+        const featureTracker = existingFeatureTracker || {
+            ids: new Set<string>()
+        };
+
+        const layerRenderer = this.layerRenderer_;
+        if (!layerRenderer) {
+            return featureTracker;
+        }
+
+        const geometryGetter: EntityGeometryGetter = this.mapLayer_.geometryGetter as EntityGeometryGetter || defaultGeometryGetter;
+        const styleGetter: EntityStyleGetter = this.mapLayer_.styleGetter as EntityStyleGetter || defaultStyleGetter;
+
+        let entityReference = createEntityReference(entity);
+
+        featureTracker.disposeStyleObserver = reaction(() => styleGetter(entity), (style) => {
+            featureTracker.ids.forEach((id, idx) => {
+                this.layerRenderer_!.updateFeatureStyle(id, style[idx] || style);
             });
-        } else {
-            this.layerRenderer_!.removeFeature(featureTracker.id);
+        });
+
+        featureTracker.disposeGeometryObserver = reaction(() => geometryGetter(entity), (geometry) => {
+            if (geometry) {
+                if (geometry.type !== 'GeometryCollection' && geometry.type !== 'GeometryCollectionEx') {
+                    this.removeFeature_(featureTracker);
+                    this.addSimpleGeometryFeature_(entity, featureTracker);
+                } else {
+                    featureTracker.ids.forEach((id) => {
+                        layerRenderer.removeFeature(id);
+                    });
+                    featureTracker.ids.clear();
+
+                    const style = styleGetter(entity);
+                    geometry.geometries.forEach((geometry, idx) => {
+                        let id = featureIdFromEntityReference(entityReference, idx);
+                        layerRenderer.addFeature(id, geometry, style[idx] || style);
+                        featureTracker.ids.add(id);
+                    });
+                    featureTracker.geometryType = geometry.type;
+                }
+            } else {
+                featureTracker.ids.forEach((id) => {
+                    layerRenderer.removeFeature(id);
+                });
+                featureTracker.ids.clear();
+                featureTracker.geometryType = undefined;
+            }
+        }, {
+            fireImmediately: true
+        });
+
+        return featureTracker;
+    }
+
+    protected removeFeature_(featureTracker: FeatureTracker) {
+        if (featureTracker.disposeGeometryObserver) {
+            featureTracker.disposeGeometryObserver();
+        }
+        if (featureTracker.disposeStyleObserver) {
+            featureTracker.disposeStyleObserver();
+        }
+
+        const layerRenderer = this.layerRenderer_;
+        if (layerRenderer) {
+            featureTracker.ids.forEach((id) => {
+                layerRenderer.removeFeature(id);
+            });
         }
     }
 
