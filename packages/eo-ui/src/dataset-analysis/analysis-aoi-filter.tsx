@@ -23,7 +23,9 @@ export const AnalysisAoiFilter = (props: AnalysisAoiFilterProps) => {
     } : undefined;
 
     const onChange = (value) => {
-        props.analysis.setGeometry(value ? value.geometry : undefined);
+        props.analysis.datasetViz.setAoi(value ? {
+            geometry: value.geometry
+         } : undefined);
     };
 
     const supportedActions = [
@@ -45,8 +47,6 @@ export const AnalysisAoiFilter = (props: AnalysisAoiFilterProps) => {
 
     let aoiFilterConfig = {
         ...analysisGeometryState,
-        value,
-        onChange,
         activeAction,
         onActiveActionChange,
         supportedGeometries: props.supportedGeometries,
@@ -59,9 +59,7 @@ export const AnalysisAoiFilter = (props: AnalysisAoiFilterProps) => {
             value={geometryValue ? {
                 geometry: geometryValue
             } : undefined}
-            onChange={(value) => {
-                props.analysis.setGeometry(value ? value.geometry : undefined);
-            }}
+            onChange={onChange}
         />
     );
 };

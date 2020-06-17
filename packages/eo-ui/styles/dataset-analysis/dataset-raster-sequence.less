@@ -1,14 +1,50 @@
+@import '~@oida/ui-react-core/styles/utils/scrollbar';
+
 .dataset-raster-sequence {
     padding: 1rem;
     display: flex;
     flex-direction: column;
     max-height: 100%;
 
+    .analysis-parameters {
+
+        flex-grow: 0;
+        flex-shrink: 0;
+
+        border-radius: @border-radius-base;
+        margin-bottom: 0.5rem;
+
+        .ant-form {
+            flex-grow: 1;
+            flex-shrink: 1;
+
+            .ant-form-item {
+                flex-direction: column;
+                align-items: flex-start;
+                margin-bottom: 0.5em;
+
+                .ant-form-item-label {
+                    label {
+                        font-size: 12px;
+                    }
+                }
+
+                .dataset-dimension-value-selector {
+                    >span {
+                        display: none;
+                    }
+                }
+            }
+        }
+
+    }
+
     .dataset-raster-sequence-thumbs {
         display: flex;
         flex-wrap: wrap;
         margin-top: 1rem;
         overflow-y: auto;
+        .scrollbar(8px, @primary-color, @primary-2);
     }
 
     .raster-sequence-thumb {

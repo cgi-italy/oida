@@ -1,11 +1,11 @@
-import { reaction, autorun } from 'mobx';
-import { types, addDisposer, applySnapshot, Instance } from 'mobx-state-tree';
+import { autorun } from 'mobx';
+import { types, addDisposer, Instance } from 'mobx-state-tree';
 
 import { LoadingState } from '@oida/core';
 import { hasConfig, VerticalProfileLayer } from '@oida/state-mst';
 
 import { DatasetViz } from '../dataset-viz';
-import { DatasetDomainSeriesProvider, DatasetDomainSeriesValueItem } from '../analysis';
+import { DatasetDimensionSeriesValueItem } from '../analysis';
 import { ColorMapConfig, ColorMap } from './color-map';
 
 import { DatasetVerticalProfiles, IDatasetVerticalProfile, VerticalProfileItem } from './dataset-vertical-profile';
@@ -20,7 +20,7 @@ export type VerticalProfileSeriesProviderRequest = {
     coordIndex: number;
 };
 
-export type VerticalProfileLineSeriesItem = DatasetDomainSeriesValueItem<number> & {
+export type VerticalProfileLineSeriesItem = DatasetDimensionSeriesValueItem<number> & {
     imageCoord: {
         x: number,
         y: number

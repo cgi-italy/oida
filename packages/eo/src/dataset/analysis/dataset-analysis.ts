@@ -5,7 +5,7 @@ import chroma from 'chroma-js';
 
 import { Geometry, IFeatureStyle } from '@oida/core';
 import { Entity, createEntityCollectionType, FeatureLayer, hasStyleAsGetter, ReferenceOrType } from '@oida/state-mst';
-
+import { DatasetAnalyses } from './dataset-analyses';
 import { DatasetViz } from '../dataset-viz';
 
 let analysisStyleGetter = (analysis): IFeatureStyle => {
@@ -83,41 +83,33 @@ const DatasetAnalysisDecl = Entity.addModel(types.compose(
     'datasetAnalysis',
     types.model({
         datasetViz: ReferenceOrType(DatasetViz.Type),
-        geometry: types.maybe(types.frozen<Geometry>()),
-        defaultColor: types.optional(types.string, getAnalysisColor),
-        destroyOnClose: types.optional(types.boolean, true)
+        defaultColor: types.optional(types.string, getAnalysisColor)
     }).actions(self => ({
-        setGeometry: (geometry: Geometry | undefined) => {
-            self.geometry = geometry;
-            //TODO: fix this
-            // @ts-ignore
-            if (self.datasetViz.setGeometry) {
-                // @ts-ignore
-                self.datasetViz.setGeometry(geometry);
-            }
-        },
         afterAttach: () => {
             let referenceCheckDisposer = autorun(() => {
                 if (!isValidReference(() => self.datasetViz) || !isValidReference(() => self.datasetViz.dataset)) {
                     let analyses = getParentOfType(self, DatasetAnalyses);
                     if (analyses) {
-                        analyses.collection.remove(self);
+                        analyses.removeAnalysis(self as IDatasetAnalysis);
                     }
                 }
             });
 
             addDisposer(self, referenceCheckDisposer);
         }
-    })).views((self: any) => {
+    })).views((self) => {
         return {
             get color() {
                 let color = self.defaultColor;
-                if ( self.selected) {
+                if ((self as IDatasetAnalysis).selected) {
                     color = '#FFFF00';
-                } else if (self.hovered) {
+                } else if ((self as IDatasetAnalysis).hovered) {
                     color = chroma(color).brighten(1).hex();
                 }
                 return color;
+            },
+            get geometry() {
+                return self.datasetViz.aoi ? self.datasetViz.aoi.geometry : undefined;
             }
         };
     }),
@@ -128,25 +120,3 @@ type DatasetAnalysisType = typeof DatasetAnalysisDecl;
 export interface DatasetAnalysisInterface extends DatasetAnalysisType {}
 export const DatasetAnalysis: DatasetAnalysisInterface = DatasetAnalysisDecl;
 export interface IDatasetAnalysis extends Instance<DatasetAnalysisInterface> {}
-
-
-const DatasetAnalysesDecl = types.model('DatasetAnalyses', {
-    collection: createEntityCollectionType(DatasetAnalysis),
-    geometryLayer: types.maybe(FeatureLayer),
-    active: types.optional(types.boolean, false)
-}).actions(self => ({
-    setActive: (active: boolean) => {
-        self.active = active;
-    },
-    afterAttach: () => {
-        self.geometryLayer = FeatureLayer.create({
-            id: 'analysisGeometries',
-            source: self.collection.id
-        });
-    }
-}));
-
-type DatasetAnalysesType = typeof DatasetAnalysesDecl;
-export interface DatasetAnalysesInterface extends DatasetAnalysesType {}
-export const DatasetAnalyses: DatasetAnalysesInterface = DatasetAnalysesDecl;
-export interface IDatasetAnalyses extends Instance<DatasetAnalysesInterface> {}

@@ -8,7 +8,7 @@ import {
     DatasetViz, DatasetVizType, TimeRange
 } from '../dataset';
 
-import { DatasetAnalyses } from '../dataset/analysis/dataset-analysis';
+import { DatasetAnalyses } from '../dataset/analysis/dataset-analyses';
 
 import { DatasetsExplorerController } from './datasets-explorer-controller';
 
@@ -119,12 +119,6 @@ const DatasetsExplorerDecl = types.compose(
                         dataset: dataset.id,
                         config: datasetConfig.mapView.config
                     });
-
-                    self.analyses.collection.add({
-                        datasetViz: datasetViewConfig.mapViz.id,
-                        id: `${datasetViewConfig.mapViz.id}analysis`,
-                        destroyOnClose: false
-                    });
                 }
             }
 
@@ -152,6 +146,18 @@ const DatasetsExplorerDecl = types.compose(
 
             let datasetView = DatasetExplorerView.create(datasetViewConfig);
             self.datasetViews.push(datasetView);
+
+            if (datasetView.mapViz) {
+                self.analyses.addAnalysis({
+                    datasetViz: datasetView.mapViz.id,
+                    id: `${datasetView.mapViz.id}Analysis`,
+                }, {
+                    id: `${datasetView.mapViz.id}ComboAnalysis`,
+                    type: datasetView.mapViz.datasetVizType,
+                    name: dataset.config.name,
+                    destroyOnClose: false
+                });
+            }
             return datasetView as IDatasetExplorerView;
         },
         removeDataset: (id: string) => {

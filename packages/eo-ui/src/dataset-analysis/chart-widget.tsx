@@ -23,6 +23,7 @@ export type ChartWidgetProps = {
     onMouseEnter?: (evt) => void;
     onMouseLeave?: (evt) => void;
     onItemClick?: (evt) => void;
+    onHighlight?: (evt, highlighted?: boolean) => void;
 };
 
 export const ChartWidget = (props: ChartWidgetProps) => {
@@ -46,33 +47,73 @@ export const ChartWidget = (props: ChartWidgetProps) => {
 
     useEffect(() => {
 
-        const onItemClick = props.onItemClick;
+        const onHighlight = props.onHighlight;
+        const chartInstance = chart;
 
-        if (chart && onItemClick) {
+        if (chartInstance && onHighlight) {
+            const onHighlightEvt = (evt) => {
+                onHighlight(evt, true);
+            };
+            const onDownPlayEvt = (evt) => {
+                onHighlight(evt, false);
+            };
+
+            chartInstance.on('highlight', onHighlightEvt);
+            chartInstance.on('downplay', onDownPlayEvt);
+            return () => {
+                chartInstance.off('highlight', onHighlightEvt);
+                chartInstance.off('downplay', onDownPlayEvt);
+            };
+        }
+    }, [chart, props.onHighlight]);
+
+    useEffect(() => {
+
+        const onItemClick = props.onItemClick;
+        const chartInstance = chart;
+
+        if (chartInstance && onItemClick) {
             let clickHandler = (evt) => {
                 onItemClick(evt);
             };
-            chart.on('click', clickHandler);
+            chartInstance.on('click', onItemClick);
             return () => {
-                chart!.off('click', clickHandler);
+                chartInstance.off('click', onItemClick);
             };
         }
     }, [chart, props.onItemClick]);
 
     useEffect(() => {
         if (chart) {
-            chart.setOption(props.options);
+            if (props.options && Array.isArray(props.options.yAxis)) {
+                chart.setOption({
+                    ...props.options,
+                    yAxis: props.options.yAxis.map(axisConfig => {
+                        return {
+                            ...axisConfig,
+                            splitNumber: Math.floor(size.height / 80)
+                        };
+                    })
+                }, true, false);
+            } else {
+                chart.setOption(props.options, true, false);
+            }
         }
     }, [chart, props.options]);
 
     useEffect(() => {
         if (chart) {
-            chart.setOption({
-                yAxis: {
-                    splitNumber: Math.floor(size.height / 80)
-                }
-            });
             chart.resize();
+            if (props.options && Array.isArray(props.options.yAxis)) {
+                chart.setOption({
+                    yAxis: props.options.yAxis.map(axisConfig => {
+                        return {
+                            ...axisConfig,
+                            splitNumber: Math.floor(size.height / 80)
+                        };
+                    })
+                });
+            }
         }
     }, [size]);
 
@@ -108,23 +149,27 @@ export const ChartWidget = (props: ChartWidgetProps) => {
     }, [props.showTip]);
 
     return (
-        <div className='chart'
-            onMouseEnter={props.onMouseEnter}
-            onMouseLeave={props.onMouseLeave}
-        >
-            {resizeListener}
-            <div style={{width: '100%', height: '100%'}}
-                ref={chartContainer}
+        <React.Fragment>
+            <div className='chart'
+                onMouseEnter={props.onMouseEnter}
+                onMouseLeave={props.onMouseLeave}
             >
+                {resizeListener}
+                <div style={{width: '100%', height: '100%'}}
+                    ref={chartContainer}
+                >
+                </div>
+
             </div>
             <div className='chart-ops'>
                 <Dropdown overlay={
                     <Menu>
                         <Menu.Item>
                             <a onClick={(evt) => {
-                                if (chartContainer.current) {
-                                    let canvas = chartContainer.current.getElementsByTagName('canvas')[0];
-                                    let img = canvas.toDataURL('image/png');
+                                if (chart) {
+                                    let img = chart.getDataURL({
+                                        type: 'png'
+                                    });
                                     download(img, 'chart.png', 'image/png');
                                 }
                             }}>PNG</a>
@@ -167,6 +212,6 @@ export const ChartWidget = (props: ChartWidgetProps) => {
                     </a>
                 </Dropdown>
             </div>
-        </div>
+        </React.Fragment>
     );
 };

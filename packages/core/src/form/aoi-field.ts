@@ -27,7 +27,7 @@ export enum AoiAction {
 export type AoiSupportedGeometry = {
     type: GeometryTypes,
     constraints?: {
-        maxCoords: number
+        maxCoords?: number
     }
 };
 

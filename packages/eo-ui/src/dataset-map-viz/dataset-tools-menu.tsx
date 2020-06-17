@@ -31,9 +31,9 @@ export const DatasetToolsMenu = (props: DatasetToolsMenuProps) => {
 
                 datasetExplorer.analyses.addAnalysis({
                     datasetViz: datasetViz,
-                    id: `${datasetViz.id}analysis`
+                    id: `${datasetViz.id}Analysis`
                 }, {
-                    id: `${datasetViz.id}analysisEnsemble`,
+                    id: `${datasetViz.id}ComboAnalysis`,
                     type: tool.type,
                     name: tool.name
                 });

@@ -32,6 +32,7 @@
     "@oida/core": "file:../core",
     "@oida/state-mst": "file:../state-mst",
     "chroma-js": "^2.0.2",
-    "lodash": "^4.17.15"
+    "lodash": "^4.17.15",
+    "uuid": "^8.0.0"
   }
 }

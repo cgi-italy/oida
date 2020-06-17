@@ -1,13 +1,15 @@
 import React, { useEffect } from 'react';
 import { useObserver } from 'mobx-react';
 
-import { IDatasetAnalyses, IDataset } from '@oida/eo';
+import { IDatasetsExplorer, IDataset } from '@oida/eo';
+import { LayoutSectionItem } from '@oida/ui-react-core';
 
 import { DashboardPane, DashboardGridBreakpoint } from './dashboard-pane';
 
 import { DatasetAnalysisWidgetFactory } from './dataset-analysis-widget-factory';
 
 import 'react-grid-layout/css/styles.css';
+
 
 export type DatasetAnalysisToolbarProps = {
     datasets: IDataset[]
@@ -27,31 +29,36 @@ export type DatasetAnalysesDashboardProps = {
     gridBreakpoints: DashboardGridBreakpoint[],
     rowSnapHeight?: number;
     style: React.CSSProperties;
-    analyses: IDatasetAnalyses
+    datasetsExplorer: IDatasetsExplorer
 };
 
 
 export const DatasetAnalysesDashboard = (props: DatasetAnalysesDashboardProps) => {
 
     useEffect(() => {
-        props.analyses.setActive(true);
+        props.datasetsExplorer.analyses.setActive(true);
         return () => {
-            props.analyses.setActive(false);
+            props.datasetsExplorer.analyses.setActive(false);
         };
     }, []);
 
-    let components = useObserver(
-        () => props.analyses.collection.items.filter(analysis => analysis.visible).map((analysis) => {
+    let activeDatasets = useObserver(() => {
+        return props.datasetsExplorer.datasetViews.map(datasetView => datasetView.dataset.config);
+    });
 
-            let analysisType = analysis.datasetViz.datasetVizType;
+    let components = useObserver(
+        () => Array.from(props.datasetsExplorer.analyses.comboAnalyses.values()).filter(analysis => analysis.visible).map((analysis) => {
+
+            let analysisType = analysis.type;
             if (DatasetAnalysisWidgetFactory.isRegistered(analysisType)) {
 
                 let chartWidget = DatasetAnalysisWidgetFactory.create(analysisType, {
-                    analysis: analysis
+                    combinedAnalysis: analysis,
+                    datasets: activeDatasets
                 });
                 return {
                     id: analysis.id,
-                    title: `${analysis.datasetViz.dataset.config.name}: ${analysis.datasetViz.name || ''}`,
+                    title: `${analysis.name}`,
                     content: chartWidget
                 };
             }
@@ -59,12 +66,12 @@ export const DatasetAnalysesDashboard = (props: DatasetAnalysesDashboardProps) =
     ));
 
     const onWidgetClose = (widgetId: string) => {
-        let analysis = props.analyses.collection.itemWithId(widgetId);
-        if (analysis) {
-            if (analysis.destroyOnClose) {
-                props.analyses.collection.remove(analysis);
+        let comboAnalysis = props.datasetsExplorer.analyses.comboAnalyses.get(widgetId);
+        if (comboAnalysis) {
+            if (comboAnalysis.destroyOnClose) {
+                props.datasetsExplorer.analyses.removeComboAnalysis(comboAnalysis.id);
             } else {
-                analysis.setVisible(false);
+                comboAnalysis.setVisible(false);
             }
         }
     };
@@ -77,8 +84,7 @@ export const DatasetAnalysesDashboard = (props: DatasetAnalysesDashboardProps) =
             expanded={true}
             showComponent={() => {}}
             style={props.style}
-            // @ts-ignore
-            components={components.filter((component) => component !== undefined)}
+            components={components.filter((component) => component !== undefined) as LayoutSectionItem[]}
             onWidgetClose={onWidgetClose}
         />
     );

@@ -15,7 +15,7 @@ import { useCenterOnMapFromModule } from '@oida/ui-react-mst';
 import { ChartWidget } from './chart-widget';
 import { UnprojectedImageLayer } from './unprojected-image-layer';
 
-import { DatasetAnalysisWidgetFactory } from './dataset-analysis-widget-factory';
+import { DatasetAnalysisWidgetFactory, DatasetAnalysisWidgetFactoryConfig } from './dataset-analysis-widget-factory';
 
 
 export type VerticalProfileImageProps = {
@@ -475,9 +475,9 @@ VerticalProfileVizWidget.defaultProps = {
     }
 };
 
-DatasetAnalysisWidgetFactory.register(VERTICAL_PROFILE_VIZ_TYPE, (config) => {
+DatasetAnalysisWidgetFactory.register(VERTICAL_PROFILE_VIZ_TYPE, (config: DatasetAnalysisWidgetFactoryConfig) => {
 
-    let analysis = config.analysis as IDatasetAnalysis;
+    let analysis = config.combinedAnalysis.analyses[0];
     let verticalProfileViz = analysis.datasetViz as IDatasetVerticalProfileViz;
 
     if (!verticalProfileViz.config.tileSourceProvider) {
@@ -487,9 +487,9 @@ DatasetAnalysisWidgetFactory.register(VERTICAL_PROFILE_VIZ_TYPE, (config) => {
     let visibilityUpdateDisposer = autorun(() => {
         let selectedProfile = verticalProfileViz.verticalProfiles.items.find((profile) => profile.selected);
         if (!selectedProfile) {
-            analysis.setVisible(false);
+            config.combinedAnalysis.setVisible(false);
         } else {
-            analysis.setVisible(true);
+            config.combinedAnalysis.setVisible(true);
         }
     });
 

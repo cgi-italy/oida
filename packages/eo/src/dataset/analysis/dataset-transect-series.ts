@@ -3,48 +3,54 @@ import { types, addDisposer, flow, Instance } from 'mobx-state-tree';
 
 import debounce from 'lodash/debounce';
 
-import { QueryFilter, CancelablePromise, LoadingState } from '@oida/core';
-import { hasConfig, hasGeometry } from '@oida/state-mst';
+import { CancelablePromise, LoadingState } from '@oida/core';
+import { hasConfig } from '@oida/state-mst';
 
 import { DatasetViz } from '../dataset-viz';
 import { DatasetVariable, DatasetDimension, DomainRange } from '../dataset-variable';
 import { isDataProvider } from '../../datasets-explorer/is-data-provider';
+import { hasDimensions } from '../has-dimensions';
 
 export const TRANSECT_SERIES_TYPE = 'transect_series';
 
 export type DatasetTransectSeriesRequest = {
-    date: Date;
     variable: string;
     geometry: GeoJSON.LineString;
-    filters: QueryFilter[];
+    dimensionValues?: Map<string, string | Date | number>;
 };
 
 export type DatasetTransectSeriesConfig = {
-    timeDomain?: DomainRange<Date>;
     variables: DatasetVariable<number>[];
     maxLineStringLength?: number;
-    provider: (request: DatasetTransectSeriesRequest) => CancelablePromise<number[]>
+    provider: (request: DatasetTransectSeriesRequest) => CancelablePromise<number[]>;
+    dimensions: DatasetDimension<string | number | Date>[];
 };
+
+type TransectDimensionType = string | Date | number;
 
 const DatasetTransectSeriesDecl = DatasetViz.addModel(types.compose(
     TRANSECT_SERIES_TYPE,
     types.model({
-        variable: types.maybe(types.string),
-        date: types.maybe(types.Date)
+        variable: types.maybe(types.string)
     }),
-    hasGeometry,
+    hasDimensions,
     isDataProvider,
     hasConfig<DatasetTransectSeriesConfig>()
 ).volatile((self) => ({
     data: [] as number[]
 })).actions((self) => {
+
+    const areAllDimensionsFilled = (dimensionValues: Map<string, TransectDimensionType>) => {
+        return self.config.dimensions.every(dim => dimensionValues.has(dim.id));
+    };
+
     return {
         updateData: flow(function*(params: Partial<DatasetTransectSeriesRequest>) {
             try {
-                const {date, geometry, variable, filters} = params;
-                if (date && geometry && variable && filters) {
+                const { geometry, variable, dimensionValues} = params;
+                if (geometry && variable && dimensionValues && areAllDimensionsFilled(dimensionValues)) {
                     self.data = yield self.startDataRequest(self.config.provider({
-                        date, geometry, variable, filters
+                        geometry, variable, dimensionValues
                     }));
                 } else {
                     self.cancelDataRequest();
@@ -64,20 +70,14 @@ const DatasetTransectSeriesDecl = DatasetViz.addModel(types.compose(
         setVariable: (variable: string | undefined) => {
             self.variable = variable;
         },
-        setDate: (date?: Date) => {
-            self.date = date;
-        },
         afterAttach: () => {
 
             let seriesUpdateDisposer = autorun(() => {
 
                 const params = {
-                    date: self.date,
-                    //@ts-ignore
-                    geometry: self.geometry as (GeoJSON.LineString | undefined),
+                    geometry: (self as IDatasetTransectSeries).aoi?.geometry as (GeoJSON.LineString | undefined),
                     variable: self.variable,
-                    //@ts-ignore
-                    filters: self.dataset.searchParams.data.filters
+                    dimensionValues: new Map(self.dimensionValues)
                 };
                 debouncedUpdate(params);
             });

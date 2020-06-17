@@ -1,21 +1,21 @@
-import { types, Instance, IAnyModelType, getParentOfType } from 'mobx-state-tree';
+import { types, Instance, IAnyModelType } from 'mobx-state-tree';
+import { v4 as uuid } from 'uuid';
 
 import { TaggedUnion, MapLayerType, isActivable } from '@oida/state-mst';
 
+import { hasSharedAoi } from './has-shared-aoi';
 import { Dataset } from './dataset';
 
-const gerateRandomId = () => {
-    return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-};
 
 const DatasetVizBase = types.compose(
     types.model({
-        id: types.optional(types.identifier, gerateRandomId),
+        id: types.optional(types.identifier, () => uuid()),
         name: types.maybe(types.string),
         dataset: types.reference(Dataset),
         mapLayer: types.maybe(MapLayerType),
-        parent: types.maybe(types.reference(types.late((): IAnyModelType => DatasetVizBase))),
+        parent: types.maybe(types.reference(types.late((): IAnyModelType => DatasetVizType as IAnyModelType))),
     }),
+    hasSharedAoi,
     isActivable
 );
 
@@ -25,4 +25,3 @@ type DatasetVizType = typeof DatasetViz.Type;
 export interface DatasetVizInterface extends DatasetVizType { }
 export const DatasetVizType: DatasetVizInterface = DatasetViz.Type;
 export interface IDatasetViz extends Instance<DatasetVizInterface> { }
-
