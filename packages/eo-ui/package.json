@@ -16,7 +16,7 @@
     "build:es": "tsc",
     "build:umd": "tsc --project tsconfig.umd.json",
     "clean": "rimraf ./lib ./es ./types ./tsconfig.tsbuildinfo",
-    "watch": "tsc --watch",
+    "watch": "cross-env TSC_WATCHFILE=UseFsEventsWithFallbackDynamicPolling tsc --watch",
     "lint": "tslint --project ./tsconfig.json",
     "test": "jest --config ./jest.config.js"
   },
