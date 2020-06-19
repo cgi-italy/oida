@@ -63,6 +63,11 @@ export const createPointEntity = (id: string, geometry: GeoJSON.Point, featureSt
         pointEntity.point = point;
     }
 
+    Object.defineProperty(pointEntity, 'pickingDisabled', {
+        value: style.pickingDisabled || false,
+        writable: true
+    });
+
     return pointEntity;
 };
 
@@ -114,6 +119,8 @@ export const updatePointEntityStyle = (pointEntity, featureStyle: IFeatureStyle)
             point.pixelSize = style.radius * 2;
         }
     }
+
+    pointEntity.pickingDisabled = style.pickingDisabled || false;
 };
 
 export const createMultiPointEntity = (id, geometry: GeoJSON.MultiPoint, featureStyle: IFeatureStyle, layerOptions) => {

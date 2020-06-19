@@ -369,6 +369,7 @@ export class CesiumMapRenderer implements IMapRenderer {
         });
 
         this.viewer_.scene.primitives.destroyPrimitives = false;
+        this.viewer_.scene.pickTranslucentDepth = true;
 
         if (props.target) {
             this.viewer_.camera.setView(this.getViewFromProps_(viewport));

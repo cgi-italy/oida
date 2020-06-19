@@ -27,6 +27,11 @@ export const createLineEntity = (id: string, geometry: GeoJSON.LineString, featu
         clampToGround: layerOptions && layerOptions.clampToGround ? true : false
     });
 
+    Object.defineProperty(lineEntity, 'pickingDisabled', {
+        value: style.pickingDisabled || false,
+        writable: true
+    });
+
     return lineEntity;
 };
 
@@ -51,6 +56,8 @@ export const updateLineEntityStyle = (lineEntity, featureStyle: IFeatureStyle) =
         polyline.width = style.width;
     }
     polyline.zIndex = style.zIndex || 0;
+
+    lineEntity.pickingDisabled = style.pickingDisabled  || false;
 
 };
 

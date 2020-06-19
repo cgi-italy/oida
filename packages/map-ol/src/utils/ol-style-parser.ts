@@ -11,25 +11,33 @@ export class OLStyleParser {
     getStyleForGeometry(geometryType: GeometryTypes, style: IFeatureStyle) {
 
         let olStyle: Style = null;
-
+        let pickingDisabled = false;
         if (style) {
             switch (geometryType) {
                 case 'Point':
                 case 'MultiPoint':
                     olStyle = this.getPointStyle_(style.point);
+                    pickingDisabled = style.point?.pickingDisabled || false;
                     break;
                 case 'LineString':
                 case 'MultiLineString':
                     olStyle = this.getLineStyle_(style.line);
+                    pickingDisabled = style.line?.pickingDisabled || false;
                     break;
                 case 'Polygon':
                 case 'MultiPolygon':
                 case 'BBox':
                 case 'Circle':
                     olStyle = this.getPolygonStyle_(style.polygon);
+                    pickingDisabled = style.polygon?.pickingDisabled || false;
                     break;
             }
         }
+
+        Object.defineProperty(olStyle, 'pickingDisabled', {
+            value: pickingDisabled,
+            writable: true
+        });
 
         return olStyle;
     }

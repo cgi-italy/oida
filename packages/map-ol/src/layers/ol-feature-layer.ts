@@ -34,8 +34,11 @@ export class OLFeatureLayer extends OLMapLayer<VectorLayer> implements IFeatureL
                 geometry: geom
             });
 
-            feature.setStyle(this.styleParser_.getStyleForGeometry(geometry.type, style));
+            const featureStyle = this.styleParser_.getStyleForGeometry(geometry.type, style);
+
+            feature.setStyle(featureStyle);
             feature.setId(id);
+            feature.set('pickingDisabled', featureStyle.pickingDisabled);
 
             this.olImpl_.getSource().addFeature(feature);
             return feature;
@@ -56,7 +59,9 @@ export class OLFeatureLayer extends OLMapLayer<VectorLayer> implements IFeatureL
     updateFeatureStyle(id, style) {
         let feature = this.getFeature(id);
         if (feature) {
-            feature.setStyle(this.styleParser_.getStyleForGeometry(feature.getGeometry().getType(), style));
+            const featureStyle = this.styleParser_.getStyleForGeometry(feature.getGeometry().getType(), style);
+            feature.setStyle(featureStyle);
+            feature.set('pickingDisabled', featureStyle.pickingDisabled);
         }
     }
 

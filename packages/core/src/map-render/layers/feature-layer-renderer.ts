@@ -4,6 +4,7 @@ import { ILayerRenderer } from './map-layer-renderer';
 interface IGeometryStyle {
     visible: boolean;
     zIndex?: number;
+    pickingDisabled?: boolean;
 }
 
 export type Color = [number, number, number, number?];

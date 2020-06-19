@@ -48,6 +48,7 @@ export class CesiumPointPrimitiveRenderer implements CesiumGeometryPrimitiveRend
             }
 
             feature.entityId_ = id;
+            feature.pickingDisabled_ = style.pickingDisabled || false;
 
         } else if (geometry.type === 'MultiPoint') {
             feature = [];
@@ -61,6 +62,7 @@ export class CesiumPointPrimitiveRenderer implements CesiumGeometryPrimitiveRend
                 }
 
                 pointFeature.entityId_ = id;
+                pointFeature.pickingDisabled_ = style.pickingDisabled || false;
 
                 feature.push(pointFeature);
             }
@@ -184,6 +186,8 @@ export class CesiumPointPrimitiveRenderer implements CesiumGeometryPrimitiveRend
         } else {
             billboard.eyeOffset = Cartesian3.ZERO;
         }
+
+        billboard.pickingDisabled_ = style.pickingDisabled || false;
     }
 
     protected createPoint_(id, coordinates, style) {
@@ -213,6 +217,8 @@ export class CesiumPointPrimitiveRenderer implements CesiumGeometryPrimitiveRend
         } else {
             point.pixelSize = 1;
         }
+
+        point.pickingDisabled_ = style.pickingDisabled || false;
 
     }
 

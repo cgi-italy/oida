@@ -19,40 +19,43 @@ class SelectEvent extends Event {
 
 export class OLSelectInteraction extends Interaction {
 
-    private hitTolerance_;
     private condition_;
+    private hitTolerance_: number;
 
     constructor(options) {
         super({
             handleEvent: (mapBrowserEvent) => {
-                if (!this.condition_(mapBrowserEvent)) {
-                    return true;
-                }
-
-                let map = mapBrowserEvent.map;
-
-                let selected = null;
-
-                map.forEachFeatureAtPixel(mapBrowserEvent.pixel, (feature, layer) => {
-                    if (feature) {
-                        selected = feature;
-                        return true;
-                    }
-                }, {
-                    hitTolerance: this.hitTolerance_
-                });
-
-                //@ts-ignore
-                this.dispatchEvent(
-                    new SelectEvent('select', selected, mapBrowserEvent)
-                );
-
-                return pointerMove(mapBrowserEvent);
+                return this.handleEvent_(mapBrowserEvent);
             }
         });
 
         this.hitTolerance_ = options.hitTolerance ? options.hitTolerance : 0;
         this.condition_ = options.condition || singleClick;
+    }
+
+    protected handleEvent_(mapBrowserEvent) {
+        if (!this.condition_(mapBrowserEvent)) {
+            return true;
+        }
+
+        let map = mapBrowserEvent.map;
+
+        let selected = null;
+
+        map.forEachFeatureAtPixel(mapBrowserEvent.pixel, (feature, layer) => {
+            if (feature && !feature.get('pickingDisabled')) {
+                selected = feature;
+                return true;
+            }
+        }, {
+            hitTolerance: this.hitTolerance_
+        });
+
+        super.dispatchEvent(
+            new SelectEvent('select', selected, mapBrowserEvent)
+        );
+
+        return pointerMove(mapBrowserEvent);
     }
 
 }

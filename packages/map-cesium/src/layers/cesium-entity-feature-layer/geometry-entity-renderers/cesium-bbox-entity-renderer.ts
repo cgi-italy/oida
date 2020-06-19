@@ -36,6 +36,11 @@ export const createBBoxEntity = (id: string, geometry: BBoxGeometry, featureStyl
         zIndex: style.zIndex || 0
     });
 
+    Object.defineProperty(bboxEntity, 'pickingDisabled', {
+        value: style.pickingDisabled || false,
+        writable: true
+    });
+
     return bboxEntity;
 
 };
@@ -66,6 +71,8 @@ export const updateBBoxEntityStyle = (bboxEntity, featureStyle: IFeatureStyle) =
     }
 
     rectangle.zIndex = style.zIndex || 0;
+
+    bboxEntity.pickingDisabled = style.pickingDisabled || false;
 };
 
 export const bboxEntityRenderer: CesiumGeometryEntityRenderer<BBoxGeometry> = {

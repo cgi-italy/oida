@@ -54,6 +54,7 @@ export class CesiumLinePrimitiveRenderer implements CesiumGeometryPrimitiveRende
         }
 
         primitive.entityId_ = id;
+        primitive.pickingDisabled_ = style.pickingDisabled || false;
 
         let feature = {
             id: id,
@@ -102,6 +103,8 @@ export class CesiumLinePrimitiveRenderer implements CesiumGeometryPrimitiveRende
         }
 
         feature.style = style;
+
+        feature.primitive.pickingDisabled_ = style.pickingDisabled || false;
     }
 
     removeFeature(feature) {

@@ -6,7 +6,10 @@ import { IFeatureHoverInteractionImplementation, IFeatureHoverInteractionProps, 
 
 import { cesiumInteractionsFactory } from './cesium-interactions-factory';
 import { CesiumMapRenderer } from '../map/cesium-map-renderer';
-import { getPickedFeatureEntity, getPickedLayer } from '../layers';
+import {
+    getPickedFeatureEntity, getPickedLayer,
+    isFeaturePickable, setNonPickableFeaturesVisibility
+} from '../layers/cesium-feature-layer';
 
 export class CesiumFeatureHoverInteraction implements IFeatureHoverInteractionImplementation {
 
@@ -42,7 +45,9 @@ export class CesiumFeatureHoverInteraction implements IFeatureHoverInteractionIm
         this.handler_ = new ScreenSpaceEventHandler(this.viewer_.scene.canvas);
 
         let onMouseMove = (movement) => {
-            let pickInfo = this.viewer_.scene.pick(movement.endPosition);
+            let pickedObjects = this.viewer_.scene.drillPick(movement.endPosition);
+            const pickInfo = pickedObjects.find(pickInfo => isFeaturePickable(pickInfo));
+
             if (pickInfo) {
                 this.viewer_.container .style.cursor = 'pointer';
                 let entityId = getPickedFeatureEntity(pickInfo);
@@ -52,7 +57,11 @@ export class CesiumFeatureHoverInteraction implements IFeatureHoverInteractionIm
                 }
                 let layer = getPickedLayer(pickInfo);
                 if (layer && layer.onLayerHover) {
+                    setNonPickableFeaturesVisibility(pickedObjects, false);
+                    //layer.updateDataSource_();
+                    this.viewer_.scene.render();
                     let coordinate = this.viewer_.scene.pickPosition(movement.endPosition);
+                    setNonPickableFeaturesVisibility(pickedObjects, true);
                     layer.onLayerHover(coordinate, entityId, pickInfo);
                 }
             } else {

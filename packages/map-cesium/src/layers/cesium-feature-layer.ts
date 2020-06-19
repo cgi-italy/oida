@@ -25,6 +25,25 @@ export const getPickedFeatureEntity = (pickInfo) => {
     return entityId;
 };
 
+export const isFeaturePickable = (pickInfo) => {
+    if (pickInfo.id instanceof Entity) {
+        return !pickInfo.id.pickingDisabled;
+    } else {
+        return pickInfo.primitive.entityId_ && !pickInfo.primitive.pickingDisabled_;
+    }
+};
+
+export const setNonPickableFeaturesVisibility = (pickInfoList, visible) => {
+    pickInfoList.forEach((pickInfo) => {
+        if (pickInfo.id instanceof Entity && pickInfo.id.pickingDisabled) {
+            pickInfo.id.show = visible;
+            pickInfo.primitive.show = visible;
+        } else if (pickInfo.primitive && pickInfo.primitive.pickingDisabled_) {
+            pickInfo.primitive.show = visible;
+        }
+    });
+};
+
 export const getPickedLayer = (pickInfo) => {
     let entity = pickInfo.id;
     let layer;

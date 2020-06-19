@@ -91,6 +91,8 @@ export class CesiumPolygonPrimitiveRenderer implements CesiumGeometryPrimitiveRe
 
         fill.entityId_ = id;
         stroke.entityId_  = id;
+        fill.pickingDisabled_ = style.pickingDisabled || false;
+        stroke.pickingDisabled_ = style.pickingDisabled || false;
 
         let feature = {
             id: id,
@@ -132,6 +134,9 @@ export class CesiumPolygonPrimitiveRenderer implements CesiumGeometryPrimitiveRe
 
         feature.stroke.show = style.visible;
         feature.fill.show = style.visible;
+
+        feature.fill.pickingDisabled_ = style.pickingDisabled || false;
+        feature.stroke.pickingDisabled_ = style.pickingDisabled || false;
 
         feature.style = style;
 
