@@ -14,6 +14,8 @@ import { IVerticalProfileLayerRenderer, IVerticalProfile, IVerticalProfileStyle,
 
 import { updateDataSource } from '../utils';
 
+const cursor = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAADsQAAA7EB9YPtSQAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAF6SURBVDiNnZO9TgJBEMf/7NGcJFMsXCWKxo+EHA8gak8N9xDG5+HjMDwDodWWcOEFIBRiocT2riBhi729tYAjeh4R/HW72d/MzuxOBumcAqiZpnkBAEKINwDPABbJg5nE+oxz/mQYxq3jOEa5XDYBYDabiX6/r5RSnu/7DwDe07LeEVHguq4Kw1AnkVLqTqejiCgAUE3K50QUjMfjX2ISz/P0Jkhpa3POX1zXVX/aG9rttsrn88/bhlmWtUy79i6klLpQKCwBFBmAmuM4hmEYOx7kN9lsFo1GgwGosVwud23btrm3vcG27SPTNK9YtOZQH1prANBMCDGfTqerQwNMJpOVEGIOACeWZS2llP9p4jEDsFBKeb1eb+86ut2uiqJoCOAz3isRUeB53p/ZR6ORJiIf63n5QZWIglarFaaVI6XUzWYz3PzCm1hKDlOJc95ljN3X63VWqVSO4oYNBoMoiqKh7/uPAD52BYgpYj3OlwAghHgF8PK95pgvLpeADirdFxkAAAAASUVORK5CYII=';
+
 export class CesiumVerticalProfileLayer extends CesiumMapLayer implements IVerticalProfileLayerRenderer {
 
     protected dataSource_;
@@ -165,17 +167,6 @@ export class CesiumVerticalProfileLayer extends CesiumMapLayer implements IVerti
     onLayerHover(coordinate, itemId, pickInfo) {
         if (this.onCoordinateHover_) {
             if (coordinate) {
-
-                let highlightEntity = this.dataSource_.entities.getById('highlighted-point');
-                if (pickInfo.id === highlightEntity) {
-                    return;
-                } else {
-                    let selectEntity = this.dataSource_.entities.getById('selected-point');
-                    if (pickInfo.id === selectEntity) {
-                        coordinate = selectEntity.position_;
-                    }
-                }
-
                 let cartographic = Cartographic.fromCartesian(coordinate);
                 this.onCoordinateHover_([
                     CesiumMath.toDegrees(cartographic.longitude),
@@ -191,16 +182,6 @@ export class CesiumVerticalProfileLayer extends CesiumMapLayer implements IVerti
     onLayerPick(coordinate, itemId, pickInfo) {
         if (this.onCoordinateSelect_) {
             if (coordinate) {
-                let highlightEntity = this.dataSource_.entities.getById('highlighted-point');
-                if (pickInfo.id === highlightEntity) {
-                    coordinate = highlightEntity.position_;
-                } else {
-                    let selectEntity = this.dataSource_.entities.getById('selected-point');
-                    if (pickInfo.id === selectEntity) {
-                        return;
-                    }
-                }
-
                 let cartographic = Cartographic.fromCartesian(coordinate);
                 this.onCoordinateSelect_([
                     CesiumMath.toDegrees(cartographic.longitude),
@@ -233,15 +214,18 @@ export class CesiumVerticalProfileLayer extends CesiumMapLayer implements IVerti
 
             let entity = this.dataSource_.entities.add({
                 id: 'highlighted-point',
-                ellipsoid: {
-                    radii: new Cartesian3(50000.0, 50000.0, 50000.0),
-                    material: new Color(1, 0.5, 0, 1)
+                billboard: {
+                    image: cursor,
+                    color: new Color(1, 0.5, 0, 1),
+                    eyeOffset: new Cartesian3(0, 0, -5000),
+                    scale: 0.6
                 }
             });
 
             entity.position_ = Cartesian3.fromDegrees(0, 0, 0);
 
             entity.position = new CallbackProperty(() => entity.position_, false);
+            entity.pickingDisabled = true;
         }
         return entity;
     }
@@ -252,16 +236,18 @@ export class CesiumVerticalProfileLayer extends CesiumMapLayer implements IVerti
 
             let entity = this.dataSource_.entities.add({
                 id: 'selected-point',
-                ellipsoid: {
-                    radii: new Cartesian3(60000.0, 60000.0, 60000.0),
-                    material: new Color(1, 1.0, 0, 1),
-                    outline: false
+                billboard: {
+                    image: cursor,
+                    color: new Color(1, 1.0, 0, 1),
+                    eyeOffset: new Cartesian3(0, 0, -10000),
+                    scale: 0.7
                 }
             });
 
             entity.position_ = Cartesian3.fromDegrees(0, 0, 0);
 
             entity.position = new CallbackProperty(() => entity.position_, false);
+            entity.pickingDisabled = true;
         }
         return entity;
     }
