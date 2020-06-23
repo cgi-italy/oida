@@ -10,12 +10,19 @@ import { updateDataSource } from '../../utils';
 export class CesiumEntityFeatureLayer extends CesiumMapLayer implements IFeatureLayerRenderer {
 
     protected clampToGround_: boolean = false;
+    protected pickCallbacks_;
     protected dataSource_;
 
     constructor(config) {
         super(config);
 
         this.clampToGround_ = config.clampToGround || false;
+        this.pickCallbacks_ = {
+            selectCb: config.onFeatureSelect,
+            hoverCb: config.onFeatureHover,
+            coordPickMode: config.coordPickMode
+        };
+
         this.dataSource_ = new CustomDataSource();
         this.dataSources_.add(this.dataSource_);
     }
@@ -37,8 +44,10 @@ export class CesiumEntityFeatureLayer extends CesiumMapLayer implements IFeature
                 this.dataSource_.entities.add(entity);
                 entity._children.forEach(childEntity => {
                     this.dataSource_.entities.add(childEntity);
+                    childEntity.pickCallbacks_ = this.pickCallbacks_;
                 });
                 entity.geometryRenderer = geometryRenderer;
+                entity.pickCallbacks_ = this.pickCallbacks_;
             }
 
             this.updateDataSource_();

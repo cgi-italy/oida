@@ -13,11 +13,17 @@ export class CesiumPrimitiveFeatureLayer extends CesiumMapLayer implements IFeat
     protected polygonRenderer_;
 
     protected clampToGround_: boolean = false;
+    protected pickCallbacks_;
 
     constructor(config) {
         super(config);
 
         this.clampToGround_ = config.clampToGround || false;
+        this.pickCallbacks_ = {
+            selectCb: config.onFeatureSelect,
+            hoverCb: config.onFeatureHover,
+            coordPickMode: config.coordPickMode
+        };
     }
 
     addFeature(id, geometry, style) {
@@ -142,7 +148,8 @@ export class CesiumPrimitiveFeatureLayer extends CesiumMapLayer implements IFeat
                 if (!this.pointRenderer_) {
                     this.pointRenderer_ = new CesiumPointPrimitiveRenderer({
                         scene: this.mapRenderer_.getViewer().scene,
-                        clampToGround: this.clampToGround_
+                        clampToGround: this.clampToGround_,
+                        pickCallbacks: this.pickCallbacks_
                     });
                     this.primitives_.add(this.pointRenderer_.getPrimitives());
                 }
@@ -152,7 +159,8 @@ export class CesiumPrimitiveFeatureLayer extends CesiumMapLayer implements IFeat
             case 'MultiLineString':
                 if (!this.lineRenderer_) {
                     this.lineRenderer_ = new CesiumLinePrimitiveRenderer({
-                        clampToGround: this.clampToGround_
+                        clampToGround: this.clampToGround_,
+                        pickCallbacks: this.pickCallbacks_
                     });
                     this.primitives_.add(this.lineRenderer_.getPrimitives());
                 }
@@ -164,7 +172,8 @@ export class CesiumPrimitiveFeatureLayer extends CesiumMapLayer implements IFeat
             case 'Circle':
                 if (!this.polygonRenderer_) {
                     this.polygonRenderer_ = new CesiumPolygonPrimitiveRenderer({
-                        clampToGround: this.clampToGround_
+                        clampToGround: this.clampToGround_,
+                        pickCallbacks: this.pickCallbacks_
                     });
                     this.primitives_.add(this.polygonRenderer_.getPrimitives());
                 }

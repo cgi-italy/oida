@@ -44,6 +44,13 @@ export const setNonPickableFeaturesVisibility = (pickInfoList, visible) => {
     });
 };
 
+export const getPickCallbacks = (pickInfo) => {
+    if (pickInfo.id instanceof Entity) {
+        return pickInfo.id.pickCallbacks_ || {};
+    } else {
+        return pickInfo.primitive?.pickCallbacks_ || {};
+    }
+};
 
 export const getPickedLayer = (pickInfo) => {
     let entity = pickInfo.id;

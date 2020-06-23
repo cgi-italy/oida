@@ -15,10 +15,12 @@ export class CesiumPointPrimitiveRenderer implements CesiumGeometryPrimitiveRend
     private primitives_: PrimitiveCollection;
 
     private clampToGround_: boolean = false;
+    private pickCallbacks_;
 
     constructor(config) {
 
         this.clampToGround_ = config.clampToGround || false;
+        this.pickCallbacks_ = config.pickCallbacks;
 
         this.primitives_ = new PrimitiveCollection();
         this.billboards_ = new BillboardCollection({
@@ -49,6 +51,7 @@ export class CesiumPointPrimitiveRenderer implements CesiumGeometryPrimitiveRend
 
             feature.entityId_ = id;
             feature.pickingDisabled_ = style.pickingDisabled || false;
+            feature.pickCallbacks_ = this.pickCallbacks_;
 
         } else if (geometry.type === 'MultiPoint') {
             feature = [];
@@ -63,6 +66,7 @@ export class CesiumPointPrimitiveRenderer implements CesiumGeometryPrimitiveRend
 
                 pointFeature.entityId_ = id;
                 pointFeature.pickingDisabled_ = style.pickingDisabled || false;
+                pointFeature.pickCallbacks_ = this.pickCallbacks_;
 
                 feature.push(pointFeature);
             }
@@ -94,6 +98,9 @@ export class CesiumPointPrimitiveRenderer implements CesiumGeometryPrimitiveRend
                 }
 
                 pointFeature.entityId_ = feature.id;
+                pointFeature.pickingDisabled_ = feature.style.pickingDisabled || false;
+                pointFeature.pickCallbacks_ = this.pickCallbacks_;
+
                 feature.push(pointFeature);
             }
         } else {

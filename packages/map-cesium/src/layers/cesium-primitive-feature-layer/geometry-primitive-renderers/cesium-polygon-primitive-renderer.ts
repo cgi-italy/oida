@@ -21,11 +21,13 @@ export class CesiumPolygonPrimitiveRenderer implements CesiumGeometryPrimitiveRe
 
     protected polygons_: PrimitiveCollection;
     protected clampToGround_: boolean = false;
+    protected pickCallbacks_;
 
     constructor(config) {
         this.polygons_ = new PrimitiveCollection();
 
         this.clampToGround_ = config.clampToGround || false;
+        this.pickCallbacks_ = config.pickCallbacks;
     }
 
     getPrimitives() {
@@ -93,6 +95,8 @@ export class CesiumPolygonPrimitiveRenderer implements CesiumGeometryPrimitiveRe
         stroke.entityId_  = id;
         fill.pickingDisabled_ = style.pickingDisabled || false;
         stroke.pickingDisabled_ = style.pickingDisabled || false;
+        fill.pickCallbacks_ = this.pickCallbacks_;
+        stroke.pickCallbacks_ = this.pickCallbacks_;
 
         let feature = {
             id: id,

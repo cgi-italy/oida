@@ -15,9 +15,12 @@ export class CesiumLinePrimitiveRenderer implements CesiumGeometryPrimitiveRende
 
     protected polylines_: PrimitiveCollection;
     protected clampToGround_: boolean = false;
+    protected pickCallbacks_;
 
     constructor(config) {
         this.clampToGround_ = config.clampToGround || false;
+        this.pickCallbacks_ = config.pickCallbacks;
+
         this.polylines_ = new PrimitiveCollection();
     }
 
@@ -55,6 +58,7 @@ export class CesiumLinePrimitiveRenderer implements CesiumGeometryPrimitiveRende
 
         primitive.entityId_ = id;
         primitive.pickingDisabled_ = style.pickingDisabled || false;
+        primitive.pickCallbacks_ = this.pickCallbacks_;
 
         let feature = {
             id: id,
@@ -81,12 +85,12 @@ export class CesiumLinePrimitiveRenderer implements CesiumGeometryPrimitiveRende
     updateStyle(feature, style) {
 
         if (style.width !== feature.style.width) {
+            let oldPrimitive = feature.primitive;
             let updatedFeature = this.addFeature(feature.id, feature.geometry, style);
-
-            updatedFeature.primitive.readyPromise.then(() => {
-                this.polylines_.remove(feature.primitive);
-                feature.primitive = updatedFeature.primitive;
-            });
+            feature.primitive = updatedFeature.primitive;
+            //updatedFeature.primitive.readyPromise.then(() => {
+                this.polylines_.remove(oldPrimitive);
+            //});
 
         } else {
             if (feature.numGeometries) {
