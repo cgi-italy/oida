@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import { useObserver } from 'mobx-react';
 
 import { EChartOption } from 'echarts';
@@ -21,7 +21,7 @@ export type DatasetTransectSeriesChartProps = {
 type LegendDataItem = {
     id: string,
     name: string,
-    line: GeoJSON.Feature<GeoJSON.LineString>
+    seriesIdx: number,
     description?: string
 };
 
@@ -34,6 +34,8 @@ export const DatasetTransectSeriesChart = (props: DatasetTransectSeriesChartProp
     const legendData: LegendDataItem[] = [];
 
     let loadingState = LoadingState.Init;
+
+    const [trackCoordinate, setTrackCoordinate] = useState(false);
 
     const {chartSeries, colors} = useObserver(() => {
 
@@ -56,13 +58,6 @@ export const DatasetTransectSeriesChart = (props: DatasetTransectSeriesChartProp
                 return;
             }
 
-            const line = {
-                type: 'Feature',
-                geometry: series.aoi.geometry as GeoJSON.LineString,
-                properties: {}
-            } as GeoJSON.Feature<GeoJSON.LineString>;
-            const distance = length(line);
-
             let yAxisUnits = variableConfig.units || variableConfig.id;
             if (!yAxes[yAxisUnits]) {
                 yAxes[yAxisUnits] = {
@@ -80,7 +75,7 @@ export const DatasetTransectSeriesChart = (props: DatasetTransectSeriesChartProp
             colors.push(props.colors[idx]);
             legendData[idx] = {
                 id: `${idx}`,
-                line: line,
+                seriesIdx: idx,
                 name: `${series.dataset.config.name}: ${variableConfig.name}`
             };
 
@@ -89,13 +84,105 @@ export const DatasetTransectSeriesChart = (props: DatasetTransectSeriesChartProp
                 name: `${idx}`,
                 yAxisIndex: yAxes[yAxisUnits].idx,
                 smooth: true,
-                data: series.data.map((item, idx) => [idx / series.data.length * distance, item])
+                data: series.data.map((item) => [item.distance, item.value])
             });
 
 
         });
 
         return {chartSeries, colors};
+    });
+
+    const tooltipFormatter = useCallback((series: EChartOption.Tooltip.Format[]) => {
+
+        if (!series.length) {
+            return '';
+        }
+
+        let lines: Array<{
+            geometry: GeoJSON.LineString,
+            content: string[],
+            distance: number,
+            coords: number[]
+        }> = [];
+
+        try {
+
+            series.forEach((data) => {
+
+                let seriesInfo = legendData[parseInt(data.seriesName!)];
+                let transectSeries = props.series[seriesInfo.seriesIdx];
+
+                let line = lines.find(l => l.geometry === transectSeries.aoi?.geometry);
+                if (!line) {
+
+                    let coordinates = transectSeries.data[data.dataIndex!].coordinates;
+
+                    line = {
+                        geometry: transectSeries.aoi!.geometry as GeoJSON.LineString,
+                        distance: data.axisValue as number,
+                        coords: coordinates,
+                        content: []
+                    };
+                    lines.push(line);
+                    if (trackCoordinate) {
+                        transectSeries.setHighlightedPosition(data.dataIndex);
+                    }
+                }
+
+                line.content.push( `
+                    <div class="series-item is-point">
+                        <span>${data.marker}</span>
+                        <span class="label">${seriesInfo.name}:</span>
+                        <span class="value">${data.data[1].toFixed(2)}</span>
+                    </div>
+                `);
+            });
+
+            let items = lines.map((line, idx) => {
+                return `
+                    <div class="axis-item">
+                        <div class="axis-header">
+                            <span class="label">Position:</span>
+                            <span class="value">${line.coords[0].toFixed(3)} ${line.coords[1].toFixed(3)}</span>
+                        </div>
+                        <div class="axis-values">
+                            ${line.content.join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            return `
+                <div class="dataset-dimension-series-tooltip">
+                    ${items}
+                </div>
+            `;
+        } catch (e) {
+            return '';
+        }
+    }, [trackCoordinate]);
+
+    const disableCoordinateTrack = () => {
+        setTrackCoordinate(false);
+        props.series.forEach(series => {
+            series.setHighlightedPosition(undefined);
+        });
+    };
+
+    const highlightedItems = useObserver(() => {
+        const highlightedItems: any[] = [];
+        legendData.forEach((item) => {
+            let highlightedPosition = props.series[item.seriesIdx].highlightedPosition;
+            if (highlightedPosition !== undefined) {
+                highlightedItems.push({
+                    seriesIndex: item.seriesIdx,
+                    dataIndex: highlightedPosition
+                });
+            }
+        });
+
+        return highlightedItems;
     });
 
     if (loadingState === LoadingState.Init || loadingState === LoadingState.Error) {
@@ -121,6 +208,9 @@ export const DatasetTransectSeriesChart = (props: DatasetTransectSeriesChartProp
     return (
         <div className='series-chart'>
             <ChartWidget
+                onMouseEnter={() => setTrackCoordinate(true)}
+                onMouseLeave={disableCoordinateTrack}
+                onHighlight={(evt) => console.log(evt)}
                 options={{
                     color: colors,
                     legend: {
@@ -133,70 +223,7 @@ export const DatasetTransectSeriesChart = (props: DatasetTransectSeriesChartProp
                     tooltip: {
                         trigger: 'axis',
                         transitionDuration: 0,
-                        formatter: (series: EChartOption.Tooltip.Format[]) => {
-
-                            if (!series.length) {
-                                return '';
-                            }
-
-                            let lines: Array<{
-                                geometry: GeoJSON.LineString,
-                                content: string[],
-                                distance: number,
-                                coords: number[]
-                            }> = [];
-
-                            try {
-
-                                let seriesContent = series.forEach((data) => {
-
-                                    let seriesInfo = legendData[parseInt(data.seriesName!)];
-
-                                    let line = lines.find(l => l.geometry === seriesInfo.line.geometry);
-                                    if (!line) {
-                                        let point = along(seriesInfo.line, data.axisValue as number);
-
-                                        line = {
-                                            geometry: seriesInfo.line.geometry,
-                                            distance: data.axisValue as number,
-                                            coords: point.geometry.coordinates,
-                                            content: []
-                                        };
-                                        lines.push(line);
-                                    }
-
-                                    line.content.push( `
-                                        <div class="series-item is-point">
-                                            <span>${data.marker}</span>
-                                            <span class="label">${seriesInfo.name}:</span>
-                                            <span class="value">${data.data[1].toFixed(2)}</span>
-                                        </div>
-                                    `);
-                                });
-
-                                let items = lines.map((line, idx) => {
-                                    return `
-                                        <div class="axis-item">
-                                            <div class="axis-header">
-                                                <span class="label">Position:</span>
-                                                <span class="value">${line.coords[0].toFixed(3)} ${line.coords[1].toFixed(3)}</span>
-                                            </div>
-                                            <div class="axis-values">
-                                                ${line.content.join('')}
-                                            </div>
-                                        </div>
-                                    `;
-                                }).join('');
-
-                                return `
-                                    <div class="dataset-dimension-series-tooltip">
-                                        ${items}
-                                    </div>
-                                `;
-                            } catch (e) {
-                                return '';
-                            }
-                        },
+                        formatter: tooltipFormatter,
                         textStyle: {
                             fontSize: 13
                         },
@@ -223,6 +250,7 @@ export const DatasetTransectSeriesChart = (props: DatasetTransectSeriesChartProp
                     backgroundColor: 'transparent'
                 } as EChartOption}
                 isLoading={loadingState === LoadingState.Loading}
+                showTip={!trackCoordinate ? highlightedItems[0] : undefined}
             />
         </div>
     );

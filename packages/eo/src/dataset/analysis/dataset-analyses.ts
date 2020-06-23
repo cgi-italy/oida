@@ -89,7 +89,21 @@ const DatasetAnalysesDecl = types.model('DatasetAnalyses', {
     afterAttach: () => {
         self.geometryLayer = FeatureLayer.create({
             id: 'analysesGeometries',
-            source: self.collection.id
+            source: self.collection.id,
+            config: {
+                onEntityHover: (analysis: IDatasetAnalysis, coordinates) => {
+                    analysis.datasetViz.aoi?.setHoveredPosition(coordinates);
+                },
+                geometryGetter: (analysis: IDatasetAnalysis) => {
+                    return analysis.datasetViz.mapGeometry;
+                },
+                rendererOptions: {
+                    cesium: {
+                        entityMode: false,
+                        coordPickMode: 'ellipsoid'
+                    }
+                }
+            }
         });
     }
 }));

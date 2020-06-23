@@ -7,11 +7,15 @@ import { TaggedUnion, MapLayerType, ReferenceOrType, isActivable } from '@oida/s
 
 const ReferenceableAoiDecl = types.model('ReferenceableAoi', {
     id: types.optional(types.identifier, () => uuid()),
-    geometry: types.frozen<Geometry>()
+    geometry: types.frozen<Geometry>(),
+    hoveredPosition: types.maybe(types.frozen<GeoJSON.Position>())
 }).actions((self) => {
     return {
         setGeometry: (geometry: Geometry) => {
             self.geometry = geometry;
+        },
+        setHoveredPosition: (position: GeoJSON.Position | undefined) => {
+            self.hoveredPosition = position;
         }
     };
 });

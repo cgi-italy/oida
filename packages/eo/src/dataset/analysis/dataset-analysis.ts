@@ -35,7 +35,7 @@ let analysisStyleGetter = (analysis): IFeatureStyle => {
         },
         line: {
             visible: analysis.visible,
-            color: color.gl(),
+            color: color.alpha(1).gl(),
             width: analysis.hovered ? 3 : 2,
             zIndex: zIndex
         },

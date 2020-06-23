@@ -1,6 +1,7 @@
 import { types, Instance, IAnyModelType } from 'mobx-state-tree';
 import { v4 as uuid } from 'uuid';
 
+import { Geometry } from '@oida/core';
 import { TaggedUnion, MapLayerType, isActivable } from '@oida/state-mst';
 
 import { hasSharedAoi } from './has-shared-aoi';
@@ -17,7 +18,13 @@ const DatasetVizBase = types.compose(
     }),
     hasSharedAoi,
     isActivable
-);
+).views((self) => {
+    return {
+        get mapGeometry(): (Geometry | undefined) {
+            return (self as IDatasetViz).aoi?.geometry;
+        }
+    };
+});
 
 export const DatasetViz = TaggedUnion('datasetVizType', DatasetVizBase);
 
