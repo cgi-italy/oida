@@ -1,7 +1,7 @@
 import chroma from 'chroma-js';
 
 import { IFeatureStyle, Geometry } from '@oida/core';
-import { FeatureLayer } from '@oida/state-mst';
+import { FeatureLayer, EntityGeometryGetter } from '@oida/state-mst';
 
 import { IDataset } from '../../dataset';
 import { IDatasetProductSearchViz } from '../dataset-product-search-viz';
@@ -9,7 +9,7 @@ import { IDatasetProduct } from '../dataset-product';
 
 export type GeometrySearchResultsLayerConfig = {
     styleGetter?: (dataset: IDataset, item: IDatasetProduct) => IFeatureStyle;
-    geometryGetter?: (item: IDatasetProduct) => Geometry;
+    geometryGetter?: EntityGeometryGetter<IDatasetProduct>;
     productSearchViz: IDatasetProductSearchViz;
 };
 
@@ -60,11 +60,13 @@ export const createGeometrySearchResultsLayer = (config: GeometrySearchResultsLa
     return FeatureLayer.create({
         id: `${config.productSearchViz.dataset.id}Results`,
         source: config.productSearchViz.products.id,
-        styleGetter: (item: IDatasetProduct) => {
-            return config.styleGetter
+        config: {
+            geometryGetter: config.geometryGetter,
+            styleGetter: (item: IDatasetProduct) => {
+                return config.styleGetter
                 ? config.styleGetter(config.productSearchViz.dataset, item)
                 : defaultStyleGetter(config.productSearchViz.dataset, item);
-        },
-        geometryGetter: config.geometryGetter
+            }
+        }
     });
 };

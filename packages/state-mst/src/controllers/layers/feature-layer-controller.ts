@@ -9,8 +9,8 @@ import { layerControllersFactory } from './layer-controllers-factory';
 
 import { ArrayTracker } from '../../utils';
 
-import { IFeatureLayer } from '../../types/layers/feature-layer';
-import { createEntityReference } from '../../types/entity/entity-reference';
+import { IFeatureLayer, EntityStyleGetter, EntityGeometryGetter } from '../../types/layers/feature-layer';
+import { createEntityReference, resolveEntityReference } from '../../types/entity/entity-reference';
 
 
 type FeatureTracker = {
@@ -20,11 +20,13 @@ type FeatureTracker = {
     disposeStyleObserver?: IReactionDisposer
 };
 
-type EntityStyleGetter = (entity: IEntity) => IFeatureStyle | IFeatureStyle[];
-type EntityGeometryGetter = (entity: IEntity) => Geometry | undefined;
 
-const defaultGeometryGetter: EntityGeometryGetter = (entity) => (entity as any).geometry;
-const defaultStyleGetter: EntityStyleGetter = (entity) => (entity as any).style;
+const defaultGeometryGetter: EntityGeometryGetter<IEntity & {
+    geometry: Geometry
+}> = (entity) => entity.geometry;
+const defaultStyleGetter: EntityStyleGetter<IEntity & {
+    style: IFeatureStyle
+}> = (entity) => entity.style;
 
 export const featureIdFromEntityReference = (entityReference: string, geometryIdx?: number) => {
     if (typeof(geometryIdx) === 'number') {
@@ -41,11 +43,31 @@ export const entityReferenceFromFeatureId = (featureId: string) => {
 export class FeatureLayerController extends MapLayerController<IFeatureLayerRenderer, IFeatureLayer> {
 
     private sourceTracker_: ArrayTracker<FeatureTracker> | undefined;
+    private geometryGetter_: EntityGeometryGetter<any> = defaultGeometryGetter;
+    private styleGetter_: EntityStyleGetter<any> = defaultStyleGetter;
 
     protected createLayerRenderer_(mapRenderer: IMapRenderer) {
+        const { styleGetter, geometryGetter, onEntityHover, ...others } = this.mapLayer_.config || {};
+        if (styleGetter) {
+            this.styleGetter_ = styleGetter;
+        }
+        if (geometryGetter) {
+            this.geometryGetter_ = geometryGetter;
+        }
+
+        let onFeatureHover;
+        if (onEntityHover) {
+            onFeatureHover = (featureId, coordinate) => {
+                let entity = resolveEntityReference(entityReferenceFromFeatureId(featureId), this.mapLayer_.source.items);
+                if (entity) {
+                    onEntityHover(entity, coordinate);
+                }
+            };
+        }
         return <IFeatureLayerRenderer>mapRenderer.getLayersFactory().create(FEATURE_LAYER_ID, {
             mapRenderer: mapRenderer,
-            ...this.mapLayer_.config
+            onFeatureHover,
+            ...others
         });
     }
 
@@ -94,10 +116,7 @@ export class FeatureLayerController extends MapLayerController<IFeatureLayerRend
 
     protected addFeature_(entity: IEntity) {
 
-
-        let geometryGetter: EntityGeometryGetter = this.mapLayer_.geometryGetter as EntityGeometryGetter || defaultGeometryGetter;
-
-        let geometry = geometryGetter(entity);
+        let geometry = this.geometryGetter_(entity);
 
         if (geometry && (geometry.type === 'GeometryCollection' || geometry.type === 'GeometryCollectionEx')) {
             return this.addGeometryCollectionFeature_(entity);
@@ -120,18 +139,16 @@ export class FeatureLayerController extends MapLayerController<IFeatureLayerRend
             return featureTracker;
         }
 
-        const geometryGetter: EntityGeometryGetter = this.mapLayer_.geometryGetter as EntityGeometryGetter || defaultGeometryGetter;
-        const styleGetter: EntityStyleGetter = this.mapLayer_.styleGetter as EntityStyleGetter || defaultStyleGetter;
         const entityReference = createEntityReference(entity);
         const featureId = featureIdFromEntityReference(entityReference);
 
-        featureTracker.disposeStyleObserver = reaction(() => styleGetter(entity), (style) => {
+        featureTracker.disposeStyleObserver = reaction(() => this.styleGetter_(entity), (style) => {
             if (layerRenderer.getFeature(featureId)) {
                 layerRenderer.updateFeatureStyle(featureId, style[0] || style);
             }
         });
 
-        featureTracker.disposeGeometryObserver = reaction(() => geometryGetter(entity), (geometry) => {
+        featureTracker.disposeGeometryObserver = reaction(() => this.geometryGetter_(entity), (geometry) => {
             if (geometry && (geometry.type === 'GeometryCollection' || geometry.type === 'GeometryCollectionEx')) {
                 this.removeFeature_(featureTracker);
                 this.addGeometryCollectionFeature_(entity, featureTracker);
@@ -141,7 +158,7 @@ export class FeatureLayerController extends MapLayerController<IFeatureLayerRend
                         layerRenderer.updateFeatureGeometry(featureId, geometry);
                     } else {
                         layerRenderer.removeFeature(featureId);
-                        const style = styleGetter(entity);
+                        const style = this.styleGetter_(entity);
                         layerRenderer.addFeature(featureId, geometry, style[0] || style);
                     }
                     featureTracker.ids.add(featureId);
@@ -173,21 +190,20 @@ export class FeatureLayerController extends MapLayerController<IFeatureLayerRend
             return featureTracker;
         }
 
-        const geometryGetter: EntityGeometryGetter = this.mapLayer_.geometryGetter as EntityGeometryGetter || defaultGeometryGetter;
-        const styleGetter: EntityStyleGetter = this.mapLayer_.styleGetter as EntityStyleGetter || defaultStyleGetter;
-
         let entityReference = createEntityReference(entity);
 
-        featureTracker.disposeStyleObserver = reaction(() => styleGetter(entity), (style) => {
+        featureTracker.disposeStyleObserver = reaction(() => this.styleGetter_(entity), (style) => {
             featureTracker.ids.forEach((id, idx) => {
                 this.layerRenderer_!.updateFeatureStyle(id, style[idx] || style);
             });
         });
 
-        featureTracker.disposeGeometryObserver = reaction(() => geometryGetter(entity), (geometry) => {
+        featureTracker.disposeGeometryObserver = reaction(() => this.geometryGetter_(entity), (geometry) => {
             if (geometry) {
                 if (geometry.type !== 'GeometryCollection' && geometry.type !== 'GeometryCollectionEx') {
-                    this.removeFeature_(featureTracker);
+                    featureTracker.ids.forEach((id) => {
+                        layerRenderer.removeFeature(id);
+                    });
                     this.addSimpleGeometryFeature_(entity, featureTracker);
                 } else {
                     featureTracker.ids.forEach((id) => {
@@ -195,7 +211,7 @@ export class FeatureLayerController extends MapLayerController<IFeatureLayerRend
                     });
                     featureTracker.ids.clear();
 
-                    const style = styleGetter(entity);
+                    const style = this.styleGetter_(entity);
                     geometry.geometries.forEach((geometry, idx) => {
                         let id = featureIdFromEntityReference(entityReference, idx);
                         layerRenderer.addFeature(id, geometry, style[idx] || style);

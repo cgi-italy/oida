@@ -15,7 +15,14 @@ cesiumLayersFactory.register(TILE_LAYER_ID, (config) => {
     return new CesiumTileLayer(config);
 });
 
-cesiumLayersFactory.register(FEATURE_LAYER_ID, createCesiumFeatureLayer);
+cesiumLayersFactory.register(FEATURE_LAYER_ID, (config) => {
+    let {rendererOptions, ...others} = config;
+
+    return createCesiumFeatureLayer({
+        ...others,
+        ...(rendererOptions ? rendererOptions.cesium : undefined)
+    });
+});
 
 cesiumLayersFactory.register(VERTICAL_PROFILE_LAYER_ID, (config) => {
     return new CesiumVerticalProfileLayer(config);
