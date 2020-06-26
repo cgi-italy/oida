@@ -128,6 +128,8 @@ export class CesiumMapLayer implements ILayerRenderer {
     protected onAddImageries_(imageries, idx) {
 
         if (imageries instanceof ImageryLayer || imageries.length) {
+            this.updateImageryVisibility_(imageries, this.parent_ ? this.parent_.isVisible() : true);
+            this.updateImageryOpacity_(imageries);
             this.mapRenderer_.refreshImageriesFromEvent({
                 type: 'add',
                 collection: this.imageries_,
