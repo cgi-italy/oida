@@ -13,10 +13,14 @@ export class CesiumMouseCoordsInteraction implements IMouseCoordsInteraction {
     private viewer_;
     private handler_;
     private onMouseCoords_;
+    private mouseLeaveHandler_?;
 
     constructor(config: IMouseCoordsInteractionProps<CesiumMapRenderer>) {
         this.viewer_ = config.mapRenderer.getViewer();
         this.onMouseCoords_ = config.onMouseCoords;
+        this.mouseLeaveHandler_ = () => {
+            this.onMouseCoords_(null);
+        };
     }
 
     setActive(active) {
@@ -24,8 +28,13 @@ export class CesiumMouseCoordsInteraction implements IMouseCoordsInteraction {
             this.bindMove_(this.onMouseCoords_);
         } else {
             if (this.handler_) {
-                this.handler_.destroy();
-                delete this.handler_;
+                try {
+                    this.handler_.destroy();
+                    this.viewer_.scene.canvas.removeEventListener('mouseleave', this.mouseLeaveHandler_);
+                    delete this.handler_;
+                } catch (e) {
+
+                }
             }
         }
     }
@@ -50,6 +59,8 @@ export class CesiumMouseCoordsInteraction implements IMouseCoordsInteraction {
                 onMouseCoords(null);
             }
         }, ScreenSpaceEventType.MOUSE_MOVE);
+
+        this.viewer_.scene.canvas.addEventListener('mouseleave', this.mouseLeaveHandler_);
     }
 }
 
