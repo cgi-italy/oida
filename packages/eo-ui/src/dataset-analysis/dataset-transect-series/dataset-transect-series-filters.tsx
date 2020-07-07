@@ -40,7 +40,8 @@ const DatasetVariableSeletor = (props: DatasetVariableSelectorProps) => {
 
 
 export type DatasetTransectSeriesFiltersProps = {
-    analysis: IDatasetAnalysis
+    analysis: IDatasetAnalysis;
+    linkedAois: Set<string>;
 };
 
 export const DatasetTransectSeriesFilters = (props: DatasetTransectSeriesFiltersProps) => {
@@ -86,6 +87,7 @@ export const DatasetTransectSeriesFilters = (props: DatasetTransectSeriesFilters
                                 maxCoords: datasetSeries.config.maxLineStringLength
                             }
                         }]}
+                        linkedAois={props.linkedAois}
                     />
                 </Form.Item>
             </React.Fragment>

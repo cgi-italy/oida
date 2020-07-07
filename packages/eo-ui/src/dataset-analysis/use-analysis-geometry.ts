@@ -30,7 +30,7 @@ export const useAnalysisGeometry = (props: useAnalysisGeometryProps) => {
     let aoiProps = useObserver(() => {
         return {
             color: analysis.color,
-            name: analysis.geometry ? analysis.geometry.type : 'None'
+            name: analysis.datasetViz.aoi ? analysis.datasetViz.aoi.name : 'None'
         };
     });
 

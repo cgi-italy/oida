@@ -1,0 +1,59 @@
+.analysis-aoi-filter {
+    display: flex;
+    align-items: center;
+
+    .drag-handle {
+        margin-right: 6px;
+        cursor: grab;
+        display: none;
+    }
+
+    .aoi-field-container {
+        padding-left: 3px;
+        padding-right: 12px;
+        outline-offset: 3px;
+        outline-width: 1px;
+        outline-color: #999999;
+        outline-style: none;
+    }
+
+    .unlink-button {
+        margin-left: -4px;
+        display: none;
+    }
+
+    &.is-dragging {
+        .drag-handle {
+            cursor: grabbing;
+        }
+    }
+
+    &.can-drop {
+        .aoi-field-container {
+            outline-style: dashed;
+        }
+
+        &.is-dropping {
+            .aoi-field-container {
+                outline-color: @primary-color;
+            }
+        }
+    }
+
+
+
+    &.can-drag {
+        .drag-handle {
+            display: block;
+        }
+    }
+
+    &.is-linked {
+        .unlink-button {
+            display: block;
+        }
+        .aoi-field-container {
+            outline-style: solid;
+        }
+    }
+}

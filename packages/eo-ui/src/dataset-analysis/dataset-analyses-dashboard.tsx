@@ -46,6 +46,8 @@ export const DatasetAnalysesDashboard = (props: DatasetAnalysesDashboardProps) =
         return props.datasetsExplorer.datasetViews.map(datasetView => datasetView.dataset.config);
     });
 
+    let linkedAois = useObserver(() => props.datasetsExplorer.analyses.getLinkedAoiIds());
+
     let components = useObserver(
         () => Array.from(props.datasetsExplorer.analyses.comboAnalyses.values()).filter(analysis => analysis.visible).map((analysis) => {
 
@@ -54,7 +56,8 @@ export const DatasetAnalysesDashboard = (props: DatasetAnalysesDashboardProps) =
 
                 let chartWidget = DatasetAnalysisWidgetFactory.create(analysisType, {
                     combinedAnalysis: analysis,
-                    datasets: activeDatasets
+                    datasets: activeDatasets,
+                    linkedAois: linkedAois
                 });
                 return {
                     id: analysis.id,

@@ -11,7 +11,7 @@ import { DatasetDimensionRangeSelector } from '../../dataset-map-viz/dataset-dim
 import { AnalysisAoiFilter } from '../analysis-aoi-filter';
 
 type DatasetDimensionSelectorProps = {
-    series: IDatasetDimensionSeries
+    series: IDatasetDimensionSeries;
 };
 
 const DatasetDimensionSelector = (props: DatasetDimensionSelectorProps) => {
@@ -79,7 +79,8 @@ const DatasetVariableSeletor = (props: DatasetVariableSelectorProps) => {
 
 
 export type DatasetDimensionSeriesFiltersProps = {
-    analysis: IDatasetAnalysis
+    analysis: IDatasetAnalysis;
+    linkedAois: Set<string>;
 };
 
 export const DatasetDimensionSeriesFilters = (props: DatasetDimensionSeriesFiltersProps) => {
@@ -148,6 +149,7 @@ export const DatasetDimensionSeriesFilters = (props: DatasetDimensionSeriesFilte
                     <AnalysisAoiFilter
                         analysis={props.analysis}
                         supportedGeometries={datasetSeries.config.supportedGeometries}
+                        linkedAois={props.linkedAois}
                     />
                 </Form.Item>
             </React.Fragment>

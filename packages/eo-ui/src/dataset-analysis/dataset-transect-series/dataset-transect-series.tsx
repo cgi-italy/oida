@@ -77,6 +77,7 @@ export const DatasetTransectSeriesAnalysis = (props: DatasetAnalysisWidgetFactor
                     </Form.Item>
                     <DatasetTransectSeriesFilters
                         analysis={analysis}
+                        linkedAois={props.linkedAois}
                     />
 
                 </Form>

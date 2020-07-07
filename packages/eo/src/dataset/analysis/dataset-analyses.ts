@@ -106,7 +106,26 @@ const DatasetAnalysesDecl = types.model('DatasetAnalyses', {
             }
         });
     }
-}));
+})).views((self) => {
+    return {
+        getLinkedAoiIds: () => {
+            let linkedAoisTotal: Record<string, number> = {};
+            const aoiIds = new Set<string>();
+
+            self.collection.items.forEach((item) => {
+                let aoiId = item.datasetViz.aoi?.id;
+                if (aoiId) {
+                    linkedAoisTotal[aoiId] = (linkedAoisTotal[aoiId] || 0) + 1;
+                    if (linkedAoisTotal[aoiId] > 1) {
+                        aoiIds.add(aoiId);
+                    }
+                }
+            });
+
+            return aoiIds;
+        }
+    };
+});
 
 type DatasetAnalysesType = typeof DatasetAnalysesDecl;
 export interface DatasetAnalysesInterface extends DatasetAnalysesType {}

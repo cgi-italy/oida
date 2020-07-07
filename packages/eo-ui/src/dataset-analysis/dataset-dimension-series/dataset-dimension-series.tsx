@@ -77,6 +77,7 @@ export const DatasetDimensionSeriesAnalysis = (props: DatasetAnalysisWidgetFacto
                     </Form.Item>
                     <DatasetDimensionSeriesFilters
                         analysis={analysis}
+                        linkedAois={props.linkedAois}
                     />
 
                 </Form>

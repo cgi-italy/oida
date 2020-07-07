@@ -3,9 +3,6 @@ import { useObserver } from 'mobx-react';
 
 import { EChartOption } from 'echarts';
 
-import length from '@turf/length';
-import along from '@turf/along';
-
 import { LoadingState } from '@oida/core';
 import { IDatasetTransectSeries } from '@oida/eo';
 
@@ -210,7 +207,6 @@ export const DatasetTransectSeriesChart = (props: DatasetTransectSeriesChartProp
             <ChartWidget
                 onMouseEnter={() => setTrackCoordinate(true)}
                 onMouseLeave={disableCoordinateTrack}
-                onHighlight={(evt) => console.log(evt)}
                 options={{
                     color: colors,
                     legend: {

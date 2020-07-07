@@ -8,5 +8,6 @@ export const DatasetAnalysisWidgetFactory = createDynamicFactory<React.ReactNode
 
 export type DatasetAnalysisWidgetFactoryConfig = {
     datasets: DatasetConfig[];
-    combinedAnalysis: IComboAnalysis
+    combinedAnalysis: IComboAnalysis,
+    linkedAois: Set<string>
 };
