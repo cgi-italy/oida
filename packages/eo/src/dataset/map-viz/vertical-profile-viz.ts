@@ -1,5 +1,5 @@
 import { autorun } from 'mobx';
-import { types, addDisposer, Instance } from 'mobx-state-tree';
+import { types, addDisposer, Instance, applySnapshot } from 'mobx-state-tree';
 
 import { LoadingState } from '@oida/core';
 import { hasConfig, VerticalProfileLayer } from '@oida/state-mst';
@@ -12,7 +12,11 @@ import { DatasetVerticalProfiles, IDatasetVerticalProfile, VerticalProfileItem }
 
 export const VERTICAL_PROFILE_VIZ_TYPE = 'vertical_profile';
 
-export type VerticalProfileDataProvider = (verticalProfileViz) => Promise<VerticalProfileItem[]>;
+export interface VerticalProfileDataProvider {
+    getProfiles: (verticalProfileViz) => Promise<VerticalProfileItem[]>;
+    getProfileData: (profileId) => Promise<string>;
+    getLineSeries?: (request: VerticalProfileSeriesProviderRequest) => Promise<VerticalProfileLineSeriesItemResponse>;
+}
 
 export type VerticalProfileSeriesProviderRequest = {
     profileId: string,
@@ -73,19 +77,24 @@ const DatasetVerticalProfileVizDecl = DatasetViz.addModel(
             refreshData: () => {
                 const mapLayer = self.mapLayer!;
                 mapLayer.setLoadingState(LoadingState.Loading);
-                self.config.dataProvider(self).then((profileData) => {
-                    profileData.forEach((profile) => {
-                        let profileInstance = self.verticalProfiles.itemWithId(profile.id);
-                        if (profileInstance) {
-                            profileInstance.setGeometry(profile.geometry);
-                            profileInstance.setStyle(profile.style);
-                        } else {
-                            self.verticalProfiles.add(profile);
-                        }
+                let pendingItem = self.verticalProfiles.items.length;
+
+                const onItemReady = (sucess: boolean) => {
+                    pendingItem--;
+                    if (!pendingItem) {
+                        mapLayer.setLoadingState(LoadingState.Success);
+                    }
+                };
+
+                self.verticalProfiles.items.forEach((item) => {
+                    self.config.dataProvider.getProfileData(item.id).then(data => {
+                        item.setStyle({
+                            fillImage: data
+                        });
+                        onItemReady(true);
+                    }, () => {
+                        onItemReady(false);
                     });
-                    mapLayer.setLoadingState(LoadingState.Success);
-                }).catch(() => {
-                    mapLayer.setLoadingState(LoadingState.Error);
                 });
             },
             refreshTileView: () => {
@@ -138,18 +147,11 @@ const DatasetVerticalProfileVizDecl = DatasetViz.addModel(
 
                 let dataUpdaterDisposer = autorun(() => {
                     mapLayer.setLoadingState(LoadingState.Loading);
-                    self.config.dataProvider(self).then((profileData) => {
-                        profileData.forEach((profile) => {
-                            let profileInstance = self.verticalProfiles.itemWithId(profile.id);
-                            if (profileInstance) {
-                                profileInstance.setGeometry(profile.geometry);
-                                profileInstance.setStyle(profile.style);
-                            } else {
-                                self.verticalProfiles.add(profile);
-                            }
-                        });
+                    self.config.dataProvider.getProfiles(self).then((profileData) => {
+                        applySnapshot(self.verticalProfiles.items, profileData);
                         mapLayer.setLoadingState(LoadingState.Success);
                     }).catch((error) => {
+                        self.verticalProfiles.clear();
                         mapLayer.setLoadingState(LoadingState.Error);
                     });
                 });

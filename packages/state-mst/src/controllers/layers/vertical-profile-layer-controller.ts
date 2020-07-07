@@ -8,8 +8,8 @@ import { layerControllersFactory } from './layer-controllers-factory';
 import { ArrayTracker } from '../../utils';
 
 import { IVerticalProfileLayer } from '../../types/layers/vertical-profile-layer';
-import { createEntityReference } from '../../types/entity/entity-reference';
-
+import { createEntityReference, resolveEntityReference } from '../../types/entity/entity-reference';
+import { entityReferenceFromFeatureId } from '../layers/feature-layer-controller';
 
 type ProfileTracker = {
     id: string,
@@ -23,10 +23,11 @@ export class VerticalProfileLayerController extends MapLayerController<IVertical
 
     protected createLayerRenderer_(mapRenderer: IMapRenderer) {
 
-        const onCoordinateSelect = (coordinate) => {
+        const onCoordinateSelect = (coordinate, featureId) => {
 
+            let evtProfile = resolveEntityReference(entityReferenceFromFeatureId(featureId), this.mapLayer_.source.items);
             let selectedProfile = this.mapLayer_.source.items.find(item => item.selected);
-            if (selectedProfile) {
+            if (selectedProfile && selectedProfile === evtProfile) {
                 this.mapLayer_.setSelectedCoordinate({
                     profileId: selectedProfile.id,
                     geographic: coordinate
@@ -36,10 +37,11 @@ export class VerticalProfileLayerController extends MapLayerController<IVertical
             }
         };
 
-        const onCoordinateHover = (coordinate) => {
+        const onCoordinateHover = (coordinate, featureId) => {
 
+            let evtProfile = resolveEntityReference(entityReferenceFromFeatureId(featureId), this.mapLayer_.source.items);
             let selectedProfile = this.mapLayer_.source.items.find(item => item.selected);
-            if (selectedProfile) {
+            if (selectedProfile && selectedProfile === evtProfile) {
                 this.mapLayer_.setHighlihgtedCoordinate({
                     profileId: selectedProfile.id,
                     geographic: coordinate
