@@ -1,5 +1,12 @@
 import { types, flow, Instance } from 'mobx-state-tree';
 import { easeOut } from 'ol/easing';
+//TODO: remove dependency from ol
+
+export type TimeRangeCenteringOptions = {
+    animate?: boolean;
+    margin?: number;
+    notIfVisible?: boolean;
+};
 
 const TimeRangeDecl = types.model(
     'TimeRange',
@@ -54,7 +61,9 @@ const TimeRangeDecl = types.model(
 
             if (start.getTime() === end.getTime()) {
                 // @ts-ignore
-                self.setDate(start, animate);
+                self.centerDate(start, {
+                    animate: animate
+                });
                 return;
             }
 
@@ -73,16 +82,22 @@ const TimeRangeDecl = types.model(
         setResolution: (resolution) => {
             self.resolution = resolution;
         },
-        makeRangeVisible: (start: Date, end: Date, marginRatio: number, animate: boolean) => {
-            if (start.getTime() < self.start.getTime() || end.getTime() > self.end.getTime()) {
-                let rangeSize = end.getTime() - start.getTime();
-                let timeMargin = rangeSize * marginRatio;
-                (self as any).setRange(new Date(start.getTime() - timeMargin),  new Date(end.getTime() + timeMargin), animate);
+        centerRange: (start: Date, end: Date, options?: TimeRangeCenteringOptions) => {
+            if (options?.notIfVisible) {
+                if (start.getTime() >= self.start.getTime() && end.getTime() <= self.end.getTime()) {
+                    return;
+                }
             }
+            let rangeSize = end.getTime() - start.getTime();
+            let timeMargin = rangeSize * (options?.margin !== undefined ? options.margin : 0.2);
+            (self as any).setRange(new Date(start.getTime() - timeMargin),  new Date(end.getTime() + timeMargin), options?.animate);
         },
-        setDate: (dt: Date, animate?: boolean) => {
+        centerDate: (dt: Date, options?: TimeRangeCenteringOptions) => {
+            if (options?.notIfVisible && dt >= self.start && dt <= self.end) {
+                return;
+            }
             let halfRangeSize = (self.end.getTime() - self.start.getTime()) / 2;
-            (self as any).setRange(new Date(dt.getTime() - halfRangeSize), new Date(dt.getTime() + halfRangeSize), animate);
+            (self as any).setRange(new Date(dt.getTime() - halfRangeSize), new Date(dt.getTime() + halfRangeSize), options?.animate);
         }
     };
 }).views((self) => {

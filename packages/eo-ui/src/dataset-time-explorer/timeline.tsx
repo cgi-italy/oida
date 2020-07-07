@@ -14,6 +14,7 @@ import {
     Timeline as VisTimeline,
     TimelineItem, TimelineGroup,
     TimelineOptions, TimelineOptionsTemplateFunction,
+    TimelineEventPropertiesResult
 } from 'vis-timeline/esnext';
 
 import 'vis-timeline/dist/vis-timeline-graph2d.css';
@@ -60,15 +61,25 @@ function isRangeItem(item: EditableRangeItem | TimelineItem): item is EditableRa
     return (item as EditableRangeItem).itemType === TimelineItemType.EditableRange;
 }
 
+export enum TimelineGroupLabelsMode {
+    Hidden = 'hidden',
+    Overlay = 'overlay',
+    Block = 'block'
+}
+
 export type TimelineProps = {
     className?: string,
     timelineItems: DataSet<TimelineItem | EditableRangeItem>,
     timelineGroups: DataSet<TimelineGroup>,
     itemTemplate?: TimelineOptionsTemplateFunction,
     groupTemplate?: TimelineOptionsTemplateFunction,
+    disableGrouping?: boolean;
     range: DateRange,
+    groupLabelsMode?: TimelineGroupLabelsMode,
     editableRanges?: Array<{id: string, step?: string, enableDraw?: boolean, onRangeUpdate: (range) => void} & DateRange>,
+    selectedDates?: Array<{id: string, value: Date, onDateChange: (value: Date) => void}>
     onRangeChange: (range: DateRange) => void,
+    onClick?: (evt: TimelineEventPropertiesResult) => void,
     onHoveredChange: (item: TimelineItem, hovered: boolean) => void,
     onSelectedChange: (item: TimelineItem | null) => void,
     onGroupHoveredChange?: (group: TimelineGroup, hovered: boolean) => void
@@ -78,8 +89,9 @@ export const Timeline = (props: TimelineProps) => {
 
     let containerRef = useRef<HTMLDivElement>(null);
 
-    let [ timeline, setTimeline ] = useState<VisTimeline>();
-    let [ wasRangeChangedFromTimeline, setWasRangeChangedFromTimeline] = useState(false);
+    const [timeline, setTimeline] = useState<VisTimeline>();
+    const [wasRangeChangedFromTimeline, setWasRangeChangedFromTimeline] = useState(false);
+    const [nextClickEventDisabled, setNextClickEventDisabled] = useState(false);
 
     useEffect(() => {
 
@@ -149,8 +161,75 @@ export const Timeline = (props: TimelineProps) => {
                 }
             });
 
-            timelineInstance.on('timechanged', ({id, time}) => {
+            setTimeline(timelineInstance);
 
+            return () => {
+                timelineInstance.destroy();
+                setTimeline(undefined);
+            };
+        }
+
+    }, [containerRef]);
+
+    useEffect(() => {
+        const timelineInstance = timeline;
+        const onClick = props.onClick;
+        if (timelineInstance && onClick) {
+
+            let isClick = !nextClickEventDisabled;
+
+            const onTimelineClick = (evt) => {
+                if (!isClick) {
+                    isClick = true;
+                    setNextClickEventDisabled(false);
+                } else {
+                    onClick(evt);
+                }
+            };
+
+            const disableClick = () => {
+                isClick = false;
+                setNextClickEventDisabled(true);
+            };
+
+            const enableClick = () => {
+                setTimeout(() => {
+                    isClick = true;
+                    setNextClickEventDisabled(false);
+                }, 0);
+            };
+
+            timelineInstance.on('rangechange', disableClick);
+            timelineInstance.on('timechange', disableClick);
+            timelineInstance.on('rangechanged', enableClick);
+            timelineInstance.on('timechanged', enableClick);
+            timelineInstance.on('click', onTimelineClick);
+
+            return () => {
+                // @ts-ignore
+                if (timelineInstance.dom) {
+                    timelineInstance.off('click', onTimelineClick);
+                    timelineInstance.off('rangechanged', enableClick);
+                    timelineInstance.off('timechanged', enableClick);
+                    timelineInstance.off('rangechange', disableClick);
+                    timelineInstance.off('timechange', disableClick);
+                }
+            };
+        }
+    }, [timeline, props.onClick]);
+
+    useEffect(() => {
+        const timelineInstance = timeline;
+        if (timelineInstance) {
+            setTimeout(() => timelineInstance.redraw());
+        }
+    }, [timeline, props.groupLabelsMode]);
+
+    useEffect(() => {
+        const timelineInstance = timeline;
+        if (timelineInstance) {
+
+            let onTimeChanged = ({id, time}) => {
                 let match = id.match(/(.*)\.range\.(start|end)$/);
 
                 if (match) {
@@ -163,19 +242,25 @@ export const Timeline = (props: TimelineProps) => {
                             end: item.end as Date
                         });
                     }
+                } else if (props.selectedDates) {
+                    let item = props.selectedDates.find(item => item.id === id);
+                    if (item) {
+                        item.onDateChange(time);
+                    }
                 }
-            });
+            };
 
-
-            setTimeline(timelineInstance);
+            timelineInstance.on('timechanged', onTimeChanged);
 
             return () => {
-                timelineInstance.destroy();
-                setTimeline(undefined);
+                // @ts-ignore
+                if (timelineInstance.dom) {
+                    timelineInstance.off('timechanged', onTimeChanged);
+                }
             };
         }
 
-    }, [containerRef]);
+    }, [timeline, props.timelineItems, props.selectedDates]);
 
     useEffect(() => {
 
@@ -224,6 +309,27 @@ export const Timeline = (props: TimelineProps) => {
             }
         }
     }, [timeline, props.range]);
+
+    useEffect(() => {
+
+        const timelineInstance = timeline;
+
+        if (timelineInstance && props.selectedDates) {
+            let ids = props.selectedDates.map((item) => {
+                return timelineInstance.addCustomTime(item.value, item.id);
+            });
+
+            return () => {
+                // @ts-ignore
+                if (timelineInstance.dom) {
+                    ids.forEach((id) => {
+                        timelineInstance.removeCustomTime(id);
+                    });
+                }
+            };
+        }
+
+    }, [timeline, props.selectedDates]);
 
     useEffect(() => {
 
@@ -335,8 +441,8 @@ export const Timeline = (props: TimelineProps) => {
                         containerRef.current!.removeEventListener('mousemove', onMoveBeforeDrawStart);
                         containerRef.current!.removeEventListener('mousemove', onDrawMove);
 
-                        timelineInstance.removeCustomTime(startMarkerId);
                         try {
+                            timelineInstance.removeCustomTime(startMarkerId);
                             timelineInstance.removeCustomTime(endMarkerId);
                         } catch (e) {
 
@@ -351,13 +457,16 @@ export const Timeline = (props: TimelineProps) => {
             });
 
             return () => {
-                rangeIds.forEach((id) => {
-                    props.timelineItems.remove(id);
-                    timelineInstance.removeCustomTime(`${id}.range.start`);
-                    timelineInstance.removeCustomTime(`${id}.range.end`);
-                });
-                if (cancelRangeDraw) {
-                    cancelRangeDraw();
+                // @ts-ignore
+                if (timelineInstance.dom) {
+                    rangeIds.forEach((id) => {
+                        props.timelineItems.remove(id);
+                        timelineInstance.removeCustomTime(`${id}.range.start`);
+                        timelineInstance.removeCustomTime(`${id}.range.end`);
+                    });
+                    if (cancelRangeDraw) {
+                        cancelRangeDraw();
+                    }
                 }
             };
         }
@@ -366,7 +475,10 @@ export const Timeline = (props: TimelineProps) => {
 
     return (
         <div
-            className={classNames('timeline', props.className)}
+            className={classNames('timeline', props.className, {
+                'groups-labels-overlay': props.groupLabelsMode === TimelineGroupLabelsMode.Overlay,
+                'groups-labels-hidden': props.groupLabelsMode === TimelineGroupLabelsMode.Hidden,
+            })}
             ref={containerRef}
         >
         </div>

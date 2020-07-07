@@ -3,10 +3,10 @@ import { types, Instance } from 'mobx-state-tree';
 const TimeDistributionItemDecl = types.model('TimeInterval', {
     start: types.Date,
     end: types.maybe(types.Date),
-    data: types.frozen()
+    data: types.maybe(types.frozen())
 }).views((self) => ({
     isRange: () => {
-        return !!self.end;
+        return !!self.end && (self.start.getTime() !== self.end.getTime());
     },
     isoString: () => {
         let itemString = `${self.start.toISOString()}`;

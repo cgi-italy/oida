@@ -52,6 +52,7 @@ export const DateRangeFieldRenderer = (props: Omit<DateRangeField, 'name' | 'typ
             value={value ? [moment.utc(value.start), moment.utc(value.end)] : undefined}
             onChange={onDateChange}
             disabledDate={disabledDates}
+            allowClear={!props.required}
             showTime={config.withTime ? {
                 defaultValue: [moment.utc('00:00:00', 'HH:mm:ss'), moment.utc('23:59:59', 'HH:mm:ss')]
             } : false}

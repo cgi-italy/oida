@@ -1,13 +1,23 @@
-import { SnapshotIn } from 'mobx-state-tree';
+import {  CancelablePromise, QueryFilter } from '@oida/core';
 
-import {  CancelablePromise } from '@oida/core';
+export type TimeDistributionInstantItem = {
+    start: Date,
+    data?: any
+};
 
-import { TimeDistributionItem } from './time-dimension';
+export type TimeDistributionRangeItem = TimeDistributionInstantItem & {
+    end: Date,
+};
 
-export type STimeDistributionItem = SnapshotIn<typeof TimeDistributionItem>;
-
+export enum TimeSearchDirection {
+    Forward = 'forward',
+    Backward = 'backward'
+}
 export interface DatasetTimeDistributionProvider {
     supportsHistograms: () => boolean;
-    getTimeDistribution: (timeRange, filters, resolution?) => CancelablePromise<STimeDistributionItem[]>;
-    getTimeExtent: (filters?) => Promise<STimeDistributionItem | null>;
+    getTimeDistribution: (timeRange, filters, resolution?) => CancelablePromise<
+        (TimeDistributionRangeItem | TimeDistributionInstantItem)[]
+    >;
+    getTimeExtent: (filters?: QueryFilter[]) => CancelablePromise<TimeDistributionRangeItem | undefined>;
+    getNearestItem: (dt: Date, direction: TimeSearchDirection) => CancelablePromise<TimeDistributionInstantItem | undefined>;
 }

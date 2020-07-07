@@ -1,8 +1,11 @@
 import moment from 'moment';
 
-import { DatasetTimeDistributionProvider, STimeDistributionItem } from '../dataset-time-distribution-provider';
+import { wrapInCancelablePromise, CancelablePromise } from '@oida/core';
+
+import { DatasetTimeDistributionProvider, TimeDistributionRangeItem } from '../dataset-time-distribution-provider';
 
 import { WmtsDomainDiscoveryService } from '../../../standards';
+
 
 type FilterSerializer = (filters) => undefined | {[key: string]: string};
 
@@ -21,7 +24,7 @@ export class WmtsTimeDistributionProvider implements DatasetTimeDistributionProv
     protected tileMatrix_: string;
     protected filterSerializer_: FilterSerializer;
     protected wmtsService_: WmtsDomainDiscoveryService;
-    protected timeExtent_: STimeDistributionItem | undefined;
+    protected timeExtent_: CancelablePromise<TimeDistributionRangeItem | undefined> | undefined;
 
     constructor(config: WmtsTimeDistributionProviderConfig) {
         this.serviceUrl_ = config.serviceUrl;
@@ -35,12 +38,12 @@ export class WmtsTimeDistributionProvider implements DatasetTimeDistributionProv
         return true;
     }
 
-    getTimeExtent(filters) {
+    getTimeExtent(filters?) {
 
         if (!filters && this.timeExtent_) {
-            return Promise.resolve(this.timeExtent_);
+            return this.timeExtent_;
         } else {
-            return this.wmtsService_.describeDomains({
+            let request = this.wmtsService_.describeDomains({
                 url: this.serviceUrl_,
                 layer: this.layer_,
                 tileMatrix: this.tileMatrix_,
@@ -50,7 +53,7 @@ export class WmtsTimeDistributionProvider implements DatasetTimeDistributionProv
             }).then((response) => {
                 let domains = response.domains;
                 if (!domains) {
-                    return null;
+                    return undefined;
                 }
 
                 let timeDomain = domains.find((domain) => {
@@ -58,22 +61,21 @@ export class WmtsTimeDistributionProvider implements DatasetTimeDistributionProv
                 });
 
                 if (!timeDomain || !timeDomain.range) {
-                    return null;
+                    return undefined;
                 }
 
                 let timeExtent = this.parseISOTimeRange_(timeDomain.range);
-                if (!filters) {
-                    this.timeExtent_ = {
-                        start: timeExtent.start.toDate(),
-                        end: timeExtent.end.toDate()
-                    };
-                }
 
                 return {
-                    start: timeExtent.start.toDate(),
-                    end: timeExtent.end.toDate()
+                    start: timeExtent.start.toDate() as Date,
+                    end: timeExtent.end.toDate() as Date
                 };
             });
+
+            if (!filters) {
+                this.timeExtent_ = request;
+            }
+            return request;
         }
     }
 
@@ -128,6 +130,11 @@ export class WmtsTimeDistributionProvider implements DatasetTimeDistributionProv
 
             return items;
         });
+    }
+
+    getNearestItem(dt: Date, direction) {
+        // TODO: implement this
+        return wrapInCancelablePromise(Promise.resolve(undefined));
     }
 
     private parseISOTimeRange_(timeRange: string) {

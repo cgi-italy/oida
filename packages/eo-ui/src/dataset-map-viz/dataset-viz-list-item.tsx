@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
 
-import { isAlive, getParentOfType } from 'mobx-state-tree';
+import { isAlive } from 'mobx-state-tree';
 import { useObserver } from 'mobx-react';
 
-import { List, Button, Badge, Tooltip, message } from 'antd';
+import { List, Button, Badge, Tooltip } from 'antd';
 import {
-    ClockCircleOutlined, FullscreenExitOutlined, SettingOutlined, BarChartOutlined,
+    FullscreenExitOutlined, SettingOutlined, BarChartOutlined,
     DownloadOutlined, EyeOutlined, EyeInvisibleOutlined, DragOutlined
 } from '@ant-design/icons';
 import { SortableHandle } from 'react-sortable-hoc';
 
 import { useCenterOnMapFromModule } from '@oida/ui-react-mst';
-import { IDatasetViz, DatasetsExplorer } from '@oida/eo';
+import { IDatasetViz } from '@oida/eo';
 
 import { DatasetVizProgressControl } from './dataset-viz-progress-control';
 import { DatasetVizSettingsFactory } from './dataset-viz-settings-factory';
@@ -57,29 +57,7 @@ export const DatasetVizListItem = (props: DatasetVizListItemProps) => {
 
     let centerOnMap = useCenterOnMapFromModule();
 
-    let actions = [
-        {
-            id: 'timeZoom',
-            icon: <ClockCircleOutlined/>,
-            title: 'Zoom to dataset time extent',
-            callback: () => {
-                let dataset = props.datasetViz.dataset;
-                if (dataset.config.timeDistribution) {
-                    dataset.config.timeDistribution.provider.getTimeExtent(dataset.searchParams.data.filters).then((range) => {
-                        if (range) {
-                            let datasetExplorer = getParentOfType(dataset, DatasetsExplorer);
-                            if (datasetExplorer) {
-                                datasetExplorer.timeExplorer.visibleRange.makeRangeVisible(
-                                    new Date(range.start), new Date(range.end!), 0.1, true
-                                );
-                            }
-                        } else {
-                            message.warning('No data available in the selected area');
-                        }
-                    });
-                }
-            }
-        },
+    let actions: any[] = [
         {
             id: 'areaZoom',
             icon: <FullscreenExitOutlined/>,
@@ -111,8 +89,11 @@ export const DatasetVizListItem = (props: DatasetVizListItemProps) => {
                     setActiveAction(undefined);
                 }
             }
-        },
-        {
+        }
+    ];
+
+    if (props.datasetViz.dataset.config.tools?.length) {
+        actions.push({
             id: 'tools',
             icon: <BarChartOutlined/>,
             title: 'Toggle dataset tools',
@@ -121,8 +102,8 @@ export const DatasetVizListItem = (props: DatasetVizListItemProps) => {
                 icon={<BarChartOutlined/>}
                 key='tools'
             />
-        }
-    ];
+        });
+    }
 
     if (props.datasetViz.dataset.config.download) {
         actions.push(        {

@@ -4,11 +4,11 @@ import { useObserver } from 'mobx-react';
 
 import { Checkbox, message } from 'antd';
 
-import { AnyFormFieldDefinition, AoiAction } from '@oida/core';
+import { AnyFormFieldDefinition, AOI_FIELD_ID, AoiAction, DATE_RANGE_FIELD_ID } from '@oida/core';
 import {
     useCenterOnMapFromModule, useMapAoiFieldFromModule, useDataFiltering
 } from '@oida/ui-react-mst';
-import { DatasetConfig, IDataset, IDatasetsExplorer, IDatasetDiscovery } from '@oida/eo';
+import { DatasetConfig, IDataset, IDatasetsExplorer, IDatasetDiscovery, DATASET_AOI_FILTER_KEY, DATASET_TIME_RANGE_FILTER_KEY } from '@oida/eo';
 import { DataFilterer } from '@oida/ui-react-antd';
 
 
@@ -49,26 +49,7 @@ export const DatasetExplorerSelection = ({datasetConfig, explorerState}: Dataset
                     let checked = evt.target.checked;
                     if (checked) {
                         datasetView = explorerState.addDataset(datasetConfig);
-                        datasetConfig.timeDistribution!.provider.getTimeExtent(
-                            datasetView.dataset.searchParams.data.filters
-                        ).then((range) => {
-                            if (range) {
-                                explorerState.timeExplorer.visibleRange.makeRangeVisible(
-                                    new Date(range.start), new Date(range.end!), 0.1, true
-                                );
-                            }
-                        }).catch((e) => {
-                            message.error(`Unable to get time range for dataset ${datasetConfig.name}: ${e}`);
-                        });
 
-                        if (datasetConfig.spatialCoverageProvider) {
-                            datasetConfig.spatialCoverageProvider().then((extent) => {
-                                centerOnMap({
-                                    type: 'BBox',
-                                    bbox: extent as GeoJSON.BBox
-                                }, {animate: true, notIfInViewport: true});
-                            });
-                        }
                     } else {
                         explorerState.removeDataset(datasetConfig.id);
                     }
@@ -120,8 +101,8 @@ export const DatasetExplorerQuery = (props: DatasetExplorerQueryProps) => {
 DatasetExplorerQuery.defaultProps = {
     filters: [
         {
-            type: 'aoi',
-            name: 'aoi',
+            type: AOI_FIELD_ID,
+            name: DATASET_AOI_FILTER_KEY,
             title: 'Area of interest',
             config: (filterState) => {
 
@@ -146,8 +127,8 @@ DatasetExplorerQuery.defaultProps = {
             }
         },
         {
-            type: 'daterange',
-            name: 'time',
+            type: DATE_RANGE_FIELD_ID,
+            name: DATASET_TIME_RANGE_FILTER_KEY,
             title: 'Time range',
             config: {
                 withTime: false

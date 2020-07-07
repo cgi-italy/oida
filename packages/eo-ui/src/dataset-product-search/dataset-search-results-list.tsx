@@ -74,7 +74,7 @@ export const DatasetSearchResultsList = ({
             itemLayout='vertical'
             paging={paging}
             sorting={sorting}
-            autoScrollOnSelection={true}
+            autoScrollOnSelection={false}
         />
     );
 };

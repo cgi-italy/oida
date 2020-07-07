@@ -40,6 +40,7 @@ export const DatasetExplorerResults = (props: DatasetExplorerResultsProps) => {
                         selection={props.selection}
                         itemContent={dataset.config.search!.searchItemContent}
                         onVisualizeItemAction={(item) => {
+                            props.explorerState.setSelectedDate(item.start);
                             props.onVisualizeProduct(dataset, item);
                         }}
                     />

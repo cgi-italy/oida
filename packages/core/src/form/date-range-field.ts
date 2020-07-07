@@ -4,7 +4,12 @@ import { setFormFieldSerializer } from './form-field-serialization';
 
 export const DATE_RANGE_FIELD_ID = 'daterange';
 
-export type DateRangeField = FormField<typeof DATE_RANGE_FIELD_ID, {start: Date, end: Date}, {
+export type DateRangeValue = {
+    start: Date,
+    end: Date
+};
+
+export type DateRangeField = FormField<typeof DATE_RANGE_FIELD_ID, DateRangeValue, {
     minDate?: Date,
     maxDate?: Date,
     withTime?: boolean;

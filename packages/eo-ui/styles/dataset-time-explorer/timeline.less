@@ -1,3 +1,5 @@
+@group-labels-width: 250px;
+
 .timeline {
     background: @component-background;
 
@@ -9,7 +11,31 @@
             border-color: @border-color-split;
 
             &.vis-left {
-                display: none;
+
+                .vis-content {
+                    max-width: 250px;
+                    width: fit-content;
+                    padding-left: 10px;
+                    min-width: 150px;
+
+                    .vis-labelset {
+
+                        .vis-label {
+                            font-size: @font-size-sm;
+                            color: @text-color;
+                            border: none;
+                            box-shadow: 0 -1px 0 @border-color-split;
+
+                            .vis-inner {
+                                width: 100%;
+                                padding: 2px 5px;
+                                white-space: nowrap;
+                                overflow: hidden;
+                                text-overflow: ellipsis;
+                            }
+                        }
+                    }
+                }
             }
 
             &.vis-bottom {
@@ -17,7 +43,12 @@
             }
 
             .vis-foreground .vis-group {
-                border-color: @border-color-split;
+                box-shadow: 0 -1px 0 @border-color-split;
+                border: none;
+
+                &:hover {
+                    background-color: rgba(255, 255, 255, 0.04);
+                }
             }
 
             .vis-time-axis {
@@ -48,6 +79,9 @@
 
             .vis-item {
                 &.vis-range {
+
+                    min-width: 10px;
+
                     .vis-item-overflow {
                         height: 6px;
                         .vis-item-content {
@@ -71,6 +105,22 @@
                     }
                 }
 
+                &.vis-point {
+
+                    height: 8px;
+                    width: 8px;
+                    border-radius: 4px;
+                    margin-left: -4px;
+
+                    .vis-item.vis-dot {
+                        display: none;
+                    }
+
+                    .vis-item-content {
+                        padding: 0;
+                    }
+                }
+
                 &.editable-range {
 
                     background-color: rgba(@primary-color, 0.2);
@@ -85,14 +135,33 @@
 
             .vis-custom-time {
                 background-color: @primary-color;
-                width: 3px;
+                width: 2px;
+                margin-left: -1px;
                 cursor: ew-resize;
 
 
                 &:hover {
                     width: 4px;
+                    margin-left: -2px;
                     z-index: 2;
                 }
+            }
+        }
+    }
+
+    &.groups-labels-hidden {
+        .vis-timeline {
+            .vis-panel.vis-left {
+                display: none;
+            }
+        }
+    }
+
+    &.groups-labels-overlay {
+        .vis-timeline {
+            .vis-panel.vis-left {
+                overflow: visible;
+                width: 0px;
             }
         }
     }

@@ -1,46 +1,132 @@
-import React, { useRef, useState, useEffect } from 'react';
-
-import { TimelineGroup, TimelineItem } from 'vis-timeline/esnext';
-import { DataSet } from 'vis-data/esnext';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
+import ReactDOM from 'react-dom';
 
 import { autorun } from 'mobx';
+import { useObserver } from 'mobx-react';
+
+import { TimelineGroup, TimelineItem, TimelineEventPropertiesResult } from 'vis-timeline/esnext';
+import { DataSet } from 'vis-data/esnext';
+import moment from 'moment';
 
 import { Button, Tooltip } from 'antd';
-import { ColumnWidthOutlined, ClockCircleOutlined } from '@ant-design/icons';
+import { ColumnWidthOutlined, ClockCircleOutlined, SearchOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 
+import { CancelablePromise, DateRangeValue } from '@oida/core';
 import { ArrayTracker } from '@oida/state-mst';
-import { IDatasetsExplorer, IDatasetExplorerView } from '@oida/eo';
+import { DateFieldRenderer, DateRangeFieldRenderer } from '@oida/ui-react-antd';
+import { IDatasetsExplorer, IDatasetExplorerView, TimeSearchDirection, getNearestDatasetProduct } from '@oida/eo';
 
-import { Timeline } from './timeline';
+import { Timeline, TimelineGroupLabelsMode } from './timeline';
 
-export type DatasetDiscoveryTimelineToolbar = {
-    explorerState: IDatasetsExplorer;
-    actions: any[];
-    activeAction: string;
+export enum DatasetTimelineTimeSelectionMode {
+    Instant = 'instant',
+    Range = 'range'
+}
+
+export type DatasetDiscoveryTimelineToolbarProps = {
+    onDrawRange: () => void;
+    timeSelectionMode: DatasetTimelineTimeSelectionMode;
+    onTimeSelectionModeChange: (selectionMode: DatasetTimelineTimeSelectionMode) => void;
+    groupLabelsMode: TimelineGroupLabelsMode
+    onGroupLabelsModeChange: (mode: TimelineGroupLabelsMode) => void;
+    selectedTime: Date | DateRangeValue | undefined
+    onSelectedTimeChange: (value: Date | DateRangeValue | undefined) => void;
+    onGoToTimeSelection: () => void;
 };
 
-export const DatasetExplorerTimelineToolbar = (props) => {
+export const DatasetExplorerTimelineToolbar = (props: DatasetDiscoveryTimelineToolbarProps) => {
 
-    let buttons = props.actions.map((action) => {
-        return (
-            <Tooltip
-                title={action.title}
-                key={action.id}
-            >
-                <Button
-                    onClick={action.callback}
-                    disabled={action.disabled}
-                    size='small'
-                    type='link'
-                >{action.icon}</Button>
-            </Tooltip>
+    const layerNamesVisible = props.groupLabelsMode === TimelineGroupLabelsMode.Block;
+    const isRangeMode = props.timeSelectionMode === DatasetTimelineTimeSelectionMode.Range;
+
+    let timeField: JSX.Element;
+
+    if (!isRangeMode) {
+        timeField = (
+            <DateFieldRenderer
+                config={{
+                    withTime: true
+                }}
+                rendererConfig={{
+                    props: {
+                        size: 'small',
+                        bordered: false,
+                        suffixIcon: null
+                    }
+                }}
+                required={true}
+                value={props.selectedTime as Date}
+                onChange={props.onSelectedTimeChange}
+            />
         );
-    });
+
+    } else {
+
+        timeField = (
+            <DateRangeFieldRenderer
+                config={{
+                    withTime: true
+                }}
+                rendererConfig={{
+                    props: {
+                        size: 'small',
+                        bordered: false,
+                        suffixIcon: null
+                    }
+                }}
+                required={false}
+                value={props.selectedTime as DateRangeValue}
+                onChange={props.onSelectedTimeChange}
+            />
+        );
+
+    }
+
 
     return (
-        <Button.Group>
-            {buttons}
-        </Button.Group>
+        <div className='dataset-timeline-toolbar'>
+            <Tooltip
+                title={layerNamesVisible ? 'Hide layer names' : 'Show layer names'}
+            >
+                <Button
+                    type={layerNamesVisible ? 'link' : 'link'}
+                    size='small'
+                    onClick={() => {
+                        props.onGroupLabelsModeChange(layerNamesVisible ? TimelineGroupLabelsMode.Hidden : TimelineGroupLabelsMode.Block);
+                    }}
+                >
+                    {layerNamesVisible ? <MenuFoldOutlined/> : <MenuUnfoldOutlined/>}
+                </Button>
+            </Tooltip>
+            <Tooltip
+                title='Go to selected time'
+            >
+                <Button
+                    type='link'
+                    size='small'
+                    onClick={props.onGoToTimeSelection}
+                >
+                    <ClockCircleOutlined/>
+                </Button>
+            </Tooltip>
+            <Tooltip
+                title={isRangeMode ? 'Disable range mode' : 'Enable range mode' }
+            >
+                <Button
+                    type={isRangeMode ? 'primary' : 'link'}
+                    size='small'
+                    onClick={() => {
+                        props.onTimeSelectionModeChange(isRangeMode
+                            ? DatasetTimelineTimeSelectionMode.Instant
+                            : DatasetTimelineTimeSelectionMode.Range
+                        );
+                    }}
+                >
+                    <ColumnWidthOutlined/>
+                </Button>
+            </Tooltip>
+            {timeField}
+        </div>
     );
 };
 
@@ -50,17 +136,135 @@ export type DatasetExplorerTimelineProps = {
 
 export type DatasetDiscoveryTimelineGroup = TimelineGroup & {
     datasetView: IDatasetExplorerView,
+    element?: Element,
     zIndex: number
+};
+
+export type DatasetTimelineGroupTemplateProps = {
+    explorerState: IDatasetsExplorer;
+    datasetView?: IDatasetExplorerView;
+};
+
+export const DatasetTimelineGroupTemplate = (props: DatasetTimelineGroupTemplateProps) => {
+
+    const datasetView = props.datasetView;
+    if (!datasetView) {
+        return null;
+    }
+
+    let centerTimeExtentButton;
+
+    const timeProvider = datasetView.dataset.config.timeDistribution?.provider;
+    if (timeProvider) {
+
+        centerTimeExtentButton = (
+            <Tooltip
+                title='Zoom to dataset time extent'
+            >
+                <Button
+                    size='small'
+                    type='link'
+                    onClick={() => {
+                        timeProvider.getTimeExtent(datasetView.dataset.searchParams.data.filters).then((range) => {
+                            if (range) {
+                                props.explorerState.timeExplorer.visibleRange.centerRange(
+                                    new Date(range.start), new Date(range.end), {
+                                        margin: 0.1,
+                                        animate: true
+                                    }
+                                );
+                            }
+                        });
+                    }}
+                >
+                    <SearchOutlined />
+                </Button>
+            </Tooltip>
+        );
+
+    }
+    return <div className='dataset-timeline-group-label'>
+        <div className='dataset-timeline-group-name'>{datasetView.dataset.config.name}</div>
+        <div className='dataset-timeline-group-actions'>{centerTimeExtentButton}</div>
+    </div>;
+};
+
+export type TimelineGroupTemplatesProps = {
+    groups: DataSet<DatasetDiscoveryTimelineGroup>
+    explorerState: IDatasetsExplorer
+};
+export const TimelineGroupTemplates = (props: TimelineGroupTemplatesProps) => {
+
+    const [groupTemplates, setGroupTemplates] = useState<React.ReactPortal[]>([]);
+
+    useEffect(() => {
+        const groups = props.groups;
+        const onGroupsUpdate = () => {
+            const groupTemplates = groups.map(group => {
+                if (group.element) {
+                    return ReactDOM.createPortal(
+                        <DatasetTimelineGroupTemplate
+                            key={group.id}
+                            datasetView={group.datasetView}
+                            explorerState={props.explorerState}
+                        />,
+                        group.element
+                    );
+                }
+            });
+            setGroupTemplates(groupTemplates.filter(portal => !!portal) as React.ReactPortal[]);
+        };
+
+        groups.on('*', onGroupsUpdate);
+
+        return () => {
+            groups.off('*', onGroupsUpdate);
+        };
+    }, [props.groups]);
+
+    return <React.Fragment>
+        {groupTemplates}
+    </React.Fragment>;
 };
 
 export const DatasetDiscoveryTimeline = (props: DatasetExplorerTimelineProps) => {
 
-    let timelineGroups = useRef(new DataSet<DatasetDiscoveryTimelineGroup>());
-    let timelineItems = useRef(new DataSet<TimelineItem>());
+    let runningRequest: CancelablePromise<any> | undefined;
+    const onSelectedDateChange = (date: Date) => {
+        if (runningRequest) {
+            runningRequest.cancel();
+        }
+        let searchDirection = (selectedDate && date > selectedDate) ? TimeSearchDirection.Forward : TimeSearchDirection.Backward;
+        runningRequest = getNearestDatasetProduct(date, searchDirection, props.explorerState.datasetViews).then(nearestItem => {
+            runningRequest = undefined;
+            if (nearestItem) {
+                props.explorerState.setSelectedDate(nearestItem);
+                setVisibleRange({...props.explorerState.timeExplorer.visibleRange.range});
+            } else {
+                props.explorerState.setSelectedDate(date);
+            }
+        });
+    };
 
-    let [visibleRange, setVisibleRange] = useState(props.explorerState.timeExplorer.visibleRange.range);
-    let [editableRanges, setEditableRanges] = useState<any>([]);
-    let [activeToolbarAction, setActiveToolbarAction] = useState<string>();
+    const goToTimeSelection = () => {
+        if (timeSelectionMode === DatasetTimelineTimeSelectionMode.Instant && props.explorerState.selectedDate) {
+            props.explorerState.timeExplorer.visibleRange.centerDate(props.explorerState.selectedDate, {
+                animate: true
+            });
+        } else if (timeSelectionMode === DatasetTimelineTimeSelectionMode.Range && props.explorerState.toi) {
+            let queryRange = props.explorerState.toi;
+            if (queryRange) {
+                props.explorerState.timeExplorer.visibleRange.centerRange(
+                    queryRange.start,
+                    queryRange.end,
+                    {
+                        margin: 0.2,
+                        animate: true
+                    }
+                );
+            }
+        }
+    };
 
     const updateGroupsOrdering = () => {
         props.explorerState.datasetViews.forEach((datasetView, idx) => {
@@ -71,6 +275,61 @@ export const DatasetDiscoveryTimeline = (props: DatasetExplorerTimelineProps) =>
         });
     };
 
+    const timelineGroups = useRef(new DataSet<DatasetDiscoveryTimelineGroup>());
+    const timelineItems = useRef(new DataSet<TimelineItem>());
+
+    const [visibleRange, setVisibleRange] = useState(props.explorerState.timeExplorer.visibleRange.range);
+    const [editableRanges, setEditableRanges] = useState<any>([]);
+    const [groupLabelsMode, setGroupLabelsMode] = useState(TimelineGroupLabelsMode.Hidden);
+    const [timeSelectionMode, setTimeSelectionMode] = useState(DatasetTimelineTimeSelectionMode.Instant);
+
+    const selectedDate = useObserver(() => props.explorerState.selectedDate);
+
+    const onTimelineClick = useCallback((evt: TimelineEventPropertiesResult) => {
+        if (timeSelectionMode === DatasetTimelineTimeSelectionMode.Instant) {
+            if (evt.what === 'item' && evt.item) {
+                let item = timelineItems.current.get(evt.item);
+                if (item && item.type === 'point') {
+                    props.explorerState.setSelectedDate(moment(item.start).toDate());
+                    return;
+                }
+            }
+            if (evt.what === 'custom-time') {
+                return;
+            }
+            if (evt.what === 'group-label') {
+                return;
+            }
+            if (evt.group) {
+                let view = props.explorerState.getDatasetView(evt.group.toString());
+                const provider = view?.timeDistributionViz?.config.provider;
+                if (provider) {
+                    let searchDirection = (selectedDate && evt.time > selectedDate)
+                        ? TimeSearchDirection.Forward
+                        : TimeSearchDirection.Backward;
+                    provider.getNearestItem(evt.time, searchDirection).then(nearestItem => {
+                        if (nearestItem) {
+                            props.explorerState.setSelectedDate(nearestItem.start);
+                        } else {
+                            provider.getTimeExtent().then((timeExtent) => {
+                                if (timeExtent) {
+                                    if (evt.time > timeExtent.end) {
+                                        props.explorerState.setSelectedDate(timeExtent.end);
+                                    } else {
+                                        props.explorerState.setSelectedDate(timeExtent.start);
+                                    }
+                                }
+                            });
+                        }
+                    });
+                    return;
+                }
+            }
+
+            onSelectedDateChange(evt.time);
+        }
+    }, [timeSelectionMode, selectedDate]);
+
     useEffect(() => {
 
         let groupTracker = new ArrayTracker({
@@ -79,16 +338,15 @@ export const DatasetDiscoveryTimeline = (props: DatasetExplorerTimelineProps) =>
             onItemAdd: (datasetView, idx) => {
 
                 let groupId = datasetView.dataset.id;
-                let groupUpdateDisposer = autorun(() => {
-                    timelineGroups.current.update({
-                        id: groupId,
-                        className: datasetView.dataset.id,
-                        datasetView: datasetView,
-                        visible: true,
-                        zIndex: idx
-                    });
-                });
 
+                timelineGroups.current.add({
+                    id: groupId,
+                    className: datasetView.dataset.id,
+                    content: '',
+                    datasetView: datasetView,
+                    visible: true,
+                    zIndex: idx
+                });
 
                 let groupItemsTracker = new ArrayTracker({
                     items: datasetView.timeDistributionViz!.timeDistribution.items,
@@ -97,20 +355,19 @@ export const DatasetDiscoveryTimeline = (props: DatasetExplorerTimelineProps) =>
 
                         let itemId = `${datasetView.dataset.id}_${item.isoString()}`;
 
-                        let itemUpdateDisposer = autorun(() => {
-                            timelineItems.current.update({
-                                id: itemId,
-                                className: item.data && item.data.loading ? 'is-loading' : '',
-                                group: datasetView.dataset.id,
-                                start: item.start,
-                                end: item.end,
-                                style: `background-color: ${datasetView.dataset.config.color}; border: none`
-                            });
+                        timelineItems.current.add({
+                            id: itemId,
+                            type: item.isRange() ? 'range' : 'point',
+                            content: '',
+                            className: item.data && item.data.loading ? 'is-loading' : '',
+                            group: datasetView.dataset.id,
+                            start: item.start,
+                            end: item.end,
+                            style: `background-color: ${datasetView.dataset.config.color}; border: none`
                         });
 
                         return () => {
                             timelineItems.current.remove(itemId);
-                            itemUpdateDisposer();
                         };
                     },
                     onItemRemove: (disposer) => {
@@ -122,7 +379,7 @@ export const DatasetDiscoveryTimeline = (props: DatasetExplorerTimelineProps) =>
                 updateGroupsOrdering();
 
                 return (() => {
-                    groupUpdateDisposer();
+                    //groupUpdateDisposer();
                     groupItemsTracker.destroy();
                     timelineGroups.current.remove(groupId);
                 });
@@ -135,105 +392,82 @@ export const DatasetDiscoveryTimeline = (props: DatasetExplorerTimelineProps) =>
             }
         });
 
-        let queryRangeTrackerDisposer = autorun(() => {
-            let queryRange = props.explorerState.toi;
-
-            if (queryRange) {
-                setEditableRanges([{
-                    id: 'query',
-                    start: queryRange.start,
-                    end: queryRange.end,
-                    onRangeUpdate: (range) => {
-                        props.explorerState.setToi(range);
-                    }
-                }]);
-            } else {
-                setEditableRanges([]);
-            }
-        });
-
         let visibleRangeTrackerDisposer = autorun(() => {
-            setVisibleRange(props.explorerState.timeExplorer!.visibleRange.range);
+            setVisibleRange(props.explorerState.timeExplorer.visibleRange.range);
         });
+
+        if (!props.explorerState.selectedDate) {
+            props.explorerState.setSelectedDate(new Date());
+        }
 
         return (() => {
             groupTracker.destroy();
-            queryRangeTrackerDisposer();
             visibleRangeTrackerDisposer();
         });
 
     }, []);
 
+    useEffect(() => {
+        if (timeSelectionMode === DatasetTimelineTimeSelectionMode.Range) {
+            const queryRangeTrackerDisposer = autorun(() => {
+                let queryRange = props.explorerState.toi;
 
-    let toolbarActions = [{
-        id: 'drawQueryRange',
-        icon: <ColumnWidthOutlined/>,
-        title: 'Draw query time range',
-        callback: () => {
-            enableAction('drawQueryRange', () => {
-                setEditableRanges([{
-                    id: 'query',
-                    enableDraw: true,
-                    onRangeUpdate: (range) => {
-                        props.explorerState.setToi(range);
-                        setActiveToolbarAction(undefined);
-                    }
-                }]);
+                if (queryRange) {
+                    setEditableRanges([{
+                        id: 'query',
+                        start: queryRange.start,
+                        end: queryRange.end,
+                        onRangeUpdate: (range) => {
+                            props.explorerState.setToi(range);
+                        }
+                    }]);
+                } else {
+                    setEditableRanges([{
+                        id: 'query',
+                        enableDraw: true,
+                        onRangeUpdate: (range) => {
+                            props.explorerState.setToi(range);
+                        }
+                    }]);
+                }
             });
-        },
-        onCancel: () => {
-            let queryRange = props.explorerState.toi;
-            if (queryRange) {
-                setEditableRanges([{
-                    id: 'query',
-                    start: queryRange.start,
-                    end: queryRange.end,
-                    onRangeUpdate: (range) => {
-                        props.explorerState.setToi(range);
-                    }
-                }]);
-            } else {
+
+            return () => {
                 setEditableRanges([]);
-            }
-        }
-    }, {
-        id: 'zoomToQueryRange',
-        icon: <ClockCircleOutlined/>,
-        title: 'Zoom to query time range',
-        disabled: !props.explorerState.toi,
-        callback: () => {
-            let queryRange = props.explorerState.toi;
-            props.explorerState.timeExplorer.visibleRange.makeRangeVisible(
-                queryRange.start, queryRange.end, 0.2, true
-            );
-        }
-    }];
-
-    const cancelCurrentAction = () => {
-        if (activeToolbarAction) {
-            let currentAction = toolbarActions.find((action) => action.id === activeToolbarAction);
-            setActiveToolbarAction(undefined);
-            if (currentAction && currentAction.onCancel) {
-                currentAction.onCancel();
-            }
-        }
-    };
-
-    const enableAction = (id, callback) => {
-        if (activeToolbarAction !== id) {
-            cancelCurrentAction();
-            setActiveToolbarAction(id);
-            callback();
+                queryRangeTrackerDisposer();
+            };
         } else {
-            cancelCurrentAction();
+
+            let queryRange = props.explorerState.toi;
+
+            onSelectedDateChange(queryRange ? queryRange.end : new Date());
+
+            return () => {
+                props.explorerState.setSelectedDate(undefined);
+            };
         }
-    };
+    }, [timeSelectionMode]);
 
     return (
         <div className='dataset-explorer-timeline'>
             <DatasetExplorerTimelineToolbar
-                discoveryState={props.explorerState}
-                actions={toolbarActions}
+                onDrawRange={() => props.explorerState.setToi(undefined)}
+                groupLabelsMode={groupLabelsMode}
+                onGroupLabelsModeChange={(mode) => setGroupLabelsMode(mode)}
+                timeSelectionMode={timeSelectionMode}
+                onTimeSelectionModeChange={(mode) => setTimeSelectionMode(mode)}
+                selectedTime={timeSelectionMode === DatasetTimelineTimeSelectionMode.Instant
+                    ? props.explorerState.selectedDate
+                    : props.explorerState.toi
+                }
+                onSelectedTimeChange={(value) => {
+                    if (timeSelectionMode === DatasetTimelineTimeSelectionMode.Instant) {
+                        onSelectedDateChange(value as Date);
+                    } else {
+                        props.explorerState.setToi(value as DateRangeValue);
+                    }
+                }}
+                onGoToTimeSelection={goToTimeSelection}
             />
             <Timeline
                 range={visibleRange}
@@ -243,13 +477,42 @@ export const DatasetDiscoveryTimeline = (props: DatasetExplorerTimelineProps) =>
                 onRangeChange={(range) => {
                     props.explorerState.timeExplorer.visibleRange.setRange(range.start!, range.end!);
                 }}
+                groupLabelsMode={groupLabelsMode}
+                groupTemplate={(group: DatasetDiscoveryTimelineGroup, element: Element) => {
+                    if (group && element !== group.element) {
+                        // use timeout to avoid an infinite loop.
+                        // doing an update during an add will generate a new element instead
+                        // of calling the grouptemplate with the element just generated
+                        setTimeout(() => {
+                            // we just link the element to the group.
+                            // the TimelineGroupTemplates component will generate a portal that will rendere the template into this element
+                            timelineGroups.current.update({
+                                id: group.id,
+                                element: element
+                            });
+                        });
+                    }
+
+                    //this is the return format expected for a react element (probably they expect a React.createClass call)
+                    return {
+                        isReactComponent: true
+                    } as unknown as string;
+
+                }}
+                selectedDates={selectedDate ? [{
+                    id: 'selected-date',
+                    value: selectedDate,
+                    onDateChange: onSelectedDateChange
+                }] : undefined}
                 onSelectedChange={(item) => {
 
                 }}
                 onHoveredChange={(item) => {
 
                 }}
+                onClick={onTimelineClick}
             />
+            <TimelineGroupTemplates groups={timelineGroups.current} explorerState={props.explorerState}/>
         </div>
     );
 };

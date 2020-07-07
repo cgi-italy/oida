@@ -1,14 +1,19 @@
 import { autorun, when } from 'mobx';
 import { isValidReference, addDisposer, isAlive } from 'mobx-state-tree';
 
+import { QueryFilter, CancelablePromise } from '@oida/core';
 import { GroupLayer, ArrayTracker, createEntityReference } from '@oida/state-mst';
 
-import { IDatasetsExplorer } from './datasets-explorer';
+import { DATASET_SELECTED_TIME_FILTER_KEY } from '../dataset/dataset';
+import { IDatasetsExplorer, IDatasetExplorerView } from './datasets-explorer';
+import { TimeSearchDirection } from '../dataset/time-distribution/dataset-time-distribution-provider';
+import { getNearestDatasetProduct } from '../utils/dataset-time-utils';
 
 export class DatasetsExplorerController {
 
     protected datasetsExplorer_: IDatasetsExplorer;
     protected datasetsTracker_;
+    protected pendingNearestTimeRequests_: Record<string, CancelablePromise<any>> = {};
 
     constructor(datasetExplorer: IDatasetsExplorer) {
         this.datasetsExplorer_ = datasetExplorer;
@@ -84,9 +89,62 @@ export class DatasetsExplorerController {
 
     }
 
-    protected applyCommonFilters_(datasetView) {
-        this.datasetsExplorer_.commonFilters.items.forEach((filter) => {
+    protected updateSelectedDate_() {
+        let selectedDate = this.datasetsExplorer_.selectedDate;
+        if (!selectedDate && !this.datasetsExplorer_.toi) {
+            selectedDate = new Date();
+        }
+        if (selectedDate) {
+            return getNearestDatasetProduct(
+                selectedDate,
+                TimeSearchDirection.Backward,
+                this.datasetsExplorer_.datasetViews
+            ).then((date) => {
+                if (date) {
+                    this.datasetsExplorer_.setSelectedDate(date);
+                }
+            });
+        } else {
+            return Promise.resolve();
+        }
+    }
+
+    protected applyFilter_(datasetView: IDatasetExplorerView, filter: QueryFilter) {
+        const timeDistributionProvider = datasetView.dataset.config.timeDistribution?.provider;
+        if (
+            filter.key === DATASET_SELECTED_TIME_FILTER_KEY
+            && filter.value !== undefined
+            && this.datasetsExplorer_.vizExplorer.nearestMatch
+            && timeDistributionProvider
+        ) {
+            if (this.pendingNearestTimeRequests_[datasetView.dataset.id]) {
+                this.pendingNearestTimeRequests_[datasetView.dataset.id].cancel();
+                delete this.pendingNearestTimeRequests_[datasetView.dataset.id];
+            }
+            this.pendingNearestTimeRequests_[datasetView.dataset.id] = timeDistributionProvider.getNearestItem(
+                filter.value, TimeSearchDirection.Backward
+            ).then((item) => {
+                if (!isAlive(datasetView)) {
+                    return;
+                }
+                let currentDatasetTime = datasetView.dataset.searchParams.filters.get(DATASET_SELECTED_TIME_FILTER_KEY);
+                let nearestMatch = item ? item.start : filter.value;
+                if (!currentDatasetTime || currentDatasetTime.getTime() !== nearestMatch.getTime()) {
+                    datasetView.dataset.searchParams.filters.set(
+                        filter.key,
+                        nearestMatch,
+                        filter.type
+                    );
+                }
+            });
+        } else {
             datasetView.dataset.searchParams.filters.set(filter.key, filter.value, filter.type);
+        }
+    }
+
+    protected applyCommonFilters_(datasetView: IDatasetExplorerView) {
+        this.datasetsExplorer_.commonFilters.items.forEach((filter) => {
+            this.applyFilter_(datasetView, filter);
         });
     }
 
@@ -100,7 +158,7 @@ export class DatasetsExplorerController {
             this.datasetsExplorer_.datasetViews.forEach((datasetView) => {
                 if (change.type === 'add' || change.type === 'update') {
                     let filter = change.newValue.value;
-                    datasetView.dataset.searchParams.filters.set(filter.key, filter.value, filter.type);
+                    this.applyFilter_(datasetView, filter);
                 } else if (change.type === 'delete') {
                     let filter = change.oldValue.value;
                     datasetView.dataset.searchParams.filters.unset(filter.key);
@@ -110,12 +168,21 @@ export class DatasetsExplorerController {
         addDisposer(this.datasetsExplorer_, filterTrackerDisposer);
 
         if (!this.datasetsExplorer_.config.disableTimeExplorer) {
+
             addDisposer(this.datasetsExplorer_, autorun(() => {
+                let selectedDate = this.datasetsExplorer_.selectedDate;
                 let toi = this.datasetsExplorer_.toi;
-                if (toi) {
-                    this.datasetsExplorer_.timeExplorer.visibleRange.makeRangeVisible(
-                        toi.start, toi.end, 0.2, true
-                    );
+                if (selectedDate) {
+                    this.datasetsExplorer_.timeExplorer.visibleRange.centerDate(selectedDate, {
+                        notIfVisible: true,
+                        animate: true
+                    });
+                } else if (toi) {
+                    this.datasetsExplorer_.timeExplorer.visibleRange.centerRange(toi.start, toi.end, {
+                        notIfVisible: true,
+                        animate: true,
+                        margin: 0.2
+                    });
                 }
             }));
         }
@@ -128,54 +195,69 @@ export class DatasetsExplorerController {
             },
             onItemAdd: (datasetView, idx) => {
 
-                this.applyCommonFilters_(datasetView);
-
                 let disposers: any[] = [];
 
-                if (datasetView.timeDistributionViz) {
-                    disposers.push(autorun(() => {
-                        let timeExplorer = this.datasetsExplorer_.timeExplorer;
-                        let active = timeExplorer.active;
-                        let timeRange = timeExplorer.visibleRange.range;
-                        if (active) {
-                            datasetView.timeDistributionViz!.setSearchParams({
-                                ...timeRange,
-                                resolution: timeExplorer.visibleRange.resolution
+                this.updateSelectedDate_().then(() => {
+
+                    if (!isAlive(datasetView)) {
+                        return;
+                    }
+
+                    this.applyCommonFilters_(datasetView);
+
+                    if (datasetView.timeDistributionViz) {
+                        disposers.push(autorun(() => {
+                            let timeExplorer = this.datasetsExplorer_.timeExplorer;
+                            let active = timeExplorer.active;
+                            let timeRange = timeExplorer.visibleRange.range;
+                            if (active) {
+                                datasetView.timeDistributionViz!.setSearchParams({
+                                    ...timeRange,
+                                    resolution: timeExplorer.visibleRange.resolution
+                                });
+                            }
+                        }));
+                    }
+
+                    if (datasetView.productSearchViz) {
+                        let productExplorer = this.datasetsExplorer_.productExplorer;
+
+                        let productExplorerLayer = productExplorer.mapLayer;
+                        if (productExplorerLayer) {
+
+                            let layerReference = createEntityReference(datasetView.productSearchViz.mapLayer!);
+                            productExplorerLayer.children.add(layerReference, this.datasetsExplorer_.datasetViews.length - idx - 1);
+
+                            disposers.push(() => {
+                                productExplorerLayer!.children.remove(layerReference);
                             });
                         }
-                    }));
-                }
 
-                if (datasetView.productSearchViz) {
-                    let productExplorerLayer = this.datasetsExplorer_.productExplorer.mapLayer;
-                    if (productExplorerLayer) {
-
-                        let layerReference = createEntityReference(datasetView.productSearchViz.mapLayer!);
-                        productExplorerLayer.children.add(layerReference, this.datasetsExplorer_.datasetViews.length - idx - 1);
-
-                        disposers.push(() => {
-                            productExplorerLayer!.children.remove(layerReference);
-                        });
+                        disposers.push(autorun(() => {
+                            let active = productExplorer.active;
+                            datasetView.productSearchViz?.setActive(active);
+                        }));
                     }
-                }
 
-                if (datasetView.mapViz) {
-                    let mapViewsLayer = this.datasetsExplorer_.vizExplorer.mapLayer;
-                    if (mapViewsLayer && datasetView.mapViz.mapLayer) {
+                    if (datasetView.mapViz) {
+                        let mapViewsLayer = this.datasetsExplorer_.vizExplorer.mapLayer;
+                        if (mapViewsLayer && datasetView.mapViz.mapLayer) {
 
-                        let layerReference = createEntityReference(datasetView.mapViz.mapLayer!);
-                        mapViewsLayer.children.add(layerReference, this.datasetsExplorer_.datasetViews.length - idx - 1);
+                            let layerReference = createEntityReference(datasetView.mapViz.mapLayer!);
+                            mapViewsLayer.children.add(layerReference, this.datasetsExplorer_.datasetViews.length - idx - 1);
 
-                        disposers.push(() => {
-                            mapViewsLayer!.children.remove(layerReference);
-                        });
+                            disposers.push(() => {
+                                mapViewsLayer!.children.remove(layerReference);
+                            });
+                        }
                     }
-                }
+                });
 
                 return disposers;
 
             },
             onItemRemove: (disposers) => {
+                this.updateSelectedDate_();
                 //@ts-ignore
                 disposers.forEach(disposer => disposer());
             }

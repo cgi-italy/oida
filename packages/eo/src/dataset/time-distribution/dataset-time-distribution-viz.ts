@@ -1,5 +1,5 @@
 import { autorun } from 'mobx';
-import { types, Instance, addDisposer } from 'mobx-state-tree';
+import { types, Instance, addDisposer, isAlive } from 'mobx-state-tree';
 import debounce from 'lodash/debounce';
 
 import { hasConfig } from '@oida/state-mst';
@@ -12,6 +12,10 @@ import { DatasetTimeDistributionConfig } from './dataset-time-distribution-confi
 const timeDistributionUpdater = (timeDistributionViz: IDatasetTimeDistributionViz, options: any = {}) => {
 
     let debounceSet = debounce((searchParams, filters) => {
+
+        if (!isAlive(timeDistributionViz)) {
+            return;
+        }
         timeDistributionViz.timeDistribution.setItems([{
             start: searchParams.start,
             end: searchParams.end,

@@ -42,6 +42,7 @@ export const DateFieldRenderer = (props: Omit<DateField, 'name' | 'type'>) => {
         <DatePicker
             value={moment.utc(value)}
             onChange={onDateChange}
+            allowClear={!props.required}
             disabledDate={disabledDates}
             showTime={config.withTime ? {
                 defaultValue: moment.utc('00:00:00', 'HH:mm:ss')

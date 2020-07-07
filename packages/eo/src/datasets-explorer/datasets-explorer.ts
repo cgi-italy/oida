@@ -1,17 +1,18 @@
 import { types, Instance, detach, addDisposer, SnapshotIn, SnapshotOrInstance, getSnapshot, applySnapshot } from 'mobx-state-tree';
 import moment from 'moment';
 
+import { AOI_FIELD_ID, AoiValue, DATE_RANGE_FIELD_ID, DateRangeValue, DATE_FIELD_ID } from '@oida/core';
 import { GroupLayer, DataFilters, hasConfig } from '@oida/state-mst';
 import {
     Dataset, DatasetConfig, IDataset,
     DatasetTimeDistributionViz, DatasetProductSearchViz,
-    DatasetViz, DatasetVizType, TimeRange
+    DatasetViz, DatasetVizType, TimeRange,
+    DATASET_AOI_FILTER_KEY, DATASET_TIME_RANGE_FILTER_KEY, DATASET_SELECTED_TIME_FILTER_KEY
 } from '../dataset';
 
 import { DatasetAnalyses } from '../dataset/analysis/dataset-analyses';
 
 import { DatasetsExplorerController } from './datasets-explorer-controller';
-
 
 const DatasetExplorerViewDecl = types.model('DatasetExplorerViews', {
     dataset: Dataset,
@@ -26,8 +27,6 @@ const DatasetExplorerView: DatasetExplorerViewInterface = DatasetExplorerViewDec
 export interface IDatasetExplorerView extends Instance<DatasetExplorerViewInterface> {}
 
 export type DatasetsExplorerConfig = {
-    aoiFilterKey: string;
-    toiFilterKey: string;
     disableTimeExplorer?: boolean;
     disableProductSearch?: boolean;
     disableMapView?: boolean;
@@ -52,7 +51,8 @@ const DatasetsExplorerDecl = types.compose(
         }), {}),
         vizExplorer: types.optional(types.model({
             active: types.optional(types.boolean, false),
-            mapLayer: types.maybe(GroupLayer)
+            mapLayer: types.maybe(GroupLayer),
+            nearestMatch: types.optional(types.boolean, true)
         }), {}),
         mapLayer: types.reference(GroupLayer),
         analyses: types.optional(DatasetAnalyses, {
@@ -66,21 +66,31 @@ const DatasetsExplorerDecl = types.compose(
         getDatasetView: (id: string) => {
             return self.datasetViews.find(datasetView => datasetView.dataset.id === id) as IDatasetExplorerView | undefined;
         },
-        get aoi() {
-            return self.commonFilters.get(self.config.aoiFilterKey);
+        get aoi(): AoiValue | undefined {
+            return self.commonFilters.get(DATASET_AOI_FILTER_KEY);
         },
-        get toi() {
-            return self.commonFilters.get(self.config.toiFilterKey);
+        get toi(): DateRangeValue | undefined {
+            return self.commonFilters.get(DATASET_TIME_RANGE_FILTER_KEY);
+        },
+        get selectedDate(): Date | undefined {
+            return self.commonFilters.get(DATASET_SELECTED_TIME_FILTER_KEY);
         }
     };
 })
 .actions((self) => {
     return {
         setAoi: (aoi) => {
-            self.commonFilters.set(self.config.aoiFilterKey, aoi, 'aoi');
+            self.commonFilters.set(DATASET_AOI_FILTER_KEY, aoi, AOI_FIELD_ID);
         },
         setToi: (toi) => {
-            self.commonFilters.set(self.config.toiFilterKey, toi, 'daterange');
+            self.commonFilters.set(DATASET_TIME_RANGE_FILTER_KEY, toi, DATE_RANGE_FIELD_ID);
+        },
+        setSelectedDate: (date: Date | undefined) => {
+            if (date) {
+                self.commonFilters.set(DATASET_SELECTED_TIME_FILTER_KEY, date, DATE_FIELD_ID);
+            } else {
+                self.commonFilters.unset(DATASET_SELECTED_TIME_FILTER_KEY);
+            }
         },
         setProductExplorerActive: (active: boolean) => {
             if (active && self.config.disableProductSearch) {
@@ -125,7 +135,8 @@ const DatasetsExplorerDecl = types.compose(
             if (!self.config.disableProductSearch && datasetConfig.search) {
                 datasetViewConfig.productSearchViz = DatasetProductSearchViz.create({
                     dataset: dataset.id,
-                    config: datasetConfig.search
+                    config: datasetConfig.search,
+                    active: self.productExplorer.active
                 });
             }
 
@@ -140,6 +151,7 @@ const DatasetsExplorerDecl = types.compose(
                         end: range.end,
                         resolution: self.timeExplorer.visibleRange.resolution
                     },
+                    active: self.timeExplorer.active,
                     config: datasetConfig.timeDistribution
                 });
             }
