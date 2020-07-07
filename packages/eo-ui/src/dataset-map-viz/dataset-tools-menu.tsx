@@ -1,9 +1,9 @@
 import React from 'react';
 import { getParentOfType } from 'mobx-state-tree';
-
+import { v4 as uuid } from 'uuid';
 import { Button, Dropdown, Menu } from 'antd';
 
-import { IDatasetViz, DatasetsExplorer, DatasetViz } from '@oida/eo';
+import { IDatasetViz, DatasetsExplorer, DatasetViz, generateComboAnalysisName } from '@oida/eo';
 
 export type DatasetToolsMenuProps = {
     datasetViz: IDatasetViz,
@@ -31,11 +31,10 @@ export const DatasetToolsMenu = (props: DatasetToolsMenuProps) => {
 
                 datasetExplorer.analyses.addAnalysis({
                     datasetViz: datasetViz,
-                    id: `${datasetViz.id}Analysis`
+                    id: uuid()
                 }, {
-                    id: `${datasetViz.id}ComboAnalysis`,
                     type: tool.type,
-                    name: tool.name
+                    name: generateComboAnalysisName(tool.name)
                 });
             }
         }

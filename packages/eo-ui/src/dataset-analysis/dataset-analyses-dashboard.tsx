@@ -48,25 +48,41 @@ export const DatasetAnalysesDashboard = (props: DatasetAnalysesDashboardProps) =
 
     let linkedAois = useObserver(() => props.datasetsExplorer.analyses.getLinkedAoiIds());
 
-    let components = useObserver(
-        () => Array.from(props.datasetsExplorer.analyses.comboAnalyses.values()).filter(analysis => analysis.visible).map((analysis) => {
+    let comboAnalyses = useObserver(
+        () => Array.from(props.datasetsExplorer.analyses.comboAnalyses.values()).filter(analysis => analysis.visible)
+    );
 
-            let analysisType = analysis.type;
-            if (DatasetAnalysisWidgetFactory.isRegistered(analysisType)) {
-
-                let chartWidget = DatasetAnalysisWidgetFactory.create(analysisType, {
-                    combinedAnalysis: analysis,
-                    datasets: activeDatasets,
-                    linkedAois: linkedAois
-                });
-                return {
+    let availableCombos = comboAnalyses.reduce((comboMap, analysis) => {
+        return {
+            ...comboMap,
+            [analysis.type]: [
+                ...(comboMap[analysis.type] || []),
+                {
                     id: analysis.id,
-                    title: `${analysis.name}`,
-                    content: chartWidget
-                };
-            }
+                    name: analysis.name!
+                }
+            ]
+        };
+    }, {} as Record<string, Array<{id: string, name: string}>>);
+
+    let components = comboAnalyses.map((analysis) => {
+
+        let analysisType = analysis.type;
+        if (DatasetAnalysisWidgetFactory.isRegistered(analysisType)) {
+
+            let chartWidget = DatasetAnalysisWidgetFactory.create(analysisType, {
+                combinedAnalysis: analysis,
+                datasets: activeDatasets,
+                linkedAois: linkedAois,
+                availableCombos: availableCombos
+            });
+            return {
+                id: analysis.id,
+                title: `${analysis.name}`,
+                content: chartWidget
+            };
         }
-    ));
+    });
 
     const onWidgetClose = (widgetId: string) => {
         let comboAnalysis = props.datasetsExplorer.analyses.comboAnalyses.get(widgetId);

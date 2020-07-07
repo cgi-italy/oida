@@ -3,14 +3,14 @@ import { useObserver } from 'mobx-react';
 import { getSnapshot, castToSnapshot } from 'mobx-state-tree';
 
 import { Button, Form, Collapse, Dropdown, Menu } from 'antd';
-import { CopyOutlined, CloseOutlined, ExportOutlined, EllipsisOutlined } from '@ant-design/icons';
+import { CopyOutlined, CloseOutlined, ExportOutlined, EllipsisOutlined, PlusOutlined } from '@ant-design/icons';
 
 import { v4 as uuid } from 'uuid';
 
 import { DatasetDimensionSeries, DIMENSION_SERIES_TYPE, DatasetDimensionSeriesConfig, IDatasetDimensionSeries } from '@oida/eo';
 
 import { DatasetSelector } from '../dataset-selector';
-
+import { AnalysisSeriesActions } from '../analysis-series-actions';
 import { DatasetAnalysisWidgetFactory, DatasetAnalysisWidgetFactoryConfig } from '../dataset-analysis-widget-factory';
 import { DatasetDimensionSeriesFilters } from './dataset-dimension-series-filters';
 import { DatasetDimensionSeriesChart } from './dataset-dimension-series-chart';
@@ -26,25 +26,9 @@ export const DatasetDimensionSeriesAnalysis = (props: DatasetAnalysisWidgetFacto
         return dataset.tools?.find(tool => tool.type === DIMENSION_SERIES_TYPE);
     });
 
-    const onSeriesAction = (action, analysis, idx) => {
-        if (action === 'remove') {
-            props.combinedAnalysis.removeAnalysis(analysis);
-        } else if (action === 'undock') {
-            props.combinedAnalysis.undockAnalysis(analysis);
-        } else if (action === 'clone') {
-
-            let series = analysis.datasetViz as IDatasetDimensionSeries;
-
-            props.combinedAnalysis.addAnalysis({
-                id: uuid(),
-                datasetViz: {
-                    ...getSnapshot(series),
-                    id: uuid(),
-                    aoi: series.aoi
-                }
-            }, idx + 1);
-        }
-    };
+    const availableTargets = useObserver(() => {
+        return (props.availableCombos[props.combinedAnalysis.type] || []).filter((combo => combo.id !== props.combinedAnalysis.id));
+    });
 
     let seriesFilters = analyses.map((analysis, idx) => {
         return (
@@ -81,35 +65,12 @@ export const DatasetDimensionSeriesAnalysis = (props: DatasetAnalysisWidgetFacto
                     />
 
                 </Form>
-                <div className='analysis-actions'>
-                    <Dropdown
-                        overlay={
-                            <Menu onClick={(evt) => onSeriesAction(evt.key, analysis, idx)}>
-                                <Menu.Item key='clone' icon={<CopyOutlined/>}>
-                                    Clone series
-                                </Menu.Item>
-                                {analyses.length > 1 &&
-                                    <Menu.Item key='remove' icon={<CloseOutlined />}>
-                                        Remove series
-                                    </Menu.Item>
-                                }{analyses.length > 1 &&
-                                    <Menu.Item key='undock' icon={<ExportOutlined/>}>
-                                        Undock series
-                                    </Menu.Item>
-                                }
-
-                            </Menu>
-                        }
-                    >
-                        <Button
-                            type='primary'
-                            shape='circle'
-                            size='small'
-                        >
-                            <EllipsisOutlined/>
-                        </Button>
-                    </Dropdown>
-                </div>
+                <AnalysisSeriesActions
+                    analysis={analysis}
+                    idx={idx}
+                    availableTargets={availableTargets}
+                    combinedAnalysis={props.combinedAnalysis}
+                />
             </div>
         );
     });

@@ -3,7 +3,7 @@ import { v4 as uuid } from 'uuid';
 
 import { createEntityCollectionType, FeatureLayer, createEntityReference } from '@oida/state-mst';
 
-import { ComboAnalysis, IComboAnalysis } from './combo-analysis';
+import { ComboAnalysis, IComboAnalysis, generateComboAnalysisName } from './combo-analysis';
 import { DatasetAnalysis, IDatasetAnalysis } from './dataset-analysis';
 
 const DatasetAnalysesDecl = types.model('DatasetAnalyses', {
@@ -58,7 +58,7 @@ const DatasetAnalysesDecl = types.model('DatasetAnalyses', {
         } else {
             targetCombo = ComboAnalysis.create({
                 id: uuid(),
-                name: currentCombo.name,
+                name: generateComboAnalysisName(currentCombo.type),
                 type: currentCombo.type
             });
             self.comboAnalyses.put(targetCombo);
