@@ -2,7 +2,7 @@ import { autorun } from 'mobx';
 import { types, Instance, addDisposer, applySnapshot, onSnapshot } from 'mobx-state-tree';
 import debounce from 'lodash/debounce';
 
-import { LoadingState, CancelablePromise } from '@oida/core';
+import { LoadingState } from '@oida/core';
 
 import { hasLoadingState, hasConfig } from '@oida/state-mst';
 
@@ -34,13 +34,15 @@ export const DatasetProductSearchVizDecl = DatasetViz.addModel(
         hasLoadingState,
         hasConfig<DatasetProductSearchConfig>()
     ).actions((self) => {
-        let pendingSearchRequest: CancelablePromise<any> | undefined = undefined;
+        let pendingSearchRequest: Promise<any> | undefined = undefined;
 
         return {
             searchProducts: () => {
 
                 if (pendingSearchRequest) {
-                    pendingSearchRequest.cancel();
+                    if (pendingSearchRequest.cancel) {
+                        pendingSearchRequest.cancel();
+                    }
                     pendingSearchRequest = undefined;
                 }
 

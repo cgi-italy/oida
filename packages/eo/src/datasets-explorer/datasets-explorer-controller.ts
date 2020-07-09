@@ -1,7 +1,7 @@
 import { autorun, when } from 'mobx';
 import { isValidReference, addDisposer, isAlive } from 'mobx-state-tree';
 
-import { QueryFilter, CancelablePromise } from '@oida/core';
+import { QueryFilter } from '@oida/core';
 import { GroupLayer, ArrayTracker, createEntityReference } from '@oida/state-mst';
 
 import { DATASET_SELECTED_TIME_FILTER_KEY } from '../dataset/dataset';
@@ -13,7 +13,7 @@ export class DatasetsExplorerController {
 
     protected datasetsExplorer_: IDatasetsExplorer;
     protected datasetsTracker_;
-    protected pendingNearestTimeRequests_: Record<string, CancelablePromise<any>> = {};
+    protected pendingNearestTimeRequests_: Record<string, Promise<any>> = {};
 
     constructor(datasetExplorer: IDatasetsExplorer) {
         this.datasetsExplorer_ = datasetExplorer;
@@ -117,8 +117,9 @@ export class DatasetsExplorerController {
             && this.datasetsExplorer_.vizExplorer.nearestMatch
             && timeDistributionProvider
         ) {
-            if (this.pendingNearestTimeRequests_[datasetView.dataset.id]) {
-                this.pendingNearestTimeRequests_[datasetView.dataset.id].cancel();
+            const pendingRequest = this.pendingNearestTimeRequests_[datasetView.dataset.id];
+            if (pendingRequest && pendingRequest.cancel) {
+                pendingRequest.cancel();
                 delete this.pendingNearestTimeRequests_[datasetView.dataset.id];
             }
             this.pendingNearestTimeRequests_[datasetView.dataset.id] = timeDistributionProvider.getNearestItem(

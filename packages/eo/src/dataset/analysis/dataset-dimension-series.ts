@@ -1,14 +1,12 @@
 import { autorun } from 'mobx';
 import { types, addDisposer, flow, Instance } from 'mobx-state-tree';
 
-import { QueryFilter, Geometry, AoiSupportedGeometry, CancelablePromise, LoadingState } from '@oida/core';
-import { hasConfig, hasGeometry } from '@oida/state-mst';
+import { Geometry, AoiSupportedGeometry, LoadingState } from '@oida/core';
+import { hasConfig, hasAsyncData } from '@oida/state-mst';
 
 import { DatasetVariable, DatasetDimension, DomainRange, isValueDomain } from '../dataset-variable';
 import { DatasetViz } from '../dataset-viz';
 import { hasDimensions } from '../has-dimensions';
-
-import { isDataProvider } from '../../datasets-explorer/is-data-provider';
 
 import debounce from 'lodash/debounce';
 
@@ -44,7 +42,7 @@ export const isStatsDimensionSeriesData = <T = string | Date | number>
 
 
 export type DatasetDimensionSeriesProvider<T = string | Date | number> =
-    (request: DatasetDimensionSeriesRequest<T>) => CancelablePromise<DatasetDimensionSeriesData<T>>;
+    (request: DatasetDimensionSeriesRequest<T>) => Promise<DatasetDimensionSeriesData<T>>;
 
 export type DatasetDimensionSeriesConfig<T = string | Date | number> = {
     provider: DatasetDimensionSeriesProvider<T>;
@@ -64,7 +62,7 @@ const createSeriesType = (typeName: string) => {
             range: types.maybe(types.frozen<DomainRange<SeriesDimensionType>>())
         }),
         hasDimensions,
-        isDataProvider,
+        hasAsyncData,
         hasConfig<DatasetDimensionSeriesConfig<SeriesDimensionType>>()
     ).volatile((self) => ({
         data: [] as DatasetDimensionSeriesData<SeriesDimensionType>
@@ -77,9 +75,9 @@ const createSeriesType = (typeName: string) => {
         return {
             updateData: flow(function*(params: Partial<DatasetDimensionSeriesRequest<SeriesDimensionType>>) {
                 try {
-                    let {range, geometry, variable, dimension, dimensionValues} = params;
+                    const {range, geometry, variable, dimension, dimensionValues} = params;
                     if (geometry && variable && dimension && areAllDimensionsFilled(dimension, dimensionValues)) {
-                        self.data = yield self.startDataRequest(self.config.provider({
+                        self.data = yield self.retrieveData(() => self.config.provider({
                             range, geometry, variable, dimension, dimensionValues
                         }));
                     } else {
@@ -94,8 +92,6 @@ const createSeriesType = (typeName: string) => {
         };
     })
     .actions((self) => {
-
-        const debouncedUpdate = debounce(self.updateData, 1000);
 
         return {
             setDimension: (dimension: string | undefined) => {
@@ -133,6 +129,8 @@ const createSeriesType = (typeName: string) => {
             },
             afterAttach: () => {
 
+                self.setDebounceInterval(1000);
+
                 let seriesUpdateDisposer = autorun(() => {
 
                     let params = {
@@ -142,11 +140,14 @@ const createSeriesType = (typeName: string) => {
                         dimension: self.dimension,
                         dimensionValues: new Map(self.dimensionValues)
                     };
-                    debouncedUpdate(params);
+
+                    self.updateData(params);
 
                 });
 
-                (self as IDatasetDimensionSeries).setDimension(self.config.dimensions[0].id);
+                if (self.dimension === undefined) {
+                    (self as IDatasetDimensionSeries).setDimension(self.config.dimensions[0].id);
+                }
 
                 addDisposer(self, () => {
                     seriesUpdateDisposer();

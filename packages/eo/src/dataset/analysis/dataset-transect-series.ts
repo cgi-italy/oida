@@ -1,17 +1,16 @@
 import { autorun } from 'mobx';
 import { types, addDisposer, flow, Instance } from 'mobx-state-tree';
 
-import debounce from 'lodash/debounce';
 import length from '@turf/length';
 import along from '@turf/along';
 import nearestPointOnLine from '@turf/nearest-point-on-line';
 
-import { CancelablePromise, LoadingState, Geometry } from '@oida/core';
-import { hasConfig } from '@oida/state-mst';
+import { LoadingState, Geometry } from '@oida/core';
+import { hasConfig, hasAsyncData } from '@oida/state-mst';
 
 import { DatasetViz } from '../dataset-viz';
 import { DatasetVariable, DatasetDimension, DomainRange } from '../dataset-variable';
-import { isDataProvider } from '../../datasets-explorer/is-data-provider';
+
 import { hasDimensions } from '../has-dimensions';
 
 export const TRANSECT_SERIES_TYPE = 'transect_series';
@@ -25,7 +24,7 @@ export type DatasetTransectSeriesRequest = {
 export type DatasetTransectSeriesConfig = {
     variables: DatasetVariable<number>[];
     maxLineStringLength?: number;
-    provider: (request: DatasetTransectSeriesRequest) => CancelablePromise<number[]>;
+    provider: (request: DatasetTransectSeriesRequest) => Promise<number[]>;
     dimensions: DatasetDimension<string | number | Date>[];
 };
 
@@ -43,7 +42,7 @@ const DatasetTransectSeriesDecl = DatasetViz.addModel(types.compose(
         variable: types.maybe(types.string)
     }),
     hasDimensions,
-    isDataProvider,
+    hasAsyncData,
     hasConfig<DatasetTransectSeriesConfig>()
 ).volatile((self) => ({
     data: [] as TransectSeriesItem[]
@@ -56,9 +55,12 @@ const DatasetTransectSeriesDecl = DatasetViz.addModel(types.compose(
     return {
         updateData: flow(function*(params: Partial<DatasetTransectSeriesRequest>) {
             try {
-                const { geometry, variable, dimensionValues} = params;
+
+                const { geometry, variable, dimensionValues } = params;
+
                 if (geometry && variable && dimensionValues && areAllDimensionsFilled(dimensionValues)) {
-                    const seriesData = yield self.startDataRequest(self.config.provider({
+
+                    const seriesData = yield self.retrieveData(() => self.config.provider({
                         geometry, variable, dimensionValues
                     }));
 
@@ -91,7 +93,13 @@ const DatasetTransectSeriesDecl = DatasetViz.addModel(types.compose(
     };
 }).actions((self) => {
 
-    const debouncedUpdate = debounce(self.updateData, 1000);
+    const getQueryParams = () => {
+        return {
+            geometry: (self as IDatasetTransectSeries).aoi?.geometry as (GeoJSON.LineString | undefined),
+            variable: self.variable,
+            dimensionValues: new Map(self.dimensionValues)
+        };
+    };
 
     return {
         setVariable: (variable: string | undefined) => {
@@ -106,14 +114,9 @@ const DatasetTransectSeriesDecl = DatasetViz.addModel(types.compose(
         },
         afterAttach: () => {
 
+            self.setDebounceInterval(1000);
             let seriesUpdateDisposer = autorun(() => {
-
-                const params = {
-                    geometry: (self as IDatasetTransectSeries).aoi?.geometry as (GeoJSON.LineString | undefined),
-                    variable: self.variable,
-                    dimensionValues: new Map(self.dimensionValues)
-                };
-                debouncedUpdate(params);
+                self.updateData(getQueryParams());
             });
 
             addDisposer(self, () => {

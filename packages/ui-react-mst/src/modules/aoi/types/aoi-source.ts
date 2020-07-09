@@ -1,8 +1,8 @@
 import { reaction } from 'mobx';
 import { types, Instance, addDisposer, flow } from 'mobx-state-tree';
 
-import { QueryParams, Geometry, CancelablePromise, LoadingState } from '@oida/core';
-import { QueryParams as QueryParamsState, hasConfig, isDataProvider, IndexedCollection } from '@oida/state-mst';
+import { QueryParams, Geometry, LoadingState } from '@oida/core';
+import { QueryParams as QueryParamsState, hasConfig, hasAsyncData, IndexedCollection } from '@oida/state-mst';
 
 import { AOICollection } from './aoi';
 
@@ -13,7 +13,7 @@ export type AoiSourceItem = {
     properties: GeoJSON.GeoJsonProperties
 };
 
-export type AoiSourceProvider = (params: QueryParams) => CancelablePromise<{
+export type AoiSourceProvider = (params: QueryParams) => Promise<{
     total: number,
     results: AoiSourceItem[]
 }>;
@@ -33,7 +33,7 @@ const AoiSourceDecl = types.compose('AoiSource',
         aois_: types.optional(AOICollection, {})
     }),
     hasConfig<AoiSourceConfig>(),
-    isDataProvider
+    hasAsyncData
 )
 .actions(self => (
     {

@@ -25,7 +25,7 @@
   },
   "peerDependencies": {
     "mobx": "^4.9.4",
-    "mobx-state-tree": "^3.14.0",
+    "mobx-state-tree": "^3.16.0",
     "moment": "^2.x"
   },
   "dependencies": {

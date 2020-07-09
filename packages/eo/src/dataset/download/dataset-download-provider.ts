@@ -1,5 +1,3 @@
-import { QueryParams, CancelablePromise } from '@oida/core';
-
 import { IDatasetViz } from '../dataset-viz';
 
 export type DownloaMapVizRequest = {
@@ -9,6 +7,6 @@ export type DownloaMapVizRequest = {
 };
 
 export interface DatasetDownloadProvider {
-    downloadMapViz: (request: DownloaMapVizRequest) => CancelablePromise<void>;
+    downloadMapViz: (request: DownloaMapVizRequest) => Promise<void>;
 }
 

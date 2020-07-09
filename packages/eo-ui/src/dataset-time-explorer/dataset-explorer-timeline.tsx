@@ -11,7 +11,7 @@ import moment from 'moment';
 import { Button, Tooltip } from 'antd';
 import { ColumnWidthOutlined, ClockCircleOutlined, SearchOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 
-import { CancelablePromise, DateRangeValue } from '@oida/core';
+import { DateRangeValue } from '@oida/core';
 import { ArrayTracker } from '@oida/state-mst';
 import { DateFieldRenderer, DateRangeFieldRenderer } from '@oida/ui-react-antd';
 import { IDatasetsExplorer, IDatasetExplorerView, TimeSearchDirection, getNearestDatasetProduct } from '@oida/eo';
@@ -229,9 +229,9 @@ export const TimelineGroupTemplates = (props: TimelineGroupTemplatesProps) => {
 
 export const DatasetDiscoveryTimeline = (props: DatasetExplorerTimelineProps) => {
 
-    let runningRequest: CancelablePromise<any> | undefined;
+    let runningRequest: Promise<any> | undefined;
     const onSelectedDateChange = (date: Date) => {
-        if (runningRequest) {
+        if (runningRequest && runningRequest.cancel) {
             runningRequest.cancel();
         }
         let searchDirection = (selectedDate && date > selectedDate) ? TimeSearchDirection.Forward : TimeSearchDirection.Backward;

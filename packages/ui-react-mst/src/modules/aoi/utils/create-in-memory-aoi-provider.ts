@@ -1,4 +1,4 @@
-import { QueryParams, SortOrder, wrapInCancelablePromise } from '@oida/core';
+import { QueryParams, SortOrder } from '@oida/core';
 
 import { AoiSourceProvider, AoiSourceItem } from '../types';
 
@@ -62,7 +62,6 @@ const filterMemoryAoiSource = (data: AoiSourceItem[], queryParams: QueryParams) 
 export const createInMemoryAoiProvider = (aoiList: AoiSourceItem[]) => {
 
     return ((queryParams: QueryParams) => {
-        let promise = Promise.resolve(filterMemoryAoiSource(aoiList, queryParams));
-        return wrapInCancelablePromise(promise);
+        return Promise.resolve(filterMemoryAoiSource(aoiList, queryParams));
     }) as AoiSourceProvider;
 };

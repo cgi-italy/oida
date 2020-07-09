@@ -1,16 +1,13 @@
 import { autorun } from 'mobx';
 import { types, addDisposer, flow, Instance, SnapshotOut } from 'mobx-state-tree';
 
-import { QueryFilter, Geometry, AoiSupportedGeometry, CancelablePromise, LoadingState } from '@oida/core';
-import { hasConfig, hasGeometry } from '@oida/state-mst';
+import { Geometry, AoiSupportedGeometry, LoadingState } from '@oida/core';
+import { hasConfig, hasAsyncData } from '@oida/state-mst';
 
 import { ColorMap, ColorMapConfig } from '../map-viz/color-map';
 import { DatasetViz } from '../dataset-viz';
 import { DatasetDimension, DomainRange, isValueDomain } from '../dataset-variable';
 import { hasDimensions } from '../has-dimensions';
-import { isDataProvider } from '../../datasets-explorer/is-data-provider';
-
-import debounce from 'lodash/debounce';
 
 export const DIMENSION_RASTER_SEQUENCE_TYPE = 'dimension_raster_sequence';
 
@@ -28,7 +25,7 @@ export type DatasetRasterSequenceItem<T = string | Date | number> = {
 };
 
 export type DatasetRasterSequenceProvider<T = string | Date | number> =
-(request: DatasetRasterSequenceRequest<T>) => CancelablePromise<DatasetRasterSequenceItem<T>[]>;
+(request: DatasetRasterSequenceRequest<T>) => Promise<DatasetRasterSequenceItem<T>[]>;
 
 export type DatasetRasterSequenceThumbGenerator =
 (data: any, colorMap: SnapshotOut<typeof ColorMap>, canvas: HTMLCanvasElement) => void;
@@ -52,7 +49,7 @@ const createRasterSequenceType = (typeName: string) => {
             range: types.maybe(types.frozen<DomainRange<SequenceDimensionType>>()),
             colorMap: types.maybe(ColorMap)
         }),
-        isDataProvider,
+        hasAsyncData,
         hasDimensions,
         hasConfig<DatasetRasterSequenceConfig<SequenceDimensionType>>()
     ).volatile((self) => ({
@@ -66,9 +63,9 @@ const createRasterSequenceType = (typeName: string) => {
         return {
             updateData: flow(function*(params: Partial<DatasetRasterSequenceRequest<SequenceDimensionType>>) {
                 try {
-                    let {range, geometry, variable, dimension, dimensionValues} = params;
+                    const {range, geometry, variable, dimension, dimensionValues} = params;
                     if (geometry && variable && dimension && areAllDimensionsFilled(dimension, dimensionValues)) {
-                        self.data = yield self.startDataRequest(self.config.provider({
+                        self.data = yield self.retrieveData(() => self.config.provider({
                             range, geometry, variable, dimension, dimensionValues
                         }));
                     } else {
@@ -83,8 +80,6 @@ const createRasterSequenceType = (typeName: string) => {
         };
     })
     .actions((self) => {
-
-        const debouncedUpdate = debounce(self.updateData, 1000);
 
         return {
             setDimension: (dimension: string | undefined) => {
@@ -122,6 +117,8 @@ const createRasterSequenceType = (typeName: string) => {
             },
             afterAttach: () => {
 
+                self.setDebounceInterval(1000);
+
                 let seriesUpdateDisposer = autorun(() => {
 
                     let params = {
@@ -131,7 +128,8 @@ const createRasterSequenceType = (typeName: string) => {
                         dimension: self.dimension,
                         dimensionValues: new Map(self.dimensionValues)
                     };
-                    debouncedUpdate(params);
+
+                    self.updateData(params);
 
                 });
 

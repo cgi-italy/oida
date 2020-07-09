@@ -1,13 +1,12 @@
 import { types, Instance, addDisposer, flow } from 'mobx-state-tree';
 import { reaction } from 'mobx';
 
-import { QueryParams as QueryParamsCore, CancelablePromise } from '@oida/core';
-import { hasConfig, QueryParams } from '@oida/state-mst';
+import { QueryParams as QueryParamsCore } from '@oida/core';
+import { hasConfig, hasAsyncData, QueryParams } from '@oida/state-mst';
 
-import { isDataProvider } from './is-data-provider';
 import { DatasetConfig } from '../dataset';
 
-export type DatasetDiscoveryProvider = (queryParams: QueryParamsCore) => CancelablePromise<DatasetConfig[]>;
+export type DatasetDiscoveryProvider = (queryParams: QueryParamsCore) => Promise<DatasetConfig[]>;
 
 export type DatasetDiscoveryConfig = {
     provider: DatasetDiscoveryProvider
@@ -18,7 +17,7 @@ const DatasetDiscoveryDecl = types.compose(
     types.model({
         queryParams: types.optional(QueryParams, {})
     }),
-    isDataProvider,
+    hasAsyncData,
     hasConfig<DatasetDiscoveryConfig>()
 ).volatile((self) => ({
     datasets: [] as DatasetConfig[]
@@ -26,7 +25,7 @@ const DatasetDiscoveryDecl = types.compose(
 ).actions((self) => ({
     searchDatasets: flow(function*() {
         try {
-            self.datasets = yield self.startDataRequest(self.config.provider(self.queryParams.data));
+            self.datasets = yield self.retrieveData(() => self.config.provider(self.queryParams.data));
         } catch (e) {
             self.datasets = [];
         }

@@ -9,4 +9,4 @@ export * from './has-geometry';
 export * from './has-style';
 export * from './needs-config';
 export * from './has-config';
-export * from './is-data-provider';
+export * from './has-async-data';

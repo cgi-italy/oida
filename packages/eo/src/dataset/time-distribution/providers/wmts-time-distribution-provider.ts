@@ -1,7 +1,5 @@
 import moment from 'moment';
 
-import { wrapInCancelablePromise, CancelablePromise } from '@oida/core';
-
 import { DatasetTimeDistributionProvider, TimeDistributionRangeItem } from '../dataset-time-distribution-provider';
 
 import { WmtsDomainDiscoveryService } from '../../../standards';
@@ -24,7 +22,7 @@ export class WmtsTimeDistributionProvider implements DatasetTimeDistributionProv
     protected tileMatrix_: string;
     protected filterSerializer_: FilterSerializer;
     protected wmtsService_: WmtsDomainDiscoveryService;
-    protected timeExtent_: CancelablePromise<TimeDistributionRangeItem | undefined> | undefined;
+    protected timeExtent_: Promise<TimeDistributionRangeItem | undefined> | undefined;
 
     constructor(config: WmtsTimeDistributionProviderConfig) {
         this.serviceUrl_ = config.serviceUrl;
@@ -134,7 +132,7 @@ export class WmtsTimeDistributionProvider implements DatasetTimeDistributionProv
 
     getNearestItem(dt: Date, direction) {
         // TODO: implement this
-        return wrapInCancelablePromise(Promise.resolve(undefined));
+        return Promise.resolve(undefined);
     }
 
     private parseISOTimeRange_(timeRange: string) {

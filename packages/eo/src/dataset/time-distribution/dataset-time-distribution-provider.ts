@@ -1,4 +1,4 @@
-import {  CancelablePromise, QueryFilter } from '@oida/core';
+import {  QueryFilter } from '@oida/core';
 
 export type TimeDistributionInstantItem = {
     start: Date,
@@ -15,9 +15,9 @@ export enum TimeSearchDirection {
 }
 export interface DatasetTimeDistributionProvider {
     supportsHistograms: () => boolean;
-    getTimeDistribution: (timeRange, filters, resolution?) => CancelablePromise<
+    getTimeDistribution: (timeRange, filters, resolution?) => Promise<
         (TimeDistributionRangeItem | TimeDistributionInstantItem)[]
     >;
-    getTimeExtent: (filters?: QueryFilter[]) => CancelablePromise<TimeDistributionRangeItem | undefined>;
-    getNearestItem: (dt: Date, direction: TimeSearchDirection) => CancelablePromise<TimeDistributionInstantItem | undefined>;
+    getTimeExtent: (filters?: QueryFilter[]) => Promise<TimeDistributionRangeItem | undefined>;
+    getNearestItem: (dt: Date, direction: TimeSearchDirection) => Promise<TimeDistributionInstantItem | undefined>;
 }

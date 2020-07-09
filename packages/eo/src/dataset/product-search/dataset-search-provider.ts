@@ -1,8 +1,8 @@
-import { QueryParams, CancelablePromise } from '@oida/core';
+import { QueryParams } from '@oida/core';
 
 import { ProductSearchRecord } from './dataset-product';
 
 export interface DatasetSearchProvider {
-    searchProducts: (queryParams: QueryParams) => CancelablePromise<{total: number, results: ProductSearchRecord[]}>;
+    searchProducts: (queryParams: QueryParams) => Promise<{total: number, results: ProductSearchRecord[]}>;
 }
 
