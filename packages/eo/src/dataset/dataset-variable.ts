@@ -21,15 +21,15 @@ export const isValueDomain = <T, S, C>(domain: ValueDomain<T, S> | CategoricalDo
     return !Array.isArray(domain);
 };
 
-export type DataDomainProvider<T, S = T> = (filters?: QueryFilter[]) => Promise<DataDomain<T, S>>;
+export type DataDomainProvider<D extends DataDomain<unknown>> = (filters?: QueryFilter[]) => Promise<D>;
 
-export type DatasetVariable<T, S = T> = {
+export type DatasetVariable<D extends DataDomain<unknown>> = {
     id: string,
     name: string,
-    domain?: DataDomain<T, S>,
-    domainProvider?: DataDomainProvider<T, S>,
+    domain?: D,
+    domainProvider?: DataDomainProvider<D>,
     units?: string,
     description?: string
 };
 
-export type DatasetDimension<T, S = T> = DatasetVariable<T, S>;
+export type DatasetDimension<D extends DataDomain<unknown>> = DatasetVariable<D>;

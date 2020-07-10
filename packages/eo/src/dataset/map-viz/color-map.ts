@@ -1,11 +1,10 @@
 import { types, Instance, SnapshotIn } from 'mobx-state-tree';
 
-import { DatasetVariable, DomainRange } from '../dataset-variable';
+import { DatasetVariable, DomainRange, ValueDomain } from '../dataset-variable';
 
 export enum ColormapConfigMode {
-    None = 'None',
-    Presets = 'Presets',
-    Customizable = 'Customizable'
+    Presets = 'preset',
+    Customizable = 'custom'
 }
 
 export type ColorMapConfigPreset = {
@@ -17,7 +16,7 @@ export type ColorMapConfigPreset = {
 export type ColorMapConfig = {
     mode: ColormapConfigMode;
     colorMaps: Array<ColorMapConfigPreset>
-    variables?: DatasetVariable<number> | DatasetVariable<number>[];
+    variables?: DatasetVariable<ValueDomain<number>> | DatasetVariable<ValueDomain<number>>[];
     default?: SnapshotIn<typeof ColorMap>
 };
 

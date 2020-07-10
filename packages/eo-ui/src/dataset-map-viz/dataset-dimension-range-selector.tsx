@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Form } from 'antd';
 
-import { DatasetDimension, DomainRange, ValueDomain, isValueDomain } from '@oida/eo';
+import { DatasetDimension, DomainRange, ValueDomain, isValueDomain, DataDomain } from '@oida/eo';
 import { NumericRangeFieldRenderer, DateRangeFieldRenderer } from '@oida/ui-react-antd';
 
-type TimeDimension = Omit<DatasetDimension<Date>, 'domain'> & {domain: ValueDomain<Date>};
-type ValueDimension = Omit<DatasetDimension<number>, 'domain'> & {domain: ValueDomain<number>};
+type TimeDimension = DatasetDimension<ValueDomain<Date>> & {domain: ValueDomain<Date>};
+type ValueDimension = DatasetDimension<ValueDomain<number>> & {domain: ValueDomain<number>};
 
 export type DatasetValueDimensionSelectorProps = {
     dimension: ValueDimension;
@@ -71,7 +71,7 @@ export const DatasetTimeRangeSelector = (props: DatasetTimeRangeSelectorProps) =
 
 
 export type DatasetDimensionRangeProps = {
-    dimension: DatasetDimension<number | Date | string>;
+    dimension: DatasetDimension<DataDomain<number | Date | string>>;
     value?: DomainRange<number | Date | string>
     onChange: (value: DomainRange<Date | number> | undefined) => void;
 };

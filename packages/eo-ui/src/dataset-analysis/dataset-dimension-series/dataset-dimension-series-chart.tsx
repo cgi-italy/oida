@@ -2,7 +2,7 @@ import React from 'react';
 import { useObserver } from 'mobx-react';
 
 import { LoadingState } from '@oida/core';
-import { IDatasetDimensionSeries, isStatsDimensionSeriesData, DIMENSION_SERIES_TYPE, DatasetDimension, isValueDomain } from '@oida/eo';
+import { IDatasetDimensionSeries, isStatsDimensionSeriesData, DIMENSION_SERIES_TYPE, DatasetDimension, isValueDomain, DataDomain } from '@oida/eo';
 
 import { AnalysisLoadingStateMessage } from '../analysis-loading-state-message';
 
@@ -62,7 +62,7 @@ export function DatasetDimensionSeriesChart(props: DatasetDimensionSeriesChartPr
 
             let dimension = series.dimension;
 
-            let dimensionConfig: DatasetDimension<number | string | Date> | undefined;
+            let dimensionConfig: DatasetDimension<DataDomain<number | string | Date>> | undefined;
             if (dimension === 'time') {
                 dimensionConfig = {
                     id: 'time',

@@ -6,7 +6,8 @@ import { Checkbox, Slider, Form } from 'antd';
 
 import {
     IDatasetAnalysis, IDatasetDimensionRasterSequence, DIMENSION_RASTER_SEQUENCE_TYPE,
-    DatasetDimension
+    DatasetDimension,
+    DataDomain
 } from '@oida/eo';
 
 
@@ -22,7 +23,7 @@ export type DatasetDomainRasterSequenceThumbProps = {
     imageGenerator;
     value: number | string | Date;
     valueFormatter: (value) => string;
-    dimensionConfig: DatasetDimension<number | string | Date>;
+    dimensionConfig: DatasetDimension<DataDomain<number | string | Date>>;
 };
 
 export const DatasetDomainRasterSequenceThumb = (props: DatasetDomainRasterSequenceThumbProps) => {

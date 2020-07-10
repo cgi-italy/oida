@@ -6,7 +6,7 @@ import { useObserver } from 'mobx-react';
 import { Button, Dropdown, InputNumber, Slider, Checkbox, Select } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
 
-import { IColorMapBase, IColorMapCustom, IColorMap, DatasetVariable, isValueDomain, ColorMapConfigPreset } from '@oida/eo';
+import { IColorMapBase, IColorMapCustom, IColorMap, DatasetVariable, ColorMapConfigPreset, ValueDomain } from '@oida/eo';
 
 export type DatasetColormapPresetSelectorItemProps = {
     preset: ColorMapConfigPreset;
@@ -105,7 +105,7 @@ export const DatasetColormapPresetSelector = (props: DatasetColormapPresetSelect
 
 export type DatasetColormapRangeSelectorProps = {
     colorMap: IColorMapCustom;
-    variable: DatasetVariable<number>;
+    variable: DatasetVariable<ValueDomain<number>>;
 };
 
 export const DatasetColormapRangeSelector = (props: DatasetColormapRangeSelectorProps) => {
@@ -117,7 +117,7 @@ export const DatasetColormapRangeSelector = (props: DatasetColormapRangeSelector
 
     let domainSlider: JSX.Element | undefined;
 
-    const variableDomain = domainConfig && isValueDomain(domainConfig)
+    const variableDomain = domainConfig
         ? {
             min: domainConfig.min,
             max: domainConfig.max,
@@ -200,7 +200,7 @@ export const DatasetColormapRangeSelector = (props: DatasetColormapRangeSelector
 
 export type DatasetColormapVariableSelectorProps = {
     colorMap: IColorMap;
-    variables: DatasetVariable<number>[];
+    variables: DatasetVariable<ValueDomain<number>>[];
 };
 
 export const DatasetColormapVariableSelector = (props: DatasetColormapVariableSelectorProps) => {
@@ -227,7 +227,7 @@ export const DatasetColormapVariableSelector = (props: DatasetColormapVariableSe
                     if (props.colorMap.mode === 'custom') {
                         let varConfig = findVariableConfig(variable);
                         if (varConfig) {
-                            if (varConfig.domain && isValueDomain(varConfig.domain)) {
+                            if (varConfig.domain) {
                                 props.colorMap.setDomain({
                                     min: varConfig.domain.min,
                                     max: varConfig.domain.max
@@ -248,7 +248,7 @@ export const DatasetColormapVariableSelector = (props: DatasetColormapVariableSe
 export type DatasetColormapSelectorProps = {
     presets: ColorMapConfigPreset[];
     colorMap: IColorMap;
-    variables?: DatasetVariable<number> | DatasetVariable<number>[];
+    variables?: DatasetVariable<ValueDomain<number>> | DatasetVariable<ValueDomain<number>>[];
 };
 
 export const DatasetColormapSelector = (props: DatasetColormapSelectorProps) => {

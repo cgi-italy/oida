@@ -4,7 +4,7 @@ import { types, addDisposer, flow, Instance } from 'mobx-state-tree';
 import { Geometry, AoiSupportedGeometry, LoadingState } from '@oida/core';
 import { hasConfig, hasAsyncData } from '@oida/state-mst';
 
-import { DatasetVariable, DatasetDimension, DomainRange, isValueDomain } from '../dataset-variable';
+import { DatasetVariable, DatasetDimension, DataDomain, DomainRange, isValueDomain } from '../dataset-variable';
 import { DatasetViz } from '../dataset-viz';
 import { hasDimensions } from '../has-dimensions';
 
@@ -47,8 +47,8 @@ export type DatasetDimensionSeriesProvider<T = string | Date | number> =
 export type DatasetDimensionSeriesConfig<T = string | Date | number> = {
     provider: DatasetDimensionSeriesProvider<T>;
     supportedGeometries: AoiSupportedGeometry[],
-    variables: DatasetVariable<number>[];
-    dimensions: DatasetDimension<T>[];
+    variables: DatasetVariable<DataDomain<number>>[];
+    dimensions: DatasetDimension<DataDomain<T>>[];
 };
 
 type SeriesDimensionType = string | Date | number;

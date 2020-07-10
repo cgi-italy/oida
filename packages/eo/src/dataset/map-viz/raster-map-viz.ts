@@ -7,14 +7,14 @@ import { DatasetViz } from '../dataset-viz';
 import { ColorMapConfig, ColorMap } from './color-map';
 import { BandMathConfig, BandMath } from './band-math';
 import { hasDimensions } from '../has-dimensions';
-import { DatasetDimension, isValueDomain } from '../dataset-variable';
+import { DatasetDimension, DataDomain, isValueDomain } from '../dataset-variable';
 
 export const RASTER_VIZ_TYPE = 'raster';
 
 export type DatasetRasterMapVizConfig = {
     bandMathConfig?: BandMathConfig;
     colorMapConfig?: ColorMapConfig;
-    dimensions?: DatasetDimension<string | number>[];
+    dimensions?: DatasetDimension<DataDomain<string | number>>[];
     nonTiled?: boolean;
     rasterSourceProvider: (rasterViz) => any;
     afterInit?: (rasterViz) => void;
@@ -39,7 +39,7 @@ const DatasetRasterVizDecl = DatasetViz.addModel(
     .actions((self) => {
         return {
             setBandMath: (bandMath: SnapshotOrInstance<typeof BandMath> | undefined) => {
-                self.bandMath = bandMath;
+                self.bandMath = cast(bandMath);
             },
             setColorMap: (colorMap: SnapshotOrInstance<typeof ColorMap> | undefined) => {
                 self.colorMap = cast(colorMap);

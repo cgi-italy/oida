@@ -6,7 +6,7 @@ import { hasConfig, hasAsyncData } from '@oida/state-mst';
 
 import { ColorMap, ColorMapConfig } from '../map-viz/color-map';
 import { DatasetViz } from '../dataset-viz';
-import { DatasetDimension, DomainRange, isValueDomain } from '../dataset-variable';
+import { DatasetDimension, DataDomain, DomainRange, isValueDomain } from '../dataset-variable';
 import { hasDimensions } from '../has-dimensions';
 
 export const DIMENSION_RASTER_SEQUENCE_TYPE = 'dimension_raster_sequence';
@@ -31,12 +31,12 @@ export type DatasetRasterSequenceThumbGenerator =
 (data: any, colorMap: SnapshotOut<typeof ColorMap>, canvas: HTMLCanvasElement) => void;
 
 export type DatasetRasterSequenceConfig<T = string | Date | number> = {
-    domain: DatasetDimension<T>;
+    domain: DatasetDimension<DataDomain<T>>;
     provider: DatasetRasterSequenceProvider<T>;
     imageGenerator: DatasetRasterSequenceThumbGenerator;
     supportedGeometries: AoiSupportedGeometry[];
     colorMap: ColorMapConfig;
-    dimensions: DatasetDimension<T>[];
+    dimensions: DatasetDimension<DataDomain<T>>[];
 };
 
 type SequenceDimensionType = string | Date | number;

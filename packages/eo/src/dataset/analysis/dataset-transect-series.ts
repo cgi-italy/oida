@@ -9,7 +9,7 @@ import { LoadingState, Geometry } from '@oida/core';
 import { hasConfig, hasAsyncData } from '@oida/state-mst';
 
 import { DatasetViz } from '../dataset-viz';
-import { DatasetVariable, DatasetDimension, DomainRange } from '../dataset-variable';
+import { DatasetVariable, DatasetDimension, DataDomain, DomainRange } from '../dataset-variable';
 
 import { hasDimensions } from '../has-dimensions';
 
@@ -22,10 +22,10 @@ export type DatasetTransectSeriesRequest = {
 };
 
 export type DatasetTransectSeriesConfig = {
-    variables: DatasetVariable<number>[];
+    variables: DatasetVariable<DataDomain<number>>[];
     maxLineStringLength?: number;
     provider: (request: DatasetTransectSeriesRequest) => Promise<number[]>;
-    dimensions: DatasetDimension<string | number | Date>[];
+    dimensions: DatasetDimension<DataDomain<string | number | Date>>[];
 };
 
 type TransectDimensionType = string | Date | number;

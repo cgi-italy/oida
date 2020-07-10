@@ -3,12 +3,12 @@ import { useObserver } from 'mobx-react';
 
 import { Slider, Select } from 'antd';
 
-import { IHasDimensions, DatasetDimension, ValueDomain, CategoricalDomain, isValueDomain } from '@oida/eo';
+import { IHasDimensions, DatasetDimension, ValueDomain, CategoricalDomain, isValueDomain, DataDomain } from '@oida/eo';
 import { DateFieldRenderer } from '@oida/ui-react-antd';
 
-type TimeDimension = Omit<DatasetDimension<Date>, 'domain'> & {domain?: ValueDomain<Date>};
-type ValueDimension = Omit<DatasetDimension<number>, 'domain'> & {domain: ValueDomain<number>};
-type CategoricalDimension = Omit<DatasetDimension<number | string>, 'domain'> & {domain: CategoricalDomain<number | string>};
+type TimeDimension = DatasetDimension<ValueDomain<Date>>;
+type ValueDimension = DatasetDimension<ValueDomain<number>> & {domain: ValueDomain<number>};
+type CategoricalDimension = DatasetDimension<CategoricalDomain<number | string>> & {domain: CategoricalDomain<number | string>};
 
 export type DatasetValueDimensionSelectorProps = {
     dimensionsState: IHasDimensions;
@@ -56,8 +56,7 @@ export const DatasetTimeDimensionSelector = (props: DatasetTimeDimensionSelector
 
     useEffect(() => {
         if (!domain && props.dimension.domainProvider) {
-            props.dimension.domainProvider().then(d => {
-                const domainRange = d as ValueDomain<Date>;
+            props.dimension.domainProvider().then(domainRange => {
                 setDomain(domainRange);
                 let val = props.dimensionsState.dimensionValues.get(props.dimension.id);
                 if (!val || val < domainRange.min) {
@@ -127,7 +126,7 @@ export const DatasetCategoricalDimensionSelector = (props: DatasetCategoricalDim
 
 export type DatasetDimensionSelectorProps = {
     dimensionsState: IHasDimensions;
-    dimension: DatasetDimension<number | string | Date>;
+    dimension: DatasetDimension<DataDomain<number | string | Date>>;
 };
 
 export const DatasetDimensionValueSelector = (props: DatasetDimensionSelectorProps) => {
