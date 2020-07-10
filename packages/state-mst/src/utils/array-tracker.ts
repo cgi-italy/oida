@@ -56,15 +56,8 @@ export class ArrayTracker<T, ITEM extends IAnyType = IAnyType> {
                 this.onItemRemoved_(this.idGetter_(change.oldValue));
                 this.onItemAdd_(this.idGetter_(change.newValue), change.newValue, idx);
             }
-        });
+        }, true);
 
-        this.trackerConfig_.items.forEach((item, idx) => {
-            if (isReferenceType(getType(item))) {
-                this.onItemAdd_(item.snapshot, item, idx);
-            } else {
-                this.onItemAdd_(this.idGetter_(item), item, idx);
-            }
-        });
     }
 
     protected unbindFromCollectionState_() {
