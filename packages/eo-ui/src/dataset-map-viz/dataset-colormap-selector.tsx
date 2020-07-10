@@ -128,8 +128,8 @@ export const DatasetColormapRangeSelector = (props: DatasetColormapRangeSelector
     if (variableDomain) {
 
         let marks = {
-            [variableDomain.min]: `${variableDomain.min} ${props.variable.units || ''}`,
-            [variableDomain.max]: `${variableDomain.max} ${props.variable.units || ''}`,
+            [variableDomain.min]: `${variableDomain.min}`,
+            [variableDomain.max]: `${variableDomain.max}`,
         };
 
         domainSlider = <Slider
@@ -165,6 +165,7 @@ export const DatasetColormapRangeSelector = (props: DatasetColormapRangeSelector
                         }
                     }}
                 />
+                {props.variable.units && <span>{props.variable.units}</span>}
                 <InputNumber
                     value={domain.max}
                     min={variableDomain?.min}

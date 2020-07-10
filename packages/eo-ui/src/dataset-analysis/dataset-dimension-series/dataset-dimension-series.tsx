@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { useObserver } from 'mobx-react';
-import { getSnapshot, castToSnapshot } from 'mobx-state-tree';
+import { castToSnapshot } from 'mobx-state-tree';
 
-import { Button, Form, Collapse, Dropdown, Menu } from 'antd';
-import { CopyOutlined, CloseOutlined, ExportOutlined, EllipsisOutlined, PlusOutlined } from '@ant-design/icons';
+import { Form, Collapse } from 'antd';
 
 import { v4 as uuid } from 'uuid';
 
