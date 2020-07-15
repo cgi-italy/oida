@@ -1,4 +1,6 @@
-import { types, Instance, SnapshotOrInstance, getParentOfType } from 'mobx-state-tree';
+import { types, Instance, SnapshotOrInstance, getParentOfType, addDisposer } from 'mobx-state-tree';
+import { when } from 'mobx';
+
 import { v4 as uuid } from 'uuid';
 
 import { EntitySafeReference, hasVisibility } from '@oida/state-mst';
@@ -34,9 +36,6 @@ const ComboAnalysisDecl = types.compose(
             let analyses = getParentOfType(self, DatasetAnalyses);
             if (analyses) {
                 analyses.removeAnalysis(analysis);
-                if (!self.analyses.length) {
-                    analyses.removeComboAnalysis(self.id);
-                }
             }
         },
         moveAnalysis: (analysis: IDatasetAnalysis, target?: string) => {
@@ -46,10 +45,15 @@ const ComboAnalysisDecl = types.compose(
                     currentComboId: self.id,
                     targetComboId: target
                 });
-                if (!self.analyses.length) {
+            }
+        },
+        afterAttach: () => {
+            addDisposer(self, when(() => !self.analyses.length, () => {
+                let analyses = getParentOfType(self, DatasetAnalyses);
+                if (analyses) {
                     analyses.removeComboAnalysis(self.id);
                 }
-            }
+            }));
         }
     };
 });

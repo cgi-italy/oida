@@ -1,12 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import classnames from 'classnames';
 
-import { Instance } from 'mobx-state-tree';
 import { useObserver } from 'mobx-react';
 
-import { List, Avatar, Popover, Button, Collapse, Dropdown } from 'antd';
+import { Avatar, Button, Dropdown } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
-import { BandMathConfigPreset, BandMathPreset, IDatasetRasterViz } from '@oida/eo';
+import { BandMathConfigPreset, IBandMathPreset } from '@oida/eo';
 
 export type DatasetBandPresetSelectorItemProps = {
     preset: BandMathConfigPreset;
@@ -55,19 +54,15 @@ export const DatasetBandPresetList = (props: DatasetBandPresetListProps) => {
 
 export type DatasetBandPresetSelectorProps = {
     presets: BandMathConfigPreset[];
-    rasterView: IDatasetRasterViz;
+    bandMath: IBandMathPreset;
 };
 
 export const DatasetBandPresetSelector = (props: DatasetBandPresetSelectorProps) => {
 
-    let selectedPreset = useObserver(() => {
+    let [dropDownVisible, setDropDownVisible] = useState(false);
 
-        try {
-            let bandMath = props.rasterView.bandMath as Instance<typeof BandMathPreset>;
-            return bandMath.preset;
-        } catch (e) {
-            return undefined;
-        }
+    let selectedPreset = useObserver(() => {
+        return props.bandMath.preset;
     });
 
     let selectedPresetConfig = props.presets.find(preset => preset.id === selectedPreset);
@@ -76,11 +71,15 @@ export const DatasetBandPresetSelector = (props: DatasetBandPresetSelectorProps)
         <Dropdown
             trigger={['click']}
             placement='bottomLeft'
-
+            onVisibleChange={(visible) => setDropDownVisible(visible)}
+            visible={dropDownVisible}
             overlay={<DatasetBandPresetList
                 presets={props.presets}
                 selectedPreset={selectedPreset}
-                onPresetSelect={(preset) => props.rasterView.setBandMath({mode: 'preset', preset: preset})}
+                onPresetSelect={(preset) => {
+                    props.bandMath.setPreset(preset);
+                    setDropDownVisible(false);
+                }}
             />}
         >
             <div className='dataset-raster-band-preset'>
@@ -91,50 +90,4 @@ export const DatasetBandPresetSelector = (props: DatasetBandPresetSelectorProps)
             </div>
         </Dropdown>
     );
-
-    // return (
-    //     <Popover
-    //         trigger='click'
-    //         placement='bottom'
-
-    //         content={<DatasetBandPresetList
-    //             presets={props.presets}
-    //             selectedPreset={selectedPreset}
-    //             onPresetSelect={(preset) => props.rasterView.setBandMath({mode: 'preset', preset: preset})}
-    //         />}
-    //     >
-    //         <div className='dataset-raster-band-preset'>
-    //             {selectedPresetConfig && <DatasetBandPresetSelectorItem
-    //                 preset={selectedPresetConfig}
-    //             />}
-    //             <Button type='link'><Icon type='down'></Icon></Button>
-    //         </div>
-    //     </Popover>
-    // );
-
-    // return (
-    //     <Collapse
-    //         className='dataset-band-selector'
-    //         bordered={false}
-    //     >
-    //         <Collapse.Panel
-    //             key='band-selector'
-    //             showArrow={false}
-    //             header={
-    //                 <div className='dataset-raster-band-preset'>
-    //                     {selectedPresetConfig && <DatasetBandPresetSelectorItem
-    //                         preset={selectedPresetConfig}
-    //                     />}
-    //                     <Button type='link'><Icon type='down'></Icon></Button>
-    //                 </div>
-    //             }
-    //         >
-    //             <DatasetBandPresetList
-    //                 presets={props.presets}
-    //                 selectedPreset={selectedPreset}
-    //                 onPresetSelect={(preset) => props.rasterView.setBandMath({mode: 'preset', preset: preset})}
-    //             />
-    //         </Collapse.Panel>
-    //     </Collapse>
-    // );
 };

@@ -30,7 +30,7 @@ export const DatasetValueDimensionSelector = (props: DatasetValueDimensionSelect
     };
 
     return (
-        <div className='dataset-dimension-selector'>
+        <div className='dataset-dimension-value-selector dataset-slider-selector'>
             <span>{props.dimension.name}: </span>
             <Slider
                 min={domain.min}
@@ -108,7 +108,7 @@ export const DatasetCategoricalDimensionSelector = (props: DatasetCategoricalDim
     });
 
     return (
-        <div className='dataset-dimension-value-selector'>
+        <div className='dataset-dimension-value-selector dataset-combo-selector'>
             <span>{props.dimension.name}: </span>
             <Select
                 value={value}

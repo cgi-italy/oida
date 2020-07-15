@@ -210,7 +210,11 @@ export function DatasetDimensionSeriesChart(props: DatasetDimensionSeriesChartPr
             position: (idx % 2) ? 'right' : 'left',
             nameGap: 20,
             width: '100px',
-            offset: Math.floor(idx / 2) * 60
+            offset: Math.floor(idx / 2) * 60,
+            axisLine: {
+                onZero: false
+            },
+            scale: true
         };
     });
 
@@ -219,7 +223,10 @@ export function DatasetDimensionSeriesChart(props: DatasetDimensionSeriesChartPr
             type: axes.x[dimensionId].type,
             name: axes.x[dimensionId].label,
             nameLocation: 'middle',
-            nameGap: 40
+            nameGap: 40,
+            axisLine: {
+                onZero: false
+            }
         };
     });
 

@@ -37,17 +37,6 @@
     }
 }
 
-.dataset-var-selector {
-    display: flex;
-    align-items: center;
-    margin-bottom: 0.5rem;
-    > span {
-        flex-grow: 0;
-        flex-shrink: 0;
-        margin-right: 0.5rem;
-    };
-}
-
 
 .dataset-colormap-selector {
 
@@ -56,6 +45,12 @@
             display: flex;
             justify-content: space-between;
             margin: 0.5rem -0.5rem -0 -0.5rem;
+            align-items: center;
+
+            .dataset-colormap-units {
+                font-size: 12px;
+            }
+
         }
 
         .ant-slider {

@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { DatasetVizOpacityControl } from './dataset-viz-opacity-control';
-import { DatasetBandPresetSelector } from './dataset-band-preset-selector';
+import { DatasetMultiBandControls } from './dataset-multiband-controls';
 import { DatasetColormapSelector } from './dataset-colormap-selector';
 import { DatasetDimensionValueSelector } from './dataset-dimension-value-selector';
 import { DatasetVizSettingsFactory } from './dataset-viz-settings-factory';
@@ -39,9 +39,9 @@ export const DatasetRasterVizSettings = (props: DatasetRasterVizSettingsProps) =
             />
             {dimensionSelectors}
             {props.datasetViz.bandMath &&
-                <DatasetBandPresetSelector
-                    rasterView={props.datasetViz}
-                    presets={bandMathConfig ? bandMathConfig.presets || [] : []}
+                <DatasetMultiBandControls
+                    dataset={props.datasetViz}
+                    bandMathConfig={bandMathConfig!}
                 />
             }
             {props.datasetViz.colorMap && colorMapConfig &&

@@ -12,6 +12,20 @@ export const hasDimensionsDecl = types.model('hasDimensions', {
             }
         },
     };
+}).preProcessSnapshot((s) => {
+    let dimensionValues = {
+        ...s.dimensionValues
+    };
+
+    for (let id in dimensionValues) {
+        if (id === 'time') {
+            dimensionValues[id] = new Date(dimensionValues[id]);
+        }
+    }
+    return {
+        ...s,
+        dimensionValues: dimensionValues
+    };
 });
 
 type HasDimensionsType = typeof hasDimensionsDecl;

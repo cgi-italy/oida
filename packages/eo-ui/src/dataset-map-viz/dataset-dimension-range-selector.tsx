@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Form } from 'antd';
 
-import { DatasetDimension, DomainRange, ValueDomain, isValueDomain, DataDomain } from '@oida/eo';
-import { NumericRangeFieldRenderer, DateRangeFieldRenderer } from '@oida/ui-react-antd';
+import { DatasetDimension, DomainRange, ValueDomain, isValueDomain, DataDomain, CategoricalDomain } from '@oida/eo';
+import { NumericRangeFieldRenderer, DateRangeFieldRenderer, SelectEnumRenderer } from '@oida/ui-react-antd';
 
 type TimeDimension = DatasetDimension<ValueDomain<Date>> & {domain: ValueDomain<Date>};
 type ValueDimension = DatasetDimension<ValueDomain<number>> & {domain: ValueDomain<number>};
+type CategoricalDimension = DatasetDimension<CategoricalDomain<string>> & {domain: CategoricalDomain<string>};
 
 export type DatasetValueDimensionSelectorProps = {
     dimension: ValueDimension;
@@ -69,6 +70,31 @@ export const DatasetTimeRangeSelector = (props: DatasetTimeRangeSelectorProps) =
     );
 };
 
+export type DatasetCategoricalRangeSelectorProps = {
+    dimension: CategoricalDimension;
+    value?: string[];
+    onChange: (value: string[]) => void;
+};
+
+export const DatasetCategoricalRangeSelector = (props: DatasetCategoricalRangeSelectorProps) => {
+    return (
+        <Form.Item label='Range'>
+            <SelectEnumRenderer
+                value={props.value}
+                onChange={(value) => props.onChange(value as string[])}
+                config={{
+                    choices: props.dimension.domain.map(domainValue => {
+                        return {
+                            name: domainValue.label || domainValue.value,
+                            value: domainValue.value
+                        };
+                    }),
+                    multiple: true
+                }}
+            />
+        </Form.Item>
+    );
+};
 
 export type DatasetDimensionRangeProps = {
     dimension: DatasetDimension<DataDomain<number | Date | string>>;
@@ -80,12 +106,17 @@ export const DatasetDimensionRangeSelector = (props: DatasetDimensionRangeProps)
 
     const [domain, setDomain] = useState(props.dimension.domain);
     useEffect(() => {
-        if (!domain && props.dimension.domainProvider) {
+        if (props.dimension.domain) {
+            setDomain(props.dimension.domain);
+        } else if (props.dimension.domainProvider) {
             props.dimension.domainProvider().then((d) => {
                 setDomain(d);
             });
         }
-    });
+        return () => {
+            setDomain(undefined);
+        };
+    }, [props.dimension]);
 
     if (!domain) {
         return null;

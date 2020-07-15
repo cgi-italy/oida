@@ -8,6 +8,8 @@ import { DownOutlined } from '@ant-design/icons';
 
 import { IColorMapBase, IColorMapCustom, IColorMap, DatasetVariable, ColorMapConfigPreset, ValueDomain } from '@oida/eo';
 
+import { DatasetInfoTooltip } from './dataset-info-tooltip';
+
 export type DatasetColormapPresetSelectorItemProps = {
     preset: ColorMapConfigPreset;
 };
@@ -165,7 +167,7 @@ export const DatasetColormapRangeSelector = (props: DatasetColormapRangeSelector
                         }
                     }}
                 />
-                {props.variable.units && <span>{props.variable.units}</span>}
+                {props.variable.units && <span className='dataset-colormap-units'>{props.variable.units}</span>}
                 <InputNumber
                     value={domain.max}
                     min={variableDomain?.min}
@@ -201,6 +203,7 @@ export const DatasetColormapRangeSelector = (props: DatasetColormapRangeSelector
 export type DatasetColormapVariableSelectorProps = {
     colorMap: IColorMap;
     variables: DatasetVariable<ValueDomain<number>>[];
+    variableSelectorLabel?: string
 };
 
 export const DatasetColormapVariableSelector = (props: DatasetColormapVariableSelectorProps) => {
@@ -218,8 +221,8 @@ export const DatasetColormapVariableSelector = (props: DatasetColormapVariableSe
     });
 
     return (
-        <div className='dataset-var-selector'>
-            <span>Variable: </span>
+        <div className='dataset-var-selector dataset-combo-selector'>
+            <span>{props.variableSelectorLabel || 'Variable'}: </span>
             <Select
                 value={selectedVariable}
                 onChange={(variable) => {
@@ -240,6 +243,7 @@ export const DatasetColormapVariableSelector = (props: DatasetColormapVariableSe
             >
                 {dataVarOptions}
             </Select>
+            <DatasetInfoTooltip info={selectedVariable ? findVariableConfig(selectedVariable)?.description : undefined}/>
         </div>
     );
 };
@@ -249,6 +253,7 @@ export type DatasetColormapSelectorProps = {
     presets: ColorMapConfigPreset[];
     colorMap: IColorMap;
     variables?: DatasetVariable<ValueDomain<number>> | DatasetVariable<ValueDomain<number>>[];
+    variableSelectorLabel?: string
 };
 
 export const DatasetColormapSelector = (props: DatasetColormapSelectorProps) => {
@@ -268,6 +273,7 @@ export const DatasetColormapSelector = (props: DatasetColormapSelectorProps) => 
         variableSelector = <DatasetColormapVariableSelector
             colorMap={props.colorMap}
             variables={props.variables}
+            variableSelectorLabel={props.variableSelectorLabel}
         />;
     }
 
