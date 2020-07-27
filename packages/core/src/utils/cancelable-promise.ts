@@ -20,11 +20,12 @@ type CancelablePromiseOptions = {
 
 const wrapCallback = <TResult>(
     callback: ((value: any) => TResult | PromiseLike<TResult>) | undefined | null,
-    options: CancelablePromiseOptions
+    options: CancelablePromiseOptions,
+    shouldThrowIfNoCallback?: boolean
 ) => {
     return (arg) => {
-        if (callback) {
-            if (!options.isCanceled) {
+        if (!options.isCanceled) {
+            if (callback) {
                 let result = callback(arg);
                 if (result instanceof Promise) {
                     options.onCancel = result.cancel;
@@ -32,6 +33,8 @@ const wrapCallback = <TResult>(
                     options.onCancel = undefined;
                 }
                 return result;
+            } else if (shouldThrowIfNoCallback) {
+                throw arg;
             }
         }
     };
@@ -46,7 +49,7 @@ const cancelableThen = function<TResult1, TResult2>(
     return cancelable(
         this.then(
             wrapCallback(onfulfilled, options),
-            wrapCallback(onrejected, options)
+            wrapCallback(onrejected, options, true)
         ),
         options
     );
@@ -76,7 +79,7 @@ const cancelableFinally = function<TResult1>(
     );
 };
 
-const cancelable = <TResult1>(promise: Promise<TResult1>, options: CancelablePromiseOptions = {isCanceled: false}) => {
+const cancelable = <TResult1>(promise: Promise<TResult1>, options: CancelablePromiseOptions = {isCanceled: false}) : Promise<TResult1> => {
     return {
         isCancelable: true,
         then: cancelableThen.bind(promise, options),
@@ -91,7 +94,7 @@ const cancelable = <TResult1>(promise: Promise<TResult1>, options: CancelablePro
         get isCanceled() {
             return options.isCanceled;
         }
-    };
+    } as Promise<TResult1>;
 };
 
 export const CancelablePromise = <T>(promise: Promise<T>, onCancel?: () => void) => {
