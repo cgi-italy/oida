@@ -86,8 +86,10 @@ export class CesiumTileLayer extends CesiumMapLayer implements ITileLayerRendere
 
     setExtent(extent) {
         this.extent_ = extent;
-        this.imageries_.removeAll(false);
-        this.imageries_.add(new ImageryLayer(this.source_, this.getLayerOptions_()));
+        if (this.source_) {
+            this.imageries_.removeAll(false);
+            this.imageries_.add(new ImageryLayer(this.source_, this.getLayerOptions_()));
+        }
     }
 
     protected getLayerOptions_() {
