@@ -1,0 +1,22 @@
+@import '~@oida/ui-react-core/styles/utils/scrollbar';
+
+.dataset-vector-feature-list {
+
+    .dataset-vector-feature-list-title {
+        font-weight: bold;
+        color: white;
+    }
+
+    .dataset-vector-feature-items {
+        max-height: 30vh;
+        padding: 0.5rem 0 0.5rem 0.5rem;
+        border-bottom: solid 1px @border-color-base;
+        margin-bottom: 1em;
+    }
+
+    .dataset-vector-feature-info {
+        max-height: 30vh;
+        overflow: auto;
+        .scrollbar(8px, @primary-color, @primary-2);
+    }
+}
