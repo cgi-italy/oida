@@ -337,6 +337,10 @@ export const DatasetDiscoveryTimeline = (props: DatasetExplorerTimelineProps) =>
             idGetter: (datasetView) => datasetView.dataset.id,
             onItemAdd: (datasetView, idx) => {
 
+                if (!datasetView.timeDistributionViz) {
+                    return;
+                }
+
                 let groupId = datasetView.dataset.id;
 
                 timelineGroups.current.add({
@@ -379,16 +383,17 @@ export const DatasetDiscoveryTimeline = (props: DatasetExplorerTimelineProps) =>
                 updateGroupsOrdering();
 
                 return (() => {
-                    //groupUpdateDisposer();
                     groupItemsTracker.destroy();
                     timelineGroups.current.remove(groupId);
                 });
 
             },
             onItemRemove: (disposer) => {
-                //@ts-ignore
-                disposer();
-                updateGroupsOrdering();
+                if (disposer) {
+                    //@ts-ignore
+                    disposer();
+                    updateGroupsOrdering();
+                }
             }
         });
 

@@ -36,7 +36,12 @@ export const DatasetExplorerMapViz = (props: DatasetExplorerMapVizProps) => {
 
     let items = datasetMapViews.map((view, idx) => {
         return (
-            <SortableItem key={view.id} index={idx} datasetViz={view.mapViz}/>
+            <SortableItem
+                key={view.id}
+                index={idx}
+                datasetViz={view.mapViz}
+                onRemove={() => props.explorerState.removeDataset(view.id)}
+            />
         );
     });
 
@@ -60,7 +65,7 @@ export const DatasetExplorerMapViz = (props: DatasetExplorerMapVizProps) => {
                             props.explorerState.moveDataset(data.oldIndex, data.newIndex);
                         }}
                         size='small'
-                        itemLayout='vertical'
+                        itemLayout='horizontal'
                     >
                         {items}
                     </SortableList>

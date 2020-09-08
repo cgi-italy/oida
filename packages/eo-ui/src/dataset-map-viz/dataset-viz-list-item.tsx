@@ -6,7 +6,8 @@ import { useObserver } from 'mobx-react';
 import { List, Button, Badge, Tooltip } from 'antd';
 import {
     FullscreenExitOutlined, SettingOutlined, BarChartOutlined,
-    DownloadOutlined, EyeOutlined, EyeInvisibleOutlined, DragOutlined
+    DownloadOutlined, EyeOutlined, EyeInvisibleOutlined, DragOutlined,
+    CloseOutlined
 } from '@ant-design/icons';
 import { SortableHandle } from 'react-sortable-hoc';
 
@@ -20,6 +21,7 @@ import { DatasetVizDownloadModal } from './dataset-viz-download';
 
 export type DatasetVizListItemProps = {
     datasetViz: IDatasetViz;
+    onRemove?: () => void;
 };
 
 export const DatasetVizListItem = (props: DatasetVizListItemProps) => {
@@ -119,9 +121,11 @@ export const DatasetVizListItem = (props: DatasetVizListItemProps) => {
 
     let DragHandle = SortableHandle(() => <div className='viz-drag-button'><DragOutlined/></div>);
 
+    const onItemRemove = props.onRemove;
 
     return (
         <List.Item
+            className='viz-item'
         >
             <div className='viz-item-content'>
                 <DragHandle/>
@@ -158,6 +162,16 @@ export const DatasetVizListItem = (props: DatasetVizListItemProps) => {
                     })
                 }
                 </div>
+                {onItemRemove && <Tooltip title='Remove layer'>
+                    <Button
+                        className='viz-iten-remove-btn'
+                        size='small'
+                        onClick={() => onItemRemove()}
+                    >
+                        <CloseOutlined/>
+                    </Button>
+                </Tooltip>
+                }
             </div>
             <DatasetVizProgressControl
                 datasetViz={props.datasetViz}

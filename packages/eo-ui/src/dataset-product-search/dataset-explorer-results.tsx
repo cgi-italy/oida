@@ -28,6 +28,9 @@ export const DatasetExplorerResults = (props: DatasetExplorerResultsProps) => {
 
     let panes = useObserver(() => {
         return props.explorerState.datasetViews.map(({dataset, productSearchViz}) => {
+            if (!productSearchViz) {
+                return null;
+            }
             return (
                 <Tabs.TabPane
                     tab={<React.Fragment><Badge color={dataset.config.color}></Badge>{dataset.config.name}</React.Fragment>}
@@ -35,8 +38,8 @@ export const DatasetExplorerResults = (props: DatasetExplorerResultsProps) => {
                 >
                     <DatasetSearchResultsList
                         queryParams={dataset.searchParams}
-                        results={productSearchViz!.products}
-                        loadingState={productSearchViz!.loadingState}
+                        results={productSearchViz.products}
+                        loadingState={productSearchViz.loadingState}
                         selection={props.selection}
                         itemContent={dataset.config.search!.searchItemContent}
                         onVisualizeItemAction={(item) => {
