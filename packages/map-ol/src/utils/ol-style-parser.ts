@@ -34,10 +34,12 @@ export class OLStyleParser {
             }
         }
 
-        Object.defineProperty(olStyle, 'pickingDisabled', {
-            value: pickingDisabled,
-            writable: true
-        });
+        if (olStyle) {
+            Object.defineProperty(olStyle, 'pickingDisabled', {
+                value: pickingDisabled,
+                writable: true
+            });
+        }
 
         return olStyle;
     }
