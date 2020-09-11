@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.3.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/map-ol@1.2.0...@oida/map-ol@1.3.0) (2020-09-11)
+
+
+### Bug Fixes
+
+* check for undefined style when setting picking props ([b421adf](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/b421adf78be516899b62d3348730dc34f7d83d37))
+
+
+### Features
+
+* allow disabling picking for a geometry from its style ([4eae42d](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/4eae42d24a23e9149ac579bc5a9bfd5a1cd09277))
+
+
+
+
+
 # [1.2.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/map-ol@1.1.0...@oida/map-ol@1.2.0) (2020-05-22)
 
 

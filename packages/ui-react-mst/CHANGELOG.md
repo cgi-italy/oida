@@ -3,6 +3,29 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.0.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/ui-react-mst@3.0.0...@oida/ui-react-mst@4.0.0) (2020-09-11)
+
+
+### Code Refactoring
+
+* reimplement cancelable promises ([f2d7249](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/f2d72494849661151744fe843123b196ff002ff7))
+
+
+### Features
+
+* add geojson aoi provider ([bed8ed4](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/bed8ed4b6ce9e9f7e9d13593181fe45b2f1a736a))
+
+
+### BREAKING CHANGES
+
+* CancelablePromise type is not defined anymore. New methods merged on Promise
+interface
+Cancelation doesn't throw anymore. Use finally for cleanup operations
+
+
+
+
+
 # [3.0.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/ui-react-mst@2.0.0...@oida/ui-react-mst@3.0.0) (2020-05-22)
 
 

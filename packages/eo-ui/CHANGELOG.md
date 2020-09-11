@@ -3,6 +3,44 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.0.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/eo-ui@1.2.0...@oida/eo-ui@2.0.0) (2020-09-11)
+
+
+### Code Refactoring
+
+* reimplement cancelable promises ([f2d7249](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/f2d72494849661151744fe843123b196ff002ff7))
+* update DatasetVariable definition ([4875009](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/4875009fb8dc1835281512d900d85813ca40af57))
+
+
+### Features
+
+* add analysis aoi linking/unlinking tools ([96fe274](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/96fe2748cda01d868e283f08e52e713a8a97e147))
+* add area statistics series support ([49648e1](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/49648e1856ea9ec80bd6ceb53e863c718457ca15))
+* add generic dataset dimension selectors ([89fef99](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/89fef99b7b2056e65d18d3be5b8872efeddc87aa))
+* add preliminary support for transect analysis ([c31abc3](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/c31abc33207356cd61467b01607496e1bd04399c))
+* add preliminary support for vector datasets ([4a37c39](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/4a37c393e7119d8b01c4d8cf775779ab48716d1c))
+* add remove action in dataset map viz item ([5f7cdc3](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/5f7cdc34e15541824180721eb785f333284b3713))
+* add support for dataset dimension selection in raster viz ([0fd6c29](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/0fd6c291dd7c0caa6cd9398423cb746465b9fee6))
+* add units in colormap control ([3dd08fc](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/3dd08fc0fc02e35ecfea91a8b47afeed3e760c09))
+* allow to move analyses between charts ([738ec7e](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/738ec7ee8b68e4b58bfcf61f709009317e653643))
+* imporve support for eo multiband datasets ([bc1a85d](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/bc1a85d0ac20a93a4c2be51a857aca53dce18917))
+* improve dataset analysis support ([53320bb](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/53320bbea16c52f8e9cb19235c601fa8f2ceabef))
+* improve dataset time navigation ([0b055d2](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/0b055d2fa5f232766c7408394df04e2bf6b67f85))
+* link map and chart view for transect series point highlight ([064fd45](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/064fd45e77f37d5febc31d834b73fcc51ff045b7))
+
+
+### BREAKING CHANGES
+
+* Code using the DatasetVariable and DatasetDimension types should be updated to use
+the new generic type
+* CancelablePromise type is not defined anymore. New methods merged on Promise
+interface
+Cancelation doesn't throw anymore. Use finally for cleanup operations
+
+
+
+
+
 # [1.2.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/eo-ui@1.1.0...@oida/eo-ui@1.2.0) (2020-05-22)
 
 

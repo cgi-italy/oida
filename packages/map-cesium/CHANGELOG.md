@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.3.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/map-cesium@1.2.0...@oida/map-cesium@1.3.0) (2020-09-11)
+
+
+### Bug Fixes
+
+* add cesium billboard zIndex support ([ec1feaf](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/ec1feafbaca802bb300f8a1e8f98eb8833953f80))
+* apply current visibility and opacity to new imageries ([183e3ad](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/183e3ada31c38e592ed574dc1c670e3466e49b8c))
+* check for null source in cesium tile layer extent update ([4219547](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/42195479774f7c71f21aee821ecc80767cee61b1))
+* listen to mouseleave event in CesiumMouseCoordsInteraction ([3eb0ed0](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/3eb0ed00f88fd78145572ffd01682c1680e9186e))
+
+
+### Features
+
+* add preliminary support for feature hovering callbacks ([c144e3b](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/c144e3b520ddfba078bd0f441e81c1a408abe16d))
+* allow disabling picking for a geometry from its style ([4eae42d](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/4eae42d24a23e9149ac579bc5a9bfd5a1cd09277))
+
+
+
+
+
 # [1.2.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/map-cesium@1.1.0...@oida/map-cesium@1.2.0) (2020-05-22)
 
 

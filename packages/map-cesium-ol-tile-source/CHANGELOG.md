@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.1](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/map-cesium-ol-tile-source@0.1.0...@oida/map-cesium-ol-tile-source@0.1.1) (2020-09-11)
+
+**Note:** Version bump only for package @oida/map-cesium-ol-tile-source
+
+
+
+
+
 # 0.1.0 (2020-05-22)
 
 

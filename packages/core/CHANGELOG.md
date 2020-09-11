@@ -3,6 +3,37 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.0.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/core@1.2.0...@oida/core@2.0.0) (2020-09-11)
+
+
+### Bug Fixes
+
+* solve issue in cancelable promise implementation ([92413a3](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/92413a3fb2ab6ec477d3105792e6a640f6d65477))
+
+
+### Code Refactoring
+
+* reimplement cancelable promises ([f2d7249](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/f2d72494849661151744fe843123b196ff002ff7))
+
+
+### Features
+
+* add date form field ([e946019](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/e946019e77239cfd3862e55b3d2f64a2649161c0))
+* allow disabling picking for a geometry from its style ([4eae42d](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/4eae42d24a23e9149ac579bc5a9bfd5a1cd09277))
+* improve dataset analysis support ([53320bb](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/53320bbea16c52f8e9cb19235c601fa8f2ceabef))
+* improve dataset time navigation ([0b055d2](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/0b055d2fa5f232766c7408394df04e2bf6b67f85))
+
+
+### BREAKING CHANGES
+
+* CancelablePromise type is not defined anymore. New methods merged on Promise
+interface
+Cancelation doesn't throw anymore. Use finally for cleanup operations
+
+
+
+
+
 # [1.2.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/core@1.1.0...@oida/core@1.2.0) (2020-05-22)
 
 

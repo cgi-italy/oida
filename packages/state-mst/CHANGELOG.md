@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.0.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/state-mst@2.1.0...@oida/state-mst@3.0.0) (2020-09-11)
+
+
+### Bug Fixes
+
+* remove buggy support for fixedKey in non serializable mst type ([47b95b8](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/47b95b8f577f25feb35121d9491cf6bd8ef8556a))
+* solve issue with array tracker init on array with references ([679b512](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/679b512656b4593cca77f8f8ae9b30c7bc9c7105))
+
+
+### Code Refactoring
+
+* reimplement cancelable promises ([f2d7249](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/f2d72494849661151744fe843123b196ff002ff7))
+
+
+### BREAKING CHANGES
+
+* CancelablePromise type is not defined anymore. New methods merged on Promise
+interface
+Cancelation doesn't throw anymore. Use finally for cleanup operations
+
+
+
+
+
 # [2.1.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/state-mst@2.0.0...@oida/state-mst@2.1.0) (2020-05-22)
 
 

@@ -1,6 +1,6 @@
 {
   "name": "@oida/map-ol",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Openlayers map renderer wrapper library",
   "module": "es/index.js",
   "main": "lib/index.js",

@@ -1,6 +1,6 @@
 {
   "name": "@oida/ui-react-mst",
-  "version": "3.0.0",
+  "version": "4.0.0",
   "description": "app components and state management",
   "module": "es/index.js",
   "main": "lib/index.js",

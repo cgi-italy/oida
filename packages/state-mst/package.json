@@ -1,6 +1,6 @@
 {
   "name": "@oida/state-mst",
-  "version": "2.1.0",
+  "version": "3.0.0",
   "description": "oida mst state management library",
   "module": "es/index.js",
   "main": "lib/index.js",
