@@ -122,19 +122,8 @@ export class CesiumPolygonPrimitiveRenderer implements CesiumGeometryPrimitiveRe
 
     updateStyle(feature, style) {
 
-        if (feature.numGeometries) {
-            for (let i = 0; i < feature.numGeometries; ++i) {
-                let attributes = feature.fill.getGeometryInstanceAttributes(`${feature.id}_${i}`);
-                attributes.color = ColorGeometryInstanceAttribute.toValue(new Color(...style.fillColor));
-                attributes = feature.stroke.getGeometryInstanceAttributes(`${feature.id}_${i}`);
-                attributes.color = ColorGeometryInstanceAttribute.toValue(new Color(...style.strokeColor));
-            }
-        } else {
-            let attributes = feature.fill.getGeometryInstanceAttributes(feature.id);
-            attributes.color = ColorGeometryInstanceAttribute.toValue(new Color(...style.fillColor));
-            attributes = feature.stroke.getGeometryInstanceAttributes(feature.id);
-            attributes.color = ColorGeometryInstanceAttribute.toValue(new Color(...style.strokeColor));
-        }
+        this.updatePrimitiveColor_(feature.fill, style.fillColor);
+        this.updatePrimitiveColor_(feature.stroke, style.strokeColor);
 
         feature.stroke.show = style.visible;
         feature.fill.show = style.visible;
@@ -273,5 +262,24 @@ export class CesiumPolygonPrimitiveRenderer implements CesiumGeometryPrimitiveRe
             fill: circleInstance,
             outline: outlineInstance
         };
+    }
+
+    protected updatePrimitiveColor_(primitive, color) {
+
+        if (primitive.ready) {
+            const instanceIds = primitive._instanceIds;
+            instanceIds.forEach((id) => {
+                const attributes = primitive.getGeometryInstanceAttributes(id);
+                attributes.color = ColorGeometryInstanceAttribute.toValue(new Color(...color));
+            });
+        } else {
+            const geometryInstances: GeometryInstance[] = Array.isArray(primitive.geometryInstances)
+                ? primitive.geometryInstances
+                : [primitive.geometryInstances];
+
+            geometryInstances.forEach((instance) => {
+                instance.attributes.color = new ColorGeometryInstanceAttribute(...color);
+            });
+        }
     }
 }
