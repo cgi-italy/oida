@@ -9,9 +9,12 @@ const generateObjectKey = () => {
     return `mst_obj_${nextObjId++}`;
 };
 
-export const registerObject = <T>(obj: T) => {
+export const registerObject = <T>(obj: T, shouldThrowOnMultipleRegistration?: boolean) => {
     //already registered
     if (obj[objIdKey]) {
+        if (shouldThrowOnMultipleRegistration) {
+            throw new Error('NonSerializableType: object registered multiple times');
+        }
         return;
     }
     let objId = generateObjectKey();
@@ -26,8 +29,17 @@ export const registerObject = <T>(obj: T) => {
     });
 };
 
+export const unregisterObject = <T>(obj: T) => {
+    if (obj && obj[objIdKey]) {
+        delete registeredObjects[obj[objIdKey]];
+    }
+};
 
-export const NonSerializableType = <T>() => {
+export type NonSerializableTypeOptions = {
+    shouldThrowOnMultipleRegistration?: boolean
+};
+
+export const NonSerializableType = <T>(options?: NonSerializableTypeOptions) => {
 
     return types.custom<string, T>({
         name: 'NonSerializableObject',
@@ -36,7 +48,7 @@ export const NonSerializableType = <T>() => {
         },
         toSnapshot(value) {
             if (!value[objIdKey]) {
-                registerObject(value);
+                registerObject(value, options?.shouldThrowOnMultipleRegistration);
             }
             return value[objIdKey];
         },

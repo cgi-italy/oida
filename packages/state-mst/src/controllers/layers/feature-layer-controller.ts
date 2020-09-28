@@ -89,6 +89,23 @@ export class FeatureLayerController extends MapLayerController<IFeatureLayerRend
             }, {fireImmediately: true})
         );
 
+        this.subscriptionTracker_.addSubscription(
+            reaction(() => {
+                return this.mapLayer_.config;
+            }, (config) => {
+                if (!config) {
+                    return;
+                } else {
+                    if (config.styleGetter !== this.styleGetter_) {
+                        this.styleGetter_ = config.styleGetter || defaultStyleGetter;
+                    }
+                    if (config.geometryGetter !== this.geometryGetter_) {
+                        this.geometryGetter_ = config.geometryGetter || defaultGeometryGetter;
+                    }
+                }
+            })
+        );
+
     }
 
     protected unbindFromLayerState_() {

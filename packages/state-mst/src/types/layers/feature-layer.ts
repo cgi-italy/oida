@@ -2,7 +2,7 @@ import { types, Instance } from 'mobx-state-tree';
 
 import { FEATURE_LAYER_ID, Geometry, IFeatureStyle } from '@oida/core';
 
-import { hasOptionalConfig } from '../mixins/has-config';
+import { hasDynamicConfig } from '../mixins/has-config';
 import { getEntityCollectionType } from '../entity/entity-collection';
 import { ReferenceOrType } from '../mst/reference-or-type';
 import { IEntity } from '../entity';
@@ -32,7 +32,7 @@ const FeatureLayerDecl = MapLayer.addModel(
                 }
             };
         }),
-        hasOptionalConfig<FeatureLayerConfig<any>>()
+        hasDynamicConfig<FeatureLayerConfig<any>>()
     )
 );
 
