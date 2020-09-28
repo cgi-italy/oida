@@ -7,3 +7,4 @@ export * from './use-map-nav-controls';
 export * from './use-center-on-map';
 export * from './use-map-viewport';
 export * from './use-export-map';
+export * from './use-map-selection';
