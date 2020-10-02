@@ -30,7 +30,8 @@
     "@turf/circle": "^6.0.1",
     "@turf/flip": "^5.1.5",
     "axios": "^0.18.1",
-    "geodesy": "^1.1.3"
+    "geodesy": "^1.1.3",
+    "tslib": "^2.0.1"
   },
   "peerDependencies": {
     "moment": "^2.x"

@@ -25,7 +25,8 @@
     "registry": "https://nexus.dev.eoss-cloud.it/repository/npm-cgi-eo/"
   },
   "dependencies": {
-    "@oida/core": "file:../core"
+    "@oida/core": "file:../core",
+    "tslib": "^2.0.1"
   },
   "peerDependencies": {
     "cesium": "^1.68.0",

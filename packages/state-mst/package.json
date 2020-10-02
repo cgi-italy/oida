@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "@oida/core": "file:../core",
-    "lodash": "4.17.15"
+    "lodash": "4.17.15",
+    "tslib": "^2.0.1"
   }
 }

@@ -38,6 +38,7 @@
     "chroma-js": "^2.0.2",
     "downloadjs": "^1.4.7",
     "lodash": "^4.17.15",
-    "react-resize-aware": "^3.0.0"
+    "react-resize-aware": "^3.0.0",
+    "tslib": "^2.0.1"
   }
 }

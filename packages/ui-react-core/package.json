@@ -32,6 +32,7 @@
   },
   "dependencies": {
     "@oida/core": "file:../core",
-    "scroll-into-view-if-needed": "^2.2.20"
+    "scroll-into-view-if-needed": "^2.2.20",
+    "tslib": "^2.0.1"
   }
 }

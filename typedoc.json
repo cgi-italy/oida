@@ -1,0 +1,20 @@
+{
+  "mode": "modules",
+  "exclude": [
+    "node_modules/**",
+    "**/*.spec.ts",
+    "./packages/samples-mst-antd/**",
+    "./packages/docs/**",
+    "./packages/docz/**"
+  ],
+  "out": "docs",
+  "name": "oida",
+  "excludeExternals": true,
+  "includeDeclarations": true,
+  "plugin": ["typedoc-plugin-sourcefile-url", "typedoc-plugin-lerna-packages", "typedoc-plugin-exclude-references"],
+  "lernaExclude": [
+    "@oida/samples-mst-antd"
+  ],
+  "readme": "README.md",
+  "sourcefile-url-map": "typedoc-git-mapping.json"
+}

@@ -36,6 +36,7 @@
     "@turf/nearest-point-on-line": "^6.0.2",
     "chroma-js": "^2.0.2",
     "lodash": "^4.17.15",
+    "tslib": "^2.0.1",
     "uuid": "^8.0.0"
   }
 }
