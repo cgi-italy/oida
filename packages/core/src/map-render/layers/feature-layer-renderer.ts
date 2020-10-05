@@ -25,7 +25,7 @@ interface IIconStyle extends IGeometryStyle {
 export type IPointStyle = ICircleStyle | IIconStyle;
 
 export const isIcon = (style: IPointStyle): style is IIconStyle => {
-    return (<IIconStyle>style).url !== undefined;
+    return (style as IIconStyle).url !== undefined;
 };
 
 export interface ILineStyle extends IGeometryStyle {

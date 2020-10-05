@@ -22,5 +22,5 @@ export const createAxiosInstance = (config?: AxiosRequestConfig) => {
 
     //@ts-ignore
     instance.cancelableRequest = cancelableRequest.bind(instance);
-    return <AxiosInstanceWithCancellation>(instance);
+    return instance;
 };

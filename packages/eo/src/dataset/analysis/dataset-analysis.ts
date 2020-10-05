@@ -6,7 +6,7 @@ import chroma from 'chroma-js';
 import { Geometry, IFeatureStyle } from '@oida/core';
 import { Entity, createEntityCollectionType, FeatureLayer, hasStyleAsGetter, ReferenceOrType } from '@oida/state-mst';
 import { DatasetAnalyses } from './dataset-analyses';
-import { DatasetViz } from '../dataset-viz';
+import { DatasetVizType } from '../dataset-viz';
 
 let analysisStyleGetter = (analysis): IFeatureStyle => {
 
@@ -82,7 +82,7 @@ let getAnalysisColor = () => {
 const DatasetAnalysisDecl = Entity.addModel(types.compose(
     'datasetAnalysis',
     types.model({
-        datasetViz: ReferenceOrType(DatasetViz.Type),
+        datasetViz: ReferenceOrType(DatasetVizType),
         defaultColor: types.optional(types.string, getAnalysisColor)
     }).actions(self => ({
         afterAttach: () => {
