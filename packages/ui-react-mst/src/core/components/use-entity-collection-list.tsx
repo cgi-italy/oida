@@ -35,9 +35,13 @@ export const useEntityCollectionList = <T extends IEntity>({
             data: collection.items.slice(),
             keyGetter: (entity: T) => entity.id,
             itemSelector: (entity: T) => {
+                const itemActions = actions
+                    ? actions.filter((action) => action.condition ? action.condition(entity) : true)
+                    : undefined;
+
                 return {
                     ...useEntityListItem({entity, iconGetter}),
-                    actions
+                    actions: itemActions
                 };
             },
             onHoverAction: (item: T, hovered: boolean) => {

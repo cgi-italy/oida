@@ -26,10 +26,14 @@ export function DataCollectionItemsList<T>(props: DataCollectionItemsListProps<T
         itemSelector,
         onHoverAction,
         onSelectAction,
+        onDefaultAction,
+        multiSelect,
         keyGetter,
         ...renderProps
     } = props;
 
+
+    let isMouseHover = false;
 
     let ItemRenderer = ({item}) => {
 
@@ -57,6 +61,7 @@ export function DataCollectionItemsList<T>(props: DataCollectionItemsListProps<T
                     }
                     }>
                         {action.icon}
+                        <span className='action-content'>{action.content}</span>
                     </a>
                 </Tooltip>
             );
@@ -73,8 +78,22 @@ export function DataCollectionItemsList<T>(props: DataCollectionItemsListProps<T
                 onMouseLeave={() => {
                     onHoverAction(item, false);
                 }}
-                onClick={() => {
-                    onSelectAction(item, SelectionMode.Replace);
+                onClick={(evt) => {
+                    let selectionMode = SelectionMode.Replace;
+                    if (multiSelect) {
+                        if (evt.ctrlKey) {
+                            selectionMode = SelectionMode.Toggle;
+                        }
+                        if (evt.shiftKey) {
+                            selectionMode = SelectionMode.Add;
+                        }
+                    }
+                    onSelectAction(item, selectionMode);
+                }}
+                onDoubleClick={(evt) => {
+                    if (onDefaultAction) {
+                        onDefaultAction(item);
+                    }
                 }}
             >
                 {(icon || meta) && itemMeta}
@@ -86,7 +105,7 @@ export function DataCollectionItemsList<T>(props: DataCollectionItemsListProps<T
         if (autoScrollOnSelection) {
             itemRenderer = (
                 <CanBeScrolledIntoView
-                    scrollToItem={hovered || selected}
+                    scrollToItem={!isMouseHover && hovered}
                 >
                     {listItem}
                 </CanBeScrolledIntoView>
@@ -100,6 +119,13 @@ export function DataCollectionItemsList<T>(props: DataCollectionItemsListProps<T
 
     return  (
         <List
+            // @ts-ignore
+            onMouseEnter={() => {
+                isMouseHover = true;
+            }}
+            onMouseLeave={() => {
+                isMouseHover = false;
+            }}
             size='small'
             loading={loadingState === LoadingState.Loading}
             dataSource={data}
