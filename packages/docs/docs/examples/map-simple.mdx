@@ -1,0 +1,70 @@
+---
+id: map-simple
+title: Simple map
+---
+import useBaseUrl from '@docusaurus/useBaseUrl';
+import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
+
+import { SimpleMap, useApiLink } from '../../src/components';
+import BrowserOnly from '@docusaurus/BrowserOnly';
+
+This example show how to create a simple interactive map.
+
+<a target='apidocs' href={useApiLink({
+    module: 'state-mst',
+    element: 'Map'
+})}>Map</a>
+
+<a target='apidocs' href={useApiLink({
+    module: 'ui-react-mst',
+    element: 'MapComponent'
+})}>MapComponent</a>
+
+Import the required libraries
+```tsx
+import React from 'react';
+
+import { Map, TileLayer } from '@oida/state-mst';
+import { MapComponent } from '@oida/ui-react-mst';
+```
+Initialize the map state
+
+```tsx
+const mapState = Map.create({
+    renderer: {
+        id: 'ol'
+    },
+    view: {
+        projection: {
+            code: 'EPSG:4326'
+        },
+        viewport: {
+            center: [12, 42],
+            resolution: 3000
+        }
+    }
+});
+
+mapState.layers.children.add([
+    TileLayer.create({
+        id: 'base',
+        layerType: 'tile',
+        source: {
+            id: 'osm'
+        },
+    })
+]);
+```
+
+Use the mapcomponent with the mapState
+
+```tsx
+<MapComponent
+    style={{height: '300px', width: '400px', position: 'relative'}}
+    mapState={mapState}
+/>
+```
+
+And this is how it will look like
+
+<SimpleMap/>
