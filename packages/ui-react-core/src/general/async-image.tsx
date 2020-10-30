@@ -54,6 +54,7 @@ export class AsyncImage extends React.Component<AsyncImageProps, AsyncImageState
             if (this.state.src) {
                 children.push(
                     <img
+                        style={{display: 'none'}}
                         key='srcImage'
                         src={this.state.src}
                         onLoad={this.onImageLoaded.bind(this)}

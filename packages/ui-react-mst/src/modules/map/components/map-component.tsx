@@ -12,9 +12,10 @@ import { useMapModuleState } from '../use-map-module-state';
 export interface MapComponentProps {
     mapState: IMap;
     className?: string;
+    style?: React.CSSProperties;
 }
 
-export const MapComponent = ({mapState, className}: MapComponentProps) => {
+export const MapComponent = ({mapState, className, style}: MapComponentProps) => {
 
     const [resizeListener, size] = useResizeAware();
 
@@ -61,6 +62,7 @@ export const MapComponent = ({mapState, className}: MapComponentProps) => {
     return (
         <div
             className={classNames('map-widget', className)}
+            style={style}
             ref={mapContainer}
         >
             {resizeListener}

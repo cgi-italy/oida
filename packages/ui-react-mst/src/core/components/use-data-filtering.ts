@@ -24,7 +24,7 @@ export const useDataFiltering = ({filters, filteringState}: DataFilteringProps) 
             filters: filters,
             values: values,
             onFilterChange: (name, value) => {
-                if (value) {
+                if (value !== undefined) {
                     let filterConfig = filters.find((f) => {
                         return f.name === name;
                     });

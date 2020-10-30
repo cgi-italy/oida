@@ -10,9 +10,13 @@ import { antdFormFieldRendererFactory } from '../form/antd-form-field-renderer-f
 
 export const FieldWrapper = (props) => {
 
-    let { title, children, type, rendererId } = props;
+    let { title, children, type, required, rendererId } = props;
     return (
-        <Form.Item label={title} className={classnames(`${type.toLowerCase()}-field`, `${rendererId}-renderer`)}>
+        <Form.Item
+            label={title}
+            rules={[{required: required}]}
+            className={classnames(`${type.toLowerCase()}-field`, `${rendererId}-renderer`)}
+        >
             {children}
         </Form.Item>
     );
@@ -40,11 +44,12 @@ export const FormRenderer = (props: FormRendererProps) => {
 
     const fields = fieldsConfig.map((config) => {
         if (config) {
-            let { FieldRenderer, renderProps } = config;
+            const { FieldRenderer, renderProps } = config;
+            const { rendererId, ...fieldProps } = renderProps;
             return (
                 <FieldWrapper key={renderProps.name} {...renderProps}>
                     <FieldRenderer
-                        {...renderProps}
+                        {...fieldProps}
                         value={props.values.get(renderProps.name)}
                         onChange={(value) => onFieldChange(renderProps.name, value)}
                     />
