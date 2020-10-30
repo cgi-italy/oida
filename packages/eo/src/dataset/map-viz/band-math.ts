@@ -79,7 +79,8 @@ export const BandMathCombinationDecl = types.model('BandMathCombination', {
     mode: types.literal('combination'),
     red: types.string,
     green: types.string,
-    blue: types.string
+    blue: types.string,
+    gain: types.optional(types.number, 1)
 }).actions((self) => {
     return {
         setRed: (band: string) => {
@@ -90,6 +91,9 @@ export const BandMathCombinationDecl = types.model('BandMathCombination', {
         },
         setBlue: (band: string) => {
             self.blue = band;
+        },
+        setGain: (gain: number) => {
+            self.gain = gain;
         }
     };
 });

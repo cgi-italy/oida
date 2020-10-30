@@ -87,7 +87,9 @@ const DatasetRasterVizDecl = DatasetViz.addModel(
             let sourceUpdateDisposer = autorun(() => {
                 let sourceConfig = self.config.rasterSourceProvider(self);
                 mapLayer.setSource(sourceConfig);
-                mapLayer.setExtent(sourceConfig.extent);
+                if (sourceConfig) {
+                    mapLayer.setExtent(sourceConfig.extent);
+                }
             });
 
             if (self.config.afterInit) {

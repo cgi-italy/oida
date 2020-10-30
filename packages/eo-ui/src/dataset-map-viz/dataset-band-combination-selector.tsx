@@ -9,6 +9,8 @@ import { QuestionCircleOutlined } from '@ant-design/icons';
 
 import { IBandMathCombination, DatasetBand, DatasetBandGroup, getFlattenDatasetBands } from '@oida/eo';
 
+import { DatasetGainControl } from './dataset-gain-control';
+
 const DatasetBandDnDType = 'DATASET_BAND';
 type DatasetBandDnDItem = {
     id: string,
@@ -164,6 +166,9 @@ export const DatasetBandCombinationSelector = (props: DatasetBandCombinationSele
                 </div>
                 {bandGroupItems}
             </div>
+            <DatasetGainControl
+                datasetViz={props.bandMath}
+            />
         </div>
     );
 };
