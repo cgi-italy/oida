@@ -87,7 +87,7 @@ export class CesiumMapRenderer implements IMapRenderer {
     }
 
     fitExtent(extent, animate?: boolean) {
-        let eps = 0.01;
+        let eps = 0.0001;
 
         let destination;
         if (extent[2] - extent[0] <= eps || extent[3] - extent[1] <= eps) {
@@ -360,6 +360,7 @@ export class CesiumMapRenderer implements IMapRenderer {
         let mapProjection = getProjectionFromSRS(projection.code, true);
 
         this.viewer_ = new CesiumWidget(container, {
+            useBrowserRecommendedResolution: false,
             ...renderProps,
             imageryProvider: false,
             sceneMode: this.getSceneMode_(renderProps),
