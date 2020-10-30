@@ -1,6 +1,6 @@
 import { AxiosInstanceWithCancellation, createAxiosInstance } from '@oida/core';
 
-export class WmtsDomainDiscoveryService {
+export class WmtsDomainDiscoveryClient {
 
     private domParser = new DOMParser();
     private xmlNamespaces = {

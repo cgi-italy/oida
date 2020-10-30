@@ -74,6 +74,9 @@ const DatasetsExplorerDecl = types.compose(
         },
         get selectedDate(): Date | undefined {
             return self.commonFilters.get(DATASET_SELECTED_TIME_FILTER_KEY);
+        },
+        get shouldEnableTime(): boolean {
+            return !self.config.disableTimeExplorer && self.datasetViews.some(datasetView => !!datasetView.timeDistributionViz);
         }
     };
 })

@@ -2,7 +2,7 @@ import moment from 'moment';
 
 import { DatasetTimeDistributionProvider, TimeDistributionRangeItem } from '../dataset-time-distribution-provider';
 
-import { WmtsDomainDiscoveryService } from '../../../standards';
+import { WmtsDomainDiscoveryClient } from '../../../protocols';
 
 
 type FilterSerializer = (filters) => undefined | {[key: string]: string};
@@ -12,7 +12,7 @@ export type WmtsTimeDistributionProviderConfig = {
     layer: string;
     tileMatrix: string;
     filterSerializer: FilterSerializer;
-    wmtsService?: WmtsDomainDiscoveryService;
+    wmtsService?: WmtsDomainDiscoveryClient;
 };
 
 export class WmtsTimeDistributionProvider implements DatasetTimeDistributionProvider {
@@ -21,7 +21,7 @@ export class WmtsTimeDistributionProvider implements DatasetTimeDistributionProv
     protected layer_: string;
     protected tileMatrix_: string;
     protected filterSerializer_: FilterSerializer;
-    protected wmtsService_: WmtsDomainDiscoveryService;
+    protected wmtsClient_: WmtsDomainDiscoveryClient;
     protected timeExtent_: Promise<TimeDistributionRangeItem | undefined> | undefined;
 
     constructor(config: WmtsTimeDistributionProviderConfig) {
@@ -29,7 +29,7 @@ export class WmtsTimeDistributionProvider implements DatasetTimeDistributionProv
         this.layer_ = config.layer;
         this.tileMatrix_ = config.tileMatrix;
         this.filterSerializer_ = config.filterSerializer;
-        this.wmtsService_ = config.wmtsService || new WmtsDomainDiscoveryService({});
+        this.wmtsClient_ = config.wmtsService || new WmtsDomainDiscoveryClient({});
     }
 
     supportsHistograms() {
@@ -41,7 +41,7 @@ export class WmtsTimeDistributionProvider implements DatasetTimeDistributionProv
         if (!filters && this.timeExtent_) {
             return this.timeExtent_;
         } else {
-            let request = this.wmtsService_.describeDomains({
+            let request = this.wmtsClient_.describeDomains({
                 url: this.serviceUrl_,
                 layer: this.layer_,
                 tileMatrix: this.tileMatrix_,
@@ -86,7 +86,7 @@ export class WmtsTimeDistributionProvider implements DatasetTimeDistributionProv
             resParam = moment.duration(resolution).toISOString();
         }
 
-        return this.wmtsService_.getHistogram({
+        return this.wmtsClient_.getHistogram({
             url: this.serviceUrl_,
             layer: this.layer_,
             tileMatrix: this.tileMatrix_,
