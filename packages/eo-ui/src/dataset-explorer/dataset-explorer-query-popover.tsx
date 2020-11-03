@@ -16,6 +16,7 @@ export const DatasetExplorerQueryPopover = (props: DatasetExplorerQueryPopoverPr
 
     return (
         <Popover
+            overlayClassName='dataset-explorer-query-popover'
             content={(
                 <DatasetExplorerQuery
                     discoveryState={props.discoveryState}

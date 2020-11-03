@@ -1,8 +1,15 @@
+@import '~@oida/ui-react-core/styles/utils/scrollbar';
+
+.dataset-colormap-preset-dropdown {
+    width: 300px;
+}
+
 .dataset-colormap-presets {
 
     border: solid 1px @border-color-base;
     border-radius: 5px;
-    overflow: hidden;
+    overflow: auto;
+    .scrollbar(8px, @primary-color, @primary-2);
 }
 
 .dataset-colormap-preset {
