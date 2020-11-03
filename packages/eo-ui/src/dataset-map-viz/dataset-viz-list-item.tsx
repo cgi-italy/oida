@@ -67,7 +67,7 @@ export const DatasetVizListItem = (props: DatasetVizListItemProps) => {
             callback: () => {
                 let dataset = props.datasetViz.dataset;
                 if (dataset.config.spatialCoverageProvider) {
-                    dataset.config.spatialCoverageProvider().then(extent => {
+                    dataset.config.spatialCoverageProvider(props.datasetViz).then(extent => {
                         centerOnMap({
                             type: 'BBox',
                             bbox: extent as GeoJSON.BBox

@@ -8,6 +8,7 @@ import { ColorMapConfig, ColorMap } from './color-map';
 import { BandMathConfig, BandMath } from './band-math';
 import { hasDimensions } from '../has-dimensions';
 import { DatasetDimension, DataDomain, isValueDomain } from '../dataset-variable';
+import { LoadingState } from '@oida/core';
 
 export const RASTER_VIZ_TYPE = 'raster';
 
@@ -16,7 +17,7 @@ export type DatasetRasterMapVizConfig = {
     colorMapConfig?: ColorMapConfig;
     dimensions?: DatasetDimension<DataDomain<string | number>>[];
     nonTiled?: boolean;
-    rasterSourceProvider: (rasterViz) => any;
+    rasterSourceProvider: (rasterViz) => Promise<any>;
     afterInit?: (rasterViz) => void;
 };
 
@@ -85,11 +86,24 @@ const DatasetRasterVizDecl = DatasetViz.addModel(
             });
 
             let sourceUpdateDisposer = autorun(() => {
-                let sourceConfig = self.config.rasterSourceProvider(self);
-                mapLayer.setSource(sourceConfig);
-                if (sourceConfig) {
-                    mapLayer.setExtent(sourceConfig.extent);
-                }
+                mapLayer.setSource(undefined);
+                mapLayer.setLoadingProps({
+                    state: LoadingState.Loading,
+                    percentage: 30
+                });
+                self.config.rasterSourceProvider(self).then((sourceConfig) => {
+                    mapLayer.setSource(sourceConfig);
+                    if (sourceConfig) {
+                        mapLayer.setExtent(sourceConfig.extent);
+                        (mapLayer as ITileLayer).setMinZoomLevel(sourceConfig.minZoomLevel);
+                        (mapLayer as ITileLayer).setMaxZoomLevel(sourceConfig.maxZoomLevel);
+                    }
+                }).finally(() => {
+                    mapLayer.setLoadingProps({
+                        state: LoadingState.Init
+                    });
+                });
+
             });
 
             if (self.config.afterInit) {

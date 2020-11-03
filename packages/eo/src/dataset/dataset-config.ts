@@ -14,7 +14,7 @@ export type DatasetConfig = {
     filters: AnyFormFieldDefinition[];
     search?: DatasetProductSearchConfig;
     timeDistribution?: DatasetTimeDistributionConfig;
-    spatialCoverageProvider?: (filters?) => Promise<number[]>;
+    spatialCoverageProvider?: (mapView) => Promise<number[]>;
     mapView?: {type: string, config: any};
     tools?: {
         type: string,
