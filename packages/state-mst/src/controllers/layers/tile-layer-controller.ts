@@ -1,4 +1,4 @@
-import { observe } from 'mobx';
+import { observe, reaction } from 'mobx';
 
 import { TILE_LAYER_ID, ITileLayerRenderer, IMapRenderer, LoadingState } from '@oida/core';
 
@@ -61,6 +61,18 @@ export class TileLayerController extends MapLayerController<ITileLayerRenderer, 
             observe(this.mapLayer_, 'source', (change) => {
                 this.resetLoadingState_();
                 this.layerRenderer_!.updateSource(change.newValue.value);
+            })
+        );
+
+        this.subscriptionTracker_.addSubscription(
+            reaction(() => this.mapLayer_.minZoomLevel, (level) => {
+                this.layerRenderer_!.setMinZoomLevel(level);
+            })
+        );
+
+        this.subscriptionTracker_.addSubscription(
+            reaction(() => this.mapLayer_.maxZoomLevel, (level) => {
+                this.layerRenderer_!.setMaxZoomLevel(level);
             })
         );
 

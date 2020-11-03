@@ -29,6 +29,14 @@ export class OLTileLayer extends OLMapLayer<TileLayer> implements ITileLayerRend
         this.olImpl_.setSource(source);
     }
 
+    setMinZoomLevel(level: number | undefined) {
+        this.olImpl_.setMinZoom(level);
+    }
+
+    setMaxZoomLevel(level: number | undefined) {
+        this.olImpl_.setMaxZoom(level);
+    }
+
     forceRefresh() {
         let source = this.olImpl_.getSource();
         if (source) {
@@ -53,7 +61,9 @@ export class OLTileLayer extends OLMapLayer<TileLayer> implements ITileLayerRend
         return new TileLayer({
             source: config.source ? this.createTileSource_(config.source) : undefined,
             extent: config.extent,
-            zIndex: config.zIndex || 0
+            zIndex: config.zIndex || 0,
+            minZoom: config.minZoomLevel,
+            maxZoom: config.maxZoomLevel
         });
 
     }

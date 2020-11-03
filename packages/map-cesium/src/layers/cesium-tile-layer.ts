@@ -13,6 +13,8 @@ export class CesiumTileLayer extends CesiumMapLayer implements ITileLayerRendere
     protected onTileLoadEnd_;
     protected source_;
     protected extent_;
+    protected minZoomLevel_: number | undefined;
+    protected maxZoomLevel_: number | undefined;
     protected sourceConfig_;
 
 
@@ -28,6 +30,8 @@ export class CesiumTileLayer extends CesiumMapLayer implements ITileLayerRendere
         };
 
         this.extent_ = config.mapLayer.extent;
+        this.minZoomLevel_ = config.mapLayer.minZoomLevel;
+        this.maxZoomLevel_ = config.mapLayer.maxZoomLevel;
 
         this.updateSource(config.mapLayer.source);
 
@@ -92,10 +96,32 @@ export class CesiumTileLayer extends CesiumMapLayer implements ITileLayerRendere
         }
     }
 
+    setMinZoomLevel(level: number | undefined) {
+        this.minZoomLevel_ = level;
+        if (this.source_) {
+            this.imageries_.removeAll(false);
+            this.imageries_.add(new ImageryLayer(this.source_, this.getLayerOptions_()));
+        }
+    }
+
+    setMaxZoomLevel(level: number | undefined) {
+        this.maxZoomLevel_ = level;
+        if (this.source_) {
+            this.imageries_.removeAll(false);
+            this.imageries_.add(new ImageryLayer(this.source_, this.getLayerOptions_()));
+        }
+    }
+
     protected getLayerOptions_() {
         let options: any = {};
         if (this.extent_) {
             options.rectangle = Rectangle.fromDegrees(...this.extent_);
+        }
+        if (this.minZoomLevel_ !== undefined) {
+            options.minimumTerrainLevel = this.minZoomLevel_;
+        }
+        if (this.maxZoomLevel_ !== undefined) {
+            options.maximumTerrainLevel = this.maxZoomLevel_;
         }
         return options;
     }

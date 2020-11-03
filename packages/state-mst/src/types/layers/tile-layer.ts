@@ -7,12 +7,20 @@ import { MapLayer } from './map-layer';
 const TileLayerDecl = MapLayer.addModel(
     types.model(TILE_LAYER_ID, {
         source: types.frozen(),
-        sourceRevision: types.optional(types.number, 0)
+        sourceRevision: types.optional(types.number, 0),
+        minZoomLevel: types.maybe(types.number),
+        maxZoomLevel: types.maybe(types.number)
     }).actions((self) => {
         return {
             setSource: (source) => {
                 self.source = source;
                 self.sourceRevision = 0;
+            },
+            setMinZoomLevel: (level) => {
+                self.minZoomLevel = level;
+            },
+            setMaxZoomLevel: (level) => {
+                self.maxZoomLevel = level;
             },
             forceRefresh: () => {
                 self.sourceRevision++;
