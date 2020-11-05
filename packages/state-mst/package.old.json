@@ -1,0 +1,32 @@
+{
+  "name": "@oida/state-mst",
+  "version": "3.0.0",
+  "description": "oida mst state management library",
+  "module": "es/index.js",
+  "main": "lib/index.js",
+  "types": "types/index.d.ts",
+  "files": [
+    "es",
+    "lib",
+    "types"
+  ],
+  "scripts": {
+    "clean": "rimraf ./lib ./es ./types ./tsconfig.tsbuildinfo",
+    "watch": "cross-env TSC_WATCHFILE=UseFsEventsWithFallbackDynamicPolling tsc --watch --preserveWatchOutput"
+  },
+  "author": "stefano marra",
+  "license": "UNLICENSED",
+  "publishConfig": {
+    "registry": "https://nexus.dev.eoss-cloud.it/repository/npm-cgi-eo/"
+  },
+  "peerDependencies": {
+    "mobx": "^4.9.4",
+    "mobx-state-tree": "^3.16.0",
+    "moment": "^2.x"
+  },
+  "dependencies": {
+    "@oida/core": "file:../core",
+    "lodash": "4.17.15",
+    "tslib": "^2.0.1"
+  }
+}

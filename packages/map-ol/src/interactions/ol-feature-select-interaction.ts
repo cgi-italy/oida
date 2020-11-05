@@ -10,6 +10,7 @@ import { click, platformModifierKeyOnly, shiftKeyOnly } from 'ol/events/conditio
 
 import { olInteractionsFactory } from './ol-interactions-factory';
 import { OLMapRenderer } from '../map/ol-map-renderer';
+import { OLFeatureLayer } from '../layers/ol-feature-layer';
 
 
 export class OLFeatureSelectInteraction  implements IFeatureSelectInteractionImplementation  {
@@ -58,8 +59,18 @@ export class OLFeatureSelectInteraction  implements IFeatureSelectInteractionImp
                     selectionMode = SelectionMode.Add;
                 }
             }
-
-            onFeatureSelect(feature ? feature.getId() : null, selectionMode);
+            if (feature) {
+                onFeatureSelect({
+                    featureId: feature.getId(),
+                    data: feature.get(OLFeatureLayer.FEATURE_DATA_KEY),
+                    mode: selectionMode
+                });
+            } else {
+                onFeatureSelect({
+                    featureId: undefined,
+                    mode: selectionMode
+                });
+            }
         });
     }
 }

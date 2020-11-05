@@ -4,13 +4,14 @@
     "node_modules/**",
     "**/*.spec.ts",
     "./packages/samples-mst-antd/**",
+    "./packages/state-mst/**",
     "./packages/docs/**",
     "./packages/docz/**"
   ],
   "out": "docs",
   "name": "oida",
-  "excludeExternals": true,
-  "includeDeclarations": true,
+  "excludeExternals": false,
+  "includeDeclarations": false,
   "plugin": ["typedoc-plugin-sourcefile-url", "typedoc-plugin-lerna-packages", "typedoc-plugin-exclude-references"],
   "lernaExclude": [
     "@oida/samples-mst-antd"

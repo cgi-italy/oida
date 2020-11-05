@@ -3,7 +3,7 @@ import { GROUP_LAYER_ID, TILE_LAYER_ID, FEATURE_LAYER_ID, VERTICAL_PROFILE_LAYER
 import { cesiumLayersFactory } from './cesium-layers-factory';
 import { CesiumGroupLayer } from './cesium-group-layer';
 import { CesiumTileLayer } from './cesium-tile-layer';
-import { createCesiumFeatureLayer, getPickedFeatureEntity, getPickedLayer, CesiumEntityFeatureLayer, CesiumPrimitiveFeatureLayer } from './cesium-feature-layer';
+import { createCesiumFeatureLayer, getPickedFeature, getPickedLayer, CesiumEntityFeatureLayer, CesiumPrimitiveFeatureLayer } from './cesium-feature-layer';
 import { CesiumVerticalProfileLayer } from './cesium-vertical-profile-layer';
 import { CesiumVolumeLayer } from './volume';
 
@@ -39,7 +39,7 @@ export {
     CesiumTileLayer,
     CesiumEntityFeatureLayer,
     CesiumPrimitiveFeatureLayer,
-    getPickedFeatureEntity,
+    getPickedFeature,
     getPickedLayer
 };
 export * from './tilesources';

@@ -2,7 +2,7 @@ import bboxPolygon from '@turf/bbox-polygon';
 import booleanDisjoint from '@turf/boolean-disjoint';
 
 import { Geometry } from '../../types';
-import { IMapRenderer } from '../../map-render';
+import { IMapRenderer, BBox } from '../../map-render';
 import { getGeometryExtent } from './get-geometry-extent';
 
 export type CenterOnMapOptions = {
@@ -14,6 +14,10 @@ export const centerOnMap = (renderer: IMapRenderer, geometry: Geometry, options:
 
     let extent = getGeometryExtent(geometry);
 
+    if (!extent) {
+        return;
+    }
+
     if (options.notIfInViewport) {
 
         if (!booleanDisjoint(
@@ -24,5 +28,5 @@ export const centerOnMap = (renderer: IMapRenderer, geometry: Geometry, options:
         }
     }
 
-    renderer.fitExtent(extent, options.animate);
+    renderer.fitExtent(extent as BBox, options.animate);
 };

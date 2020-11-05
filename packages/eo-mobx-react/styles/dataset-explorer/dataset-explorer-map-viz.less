@@ -1,0 +1,32 @@
+@import '~@oida/ui-react-core/styles/utils/scrollbar';
+
+.dataset-explorer-viz {
+    margin: 6px;
+    position: relative;
+    max-height: 100%;
+    overflow: auto;
+    .scrollbar(8px, @primary-color, @primary-2);
+
+    .viz-filters {
+        text-align: right;
+    }
+
+    .ant-list-item.viz-item {
+
+        display: block;
+        padding-bottom: 2px;
+
+        .viz-item-content {
+            .viz-drag-button {
+                display: inline-block;
+                cursor: grab;
+            }
+        }
+
+        .ant-progress {
+            margin-top: 2px;
+            display: inherit;
+            line-height: 0;
+        }
+    }
+}

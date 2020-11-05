@@ -124,6 +124,19 @@ export class CesiumVolumeTileSet {
                 this.colorMap_.noDataValue = colorMapConfig.noDataValue;
             }
 
+        } else {
+            this.colorMap_ = {
+                texture: undefined,
+                needsUpdate: true,
+                range: {
+                    min: 0,
+                    max: 100
+                },
+                clamp: true,
+                noDataValue: 0,
+                colorMap: new Image(),
+                ...colorMapConfig
+            };
         }
     }
 

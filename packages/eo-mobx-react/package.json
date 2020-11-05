@@ -1,0 +1,68 @@
+{
+  "name": "@oida/eo-mobx-react",
+  "version": "0.1.0",
+  "description": "oida EO analyst UI library",
+  "module": "es/index.js",
+  "main": "lib/index.js",
+  "types": "types/index.d.ts",
+  "less": "styles/index.less",
+  "files": [
+    "es",
+    "lib",
+    "styles",
+    "types"
+  ],
+  "scripts": {
+    "build:es": "tsc",
+    "build:umd": "tsc --project tsconfig.umd.json",
+    "clean": "rimraf ./lib ./es ./types ./tsconfig.tsbuildinfo",
+    "watch": "cross-env TSC_WATCHFILE=UseFsEventsWithFallbackDynamicPolling tsc --watch --preserveWatchOutput",
+    "lint": "tslint --project ./tsconfig.json",
+    "test": "jest --config ./jest.config.js"
+  },
+  "author": "stefano marra",
+  "license": "UNLICENSED",
+  "publishConfig": {
+    "registry": "https://nexus.dev.eoss-cloud.it/repository/npm-cgi-eo/"
+  },
+  "peerDependencies": {
+    "antd": "4.x",
+    "classnames": "2.x",
+    "lodash": "^4.x",
+    "mobx": "6.x",
+    "mobx-react": "7.x",
+    "moment": "2.x",
+    "ol": "6.x",
+    "proj4": "2.x",
+    "react": "16.x",
+    "react-dom": "16.x"
+  },
+  "dependencies": {
+    "@egjs/hammerjs": "^2.0.17",
+    "@oida/core": "file:../core",
+    "@oida/eo-mobx": "file:../eo-mobx",
+    "@oida/map-ol": "file:../map-ol",
+    "@oida/state-mobx": "file:../state-mobx",
+    "@oida/ui-react-antd": "file:../ui-react-antd",
+    "@oida/ui-react-core": "file:../ui-react-core",
+    "@oida/ui-react-mobx": "file:../ui-react-mobx",
+    "@turf/along": "6.0.1",
+    "@turf/distance": "^6.0.1",
+    "@turf/great-circle": "^5.1.5",
+    "@turf/length": "^6.0.2",
+    "downloadjs": "^1.4.7",
+    "echarts": "^4.3.0",
+    "keycharm": "^0.3.1",
+    "propagating-hammerjs": "^1.4.7",
+    "react-dnd": "^11.1.3",
+    "react-dnd-html5-backend": "^11.1.3",
+    "react-grid-layout": "^0.17.1",
+    "react-resize-aware": "^3.0.0",
+    "react-sortable-hoc": "^1.10.1",
+    "tslib": "^2.0.1",
+    "uuid": "^8.0.0",
+    "vis-data": "^7.1.0",
+    "vis-timeline": "^7.4.2",
+    "vis-util": "^4.3.4"
+  }
+}

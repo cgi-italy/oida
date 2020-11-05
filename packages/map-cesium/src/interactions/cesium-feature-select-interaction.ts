@@ -12,7 +12,7 @@ import {
 import { cesiumInteractionsFactory } from './cesium-interactions-factory';
 import { CesiumMapRenderer } from '../map/cesium-map-renderer';
 import {
-    getPickedFeatureEntity, getPickedLayer,
+    getPickedFeature, getPickedLayer,
     isFeaturePickable, setNonPickableFeaturesVisibility
 } from '../layers/cesium-feature-layer';
 
@@ -86,7 +86,7 @@ export class CesiumFeatureSelectInteraction implements IFeatureSelectInteraction
         const pickInfo = pickedObjects.find(pickInfo => isFeaturePickable(pickInfo));
 
         if (pickInfo) {
-            let entityId = getPickedFeatureEntity(pickInfo);
+            let feature = getPickedFeature(pickInfo);
 
             let layer = getPickedLayer(pickInfo);
             if (layer && layer.onLayerPick) {
@@ -94,12 +94,15 @@ export class CesiumFeatureSelectInteraction implements IFeatureSelectInteraction
                 this.viewer_.scene.render();
                 let coordinate = this.viewer_.scene.pickPosition(movement.position);
                 setNonPickableFeaturesVisibility(pickedObjects, true);
-                layer.onLayerPick(coordinate, entityId, pickInfo);
+                layer.onLayerPick(coordinate, feature?.id, pickInfo);
             }
 
-            this.onFeatureSelect_(entityId, selectionMode);
+            this.onFeatureSelect_({featureId: feature?.id, data: feature?.data, mode: selectionMode});
         } else {
-            this.onFeatureSelect_( null, selectionMode);
+            this.onFeatureSelect_({
+                featureId: undefined,
+                mode: selectionMode
+            });
         }
     }
 

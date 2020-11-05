@@ -11,18 +11,26 @@ export const createCesiumFeatureLayer = (config) => {
     }
 };
 
-export const getPickedFeatureEntity = (pickInfo) => {
+export const getPickedFeature = (pickInfo) => {
     let entity = pickInfo.id;
-    let entityId;
+    let feature: {id: string, data: any} | undefined;
     if (pickInfo.id instanceof Entity) {
         if (entity.parent) {
             entity = entity.parent;
         }
-        entityId = entity.id;
+        feature = {
+            id: entity.id,
+            data: entity.data
+        };
+
     } else if (pickInfo.primitive.entityId_) {
-        entityId = pickInfo.primitive.entityId_;
+        feature = {
+            id: pickInfo.primitive.entityId_,
+            data: pickInfo.primitive.data_
+        };
     }
-    return entityId;
+
+    return feature;
 };
 
 export const isFeaturePickable = (pickInfo) => {

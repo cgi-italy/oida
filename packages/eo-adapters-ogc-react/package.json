@@ -1,0 +1,41 @@
+{
+  "name": "@oida/eo-adapters-ogc-react",
+  "version": "0.1.0",
+  "description": "oida EO OGC adapters react components",
+  "module": "es/index.js",
+  "main": "lib/index.js",
+  "types": "types/index.d.ts",
+  "less": "styles/index.less",
+  "files": [
+    "es",
+    "lib",
+    "styles",
+    "types"
+  ],
+  "scripts": {
+    "build:es": "tsc",
+    "build:umd": "tsc --project tsconfig.umd.json",
+    "clean": "rimraf ./lib ./es ./types ./tsconfig.tsbuildinfo",
+    "watch": "cross-env TSC_WATCHFILE=UseFsEventsWithFallbackDynamicPolling tsc --watch --preserveWatchOutput",
+    "lint": "tslint --project ./tsconfig.json",
+    "test": "jest --config ./jest.config.js"
+  },
+  "author": "stefano marra",
+  "license": "UNLICENSED",
+  "publishConfig": {
+    "registry": "https://nexus.dev.eoss-cloud.it/repository/npm-cgi-eo/"
+  },
+  "peerDependencies": {
+    "antd": "4.x",
+    "classnames": "2.x",
+    "lodash": "^4.x",
+    "mobx": "6.x",
+    "mobx-react": "7.x",
+    "moment": "2.x",
+    "react": "16.x",
+    "react-dom": "16.x"
+  },
+  "dependencies": {
+    "tslib": "^2.0.1"
+  }
+}

@@ -15,6 +15,9 @@ import { OLStyleParser } from '../utils/ol-style-parser';
 
 export class OLFeatureLayer extends OLMapLayer<VectorLayer> implements IFeatureLayerRenderer {
 
+    static readonly FEATURE_DATA_KEY = 'data';
+    static readonly FEATURE_PICKING_DISABLED_KEY = 'pickingDisabled';
+
     protected geomParser_;
     protected styleParser_;
 
@@ -25,7 +28,7 @@ export class OLFeatureLayer extends OLMapLayer<VectorLayer> implements IFeatureL
     }
 
 
-    addFeature(id, geometry, style) {
+    addFeature(id, geometry, style, data) {
 
         let geom = this.parseGeometry_(geometry);
 
@@ -39,7 +42,10 @@ export class OLFeatureLayer extends OLMapLayer<VectorLayer> implements IFeatureL
             feature.setStyle(featureStyle);
             feature.setId(id);
             if (featureStyle) {
-                feature.set('pickingDisabled', featureStyle.pickingDisabled);
+                feature.set(OLFeatureLayer.FEATURE_PICKING_DISABLED_KEY, featureStyle.pickingDisabled);
+            }
+            if (data) {
+                feature.set(OLFeatureLayer.FEATURE_DATA_KEY, data);
             }
             this.olImpl_.getSource().addFeature(feature);
             return feature;
@@ -48,6 +54,17 @@ export class OLFeatureLayer extends OLMapLayer<VectorLayer> implements IFeatureL
 
     getFeature(id) {
         return this.olImpl_.getSource().getFeatureById(id);
+    }
+
+    hasFeature(id: string) {
+        return !!this.olImpl_.getSource().getFeatureById(id);
+    }
+
+    getFeatureData(id: string) {
+        let feature = this.getFeature(id);
+        if (feature) {
+            return feature.get(OLFeatureLayer.FEATURE_DATA_KEY);
+        }
     }
 
     updateFeatureGeometry(id, geometry) {
@@ -63,7 +80,7 @@ export class OLFeatureLayer extends OLMapLayer<VectorLayer> implements IFeatureL
             const featureStyle = this.styleParser_.getStyleForGeometry(feature.getGeometry().getType(), style);
             feature.setStyle(featureStyle);
             if (featureStyle) {
-                feature.set('pickingDisabled', featureStyle.pickingDisabled);
+                feature.set(OLFeatureLayer.FEATURE_PICKING_DISABLED_KEY, featureStyle.pickingDisabled);
             }
         }
     }

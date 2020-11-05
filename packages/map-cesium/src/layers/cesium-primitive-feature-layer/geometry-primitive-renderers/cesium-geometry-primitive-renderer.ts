@@ -9,7 +9,7 @@ interface Feature {
 
 export interface CesiumGeometryPrimitiveRenderer {
     getPrimitives();
-    addFeature(id: string, geometry: GeoJSON.GeometryObject, style: GeometryStyle): Feature;
+    addFeature(id: string, geometry: GeoJSON.GeometryObject, style: GeometryStyle, data: any): Feature;
     updateGeometry(feature: Feature, geometry: GeoJSON.GeometryObject);
     updateStyle(feature: Feature, style: GeometryStyle);
     clear();

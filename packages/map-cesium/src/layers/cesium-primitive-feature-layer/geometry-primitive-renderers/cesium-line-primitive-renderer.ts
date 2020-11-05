@@ -28,7 +28,7 @@ export class CesiumLinePrimitiveRenderer implements CesiumGeometryPrimitiveRende
         return this.polylines_;
     }
 
-    addFeature(id, geometry, style) {
+    addFeature(id, geometry, style, data) {
 
         let instances;
         if (geometry.type === 'LineString') {
@@ -59,13 +59,15 @@ export class CesiumLinePrimitiveRenderer implements CesiumGeometryPrimitiveRende
         primitive.entityId_ = id;
         primitive.pickingDisabled_ = style.pickingDisabled || false;
         primitive.pickCallbacks_ = this.pickCallbacks_;
+        primitive.data_ = data;
 
         let feature = {
             id: id,
             primitive: primitive,
             numGeometries: instances.length,
             style: style,
-            geometry: geometry
+            geometry: geometry,
+            data: data
         };
 
         return feature;
@@ -76,7 +78,7 @@ export class CesiumLinePrimitiveRenderer implements CesiumGeometryPrimitiveRende
 
         this.removeFeature(feature);
 
-        let updatedFeature = this.addFeature(feature.id, geometry, feature.style);
+        let updatedFeature = this.addFeature(feature.id, geometry, feature.style, feature.data);
         feature.primitive = updatedFeature.primitive;
         feature.numGeometries = updatedFeature.numGeometries;
         feature.geometry = geometry;
@@ -86,7 +88,7 @@ export class CesiumLinePrimitiveRenderer implements CesiumGeometryPrimitiveRende
 
         if (style.width !== feature.style.width) {
             let oldPrimitive = feature.primitive;
-            let updatedFeature = this.addFeature(feature.id, feature.geometry, style);
+            let updatedFeature = this.addFeature(feature.id, feature.geometry, style, feature.data);
             feature.primitive = updatedFeature.primitive;
             //updatedFeature.primitive.readyPromise.then(() => {
                 this.polylines_.remove(oldPrimitive);

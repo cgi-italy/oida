@@ -4,7 +4,10 @@ import { IMapRenderer } from '../map/map-renderer';
 export const FEATURE_HOVER_INTERACTION_ID = 'featurehover';
 
 export type IFeatureHoverInteractionProps<T extends IMapRenderer = IMapRenderer> = {
-    onFeatureHover: (featureId: string) => void
+    onFeatureHover: (hovered?: {
+        featureId: string,
+        data: any
+    }) => void
 } & IMMapInteractionProps<T>;
 
 export interface IFeatureHoverInteractionImplementation extends IMapInteractionImplementation {

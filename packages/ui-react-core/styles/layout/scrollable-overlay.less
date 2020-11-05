@@ -1,0 +1,32 @@
+@import '../utils/scrollbar';
+
+.scrollable-overlay {
+    height: 100%;
+    position: relative;
+
+    .scrollable-overlay-content-wrapper {
+
+        height: 100%;
+        overflow: hidden;
+        margin-right: 5px;
+
+        .scrollable-overlay-content {
+            position: relative;
+        }
+    }
+
+
+    .scrollable-overlay-scroller {
+        .scrollbar(8px, @primary-color, @primary-2);
+        height: 100%;
+        overflow: auto;
+        pointer-events: all;
+        position: absolute;
+        top: 0px;
+        right: 0px;
+
+        .scrollable-overlay-scroller-overflow {
+            width: 10px;
+        }
+    }
+}

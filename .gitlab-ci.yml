@@ -45,7 +45,6 @@ build:
   script:
     - npm run build:es
     - npm run build:umd
-    - npm run build:samples -- -- -- --env.baseUrl='{{ getenv "BASE_URL"}}'
   only:
     - branches
 

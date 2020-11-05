@@ -40,11 +40,11 @@ export const InputFieldRenderer = (props: Omit<StringField, 'name' | 'type'> & I
     }, [inputValue]);
 
     const onInputChange = (evt) => {
-        setInputValue(evt.target.value);
+        setInputValue(evt.target.value || undefined);
     };
 
     const onEnterPress = () => {
-        props.onChange(inputValue);
+        props.onChange(inputValue || undefined);
     };
 
 

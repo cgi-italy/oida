@@ -32,7 +32,7 @@ export class CesiumVerticalProfileLayer extends CesiumMapLayer implements IVerti
         this.onCoordinateHover_ = config.onCoordinateHover;
     }
 
-    addProfile(id: string, profile: IVerticalProfile, style: IVerticalProfileStyle) {
+    addProfile(id: string, profile: IVerticalProfile, style: IVerticalProfileStyle, data?: any) {
 
         if (!profile) {
             return;
@@ -67,6 +67,7 @@ export class CesiumVerticalProfileLayer extends CesiumMapLayer implements IVerti
         });
 
         entity.layer_ = this;
+        entity.data = data;
 
         this.dataSource_.entities.add(entity);
         this.updateDataSource_();

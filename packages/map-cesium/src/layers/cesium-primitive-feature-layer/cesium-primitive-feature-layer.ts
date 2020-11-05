@@ -26,7 +26,7 @@ export class CesiumPrimitiveFeatureLayer extends CesiumMapLayer implements IFeat
         };
     }
 
-    addFeature(id, geometry, style) {
+    addFeature(id, geometry, style, data) {
 
         if (!geometry) {
             return;
@@ -35,10 +35,11 @@ export class CesiumPrimitiveFeatureLayer extends CesiumMapLayer implements IFeat
         let geometryRenderer = this.getOrCreateGeometryRenderer_(geometry.type);
 
         if (geometryRenderer) {
-            let feature = geometryRenderer.addFeature(id, geometry, this.getStyleForGeometry_(style, geometry.type));
+            let feature = geometryRenderer.addFeature(id, geometry, this.getStyleForGeometry_(style, geometry.type), data);
             feature.geometryRenderer = geometryRenderer;
             feature.geometryType = geometry.type;
 
+            feature.data = data;
             this.featureMap_[id] = feature;
 
             this.mapRenderer_.getViewer().scene.requestRender();
@@ -92,6 +93,15 @@ export class CesiumPrimitiveFeatureLayer extends CesiumMapLayer implements IFeat
         this.featureMap_ = {};
 
         this.mapRenderer_.getViewer().scene.requestRender();
+    }
+
+    hasFeature(id: string) {
+        return !!this.featureMap_[id];
+    }
+
+    getFeatureData(id: string) {
+        const feature = this.featureMap_[id];
+        return feature ? feature.data : undefined;
     }
 
     getFeature(id) {

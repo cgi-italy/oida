@@ -1,0 +1,35 @@
+{
+  "name": "@oida/samples-mst-antd",
+  "version": "3.0.0",
+  "description": "oida samples based on mst for state management and antd for widgeting",
+  "main": "src/index.tsx",
+  "private": true,
+  "scripts": {
+    "build:samples": "webpack --config webpack.prod.js",
+    "lint": "tslint --project ./tsconfig.json",
+    "start": "cross-env TSC_WATCHFILE=UseFsEventsWithFallbackDynamicPolling webpack-dev-server --config webpack.dev.js --mode development --progress --colors",
+    "test": "jest --config jest.config.js"
+  },
+  "author": "stefano marra",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@oida/core": "file:../core",
+    "@oida/map-cesium": "file:../map-cesium",
+    "@oida/map-ol": "file:../map-ol",
+    "@oida/state-mst": "file:../state-mst",
+    "@oida/ui-react-antd": "file:../ui-react-antd",
+    "@oida/ui-react-core": "file:../ui-react-core",
+    "@oida/ui-react-mst": "file:../ui-react-mst",
+    "@turf/bbox-polygon": "^6.0.1",
+    "@turf/boolean-point-in-polygon": "^6.0.1",
+    "antd": "^4.2.4",
+    "cesium": "^1.68.0",
+    "classnames": "^2.2.6",
+    "faker": "^4.1.0",
+    "ol": "^6.2.0",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "react-router": "^5.1.2",
+    "react-router-dom": "^5.1.2"
+  }
+}

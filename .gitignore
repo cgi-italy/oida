@@ -1,7 +1,7 @@
 node_modules
-packages/**/.rpt2_cache
-packages/**/tsconfig.tsbuildinfo
-packages/**/dist
-packages/**/es
-packages/**/lib
-packages/**/types
+packages/*/tsconfig.tsbuildinfo
+packages/*/dist
+packages/*/es
+packages/*/lib
+packages/*/types
+.docz

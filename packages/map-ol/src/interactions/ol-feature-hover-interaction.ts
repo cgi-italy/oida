@@ -6,6 +6,7 @@ import { pointerMove } from 'ol/events/condition';
 
 import { olInteractionsFactory } from './ol-interactions-factory';
 import { OLMapRenderer } from '../map/ol-map-renderer';
+import { OLFeatureLayer } from '../layers/ol-feature-layer';
 
 
 export class OLFeatureHoverInteraction  implements IFeatureHoverInteractionImplementation  {
@@ -23,6 +24,7 @@ export class OLFeatureHoverInteraction  implements IFeatureHoverInteractionImple
             this.viewer_.addInteraction(this.olInteraction_);
         } else {
             this.viewer_.removeInteraction(this.olInteraction_);
+            this.viewer_.getViewport().style.cursor = '';
         }
     }
 
@@ -41,12 +43,14 @@ export class OLFeatureHoverInteraction  implements IFeatureHoverInteractionImple
             let feature = evt.selected;
             if (feature) {
                 this.viewer_.getViewport().style.cursor = 'pointer';
-                onFeatureHover(feature.getId());
+                onFeatureHover({
+                    featureId: feature.getId(),
+                    data: feature.get(OLFeatureLayer.FEATURE_DATA_KEY)
+                });
             } else {
                 this.viewer_.getViewport().style.cursor = '';
-                onFeatureHover(null);
+                onFeatureHover(undefined);
             }
-            onFeatureHover(feature ? feature.getId() : null);
         });
     }
 }

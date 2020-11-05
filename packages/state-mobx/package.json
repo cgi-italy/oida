@@ -1,0 +1,34 @@
+{
+  "name": "@oida/state-mobx",
+  "version": "0.1.0",
+  "description": "oida mobx state management library",
+  "module": "es/index.js",
+  "main": "lib/index.js",
+  "types": "types/index.d.ts",
+  "files": [
+    "es",
+    "lib",
+    "types"
+  ],
+  "scripts": {
+    "build:es": "tsc",
+    "build:umd": "tsc --project tsconfig.umd.json",
+    "clean": "rimraf ./lib ./es ./types ./tsconfig.tsbuildinfo",
+    "watch": "cross-env TSC_WATCHFILE=UseFsEventsWithFallbackDynamicPolling tsc --watch --preserveWatchOutput",
+    "lint": "tslint --project ./tsconfig.json",
+    "test": "jest --config ./jest.config.js"
+  },
+  "author": "stefano marra",
+  "license": "UNLICENSED",
+  "publishConfig": {
+    "registry": "https://nexus.dev.eoss-cloud.it/repository/npm-cgi-eo/"
+  },
+  "peerDependencies": {
+    "mobx": "6.x",
+    "moment": "^2.x"
+  },
+  "dependencies": {
+    "@oida/core": "file:../core",
+    "tslib": "^2.0.1"
+  }
+}

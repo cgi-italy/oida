@@ -3,6 +3,8 @@ import Interaction from 'ol/interaction/Interaction';
 import { singleClick, pointerMove } from 'ol/events/condition';
 import Event from 'ol/events/Event';
 
+import { OLFeatureLayer } from '../layers/ol-feature-layer';
+
 class SelectEvent extends Event {
 
     public selected;
@@ -43,7 +45,7 @@ export class OLSelectInteraction extends Interaction {
         let selected = null;
 
         map.forEachFeatureAtPixel(mapBrowserEvent.pixel, (feature, layer) => {
-            if (feature && !feature.get('pickingDisabled')) {
+            if (feature && !feature.get(OLFeatureLayer.FEATURE_PICKING_DISABLED_KEY)) {
                 selected = feature;
                 return true;
             }

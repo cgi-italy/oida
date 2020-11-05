@@ -27,7 +27,7 @@ export class CesiumEntityFeatureLayer extends CesiumMapLayer implements IFeature
         this.dataSources_.add(this.dataSource_);
     }
 
-    addFeature(id: string, geometry: Geometry, style: IFeatureStyle) {
+    addFeature(id: string, geometry: Geometry, style: IFeatureStyle, data: any) {
 
         if (!geometry) {
             return;
@@ -48,6 +48,7 @@ export class CesiumEntityFeatureLayer extends CesiumMapLayer implements IFeature
                 });
                 entity.geometryRenderer = geometryRenderer;
                 entity.pickCallbacks_ = this.pickCallbacks_;
+                entity.data = data;
             }
 
             this.updateDataSource_();
@@ -95,6 +96,15 @@ export class CesiumEntityFeatureLayer extends CesiumMapLayer implements IFeature
 
     getFeature(id: string) {
         return this.dataSource_.entities.getById(id);
+    }
+
+    hasFeature(id: string) {
+        return !!this.getFeature(id);
+    }
+
+    getFeatureData(id: string) {
+        const feature = this.getFeature(id);
+        return feature ? feature.data : undefined;
     }
 
     removeAllFeatures() {

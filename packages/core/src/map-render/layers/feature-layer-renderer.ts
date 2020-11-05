@@ -45,9 +45,10 @@ export interface IFeatureStyle {
     polygon?: IPolygonStyle;
 }
 
-export interface IFeatureLayerRenderer extends ILayerRenderer {
-    addFeature(id: string, geometry: Geometry, style: IFeatureStyle);
-    getFeature(id: string);
+export interface IFeatureLayerRenderer<T = any> extends ILayerRenderer {
+    addFeature(id: string, geometry: Geometry, style: IFeatureStyle, data?: T);
+    hasFeature(id: string): boolean;
+    getFeatureData(id: string): T | undefined;
     updateFeatureGeometry(id: string, geometry: Geometry);
     updateFeatureStyle(id: string, style: IFeatureStyle);
     removeFeature(id: string);

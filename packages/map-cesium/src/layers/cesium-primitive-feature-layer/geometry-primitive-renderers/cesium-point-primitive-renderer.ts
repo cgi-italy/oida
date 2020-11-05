@@ -38,7 +38,7 @@ export class CesiumPointPrimitiveRenderer implements CesiumGeometryPrimitiveRend
         return this.primitives_;
     }
 
-    addFeature(id, geometry, style: IPointStyle) {
+    addFeature(id, geometry, style: IPointStyle, data) {
 
         let feature: any = null;
 
@@ -52,6 +52,7 @@ export class CesiumPointPrimitiveRenderer implements CesiumGeometryPrimitiveRend
             feature.entityId_ = id;
             feature.pickingDisabled_ = style.pickingDisabled || false;
             feature.pickCallbacks_ = this.pickCallbacks_;
+            feature.data_ = data;
 
         } else if (geometry.type === 'MultiPoint') {
             feature = [];
@@ -67,12 +68,14 @@ export class CesiumPointPrimitiveRenderer implements CesiumGeometryPrimitiveRend
                 pointFeature.entityId_ = id;
                 pointFeature.pickingDisabled_ = style.pickingDisabled || false;
                 pointFeature.pickCallbacks_ = this.pickCallbacks_;
+                pointFeature.data_ = data;
 
                 feature.push(pointFeature);
             }
 
             feature.id = id;
             feature.style = style;
+            feature.data = data;
         }
 
         return feature;
@@ -100,6 +103,7 @@ export class CesiumPointPrimitiveRenderer implements CesiumGeometryPrimitiveRend
                 pointFeature.entityId_ = feature.id;
                 pointFeature.pickingDisabled_ = feature.style.pickingDisabled || false;
                 pointFeature.pickCallbacks_ = this.pickCallbacks_;
+                pointFeature.data_ = feature.data;
 
                 feature.push(pointFeature);
             }

@@ -9,7 +9,7 @@ import { IFeatureHoverInteractionImplementation, IFeatureHoverInteractionProps, 
 import { cesiumInteractionsFactory } from './cesium-interactions-factory';
 import { CesiumMapRenderer } from '../map/cesium-map-renderer';
 import {
-    getPickedFeatureEntity, getPickedLayer,
+    getPickedFeature, getPickedLayer,
     isFeaturePickable, setNonPickableFeaturesVisibility,
     getPickCallbacks
 } from '../layers/cesium-feature-layer';
@@ -43,7 +43,7 @@ export class CesiumFeatureHoverInteraction implements IFeatureHoverInteractionIm
 
     bindMove_(onFeatureHover) {
 
-        let hoveredFeature = null;
+        let hoveredFeature: string | undefined = undefined;
 
         this.handler_ = new ScreenSpaceEventHandler(this.viewer_.scene.canvas);
 
@@ -53,10 +53,13 @@ export class CesiumFeatureHoverInteraction implements IFeatureHoverInteractionIm
 
             if (pickInfo) {
                 this.viewer_.container .style.cursor = 'pointer';
-                let entityId = getPickedFeatureEntity(pickInfo);
-                if (entityId !== hoveredFeature) {
-                    onFeatureHover(entityId);
-                    hoveredFeature = entityId;
+                let feature = getPickedFeature(pickInfo);
+                if (feature?.id !== hoveredFeature) {
+                    onFeatureHover({
+                        featureId: feature?.id,
+                        data: feature?.data
+                    });
+                    hoveredFeature = feature?.id;
                 }
                 let layer = getPickedLayer(pickInfo);
                 if (layer && layer.onLayerHover) {
@@ -64,7 +67,7 @@ export class CesiumFeatureHoverInteraction implements IFeatureHoverInteractionIm
                     this.viewer_.scene.render();
                     let coordinate = this.viewer_.scene.pickPosition(movement.endPosition);
                     setNonPickableFeaturesVisibility(pickedObjects, true);
-                    layer.onLayerHover(coordinate, entityId, pickInfo);
+                    layer.onLayerHover(coordinate, feature?.id, pickInfo);
                 }
                 const { hoverCb, coordPickMode } = getPickCallbacks(pickInfo);
                 if (hoverCb) {
@@ -79,7 +82,7 @@ export class CesiumFeatureHoverInteraction implements IFeatureHoverInteractionIm
                     }
                     if (cartesian) {
                         let cartographic = Cartographic.fromCartesian(cartesian);
-                        hoverCb(entityId, [
+                        hoverCb(feature?.id, [
                             CesiumMath.toDegrees(cartographic.longitude),
                             CesiumMath.toDegrees(cartographic.latitude),
                             cartographic.height
@@ -89,8 +92,8 @@ export class CesiumFeatureHoverInteraction implements IFeatureHoverInteractionIm
             } else {
                 this.viewer_.container .style.cursor = '';
                 if (hoveredFeature) {
-                    onFeatureHover(null);
-                    hoveredFeature = null;
+                    onFeatureHover(undefined);
+                    hoveredFeature = undefined;
                 }
             }
         };

@@ -34,7 +34,7 @@ export class CesiumPolygonPrimitiveRenderer implements CesiumGeometryPrimitiveRe
         return this.polygons_;
     }
 
-    addFeature(id, geometry, style) {
+    addFeature(id, geometry, style, data) {
         let fillInstances: any = null;
         let outlineInstances: any = null;
 
@@ -97,13 +97,16 @@ export class CesiumPolygonPrimitiveRenderer implements CesiumGeometryPrimitiveRe
         stroke.pickingDisabled_ = style.pickingDisabled || false;
         fill.pickCallbacks_ = this.pickCallbacks_;
         stroke.pickCallbacks_ = this.pickCallbacks_;
+        fill.data_ = data;
+        stroke.data_ = data;
 
         let feature = {
             id: id,
             fill: fill,
             stroke: stroke,
             numGeometries: fillInstances.length,
-            style: style
+            style: style,
+            data: data
         };
 
         return feature;
@@ -113,7 +116,7 @@ export class CesiumPolygonPrimitiveRenderer implements CesiumGeometryPrimitiveRe
     updateGeometry(feature, geometry) {
         this.removeFeature(feature);
 
-        let updatedFeature = this.addFeature(feature.id, geometry, feature.style);
+        let updatedFeature = this.addFeature(feature.id, geometry, feature.style, feature.data);
         feature.fill = updatedFeature.fill;
         feature.stroke = updatedFeature.stroke;
         feature.numGeometries = updatedFeature.numGeometries;

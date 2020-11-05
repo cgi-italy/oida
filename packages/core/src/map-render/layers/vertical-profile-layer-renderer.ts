@@ -21,7 +21,7 @@ export type VerticalProfileCoordinate = {
 };
 
 export interface IVerticalProfileLayerRenderer extends ILayerRenderer {
-    addProfile(id: string, profile: IVerticalProfile, style: IVerticalProfileStyle);
+    addProfile(id: string, profile: IVerticalProfile, style: IVerticalProfileStyle, data?: any);
     getProfile(id: string);
     updateProfile(id: string, profile: IVerticalProfile);
     updateProfileStyle(id: string, style: IVerticalProfileStyle);

@@ -1,0 +1,23 @@
+{
+  "extends": "../../config/tsconfig.default.es6.json",
+  "compilerOptions": {
+    "declarationDir": "./types",
+    "outDir": "./es",
+    "rootDir": "./src"
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "references": [
+    {
+      "path": "../core"
+    },
+    {
+      "path": "../state-mobx"
+    },
+    {
+      "path": "../eo-mobx"
+    }
+  ]
+}
+

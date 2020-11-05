@@ -48,7 +48,7 @@ export const SelectEnumRenderer = (props: Omit<EnumField, 'name' | 'type'> & Sel
                 isComponentMounted = false;
             };
         }
-    }, []);
+    }, [props.config.choices]);
 
 
     return (

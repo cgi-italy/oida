@@ -1,0 +1,34 @@
+{
+  "name": "@oida/eo-adapters-adam",
+  "version": "0.1.0",
+  "description": "oida EO adam adapters",
+  "module": "es/index.js",
+  "main": "lib/index.js",
+  "types": "types/index.d.ts",
+  "files": [
+    "es",
+    "lib",
+    "types"
+  ],
+  "scripts": {
+    "build:es": "tsc",
+    "build:umd": "tsc --project tsconfig.umd.json",
+    "clean": "rimraf ./lib ./es ./types ./tsconfig.tsbuildinfo",
+    "watch": "cross-env TSC_WATCHFILE=UseFsEventsWithFallbackDynamicPolling tsc --watch --preserveWatchOutput",
+    "lint": "tslint --project ./tsconfig.json",
+    "test": "jest --config ./jest.config.js"
+  },
+  "author": "stefano marra",
+  "license": "UNLICENSED",
+  "publishConfig": {
+    "registry": "https://nexus.dev.eoss-cloud.it/repository/npm-cgi-eo/"
+  },
+  "dependencies": {
+    "@oida/core": "file:../core",
+    "@oida/eo-geotiff": "file:../eo-geotiff",
+    "@oida/eo-mobx": "file:../eo-mobx",
+    "@oida/map-cesium": "file:../map-cesium",
+    "@oida/map-ol": "file:../map-ol",
+    "tslib": "^2.0.1"
+  }
+}

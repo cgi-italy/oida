@@ -2,8 +2,6 @@
   "extends": "./config/tsconfig.default.es6.json",
   "compilerOptions": {
     "composite": false,
-    "declaration": true,
-    "declarationMap": true,
     "jsx": "react",
     "baseUrl": "./",
     "paths": {

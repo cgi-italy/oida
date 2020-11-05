@@ -1,0 +1,32 @@
+{
+  "extends": "../../config/tsconfig.default.umd.json",
+  "compilerOptions": {
+    "jsx": "react",
+    "outDir": "./lib",
+    "rootDir": "./src"
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "references": [
+    {
+      "path": "../core"
+    },
+    {
+      "path": "../state-mobx"
+    },
+    {
+      "path": "../eo-mobx"
+    },
+    {
+      "path": "../ui-react-antd"
+    },
+    {
+      "path": "../ui-react-core"
+    },
+    {
+      "path": "../ui-react-mobx"
+    }
+  ]
+}
+
