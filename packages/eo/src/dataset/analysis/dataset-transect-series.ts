@@ -24,7 +24,7 @@ export type DatasetTransectSeriesRequest = {
 export type DatasetTransectSeriesConfig = {
     variables: DatasetVariable<DataDomain<number>>[];
     maxLineStringLength?: number;
-    provider: (request: DatasetTransectSeriesRequest) => Promise<number[]>;
+    provider: (request: DatasetTransectSeriesRequest) => Promise<Array<{x: number, y: number}>>;
     dimensions: DatasetDimension<DataDomain<string | number | Date>>[];
 };
 
@@ -69,14 +69,12 @@ const DatasetTransectSeriesDecl = DatasetViz.addModel(types.compose(
                         geometry: geometry,
                         properties: {}
                     } as GeoJSON.Feature<GeoJSON.LineString>;
-                    const distance = length(line);
 
                     self.data = seriesData.map((item, idx) => {
-                        const relativeDistance = idx / (seriesData.length - 1) * distance;
-                        const coordinates = along(line, relativeDistance);
+                        const coordinates = along(line, item.x);
                         return {
-                            value: item,
-                            distance: idx / (seriesData.length - 1) * distance,
+                            value: item.y,
+                            distance: item.x,
                             coordinates: coordinates.geometry.coordinates
                         };
                     });
