@@ -1,4 +1,4 @@
-import { cesiumTileSourcesFactory, getTileGridFromSRS } from '@oida/map-cesium';
+import { cesiumTileSourcesFactory, getProjectionType, ProjectionType } from '@oida/map-cesium';
 import { olTileSourcesFactory } from '@oida/map-ol';
 
 import { CesiumOLImageryProvider } from './cesium-ol-imagery-provider';
@@ -9,7 +9,7 @@ cesiumTileSourcesFactory.create = (id: string, config: any) => {
     //use ol tile source for unsupported source types and unsupported projections
     if (
         !cesiumTileSourcesFactory.isRegistered(id) ||
-        (config.srs && !getTileGridFromSRS(config.srs))
+        (config.srs && (getProjectionType(config.srs) === ProjectionType.Other))
     ) {
         let olSource = olTileSourcesFactory.create(id, config);
         if (olSource) {

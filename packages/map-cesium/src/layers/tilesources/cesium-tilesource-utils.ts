@@ -1,69 +1,96 @@
-import { ProjectionType, getProjectionType } from '../../utils/projection';
-
 import GeographicTilingScheme from 'cesium/Source/Core/GeographicTilingScheme.js';
 import WebMercatorTilingScheme from 'cesium/Source/Core/WebMercatorTilingScheme.js';
 import Cartesian2 from 'cesium/Source/Core/Cartesian2';
 import Rectangle from 'cesium/Source/Core/Rectangle';
 
-export const getTileGridFromSRS = (srs, tileGridConfig?) => {
+import { TileGridConfig, computeTileGridParams } from '@oida/core';
 
-    let tileSchemeConfig: any = {
-    };
+import { ProjectionType, getProjectionType } from '../../utils/projection';
 
-    let additionalConfig: any = {
-        tileWidth: 256,
-        tileHeight: 256,
-        minimumLevel: 0
-    };
+type CesiumTileSchemeConfig = {
+    numberOfLevelZeroTilesX?: number;
+    numberOfLevelZeroTilesY?: number;
+    rectangle?: Rectangle;
+    rectangleSouthwestInMeters?: Cartesian2;
+    rectangleNortheastInMeters?: Cartesian2;
+};
 
-    if (tileGridConfig) {
-        if (tileGridConfig.tileSize) {
-            additionalConfig.tileWidth = tileGridConfig.tileSize;
-            additionalConfig.tileHeight = tileGridConfig.tileSize;
-        }
-        if (tileGridConfig.minZoom) {
-            additionalConfig.minimumLevel = tileGridConfig.minZoom;
-        }
-        if (tileGridConfig.maxZoom) {
-            additionalConfig.maximumLevel = tileGridConfig.maxZoom;
-        }
-        if (tileGridConfig.gridSize) {
-            tileSchemeConfig.numberOfLevelZeroTilesX = tileGridConfig.gridSize[0];
-            tileSchemeConfig.numberOfLevelZeroTilesY = tileGridConfig.gridSize[1];
-        }
+type CesiumTileGridConfig = {
+    tileWidth: number;
+    tileHeight: number;
+    minimumLevel: number;
+    maximumLevel?: number;
+    tileMatrixLabels?: string[];
+};
+
+export const getTileGridFromSRS = (srs: string, tileGridConfig?: TileGridConfig) => {
+
+    let projection = getProjectionType(srs);
+    if (projection === ProjectionType.Other) {
+        return;
     }
 
-    let tileGrid;
-    let projection = getProjectionType(srs);
+    tileGridConfig = tileGridConfig || {};
+
+    let tileSize = Array.isArray(tileGridConfig.tileSize)
+        ? tileGridConfig.tileSize
+        : [tileGridConfig.tileSize || 256, tileGridConfig.tileSize || 256];
+
+    let gridSize = tileGridConfig.gridSize;
+    let extent = tileGridConfig.extent;
+
+    if (extent) {
+        const gridParams = computeTileGridParams({
+            extent,
+            tileSize,
+            gridSize,
+            forceUniformResolution: tileGridConfig.forceUniformResolution
+        });
+
+        gridSize = gridParams.gridSize;
+        tileSize = gridParams.tileSize;
+    }
+
+    let gridConfig: CesiumTileGridConfig = {
+        tileWidth: tileSize[0],
+        tileHeight: tileSize[1],
+        minimumLevel: tileGridConfig.minZoom || 0,
+        tileMatrixLabels: tileGridConfig.matrixIds
+    };
+
+    if (tileGridConfig.maxZoom) {
+        gridConfig.maximumLevel = tileGridConfig.maxZoom;
+    } else if (tileGridConfig.resolutions) {
+        gridConfig.maximumLevel = tileGridConfig.resolutions.length - 1;
+    }
+
+    let tileSchemeConfig: CesiumTileSchemeConfig = {};
+    if (gridSize) {
+        tileSchemeConfig.numberOfLevelZeroTilesX = gridSize[0];
+        tileSchemeConfig.numberOfLevelZeroTilesY = gridSize[1];
+    }
+
+    let tilingScheme: GeographicTilingScheme | WebMercatorTilingScheme;
 
     if (projection === ProjectionType.GlobalGeodetic) {
-        if (tileGridConfig) {
-            if (tileGridConfig.extent) {
-                tileSchemeConfig.rectangle = Rectangle.fromDegrees(...tileGridConfig.extent);
-            }
+        if (extent) {
+            tileSchemeConfig.rectangle = Rectangle.fromDegrees(...extent);
         }
-        tileGrid = {
-            scheme: new GeographicTilingScheme(tileSchemeConfig)
-        };
+        tilingScheme = new GeographicTilingScheme(tileSchemeConfig);
 
     } else if (projection === ProjectionType.GlobalMercator) {
-        if (tileGridConfig) {
-            if (tileGridConfig.extent) {
-                tileSchemeConfig.rectangleSouthwestInMeters = new Cartesian2(tileGridConfig.extent[0], tileGridConfig.extent[2]);
-                tileSchemeConfig.rectangleNortheastInMeters = new Cartesian2(tileGridConfig.extent[1], tileGridConfig.extent[3]);
-            }
+        if (extent) {
+            tileSchemeConfig.rectangleSouthwestInMeters = new Cartesian2(extent[0], extent[2]);
+            tileSchemeConfig.rectangleNortheastInMeters = new Cartesian2(extent[1], extent[3]);
         }
-        tileGrid = {
-            scheme: new WebMercatorTilingScheme(tileSchemeConfig)
-        };
-
+        tilingScheme = new WebMercatorTilingScheme(tileSchemeConfig);
     }
 
-    if (tileGrid) {
-        tileGrid.config = additionalConfig;
-    }
+    return {
+        scheme: tilingScheme,
+        config: gridConfig
+    };
 
-    return tileGrid;
 };
 
 

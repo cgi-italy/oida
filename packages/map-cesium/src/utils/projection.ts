@@ -7,7 +7,7 @@ export enum ProjectionType {
     Other
 }
 
-export const getProjectionType = (srs) => {
+export const getProjectionType = (srs: string) => {
 
     let projection : ProjectionType;
 
@@ -30,7 +30,7 @@ export const getProjectionType = (srs) => {
     return projection;
 };
 
-export const getProjectionFromSRS = (srs, defaultGeographic = false) => {
+export const getProjectionFromSRS = (srs: string, defaultGeographic = false) => {
 
     let projection = getProjectionType(srs);
 
