@@ -6,7 +6,7 @@ import { MapLayer, MapLayerProps } from './map-layer';
 import { IsHoverable, IsSelectable, Config, ConfigProps, HasConfig } from '../../mixins';
 
 export interface FeatureInterface extends IsHoverable, IsSelectable {
-    id: string;
+    id: string | number;
 }
 
 export type FeatureGeometryGetter<T extends FeatureInterface> = (entity: T) => Geometry | undefined;

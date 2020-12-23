@@ -1,14 +1,14 @@
 import { IObservableArray } from 'mobx';
 
 import { SelectionMode } from '@oida/core';
-import { Entity, SelectionManager } from '@oida/state-mobx';
+import { Entity, SelectionManager, IsEntity } from '@oida/state-mobx';
 import { DataCollectionItemAction } from '@oida/ui-react-core';
 
 import { useEntityListItem } from './use-entity-list-item';
 import { useSelector } from './use-selector';
 
 
-export type EntityCollectionListProps<T extends Entity> = {
+export type EntityCollectionListProps<T extends IsEntity> = {
     items?: IObservableArray<T>;
     actions?: DataCollectionItemAction<T>[];
     iconGetter?: (entity: T) => string | Promise<string>;
@@ -16,7 +16,7 @@ export type EntityCollectionListProps<T extends Entity> = {
 };
 
 
-export const useEntityCollectionList = <T extends Entity>(props: EntityCollectionListProps<T>) => {
+export const useEntityCollectionList = <T extends IsEntity>(props: EntityCollectionListProps<T>) => {
 
     const { items, actions, iconGetter, selectionManager } = props;
 
@@ -28,7 +28,7 @@ export const useEntityCollectionList = <T extends Entity>(props: EntityCollectio
         }
         return {
             data: items.slice(),
-            keyGetter: (entity: T) => entity.id,
+            keyGetter: (entity: T) => entity.id.toString(),
             itemSelector: (entity: T) => {
                 const itemActions = actions
                     ? actions.filter((action) => action.condition ? action.condition(entity) : true)

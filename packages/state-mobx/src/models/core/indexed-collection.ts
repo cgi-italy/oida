@@ -3,13 +3,13 @@ import { makeObservable, observable, action } from 'mobx';
 import { Collection, CollectionProps } from './collection';
 
 export type IndexedCollectionProps<T> = CollectionProps<T> & {
-    idGetter: (item: T) => string;
+    idGetter: (item: T) => string | number;
 };
 
 export class IndexedCollection<T> extends Collection<T> {
 
-    protected idMap_: Record<string, T> = {};
-    protected idGetter_: (item: T) => string;
+    protected idMap_: Record<string | number, T> = {};
+    protected idGetter_: (item: T) => string | number;
 
     constructor(props: IndexedCollectionProps<T>) {
         super(props);

@@ -6,12 +6,12 @@ import {
 
 
 export type EntityProps = {
-    id: string;
+    id: string | number;
     entityType: string;
 } & VisibleProps & HoveredProps & SelectedProps;
 
 export class Entity implements HasVisibility, IsHoverable, IsSelectable {
-    readonly id: string;
+    readonly id: string | number;
     readonly entityType: string;
     readonly visible: Visible;
     readonly hovered: Hovered;
@@ -27,5 +27,5 @@ export class Entity implements HasVisibility, IsHoverable, IsSelectable {
 }
 
 export interface IsEntity extends HasVisibility, IsHoverable, IsSelectable {
-    id: string;
+    id: string | number;
 }

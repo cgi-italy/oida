@@ -11,7 +11,7 @@ import { VerticalProfileLayer } from '../../models/map/layers/vertical-profile-l
 import { FeatureInterface } from '../../models/map/layers/feature-layer';
 
 type ProfileTracker = {
-    id: string,
+    id: string | number,
     disposeProfileObserver: IReactionDisposer,
     disposeStyleObserver: IReactionDisposer
 };
@@ -28,7 +28,7 @@ extends MapLayerController<IVerticalProfileLayerRenderer, VerticalProfileLayer<T
             const profile = this.mapLayer_.source?.find(profile => profile.selected.value && profile.id === profileId);
             if (profile) {
                 this.mapLayer_.setSelectedCoordinate({
-                    profileId: profile.id,
+                    profileId: profile.id.toString(),
                     geographic: coordinate
                 });
             } else {
@@ -41,7 +41,7 @@ extends MapLayerController<IVerticalProfileLayerRenderer, VerticalProfileLayer<T
             const profile = this.mapLayer_.source?.find(profile => profile.selected.value && profile.id === profileId);
             if (profile) {
                 this.mapLayer_.setHighlihgtedCoordinate({
-                    profileId: profile.id,
+                    profileId: profile.id.toString(),
                     geographic: coordinate
                 });
             } else {
@@ -118,20 +118,21 @@ extends MapLayerController<IVerticalProfileLayerRenderer, VerticalProfileLayer<T
 
         const layerRenderer = this.layerRenderer_!;
 
-        layerRenderer.addProfile(item.id, profile, style, {
+        const profileId = item.id.toString();
+        layerRenderer.addProfile(profileId, profile, style, {
             model: item
         });
 
         let disposeProfileObserver = reaction(() => this.mapLayer_.config.value.profileGetter(item), (profile) => {
-            if (layerRenderer.getProfile(item.id)) {
+            if (layerRenderer.getProfile(profileId)) {
                 if (profile) {
-                    layerRenderer.updateProfile(item.id, profile);
+                    layerRenderer.updateProfile(profileId, profile);
                 } else {
-                    layerRenderer.removeProfile(item.id);
+                    layerRenderer.removeProfile(profileId);
                 }
             } else {
                 if (profile) {
-                    layerRenderer.addProfile(item.id, profile, this.mapLayer_.config.value.styleGetter(item), {
+                    layerRenderer.addProfile(profileId, profile, this.mapLayer_.config.value.styleGetter(item), {
                         model: item
                     });
                 }
@@ -139,8 +140,8 @@ extends MapLayerController<IVerticalProfileLayerRenderer, VerticalProfileLayer<T
         });
 
         let disposeStyleObserver = reaction(() => this.mapLayer_.config.value.styleGetter(item), (style) => {
-            if (layerRenderer.getProfile(item.id)) {
-                layerRenderer.updateProfileStyle(item.id, style);
+            if (layerRenderer.getProfile(profileId)) {
+                layerRenderer.updateProfileStyle(profileId, style);
             }
         });
 
@@ -154,7 +155,7 @@ extends MapLayerController<IVerticalProfileLayerRenderer, VerticalProfileLayer<T
     protected removeProfile_(profileTracker: ProfileTracker) {
         profileTracker.disposeProfileObserver();
         profileTracker.disposeStyleObserver();
-        this.layerRenderer_!.removeProfile(profileTracker.id);
+        this.layerRenderer_!.removeProfile(profileTracker.id.toString());
     }
 
 }

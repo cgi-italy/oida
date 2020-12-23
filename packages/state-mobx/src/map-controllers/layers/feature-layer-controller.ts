@@ -131,7 +131,7 @@ export class FeatureLayerController
             return featureTracker;
         }
 
-        const featureId = feature.id;
+        const featureId = feature.id.toString();
 
         featureTracker.disposeStyleObserver = reaction(() => this.styleGetter_(feature), (style) => {
             if (layerRenderer.hasFeature(featureId)) {
