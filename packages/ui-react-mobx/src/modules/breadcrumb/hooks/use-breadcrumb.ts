@@ -5,27 +5,33 @@ import { useSelector } from '../../../core/hooks';
 import { useBreadcrumbModule } from './use-breadcrumb-module';
 
 
-export type BreadcrumbProps = {
+export type useBreadcrumbProps = {
     breadcrumb: IndexedCollection<BreadcrumbItemProps>
+    minLevel?: number;
+    maxLevel?: number;
 };
 
-export const useBreadcrumb = (props: BreadcrumbProps) => {
-    return useSelector(() => ({
-        items: props.breadcrumb.items.map((item) => {
+export const useBreadcrumb = (props: useBreadcrumbProps) => {
+    return useSelector(() => {
+        let items = props.breadcrumb.items.map((item) => {
             return {
                 key: item.key,
                 title: item.title,
                 link: item.link,
                 onClick: item.onClick
             };
-        })
-    }), [props.breadcrumb]);
+        });
+        return {
+            items: items.slice(props.minLevel, props.maxLevel)
+        };
+    }, [props.breadcrumb, props.minLevel, props.maxLevel]);
 };
 
-export const useBreadcrumbFromModule = (breadcrumbModuleId?: string) => {
+export const useBreadcrumbFromModule = (props?: Omit<useBreadcrumbProps, 'breadcrumb'>, breadcrumbModuleId?: string) => {
     const breadcrumbModule = useBreadcrumbModule(breadcrumbModuleId);
 
     return useBreadcrumb({
-        breadcrumb: breadcrumbModule.breadcrumb
+        breadcrumb: breadcrumbModule.breadcrumb,
+        ...props
     });
 };

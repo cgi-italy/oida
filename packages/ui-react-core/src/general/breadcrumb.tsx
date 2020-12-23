@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 export type BreadcrumbItemProps = {
     key: string;
@@ -9,7 +10,13 @@ export type BreadcrumbItemProps = {
 
 export type BreadcrumbProps = {
     items: BreadcrumbItemProps[];
-    linkItem: React.ComponentType<BreadcrumbItemProps>
+    linkItem?: React.ComponentType<BreadcrumbItemProps>
+};
+
+export const BreadcrumbRouterLinkItem = (props: BreadcrumbItemProps) => {
+    return (
+        <Link to={props.link || '#'}>{props.title}</Link>
+    );
 };
 
 export type BreadcrumbRenderer = (props: BreadcrumbProps) => React.ReactNode;
