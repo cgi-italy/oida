@@ -42,17 +42,31 @@ export class OLMapRenderer implements IMapRenderer {
     }
 
     fitExtent(extent, animate?: boolean) {
-        let view = this.viewer_.getView();
-        let projection = view.getProjection();
-        if (projection.getCode() !== 'EPSG:4326') {
-            extent = transformExtent(extent, 'EPSG:4326', projection);
-            if (isNaN(extent[0]) || isNaN(extent[1]) || isNaN(extent[2]) || isNaN(extent[3])) {
+
+        const view = this.viewer_.getView();
+        const projection = view.getProjection();
+
+        const eps = 0.0001;
+        if (extent[2] - extent[0] <= eps || extent[3] - extent[1] <= eps) {
+            const center = transform([extent[0], extent[1]], 'EPSG:4326', view.getProjection());
+            if (isNaN(center[0]) || isNaN(center[1])) {
                 return;
             }
+            view.animate({
+                center: center
+            });
+        } else {
+
+            if (projection.getCode() !== 'EPSG:4326') {
+                extent = transformExtent(extent, 'EPSG:4326', projection);
+                if (isNaN(extent[0]) || isNaN(extent[1]) || isNaN(extent[2]) || isNaN(extent[3])) {
+                    return;
+                }
+            }
+            view.fit(extent, {
+                duration: animate ? 1000 : 0
+            });
         }
-        this.viewer_.getView().fit(extent, {
-            duration: animate ? 1000 : 0
-        });
     }
 
     getViewportExtent() {
