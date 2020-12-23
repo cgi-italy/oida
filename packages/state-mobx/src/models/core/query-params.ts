@@ -2,6 +2,15 @@ import { makeObservable, observable, action, computed, reaction, ObservableMap }
 
 import { SortOrder, QueryFilter } from '@oida/core';
 
+
+export type FilterTypeReaction =  (filters: DataFilters, key: string) => (() => void);
+
+const filterTypeReactions: Record<string, FilterTypeReaction> = {};
+
+export const setReactionForFilterType = (type: string, reaction: FilterTypeReaction) => {
+    filterTypeReactions[type] = reaction;
+};
+
 export type DataFiltersProps = {
     values?: Record<string, QueryFilter>
 };
@@ -9,11 +18,15 @@ export type DataFiltersProps = {
 export class DataFilters {
     items: ObservableMap<string, QueryFilter>;
 
+    protected reactionsDisposer_: Record<string, () => void>;
+
     constructor(props?: DataFiltersProps) {
 
         this.items =  observable.map(props?.values || {}, {
             deep: false
         });
+
+        this.reactionsDisposer_ = {};
 
         makeObservable(this, {
             set: action,
@@ -32,14 +45,23 @@ export class DataFilters {
             value: value,
             type: type
         });
+        if (filterTypeReactions[type] && !this.reactionsDisposer_[key]) {
+            this.reactionsDisposer_[key] = filterTypeReactions[type](this, key);
+        }
     }
 
     clear() {
         this.items.clear();
+        Object.values(this.reactionsDisposer_).forEach(disposer => disposer());
+        this.reactionsDisposer_ = {};
     }
 
     unset(key: string) {
         this.items.delete(key);
+        if (this.reactionsDisposer_[key]) {
+            this.reactionsDisposer_[key]();
+            delete this.reactionsDisposer_[key];
+        }
     }
 
     asArray() {
@@ -179,7 +201,8 @@ export class QueryParams {
         }
 
         makeObservable(this, {
-            data: computed
+            data: computed,
+            reset: action
         });
 
         this.afterInit_();
@@ -200,8 +223,13 @@ export class QueryParams {
         };
     }
 
+    reset() {
+        this.filters.clear();
+        this.paging.setTotal(0);
+    }
+
     protected afterInit_() {
-        reaction(() => Object.values(this.filters.items), () => {
+        reaction(() => this.filters.asArray(), () => {
             this.paging.setPage(0);
         });
     }
