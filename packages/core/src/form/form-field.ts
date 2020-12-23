@@ -29,10 +29,10 @@ export type FormField<TYPE extends string, T, CONFIG> = FormFieldConfig<TYPE, CO
 
 
 export type FormFieldDefinition<TYPE extends string, T, CONFIG> =
-    FormFieldConfig<TYPE, CONFIG> | FormFieldConfigFromState<TYPE, T, CONFIG>;
+    FormFieldConfig<TYPE, CONFIG> | FormFieldConfigFromState<TYPE, CONFIG, T>;
 
 export const isFormFieldConfigFromState = <TYPE extends string, T, CONFIG>(definition: FormFieldDefinition<TYPE, T, CONFIG>):
-definition is FormFieldConfigFromState<TYPE, T, CONFIG> => {
+definition is FormFieldConfigFromState<TYPE, CONFIG, T> => {
     return typeof(definition.config) === 'function';
 };
 
