@@ -121,6 +121,8 @@
   "dependencies": {
     "@oida/core": "file:packages\\core",
     "@oida/eo-adapters-adam": "file:packages\\eo-adapters-adam",
+    "@oida/eo-adapters-ogc": "file:packages\\eo-adapters-ogc",
+    "@oida/eo-adapters-ogc-react": "file:packages\\eo-adapters-ogc-react",
     "@oida/eo-geotiff": "file:packages\\eo-geotiff",
     "@oida/eo-mobx": "file:packages\\eo-mobx",
     "@oida/eo-mobx-react": "file:packages\\eo-mobx-react",
