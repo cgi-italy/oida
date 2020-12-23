@@ -123,15 +123,20 @@ export class WmsDatasetDiscoveryProvider extends DatasetDiscoveryProvider<WmsDat
 
     @action
     selectService(service: WmsItem | string | undefined) {
-        this.results.clear();
-        this.criteria.filters.clear();
-        this.criteria.paging.setPage(0);
         let selectedService: WmsItem | undefined;
         if (typeof(service) === 'string') {
             selectedService = this.services.find((item) => item.id === service);
         } else {
             selectedService = service;
         }
+        if (this.selectedService === selectedService) {
+            return;
+        }
+
+        this.results.clear();
+        this.criteria.filters.clear();
+        this.criteria.paging.setPage(0);
+
         this.selectedService = selectedService;
     }
 

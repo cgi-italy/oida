@@ -1,169 +1,76 @@
-import React, { useMemo, useEffect } from 'react';
+import React, { useEffect } from 'react';
 
-import { Select, Tooltip } from 'antd';
-import { SearchOutlined, PlusOutlined, PictureOutlined, InfoCircleOutlined } from '@ant-design/icons';
-import { STRING_FIELD_ID } from '@oida/core';
+import { Select } from 'antd';
 
-import { useEntityCollectionList, useDataPaging, useDataSorting, useDataFiltering, BreadcrumbItem, useSelector } from '@oida/ui-react-mobx';
-import { DataCollectionList } from '@oida/ui-react-antd';
-import { DatasetConfig, DatasetExplorer } from '@oida/eo-mobx';
+import { useSelector } from '@oida/ui-react-mobx';
+import { DatasetExplorer } from '@oida/eo-mobx';
 
-import { DatasetDiscoveryProviderFactory, DatasetDiscoveryResultItem } from '@oida/eo-mobx-react';
+import { DatasetDiscoveryProviderFactory } from '@oida/eo-mobx-react';
 import {
-    WmsDatasetDiscoveryProvider, WMS_DATASET_DISCOVERY_PROVIDER_TYPE, WmsDatasetDiscoveryProviderItem,
-    WmsService, WmsLayerPreviewMode
+    WmsDatasetDiscoveryProvider, WMS_DATASET_DISCOVERY_PROVIDER_TYPE
  } from '@oida/eo-adapters-ogc';
 
-import { useQueryCriteriaUrlBinding, useQueryFiltersBreadcrumbBindingFromModule } from '@oida/ui-react-mobx';
+import { useHistory, useRouteMatch, Redirect, Route, Switch, useParams } from 'react-router';
+import { WmsDiscoveryProviderResults } from './wms-discovery-provider-results';
 
 
-type WmsDiscoveryLayerItemProps = {
-    wmsDiscoveryItem: WmsDatasetDiscoveryProviderItem
+const WmsDiscoveryProviderRedirect = (props: {provider: WmsDatasetDiscoveryProvider}) => {
+    const { url } = useRouteMatch();
+
+    const selectedService = useSelector(() => props.provider.selectedService || props.provider.services[0]);
+    if (selectedService) {
+        return (
+            <Redirect to={{
+                pathname: `${url}/${selectedService.id}`,
+                state: {
+                    updateLocationFromState: true
+                }
+            }}
+            />
+        );
+    } else {
+        return null;
+    }
 };
 
-const WmsDiscoveryLayerItem = (props: WmsDiscoveryLayerItemProps) => {
+export const WmsDiscoveryProviderRoute = (props: WmsDiscoveryProviderRouterProps) => {
 
-    const layerData = useMemo(() => {
+    const { serviceId } = useParams();
 
-        const meta: any[] = [];
-
-        const layer = props.wmsDiscoveryItem.layer;
-
-        if (layer.Title) {
-            meta.push({
-                label: (
-                    <Tooltip title='Source name'>
-                        <PictureOutlined />
-                    </Tooltip>
-                ),
-                value: layer.Title
-            });
-        }
-
-        if (layer.Abstract) {
-            meta.push({
-                label: (
-                    <Tooltip title='Description'>
-                        <InfoCircleOutlined />
-                    </Tooltip>
-                ),
-                value: layer.Abstract
-            });
-        }
-
-        let preview: Promise<string> | undefined;
-
-        if (props.wmsDiscoveryItem.service && layer.Name && !props.wmsDiscoveryItem.disablePreview) {
-            preview = props.wmsDiscoveryItem.service.getLayerPreview(layer.Name, {
-                width: 128,
-                mode: WmsLayerPreviewMode.KeepRatio,
-                transparent: true
-            });
-        }
-
-        return {
-            metadata: meta,
-            preview: preview
-        };
-
-    }, []);
+    useEffect(() => {
+        props.provider.selectService(serviceId);
+    }, [serviceId]);
 
     return (
-        <DatasetDiscoveryResultItem
-            metadata={layerData.metadata}
-            actions={[]}
-            preview={layerData.preview}
-            title={props.wmsDiscoveryItem.layer.Name}
+        <WmsDiscoveryProviderResults
+            provider={props.provider}
+            datasetExplorer={props.datasetExplorer}
         />
     );
 };
 
-export type WmsDiscoveryProviderResultsProps = {
-    provider: WmsDatasetDiscoveryProvider,
-    datasetExplorer: DatasetExplorer
+export type WmsDiscoveryProviderRouterProps = {
+    provider: WmsDatasetDiscoveryProvider;
+    datasetExplorer: DatasetExplorer;
 };
 
-export const WmsDiscoveryProviderResults = (props: WmsDiscoveryProviderResultsProps) => {
+export const WmsDiscoveryProviderRouter = (props: WmsDiscoveryProviderRouterProps) => {
 
-    const searchFilters = [
-        {
-            name: 'search',
-            type: STRING_FIELD_ID,
-            config: {},
-            rendererConfig: {
-                props: {
-                    prefix: (<SearchOutlined/>)
-                }
-            }
-        }
-    ];
-
-    const actions = [
-        {
-            name: 'Add to map',
-            content: 'Add to map',
-            icon: (<PlusOutlined/>),
-            callback: (item: WmsDatasetDiscoveryProviderItem) => {
-                props.provider.createDataset(item).then((datasetConfig) => {
-                    if (datasetConfig) {
-                        props.datasetExplorer.addDataset(datasetConfig);
-                    }
-                });
-            },
-            condition: (entity) => {
-                return true;
-            }
-        }
-    ];
-
-    useQueryCriteriaUrlBinding({
-        criteria: props.provider.criteria
-    });
-
-    useQueryFiltersBreadcrumbBindingFromModule({
-        filtersConfig: searchFilters,
-        filteringState: props.provider.criteria.filters
-    });
-
-    const loadingState = useSelector(() => props.provider.loadingState.value);
-
-    let pagingProps = useDataPaging(props.provider.criteria.paging);
-
-    let filteringProps = useDataFiltering({
-        filteringState: props.provider.criteria.filters,
-        filters: searchFilters
-    });
-
-    let sortingProps = useDataSorting({
-        sortableFields: [{key: 'Title', name: 'Name'}],
-        sortingState: props.provider.criteria.sorting
-    });
-
-    let items = useEntityCollectionList<WmsDatasetDiscoveryProviderItem>({
-        items: props.provider.results,
-        actions: actions
-    });
-
-    if (!items) {
-        return null;
-    }
+    const { path } = useRouteMatch();
 
     return (
-        <div className='wms-discovery-provider-service'>
-            <DataCollectionList<WmsDatasetDiscoveryProviderItem>
-                className='dataset-discovery-results wms-discovery-layer-list'
-                content={(item) => <WmsDiscoveryLayerItem wmsDiscoveryItem={item}/>}
-                items={{
-                    ...items,
-                    loadingState: loadingState
-                }}
-                itemLayout='vertical'
-                paging={pagingProps}
-                sorting={sortingProps}
-                filters={filteringProps}
-                autoScrollOnSelection={false}
-            />
-        </div>
+        <Switch>
+            <Route exact path={path}>
+                <WmsDiscoveryProviderRedirect provider={props.provider}
+                />
+            </Route>
+            <Route path={`${path}/:serviceId`}>
+                <WmsDiscoveryProviderRoute
+                    provider={props.provider}
+                    datasetExplorer={props.datasetExplorer}
+                />
+            </Route>
+        </Switch>
     );
 };
 
@@ -187,30 +94,28 @@ export const WmsDiscoveryProvider = (props: WmsDiscoveryProviderProps) => {
         });
     });
 
-    const selectedWms = useSelector(() => props.provider.selectedService);
+    const history = useHistory();
+    const { url, path } = useRouteMatch();
+    const match = useRouteMatch<{serviceId: string}>({
+        path: `${path}/:serviceId`
+    });
+    const selectedService = match?.params.serviceId;
 
     return (
         <div className='wms-discovery-provider'>
-            {selectedWms && <BreadcrumbItem
-                data={{
-                    key: selectedWms.id,
-                    title: selectedWms.name,
-                    onClick: () => props.provider.criteria.reset()
-                }}
-            />}
-            <div>
+            <div className='wms-discovery-service-selector'>
                 <label>Service:</label>
                 <Select
-                    value={selectedWms?.id}
-                    onChange={(value) => props.provider.selectService(value)}
+                    value={selectedService}
+                    onChange={(value) => history.push(`${url}/${value}`)}
                 >
                     {serviceOptions}
                 </Select>
             </div>
-            {selectedWms && <WmsDiscoveryProviderResults
+            <WmsDiscoveryProviderRouter
                 datasetExplorer={props.datasetExplorer}
                 provider={props.provider}
-            />}
+            />
         </div>
     );
 };
