@@ -9,6 +9,7 @@ import { DataCollectionItemsProps, CanBeScrolledIntoView } from '@oida/ui-react-
 
 export type DataCollectionItemsListProps<T> = {
     autoScrollOnSelection?: boolean;
+    autoScrollOnHover?: boolean;
     meta?: (item: T) => {avatar?: React.ReactNode, description?: React.ReactNode, title?: React.ReactNode};
     extra?: (item: T) => React.ReactNode;
     content?: (item: T) => React.ReactNode;
@@ -20,6 +21,7 @@ export function DataCollectionItemsList<T>(props: DataCollectionItemsListProps<T
 
     let {
         autoScrollOnSelection,
+        autoScrollOnHover,
         meta,
         content,
         extra,
@@ -103,6 +105,15 @@ export function DataCollectionItemsList<T>(props: DataCollectionItemsListProps<T
 
         let itemRenderer = listItem;
         if (autoScrollOnSelection) {
+            itemRenderer = (
+                <CanBeScrolledIntoView
+                    scrollToItem={!isMouseHover && selected}
+                >
+                    {listItem}
+                </CanBeScrolledIntoView>
+            );
+        }
+        if (autoScrollOnHover) {
             itemRenderer = (
                 <CanBeScrolledIntoView
                     scrollToItem={!isMouseHover && hovered}

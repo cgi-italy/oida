@@ -8,6 +8,15 @@
                 }
             }
         }
+
+        &.is-required {
+            label {
+                &::after {
+                    display: inline;
+                    content: '*'
+                }
+            }
+        }
     }
 
     &.ant-form-small {

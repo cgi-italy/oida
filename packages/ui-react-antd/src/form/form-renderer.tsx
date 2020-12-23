@@ -15,7 +15,7 @@ export const FieldWrapper = (props) => {
         <Form.Item
             label={title}
             rules={[{required: required}]}
-            className={classnames(`${type.toLowerCase()}-field`, `${rendererId}-renderer`)}
+            className={classnames(`${type.toLowerCase()}-field`, `${rendererId}-renderer`, {'is-required': required})}
         >
             {children}
         </Form.Item>

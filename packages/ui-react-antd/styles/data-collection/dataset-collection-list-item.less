@@ -1,0 +1,97 @@
+.data-collection-compact-list-item {
+    display: flex;
+    align-items: center;
+
+    .data-collection-compact-list-item-preview {
+        height: 32px;
+        width: 32px;
+        overflow: hidden;
+        margin-right: 0.5rem;
+        flex-shrink: 0;
+        font-size: 20px;
+        text-align: center;
+        line-height: 32px;
+
+        .anticon-loading {
+            font-size: 32px;
+        }
+
+        img {
+            width: auto;
+        }
+    }
+
+    .data-collection-compact-list-item-icon {
+        margin-right: 0.5rem;
+        font-size: 20px;
+        width: 32px;
+        line-height: 32px;
+        text-align: center;
+        flex-shrink: 0;
+    }
+
+    .data-collection-compact-list-item-title {
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+}
+
+.data-collection-list-item-detailed {
+
+    .data-collection-list-item-detailed-title {
+        margin-bottom: 10px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+        font-weight: bold;
+    }
+
+    .data-collection-list-item-detailed-content {
+        display: flex;
+
+        .data-collection-list-item-detailed-meta {
+            flex-grow: 1;
+
+            .ant-descriptions-view {
+                border: none;
+
+                table {
+
+                    table-layout: fixed;
+
+                    .ant-descriptions-row {
+                        border-bottom: none;
+
+                        .ant-descriptions-item-label {
+                            width: 2em;
+                            background-color: transparent;
+                            border-right: none;
+                            padding: 4px 8px;
+                            vertical-align: top;
+                        }
+
+                        .ant-descriptions-item-content {
+                            padding: 4px 8px;
+                            font-size: 13px;
+                        }
+                    }
+                }
+            }
+        }
+        .data-collection-list-item-detailed-preview {
+            max-width: 30%;
+            min-height: 100%;
+            flex-shrink: 0;
+
+            .anticon-loading {
+                font-size: 48px;
+            }
+
+            img {
+                width: 100%;
+                height: auto;
+            }
+        }
+    }
+}
