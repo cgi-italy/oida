@@ -2,19 +2,18 @@ import React from 'react';
 
 import { Tabs, Tooltip } from 'antd';
 
-import { useSelector } from '@oida/ui-react-mobx';
-import { DatasetDiscovery } from '@oida/eo-mobx';
+import { DatasetDiscoveryProvider } from '@oida/eo-mobx';
 
 
 export type DatasetDiscoveryProviderSelectorProps = {
-    datasetDiscovery: DatasetDiscovery
+    providers: DatasetDiscoveryProvider[];
+    selectedProvider?: string;
+    onProviderSelect: (providerId: string) => void;
 };
 
-export const DatasetDiscoveryProviderTabSelector = (props: DatasetDiscoveryProviderSelectorProps) => {
+export const DatasetDiscoveryProviderTabsSelector = (props: DatasetDiscoveryProviderSelectorProps) => {
 
-    const selectedProvider = useSelector(() => props.datasetDiscovery.selectedProvider);
-
-    const tabs = useSelector(() => props.datasetDiscovery.providers.map((provider) => {
+    const tabs = props.providers.map((provider) => {
         return (
             <Tabs.TabPane
                 tab={
@@ -29,12 +28,12 @@ export const DatasetDiscoveryProviderTabSelector = (props: DatasetDiscoveryProvi
                 key={provider.id}
             />
         );
-    }));
+    });
 
     return (
         <Tabs
-            activeKey={selectedProvider?.id}
-            onChange={(value) => props.datasetDiscovery.selectProvider(value)}
+            activeKey={props.selectedProvider}
+            onChange={props.onProviderSelect}
             size='small'
         >
             {tabs}

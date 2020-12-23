@@ -5,8 +5,8 @@ import { DrawerProps } from 'antd/lib/drawer';
 import { LeftOutlined } from '@ant-design/icons';
 
 import { DatasetDiscovery, DatasetExplorer } from '@oida/eo-mobx';
-import { DatasetDiscoveryProviderTabSelector } from './dataset-discovery-provider-tab-selector';
-import { DatasetDiscoveryProvider } from './dataset-discovery-provider';
+
+import { DatasetDiscoveryProviderTabsNavigation, DatasetDiscoveryProviderRouter } from './dataset-discovery-provider-route';
 
 
 export type DatasetDiscoveryDrawerProps = {
@@ -41,7 +41,7 @@ export const DatasetDiscoveryDrawer = (props: DatasetDiscoveryDrawerProps) => {
                     onBack={() => setVisible(false)}
                     backIcon={props.backIcon || <Tooltip title='Back to map'><LeftOutlined/></Tooltip>}
                     footer={
-                        <DatasetDiscoveryProviderTabSelector
+                        <DatasetDiscoveryProviderTabsNavigation
                             datasetDiscovery={datasetDiscovery}
                         />
                     }
@@ -62,10 +62,10 @@ export const DatasetDiscoveryDrawer = (props: DatasetDiscoveryDrawerProps) => {
                 }
             }}
         >
-            <DatasetDiscoveryProvider
+            {visible && <DatasetDiscoveryProviderRouter
                 datasetDiscovery={datasetDiscovery}
                 datasetExplorer={datasetExplorer}
-            />
+            />}
         </Drawer>
     );
 };
