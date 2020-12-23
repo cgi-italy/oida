@@ -4,7 +4,7 @@ import { DatasetTimeDistributionConfig } from './dataset-time-distribution-confi
 import { DatasetProductSearchConfig } from './dataset-product-search-config';
 import { DatasetDownloadConfig } from './dataset-download-config';
 import { DatasetToolConfig } from './dataset-tool-config';
-import { DatasetViz } from '../models';
+import { DatasetSpatialCoverageProvider } from './dataset-spatial-coverage-provider';
 
 export type DatasetConfig = {
     id: string;
@@ -16,7 +16,7 @@ export type DatasetConfig = {
     filters: AnyFormFieldDefinition[];
     timeDistribution?: DatasetTimeDistributionConfig;
     productSearch?: DatasetProductSearchConfig;
-    spatialCoverageProvider?: (datasetViz: DatasetViz<any>) => Promise<number[]>;
+    spatialCoverageProvider?: DatasetSpatialCoverageProvider;
     mapView?: {type: string, props: Record<string, any>};
     tools?: DatasetToolConfig[];
     download?: DatasetDownloadConfig;

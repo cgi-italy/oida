@@ -65,7 +65,7 @@ export class AdamDatasetDiscoveryProvider extends DatasetDiscoveryProvider<AdamD
                 });
             });
 
-            this.setResults(results);
+            this.setResults_(results);
         }, {fireImmediately: true});
     }
 }

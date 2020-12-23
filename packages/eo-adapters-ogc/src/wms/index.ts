@@ -4,3 +4,4 @@ export * from './wms-time-series-tool';
 export * from './wms-time-distribution-provider';
 export * from './wms-discovery-provider';
 export * from './wms-raster-view';
+export * from './wms-dataset-config';

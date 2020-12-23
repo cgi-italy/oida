@@ -1,6 +1,7 @@
 import { getGeometryExtent } from '@oida/core';
 import {
-    RasterMapViz, RasterMapVizConfig, RASTER_VIZ_TYPE, RasterBandModeType, RasterBandPreset, RasterBandModePreset
+    RasterMapViz, RasterMapVizConfig, RASTER_VIZ_TYPE, RasterBandModeType, RasterBandPreset, RasterBandModePreset,
+    DatasetSpatialCoverageProvider
 } from '@oida/eo-mobx';
 
 import { WmsLayer } from './wms-client';
@@ -8,7 +9,11 @@ import { WmsLayer } from './wms-client';
 import { intersects, getIntersection } from 'ol/extent';
 import { transformExtent } from 'ol/proj';
 
-export const createWmsRasterSourceProvider = (layer: WmsLayer, wmsUrl: string) => {
+export const createWmsRasterSourceProvider = (
+    layer: WmsLayer,
+    wmsUrl: string,
+    spatialCoverageProvider?: DatasetSpatialCoverageProvider
+) => {
 
     return (rasterView: RasterMapViz) => {
 
@@ -17,23 +22,8 @@ export const createWmsRasterSourceProvider = (layer: WmsLayer, wmsUrl: string) =
             format: 'image/png'
         };
 
-        let { extent, crs } = layer.BoundingBox[0];
-
         if (layer.BoundingBox.find((bbox) => bbox.crs === 'EPSG:404000')) {
-            return undefined;
-        }
-
-        let aoiFilter = rasterView.dataset.aoiFilter;
-
-        if (aoiFilter && !aoiFilter.props?.fromMapViewport) {
-            let aoiExtent = getGeometryExtent(aoiFilter.geometry);
-            aoiExtent = transformExtent(aoiExtent, 'EPSG:4326', crs);
-
-            if (!intersects(extent, aoiExtent)) {
-                return undefined;
-            } else {
-                extent = getIntersection(extent, aoiExtent);
-            }
+            return Promise.resolve(undefined);
         }
 
         let timeFilter = rasterView.dataset.selectedTime;
@@ -51,19 +41,52 @@ export const createWmsRasterSourceProvider = (layer: WmsLayer, wmsUrl: string) =
             style = bandMode.preset;
         }
 
-        return {
-            id: 'wms',
-            url: wmsUrl,
-            layers: layer.Name,
-            styles: style,
-            srs: crs,
-            parameters: params,
-            extent: extent
-        };
+        let bbox = layer.BoundingBox[0];
+        let extent = Promise.resolve(bbox.extent);
+        let crs = bbox.crs;
+
+        if (spatialCoverageProvider) {
+            extent = spatialCoverageProvider(rasterView).then((coverageExtent) => {
+                if (coverageExtent) {
+                    crs = 'EPSG:4326';
+                    return coverageExtent;
+                } else {
+                    return bbox.extent;
+                }
+            });
+        }
+
+        return extent.then((extent) => {
+            let aoiFilter = rasterView.dataset.aoiFilter;
+
+            if (aoiFilter && !aoiFilter.props?.fromMapViewport) {
+                let aoiExtent = getGeometryExtent(aoiFilter.geometry);
+                aoiExtent = transformExtent(aoiExtent, 'EPSG:4326', crs);
+
+                if (!intersects(extent, aoiExtent)) {
+                    return Promise.resolve(undefined);
+                } else {
+                    extent = getIntersection(extent, aoiExtent);
+                }
+            }
+
+            return Promise.resolve({
+                id: 'wms',
+                url: wmsUrl,
+                layers: layer.Name,
+                styles: style,
+                srs: crs,
+                parameters: params,
+                tileGrid: {
+                    extent: extent,
+                    forceUniformResolution: true
+                }
+            });
+        });
     };
 };
 
-export const getWmsLayerRasterView = (layer: WmsLayer, wmsUrl: string) => {
+export const getWmsLayerRasterView = (layer: WmsLayer, wmsUrl: string, spatialCoverageProvider?: DatasetSpatialCoverageProvider) => {
 
     let dimensions = layer.Dimension;
     if (dimensions) {
@@ -86,7 +109,7 @@ export const getWmsLayerRasterView = (layer: WmsLayer, wmsUrl: string) => {
     }];
 
     let rasterVizConfig: RasterMapVizConfig = {
-        rasterSourceProvider: createWmsRasterSourceProvider(layer, wmsUrl),
+        rasterSourceProvider: createWmsRasterSourceProvider(layer, wmsUrl, spatialCoverageProvider),
         bandMode: {
             supportedModes: [{
                 type: RasterBandModeType.Preset,

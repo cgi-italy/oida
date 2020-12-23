@@ -72,7 +72,7 @@ export const createAdamRasterTileSourceProvider = (
 
         let timeSubset = getWcsTimeFilterSubset(rasterView.dataset.selectedTime);
         if (!timeSubset) {
-            return undefined;
+            return Promise.resolve(undefined);
         } else {
             subsets.push(timeSubset);
         }
@@ -80,13 +80,13 @@ export const createAdamRasterTileSourceProvider = (
         const aoiParams = getAoiWcsParams(datasetConfig, rasterView.dataset.aoiFilter);
         if (!aoiParams) {
             //the coverage is outside of the currently selected aoi
-            return undefined;
+            return Promise.resolve(undefined);
         }
 
         const bandMode = rasterView.bandMode;
         const wcsCoverageParams = getCoverageWcsParams(datasetConfig, rasterView.dimensions, bandMode);
         if (!wcsCoverageParams) {
-            return undefined;
+            return Promise.resolve(undefined);
         }
 
         if (wcsCoverageParams.bandSubset) {
@@ -112,7 +112,7 @@ export const createAdamRasterTileSourceProvider = (
             }
         }
 
-        return {
+        return Promise.resolve({
             id: ADAM_WCS_SOURCE_ID,
             url: factoryConfig.wcsServiceUrl,
             srs: datasetConfig.coverageSrs,
@@ -130,7 +130,7 @@ export const createAdamRasterTileSourceProvider = (
             colortable: colorTable,
             colorrange: colorRange,
             requestExtentOffset: datasetConfig.requestExtentOffset
-        };
+        });
     };
 
     return {

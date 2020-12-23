@@ -1,6 +1,6 @@
-import { reaction } from 'mobx';
+import { reaction, autorun } from 'mobx';
 
-import { TileSource, SubscriptionTracker } from '@oida/core';
+import { TileSource, SubscriptionTracker, LoadingState } from '@oida/core';
 import { TileLayer } from '@oida/state-mobx';
 
 import { DatasetDimension, DataDomain, isValueDomain, isDomainProvider } from '../types/dataset-variable';
@@ -16,7 +16,7 @@ export const RASTER_VIZ_TYPE = 'raster';
 export type RasterMapVizConfig = {
     bandMode: RasterBandModeConfig;
     dimensions?: DatasetDimension<DataDomain<string | number | Date>>[];
-    rasterSourceProvider: (rasterViz: RasterMapViz) => (TileSource & {extent?: number[]}) | undefined
+    rasterSourceProvider: (rasterViz: RasterMapViz) => Promise<(TileSource & {extent?: number[]}) | undefined>
     afterInit?: (rasterViz: RasterMapViz) => void;
 };
 
@@ -89,19 +89,23 @@ export class RasterMapViz extends DatasetViz<TileLayer> implements HasDatasetDim
 
     protected afterInit_() {
 
-        const sourceUpdateDisposer = reaction(
-            () => this.config.rasterSourceProvider(this),
-            (sourceConfig) => {
+        const sourceUpdateDisposer = autorun(() => {
+            this.mapLayer.loadingStatus.update({
+                value: LoadingState.Loading,
+                percentage: 30
+            });
+            this.config.rasterSourceProvider(this).then((sourceConfig) => {
                 this.mapLayer.setSource(sourceConfig);
                 if (sourceConfig) {
                     this.mapLayer.setExtent(sourceConfig.extent);
                 }
-            },
-            {
-                fireImmediately: true,
-                delay: 1000
-            }
-        );
+            }).finally(() => {
+                this.mapLayer.loadingStatus.setValue(LoadingState.Init);
+            });
+        }, {
+            delay: 1000
+        });
+
         this.subscriptionTracker_.addSubscription(sourceUpdateDisposer);
 
         if (this.config.afterInit) {

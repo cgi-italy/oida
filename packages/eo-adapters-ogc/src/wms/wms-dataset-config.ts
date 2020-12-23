@@ -1,26 +1,23 @@
 import { v4 as uuid } from 'uuid';
 
-import { WmsService, WmsLayerPreviewMode } from './wms-service';
+import { DatasetConfig, DatasetSpatialCoverageProvider } from '@oida/eo-mobx';
+
+import { WmsService } from './wms-service';
 import { WmsTimeDistributionProvider } from './wms-time-distribution-provider';
 import { getWmsTimeSeriesToolConfig } from './wms-time-series-tool';
 import { getWmsLayerRasterView } from './wms-raster-view';
-import { DatasetConfig } from '@oida/eo-mobx';
+
 
 export type WmsDatasetConfig = {
     service: WmsService;
     layerName: string;
+    spatialCoverageProvider?: DatasetSpatialCoverageProvider
 };
 
 export const getWmsDatasetConfig = (config: WmsDatasetConfig) => {
     const wmsService = config.service;
 
-    return Promise.all([
-        wmsService.getLayerCapabilities(config.layerName),
-        wmsService.getLayerPreview(config.layerName, {
-            width: 128,
-            mode: WmsLayerPreviewMode.KeepRatio
-        })
-    ]).then(([layer, preview]) => {
+    return wmsService.getLayerCapabilities(config.layerName).then((layer) => {
         if (!layer || !layer.Name) {
             throw new Error(`No layer with name ${config.layerName}`);
         }
@@ -50,12 +47,13 @@ export const getWmsDatasetConfig = (config: WmsDatasetConfig) => {
             name: layer.Title || layer.Name,
             description: layer.Abstract,
             filters: [],
-            mapView: getWmsLayerRasterView(layer, wmsService.getServiceUrl()),
-            spatialCoverageProvider: () => Promise.resolve(layer.EX_GeographicBoundingBox),
+            mapView: getWmsLayerRasterView(layer, wmsService.getServiceUrl(), timeDimension ? config.spatialCoverageProvider : undefined),
+            spatialCoverageProvider: timeDimension
+                ? config.spatialCoverageProvider || (() => Promise.resolve(layer.EX_GeographicBoundingBox))
+                : (() => Promise.resolve(layer.EX_GeographicBoundingBox)),
             timeDistribution: timeDistributionProvider ? {
                 provider: timeDistributionProvider
             } : undefined,
-            thumb: preview,
             tools: tools
         } as DatasetConfig;
     });
