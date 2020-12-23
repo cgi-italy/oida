@@ -25,7 +25,10 @@ export const BreadcrumbItemInjector = (props: BreadcrumbItemInjectorProps) => {
         }
         return () => {
             if (data) {
-                breadcrumb.remove(data);
+                const item = breadcrumb.items.find((item) => item.key === data.key);
+                if (item) {
+                    breadcrumb.remove(item);
+                }
             }
         };
     }, [breadcrumb]);
@@ -42,8 +45,8 @@ export const BreadcrumbItemInjector = (props: BreadcrumbItemInjectorProps) => {
 
 };
 
-export const BreadcrumbItem = (props: Omit<BreadcrumbItemInjectorProps, 'breadcrumb'>, breadcrumbModuleId?: string) => {
-    const breadcrumbModule = useBreadcrumbModule(breadcrumbModuleId);
+export const BreadcrumbItem = (props: Omit<BreadcrumbItemInjectorProps, 'breadcrumb'> & {breadcrumbModuleId?: string}) => {
+    const breadcrumbModule = useBreadcrumbModule(props.breadcrumbModuleId);
 
     return <BreadcrumbItemInjector breadcrumb={breadcrumbModule.breadcrumb} {...props}/>;
 };

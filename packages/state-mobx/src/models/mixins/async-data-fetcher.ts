@@ -74,7 +74,7 @@ export class AsyncDataFetcher<T> implements HasLoadingStatus {
                 if (!requestWrapper.isCanceled) {
                     this.loadingStatus.update({
                         value: LoadingState.Error,
-                        message: error
+                        message: error.message
                     });
                     reject(error);
                 }

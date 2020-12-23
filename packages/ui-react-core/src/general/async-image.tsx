@@ -4,8 +4,8 @@ import { LoadingState } from '@oida/core';
 
 export type AsyncImageProps = {
     imageUrl: string | Promise<string>;
-    loadingUrl?: string;
-    errorUrl?: string;
+    loadingContent?: React.ReactNode;
+    errorContent?: React.ReactNode;
     onLoad?: (state: LoadingState) => void;
 };
 
@@ -44,8 +44,8 @@ export class AsyncImage extends React.Component<AsyncImageProps, AsyncImageState
 
     render() {
         if (this.state.loadingState === LoadingState.Error) {
-            if (this.props.errorUrl) {
-                return (<img src={this.props.errorUrl}></img>);
+            if (this.props.errorContent) {
+                return (<React.Fragment>{this.props.errorContent}</React.Fragment>);
             } else {
                 return null;
             }
@@ -62,8 +62,8 @@ export class AsyncImage extends React.Component<AsyncImageProps, AsyncImageState
                     ></img>
                 );
             }
-            if (this.props.loadingUrl) {
-                children.push(<img key='spinner' src={this.props.loadingUrl}></img>);
+            if (this.props.loadingContent) {
+                children.push(<React.Fragment key='loading-content'>{this.props.loadingContent}</React.Fragment>);
             }
             return children;
         } else if (this.state.loadingState === LoadingState.Success) {

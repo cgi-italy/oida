@@ -1,8 +1,9 @@
 import { computed, makeObservable, observable, action } from 'mobx';
 import chroma from 'chroma-js';
 
+import { randomColorFactory } from '@oida/core';
 import {
-    MapLayer, randomColorFactory,
+    MapLayer,
     HasVisibility, Visible, VisibleProps,
     IsHoverable, Hovered, HoveredProps,
     IsSelectable, Selected, SelectedProps

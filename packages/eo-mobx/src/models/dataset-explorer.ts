@@ -1,8 +1,8 @@
 import { autorun, computed, makeObservable, observable, action, observe } from 'mobx';
 import moment from 'moment';
 
+import { SubscriptionTracker, AoiValue, DateRangeValue, QueryFilter, DATE_FIELD_ID, DATE_RANGE_FIELD_ID, randomColorFactory } from '@oida/core';
 import { GroupLayer, MapLayer, DataFilters } from '@oida/state-mobx';
-import { SubscriptionTracker, AoiValue, DateRangeValue, QueryFilter, DATE_FIELD_ID, DATE_RANGE_FIELD_ID } from '@oida/core';
 
 import { Dataset, DATASET_AOI_FILTER_KEY, DATASET_TIME_RANGE_FILTER_KEY, DATASET_SELECTED_TIME_FILTER_KEY } from './dataset';
 import { DatasetConfig } from '../types/dataset-config';
@@ -186,6 +186,8 @@ export type DatasetsExplorerProps = {
     config?: DatasetsExplorerConfig;
 };
 
+const randomColor = randomColorFactory();
+
 export class DatasetExplorer {
     readonly config: DatasetsExplorerConfig;
     readonly mapLayer: GroupLayer;
@@ -253,6 +255,10 @@ export class DatasetExplorer {
 
     @action
     addDataset(datasetConfig: DatasetConfig) {
+
+        if (!datasetConfig.color) {
+            datasetConfig.color = randomColor();
+        }
         const item = new DatasetExplorerItem({
             datasetConfig: datasetConfig,
             explorer: this

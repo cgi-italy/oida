@@ -1,20 +1,22 @@
 import { IMapRenderer } from '@oida/core';
 import { makeObservable, observable, action } from 'mobx';
 
+export type MapRendererOptions = Record<string, any>;
+
 export type MapRendererProps = {
     id: string;
-    options?: any
+    options?: MapRendererOptions
 };
 
 
 export class MapRenderer {
     id: string;
-    options: any;
+    options: MapRendererOptions;
     implementation: IMapRenderer | undefined;
 
     constructor(props: MapRendererProps) {
         this.id = props.id;
-        this.options = props.options;
+        this.options = props.options || {};
         this.implementation = undefined;
 
         makeObservable(this, {
@@ -24,7 +26,7 @@ export class MapRenderer {
         });
     }
 
-    setOptions(options: Partial<any>) {
+    setOptions(options: Partial<MapRendererOptions>) {
         this.options = {
             ...this.options,
             ...options

@@ -1,9 +1,10 @@
-import { Active, ActiveProps, IsActivable, IsEntity } from '@oida/state-mobx';
 import { IObservableArray, observable, action } from 'mobx';
+
+import { Active, ActiveProps, IsActivable, IsEntity } from '@oida/state-mobx';
 import { Geometry, createDynamicFactory } from '@oida/core';
 
 export interface DatasetDiscoveryProviderItem extends IsEntity {
-    footprint?: Geometry;
+    geometry?: Geometry;
 }
 
 export type DatasetDiscoveryProviderProps = {
@@ -56,7 +57,7 @@ export abstract class DatasetDiscoveryProvider<
     }
 
     @action
-    setResults(results: T[]) {
+    protected setResults_(results: T[]) {
         this.results.replace(results);
     }
 }

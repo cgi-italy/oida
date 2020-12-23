@@ -174,6 +174,9 @@ export class DatasetDimensionSeries extends DatasetAnalysis<undefined> implement
         });
     }
     protected canRunQuery_ = () => {
+
+        const seriesRange = this.seriesRange;
+
         return this.seriesDimension
             && this.geometry
             && this.seriesVariable

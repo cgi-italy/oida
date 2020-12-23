@@ -7,11 +7,14 @@ import { useSelector } from './use-selector';
 export type DataFilteringProps = {
     filteringState?: DataFilters;
     filters: AnyFormFieldDefinition[];
+    trackFilterDefinitions?: boolean;
 };
 
 export const useDataFiltering = (props: DataFilteringProps) => {
 
     const { filteringState, filters } = props;
+
+    const hooksDeps: React.DependencyList = props.trackFilterDefinitions ? [filteringState, filters] : [filteringState];
 
     return useSelector(() => {
         if (!filteringState) {
@@ -39,5 +42,5 @@ export const useDataFiltering = (props: DataFilteringProps) => {
                 }
             }
         } as DataFiltererProps;
-    }, [filteringState]);
+    }, hooksDeps);
 };
