@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import { SelectionMode, AoiValue, FormFieldState } from '@oida/core';
 import { IndexedCollection, Map, SelectionManager } from '@oida/state-mobx';
@@ -20,47 +20,42 @@ export const useMapAoiInstance = (props: MapAoiInstanceProps) => {
 
     const { mapSelection, aois, map, value} = props;
 
+    const aoiInstance = useMemo(() => {
+        const aoiId = value?.props?.id;
+        if (aoiId) {
+            return aois.itemWithId(aoiId);
+        }
+    }, [value]);
+
+
     useEffect(() => {
 
-        if (value) {
+        if (aoiInstance) {
 
-            let aoiInstance = getAoiInstance();
-            if (aoiInstance) {
-                aoiInstance.visible.setValue(true);
-            }
+            aoiInstance.visible.setValue(true);
 
             return () => {
-                let aoiInstance = getAoiInstance();
                 if (aoiInstance) {
                     aoiInstance.visible.setValue(false);
                 }
             };
 
         }
-    }, [value]);
+    }, [aoiInstance]);
 
     const centerOnMap = useCenterOnMap({
         map: map
     });
 
-    const getAoiInstance = () => {
-        if (value && value.props && value.props.id) {
-            return aois.itemWithId(value.props.id);
-        } else {
-            return undefined;
-        }
-    };
-
     const onAoiHover = (hovered) => {
         if (hovered) {
-            mapSelection.setHovered(getAoiInstance());
+            mapSelection.setHovered(aoiInstance);
         } else {
             mapSelection.setHovered(undefined);
         }
     };
 
     const onAoiSelect = (selected) => {
-        let aoiInstance = getAoiInstance();
         mapSelection.selection.modifySelection(aoiInstance, SelectionMode.Replace);
         if (aoiInstance) {
             centerOnMap(aoiInstance.geometry.value, {
@@ -70,14 +65,13 @@ export const useMapAoiInstance = (props: MapAoiInstanceProps) => {
     };
 
     let aoiProps = useSelector(() => {
-        let aoiInstance = getAoiInstance();
         if (aoiInstance) {
             return {
                 color: aoiInstance.color,
                 name: aoiInstance.name
             };
         }
-    });
+    }, [aoiInstance]);
 
     return {
         onHoverAction: onAoiHover,
