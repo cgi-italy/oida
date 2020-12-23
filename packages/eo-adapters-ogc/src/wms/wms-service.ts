@@ -8,7 +8,7 @@ export type WmsServiceConfig = {
     version?: string;
     wmsClient?: WmsClient;
     ncWms?: boolean;
-    supportsNamespacedCapabilities?: boolean;
+    isGeoserver?: boolean;
 };
 
 export enum WmsLayerPreviewMode {
@@ -38,7 +38,7 @@ export class WmsService {
     protected wmsClient_: WmsClient;
     protected config_: WmsServiceConfig;
     protected globalCapabilities_: Promise<WmsCapabilities> | undefined;
-    protected cachedCapabilities_: Record<string, Promise<WmsLayer>> = {};
+    protected cachedCapabilities_: Record<string, Promise<WmsLayer | undefined>> = {};
 
     constructor(config: WmsServiceConfig) {
         this.wmsClient_ = config.wmsClient || new WmsClient();
@@ -75,16 +75,21 @@ export class WmsService {
     }
 
     getLayerCapabilities(layerName: string) {
-        if (this.config_.supportsNamespacedCapabilities && !this.globalCapabilities_) {
+        // Geoserver support WMS capabilities retrieval for a single layer
+        if (this.config_.isGeoserver && !this.globalCapabilities_) {
 
             if (!this.cachedCapabilities_[layerName]) {
-                let workspaceSplit = layerName.split(':');
 
                 this.cachedCapabilities_[layerName] = this.wmsClient_.getCapabilities({
-                    url: `${this.config_.url}/${workspaceSplit.join('/')}`,
+                    url: this.getGeoserverLayerNamespacedUrl_(layerName),
                     version: this.config_.version
                 }).then((capabilities) => {
-                    return capabilities.Capability.Layer;
+                    const rootLayer = capabilities.Capability.Layer;
+                    if (rootLayer.Layer) {
+                        return rootLayer.Layer[0];
+                    } else {
+                        return undefined;
+                    }
                 }).catch((error) => {
                     delete this.cachedCapabilities_[layerName];
                     throw error;
@@ -288,4 +293,8 @@ export class WmsService {
         return undefined;
     }
 
+    protected getGeoserverLayerNamespacedUrl_(layerName: string) {
+        const workspaceSplit = layerName.split(':');
+        return this.config_.url.replace(/(ows|wms)(\/?)$/, `${workspaceSplit.join('/')}/$1$2`);
+    }
 }

@@ -1,5 +1,9 @@
 import { AxiosInstanceWithCancellation, createAxiosInstance } from '@oida/core';
 
+export type WmtsDomainDiscoveryClientConfig = {
+    axiosInstance?: AxiosInstanceWithCancellation;
+};
+
 export class WmtsDomainDiscoveryClient {
 
     private domParser = new DOMParser();
@@ -11,8 +15,8 @@ export class WmtsDomainDiscoveryClient {
 
     private axiosInstance_: AxiosInstanceWithCancellation;
 
-    constructor(config) {
-        this.axiosInstance_ = config.axiosInstance || createAxiosInstance();
+    constructor(config?: WmtsDomainDiscoveryClientConfig) {
+        this.axiosInstance_ = config?.axiosInstance || createAxiosInstance();
     }
 
     describeDomains(parameters: {

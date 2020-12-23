@@ -10,10 +10,12 @@ import { getWmsDatasetConfig } from './wms-dataset-config';
 
 export const WMS_DATASET_DISCOVERY_ITEM_TYPE = 'wms-discovery-provider-item';
 
+export type WmsDatasetFactory = (item: WmsDatasetDiscoveryProviderItem) => Promise<DatasetConfig | undefined>;
 export type WmsDatasetDiscoveryProviderItemProps = {
     service: WmsService;
     layer: WmsLayer;
     disablePreview?: boolean;
+    datasetFactory?: WmsDatasetFactory;
 };
 
 export class WmsDatasetDiscoveryProviderItem extends Entity {
@@ -21,6 +23,7 @@ export class WmsDatasetDiscoveryProviderItem extends Entity {
     readonly service: WmsService;
     readonly layer: WmsLayer;
     readonly disablePreview: boolean;
+    readonly datasetFactory: WmsDatasetFactory | undefined;
 
     constructor(props: WmsDatasetDiscoveryProviderItemProps) {
         super({
@@ -31,6 +34,7 @@ export class WmsDatasetDiscoveryProviderItem extends Entity {
         this.service = props.service;
         this.layer = props.layer;
         this.disablePreview = props.disablePreview || false;
+        this.datasetFactory = props.datasetFactory;
     }
 }
 
@@ -41,6 +45,7 @@ export type WmsItem = {
     name: string;
     service: WmsService;
     disablePreview?: boolean;
+    datasetFactory?: WmsDatasetFactory;
 };
 
 export type WmsItemProps = {
@@ -48,6 +53,7 @@ export type WmsItemProps = {
     name: string;
     service: WmsService | WmsServiceConfig;
     disablePreview?: boolean;
+    datasetFactory?: WmsDatasetFactory;
 };
 
 export type WmsDatasetDiscoveryProviderProps = {
@@ -131,10 +137,14 @@ export class WmsDatasetDiscoveryProvider extends DatasetDiscoveryProvider<WmsDat
 
     createDataset(item: WmsDatasetDiscoveryProviderItem): Promise<DatasetConfig | undefined> {
         if (item.layer.Name) {
-            return getWmsDatasetConfig({
-                layerName: item.layer.Name,
-                service: item.service
-            });
+            if (item.datasetFactory) {
+                return item.datasetFactory(item);
+            } else {
+                return getWmsDatasetConfig({
+                    layerName: item.layer.Name,
+                    service: item.service
+                });
+            }
         } else {
             return Promise.resolve(undefined);
         }
@@ -146,10 +156,11 @@ export class WmsDatasetDiscoveryProvider extends DatasetDiscoveryProvider<WmsDat
             if (this.active.value && wmsService) {
                 let criteria = this.criteria.data;
                 this.dataFetcher_.fetchData().then((data) => {
-                    this.setResults(data.map(item => new WmsDatasetDiscoveryProviderItem({
+                    this.setResults_(data.map(item => new WmsDatasetDiscoveryProviderItem({
                         service: wmsService.service,
                         layer: item,
-                        disablePreview: wmsService.disablePreview
+                        disablePreview: wmsService.disablePreview,
+                        datasetFactory: wmsService.datasetFactory
                     })));
                 });
             }
