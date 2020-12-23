@@ -20,6 +20,7 @@ export const getProjectionType = (srs: string) => {
             break;
         case 'EPSG:4326':
         case 'WGS84':
+        case 'CRS:84':
             projection = ProjectionType.GlobalGeodetic;
             break;
         default:
