@@ -1,7 +1,7 @@
 import { autorun, reaction } from 'mobx';
 import debounce from 'lodash/debounce';
 
-import { AoiValue } from '@oida/core';
+import { AoiValue, randomColorFactory } from '@oida/core';
 import { Map, IndexedCollection } from '@oida/state-mobx';
 
 import { Aoi } from '../models';
@@ -15,6 +15,7 @@ export type bindAoiValueToMapProps = {
 };
 
 let nextAoiId = 1;
+const generateAoiColor = randomColorFactory();
 
 /**
  * Automatically create an AOI instance based on the value of an AOI value (e.g. for map displaying).
@@ -25,6 +26,7 @@ export const bindAoiValueToMap = (props: bindAoiValueToMapProps) => {
 
     let aoiInstance: Aoi | undefined;
     let viewportObserverDisposer: (() => void) | undefined;
+    const color = generateAoiColor();
 
     const debouncedAoiUpdate = debounce((aoiValue: AoiValue) => {
         props.setter(aoiValue);
@@ -44,10 +46,11 @@ export const bindAoiValueToMap = (props: bindAoiValueToMapProps) => {
             }
 
             if (!aoiInstance) {
-                const aoiInstance = new Aoi({
+                aoiInstance = new Aoi({
                     id: `filterAoi${nextAoiId++}`,
                     name: valueProps.name ? valueProps.name : value.geometry.type,
-                    geometry: value.geometry
+                    geometry: value.geometry,
+                    color: color
                 });
 
                 props.aois.add(aoiInstance);
@@ -56,7 +59,7 @@ export const bindAoiValueToMap = (props: bindAoiValueToMapProps) => {
                     ...value,
                     props: {
                         ...valueProps,
-                        id: aoiInstance.id
+                        id: aoiInstance.id.toString()
                     },
                 });
 
@@ -69,7 +72,7 @@ export const bindAoiValueToMap = (props: bindAoiValueToMapProps) => {
                         geometry: value.geometry,
                         props: {
                             ...valueProps,
-                            id: aoiInstance.id
+                            id: aoiInstance.id.toString()
                         }
                     });
                 }

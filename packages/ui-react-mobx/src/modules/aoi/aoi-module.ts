@@ -1,11 +1,12 @@
 import { observable, makeObservable, computed, action } from 'mobx';
-import { IndexedCollection, FeatureLayer } from '@oida/state-mobx';
+import { AOI_FIELD_ID, setAoiFieldFactory, FormFieldState, AoiValue } from '@oida/core';
+import { IndexedCollection, FeatureLayer, setReactionForFilterType } from '@oida/state-mobx';
 
 import { AppModule } from '../app-module';
 import { MapModule } from '../map';
-import { defaultAoiStyleGetter } from './utils';
+import { defaultAoiStyleGetter, bindAoiValueToMap } from './utils';
 import { Aoi, AoiProps, AoiSource } from './models';
-
+import { useMapAoiFieldFromModule } from './hooks/use-map-aoi-field';
 
 export const DEFAULT_AOI_MODULE_ID = 'aoi';
 
@@ -63,6 +64,38 @@ export class AoiModule extends AppModule {
 
         this.mapModule = props.mapModule;
         this.config = props.config;
+
+        setReactionForFilterType(AOI_FIELD_ID, (filters, key) => {
+            const filterMapBindingDisposer = bindAoiValueToMap({
+                aois: this.aois,
+                getter: () => filters.get(key)?.value,
+                setter: (value) => filters.set(key, value, AOI_FIELD_ID),
+                map: this.mapModule.map
+            });
+            return filterMapBindingDisposer;
+        });
+
+        setAoiFieldFactory((props) => {
+            return {
+                type: AOI_FIELD_ID,
+                name: props.name,
+                title: props.title || 'Area of interest',
+                config: (filterState: FormFieldState<AoiValue>) => {
+
+                    let aoiFieldConfig = useMapAoiFieldFromModule({
+                        ...filterState,
+                        supportedGeometries: props.supportedGeometries
+                    }, this.id);
+
+                    return {
+                        supportedGeometries: props.supportedGeometries,
+                        supportedActions: props.supportedActions,
+                        ...aoiFieldConfig,
+                        name: aoiFieldConfig.name || 'Aoi'
+                    };
+                }
+            };
+        });
 
         makeObservable(this);
     }
