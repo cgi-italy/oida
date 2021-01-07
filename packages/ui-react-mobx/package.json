@@ -37,6 +37,8 @@
     "chroma-js": "^2.0.2",
     "downloadjs": "^1.4.7",
     "lodash": "^4.17.15",
+    "lz-string": "^1.4.4",
+    "query-string": "^6.13.8",
     "react-resize-aware": "^3.0.0",
     "tslib": "^2.0.1"
   }
