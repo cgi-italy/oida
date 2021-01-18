@@ -43,7 +43,7 @@ export const AsyncImage = (props: AsyncImageProps) => {
             {imageUrl &&
                 <img
                     src={imageUrl}
-                    style={{display: loadingState === LoadingState.Success ? 'block' : ''}}
+                    style={{display: loadingState !== LoadingState.Success ? 'none' : ''}}
                     onLoad={() => setLoadingState(LoadingState.Success)}
                     onError={() => setLoadingState(LoadingState.Error)}
                 />

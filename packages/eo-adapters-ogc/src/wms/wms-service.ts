@@ -294,7 +294,7 @@ export class WmsService {
     }
 
     protected getGeoserverLayerNamespacedUrl_(layerName: string) {
-        const workspaceSplit = layerName.split(':');
+        const workspaceSplit = layerName.split(/:(.+)/).slice(0, 2);
         return this.config_.url.replace(/(ows|wms)(\/?)$/, `${workspaceSplit.join('/')}/$1$2`);
     }
 }

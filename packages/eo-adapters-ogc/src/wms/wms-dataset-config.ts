@@ -47,7 +47,10 @@ export const getWmsDatasetConfig = (config: WmsDatasetConfig) => {
             name: layer.Title || layer.Name,
             description: layer.Abstract,
             filters: [],
-            mapView: getWmsLayerRasterView(layer, wmsService.getServiceUrl(), timeDimension ? config.spatialCoverageProvider : undefined),
+            mapView: getWmsLayerRasterView({
+                ...layer,
+                Name: config.layerName
+            }, wmsService.getServiceUrl(), timeDimension ? config.spatialCoverageProvider : undefined),
             spatialCoverageProvider: timeDimension
                 ? config.spatialCoverageProvider || (() => Promise.resolve(layer.EX_GeographicBoundingBox))
                 : (() => Promise.resolve(layer.EX_GeographicBoundingBox)),

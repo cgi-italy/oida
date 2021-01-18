@@ -1,26 +1,25 @@
 import React, { useState, useEffect, useRef } from 'react';
 
 import { Input } from 'antd';
+import { InputProps } from 'antd/lib/input/Input';
 
 import { StringField, STRING_FIELD_ID } from '@oida/core';
 
 import { antdFormFieldRendererFactory } from './antd-form-field-renderer-factory';
 
+
 export type InputFieldRendererProps = {
-    prefix?: React.ReactNode,
-    suffix?: React.ReactNode,
-    addonBefore?: React.ReactNode,
-    addonAfter?: React.ReactNode,
-    changeDelay?: number
-};
+    changeDelay?: number;
+} & Omit<InputProps, 'onChange' | 'onPressEnter' | 'value'>;
 
 export const InputFieldRenderer = (props: Omit<StringField, 'name' | 'type'> & InputFieldRendererProps) => {
 
-    let [inputValue, setInputValue] = useState(props.value);
+    const [inputValue, setInputValue] = useState(props.value);
 
     useEffect(() => {
         setInputValue(props.value);
     }, [props.value]);
+
 
     useEffect(() => {
         if (props.changeDelay) {
@@ -47,14 +46,14 @@ export const InputFieldRenderer = (props: Omit<StringField, 'name' | 'type'> & I
         props.onChange(inputValue || undefined);
     };
 
-
-    let { value, onChange, changeDelay, ...renderProps } =  props;
+    let { value, onChange, changeDelay, config, ...renderProps } =  props;
 
         return (
         <Input
             value={inputValue}
             onPressEnter={onEnterPress}
             onChange={onInputChange}
+            autoFocus={props.autoFocus}
             {...renderProps}
         >
         </Input>

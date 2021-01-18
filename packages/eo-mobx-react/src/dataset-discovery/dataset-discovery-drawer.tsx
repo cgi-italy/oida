@@ -35,6 +35,7 @@ export const DatasetDiscoveryDrawer = (props: DatasetDiscoveryDrawerProps) => {
     return (
         <Drawer
             className='dataset-discovery-drawer'
+            push={false}
             title={
                 <PageHeader
                     title={props.title || 'Data discovery'}

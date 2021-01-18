@@ -8,6 +8,7 @@ export type FormFieldCommonConfig<TYPE extends string> = {
     name: string;
     title?: string;
     required?: boolean;
+    autoFocus?: boolean;
     rendererConfig?: FormFieldRendererConfig;
 };
 

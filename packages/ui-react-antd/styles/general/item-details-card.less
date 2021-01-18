@@ -1,0 +1,55 @@
+.item-details-card {
+    .item-details-card-title {
+        font-weight: bold;
+        font-size: 15px;
+        margin-bottom: 10px;
+    }
+
+    .item-details-card-content {
+        display: flex;
+
+        .item-details-card-meta-container {
+            position: relative;
+            .item-details-card-meta {
+                flex-grow: 1;
+                margin: 0px 10px 0px 5px;
+
+                .ant-descriptions-item-label {
+                    color: @primary-color;
+                }
+            }
+        }
+
+        .item-details-card-preview {
+            max-width: 40%;
+            flex-shrink: 0;
+
+            video, img {
+                width: 100%;
+            }
+
+            .anticon {
+                vertical-align: top;
+                font-size: 140px;
+            }
+        }
+
+    }
+
+    .item-details-card-actions {
+        text-align: right;
+        margin-top: 20px;
+        padding-top: 10px;
+
+        .ant-btn {
+
+            .action-icon {
+                margin-right: 5px;
+            }
+
+            &:not(:last-child) {
+                margin-right: 10px;
+            }
+        }
+    }
+}
