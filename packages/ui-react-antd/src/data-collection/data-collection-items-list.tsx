@@ -1,82 +1,122 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 import classnames from 'classnames';
 
 import { List, Tooltip } from 'antd';
+import { useDrop } from 'react-dnd';
+import { NativeTypes } from 'react-dnd-html5-backend';
 
 import { LoadingState, SelectionMode } from '@oida/core';
-import { DataCollectionItemsProps, CanBeScrolledIntoView } from '@oida/ui-react-core';
+import { DataCollectionItemsProps, DataCollectionItemProps, useScrollIntoView } from '@oida/ui-react-core';
+
+type ListItemProps<T> = {
+    item: T;
+    itemSelector: (item: T) => DataCollectionItemProps<T>;
+    content: (item: T) => React.ReactNode;
+    onMouseEnter?: (evt: React.MouseEvent) => void;
+    onMouseLeave?: (evt: React.MouseEvent) => void;
+    onClick?: (evt: React.MouseEvent) => void;
+    onDoubleClick?: (evt: React.MouseEvent) => void;
+    fileDropProps?: {
+        canDrop: (item: T) => boolean;
+        onDrop: (item: T, files: File[]) => void;
+    };
+    scrollOnSelection?: boolean;
+};
+
+function ListItem<T>(props: ListItemProps<T>) {
+
+    const {hovered, selected, actions: actions} =  props.itemSelector(props.item);
+
+    const itemActions = actions ? actions.map((action) => {
+        return (
+            <Tooltip title={action.name}>
+                <a onClick={
+                    () => {
+                        action.callback(props.item);
+                }
+                }>
+                    {action.icon}
+                    <span className='action-content'>{action.content}</span>
+                </a>
+            </Tooltip>
+        );
+    }) : undefined;
+
+    const [{ canDrop, isDropHover }, drop] = useDrop({
+        accept: [NativeTypes.FILE],
+        drop: (dropItem: {files: File[], items: DataTransferItemList, type: typeof NativeTypes.FILE}, monitor) => {
+            props.fileDropProps?.onDrop(props.item, dropItem.files);
+        },
+        canDrop: () => props.fileDropProps ? props.fileDropProps.canDrop(props.item) : false,
+        collect: (monitor) => ({
+            isDropHover: monitor.isOver(),
+            canDrop: monitor.canDrop(),
+        })
+    });
+
+    const [itemRef, setItemRef] = useState<Element | null>(null);
+
+    useScrollIntoView({
+        element: itemRef,
+        scrollToElement: selected
+    });
+
+    return (
+        <div
+            className='list-item-wrapper'
+            ref={(element) => {
+                setItemRef(element);
+                drop(element);
+            }}
+        >
+            <List.Item
+                actions={itemActions}
+                className={classnames({'hovered': hovered, 'selected': selected, 'can-drop': canDrop, 'is-drop-hover': isDropHover})}
+                onMouseEnter={props.onMouseEnter}
+                onMouseLeave={props.onMouseLeave}
+                onClick={props.onClick}
+                onDoubleClick={props.onDoubleClick}
+            >
+                {props.content(props.item)}
+            </List.Item>
+        </div>
+    );
+
+}
 
 export type DataCollectionItemsListProps<T> = {
     autoScrollOnSelection?: boolean;
-    autoScrollOnHover?: boolean;
-    meta?: (item: T) => {avatar?: React.ReactNode, description?: React.ReactNode, title?: React.ReactNode};
-    extra?: (item: T) => React.ReactNode;
-    content?: (item: T) => React.ReactNode;
+    content: (item: T) => React.ReactNode;
     itemLayout?: 'horizontal' | 'vertical';
+    size?: 'default' | 'small' | 'large';
 };
-
-
 export function DataCollectionItemsList<T>(props: DataCollectionItemsListProps<T> & DataCollectionItemsProps<T>) {
 
-    let {
+    const {
         autoScrollOnSelection,
-        autoScrollOnHover,
-        meta,
         content,
-        extra,
         itemSelector,
         onHoverAction,
         onSelectAction,
         onDefaultAction,
+        fileDropProps,
         multiSelect,
         keyGetter,
         ...renderProps
     } = props;
 
+    let lastClickedRowIndex = -1;
 
-    let isMouseHover = false;
+    const listItems = props.data.map((item, listIndex) => {
 
-    let ItemRenderer = ({item}) => {
-
-        let {hovered, selected, actions: actions, icon} =  itemSelector(item);
-
-        let metaProps = meta ? meta(item) : {};
-
-        let itemMeta = (
-            <List.Item.Meta avatar={
-                icon &&
-                (
-                    <span className='ant-avatar ant-avatar-circle ant-avatar-image'>
-                        {icon}
-                    </span>
-                )} {...metaProps}>
-            </List.Item.Meta>
-        );
-
-        let itemActions = actions ? actions.map((action) => {
-            return (
-                <Tooltip title={action.name}>
-                    <a onClick={
-                        () => {
-                            action.callback(item);
-                    }
-                    }>
-                        {action.icon}
-                        <span className='action-content'>{action.content}</span>
-                    </a>
-                </Tooltip>
-            );
-        }) : undefined;
-
-        let listItem = (
-            <List.Item
-                extra={props.extra && props.extra(item)}
-                actions={itemActions}
-                className={classnames({'hovered': hovered, 'selected': selected})}
-                onMouseEnter={() => {
-                    onHoverAction(item, true);
-                }}
+        return (
+            <ListItem<T>
+                key={keyGetter(item)}
+                item={item}
+                itemSelector={itemSelector}
+                content={content}
+                onMouseEnter={() => onHoverAction(item, true)}
                 onMouseLeave={() => {
                     onHoverAction(item, false);
                 }}
@@ -88,6 +128,17 @@ export function DataCollectionItemsList<T>(props: DataCollectionItemsListProps<T
                         }
                         if (evt.shiftKey) {
                             selectionMode = SelectionMode.Add;
+                            if (lastClickedRowIndex !== -1) {
+                                const startIdx = lastClickedRowIndex < listIndex ? lastClickedRowIndex : listIndex;
+                                const endIdx = lastClickedRowIndex < listIndex ? listIndex + 1 : lastClickedRowIndex + 1;
+                                const items = data.slice(startIdx, endIdx);
+                                items.forEach((item) => {
+                                    onSelectAction(item, selectionMode);
+                                });
+                                return;
+                            }
+                        } else {
+                            lastClickedRowIndex = listIndex;
                         }
                     }
                     onSelectAction(item, selectionMode);
@@ -97,54 +148,25 @@ export function DataCollectionItemsList<T>(props: DataCollectionItemsListProps<T
                         onDefaultAction(item);
                     }
                 }}
-            >
-                {(icon || meta) && itemMeta}
-                {props.content && props.content(item)}
-            </List.Item>
+                fileDropProps={fileDropProps}
+            />
         );
+    });
 
-        let itemRenderer = listItem;
-        if (autoScrollOnSelection) {
-            itemRenderer = (
-                <CanBeScrolledIntoView
-                    scrollToItem={!isMouseHover && selected}
-                >
-                    {listItem}
-                </CanBeScrolledIntoView>
-            );
-        }
-        if (autoScrollOnHover) {
-            itemRenderer = (
-                <CanBeScrolledIntoView
-                    scrollToItem={!isMouseHover && hovered}
-                >
-                    {listItem}
-                </CanBeScrolledIntoView>
-            );
-        }
-
-        return itemRenderer;
-    };
-
-    let {data, loadingState, ...listProps} = renderProps;
+    const {data, loadingState, ...listProps} = renderProps;
 
     return  (
         <List
-            // @ts-ignore
-            onMouseEnter={() => {
-                isMouseHover = true;
-            }}
-            onMouseLeave={() => {
-                isMouseHover = false;
-            }}
-            size='small'
+            className='data-collection-list-items'
+            size={props.size || 'small'}
             loading={loadingState === LoadingState.Loading}
-            dataSource={data}
             rowKey={keyGetter}
-            renderItem={(item: T) => (<ItemRenderer item={item}></ItemRenderer>)} //allow usage of hooks inside ItemRenderer
             {...listProps}
-        />
+        >
+            {listItems}
+        </List>
     );
+
 }
 
 DataCollectionItemsList.defaultProps = {

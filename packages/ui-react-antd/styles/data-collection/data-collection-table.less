@@ -1,9 +1,83 @@
-.ant-table-row {
-    &.hovered {
-        background-color: @table-row-hover-bg;
+@import '~@oida/ui-react-core/styles/utils/scrollbar';
+
+.data-collection-table {
+    display: flex;
+    flex-direction: column;
+
+    .ant-collapse {
+        flex-grow: 0;
+        flex-shrink: 0;
     }
 
-    &.selected {
-        background-color: @table-selected-row-bg;
+    .data-collection-table-container {
+        flex-grow: 1;
+        flex-shrink: 1;
+
+        .ant-table-row {
+
+            user-select: none;
+            cursor: pointer;
+
+            .ant-table-cell {
+                border-top: dashed 1px transparent;
+                &:first-child {
+                    border-left: dashed 1px transparent;
+                }
+                &:last-child {
+                    border-right: dashed 1px transparent;
+                }
+            }
+
+            &.hovered {
+                background-color: @table-row-hover-bg;
+            }
+
+            &.selected {
+                background-color: @table-selected-row-bg;
+            }
+
+            &.can-drop {
+                &.is-drop-hover {
+
+                    .ant-table-cell {
+
+                        border-bottom-style: dashed;
+                        border-color: @primary-color;
+
+                        &:first-child {
+                            border-left-style: dashed;
+                        }
+                        &:last-child {
+                            border-right-style: dashed;
+                        }
+                    }
+
+                }
+            }
+        }
+
+    }
+
+    .ant-table-pagination {
+        flex-grow: 0;
+        flex-shrink: 0;
+    }
+
+    &.full-height {
+
+        height: 100%;
+        overflow: hidden;
+
+        .data-collection-table-container {
+            overflow: hidden;
+            position: relative;
+
+            .ant-table-body {
+                overflow-y: auto !important;
+                scroll-behavior: smooth;
+                .scrollbar(8px, @primary-color, @primary-2);
+            }
+        }
+
     }
 }

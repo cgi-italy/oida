@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Select, Upload, Button, Tooltip } from 'antd';
+import { Select, Upload, Button, Tooltip, List } from 'antd';
 import { SelectOutlined, UploadOutlined } from '@ant-design/icons';
 
 import { AoiImportConfig } from '@oida/ui-react-core';
@@ -93,10 +93,10 @@ export const AoiImportRenderer = (props: AoiImportConfig) => {
             </div>
             {groupAoisProps && <DataCollectionList<any>
                 autoScrollOnSelection={true}
-                meta={(item) => {
-                    return {
-                        title: item.name
-                    };
+                content={(item) => {
+                    return <List.Item.Meta
+                        title={item.name}
+                    />;
                 }}
                 {...groupAoisProps}
             />}

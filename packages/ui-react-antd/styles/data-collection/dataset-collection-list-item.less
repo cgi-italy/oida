@@ -1,22 +1,23 @@
 .data-collection-compact-list-item {
     display: flex;
     align-items: center;
+    overflow: hidden;
 
     .data-collection-compact-list-item-preview {
-        height: 32px;
-        width: 32px;
+        height: 48px;
+        width: 48px;
         overflow: hidden;
         margin-right: 0.5rem;
         flex-shrink: 0;
-        font-size: 20px;
+        font-size: 24px;
         text-align: center;
-        line-height: 32px;
 
         .anticon-loading {
-            font-size: 32px;
+            font-size: 48px;
         }
 
         img {
+            height: 100%;
             width: auto;
         }
     }
@@ -24,16 +25,27 @@
     .data-collection-compact-list-item-icon {
         margin-right: 0.5rem;
         font-size: 20px;
-        width: 32px;
-        line-height: 32px;
+        width: 48px;
         text-align: center;
         flex-shrink: 0;
     }
 
-    .data-collection-compact-list-item-title {
-        text-overflow: ellipsis;
-        white-space: nowrap;
+    .data-collection-compact-list-item-content {
+        flex-grow: 1;
         overflow: hidden;
+
+        .data-collection-compact-list-item-title {
+            font-weight: bold;
+        }
+
+        .data-collection-compact-list-item-meta {
+            font-size: 13px;
+
+            span:first-child {
+                margin-right: 0.3em;
+                color: @text-color-secondary;
+            }
+        }
     }
 }
 
@@ -54,26 +66,34 @@
             flex-grow: 1;
 
             .ant-descriptions-view {
-                border: none;
 
                 table {
 
-                    table-layout: fixed;
 
                     .ant-descriptions-row {
-                        border-bottom: none;
 
-                        .ant-descriptions-item-label {
-                            width: 2em;
-                            background-color: transparent;
-                            border-right: none;
-                            padding: 4px 8px;
-                            vertical-align: top;
-                        }
+                        .ant-descriptions-item {
+                            padding-bottom: 2px;
 
-                        .ant-descriptions-item-content {
-                            padding: 4px 8px;
-                            font-size: 13px;
+                            .ant-descriptions-item-container {
+                                align-items: center;
+
+                                .ant-descriptions-item-label {
+                                    padding: 2px 4px;
+                                    display: flex;
+                                    align-items: center;
+                                    align-self: flex-start;
+
+                                    &:after {
+                                        margin-left: 4px;
+                                    }
+                                }
+
+                                .ant-descriptions-item-content {
+                                    padding: 2px 4px;
+                                    font-size: 13px;
+                                }
+                            }
                         }
                     }
                 }
@@ -86,6 +106,11 @@
 
             .anticon-loading {
                 font-size: 48px;
+            }
+
+            .anticon {
+                font-size: 70px;
+                vertical-align: top;
             }
 
             img {

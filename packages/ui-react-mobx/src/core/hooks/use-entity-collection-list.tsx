@@ -11,14 +11,13 @@ import { useSelector } from './use-selector';
 export type EntityCollectionListProps<T extends IsEntity> = {
     items?: IObservableArray<T>;
     actions?: DataCollectionItemAction<T>[];
-    iconGetter?: (entity: T) => string | Promise<string>;
     selectionManager?: SelectionManager;
 };
 
 
 export const useEntityCollectionList = <T extends IsEntity>(props: EntityCollectionListProps<T>) => {
 
-    const { items, actions, iconGetter, selectionManager } = props;
+    const { items, actions, selectionManager } = props;
 
     let hoveredItem: T | undefined, selectedItem: T | undefined;
 
@@ -35,7 +34,7 @@ export const useEntityCollectionList = <T extends IsEntity>(props: EntityCollect
                     : undefined;
 
                 return {
-                    ...useEntityListItem({entity, iconGetter}),
+                    ...useEntityListItem({entity}),
                     actions: itemActions
                 };
             },

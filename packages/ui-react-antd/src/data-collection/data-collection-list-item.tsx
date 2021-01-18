@@ -7,23 +7,21 @@ import {
 
 import { AsyncImage } from '@oida/ui-react-core';
 
-export type DatasetCollectionListItemProps<T> = {
+
+export type DatasetCollectionListItemMeta = {
+    label: React.ReactNode,
+    value: React.ReactNode
+};
+
+export type DatasetCollectionListItemProps = {
     title: React.ReactNode;
     preview?: string | Promise<string>;
     icon?: React.ReactNode;
-    metadata?: Array<{
-        label: React.ReactNode,
-        value: React.ReactNode
-    }>;
-    actions?: Array<{
-        icon: React.ReactNode;
-        title: React.ReactNode;
-        callback: (item: T) => void;
-    }>
+    metadata?: DatasetCollectionListItemMeta[];
     className?: string
 };
 
-export function DataCollectionDetailedListItem<T>(props: DatasetCollectionListItemProps<T>) {
+export function DataCollectionDetailedListItem(props: DatasetCollectionListItemProps) {
 
     const metadata = props.metadata?.map((item, idx) => {
         return <Descriptions.Item key={idx} label={item.label}>{item.value}</Descriptions.Item>;
@@ -43,7 +41,6 @@ export function DataCollectionDetailedListItem<T>(props: DatasetCollectionListIt
                     className={'data-collection-list-item-detailed-meta'}
                     column={1}
                     size={'small'}
-                    bordered={true}
                 >
                     {metadata}
                 </Descriptions>
@@ -59,7 +56,17 @@ export function DataCollectionDetailedListItem<T>(props: DatasetCollectionListIt
     );
 }
 
-export function DataCollectionCompactListItem<T>(props: DatasetCollectionListItemProps<T>) {
+export function DataCollectionCompactListItem(props: DatasetCollectionListItemProps) {
+
+    const metadata = props.metadata?.map((item, idx) => {
+        return (
+            <div className='data-collection-compact-list-item-meta' key={idx}>
+                <span>{item.label}:</span>
+                <span>{item.value}</span>
+            </div>
+        );
+    });
+
     return (
         <div
             className={classnames('data-collection-compact-list-item', props.className)}
@@ -76,10 +83,11 @@ export function DataCollectionCompactListItem<T>(props: DatasetCollectionListIte
                     />
                 </div>
             }
-            <div className='data-collection-compact-list-item-title'
-                title={typeof(props.title) === 'string' ? props.title : ''}
-            >
-                {props.title}
+            <div className='data-collection-compact-list-item-content'>
+                <div className='data-collection-compact-list-item-title'>
+                    {props.title}
+                </div>
+                {metadata}
             </div>
         </div>
     );
