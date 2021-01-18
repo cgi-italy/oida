@@ -36,7 +36,7 @@ const useMapAoiImporterBase = (props: MapAoiImporterProps) => {
     const onAoiImportAction = (aoi) => {
 
         props.onChange({
-            geometry: aoi.geometry,
+            geometry: aoi.geometry.value,
             props: {
                 name: aoi.name
             }
@@ -62,7 +62,7 @@ const useMapAoiImporterBase = (props: MapAoiImporterProps) => {
     });
 
     const onAoiCenterOnMapAction = (aoi) => {
-        centerOnMap(aoi.geometry, {
+        centerOnMap(aoi.geometry.value, {
             animate: true
         });
     };

@@ -1,7 +1,7 @@
 
 import React from 'react';
 
-import { FormField, FormFieldDefinition, isFormFieldConfigFromState } from '@oida/core';
+import { FormField, FormFieldDefinition, isFormFieldConfigFromState, FormFieldState } from '@oida/core';
 
 type ExtractType<IT extends FormField<any, any, any>> = IT extends FormField<infer TYPE, any, any> ? TYPE : never;
 type ExtractValue<IT extends FormField<any, any, any>> = IT extends FormField<any, infer T, any> ? T : never;
@@ -9,6 +9,11 @@ type ExtractConfig<IT extends FormField<any, any, any>> = IT extends FormField<a
 
 
 export type FormFieldRenderer<T extends FormField<any, any, any>> = (props: T) => JSX.Element | null;
+export type FormFieldExtendedRenderer<T extends FormField<any, any, any>> = (
+    props: Omit<
+        FormFieldDefinition<ExtractType<T>, ExtractValue<T>, ExtractConfig<T>> & FormFieldState<ExtractValue<T>>, 'rendererConfig'
+    > & Record<string, any>
+) => JSX.Element | null;
 
 export const formFieldRendererFactory = () => {
     const REGISTERED_RENDERERS = new Map<string, Map<string, FormFieldRenderer<any>>>();
@@ -65,7 +70,7 @@ export const formFieldRendererFactory = () => {
 
         return {
             rendererId: rendererId,
-            FormFieldRenderer: FormFieldRenderer as FormFieldRenderer<T>
+            FormFieldRenderer: FormFieldRenderer as FormFieldExtendedRenderer<T>
         };
     };
 
@@ -76,3 +81,16 @@ export const formFieldRendererFactory = () => {
 };
 
 export type FormFieldRendererFactory = ReturnType<typeof formFieldRendererFactory>;
+
+let defaultFormFieldRendererFactory: FormFieldRendererFactory;
+
+export const getDefaultFormFieldRendererFactory = () => {
+    if (!defaultFormFieldRendererFactory) {
+        throw new Error('getDefaultFormFieldRendererFactory: no default factory registered');
+    }
+    return defaultFormFieldRendererFactory;
+};
+
+export const setDefaultFormFieldRendererFactory = (rendererFactory: FormFieldRendererFactory) => {
+    defaultFormFieldRendererFactory = rendererFactory;
+};

@@ -15,7 +15,9 @@ import { AoiImportRenderer } from './aoi-import';
 import { AoiEditor } from './aoi-editor';
 import { AoiImportConfig } from '@oida/ui-react-core';
 
-export type AoiFieldRendererProps = Omit<AoiField<AoiImportConfig>, 'name' | 'type'>;
+export type AoiFieldRendererProps = Omit<AoiField<AoiImportConfig>, 'name' | 'type'> & {
+    importDrawerPlacement?: 'left' | 'right'
+};
 
 export const AoiFieldRenderer = (props:  AoiFieldRendererProps) => {
 
@@ -85,6 +87,7 @@ export const AoiFieldRenderer = (props:  AoiFieldRendererProps) => {
             >No area specified</Tag>
             }
             <Button.Group
+                size='small'
                 className='aoi-draw-actions'
             >
                 {
@@ -186,6 +189,7 @@ export const AoiFieldRenderer = (props:  AoiFieldRendererProps) => {
                 </Button.Group>
                 <Button.Group
                     className='aoi-edit-actions'
+                    size='small'
                 >
                 {
                     <Tooltip
@@ -238,10 +242,11 @@ export const AoiFieldRenderer = (props:  AoiFieldRendererProps) => {
             {
                 aoiControls.import && importConfig &&
                 <Drawer
+                    push={false}
                     className='aoi-import-drawer'
                     visible={activeAction === AoiAction.Import}
                     width={370}
-                    placement='left'
+                    placement={props.importDrawerPlacement || 'left'}
                     onClose={() => {
                         onActiveActionChange(AoiAction.None);
                     }}

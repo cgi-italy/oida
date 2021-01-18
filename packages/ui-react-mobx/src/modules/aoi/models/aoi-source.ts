@@ -47,6 +47,8 @@ export class AoiSource {
             }
         });
         this.lazy_ = props.lazy || false;
+
+        this.afterInit_();
     }
 
     get loadingStatus() {

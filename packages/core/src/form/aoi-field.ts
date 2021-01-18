@@ -53,7 +53,8 @@ setFormFieldSerializer(AOI_FIELD_ID, {
     }
 });
 
-type AoiFieldFactoryProps = {
+
+export type AoiFieldFactoryProps = {
     name: string;
     title?: string;
     required?: boolean;
@@ -62,13 +63,23 @@ type AoiFieldFactoryProps = {
     supportedGeometries: AoiSupportedGeometry[];
 };
 
-type AoiFieldFactory = (props: AoiFieldFactoryProps) => AoiFieldDefinition;
+export type AoiFieldFactory = (props: AoiFieldFactoryProps) => AoiFieldDefinition;
 
 let aoiFieldFactory: AoiFieldFactory | undefined;
+
+/**
+ * Since AOI field definition is usually linked to the specific map implementation (e.g. aoi drawing,
+ * aoi visualization on map) with this method it is possible to register a function that generates
+ * an AOI field definition given some basic field properties
+ * @param factory The AOI factory function
+ */
 export const setAoiFieldFactory = (factory: AoiFieldFactory) => {
     aoiFieldFactory = factory;
 };
 
+/**
+ * Get the AOI factory registered with {@link setAoiFieldFactory}
+ */
 export const getAoiFieldFactory = () => {
     if (!aoiFieldFactory) {
         throw new Error('AoiFieldFactory: no factory defined');

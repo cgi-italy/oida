@@ -65,6 +65,8 @@ export class AoiModule extends AppModule {
         this.mapModule = props.mapModule;
         this.config = props.config;
 
+        this.activeSourceId_ = undefined;
+
         setReactionForFilterType(AOI_FIELD_ID, (filters, key) => {
             const filterMapBindingDisposer = bindAoiValueToMap({
                 aois: this.aois,
@@ -80,6 +82,8 @@ export class AoiModule extends AppModule {
                 type: AOI_FIELD_ID,
                 name: props.name,
                 title: props.title || 'Area of interest',
+                rendererConfig: props.rendererConfig,
+                required: props.required,
                 config: (filterState: FormFieldState<AoiValue>) => {
 
                     let aoiFieldConfig = useMapAoiFieldFromModule({
@@ -91,7 +95,7 @@ export class AoiModule extends AppModule {
                         supportedGeometries: props.supportedGeometries,
                         supportedActions: props.supportedActions,
                         ...aoiFieldConfig,
-                        name: aoiFieldConfig.name || 'Aoi'
+                        name: aoiFieldConfig.name || filterState.value?.geometry.type || 'Aoi'
                     };
                 }
             };
