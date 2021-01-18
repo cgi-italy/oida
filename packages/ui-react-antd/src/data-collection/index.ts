@@ -5,3 +5,4 @@ export * from './data-collection-list-item';
 export * from './data-pager';
 export * from './data-sort-combo';
 export * from './data-filterer';
+export * from './advanced-search-filterer';
