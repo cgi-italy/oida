@@ -60,7 +60,7 @@ export const DashboardPane = (props: DashboardPaneProps) => {
                         x: 0,
                         y: Infinity,
                         w: cols[breakpoint],
-                        h: 6
+                        h: 8
                     };
                 }
             }
@@ -108,6 +108,7 @@ export const DashboardPane = (props: DashboardPaneProps) => {
             <Responsive
                 width={size.width || 100}
                 compactType={'vertical'}
+                preventCollision={false}
                 breakpoints={breakpoints}
                 cols={cols}
                 layouts={gridLayouts}

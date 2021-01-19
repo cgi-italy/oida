@@ -39,7 +39,7 @@ export function DataCollectionDetailedListItem(props: DatasetCollectionListItemP
             <div className='data-collection-list-item-detailed-content'>
                 <Descriptions
                     className={'data-collection-list-item-detailed-meta'}
-                    column={1}
+                    column={props.preview ? 1 : 2}
                     size={'small'}
                 >
                     {metadata}

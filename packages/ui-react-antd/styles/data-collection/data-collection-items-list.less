@@ -57,8 +57,14 @@
     }
 
     &.ant-list-vertical {
-        .action-content {
-            display: inline-block;
+        .ant-list-item-action {
+            display: flex;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+
+            .action-content {
+                display: inline-block;
+            }
         }
     }
 

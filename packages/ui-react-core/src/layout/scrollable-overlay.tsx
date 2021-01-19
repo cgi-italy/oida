@@ -1,13 +1,19 @@
 import React, { useRef } from 'react';
 import useResizeAware from 'react-resize-aware';
+import classnames from 'classnames';
 
-export const ScrollableOverlay = (props) => {
+export type ScrollableOverlayProps = {
+    className?: string;
+    children?: React.ReactNode
+};
+
+export const ScrollableOverlay = (props: ScrollableOverlayProps) => {
 
     const [resizeListener, size] = useResizeAware();
     const scrollableContentRef = useRef<HTMLDivElement>(null);
 
     return (
-        <div className='scrollable-overlay'>
+        <div className={classnames('scrollable-overlay', props.className)}>
             <div className='scrollable-overlay-content-wrapper' ref={scrollableContentRef}>
                 <div className='scrollable-overlay-content' >
                     {resizeListener}
