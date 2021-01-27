@@ -5,3 +5,4 @@ export * from './create-axios-instance';
 export * from './geometry';
 export * from './time';
 export * from './color';
+export * from './xml-utils';

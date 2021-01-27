@@ -34,7 +34,7 @@ export const getGeometryExtent = (geometry: Geometry): (GeoJSON.BBox | undefined
         geometry = circle(geometry.center, geometry.radius / 1000, {
             units: 'kilometers',
             steps: circleApproxSteps
-        });
+        }).geometry;
     }
 
     return bbox(geometry);
