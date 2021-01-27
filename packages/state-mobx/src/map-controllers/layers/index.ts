@@ -6,3 +6,4 @@ export * from './feature-layer-controller';
 export * from './vertical-profile-layer-controller';
 export * from './volume-layer-controller';
 export * from './volume-view-mode';
+export * from './geo-image-layer-controller';

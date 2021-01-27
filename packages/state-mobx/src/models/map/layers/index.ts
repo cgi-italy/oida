@@ -4,3 +4,4 @@ export * from './tile-layer';
 export * from './feature-layer';
 export * from './vertical-profile-layer';
 export * from './volume-layer';
+export * from './geo-image-layer';

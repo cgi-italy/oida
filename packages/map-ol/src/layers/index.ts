@@ -4,5 +4,6 @@ export * from './ol-group-layer';
 export * from './ol-tile-layer';
 export * from './ol-image-layer';
 export * from './ol-feature-layer';
+export * from './ol-geo-image-layer';
 export * from './tilesources';
 export * from './image-sources';
