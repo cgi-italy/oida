@@ -28,6 +28,7 @@
   },
   "dependencies": {
     "@oida/core": "file:../core",
+    "@oida/eo-mobx": "file:../eo-mobx",
     "@oida/state-mobx": "file:../state-mobx",
     "mediaelement": "^4.2.16",
     "tslib": "^2.0.1",

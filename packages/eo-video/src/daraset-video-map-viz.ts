@@ -1,9 +1,9 @@
-import { reaction, autorun } from 'mobx';
+import { autorun } from 'mobx';
 
 import { SubscriptionTracker, GeoImageLayerFootprint } from '@oida/core';
 import { GeoImageLayer } from '@oida/state-mobx';
-
 import { DatasetViz, DatasetVizProps } from '@oida/eo-mobx';
+
 import { AdaptiveVideoLayer } from './adaptive-video-source';
 
 
