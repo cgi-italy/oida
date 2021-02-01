@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 import classnames from 'classnames';
 
-import { List, Tooltip } from 'antd';
+import { List, Tooltip, Empty } from 'antd';
 import { useDrop } from 'react-dnd';
 import { NativeTypes } from 'react-dnd-html5-backend';
 
@@ -155,18 +155,21 @@ export function DataCollectionItemsList<T>(props: DataCollectionItemsListProps<T
 
     const {data, loadingState, ...listProps} = renderProps;
 
-    return  (
-        <List
-            className='data-collection-list-items'
-            size={props.size || 'small'}
-            loading={loadingState === LoadingState.Loading}
-            rowKey={keyGetter}
-            {...listProps}
-        >
-            {listItems}
-        </List>
-    );
-
+    if (loadingState === LoadingState.Success && !data.length) {
+        return <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />;
+    } else {
+        return (
+            <List
+                className='data-collection-list-items'
+                size={props.size || 'small'}
+                loading={loadingState === LoadingState.Loading}
+                rowKey={keyGetter}
+                {...listProps}
+            >
+                {listItems}
+            </List>
+        );
+    }
 }
 
 DataCollectionItemsList.defaultProps = {

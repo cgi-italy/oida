@@ -61,7 +61,7 @@ export function DataCollectionCompactListItem(props: DatasetCollectionListItemPr
     const metadata = props.metadata?.map((item, idx) => {
         return (
             <div className='data-collection-compact-list-item-meta' key={idx}>
-                <span>{item.label}:</span>
+                {item.label && <span>{item.label}:</span>}
                 <span>{item.value}</span>
             </div>
         );
