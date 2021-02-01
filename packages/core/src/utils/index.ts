@@ -6,3 +6,4 @@ export * from './geometry';
 export * from './time';
 export * from './color';
 export * from './xml-utils';
+export * from './spatial-reference-org-definition-provider';
