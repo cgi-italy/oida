@@ -1,4 +1,4 @@
-import { IObservableArray, observable, action } from 'mobx';
+import { IObservableArray, observable, action, makeObservable } from 'mobx';
 
 import { Active, ActiveProps, IsActivable, IsEntity } from '@oida/state-mobx';
 import { Geometry, createDynamicFactory } from '@oida/core';
@@ -54,6 +54,8 @@ export abstract class DatasetDiscoveryProvider<
         this.results = observable.array([], {
             deep: false
         });
+
+        makeObservable(this);
     }
 
     @action

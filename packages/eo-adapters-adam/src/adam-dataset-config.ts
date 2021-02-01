@@ -61,7 +61,7 @@ export type AdamDatasetConfig = {
     coverageExtent: number[];
     requestExtentOffset?: number[];
     dimensions?: AdamDatasetDimension[];
-    isTimeless?: boolean;
+    fixedTime?: Date;
     renderMode: AdamDatasetRenderMode;
     cswCollection?: string;
     productSearchRecordContent?: (item: ProductSearchRecord) => any;

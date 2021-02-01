@@ -7,6 +7,7 @@ import { DatasetTimeDistributionProvider, TimeSearchDirection, TimeDistributionR
 export type AdamWcsTimeDistributionProviderConfig = {
     serviceUrl: string;
     coverageId: string;
+    fixedTime?: Date;
     axiosInstance?: AxiosInstanceWithCancellation;
     searchProvider?: DatasetProductSearchProvider;
 };
@@ -31,6 +32,15 @@ export class AdamWcsTimeDistributionProvider implements DatasetTimeDistributionP
     constructor(config: AdamWcsTimeDistributionProviderConfig) {
         this.config_ = config;
         this.axiosInstance_ = config.axiosInstance || createAxiosInstance();
+        if (config.fixedTime) {
+            this.timeExtent_ = Promise.resolve({
+                start: config.fixedTime,
+                end: config.fixedTime,
+                data: {
+                    size: 1
+                }
+            });
+        }
     }
 
     getTimeExtent(filters?) {

@@ -84,7 +84,7 @@ export const getAdamDatasetToolsConfig = (
         } : undefined
     };
 
-    if (!datasetConfig.isTimeless) {
+    if (!datasetConfig.fixedTime) {
         dimensions.unshift(timeDimension);
     }
 
