@@ -25,7 +25,8 @@
   },
   "peerDependencies": {
     "mobx": "6.x",
-    "moment": "^2.x"
+    "moment": "^2.x",
+    "proj4": "^2.x"
   },
   "dependencies": {
     "@oida/core": "file:../core",

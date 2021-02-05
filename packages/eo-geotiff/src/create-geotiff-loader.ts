@@ -1,8 +1,9 @@
 import { fromArrayBuffer } from 'geotiff';
 import { plot } from 'plotty';
 import LruCache from 'lru-cache';
+import proj4 from 'proj4';
 
-import { AxiosInstanceWithCancellation } from '@oida/core';
+import { AxiosInstanceWithCancellation, SpatialReferenceOrgDefinitionProvider } from '@oida/core';
 
 class PlottyRendererWrapper {
     protected renderer_: plot;
@@ -64,7 +65,9 @@ let rawDataRenderer: plot | undefined = undefined;
 const getOrCreateRawDataRenderer = () => {
     if (!rawDataRenderer) {
         rawDataRenderer = new plot({
-            canvas: document.createElement('canvas')
+            canvas: document.createElement('canvas'),
+            //the webgl renderer is not currently able to handle NaN values. Disable it for now
+            useWebGL: false
         });
     }
     return new PlottyRendererWrapper(rawDataRenderer);
@@ -90,7 +93,7 @@ export type createGeotiffTileLoaderProps = {
 };
 
 export type GeotiffLoader = {
-    load: (source: {url: string, postData?: string}, flip: boolean) => Promise<string>;
+    load: (source: {url: string, postData?: string, requestExtent?: number[], requestSrs?: string}, flip: boolean) => Promise<string>;
     renderer: PlottyRendererWrapper,
     dataCache: LruCache
 };
@@ -143,7 +146,37 @@ export const createGeoTiffLoader = (props: createGeotiffTileLoaderProps): Geotif
         };
     }
 
-    let load = (source: {url: string, data?: any}, flip?: boolean) => {
+    let scaleCanvas = document.createElement('canvas');
+    let scaleCtx = scaleCanvas.getContext('2d')!;
+
+    const getImageSource = (requestExtent, responseExtent) => {
+        let requestWidth = requestExtent[2] - requestExtent[0];
+        let requestHeight = requestExtent[3] - requestExtent[1];
+        let responseWidth = responseExtent[2] - responseExtent[0];
+        let responseHeight = responseExtent[3] - responseExtent[1];
+        if (requestWidth - responseWidth > 0.001 || requestHeight - responseHeight > 0.001) {
+
+            let plottyCanvas = renderer.getCanvas();
+
+            const dw = responseWidth / requestWidth * plottyCanvas.width;
+            const dh = responseHeight / requestHeight * plottyCanvas.height;
+            const dx = (responseExtent[0] - requestExtent[0]) / requestWidth * plottyCanvas.width;
+            const dy = (requestExtent[3] - responseExtent[3]) / requestHeight * plottyCanvas.height;
+
+            scaleCanvas.width = plottyCanvas.width;
+            scaleCanvas.height = plottyCanvas.height;
+
+            scaleCtx.clearRect(0, 0, scaleCanvas.width, scaleCanvas.height);
+            scaleCtx.drawImage(plottyCanvas, dx, dy, dw, dh);
+            return scaleCanvas.toDataURL();
+        } else {
+            return renderer.getCanvas().toDataURL();
+        }
+    };
+
+    const srsDefGetter = new SpatialReferenceOrgDefinitionProvider();
+
+    let load = (source: {url: string, data?: any, requestExtent?: number[], requestSrs?: string}, flip?: boolean) => {
 
         let cachedData = dataCache.get(source.url);
 
@@ -165,7 +198,11 @@ export const createGeoTiffLoader = (props: createGeotiffTileLoaderProps): Geotif
                             if (flip) {
                                 resolve(getFlippedImage(renderer.getCanvas()));
                             } else {
-                                resolve(renderer.getCanvas().toDataURL());
+                                if (cachedData.requestExtent) {
+                                    resolve(getImageSource(cachedData.requestExtent, cachedData.responseExtent));
+                                } else {
+                                    resolve(renderer.getCanvas().toDataURL());
+                                }
                             }
                         }
                     });
@@ -184,6 +221,64 @@ export const createGeoTiffLoader = (props: createGeotiffTileLoaderProps): Geotif
                             if (gdalNoData) {
                                 noData = parseFloat(gdalNoData);
                             }
+
+                            const requestExtent = source.requestExtent;
+                            let responseExtent = image.getBoundingBox();
+
+                            if (requestExtent) {
+                                // if the response is in a different srs than the request reproject the extent to the request srs and then
+                                // handle the rescaling. it works only if the two srs axes are aligned
+                                if (source.requestSrs) {
+                                    let responseSrs = image.geoKeys.ProjectedCSTypeGeoKey || image.geoKeys.GeographicTypeGeoKey;
+                                    if (responseSrs) {
+                                        responseSrs = `EPSG:${responseSrs}`;
+                                        if (responseSrs !== source.requestSrs) {
+                                            if (!proj4.defs(responseSrs)) {
+                                                return srsDefGetter.getSrsDefinition(responseSrs).then((srsDef) => {
+                                                    proj4.defs(responseSrs, srsDef);
+
+                                                    const ll = proj4(
+                                                        responseSrs, source.requestSrs, [responseExtent[0], responseExtent[1]]
+                                                    );
+                                                    const ur = proj4(
+                                                        responseSrs, source.requestSrs, [responseExtent[2], responseExtent[3]]
+                                                    );
+
+                                                    responseExtent = [...ll, ...ur];
+
+                                                    dataCache.set(source.url, {
+                                                        values: data[0],
+                                                        width: image.getWidth(),
+                                                        height: image.getHeight(),
+                                                        noData: noData,
+                                                        requestExtent: requestExtent,
+                                                        responseExtent: responseExtent
+                                                    });
+
+                                                    renderer.setNoDataValue(noData);
+                                                    renderer.setData(data[0], image.getWidth(), image.getHeight());
+                                                    renderer.render();
+
+                                                    if (getRotatedImage) {
+                                                        return getRotatedImage(flip);
+                                                    } else {
+                                                        if (flip) {
+                                                            return getFlippedImage(renderer.getCanvas());
+                                                        } else {
+                                                            return getImageSource(requestExtent, responseExtent);
+                                                        }
+                                                    }
+                                                });
+                                            }
+                                            const ll = proj4(responseSrs, source.requestSrs, [responseExtent[0], responseExtent[1]]);
+                                            const ur = proj4(responseSrs, source.requestSrs, [responseExtent[2], responseExtent[3]]);
+                                            responseExtent = [...ll, ...ur];
+                                        }
+
+                                    }
+                                }
+                            }
+
                             renderer.setNoDataValue(noData);
                             renderer.setData(data[0], image.getWidth(), image.getHeight());
                             renderer.render();
@@ -192,7 +287,9 @@ export const createGeoTiffLoader = (props: createGeotiffTileLoaderProps): Geotif
                                 values: data[0],
                                 width: image.getWidth(),
                                 height: image.getHeight(),
-                                noData: noData
+                                noData: noData,
+                                requestExtent: requestExtent,
+                                responseExtent: responseExtent
                             });
 
                             if (getRotatedImage) {
@@ -201,7 +298,11 @@ export const createGeoTiffLoader = (props: createGeotiffTileLoaderProps): Geotif
                                 if (flip) {
                                     return getFlippedImage(renderer.getCanvas());
                                 } else {
-                                    return renderer.getCanvas().toDataURL();
+                                    if (requestExtent) {
+                                        return getImageSource(requestExtent, responseExtent);
+                                    } else {
+                                        return renderer.getCanvas().toDataURL();
+                                    }
                                 }
                             }
                         }).catch(() => {
