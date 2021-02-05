@@ -88,35 +88,37 @@ export const getAdamDatasetToolsConfig = (
         dimensions.unshift(timeDimension);
     }
 
-    let wcsSeriesProvider = new AdamWcsSeriesProvider({
-        axiosInstance: axiosInstance,
-        coverageSrs: datasetConfig.coverageSrs,
-        serviceUrl: factoryConfig.wcsServiceUrl,
-        extentOffset: datasetConfig.requestExtentOffset,
-        variables: variables,
-        dimensions: dimensions
-    });
-
-    let dimensionSeriesToolConfig: DatasetDimensionSeriesConfig = {
-        supportedGeometries: [{
-            type: 'Point'
-        }, {
-            type: 'BBox'
-        }],
-        variables: variables,
-        dimensions: dimensions,
-        provider: (request) => {
-            return wcsSeriesProvider.getSeries(request);
-        }
-    };
-
     let tools: DatasetToolConfig[] = [];
 
-    tools.push({
-        type: DIMENSION_SERIES_TYPE,
-        name: 'Series analysis',
-        config: dimensionSeriesToolConfig
-    });
+    if (dimensions.length) {
+        let wcsSeriesProvider = new AdamWcsSeriesProvider({
+            axiosInstance: axiosInstance,
+            coverageSrs: datasetConfig.coverageSrs,
+            serviceUrl: factoryConfig.wcsServiceUrl,
+            extentOffset: datasetConfig.requestExtentOffset,
+            variables: variables,
+            dimensions: dimensions
+        });
+
+        let dimensionSeriesToolConfig: DatasetDimensionSeriesConfig = {
+            supportedGeometries: [{
+                type: 'Point'
+            }, {
+                type: 'BBox'
+            }],
+            variables: variables,
+            dimensions: dimensions,
+            provider: (request) => {
+                return wcsSeriesProvider.getSeries(request);
+            }
+        };
+
+        tools.push({
+            type: DIMENSION_SERIES_TYPE,
+            name: 'Series analysis',
+            config: dimensionSeriesToolConfig
+        });
+    }
 
     return tools;
 

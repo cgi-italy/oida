@@ -1,25 +1,38 @@
 import moment from 'moment';
 
-import { AxiosInstanceWithCancellation, createAxiosInstance, QueryParams, randomColorFactory } from '@oida/core';
+import { AxiosInstanceWithCancellation, createAxiosInstance, QueryParams, randomColorFactory, getGeometryExtent } from '@oida/core';
 import { AdamWcsCoverageDescriptionClient } from './adam-wcs-coverage-description-client';
 import { AdamDatasetConfig, AdamDatasetDimension, AdamDatasetSingleBandCoverage, AdamDatasetMultiBandCoverage, AdamDatasetRenderMode } from '../adam-dataset-config';
 
-export type AdamDatasetMetadataGridName = {[key: string]: string[]};
+export type AdamDatasetMetadataGridName = {
+    id: string;
+    label: string;
+    values: Array<{
+        label: string;
+        value: string;
+    }>;
+};
 
-export type AdamDatasetMetadata = {
-    datasetId: string;
-    shortDatasetId: string;
-    extendedDatasetName: string;
-    datasetType: 'Raster' | 'Vertical' | 'Tomo';
-    subdatasets?: number;
-    description: string;
-    minDate: string;
-    maxDate: string;
+export type AdamDatasetMetadataSubdataset = {
+    subDatasetId: string;
+    name: string;
     minValue: number;
     maxValue: number;
     noDataValue: number;
+    minDate: string;
+    maxDate: string;
+    geometry: GeoJSON.Geometry;
+    grid?: boolean;
     gridNames?: AdamDatasetMetadataGridName[];
-    subdatasetsNames: string[];
+};
+
+export type AdamDatasetMetadata = {
+    datasetId: string;
+    title: string;
+    datasetType: 'Raster' | 'Vertical' | 'Tomo';
+    geometry: GeoJSON.Geometry;
+    subDataset: AdamDatasetMetadataSubdataset[];
+    description: string;
 };
 
 export type AdamDatasetDiscoveryRequest = {
@@ -65,8 +78,8 @@ export class AdamOpensearchDatasetDiscoveryClient {
         const params: AdamDatasetDiscoveryRequest = {};
 
         if (queryParams.paging) {
-            params.maxRecords = queryParams.paging.pageSize;
-            params.startIndex = queryParams.paging.offset;
+            //params.maxRecords = queryParams.paging.pageSize;
+            //params.startIndex = queryParams.paging.offset;
         }
 
         return this.axiosInstance_.request<AdamDatasetDiscoveryResponse>({
@@ -78,101 +91,108 @@ export class AdamOpensearchDatasetDiscoveryClient {
     }
 
     getAdamDatasetConfig(metadata: AdamDatasetMetadata): Promise<AdamDatasetConfig> {
-        return this.wcsCoverageDescriptionClient_.getCoverageDetails(metadata.shortDatasetId).then((coverageDetails) => {
+
+        // disable WCS coverage description retrieval for now and always query the dataset using EPSG:4326
+        // this is just a temporary measure and has some bad implications (i.e. the WCS data srs is different from the layer srs)
+
+        //return this.wcsCoverageDescriptionClient_.getCoverageDetails(metadata.datasetId).then((coverageDetails) => {
 
             const dimensions: AdamDatasetDimension[] = [];
-            if (metadata.gridNames) {
-                metadata.gridNames.forEach((gridName, idx) => {
-                    const [dimensionId, values] = Object.entries(gridName)[0];
-                    dimensions.push({
-                        id: dimensionId,
-                        name: dimensionId,
-                        wcsSubset: {
-                            id: 'gfix',
-                            idx: idx
-                        },
-                        wcsResponseKey: 'gfix',
-                        tarFilenameRegex: /^/,
-                        domain: values.map((label, idx) => {
-                            return {
-                                label: label,
-                                value: idx + 1
-                            };
-                        })
-                    });
-                });
-            }
-
-            let minValue =  metadata.minValue;
-            let maxValue = metadata.maxValue;
-
-            const range = (maxValue - minValue) / 100;
-
-            if (range < 1) {
-                const precision = -Math.floor(Math.log10(range));
-                minValue = parseFloat(minValue.toFixed(precision));
-                maxValue = parseFloat(maxValue.toFixed(precision));
-            } else {
-                minValue = Math.floor(minValue);
-                maxValue = Math.ceil(maxValue);
-            }
-
             let coverages: AdamDatasetSingleBandCoverage[] | AdamDatasetMultiBandCoverage;
 
-            if (metadata.subdatasets && metadata.subdatasets > 1) {
+            if (metadata.subDataset.length > 1) {
                 coverages = {
                    id: 'bands',
                    name: 'Bands',
-                   wcsCoverage: metadata.shortDatasetId,
+                   wcsCoverage: metadata.datasetId,
                    presets: [],
                    bandGroups: [{
                        id: 'bands',
                        name: 'Bands',
-                       bandIndices: metadata.subdatasetsNames.map((subdatasetName, idx) => idx + 1)
+                       bandIndices: metadata.subDataset.map((subdataset, idx) => idx + 1)
                    }],
-                   bands: metadata.subdatasetsNames.map((subdatasetName, idx) => {
+                   bands: metadata.subDataset.map((subdataset, idx) => {
+                       const [minValue, maxValue] = this.getRoundedMinMax_(subdataset.minValue, subdataset.maxValue);
                        return {
                            idx: idx + 1,
-                           name: subdatasetName,
+                           name: subdataset.name,
                            domain: {
                                min: minValue,
                                max: maxValue,
-                               noData: metadata.noDataValue
+                               noData: subdataset.noDataValue
                            }
                        };
                    })
                 };
             } else {
+                const variable = metadata.subDataset[0];
+                const [minValue, maxValue] = this.getRoundedMinMax_(variable.minValue, variable.maxValue);
                 coverages = [{
-                    id: `${metadata.shortDatasetId}_${metadata.subdatasetsNames[0]}`,
-                    name: metadata.subdatasetsNames[0],
-                    wcsCoverage: metadata.shortDatasetId,
+                    id: `${metadata.datasetId}_${variable.name}`,
+                    name: variable.name,
+                    wcsCoverage: metadata.datasetId,
                     domain: {
                         min: minValue,
                         max: maxValue
                     }
                 }];
+
+                if (variable.grid && variable.gridNames) {
+                    //TODO: remove the reverse once the discovery metadata are coherent
+                    variable.gridNames.reverse().forEach((gridName, idx) => {
+                        dimensions.push({
+                            id: gridName.id,
+                            name: gridName.label,
+                            wcsSubset: {
+                                id: 'gfix',
+                                idx: idx
+                            },
+                            wcsResponseKey: 'gfix',
+                            tarFilenameRegex: /^/,
+                            domain: gridName.values.map((item) => {
+                                return {
+                                    label: item.label,
+                                    value: item.value
+                                };
+                            })
+                        });
+                    });
+                }
             }
 
             let fixedTime: Date | undefined;
-            if (metadata.minDate === metadata.maxDate) {
-                fixedTime = moment.utc(metadata.minDate).toDate();
+            if (metadata.subDataset[0].minDate === metadata.subDataset[0].maxDate) {
+                fixedTime = moment.utc(metadata.subDataset[0].minDate).toDate();
             }
 
-            return {
-                id: metadata.shortDatasetId,
+            return Promise.resolve({
+                id: metadata.datasetId,
                 color: this.colorFactory_(),
                 type: 'raster',
-                coverageExtent: coverageDetails.extent,
-                coverageSrs: coverageDetails.srs,
-                srsDef: coverageDetails.srsDef,
+                coverageExtent: getGeometryExtent(metadata.geometry)!,
+                coverageSrs: 'EPSG:4326',
                 name: metadata.datasetId,
                 fixedTime: fixedTime,
                 renderMode: AdamDatasetRenderMode.ClientSide,
                 coverages: coverages,
                 dimensions: dimensions
-            };
+            });
 
-        });
+        //});
+    }
+
+    protected getRoundedMinMax_(minValue: number, maxValue: number) {
+        const range = (maxValue - minValue) / 100;
+
+        if (range < 1) {
+            const precision = -Math.floor(Math.log10(range));
+            minValue = parseFloat(minValue.toFixed(precision));
+            maxValue = parseFloat(maxValue.toFixed(precision));
+        } else {
+            minValue = Math.floor(minValue);
+            maxValue = Math.ceil(maxValue);
+        }
+
+        return [minValue, maxValue];
     }
 }

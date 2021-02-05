@@ -29,6 +29,7 @@ export const getAdamDatasetFactory = (factoryConfig: AdamDatasetFactoryConfig) =
         const timeDistributionConfig = getAdamDatasetTimeDistributionConfig(
             axiosInstance, factoryConfig, config, productSearchConfig?.searchProvider
         );
+        const spatialCoverageProvider = getAdamDatasetSpatialCoverageProvider(axiosInstance, factoryConfig, config);
 
         let datasetConfig: DatasetConfig = {
             id: config.id,
@@ -37,10 +38,10 @@ export const getAdamDatasetFactory = (factoryConfig: AdamDatasetFactoryConfig) =
             filters: [],
             productSearch: productSearchConfig,
             timeDistribution: timeDistributionConfig,
-            mapView: getAdamDatasetMapViewConfig(axiosInstance, factoryConfig, config),
+            mapView: getAdamDatasetMapViewConfig(axiosInstance, factoryConfig, config, spatialCoverageProvider),
             tools: getAdamDatasetToolsConfig(axiosInstance, factoryConfig, config, timeDistributionConfig?.provider),
             download: getAdamDatasetDownloadConfig(axiosInstance, factoryConfig, config),
-            spatialCoverageProvider: getAdamDatasetSpatialCoverageProvider(axiosInstance, factoryConfig, config)
+            spatialCoverageProvider: spatialCoverageProvider
         };
 
         return datasetConfig;

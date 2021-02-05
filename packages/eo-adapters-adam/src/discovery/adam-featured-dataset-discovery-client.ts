@@ -38,7 +38,7 @@ export class AdamFeaturedDatasetDiscoveryClient {
             queryParams.filters.forEach((filter) => {
                 if (filter.key === 'q') {
                     datasets = datasets.filter((dataset) => {
-                        return dataset.name.indexOf(filter.value) !== -1;
+                        return dataset.name.toLowerCase().indexOf(filter.value.toLowerCase()) !== -1;
                     });
                 }
             });

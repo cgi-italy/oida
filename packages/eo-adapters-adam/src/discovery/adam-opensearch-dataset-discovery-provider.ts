@@ -17,10 +17,14 @@ export class AdamOpensearchDatasetDiscoveryProviderItem extends Entity {
     constructor(props: AdamOpensearchDatasetDiscoveryProviderItemProps) {
         super({
             entityType: ADAM_OPENSEARCH_DATASET_DISCOVERY_ITEM_TYPE,
-            id: props.metadata.shortDatasetId
+            id: props.metadata.datasetId
         });
 
         this.metadata = props.metadata;
+    }
+
+    get geometry() {
+        return this.metadata.geometry;
     }
 }
 

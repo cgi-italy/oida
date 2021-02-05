@@ -181,7 +181,7 @@ export class DatasetDimensionSeries extends DatasetAnalysis<undefined> implement
             && this.geometry
             && this.seriesVariable
             && this.config.dimensions.every((dim) => {
-                return (dim.id === this.seriesDimension) || this.dimensions.values.has(dim.id);
+                return (dim.id === this.seriesDimension) || (this.dimensions.values.has(dim.id) && this.dimensions.values.get(dim.id));
             });
     }
 

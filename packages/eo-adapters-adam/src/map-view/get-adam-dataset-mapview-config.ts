@@ -5,15 +5,18 @@ import { AxiosInstanceWithCancellation } from '@oida/core';
 
 import { AdamDatasetConfig } from '../adam-dataset-config';
 import { AdamDatasetFactoryConfig } from '../get-adam-dataset-factory';
+import { AdamSpatialCoverageProvider } from '../get-adam-dataset-spatial-coverage-provider';
 
 import { getAdamRasterMapViewConfig } from './raster';
 import { getAdamVerticalProfileViewConfig } from './vertical-profile';
 import { getAdamVolumetricMapViewConfig } from './volumetric';
 
+
 export const getAdamDatasetMapViewConfig = (
     axiosInstance: AxiosInstanceWithCancellation,
     factoryConfig: AdamDatasetFactoryConfig,
-    datasetConfig: AdamDatasetConfig
+    datasetConfig: AdamDatasetConfig,
+    spatialCoverageProvider: AdamSpatialCoverageProvider
 ) => {
 
     if (datasetConfig.srsDef) {
@@ -26,7 +29,7 @@ export const getAdamDatasetMapViewConfig = (
     } else if (datasetConfig.type === 'volume') {
         return getAdamVolumetricMapViewConfig(factoryConfig, datasetConfig);
     } else {
-        return getAdamRasterMapViewConfig(axiosInstance, factoryConfig, datasetConfig);
+        return getAdamRasterMapViewConfig(axiosInstance, factoryConfig, datasetConfig, spatialCoverageProvider);
     }
 
 };

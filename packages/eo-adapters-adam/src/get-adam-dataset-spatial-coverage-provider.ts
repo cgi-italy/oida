@@ -11,6 +11,8 @@ import { AdamDatasetFactoryConfig } from './get-adam-dataset-factory';
 import { AdamServiceParamsSerializer } from './utils/adam-service-params-serializer';
 import { getWcsTimeFilterSubset, getCoverageWcsParams } from './utils';
 
+export type AdamSpatialCoverageProvider = (mapView: DatasetViz<any>, keepDatasetSrs?: boolean) => Promise<number[] | undefined>;
+
 export const getAdamDatasetSpatialCoverageProvider = (
     axiosInstance: AxiosInstanceWithCancellation,
     factoryConfig: AdamDatasetFactoryConfig,
@@ -27,7 +29,7 @@ export const getAdamDatasetSpatialCoverageProvider = (
         geogCoverageExtent = transformExtent(geogCoverageExtent, datasetConfig.coverageSrs, 'EPSG:4326');
     }
 
-    return (mapView: DatasetViz<any>, keepDatasetSrs?: boolean) => {
+    return ((mapView: DatasetViz<any>, keepDatasetSrs?: boolean) => {
 
         if (mapView instanceof RasterMapViz) {
             let wcsParams: any = {
@@ -92,6 +94,6 @@ export const getAdamDatasetSpatialCoverageProvider = (
         } else {
             return Promise.resolve(keepDatasetSrs ? datasetConfig.coverageExtent : geogCoverageExtent);
         }
-    };
+    }) as AdamSpatialCoverageProvider;
 
 };

@@ -1,6 +1,6 @@
 import { AxiosInstanceWithCancellation } from '@oida/core';
 import {
-    RasterMapViz, RasterBandModeSingle, RasterBandModePreset, RasterBandModeCombination, RasterBandMode,
+    RasterMapViz, RasterBandModeSingle, RasterBandModePreset, RasterBandModeCombination, RasterBandMode
 } from '@oida/eo-mobx';
 import { createGeoTiffLoader, GeotiffLoader } from '@oida/eo-geotiff';
 
@@ -8,6 +8,7 @@ import { ADAM_WCS_SOURCE_ID } from '../adam-wcs-tile-source';
 import { getWcsTimeFilterSubset, getAoiWcsParams, getCoverageWcsParams, getColormapWcsParams } from '../../utils';
 import { AdamDatasetConfig, isMultiBandCoverage, AdamDatasetCoverageBand } from '../../adam-dataset-config';
 import { AdamDatasetFactoryConfig } from '../../get-adam-dataset-factory';
+import { AdamSpatialCoverageProvider } from '../../get-adam-dataset-spatial-coverage-provider';
 
 const getMultiBandColorRange = (
     datasetConfig: AdamDatasetConfig,
@@ -47,8 +48,8 @@ export const createAdamRasterTileSourceProvider = (
     factoryConfig: AdamDatasetFactoryConfig,
     datasetConfig: AdamDatasetConfig,
     axiosInstance: AxiosInstanceWithCancellation,
+    spatialCoverageProvider: AdamSpatialCoverageProvider,
     useRawData?: boolean
-
 ) => {
 
     let geotiffLoader: GeotiffLoader | undefined;
@@ -112,24 +113,33 @@ export const createAdamRasterTileSourceProvider = (
             }
         }
 
-        return Promise.resolve({
-            id: ADAM_WCS_SOURCE_ID,
-            url: factoryConfig.wcsServiceUrl,
-            srs: datasetConfig.coverageSrs,
-            coverage: wcsCoverageParams.coverageId,
-            minZoomLevel: datasetConfig.minZoomLevel,
-            format: format,
-            subsets: subsets,
-            tileGrid: {
-                extent: aoiParams.extent,
-                forceUniformResolution: true
-            },
-            crossOrigin: true,
-            wktFilter: aoiParams.wktFilter,
-            tileLoadFunction: tileLoadFunction,
-            colortable: colorTable,
-            colorrange: colorRange,
-            requestExtentOffset: datasetConfig.requestExtentOffset
+        return spatialCoverageProvider(rasterView, true).then((coverageExtent) => {
+            const aoiParams = getAoiWcsParams(datasetConfig, rasterView.dataset.aoiFilter, coverageExtent);
+
+            if (!aoiParams) {
+                //the coverage is outside of the currently selected aoi
+                return undefined;
+            }
+
+            return {
+                id: ADAM_WCS_SOURCE_ID,
+                url: factoryConfig.wcsServiceUrl,
+                srs: datasetConfig.coverageSrs,
+                coverage: wcsCoverageParams.coverageId,
+                minZoomLevel: datasetConfig.minZoomLevel,
+                format: format,
+                subsets: subsets,
+                tileGrid: {
+                    extent: aoiParams.extent,
+                    forceUniformResolution: true
+                },
+                crossOrigin: true,
+                wktFilter: aoiParams.wktFilter,
+                tileLoadFunction: tileLoadFunction,
+                colortable: colorTable,
+                colorrange: colorRange,
+                requestExtentOffset: datasetConfig.requestExtentOffset
+            };
         });
     };
 

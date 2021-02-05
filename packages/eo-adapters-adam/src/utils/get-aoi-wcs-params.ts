@@ -6,9 +6,9 @@ import { AoiValue } from '@oida/core';
 
 import { AdamDatasetConfig } from '../adam-dataset-config';
 
-export const getAoiWcsParams = (datasetConfig: AdamDatasetConfig, aoiFilter: AoiValue | undefined) => {
+export const getAoiWcsParams = (datasetConfig: AdamDatasetConfig, aoiFilter: AoiValue | undefined, currentCoverageExtent?: number[]) => {
 
-    let extent: number[] = datasetConfig.coverageExtent.slice();
+    let extent: number[] = currentCoverageExtent || datasetConfig.coverageExtent.slice();
     let wktFilter: string | undefined;
     let wcsSubsets: string[] = [];
 

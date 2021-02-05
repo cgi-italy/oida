@@ -5,7 +5,7 @@ import {
     RasterMapViz,
     RASTER_VIZ_TYPE,
     RasterMapVizConfig,
-    RasterBandModeType,
+    RasterBandModeType
 } from '@oida/eo-mobx';
 
 import { getPlottyColorScales } from '@oida/eo-geotiff';
@@ -13,19 +13,23 @@ import { getPlottyColorScales } from '@oida/eo-geotiff';
 import { AdamDatasetConfig, AdamDatasetRenderMode, isMultiBandCoverage } from '../../adam-dataset-config';
 import { AdamDatasetFactoryConfig } from '../../get-adam-dataset-factory';
 import { createAdamRasterTileSourceProvider } from './create-adam-raster-tile-source-provider';
+import { AdamSpatialCoverageProvider } from '../../get-adam-dataset-spatial-coverage-provider';
 
 
 export const getAdamRasterMapViewConfig = (
     axiosInstance: AxiosInstanceWithCancellation,
     factoryConfig: AdamDatasetFactoryConfig,
-    datasetConfig: AdamDatasetConfig
+    datasetConfig: AdamDatasetConfig,
+    spatialCoverageProvider: AdamSpatialCoverageProvider
 ) => {
 
     let afterInit: ((mapViz: RasterMapViz) => void) | undefined = undefined;
 
     let useRawData = datasetConfig.renderMode !== AdamDatasetRenderMode.ServerSide;
 
-    const {provider, tiffLoader} = createAdamRasterTileSourceProvider(factoryConfig, datasetConfig, axiosInstance, useRawData);
+    const {provider, tiffLoader} = createAdamRasterTileSourceProvider(
+        factoryConfig, datasetConfig, axiosInstance, spatialCoverageProvider, useRawData
+    );
 
     if (tiffLoader) {
         afterInit = (mapViz: RasterMapViz) => {
