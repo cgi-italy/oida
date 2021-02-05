@@ -2,6 +2,7 @@ import { autorun } from 'mobx';
 
 import { SubscriptionTracker, GeoImageLayerFootprint } from '@oida/core';
 import { GeoImageLayer } from '@oida/state-mobx';
+import { getMapModule } from '@oida/ui-react-mobx';
 import { DatasetViz, DatasetVizProps } from '@oida/eo-mobx';
 
 import { AdaptiveVideoLayer } from './adaptive-video-source';
@@ -14,7 +15,7 @@ export type DatasetVideoMapVizConfig = {
         start: Date,
         end: Date
     };
-    videoSource: string;
+    videoSource: string | string[];
     footprints: GeoImageLayerFootprint[];
     frameRate?: number;
     resolution?: number;
@@ -46,14 +47,24 @@ export class DatasetVideoMapViz extends DatasetViz<GeoImageLayer> {
     }
 
     dispose() {
+        this.source.dispose();
         this.subscriptionTracker_.unsubscribe();
     }
 
-    protected initMapLayer_() {
+    protected initMapLayer_(props: DatasetVideoMapVizProps) {
+
+        const mapState = getMapModule().map;
+
         this.source = new AdaptiveVideoLayer({
-            id: `${this.dataset.id}_video`,
-            footprints: this.config.footprints,
-            videoSource: this.config.videoSource
+            id: `${this.id}_video`,
+            footprints: props.config.footprints,
+            videoSource: props.config.videoSource,
+            frameRate: props.config.frameRate,
+            mapState: mapState,
+            onTimeUpdate: (time) => {
+                const dt = this.getDateFromFrameTime_(time);
+                this.dataset.setSelectedDate(dt);
+            }
         });
         return this.source.mapLayer;
     }
@@ -62,26 +73,57 @@ export class DatasetVideoMapViz extends DatasetViz<GeoImageLayer> {
     protected afterInit_() {
 
         const timeUpdateDisposer = autorun(() => {
-            const selectedTime = this.dataset.selectedTime;
-            if (!this.source.isPlaying) {
-                let time = selectedTime instanceof Date ? selectedTime : selectedTime?.end;
-                if (time) {
-                    if (time < this.config.timeRange.start) {
-                        time = this.config.timeRange.start;
+            if (this.source.ready) {
+                const selectedTime = this.dataset.selectedTime;
+                if (!this.source.isPlaying) {
+                    let time = selectedTime instanceof Date ? selectedTime : selectedTime?.end;
+                    if (time) {
+                        this.source.seekByPercentage(this.getVideoPercentageFromDate_(time));
                     }
-                    if (time > this.config.timeRange.end) {
-                        time = this.config.timeRange.end;
-                    }
-                    const percentage =
-                        (time.getTime() - this.config.timeRange.start.getTime())
-                        / (this.config.timeRange.end.getTime() - this.config.timeRange.start.getTime());
-
-                    this.source.seekByPercentage(percentage);
                 }
             }
         });
 
         this.subscriptionTracker_.addSubscription(timeUpdateDisposer);
+    }
+
+    protected getDateFromFrameTime_(time) {
+        const perdentage = time / this.source.duration;
+        const duration = this.config.duration
+        ? this.config.duration * 1000
+        : this.config.timeRange.end.getTime() - this.config.timeRange.start.getTime();
+
+        let dt = new Date(this.config.timeRange.start.getTime() + duration * perdentage);
+
+        if (this.config.frameRate) {
+            const frameDuration = 1000 / this.config.frameRate;
+            const distance = dt.getTime() - this.config.timeRange.start.getTime();
+            dt = new Date(this.config.timeRange.start.getTime() + frameDuration * Math.floor(distance / frameDuration));
+        }
+        return dt;
+    }
+
+    protected getVideoPercentageFromDate_(dt: Date) {
+        if (dt < this.config.timeRange.start) {
+            dt = this.config.timeRange.start;
+        }
+        if (dt > this.config.timeRange.end) {
+            dt = this.config.timeRange.end;
+        }
+
+        const duration = this.config.duration
+            ? this.config.duration * 1000
+            : this.config.timeRange.end.getTime() - this.config.timeRange.start.getTime();
+
+        let relativeTime = dt.getTime() - this.config.timeRange.start.getTime();
+
+        if (this.config.frameRate) {
+            relativeTime += (1000 / this.config.frameRate) * 0.5;
+        }
+
+        const percentage = relativeTime / duration;
+
+        return percentage;
     }
 }
 

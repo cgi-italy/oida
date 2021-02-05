@@ -58,6 +58,8 @@ export abstract class DatasetViz<T extends (MapLayer | undefined) = undefined> {
         this.widgetVisible = widgetVisible;
     }
 
+    dispose() {}
+
     protected clone_(specProps?: Record<string, any>) {
         return new (this.constructor as any)({
             parent: this.parent,

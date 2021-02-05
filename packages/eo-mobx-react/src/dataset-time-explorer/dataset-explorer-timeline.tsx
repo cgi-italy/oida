@@ -294,7 +294,7 @@ export const DatasetDiscoveryTimeline = (props: DatasetExplorerTimelineProps) =>
         end: moment.utc().toDate()
     });
     const [editableRanges, setEditableRanges] = useState<any>([]);
-    const [groupLabelsMode, setGroupLabelsMode] = useState(TimelineGroupLabelsMode.Hidden);
+    const [groupLabelsMode, setGroupLabelsMode] = useState(TimelineGroupLabelsMode.Block);
     const [timeSelectionMode, setTimeSelectionMode] = useState(DatasetTimelineTimeSelectionMode.Instant);
 
     const selectedDate = useSelector(() => props.explorerState.selectedDate);
@@ -363,7 +363,7 @@ export const DatasetDiscoveryTimeline = (props: DatasetExplorerTimelineProps) =>
 
                 timelineGroups.current.add({
                     id: groupId,
-                    className: datasetView.dataset.id,
+                    className: datasetView.dataset.id.toString(),
                     content: '',
                     datasetView: datasetView,
                     visible: true,

@@ -11,11 +11,11 @@ export type VideoTimeDistributionProviderConfig = {
 export class VideoTimeDistributionProvider implements DatasetTimeDistributionProvider {
 
     protected readonly timeRange_: {start: Date, end: Date};
-    protected readonly frameRateInMsec_: number | undefined;
+    protected readonly frameDuration_: number | undefined;
 
     constructor(config: VideoTimeDistributionProviderConfig) {
         this.timeRange_ = config.timeRange;
-        this.frameRateInMsec_ = config.frameRate ? config.frameRate * 1000 : undefined;
+        this.frameDuration_ = config.frameRate ? 1000 / config.frameRate : undefined;
     }
 
     supportsHistograms() {
@@ -32,20 +32,22 @@ export class VideoTimeDistributionProvider implements DatasetTimeDistributionPro
         } else if (timeRange.end < this.timeRange_.start) {
             return Promise.resolve([]);
         } else {
-            if (this.frameRateInMsec_ && resolution < this.frameRateInMsec_) {
+            if (this.frameDuration_ && resolution < this.frameDuration_) {
                 const distance = timeRange.start.getTime() - this.timeRange_.start.getTime();
-                let frame = this.timeRange_.start.getTime() + Math.floor(distance / this.frameRateInMsec_);
+                let frame = distance > 0
+                    ? this.timeRange_.start.getTime() + this.frameDuration_ * Math.floor(distance / this.frameDuration_)
+                    : this.timeRange_.start.getTime();
                 const end = this.timeRange_.end < timeRange.end ? this.timeRange_.end.getTime() : timeRange.end.getTime();
                 const distributionItems: TimeDistributionInstantItem[] = [];
-                while (frame < end) {
+                while (frame <= end) {
                     distributionItems.push({start: new Date(frame)});
-                    frame += this.frameRateInMsec_;
+                    frame += this.frameDuration_;
                 }
                 return Promise.resolve(distributionItems);
             } else {
                 return Promise.resolve([{
-                    start: this.timeRange_.start,
-                    end: this.timeRange_.end
+                    start: new Date(this.timeRange_.start),
+                    end: new Date(this.timeRange_.end)
                 }]);
             }
         }
@@ -58,9 +60,9 @@ export class VideoTimeDistributionProvider implements DatasetTimeDistributionPro
                 target = undefined;
             } else if (dt < this.timeRange_.start) {
                 target = this.timeRange_.start;
-            } else if (this.frameRateInMsec_) {
+            } else if (this.frameDuration_) {
                 const distance = dt.getTime() - this.timeRange_.start.getTime();
-                target = new Date(this.timeRange_.start.getTime() + Math.ceil(distance / this.frameRateInMsec_));
+                target = new Date(this.timeRange_.start.getTime() + this.frameDuration_ * Math.ceil(distance / this.frameDuration_));
             } else {
                 target = dt;
             }
@@ -69,14 +71,14 @@ export class VideoTimeDistributionProvider implements DatasetTimeDistributionPro
                 target = undefined;
             } else if (dt > this.timeRange_.end) {
                 target = this.timeRange_.end;
-            } else if (this.frameRateInMsec_) {
-                const distance = dt.getTime() - this.timeRange_.start.getTime();
-                target = new Date(this.timeRange_.start.getTime() + Math.floor(distance / this.frameRateInMsec_));
+            } else if (this.frameDuration_) {
+                const distance = dt.getTime() + 1 - this.timeRange_.start.getTime();
+                target = new Date(this.timeRange_.start.getTime() + this.frameDuration_ * Math.floor(distance / this.frameDuration_));
             } else {
                 target = dt;
             }
         }
-        return Promise.resolve(target ? {start: target} : undefined);
+        return Promise.resolve(target ? {start: new Date(target)} : undefined);
     }
 }
 

@@ -1,22 +1,22 @@
-import { observable, makeObservable, autorun, action } from 'mobx';
+import { observable, makeObservable, autorun, action, reaction } from 'mobx';
 
 import { LoadingState, GeoImageLayerFootprint, getGeometryExtent } from '@oida/core';
 import { Map, GeoImageLayer } from '@oida/state-mobx';
 
 import { createAdaptiveVideo } from './adaptive-video';
-
+import { VideoAdapter, DashVideoAdapter, HlsVideoAdapter, HtmlVideoAdapter, VideoStream } from './video-adapters';
 
 export type AdaptiveVideoLayerConfig = {
     id: string;
-    videoSource: string;
+    videoSource: string | string[];
     resolution?: number;
+    frameRate?: number;
     footprints: GeoImageLayerFootprint[];
     mapState?: Map;
+    onTimeUpdate?: (time: number) => void;
 };
 
-type AdaptiveStream = {
-    quality: number;
-    bitrate: number;
+type AdaptiveStream = VideoStream & {
     resolution: number;
 };
 
@@ -28,9 +28,12 @@ export class AdaptiveVideoLayer {
     protected readonly map_: Map | undefined;
 
     protected mediaElement_;
+    protected videoAdapter_: VideoAdapter | undefined;
     protected videoStreams_?: AdaptiveStream[];
     protected resolution_: number;
-    protected footprints_: GeoImageLayerFootprint[];
+    protected readonly frameDuration_: number;
+    protected readonly footprints_: GeoImageLayerFootprint[];
+    protected readonly timeUpdateCb_: ((time: number) => void) | undefined;
 
     constructor(config: AdaptiveVideoLayerConfig) {
 
@@ -41,12 +44,18 @@ export class AdaptiveVideoLayer {
                 dynamicFootprint: true,
                 srs: 'EPSG:4326'
             },
+            extent: getGeometryExtent({
+                type: 'MultiLineString',
+                coordinates: config.footprints
+            }),
             footprint: config.footprints[0]
         });
 
         this.footprints_ = config.footprints;
         this.resolution_ = config.resolution || 0;
+        this.frameDuration_ = 1 / (config.frameRate || 10);
         this.videoStreams_ = undefined;
+        this.timeUpdateCb_ = config.onTimeUpdate;
 
         this.ready = false;
         this.isPlaying = false;
@@ -60,26 +69,47 @@ export class AdaptiveVideoLayer {
         if (!this.isPlaying) {
             this.setPlayMode_();
         }
-
-        this.setPlayMode_();
     }
 
     stop() {
         if (this.isPlaying) {
-            this.setFrameMode_();
+            this.mediaElement_.pause();
         }
-    }
-
-    seek(time: number) {
-        this.mediaElement_.currentTime = time;
-    }
-
-    seekByPercentage(percentage: number) {
-        this.mediaElement_.currentTime = this.mediaElement_.duration * percentage;
     }
 
     get duration() {
         return this.mediaElement_.duration;
+    }
+
+    seek(time: number) {
+        if (time >= this.mediaElement_.duration) {
+            time = this.mediaElement_.duration - (this.frameDuration_ / 2);
+        }
+        if (time < 0) {
+            time = 0;
+        }
+        if (Math.abs(time - this.mediaElement_.currentTime) > this.frameDuration_ / 2) {
+            this.videoAdapter_?.seek(time);
+        }
+    }
+
+    seekByPercentage(percentage: number) {
+        this.seek(this.mediaElement_.duration * percentage);
+    }
+
+    stepForward() {
+        this.seek(this.mediaElement_.currentTime + this.frameDuration_);
+    }
+
+    stepBackward() {
+        this.seek(this.mediaElement_.currentTime - this.frameDuration_);
+    }
+
+    dispose() {
+        if (this.mediaElement_) {
+            document.body.removeChild(this.mediaElement_.renderer);
+            this.mediaElement_.remove();
+        }
     }
 
     get extent() {
@@ -98,89 +128,62 @@ export class AdaptiveVideoLayer {
         return this.footprints_[footprintIndex];
     }
 
-    protected initVideoObject_(videoSource: string) {
+    protected initVideoObject_(videoSource: string | string[]) {
 
         this.mapLayer.loadingStatus.setValue(LoadingState.Loading);
 
         createAdaptiveVideo(videoSource).then(({media}) => {
 
             this.mediaElement_ = media;
+            this.mediaElement_.setMuted(true);
 
-            media.addEventListener('loadedmetadata', () => {
+            // chrome has a lagging issue when HW acceleration is enabled and the video
+            // is not visible on the screen. Append the video element to body and make it
+            // 'almost' invisible
+            this.appendVideoElementToBody_();
 
-                this.mapLayer.setSource(media.renderer);
-                this.mediaElement_.setMuted(true);
-
-                const dashPlayer = media.dashPlayer;
-                if (dashPlayer) {
-                    const streams = dashPlayer.getBitrateInfoListFor('video');
-
-                    const fullResWidth = streams[streams.length - 1].width;
-                    if (!this.resolution_) {
-                        this.resolution_ = this.getVideoResolutionInMeters_(fullResWidth);
-                    }
-                    this.videoStreams_ = streams.map((stream, idx) => {
-                        return {
-                            quality: idx,
-                            resolution: fullResWidth / stream.width * this.resolution_,
-                            bitrate: stream.bitrate / 1000
-                        };
-                    });
-
-                    const map = this.map_;
-                    if (map) {
-                        autorun(() => {
-                            const resolution = map.view.viewport.resolution;
-                            this.onMapResolutionChange_(resolution);
-                        }, {
-                            delay: 1000
-                        });
-                    }
-                } else {
-                    if (!this.resolution_) {
-                        this.resolution_ = this.getVideoResolutionInMeters_(media.renderer.videoWidth);
-                    }
-                }
-
-                this.mediaElement_.addEventListener('waiting', (event) => {
-                    this.mapLayer.loadingStatus.setValue(LoadingState.Loading);
+            if (media.dashPlayer) {
+                this.videoAdapter_ = new DashVideoAdapter({
+                    dashPlayer: media.dashPlayer,
+                    videoElement: this.mediaElement_.renderer
                 });
-
-                this.mediaElement_.addEventListener('playing', (evt) => {
-                    this.mapLayer.loadingStatus.setValue(LoadingState.Success);
-                    this.mapLayer.forceRefresh();
+            } else if (media.hlsPlayer) {
+                this.videoAdapter_ = new HlsVideoAdapter({
+                    hlsPlayer: media.hlsPlayer,
+                    videoElement: this.mediaElement_.renderer
                 });
-
-                this.mediaElement_.addEventListener('seeked', (evt) => {
-                    this.mapLayer.loadingStatus.setValue(LoadingState.Success);
-                    this.updateFootprintForCurrentTime_();
-                    this.mapLayer.forceRefresh();
+            } else {
+                this.videoAdapter_ = new HtmlVideoAdapter({
+                    videoElement: this.mediaElement_.renderer
                 });
+            }
 
-                this.mediaElement_.addEventListener('seeking', (evt) => {
-                    this.mapLayer.loadingStatus.setValue(LoadingState.Loading);
-                });
+            const streams = this.videoAdapter_.getAvailableStreams();
 
-                this.setReady_();
-                this.setFrameMode_();
-
-            }, {
-                once: true
+            const fullResWidth = streams[streams.length - 1].width;
+            if (!this.resolution_) {
+                this.resolution_ = this.getVideoResolutionInMeters_(fullResWidth);
+            }
+            this.videoStreams_ = streams.map((stream) => {
+                return {
+                    ...stream,
+                    resolution: fullResWidth / stream.width * this.resolution_
+                };
             });
+
+            this.setFrameMode_();
+            this.forceFrameReload_();
+
         }).catch(() => {
             this.mapLayer.loadingStatus.setValue(LoadingState.Error);
         });
     }
 
-    protected getQualityForResolution_(resolution: number) {
+    protected getQualityForResolution_(resolution: number): AdaptiveStream | undefined {
 
         const videoStreams = this.videoStreams_;
         if (!videoStreams) {
-            return {
-                bitrate: -1,
-                quality: -1,
-                resolution: this.resolution_
-            };
+            return undefined;
         }
 
         for (let i = 0; i < videoStreams.length; ++i) {
@@ -198,114 +201,50 @@ export class AdaptiveVideoLayer {
 
     protected setPlayMode_() {
 
-        const dashPlayer = this.mediaElement_.dashPlayer;
-        if (dashPlayer) {
-            const initialBitrate = this.map_ ? this.getQualityForResolution_(this.map_.view.viewport.resolution).bitrate : -1;
-            this.mediaElement_.dashPlayer.resetSettings();
-            this.mediaElement_.dashPlayer.updateSettings({
-                streaming: {
-                    abr: {
-                        ABRStrategy: 'abrBola', // abrThroughput abrBola abrDynamic
-                        autoSwitchBitrate: {
-                            video: true
-                        },
-                        maxBitrate: {
-                            video: initialBitrate
-                        },
-                        initialBitrate: {
-                            video: initialBitrate
-                        }
-                    },
-                    fastSwitchEnabled: true
-                }
-            });
-        }
+        const preferredStream = this.map_ ? this.getQualityForResolution_(this.map_.view.viewport.resolution) : undefined;
+        this.videoAdapter_?.setPlayMode(preferredStream);
 
-        let lastFrameTs = -1;
+        this.mediaElement_.play();
+        this.setIsPlaying_(true);
+
+        let lastFrameTime = -1;
 
         const updateTexture = () => {
-            if (this.mediaElement_.currentTime !== lastFrameTs) {
-                console.log(this.mediaElement_.currentTime);
+            if (this.mediaElement_.currentTime - lastFrameTime > this.frameDuration_) {
                 this.updateFootprintForCurrentTime_();
                 this.mapLayer.forceRefresh();
-                lastFrameTs = this.mediaElement_.currentTime;
+                lastFrameTime = this.mediaElement_.currentTime;
+                if (this.timeUpdateCb_) {
+                    this.timeUpdateCb_(this.mediaElement_.currentTime);
+                }
             }
             if (this.isPlaying) {
                 requestAnimationFrame(updateTexture);
             }
         };
-        requestAnimationFrame(updateTexture);
+        updateTexture();
 
-        this.mediaElement_.play();
-        this.setIsPlaying_(true);
+
     }
 
     protected setFrameMode_() {
 
         this.setIsPlaying_(false);
-        this.mediaElement_.pause();
-
-        const dashPlayer = this.mediaElement_.dashPlayer;
-        if (dashPlayer) {
-            this.mediaElement_.dashPlayer.resetSettings();
-            dashPlayer.updateSettings({
-                streaming: {
-                    abr: {
-                        autoSwitchBitrate: {
-                            video: false
-                        }
-                    },
-                    reuseExistingSourceBuffers: false,
-                    flushBufferAtTrackSwitch: true,
-                    stableBufferTime: 0.5,
-                    bufferTimeAtTopQuality: 0.5,
-                    bufferTimeAtTopQualityLongForm: 0.5,
-                    bufferToKeep: 0
-                }
-            });
-
-            let frameQuality = 0;
-            if (this.map_) {
-                frameQuality = this.getQualityForResolution_(this.map_.view.viewport.resolution).quality;
-            } else if (this.videoStreams_) {
-                frameQuality = this.videoStreams_.length - 1;
-            }
-            dashPlayer.setQualityFor('video', frameQuality);
-            this.forceFrameReload_();
-
-        }
+        const preferredStream = this.map_
+            ? this.getQualityForResolution_(this.map_.view.viewport.resolution)
+            : this.videoStreams_ ? this.videoStreams_[this.videoStreams_.length - 1] : undefined;
+        this.videoAdapter_?.setFrameMode(preferredStream);
+        //this.forceFrameReload_();
     }
 
     protected onMapResolutionChange_(resolution: number) {
-
-        const dashPlayer = this.mediaElement_.dashPlayer;
-
-        if (dashPlayer) {
-            const quality = this.getQualityForResolution_(resolution);
-
-            if (this.isPlaying) {
-                const currentMaxBitrate = dashPlayer.getSettings().streaming.abr.maxBitrate.video;
-                if (quality.bitrate !== currentMaxBitrate) {
-                    console.log(`Updating max stream quality from ${currentMaxBitrate} to ${quality.bitrate}`);
-                    dashPlayer.updateSettings({
-                        streaming: {
-                            abr: {
-                                maxBitrate: {
-                                    video: quality.bitrate
-                                }
-                            }
-                        }
-                    });
-                }
-            } else {
-                const currentQuality = dashPlayer.getQualityFor('video');
-                if (quality.quality !== currentQuality) {
-                    dashPlayer.setQualityFor('video', quality.quality);
-                    this.forceFrameReload_();
-                }
+        const preferredStream = this.getQualityForResolution_(resolution);
+        if (preferredStream) {
+            const streamChanged = this.videoAdapter_?.setPreferredStream(preferredStream);
+            if (streamChanged && !this.isPlaying) {
+                this.forceFrameReload_();
             }
         }
-
     }
 
     protected getVideoResolutionInMeters_(videoWidth) {
@@ -326,6 +265,39 @@ export class AdaptiveVideoLayer {
 
     @action
     protected setReady_() {
+        this.videoAdapter_?.bindToAdapterEvents({
+            onSeeking: () => {
+                this.mapLayer.loadingStatus.update({
+                    value: LoadingState.Loading,
+                    percentage: 90
+                });
+            },
+            onSeeked: this.onFrameSeeked_.bind(this),
+            onPlaying: () => {
+                this.mapLayer.loadingStatus.setValue(LoadingState.Success);
+            },
+            onWaiting: () => {
+                if (this.isPlaying) {
+                    this.mapLayer.loadingStatus.update({
+                        value: LoadingState.Loading,
+                        percentage: 70
+                    });
+                }
+            },
+            onPlayEnd: () => {
+                this.setFrameMode_();
+            }
+        });
+
+        const map = this.map_;
+        if (map && this.videoStreams_?.length && this.videoStreams_.length > 1) {
+            reaction(() => map.view.viewport.resolution, (resolution) => {
+                this.onMapResolutionChange_(resolution);
+            }, {
+                delay: 1000
+            });
+        }
+
         this.ready = true;
     }
 
@@ -337,7 +309,40 @@ export class AdaptiveVideoLayer {
     protected forceFrameReload_() {
         const currentTime = this.mediaElement_.currentTime;
         this.mediaElement_.currentTime = Number.MAX_VALUE;
-        setImmediate(() => this.mediaElement_.currentTime = currentTime);
+        setImmediate(() => {
+            this.mediaElement_.currentTime = currentTime;
+            if (!this.ready) {
+
+                const onFirstSeek = () => {
+                    this.mapLayer.setSource(this.mediaElement_.renderer);
+                    this.setReady_();
+                    this.mediaElement_.removeEventListener('seeked', onFirstSeek);
+                };
+
+                this.mediaElement_.addEventListener('seeked', onFirstSeek);
+            }
+        });
+    }
+
+    protected onFrameSeeked_() {
+        if (!this.isPlaying) {
+            this.mapLayer.loadingStatus.setValue(LoadingState.Success);
+            this.updateFootprintForCurrentTime_();
+            this.mapLayer.forceRefresh();
+            if (this.timeUpdateCb_) {
+                this.timeUpdateCb_(this.mediaElement_.currentTime);
+            }
+        }
+    }
+
+    protected appendVideoElementToBody_() {
+        const videoElement: HTMLVideoElement = this.mediaElement_.renderer;
+        videoElement.style.position = 'absolute';
+        videoElement.style.top = '0px';
+        videoElement.style.right = '0px';
+        videoElement.style.width = '1px';
+        videoElement.style.zIndex = '1000';
+        document.body.append(videoElement);
     }
 }
 

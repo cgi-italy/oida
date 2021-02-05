@@ -29,7 +29,11 @@ export class DatasetExplorerItem {
 
     constructor(props: DatasetExplorerItemProps) {
         this.dataset = new Dataset({
-            config: props.datasetConfig
+            config: props.datasetConfig,
+            onSelectedDateUpdate: ((dt: Date) => {
+                // sync the dataset selected date with the global explorer selected date
+                props.explorer.setSelectedDate(dt);
+            })
         });
         this.explorer = props.explorer;
 
@@ -59,6 +63,9 @@ export class DatasetExplorerItem {
         if (this.pendingNearestTimeRequests_ && this.pendingNearestTimeRequests_.cancel) {
             this.pendingNearestTimeRequests_.cancel();
             this.pendingNearestTimeRequests_ = undefined;
+        }
+        if (this.mapViz) {
+            this.mapViz.dispose();
         }
 
         this.subscriptionTracker_.unsubscribe();
