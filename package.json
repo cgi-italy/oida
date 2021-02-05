@@ -127,6 +127,7 @@
     "@oida/eo-mobx": "file:packages\\eo-mobx",
     "@oida/eo-mobx-react": "file:packages\\eo-mobx-react",
     "@oida/eo-video": "file:packages\\eo-video",
+    "@oida/eo-video-react": "file:packages\\eo-video-react",
     "@oida/map-cesium": "file:packages\\map-cesium",
     "@oida/map-cesium-ol-tile-source": "file:packages\\map-cesium-ol-tile-source",
     "@oida/map-ol": "file:packages\\map-ol",

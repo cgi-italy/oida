@@ -33,3 +33,12 @@ export const useAppModule = <M extends AppModule> (id: string, moduleCtor: new(.
     return module as M;
 };
 
+export const getAppModule = <M extends AppModule> (id: string, moduleCtor: new(...args: any[]) => M) => {
+    let appStore = appStoreContext._currentValue;
+
+    let module = appStore.modules.getModule(id);
+    if (!(module instanceof moduleCtor)) {
+        throw new Error(`getAppModule: no module of type ${moduleCtor.name} with id '${id}' found`);
+    }
+    return module as M;
+};
