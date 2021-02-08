@@ -97,7 +97,13 @@ export const WmsDiscoveryProviderResults = (props: WmsDiscoveryProviderResultsPr
                 itemLayout='vertical'
                 paging={pagingProps}
                 sorting={sortingProps}
-                filters={filteringProps}
+                filters={filteringProps
+                    ? {
+                        ...filteringProps,
+                        mainFilter: 'search'
+                    }
+                    : undefined
+                }
                 autoScrollOnSelection={false}
             />
         </div>
