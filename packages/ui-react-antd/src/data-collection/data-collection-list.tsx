@@ -1,15 +1,12 @@
 import React from 'react';
 import classnames from 'classnames';
 
-import { Collapse, Button } from 'antd';
-import { FilterOutlined } from '@ant-design/icons';
-
 import { DataCollectionProps, DataPagerRenderer, DataSorterRenderer, DataFiltererRenderer } from '@oida/ui-react-core';
 
 import { DataCollectionItemsList, DataCollectionItemsListProps } from './data-collection-items-list';
 import { DataPager } from './data-pager';
 import { DataSortCombo } from './data-sort-combo';
-import { DataFilterer } from './data-filterer';
+import { AdvancedSearchFilterer } from './advanced-search-filterer';
 
 export type DataCollectionListProps<T> = {
     pagerRender?: DataPagerRenderer;
@@ -27,14 +24,10 @@ export class DataCollectionList<T> extends React.Component<DataCollectionListPro
             </div>
         ),
         sortRender: (props) => (
-            <DataSortCombo style={{width: '150px'}} {...props}></DataSortCombo>
+            <DataSortCombo {...props}></DataSortCombo>
         ),
         filtererRender: (props) => (
-            <Collapse destroyInactivePanel={true}>
-                <Collapse.Panel key='filter' header={<Button size='small'><FilterOutlined/></Button>} showArrow={false}>
-                    <DataFilterer {...props}></DataFilterer>
-                </Collapse.Panel>
-            </Collapse>
+            <AdvancedSearchFilterer {...props}></AdvancedSearchFilterer>
         )
     };
 
@@ -43,8 +36,8 @@ export class DataCollectionList<T> extends React.Component<DataCollectionListPro
         return  (
             <div className={classnames('data-collection-list', className)}>
                 <div className='filter-section'>
-                    {sorting && sortRender!(sorting)}
                     {filters && filtererRender!(filters)}
+                    {sorting && sortRender!(sorting)}
                 </div>
                 <DataCollectionItemsList<T>
                     {...items}

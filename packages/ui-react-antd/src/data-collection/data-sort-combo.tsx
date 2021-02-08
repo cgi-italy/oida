@@ -33,10 +33,9 @@ export const DataSortCombo = (props: SelectProps<string> & DataSorterProps) => {
     });
 
     return (
-        <InputGroup compact>
+        <InputGroup compact className='data-sort-combo'>
             <Select
                 {...selectProps}
-                size='small'
                 allowClear={true}
                 showSearch={true}
                 filterOption={true}
@@ -47,7 +46,7 @@ export const DataSortCombo = (props: SelectProps<string> & DataSorterProps) => {
                 {options}
             </Select>
             <Button
-                size='small'
+                size={selectProps.size}
                 disabled={!sortKey}
                 icon={sortOrder === SortOrder.Ascending ? <SortAscendingOutlined/> : <SortDescendingOutlined/>}
                 onClick={switchSortOrder}
