@@ -28,6 +28,14 @@ export class OLGeoImageLayer extends OLMapLayer<ImageLayer> implements IGeoImage
     updateSource(source: GeoImageLayerSource | undefined) {
         this.source_ = source;
         this.imageProjector_.setSource(source);
+        this.olImpl_.setSource(source ? new CanvasSource({
+            canvasFunction: (extent, resolution, pixelRatio, imgSize, projection) => {
+                this.imageProjector_.render(extent, imgSize);
+                return this.imageProjector_.getCanvas();
+            },
+            ratio: 1,
+            projection: 'EPSG:4326'
+        }) : undefined);
         this.forceRefresh();
     }
 
@@ -45,14 +53,14 @@ export class OLGeoImageLayer extends OLMapLayer<ImageLayer> implements IGeoImage
     protected createOLObject_(config) {
 
         const layer = new ImageLayer({
-            source: new CanvasSource({
+            source: config.source ? new CanvasSource({
                 canvasFunction: (extent, resolution, pixelRatio, imgSize, projection) => {
                     this.imageProjector_.render(extent, imgSize);
                     return this.imageProjector_.getCanvas();
                 },
                 ratio: 1,
                 projection: config.srs
-            }),
+            }) : undefined,
             extent: config.extent,
             zIndex: config.zIndex || 0
         });
