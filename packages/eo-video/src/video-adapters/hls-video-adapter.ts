@@ -36,6 +36,7 @@ export class HlsVideoAdapter implements VideoAdapter {
         } else {
             if (this.hlsPlayer_.currentLevel !== stream.id) {
                 this.hlsPlayer_.currentLevel = stream.id;
+                return true;
             }
         }
         return false;
