@@ -53,14 +53,15 @@ export const WmsDiscoveryProviderResults = (props: WmsDiscoveryProviderResultsPr
         }
     ];
 
-    useQueryCriteriaUrlBinding({
-        criteria: props.provider.criteria
-    });
+    // TODO: enable once the redirect base url issue is fixed
+    // useQueryCriteriaUrlBinding({
+    //     criteria: props.provider.criteria
+    // });
 
-    useQueryFiltersBreadcrumbBindingFromModule({
-        filtersConfig: searchFilters,
-        filteringState: props.provider.criteria.filters
-    });
+    // useQueryFiltersBreadcrumbBindingFromModule({
+    //     filtersConfig: searchFilters,
+    //     filteringState: props.provider.criteria.filters
+    // });
 
     const loadingState = useSelector(() => props.provider.loadingState.value);
 
