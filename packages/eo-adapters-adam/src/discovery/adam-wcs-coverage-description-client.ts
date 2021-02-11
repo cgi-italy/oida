@@ -1,7 +1,7 @@
 import proj4 from 'proj4';
 
 import { AxiosInstanceWithCancellation, createAxiosInstance,
-    getXmlStringNodeValue, SpatialReferenceOrgDefinitionProvider
+    getXmlStringNodeValue, EpsgIoDefinitionProvider
 } from '@oida/core';
 
 
@@ -27,7 +27,7 @@ export class AdamWcsCoverageDescriptionClient {
 
     protected readonly axiosInstance_: AxiosInstanceWithCancellation;
     protected readonly wcsUrl_: string;
-    protected readonly srsDefProvider_: SpatialReferenceOrgDefinitionProvider;
+    protected readonly srsDefProvider_: EpsgIoDefinitionProvider;
 
     protected domParser_ = new DOMParser();
     protected xmlNamespaces_ = {
@@ -40,7 +40,7 @@ export class AdamWcsCoverageDescriptionClient {
         this.axiosInstance_ = config.axiosInstance || createAxiosInstance();
         this.wcsUrl_ = config.wcsUrl;
 
-        this.srsDefProvider_ = new SpatialReferenceOrgDefinitionProvider({
+        this.srsDefProvider_ = new EpsgIoDefinitionProvider({
             axiosInstance: this.axiosInstance_
         });
     }

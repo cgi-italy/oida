@@ -7,3 +7,4 @@ export * from './time';
 export * from './color';
 export * from './xml-utils';
 export * from './spatial-reference-org-definition-provider';
+export * from './epsg-io-definition-provider';
