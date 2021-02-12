@@ -49,7 +49,8 @@ export const createGeoTiffLoader = (props: createGeotiffTileLoaderProps): Geotif
             url: source.url,
             postData: source.data,
             outputExtent: source.requestExtent,
-            outputSrs: source.requestSrs
+            outputSrs: source.requestSrs,
+            retryCount: 2
         }).then((response) => {
             if (!response) {
                 return '';

@@ -20,6 +20,7 @@ export type RenderFromUrlParams = {
     outputExtent?: number[];
     outputSrs?: string;
     disableCache?: boolean;
+    retryCount?: number;
 };
 
 export type RenderFromBufferParams = {
@@ -150,8 +151,22 @@ export class GeotiffRenderer {
                     canvas,
                     newSrsDefinition
                 };
+            }).catch(() => {
+                if (params.retryCount) {
+                    return this.renderFromUrl({
+                        ...params,
+                        retryCount: params.retryCount - 1
+                    });
+                }
+                return undefined;
             });
         }).catch(() => {
+            if (params.retryCount) {
+                return this.renderFromUrl({
+                    ...params,
+                    retryCount: params.retryCount - 1
+                });
+            }
             if (!params.disableCache) {
                 this.cache_.set(params.url, {
                     values: undefined
