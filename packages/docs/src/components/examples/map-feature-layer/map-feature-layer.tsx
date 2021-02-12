@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { useObserver, observer } from 'mobx-react';
+import React from 'react';
 
 import { Geometry } from '@oida/core';
 import { Map, FeatureLayer, TileLayer, IndexedCollection, Entity, GeometryState,  EntityProps,
@@ -8,11 +7,9 @@ import { Map, FeatureLayer, TileLayer, IndexedCollection, Entity, GeometryState,
 
 import { useMapMouseCoords } from '@oida/ui-react-mobx';
 
-// import { MapComponent } from '@oida/ui-react-mst';
-import { MapComponent } from '../../common/async-map-mobx';
-import BrowserOnly from '@docusaurus/BrowserOnly';
-import { useEffect } from 'react';
-import { autorun } from 'mobx';
+import { MapComponent } from '@oida/ui-react-mobx';
+
+import '@oida/map-cesium';
 
 type MyFeatureProps = {
     geometry: Geometry
@@ -51,7 +48,7 @@ const mouseCoordsInteraction = new MouseCoordsInteraction({
 const appState = new AppState({
     map: new Map({
         renderer: {
-            id: 'ol',
+            id: 'cesium',
             options: {}
         },
         view: {
@@ -134,7 +131,7 @@ const MouseCoords = () => {
     return <div>{mouseCoords.coords.lat} {mouseCoords.coords.lon}</div>;
 };
 
-export const MapFeatureLayer = () => {
+const MapFeatureLayer = () => {
     return (
         <React.Fragment>
             <MapComponent style={{height: '300px', width: '400px', position: 'relative'}} mapState={appState.map}/>
@@ -143,3 +140,4 @@ export const MapFeatureLayer = () => {
     );
 };
 
+export default MapFeatureLayer;

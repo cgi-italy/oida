@@ -1,0 +1,22 @@
+@import '~antd/lib/style/themes/default.less';
+@import '~antd/lib/style/mixins/index';
+
+// antd overrides some global rules modifying the docusaurus look'n'feel
+// scope the global rules inside the .oida-sample class
+.oida-sample {
+    @import '~antd/lib/style/core/base.less';
+
+    margin: 0; // 1
+    color: @text-color;
+    font-size: @font-size-base;
+    font-family: @font-family;
+    font-variant: @font-variant-base;
+    line-height: @line-height-base;
+    background-color: @body-background; // 2
+    font-feature-settings: @font-feature-settings-base;
+}
+
+@import '~antd/lib/style/core/iconfont';
+@import '~antd/lib/style/core/motion';
+
+@import '~antd/lib/style/components.less';

@@ -1,4 +1,11 @@
 const webpack = require('webpack');
+const path = require('path');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+
+const oidaNodeModulesDir = '../../node_modules';
+const cesiumSource = 'cesium/Source';
+const cesiumWorkers = '../Build/Cesium/Workers';
+const cesiumBaseUrl = 'Cesium';
 
 module.exports = function (context, options) {
     return {
@@ -25,6 +32,13 @@ module.exports = function (context, options) {
                     new webpack.DefinePlugin({
                         // Define relative base path in cesium for loading assets
                         CESIUM_BASE_URL: 'Cesium'
+                    }),
+                    new CopyWebpackPlugin({
+                        patterns: [
+                            { from: path.join(oidaNodeModulesDir, cesiumSource, cesiumWorkers), to: `${cesiumBaseUrl}/Workers` },
+                            { from: path.join(oidaNodeModulesDir, cesiumSource, 'Assets'), to: `${cesiumBaseUrl}/Assets` },
+                            { from: path.join(oidaNodeModulesDir, cesiumSource, 'Widgets'), to: `${cesiumBaseUrl}/Widgets` }
+                        ]
                     })
                 ]
             }

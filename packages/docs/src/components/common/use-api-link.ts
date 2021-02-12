@@ -2,7 +2,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 
 export type useApiLinkProps = {
-    module: 'core' | 'map-ol' | 'map-cesium' | 'state-mst' | 'ui-react-antd' | 'ui-react-core' | 'ui-react-mst' | 'eo' | 'eo-ui',
+    module: 'core' | 'map-ol' | 'map-cesium' | 'state-mobx' | 'ui-react-antd' | 'ui-react-core' | 'ui-react-mobx' | 'eo-mobx' | 'eo-mobx-react',
     category?: 'modules' | 'interfaces' | 'classes',
     element?: string
 };

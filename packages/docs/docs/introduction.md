@@ -13,4 +13,4 @@ OIDA (Online Interactive Data Analysis) is a set of typescript libraries designe
 
 ## map-cesium
 
-## state-mst
+## state-mobx

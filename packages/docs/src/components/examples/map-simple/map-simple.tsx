@@ -1,8 +1,8 @@
 import React from 'react';
 import { Map, TileLayer, MapLayer } from '@oida/state-mobx';
 
-// import { MapComponent } from '@oida/ui-react-mst';
-import { MapComponent } from '../../common/async-map-mobx';
+import { MapComponent } from '@oida/ui-react-mobx';
+import '@oida/map-ol';
 
 
 const mapState = new Map({
@@ -45,8 +45,8 @@ mapState.layers.children.add([
 ]);
 
 
-
-export const MapMobx = () => {
+const MapMobx = () => {
     return (<MapComponent style={{height: '300px', width: '400px', position: 'relative'}} mapState={mapState}/>);
 };
 
+export default MapMobx;

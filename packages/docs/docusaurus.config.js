@@ -2,6 +2,7 @@ const path = require('path');
 
 const deploymentUrl = process.env.DEPLOYMENT_URL || 'http://localhost:3000';
 const baseUrl = process.env.BASE_URL || '/';
+const gitlabRepoUrl = process.env.GITLAB_URL || 'https://gitlab.dev.eoss-cloud.it/frontend/oida';
 const gitlabBranch = process.env.GITLAB_BRANCH || 'master';
 
 module.exports = {
@@ -34,7 +35,7 @@ module.exports = {
                     position: 'left'
                 },
                 {
-                    href: 'https://gitlab.dev.eoss-cloud.it/frontend/oida',
+                    href: `${gitlabRepoUrl}`,
                     label: 'Gitlab',
                     position: 'right',
                     className: 'gitlab-link'
@@ -53,7 +54,7 @@ module.exports = {
                         },
                         {
                             label: 'Examples',
-                            to: 'docs/examples/',
+                            to: 'docs/examples/map-simple',
                         },
                     ],
                 },
@@ -65,12 +66,8 @@ module.exports = {
                             to: 'blog',
                         },
                         {
-                            label: 'Blog',
-                            to: 'blog',
-                        },
-                        {
                             label: 'Gitlab',
-                            href: 'https://gitlab.dev.eoss-cloud.it/frontend/oida',
+                            href: `${gitlabRepoUrl}`,
                         },
                     ],
                 },
@@ -86,13 +83,13 @@ module.exports = {
                     sidebarPath: require.resolve('./sidebars.js'),
                     // Please change this to your repo.
                     editUrl:
-                        `https://gitlab.dev.eoss-cloud.it/frontend/oida/edit/${gitlabBranch}/packages/docs`,
+                        `${gitlabRepoUrl}/edit/${gitlabBranch}/packages/docs`,
                 },
                 blog: {
                     showReadingTime: true,
                     // Please change this to your repo.
                     editUrl:
-                        `https://gitlab.dev.eoss-cloud.it/frontend/oida/edit/${gitlabBranch}/packages/docs`,
+                        `${gitlabRepoUrl}/edit/${gitlabBranch}/packages/docs`,
                 },
                 theme: {
                     customCss: require.resolve('./src/css/custom.css'),
@@ -113,6 +110,7 @@ module.exports = {
         path.resolve(__dirname, 'plugins/custom-webpack-config')
     ],
     customFields: {
-        typedocsLocation: 'typedocs'
+        typedocsLocation: 'typedocs',
+        gitlabDocsUrl: `${gitlabRepoUrl}/blob/${gitlabBranch}/packages/docs`
     }
 };

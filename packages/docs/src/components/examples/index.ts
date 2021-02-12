@@ -1,2 +1,1 @@
-export * from './map-simple';
-export * from './map-mobx';
+export * from './browser-sample';

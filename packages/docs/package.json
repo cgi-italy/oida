@@ -1,19 +1,18 @@
 {
   "name": "@oida/docs",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
   "scripts": {
     "docusaurus": "docusaurus",
     "start": "docusaurus start",
-    "build": "docusaurus build",
+    "build:docs": "docusaurus build --out-dir dist",
     "swizzle": "docusaurus swizzle",
-    "deploy": "docusaurus deploy",
-    "serve": "docusaurus serve"
+    "serve": "docusaurus serve --dir dist"
   },
   "dependencies": {
-    "@docusaurus/core": "2.0.0-alpha.64",
-    "@docusaurus/preset-classic": "2.0.0-alpha.64",
-    "@mdx-js/react": "^1.5.8",
+    "@docusaurus/core": "2.0.0-alpha.70",
+    "@docusaurus/preset-classic": "2.0.0-alpha.70",
+    "@mdx-js/react": "^1.6.22",
     "clsx": "^1.1.1",
     "docusaurus-plugin-less": "^1.0.3",
     "iframe-resizer-react": "^1.0.4"
@@ -23,10 +22,10 @@
     "react-dom": "^16.x"
   },
   "devDependencies": {
-    "@docusaurus/module-type-aliases": "^2.0.0-alpha.51",
+    "@docusaurus/module-type-aliases": "^2.0.0-alpha.70",
     "@tsconfig/docusaurus": "^1.0.2",
     "@types/react-helmet": "^6.1.0",
-    "typescript": "^4.0.3"
+    "typescript": "^4.1.5"
   },
   "browserslist": {
     "production": [
