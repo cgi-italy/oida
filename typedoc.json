@@ -1,21 +1,20 @@
 {
-  "mode": "modules",
   "exclude": [
     "node_modules/**",
     "**/*.spec.ts",
-    "./packages/samples-mst-antd/**",
-    "./packages/state-mst/**",
-    "./packages/docs/**",
-    "./packages/docz/**"
+    "./packages/docs/**"
   ],
   "out": "docs",
+  "entryPoints": [
+    "./packages/core/src/index.ts",
+    "./packages/map-ol/src/index.ts",
+    "./packages/map-cesium/src/index.ts",
+    "./packages/state-mobx/src/index.ts"
+  ],
   "name": "oida",
   "excludeExternals": false,
-  "includeDeclarations": false,
-  "plugin": ["typedoc-plugin-sourcefile-url", "typedoc-plugin-lerna-packages", "typedoc-plugin-exclude-references"],
-  "lernaExclude": [
-    "@oida/samples-mst-antd"
-  ],
+  "includes": "./packages",
+  "plugin": ["typedoc-plugin-sourcefile-url"],
   "readme": "README.md",
-  "sourcefile-url-map": "typedoc-git-mapping.json"
+  "sourcefile-url-prefix": "https://gitlab.dev.eoss-cloud.it/frontend/oida/blob/master/packages/"
 }

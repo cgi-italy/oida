@@ -5,10 +5,13 @@
     "jsx": "react",
     "baseUrl": "./",
     "paths": {
-      "@oida/*": ["packages/*"]
+      "@oida/*": ["packages/*/src"]
     }
   },
   "include": [
-    "packages/**/src/**/*"
+    "packages/**/src/*"
+  ],
+  "exclude": [
+    "packages/docs/*"
   ]
 }
