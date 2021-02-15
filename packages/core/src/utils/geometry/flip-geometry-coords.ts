@@ -3,12 +3,12 @@ import flip from '@turf/flip';
 
 import { Geometry } from '../../types';
 
-export const flipGeometryCoords = (geometry: Geometry) => {
+export const flipGeometryCoords: (geometry: Geometry) => Geometry = (geometry: Geometry) => {
     if (geometry.type === 'GeometryCollectionEx') {
         return {
             type: geometry.type,
             geometries: geometry.geometries.map((geometry) => {
-                flipGeometryCoords(geometry);
+                return flipGeometryCoords(geometry);
             })
         };
     }
