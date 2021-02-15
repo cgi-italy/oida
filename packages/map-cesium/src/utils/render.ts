@@ -2,6 +2,10 @@ import JulianDate from 'cesium/Source/Core/JulianDate';
 
 const updateVisualizers = (dataSource, time) => {
 
+    if (!time) {
+        return true;
+    }
+
     let pendingUpdate = false;
 
     let visualizers = dataSource._visualizers;
@@ -31,7 +35,9 @@ export const updateDataSource = (dataSource, scene) => {
         };
 
         scene.postRender.addEventListener(postRenderCallback);
-        setTimeout(() => scene.requestRender(), 20);
+        if (scene.lastRenderTime) {
+            setTimeout(() => scene.requestRender(), 20);
+        }
     } else {
         scene.requestRender();
     }
