@@ -7,12 +7,12 @@ import { Tooltip } from 'antd';
 import { LinkOutlined, DragOutlined } from '@ant-design/icons';
 
 import { AoiSupportedGeometry, AoiAction, AoiValue } from '@oida/core';
-import { DatasetAnalysis } from '@oida/eo-mobx';
+import { DatasetAnalysis, SharedAoi } from '@oida/eo-mobx';
 import { AoiFieldRenderer } from '@oida/ui-react-antd';
 import { useMapAoiDrawerFromModule, useAoiAction, useSelector } from '@oida/ui-react-mobx';
 
 import { useAnalysisGeometryFromModule } from './use-analysis-geometry';
-import { SharedAoi } from '@oida/eo-mobx/types/models/shared-aoi';
+
 
 export type AnalysisAoiFilterProps = {
     analysis: DatasetAnalysis<any>

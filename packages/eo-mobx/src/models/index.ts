@@ -1,6 +1,7 @@
 export * from './dataset-dimensions';
 export * from './color-map';
 export * from './vertical-scale';
+export * from './shared-aoi';
 export * from './dataset';
 export * from './dataset-viz';
 export * from './raster-band-mode';
