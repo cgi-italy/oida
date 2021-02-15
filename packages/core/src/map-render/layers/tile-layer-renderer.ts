@@ -1,5 +1,7 @@
 import { ILayerRenderer } from './map-layer-renderer';
 
+export type TileSource = Record<string, any>;
+
 export type TileGridConfig = {
     tileSize?: number | number[];
     gridSize?: number[];
