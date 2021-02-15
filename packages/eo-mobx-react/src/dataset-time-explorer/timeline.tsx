@@ -5,17 +5,17 @@ import { DateRange } from '@oida/core';
 
 import moment from 'moment';
 
-import { DataSet } from 'vis-data/esnext';
+import { DataSet } from 'vis-data/peer';
 
 // @ts-ignore
-import { timeline as timelineExports } from 'vis-timeline/esnext';
+import { timeline as timelineExports } from 'vis-timeline/peer';
 
 import {
     Timeline as VisTimeline,
     TimelineItem, TimelineGroup,
     TimelineOptions, TimelineOptionsTemplateFunction,
     TimelineEventPropertiesResult
-} from 'vis-timeline/esnext';
+} from 'vis-timeline/peer';
 
 import 'vis-timeline/dist/vis-timeline-graph2d.css';
 

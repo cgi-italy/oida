@@ -3,8 +3,8 @@ import ReactDOM from 'react-dom';
 
 import { autorun } from 'mobx';
 
-import { TimelineGroup, TimelineItem, TimelineEventPropertiesResult } from 'vis-timeline/esnext';
-import { DataSet } from 'vis-data/esnext';
+import { TimelineGroup, TimelineItem, TimelineEventPropertiesResult } from 'vis-timeline/peer';
+import { DataSet } from 'vis-data/peer';
 import moment from 'moment';
 
 import { Button, Tooltip } from 'antd';
