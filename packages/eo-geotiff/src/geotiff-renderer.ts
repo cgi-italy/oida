@@ -282,8 +282,17 @@ export class GeotiffRenderer {
     }
 
     protected getImageSrs_(image) {
-        let imageSrs: string = image.geoKeys.ProjectedCSTypeGeoKey || image.geoKeys.GeographicTypeGeoKey;
-        return imageSrs ? `EPSG:${imageSrs}` : undefined;
+        const imageSrs: number = image.geoKeys.ProjectedCSTypeGeoKey || image.geoKeys.GeographicTypeGeoKey;
+        if (imageSrs) {
+            if (imageSrs < 32767) {
+                return  `EPSG:${imageSrs}`;
+            } else {
+                // user defined srs (http://geotiff.maptools.org/spec/geotiff6.html#6.3.3.1)
+                return undefined;
+            }
+        } else {
+            return undefined;
+        }
     }
 
     protected wrapImage_(sourceCanvas: HTMLCanvasElement, sourceExtent: number[], outputExtent: number[]) {
