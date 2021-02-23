@@ -2,8 +2,9 @@
 import { AxiosInstanceWithCancellation } from '@oida/core';
 
 import { DatasetVerticalProfileViz, RasterBandModeSingle } from '@oida/eo-mobx';
-import { createGeoTiffLoader } from '@oida/eo-geotiff';
 
+
+import { createGeoTiffLoader } from '../../utils';
 import { ADAM_WCS_SOURCE_ID } from '../adam-wcs-tile-source';
 import { AdamDatasetConfig, isMultiBandCoverage } from '../../adam-dataset-config';
 import { AdamDatasetFactoryConfig } from '../../get-adam-dataset-factory';

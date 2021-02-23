@@ -1,8 +1,10 @@
 import LruCache from 'lru-cache';
+import proj4 from 'proj4';
+import { register } from 'ol/proj/proj4';
 
 import { AxiosInstanceWithCancellation } from '@oida/core';
-import { GeotiffRenderer } from './geotiff-renderer';
-import { PlottyRenderer } from './plotty-renderer';
+import { GeotiffRenderer } from '@oida/eo-geotiff';
+import { PlottyRenderer } from '@oida/eo-geotiff';
 
 
 export type createGeotiffTileLoaderProps = {
@@ -55,6 +57,9 @@ export const createGeoTiffLoader = (props: createGeotiffTileLoaderProps): Geotif
             if (!response) {
                 return '';
             } else {
+                if (response.newSrsDefinition) {
+                    register(proj4);
+                }
                 if (getRotatedImage) {
                     return getRotatedImage(response.canvas);
                 } else {

@@ -2,8 +2,8 @@ import debounce from 'lodash/debounce';
 
 import { AxiosInstanceWithCancellation } from '@oida/core';
 import { DatasetVerticalProfileViz, VerticalProfileItemProps, RasterBandModeSingle } from  '@oida/eo-mobx';
-import { createGeoTiffLoader } from '@oida/eo-geotiff';
 
+import { createGeoTiffLoader } from '../../utils';
 import { AdamDatasetConfig, AdamDatasetSingleBandCoverage, isMultiBandCoverage } from '../../adam-dataset-config';
 import { AdamDatasetFactoryConfig } from '../../get-adam-dataset-factory';
 import { AdamWcsVerticalProfileDataProvider } from './adam-wcs-vertical-profile-data-provider';

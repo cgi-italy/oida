@@ -4,3 +4,4 @@ export * from './get-wcs-time-filter-subset';
 export * from './get-aoi-wcs-params';
 export * from './get-coverage-wcs-params';
 export * from './get-colormap-wcs-params';
+export * from './create-geotiff-loader';

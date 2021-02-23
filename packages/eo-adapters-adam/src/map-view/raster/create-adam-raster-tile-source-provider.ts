@@ -2,10 +2,9 @@ import { AxiosInstanceWithCancellation } from '@oida/core';
 import {
     RasterMapViz, RasterBandModeSingle, RasterBandModePreset, RasterBandModeCombination, RasterBandMode
 } from '@oida/eo-mobx';
-import { createGeoTiffLoader, GeotiffLoader } from '@oida/eo-geotiff';
 
 import { ADAM_WCS_SOURCE_ID } from '../adam-wcs-tile-source';
-import { getWcsTimeFilterSubset, getAoiWcsParams, getCoverageWcsParams, getColormapWcsParams } from '../../utils';
+import { getWcsTimeFilterSubset, getAoiWcsParams, getCoverageWcsParams, getColormapWcsParams, createGeoTiffLoader, GeotiffLoader } from '../../utils';
 import { AdamDatasetConfig, isMultiBandCoverage, AdamDatasetCoverageBand } from '../../adam-dataset-config';
 import { AdamDatasetFactoryConfig } from '../../get-adam-dataset-factory';
 import { AdamSpatialCoverageProvider } from '../../get-adam-dataset-spatial-coverage-provider';
@@ -73,15 +72,14 @@ export const createAdamRasterTileSourceProvider = (
 
         let timeSubset = getWcsTimeFilterSubset(rasterView.dataset.selectedTime);
         if (!timeSubset) {
-            return Promise.resolve(undefined);
+            return Promise.reject(new Error('The layer time span is outside of the selected time range'));
         } else {
             subsets.push(timeSubset);
         }
 
         const aoiParams = getAoiWcsParams(datasetConfig, rasterView.dataset.aoiFilter);
         if (!aoiParams) {
-            //the coverage is outside of the currently selected aoi
-            return Promise.resolve(undefined);
+            return Promise.reject(new Error('The layer extent does not intersect the selected area of interest'));
         }
 
         const bandMode = rasterView.bandMode;
@@ -117,8 +115,7 @@ export const createAdamRasterTileSourceProvider = (
             const aoiParams = getAoiWcsParams(datasetConfig, rasterView.dataset.aoiFilter, coverageExtent);
 
             if (!aoiParams) {
-                //the coverage is outside of the currently selected aoi
-                return undefined;
+                return Promise.reject(new Error('The layer extent does not intersect the selected area of interest'));
             }
 
             return {

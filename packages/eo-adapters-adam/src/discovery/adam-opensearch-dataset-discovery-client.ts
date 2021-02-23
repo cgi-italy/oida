@@ -138,7 +138,6 @@ export class AdamOpensearchDatasetDiscoveryClient {
                 }];
 
                 if (variable.grid && variable.gridNames) {
-                    //TODO: remove the reverse once the discovery metadata are coherent
                     variable.gridNames.forEach((gridName, idx) => {
                         dimensions.push({
                             id: gridName.id,
