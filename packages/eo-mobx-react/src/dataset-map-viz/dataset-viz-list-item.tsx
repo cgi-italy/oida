@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 
 import { List, Button, Badge, Tooltip } from 'antd';
 import {
-    FullscreenExitOutlined, SettingOutlined, BarChartOutlined,
+    AimOutlined, SettingOutlined, BarChartOutlined,
     DownloadOutlined, EyeOutlined, EyeInvisibleOutlined, DragOutlined,
-    CloseOutlined
+    CloseOutlined, WarningOutlined
 } from '@ant-design/icons';
 import { SortableHandle } from 'react-sortable-hoc';
 
@@ -16,6 +16,7 @@ import { DatasetVizSettingsFactory } from './dataset-viz-settings-factory';
 import { MapLayer } from '@oida/state-mobx';
 import { DatasetVizDownloadModal } from './dataset-viz-download';
 import { DatasetToolsMenu } from './dataset-tools-menu';
+import { LoadingState } from '@oida/core';
 
 export type DatasetVizListItemProps = {
     datasetExplorer: DatasetExplorer;
@@ -43,68 +44,77 @@ export const DatasetVizListItem = (props: DatasetVizListItemProps) => {
 
     let centerOnMap = useCenterOnMapFromModule();
 
-    let actions: any[] = [];
-
-    const spatialCoverageProvider = props.datasetViz.dataset.config.spatialCoverageProvider;
-    if (spatialCoverageProvider) {
-        actions.push({
-            id: 'areaZoom',
-            icon: <FullscreenExitOutlined/>,
-            title: 'Zoom to dataset area',
-            callback: () => {
-                spatialCoverageProvider(props.datasetViz).then((extent) => {
-                    centerOnMap({
-                        type: 'BBox',
-                        bbox: extent as GeoJSON.BBox
-                    }, {animate: true});
-                });
-            }
-        });
-    }
-
-    const settingsContent = DatasetVizSettingsFactory.create(props.datasetViz.vizType, {
-        datasetViz: props.datasetViz
+    const loadingState = useSelector(() => {
+        return {
+            value: props.datasetViz.mapLayer.loadingStatus.value,
+            message: props.datasetViz.mapLayer.loadingStatus.message
+        };
     });
 
-    if (settingsContent) {
-        actions.push({
-            id: 'settings',
-            icon: <SettingOutlined/>,
-            title: 'Toggle visualization settings',
-            content: settingsContent,
-            callback: () => {
-                if (activeAction !== 'settings') {
-                    setActiveAction('settings');
-                } else {
-                    setActiveAction(undefined);
+    let actions: any[] = [];
+
+    if (loadingState.value !== LoadingState.Error) {
+        const spatialCoverageProvider = props.datasetViz.dataset.config.spatialCoverageProvider;
+        if (spatialCoverageProvider) {
+            actions.push({
+                id: 'areaZoom',
+                icon: <AimOutlined/>,
+                title: 'Zoom to dataset area',
+                callback: () => {
+                    spatialCoverageProvider(props.datasetViz).then((extent) => {
+                        centerOnMap({
+                            type: 'BBox',
+                            bbox: extent as GeoJSON.BBox
+                        }, {animate: true});
+                    });
                 }
-            }
-        });
-    }
+            });
+        }
 
-    if (props.datasetViz.dataset.config.tools?.length) {
-        actions.push({
-            id: 'tools',
-            icon: <BarChartOutlined/>,
-            title: 'Toggle dataset tools',
-            menu: <DatasetToolsMenu
-                datasetViz={props.datasetViz}
-                datasetExplorer={props.datasetExplorer}
-                icon={<BarChartOutlined/>}
-                key='tools'
-            />
+        const settingsContent = DatasetVizSettingsFactory.create(props.datasetViz.vizType, {
+            datasetViz: props.datasetViz
         });
-    }
 
-    if (props.datasetViz.dataset.config.download) {
-        actions.push(        {
-            id: 'download',
-            icon: <DownloadOutlined/>,
-            title: 'Download',
-            callback: () => {
-                setDownloadVisible(true);
-            }
-        });
+        if (settingsContent) {
+            actions.push({
+                id: 'settings',
+                icon: <SettingOutlined/>,
+                title: 'Toggle visualization settings',
+                content: settingsContent,
+                callback: () => {
+                    if (activeAction !== 'settings') {
+                        setActiveAction('settings');
+                    } else {
+                        setActiveAction(undefined);
+                    }
+                }
+            });
+        }
+
+        if (props.datasetViz.dataset.config.tools?.length) {
+            actions.push({
+                id: 'tools',
+                icon: <BarChartOutlined/>,
+                title: 'Toggle dataset tools',
+                menu: <DatasetToolsMenu
+                    datasetViz={props.datasetViz}
+                    datasetExplorer={props.datasetExplorer}
+                    icon={<BarChartOutlined/>}
+                    key='tools'
+                />
+            });
+        }
+
+        if (props.datasetViz.dataset.config.download) {
+            actions.push(        {
+                id: 'download',
+                icon: <DownloadOutlined/>,
+                title: 'Download',
+                callback: () => {
+                    setDownloadVisible(true);
+                }
+            });
+        }
     }
 
 
@@ -129,6 +139,18 @@ export const DatasetVizListItem = (props: DatasetVizListItemProps) => {
                 </Button>
                 <Badge color={vizState.color}></Badge>
                 <div className='viz-item-name' title={vizState.name}>{vizState.name}</div>
+                {loadingState.value === LoadingState.Error &&
+                    <div className='viz-item-error'>
+                        <Tooltip title={loadingState.message}>
+                            <Button
+                                size='small'
+                                type='link'
+                            >
+                                <WarningOutlined />
+                            </Button>
+                        </Tooltip>
+                    </div>
+                }
                 <div className='viz-item-actions'>
                 {
                     actions.map((action) => {

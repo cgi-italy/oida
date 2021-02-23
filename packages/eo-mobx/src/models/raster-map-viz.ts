@@ -99,8 +99,13 @@ export class RasterMapViz extends DatasetViz<TileLayer> implements HasDatasetDim
                 if (sourceConfig) {
                     this.mapLayer.setExtent(sourceConfig.extent);
                 }
-            }).finally(() => {
                 this.mapLayer.loadingStatus.setValue(LoadingState.Init);
+            }).catch((error) => {
+                this.mapLayer.setSource(undefined);
+                this.mapLayer.loadingStatus.update({
+                    value: LoadingState.Error,
+                    message: error.message
+                });
             });
         }, {
             delay: 1000

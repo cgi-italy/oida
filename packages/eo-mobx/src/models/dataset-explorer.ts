@@ -120,14 +120,20 @@ export class DatasetExplorerItem {
             this.pendingNearestTimeRequests_ = timeDistributionProvider.getNearestItem(
                 filter.value, TimeSearchDirection.Backward
             ).then((item) => {
-                let currentDatasetTime = this.dataset.filters.get(DATASET_SELECTED_TIME_FILTER_KEY)?.value;
-                let nearestMatch = item ? item.start : filter.value;
-                if (!currentDatasetTime || currentDatasetTime.getTime() !== nearestMatch.getTime()) {
-                    this.dataset.filters.set(
-                        DATASET_SELECTED_TIME_FILTER_KEY,
-                        nearestMatch,
-                        filter.type
+                if (!item || !item.start) {
+                    this.dataset.filters.unset(
+                        DATASET_SELECTED_TIME_FILTER_KEY
                     );
+                } else {
+                    let currentDatasetTime = this.dataset.filters.get(DATASET_SELECTED_TIME_FILTER_KEY)?.value;
+                    let nearestMatch = item.start;
+                    if (!currentDatasetTime || currentDatasetTime.getTime() !== nearestMatch.getTime()) {
+                        this.dataset.filters.set(
+                            DATASET_SELECTED_TIME_FILTER_KEY,
+                            nearestMatch,
+                            filter.type
+                        );
+                    }
                 }
             });
         } else {
