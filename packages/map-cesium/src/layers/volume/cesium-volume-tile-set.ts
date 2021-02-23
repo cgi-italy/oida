@@ -37,10 +37,15 @@ export class CesiumVolumeTileSet {
             uniform float noDataValue;
             uniform sampler2D colorMapTexture;
 
+            bool isNan( float val ) {
+                return ( val < 0.0 || 0.0 < val || val == 0.0 ) ? false : true;
+            }
+
             vec4 applyColorMap(float value) {
-                if (value == noDataValue) {
+                if (value == noDataValue || isNan(value)) {
                     return vec4(0.0, 0.0, 0.0, 0.0);
                 }
+
                 if (!clampRange && (value < mapRange[0] || value > mapRange[1])) {
                     return vec4(0.0, 0.0, 0.0, 0.0);
                 }
