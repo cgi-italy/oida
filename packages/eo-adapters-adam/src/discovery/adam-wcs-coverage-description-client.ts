@@ -6,6 +6,7 @@ import { AxiosInstanceWithCancellation, createAxiosInstance,
 
 
 export type AdamWcsCoverageDescription = {
+    id: string;
     srs: string;
     srsDef?: string;
     time: {
@@ -75,6 +76,11 @@ export class AdamWcsCoverageDescriptionClient {
         try {
             const coverageDescription = doc.getElementsByTagNameNS(this.xmlNamespaces_.wcs, 'CoverageDescription')[0];
 
+            const coverageId = coverageDescription.getAttributeNS(this.xmlNamespaces_.gml, 'id');
+            if (!coverageId) {
+                throw new Error();
+            }
+
             const envelope = coverageDescription.getElementsByTagNameNS(this.xmlNamespaces_.gml, 'Envelope')[0];
             const axesAttr = envelope.getAttribute('axisLabels');
 
@@ -127,6 +133,7 @@ export class AdamWcsCoverageDescriptionClient {
             }
 
             return {
+                id: coverageId,
                 srs,
                 time: {
                     start: new Date(lowerCorner[timeAxisIdx] * 1000),
