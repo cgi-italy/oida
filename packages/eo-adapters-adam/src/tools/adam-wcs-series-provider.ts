@@ -129,7 +129,7 @@ export class AdamWcsSeriesProvider  {
                 paramsSerializer: AdamServiceParamsSerializer
             }).then((response) => {
                 return this.parseWcsResponse_(response.data, dimensionConfig!).then((data) => {
-                    const noData = variableConfig?.domain.noData;
+                    const noData = variableConfig?.domain?.noData;
                     if (noData !== undefined) {
                         return data.filter(item => item.y !== noData);
                     } else {

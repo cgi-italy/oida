@@ -1,6 +1,7 @@
 import proj4 from 'proj4';
 import { register } from 'ol/proj/proj4';
 import { transformExtent } from 'ol/proj';
+import { getIntersection } from 'ol/extent';
 import { fromArrayBuffer } from 'geotiff';
 
 import { AxiosInstanceWithCancellation } from '@oida/core';
@@ -74,7 +75,11 @@ export const getAdamDatasetSpatialCoverageProvider = (
                         let extent = image.getBoundingBox();
                         if (!keepDatasetSrs && datasetConfig.coverageSrs !== 'EPSG:4326') {
                             extent = transformExtent(extent, datasetConfig.coverageSrs, 'EPSG:4326');
+                            extent = getIntersection(extent, geogCoverageExtent);
+                        } else {
+                            extent = getIntersection(extent, datasetConfig.coverageExtent);
                         }
+
                         if (datasetConfig.requestExtentOffset) {
                             extent[0] -= datasetConfig.requestExtentOffset[0];
                             extent[2] -= datasetConfig.requestExtentOffset[0];

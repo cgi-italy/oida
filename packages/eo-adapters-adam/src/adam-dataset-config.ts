@@ -19,13 +19,13 @@ export type AdamDatasetSingleBandCoverage = Omit<RasterBandConfig, 'domain'> & {
         value: string;
         idx?: number;
     };
-    domain: ValueDomain<number>
+    domain?: ValueDomain<number>
 };
 
 
 export type AdamDatasetCoverageBand = Omit<RasterBandConfig, 'id' | 'domain'> & {
     idx: number;
-    domain: ValueDomain<number>;
+    domain?: ValueDomain<number>;
 };
 
 export type AdamDatasetMultiBandCoveragePreset = RasterBandPreset & {

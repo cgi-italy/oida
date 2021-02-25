@@ -28,14 +28,14 @@ const getMultiBandColorRange = (
         if (presetConfig) {
             const redConfig = datasetBandsDict[presetConfig.bands[0]];
             if (redConfig) {
-                let defaultRange = redConfig.default?.range || redConfig.domain;
+                let defaultRange = redConfig.default?.range || redConfig.domain || {min: 0, max: 100};
                 colorRange = `(${defaultRange.min},${defaultRange.max})`;
             }
         }
     } else if (bandModeValue instanceof RasterBandModeCombination) {
         const redConfig = datasetBandsDict[bandModeValue.red];
         if (redConfig) {
-            let defaultRange = redConfig.default?.range || redConfig.domain;
+            let defaultRange = redConfig.default?.range || redConfig.domain || {min: 0, max: 100};
             colorRange = `(${defaultRange.min},${defaultRange.max})`;
         }
     }

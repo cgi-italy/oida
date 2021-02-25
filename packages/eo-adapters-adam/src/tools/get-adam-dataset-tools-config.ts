@@ -51,15 +51,17 @@ export const getAdamDatasetToolsConfig = (
         };
 
         datasetConfig.coverages.bands.forEach((band) => {
-            bandsDomain.min = Math.min(bandsDomain.min, band.domain.min);
-            bandsDomain.max = Math.max(bandsDomain.max, band.domain.max);
+            if (band.domain) {
+                bandsDomain.min = Math.min(bandsDomain.min, band.domain.min);
+                bandsDomain.max = Math.max(bandsDomain.max, band.domain.max);
+            }
         });
 
         variables.push({
             id: `${datasetConfig.id}_band_value`,
             name: 'Band value',
             wcsCoverage: datasetConfig.coverages.wcsCoverage,
-            domain: bandsDomain
+            domain: bandsDomain[0] < bandsDomain[1] ? bandsDomain : undefined
         });
 
     } else {
