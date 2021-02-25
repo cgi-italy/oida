@@ -167,12 +167,16 @@ export class CesiumVolumeTileSet {
 
     update(frameState) {
         if (this.colorMap_ && this.colorMap_.needsUpdate) {
-            if (!this.colorMap_.texture) {
-                this.colorMap_.texture = this.createColorMapTexture_(this.colorMap_.colorMap, frameState.context);
+            if (this.colorMap_.colorMap instanceof HTMLImageElement && !this.colorMap_.colorMap.complete) {
+                // do nothing: the image is not loaded yet. postpone texture generation to subsequent updates
             } else {
-                this.colorMap_.texture.copyFrom(this.colorMap_.colorMap);
+                if (!this.colorMap_.texture) {
+                    this.colorMap_.texture = this.createColorMapTexture_(this.colorMap_.colorMap, frameState.context);
+                } else {
+                    this.colorMap_.texture.copyFrom(this.colorMap_.colorMap);
+                }
+                this.colorMap_.needsUpdate = false;
             }
-            this.colorMap_.needsUpdate = false;
         }
         this.rootTiles_.forEach(tile => tile.traverse(frameState));
     }
