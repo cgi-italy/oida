@@ -100,24 +100,11 @@ export class AdamOpensearchDatasetDiscoveryClient {
         });
     }
 
-    protected getRoundedMinMax_(minValue: number, maxValue: number) {
-        const range = (maxValue - minValue) / 100;
-
-        if (range < 1) {
-            const precision = -Math.floor(Math.log10(range));
-            minValue = parseFloat(minValue.toFixed(precision));
-            maxValue = parseFloat(maxValue.toFixed(precision));
-        } else {
-            minValue = Math.floor(minValue);
-            maxValue = Math.ceil(maxValue);
-        }
-
-        return [minValue, maxValue];
-    }
-
     protected getConfigFromMetadataAndCoverage_(
         metadata: AdamDatasetMetadata, coverageDetails?: AdamWcsCoverageDescription
     ): AdamDatasetConfig {
+
+        try {
         const dimensions: AdamDatasetDimension[] = [];
         let coverages: AdamDatasetSingleBandCoverage[] | AdamDatasetMultiBandCoverage;
 
@@ -133,28 +120,42 @@ export class AdamOpensearchDatasetDiscoveryClient {
                    bandIndices: metadata.subDataset.map((subdataset, idx) => idx + 1)
                }],
                bands: metadata.subDataset.map((subdataset, idx) => {
-                   const [minValue, maxValue] = this.getRoundedMinMax_(subdataset.minValue, subdataset.maxValue);
+                   const minMax = this.getRoundedMinMax_(subdataset.minValue, subdataset.maxValue);
                    return {
                        idx: idx + 1,
                        name: subdataset.name,
-                       domain: {
-                           min: minValue,
-                           max: maxValue,
+                       domain: minMax ? {
+                           min: minMax[0],
+                           max: minMax[1],
                            noData: subdataset.noDataValue
+                       } : undefined,
+                       // if data range is not defined set a default range to initialize the colormap object
+                       default: minMax ? undefined : {
+                           range: {
+                               min: 0,
+                               max: 10
+                           }
                        }
                    };
                })
             };
         } else {
             const variable = metadata.subDataset[0];
-            const [minValue, maxValue] = this.getRoundedMinMax_(variable.minValue, variable.maxValue);
+            const minMax = this.getRoundedMinMax_(variable.minValue, variable.maxValue);
             coverages = [{
                 id: `${metadata.datasetId}_${variable.name}`,
                 name: variable.name,
                 wcsCoverage: coverageDetails ? coverageDetails.id : metadata.datasetId,
-                domain: {
-                    min: minValue,
-                    max: maxValue
+                domain: minMax ? {
+                    min: minMax[0],
+                    max: minMax[1],
+                } : undefined,
+                // if data range is not defined set a default range to initialize the colormap object
+                default: minMax ? undefined : {
+                    range: {
+                        min: 0,
+                        max: 10
+                    }
                 }
             }];
 
@@ -180,17 +181,46 @@ export class AdamOpensearchDatasetDiscoveryClient {
             }
         }
 
+        let minDate: moment.Moment | undefined = moment.utc(metadata.subDataset[0].minDate);
+        if (!minDate.isValid()) {
+            minDate = coverageDetails ? moment.utc(coverageDetails?.time.start) : undefined;
+        }
+        let maxDate: moment.Moment | undefined = moment.utc(metadata.subDataset[0].maxDate);
+        if (!maxDate.isValid()) {
+            maxDate = coverageDetails ? moment.utc(coverageDetails?.time.end) : undefined;
+        }
+
         let fixedTime: Date | undefined;
-        if (metadata.subDataset[0].minDate === metadata.subDataset[0].maxDate) {
-            fixedTime = moment.utc(metadata.subDataset[0].minDate).toDate();
+        if (!minDate || minDate?.isSame(maxDate)) {
+            fixedTime = moment.utc(minDate).toDate();
+        }
+
+        let extent = coverageDetails ? coverageDetails.extent : getGeometryExtent(metadata.geometry)!;
+        const srs = coverageDetails ? coverageDetails.srs : 'EPSG:4326';
+
+        // TODO: fix cesium rectangle intersection error when geographic domain
+        // is beyond geographic projection limits
+        if (srs === 'EPSG:4326') {
+            if (extent[0] <= -180) {
+                extent[0] = -180;
+            }
+            if (extent[2] >= 180) {
+                extent[2] = 180;
+            }
+            if (extent[1] <= -90) {
+                extent[1] = -90;
+            }
+            if (extent[3] >= 90) {
+                extent[3] = 90;
+            }
         }
 
         return {
             id: metadata.datasetId,
             color: this.colorFactory_(),
             type: 'raster',
-            coverageExtent: coverageDetails ? coverageDetails.extent : getGeometryExtent(metadata.geometry)!,
-            coverageSrs: coverageDetails ? coverageDetails.srs : 'EPSG:4326',
+            coverageExtent: extent,
+            coverageSrs: srs,
             srsDef: coverageDetails?.srsDef,
             name: metadata.datasetId,
             fixedTime: fixedTime,
@@ -198,5 +228,31 @@ export class AdamOpensearchDatasetDiscoveryClient {
             coverages: coverages,
             dimensions: dimensions
         };
+
+        } catch (error) {
+            throw new Error('Invalid dataset');
+        }
+    }
+
+    protected getRoundedMinMax_(minValue: number | undefined, maxValue: number | undefined) {
+
+        if (typeof(minValue) !== 'number' || typeof(maxValue) !== 'number') {
+            return undefined;
+        }
+        const range = (maxValue - minValue) / 100;
+
+        if (range <= 0) {
+            return undefined;
+        }
+        if (range < 1) {
+            const precision = -Math.floor(Math.log10(range));
+            minValue = parseFloat(minValue.toFixed(precision));
+            maxValue = parseFloat(maxValue.toFixed(precision));
+        } else {
+            minValue = Math.floor(minValue);
+            maxValue = Math.ceil(maxValue);
+        }
+
+        return [minValue, maxValue];
     }
 }
