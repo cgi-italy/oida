@@ -135,6 +135,10 @@ export class DatasetExplorerItem {
                         );
                     }
                 }
+            }).catch((error) => {
+                this.dataset.filters.unset(
+                    DATASET_SELECTED_TIME_FILTER_KEY
+                );
             });
         } else {
             this.dataset.filters.set(filter.key, filter.value, filter.type);

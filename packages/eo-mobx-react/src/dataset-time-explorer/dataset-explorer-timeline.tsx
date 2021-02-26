@@ -1,8 +1,7 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
 import ReactDOM from 'react-dom';
-
 import { autorun } from 'mobx';
-
+import classnames from 'classnames';
 import { TimelineGroup, TimelineItem, TimelineEventPropertiesResult } from 'vis-timeline/peer';
 import { DataSet } from 'vis-data/peer';
 import moment from 'moment';
@@ -381,7 +380,10 @@ export const DatasetDiscoveryTimeline = (props: DatasetExplorerTimelineProps) =>
                             id: itemId,
                             type: item.isRange ? 'range' : 'point',
                             content: '',
-                            className: item.data && item.data.loading ? 'is-loading' : '',
+                            className: classnames({
+                                'is-loading' : item.data?.loading,
+                                'is-error': item.data?.error
+                            }),
                             group: datasetView.dataset.id,
                             start: item.start,
                             end: item.end,

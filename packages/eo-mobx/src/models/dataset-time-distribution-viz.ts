@@ -39,7 +39,13 @@ const timeDistributionUpdater = (timeDistributionViz: DatasetTimeDistributionViz
         pendingRequest = timeDistributionViz.config.provider.getTimeDistribution(searchParams, filters, stepDuration).then((items) => {
             timeDistributionViz.timeDistribution.setItems(items);
         }).catch((e) => {
-
+            timeDistributionViz.timeDistribution.setItems([{
+                start: searchParams.start,
+                end: searchParams.end,
+                data: {
+                    error: true
+                }
+            }]);
         });
 
     }, options.debounceTimeout || 1000);
