@@ -1,6 +1,6 @@
 import { DatasetDiscoveryProvider, DatasetDiscoveryProviderProps } from '@oida/eo-mobx';
 import { Entity, QueryParams, QueryParamsProps, AsyncDataFetcher } from '@oida/state-mobx';
-import { reaction } from 'mobx';
+import { autorun } from 'mobx';
 import { AdamDatasetFactoryConfig, AdamDatasetFactory, getAdamDatasetFactory } from '../get-adam-dataset-factory';
 import { AdamDatasetMetadata, AdamOpensearchDatasetDiscoveryClient, AdamDatasetDiscoveryResponse } from './adam-opensearch-dataset-discovery-client';
 
@@ -75,17 +75,20 @@ export class AdamOpensearchDatasetDiscoveryProvider extends DatasetDiscoveryProv
     }
 
     protected afterInit_() {
-        reaction(() => this.criteria.data, (criteria) => {
-            this.asyncDataFetcher_.fetchData().then((data) => {
-                const datasets = data.features.map((metadata) => {
-                    return new AdamOpensearchDatasetDiscoveryProviderItem({
-                        metadata: metadata
+        autorun(() => {
+            if (this.active.value) {
+                const criteria = this.criteria.data;
+                this.asyncDataFetcher_.fetchData().then((data) => {
+                    const datasets = data.features.map((metadata) => {
+                        return new AdamOpensearchDatasetDiscoveryProviderItem({
+                            metadata: metadata
+                        });
                     });
+                    this.setResults_(datasets);
+                    return data;
                 });
-                this.setResults_(datasets);
-                return data;
-            });
-        }, {fireImmediately: true});
+            }
+        });
     }
 }
 

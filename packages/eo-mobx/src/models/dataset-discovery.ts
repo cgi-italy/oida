@@ -90,8 +90,13 @@ export class DatasetDiscovery {
             return;
         }
 
+        if (this.selectedProvider) {
+            this.selectedProvider.active.setValue(false);
+        }
+
         this.selectedProvider = providerInstance;
         if (providerInstance) {
+            providerInstance.active.setValue(true);
             this.footprintLayer.setSource(providerInstance.results);
         } else {
             this.footprintLayer.setSource(undefined);
@@ -102,7 +107,15 @@ export class DatasetDiscovery {
     @action
     addProviders<P extends DatasetDiscoveryProviderProps>(providers: (DatasetDiscoveryProvider | P)[]) {
         const instances = providers.map(provider => {
-            return provider instanceof DatasetDiscoveryProvider ? provider : DatasetDiscoveryProvider.create(provider);
+            if (provider instanceof DatasetDiscoveryProvider) {
+                provider.active.setValue(false);
+                return provider;
+            } else {
+                return DatasetDiscoveryProvider.create({
+                    ...provider,
+                    active: false
+                });
+            }
         });
         this.providers.push(...instances);
     }

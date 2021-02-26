@@ -1,7 +1,6 @@
 import { DatasetDiscoveryProvider, DatasetDiscoveryProviderProps } from '@oida/eo-mobx';
-import { AdamDatasetConfig } from '../adam-dataset-config';
 import { Entity, QueryParams, QueryParamsProps } from '@oida/state-mobx';
-import { reaction } from 'mobx';
+import { autorun } from 'mobx';
 import { AdamDatasetFactoryConfig, AdamDatasetFactory, getAdamDatasetFactory } from '../get-adam-dataset-factory';
 import { AdamFeaturedDataset, AdamFeaturedDatasetDiscoveryClient } from './adam-featured-dataset-discovery-client';
 
@@ -71,18 +70,20 @@ export class AdamFeaturedDatasetDiscoveryProvider extends DatasetDiscoveryProvid
     }
 
     protected afterInit_() {
-        reaction(() => this.criteria.data, (criteria) => {
-            this.searchClient.searchDatasets(criteria).then((data) => {
-                const results = data.datasets.map((dataset) => {
-                    return new AdamFeaturedDatasetDiscoveryProviderItem({
-                        dataset: dataset
+        autorun(() => {
+            if (this.active.value) {
+                this.searchClient.searchDatasets(this.criteria.data).then((data) => {
+                    const results = data.datasets.map((dataset) => {
+                        return new AdamFeaturedDatasetDiscoveryProviderItem({
+                            dataset: dataset
+                        });
                     });
-                });
 
-                this.setResults_(results);
-                this.criteria.paging.setTotal(data.total);
-            });
-        }, {fireImmediately: true});
+                    this.setResults_(results);
+                    this.criteria.paging.setTotal(data.total);
+                });
+            }
+        });
     }
 }
 
