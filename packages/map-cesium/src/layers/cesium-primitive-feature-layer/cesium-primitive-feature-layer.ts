@@ -35,16 +35,21 @@ export class CesiumPrimitiveFeatureLayer extends CesiumMapLayer implements IFeat
         let geometryRenderer = this.getOrCreateGeometryRenderer_(geometry.type);
 
         if (geometryRenderer) {
-            let feature = geometryRenderer.addFeature(id, geometry, this.getStyleForGeometry_(style, geometry.type), data);
-            feature.geometryRenderer = geometryRenderer;
-            feature.geometryType = geometry.type;
 
-            feature.data = data;
-            this.featureMap_[id] = feature;
+            try {
+                let feature = geometryRenderer.addFeature(id, geometry, this.getStyleForGeometry_(style, geometry.type), data);
+                feature.geometryRenderer = geometryRenderer;
+                feature.geometryType = geometry.type;
 
-            this.mapRenderer_.getViewer().scene.requestRender();
+                feature.data = data;
+                this.featureMap_[id] = feature;
 
-            return feature;
+                this.mapRenderer_.getViewer().scene.requestRender();
+
+                return feature;
+            } catch {
+                return undefined;
+            }
         }
 
     }

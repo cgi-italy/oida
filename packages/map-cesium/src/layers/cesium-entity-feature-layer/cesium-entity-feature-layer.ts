@@ -36,22 +36,29 @@ export class CesiumEntityFeatureLayer extends CesiumMapLayer implements IFeature
         let geometryRenderer = geometryEntityRendererFactory.create(geometry.type);
 
         if (geometryRenderer) {
-            let entity = geometryRenderer.create(id, geometry, style, {
-                clampToGround: this.clampToGround_
-            });
 
-            if (entity) {
-                this.dataSource_.entities.add(entity);
-                entity._children.forEach(childEntity => {
-                    this.dataSource_.entities.add(childEntity);
-                    childEntity.pickCallbacks_ = this.pickCallbacks_;
+            try {
+                let entity = geometryRenderer.create(id, geometry, style, {
+                    clampToGround: this.clampToGround_
                 });
-                entity.geometryRenderer = geometryRenderer;
-                entity.pickCallbacks_ = this.pickCallbacks_;
-                entity.data = data;
-            }
 
-            this.updateDataSource_();
+                if (entity) {
+                    this.dataSource_.entities.add(entity);
+                    entity._children.forEach(childEntity => {
+                        this.dataSource_.entities.add(childEntity);
+                        childEntity.pickCallbacks_ = this.pickCallbacks_;
+                    });
+                    entity.geometryRenderer = geometryRenderer;
+                    entity.pickCallbacks_ = this.pickCallbacks_;
+                    entity.data = data;
+
+                    this.updateDataSource_();
+                }
+
+                return entity;
+            } catch {
+                return undefined;
+            }
         }
     }
 
