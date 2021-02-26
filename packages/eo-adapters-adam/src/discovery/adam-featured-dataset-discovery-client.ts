@@ -76,16 +76,21 @@ export class AdamFeaturedDatasetDiscoveryClient {
         } else {
             coverageId = config.coverages[0].wcsCoverage;
         }
-        return this.wcsCoverageDescriptionClient_.getCoverageDetails(coverageId).then((coverage) => {
-            return {
-                ...config,
-                coverageExtent: coverage.extent,
-                coverageSrs: coverage.srs,
-                srsDef: coverage.srsDef,
-                renderMode: AdamDatasetRenderMode.ClientSide,
-                color: config.color || this.colorFactory_(),
-                fixedTime: coverage.time.start.getTime() === coverage.time.end.getTime() ? coverage.time.start : undefined
-            };
+        return this.wcsCoverageDescriptionClient_.getCoverageDetails(coverageId).then((coverages) => {
+            if (!coverages.length) {
+                throw new Error('Invalid dataset');
+            } else {
+                const coverage = coverages[0];
+                return {
+                    ...config,
+                    coverageExtent: coverage.extent,
+                    coverageSrs: coverage.srs,
+                    srsDef: coverage.srsDef,
+                    renderMode: AdamDatasetRenderMode.ClientSide,
+                    color: config.color || this.colorFactory_(),
+                    fixedTime: coverage.time.start.getTime() === coverage.time.end.getTime() ? coverage.time.start : undefined
+                };
+            }
         });
     }
 }

@@ -1,6 +1,6 @@
 import moment from 'moment';
 
-import { AxiosInstanceWithCancellation, createAxiosInstance, QueryParams, randomColorFactory, getGeometryExtent } from '@oida/core';
+import { AxiosInstanceWithCancellation, createAxiosInstance, QueryParams, randomColorFactory, getGeometryExtent, isValidExtent } from '@oida/core';
 import { AdamWcsCoverageDescriptionClient, AdamWcsCoverageDescription } from './adam-wcs-coverage-description-client';
 import { AdamDatasetConfig, AdamDatasetDimension, AdamDatasetSingleBandCoverage, AdamDatasetMultiBandCoverage, AdamDatasetRenderMode } from '../adam-dataset-config';
 
@@ -93,141 +93,169 @@ export class AdamOpensearchDatasetDiscoveryClient {
     getAdamDatasetConfig(metadata: AdamDatasetMetadata): Promise<AdamDatasetConfig> {
 
 
-        return this.wcsCoverageDescriptionClient_.getCoverageDetails(metadata.datasetId).then((coverageDetails) => {
-            return this.getConfigFromMetadataAndCoverage_(metadata, coverageDetails);
+        return this.wcsCoverageDescriptionClient_.getCoverageDetails(metadata.datasetId).then((coverages) => {
+            return this.getConfigFromMetadataAndCoverage_(metadata, coverages);
         }).catch(() => {
-            return this.getConfigFromMetadataAndCoverage_(metadata);
+            return this.getConfigFromMetadataAndCoverage_(metadata, []);
         });
     }
 
     protected getConfigFromMetadataAndCoverage_(
-        metadata: AdamDatasetMetadata, coverageDetails?: AdamWcsCoverageDescription
+        metadata: AdamDatasetMetadata, wcsCoverages: AdamWcsCoverageDescription[]
     ): AdamDatasetConfig {
 
         try {
-        const dimensions: AdamDatasetDimension[] = [];
-        let coverages: AdamDatasetSingleBandCoverage[] | AdamDatasetMultiBandCoverage;
 
-        if (metadata.subDataset.length > 1) {
-            coverages = {
-               id: 'bands',
-               name: 'Bands',
-               wcsCoverage: coverageDetails ? coverageDetails.id : metadata.datasetId,
-               presets: [],
-               bandGroups: [{
-                   id: 'bands',
-                   name: 'Bands',
-                   bandIndices: metadata.subDataset.map((subdataset, idx) => idx + 1)
-               }],
-               bands: metadata.subDataset.map((subdataset, idx) => {
-                   const minMax = this.getRoundedMinMax_(subdataset.minValue, subdataset.maxValue);
-                   return {
-                       idx: idx + 1,
-                       name: subdataset.name,
-                       domain: minMax ? {
-                           min: minMax[0],
-                           max: minMax[1],
-                           noData: subdataset.noDataValue
-                       } : undefined,
-                       // if data range is not defined set a default range to initialize the colormap object
-                       default: minMax ? undefined : {
-                           range: {
-                               min: 0,
-                               max: 10
-                           }
-                       }
-                   };
-               })
-            };
-        } else {
-            const variable = metadata.subDataset[0];
-            const minMax = this.getRoundedMinMax_(variable.minValue, variable.maxValue);
-            coverages = [{
-                id: `${metadata.datasetId}_${variable.name}`,
-                name: variable.name,
-                wcsCoverage: coverageDetails ? coverageDetails.id : metadata.datasetId,
-                domain: minMax ? {
-                    min: minMax[0],
-                    max: minMax[1],
-                } : undefined,
-                // if data range is not defined set a default range to initialize the colormap object
-                default: minMax ? undefined : {
-                    range: {
-                        min: 0,
-                        max: 10
+            //TODO: more than one coverages could be associated to a dataset. Since raster viz currently support
+            // only one layer if there are two or more coverages fallback to the 4326 reprojection through
+            // eo-geotiff library
+            let wcsCoverage = wcsCoverages.length === 1 ? wcsCoverages[0] : undefined;
+
+            let extent: number[];
+            let srs: string;
+
+            if (!wcsCoverage) {
+                extent = getGeometryExtent(metadata.geometry)!;
+                srs = 'EPSG:4326';
+                if (!extent || !isValidExtent(extent)) {
+                    //no valid extent available in opensearch metadata. use the first available coverage
+                    wcsCoverage = wcsCoverages[0];
+                    if (!wcsCoverage) {
+                        throw new Error('Invalid dataset');
+                    } else {
+                        extent = wcsCoverage.extent;
+                        srs = wcsCoverage.srs;
                     }
                 }
-            }];
+            } else {
+                extent = wcsCoverage.extent;
+                srs = wcsCoverage.srs;
+            }
 
-            if (variable.grid && variable.gridNames) {
-                variable.gridNames.forEach((gridName, idx) => {
-                    dimensions.push({
-                        id: gridName.id,
-                        name: gridName.label,
-                        wcsSubset: {
-                            id: 'gfix',
-                            idx: idx
-                        },
-                        wcsResponseKey: 'gfix',
-                        tarFilenameRegex: /^/,
-                        domain: gridName.values.map((item) => {
-                            return {
-                                label: item.label,
-                                value: item.value
-                            };
-                        })
+            const dimensions: AdamDatasetDimension[] = [];
+            let coverages: AdamDatasetSingleBandCoverage[] | AdamDatasetMultiBandCoverage;
+
+            if (metadata.subDataset.length > 1) {
+                coverages = {
+                id: 'bands',
+                name: 'Bands',
+                wcsCoverage: wcsCoverage ? wcsCoverage.id : metadata.datasetId,
+                presets: [],
+                bandGroups: [{
+                    id: 'bands',
+                    name: 'Bands',
+                    bandIndices: metadata.subDataset.map((subdataset, idx) => idx + 1)
+                }],
+                bands: metadata.subDataset.map((subdataset, idx) => {
+                    const minMax = this.getRoundedMinMax_(subdataset.minValue, subdataset.maxValue);
+                    return {
+                        idx: idx + 1,
+                        name: subdataset.name,
+                        domain: minMax ? {
+                            min: minMax[0],
+                            max: minMax[1],
+                            noData: subdataset.noDataValue
+                        } : undefined,
+                        // if data range is not defined set a default range to initialize the colormap object
+                        default: minMax ? undefined : {
+                            range: {
+                                min: 0,
+                                max: 10
+                            }
+                        }
+                    };
+                })
+                };
+            } else {
+                const variable = metadata.subDataset[0];
+                const minMax = this.getRoundedMinMax_(variable.minValue, variable.maxValue);
+                coverages = [{
+                    id: `${metadata.datasetId}_${variable.name}`,
+                    name: variable.name,
+                    wcsCoverage: wcsCoverage ? wcsCoverage.id : metadata.datasetId,
+                    domain: minMax ? {
+                        min: minMax[0],
+                        max: minMax[1],
+                    } : undefined,
+                    // if data range is not defined set a default range to initialize the colormap object
+                    default: minMax ? undefined : {
+                        range: {
+                            min: 0,
+                            max: 10
+                        }
+                    }
+                }];
+
+                if (variable.grid && variable.gridNames) {
+                    variable.gridNames.forEach((gridName, idx) => {
+                        dimensions.push({
+                            id: gridName.id,
+                            name: gridName.label,
+                            wcsSubset: {
+                                id: 'gfix',
+                                idx: idx
+                            },
+                            wcsResponseKey: 'gfix',
+                            tarFilenameRegex: /^/,
+                            domain: gridName.values.map((item) => {
+                                return {
+                                    label: item.label,
+                                    value: item.value
+                                };
+                            })
+                        });
                     });
-                });
+                }
             }
-        }
 
-        let minDate: moment.Moment | undefined = moment.utc(metadata.subDataset[0].minDate);
-        if (!minDate.isValid()) {
-            minDate = coverageDetails ? moment.utc(coverageDetails?.time.start) : undefined;
-        }
-        let maxDate: moment.Moment | undefined = moment.utc(metadata.subDataset[0].maxDate);
-        if (!maxDate.isValid()) {
-            maxDate = coverageDetails ? moment.utc(coverageDetails?.time.end) : undefined;
-        }
-
-        let fixedTime: Date | undefined;
-        if (!minDate || minDate?.isSame(maxDate)) {
-            fixedTime = moment.utc(minDate).toDate();
-        }
-
-        let extent = coverageDetails ? coverageDetails.extent : getGeometryExtent(metadata.geometry)!;
-        const srs = coverageDetails ? coverageDetails.srs : 'EPSG:4326';
-
-        // TODO: fix cesium rectangle intersection error when geographic domain
-        // is beyond geographic projection limits
-        if (srs === 'EPSG:4326') {
-            if (extent[0] <= -180) {
-                extent[0] = -180;
+            let minDate: moment.Moment | undefined = moment.utc(metadata.subDataset[0].minDate);
+            if (!minDate.isValid()) {
+                minDate = wcsCoverages.length === 1 ? moment.utc(wcsCoverages[0].time.start) : undefined;
             }
-            if (extent[2] >= 180) {
-                extent[2] = 180;
+            let maxDate: moment.Moment | undefined = moment.utc(metadata.subDataset[0].maxDate);
+            if (!maxDate.isValid()) {
+                maxDate = wcsCoverages.length === 1 ? moment.utc(wcsCoverages[0].time.end) : undefined;
             }
-            if (extent[1] <= -90) {
-                extent[1] = -90;
-            }
-            if (extent[3] >= 90) {
-                extent[3] = 90;
-            }
-        }
 
-        return {
-            id: metadata.datasetId,
-            color: this.colorFactory_(),
-            type: 'raster',
-            coverageExtent: extent,
-            coverageSrs: srs,
-            srsDef: coverageDetails?.srsDef,
-            name: metadata.datasetId,
-            fixedTime: fixedTime,
-            renderMode: AdamDatasetRenderMode.ClientSide,
-            coverages: coverages,
-            dimensions: dimensions
-        };
+            let fixedTime: Date | undefined;
+            if (minDate && minDate?.isSame(maxDate)) {
+                fixedTime = moment.utc(minDate).toDate();
+            }
+
+            if (!isValidExtent(extent)) {
+                throw new Error('Invalid dataset extent');
+            }
+
+            // TODO: fix cesium rectangle intersection error when geographic domain
+            // is beyond geographic projection limits
+            if (srs === 'EPSG:4326') {
+                if (extent[0] <= -180) {
+                    extent[0] = -180;
+                }
+                if (extent[2] >= 180) {
+                    extent[2] = 180;
+                }
+                if (extent[1] <= -90) {
+                    extent[1] = -90;
+                }
+                if (extent[3] >= 90) {
+                    extent[3] = 90;
+                }
+            }
+
+            return {
+                id: metadata.datasetId,
+                color: this.colorFactory_(),
+                type: 'raster',
+                coverageExtent: extent,
+                coverageSrs: srs,
+                srsDef: wcsCoverage?.srsDef,
+                name: metadata.datasetId,
+                fixedTime: fixedTime,
+                renderMode: AdamDatasetRenderMode.ClientSide,
+                coverages: coverages,
+                dimensions: dimensions
+            };
 
         } catch (error) {
             throw new Error('Invalid dataset');
