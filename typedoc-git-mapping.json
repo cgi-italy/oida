@@ -1,6 +1,0 @@
-[
-  {
-    "pattern": "^packages",
-    "replace": "https://gitlab.dev.eoss-cloud.it/frontend/oida/blob/master/packages"
-  }
-]

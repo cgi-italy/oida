@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "docs.fullname" . }}
+  labels:
+    {{- include "docs.labels" . | nindent 4 }}
+spec:
+{{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+{{- end }}
+  selector:
+    matchLabels:
+      {{- include "docs.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+    {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      labels:
+        {{- include "docs.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "docs.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      volumes:
+      - name : gatekeeper-config
+        configMap:
+          name: gatekeeper-config
+      - name : gatekeeper-files
+        configMap:
+          name: gatekeeper-files
+      containers:
+        - name: gatekeeper
+          image: keycloak/keycloak-gatekeeper:latest
+          args:
+          - --config=/etc/keycloak-gatekeeper.conf
+          ports:
+          - containerPort: {{ .Values.gatekeeper.port  }}
+            name: gatekeeper
+          volumeMounts:
+          - name: gatekeeper-config
+            mountPath: /etc/keycloak-gatekeeper.conf
+            subPath: keycloak-gatekeeper.conf
+          - name: gatekeeper-files
+            mountPath: /html
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: app
+              containerPort: {{ .Values.app.port }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: app
+          readinessProbe:
+            httpGet:
+              path: /
+              port: app
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

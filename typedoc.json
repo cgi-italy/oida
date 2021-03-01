@@ -1,20 +1,30 @@
 {
+  "name": "oida",
+  "entryPoints": [
+    "./packages/core/src/index.ts",
+    "./packages/map-ol/src/index.ts",
+    "./packages/map-cesium/src/index.ts",
+    "./packages/map-cesium-ol-tile-source/src/index.ts",
+    "./packages/state-mobx/src/index.ts",
+    "./packages/ui-react-core/src/index.ts",
+    "./packages/ui-react-antd/src/index.ts",
+    "./packages/ui-react-mobx/src/index.ts",
+    "./packages/eo-mobx/src/index.ts",
+    "./packages/eo-mobx-react/src/index.ts",
+    "./packages/eo-adapters-ogc/src/index.ts",
+    "./packages/eo-adapters-ogc-react/src/index.ts",
+    "./packages/eo-adapters-adam/src/index.ts",
+    "./packages/eo-geotiff/src/index.ts",
+    "./packages/eo-video/src/index.ts",
+    "./packages/eo-video-react/src/index.ts"
+  ],
+  "includes": "./packages",
   "exclude": [
     "node_modules/**",
     "**/*.spec.ts",
     "./packages/docs/**"
   ],
-  "out": "docs",
-  "entryPoints": [
-    "./packages/core/src/index.ts",
-    "./packages/map-ol/src/index.ts",
-    "./packages/map-cesium/src/index.ts",
-    "./packages/state-mobx/src/index.ts"
-  ],
-  "name": "oida",
-  "excludeExternals": false,
-  "includes": "./packages",
-  "plugin": ["typedoc-plugin-sourcefile-url"],
   "readme": "README.md",
+  "plugin": ["typedoc-plugin-sourcefile-url"],
   "sourcefile-url-prefix": "https://gitlab.dev.eoss-cloud.it/frontend/oida/blob/master/packages/"
 }

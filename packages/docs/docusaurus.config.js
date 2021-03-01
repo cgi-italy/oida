@@ -4,10 +4,11 @@ const deploymentUrl = process.env.DEPLOYMENT_URL || 'http://localhost:3000';
 const baseUrl = process.env.BASE_URL || '/';
 const gitlabRepoUrl = process.env.GITLAB_URL || 'https://gitlab.dev.eoss-cloud.it/frontend/oida';
 const gitlabBranch = process.env.GITLAB_BRANCH || 'master';
+const typedocsLocation = `${deploymentUrl}${baseUrl}typedoc`;
 
 module.exports = {
     title: 'OIDA',
-    tagline: 'Earth Observation Data Visualization and Analysis Library',
+    tagline: 'Earth Observation Data Visualization and Analysis Libraries',
     url: deploymentUrl,
     baseUrl: baseUrl,
     onBrokenLinks: 'throw',
@@ -18,8 +19,8 @@ module.exports = {
         navbar: {
             title: 'OIDA',
             logo: {
-                alt: 'My Site Logo',
-                src: 'img/logo.svg',
+                alt: 'OIDA logo',
+                src: 'img/logo.webp',
             },
             items: [
                 {
@@ -28,9 +29,9 @@ module.exports = {
                     label: 'Docs',
                     position: 'left',
                 },
-                { to: 'blog', label: 'Blog', position: 'left' },
+                //{ to: 'blog', label: 'Blog', position: 'left' },
                 {
-                    href: `${deploymentUrl}${baseUrl}typedocs`,
+                    href: `${typedocsLocation}/index.html`,
                     label: 'Api docs',
                     position: 'left'
                 },
@@ -61,10 +62,10 @@ module.exports = {
                 {
                     title: 'More',
                     items: [
-                        {
-                            label: 'Blog',
-                            to: 'blog',
-                        },
+                        // {
+                        //     label: 'Blog',
+                        //     to: 'blog',
+                        // },
                         {
                             label: 'Gitlab',
                             href: `${gitlabRepoUrl}`,
@@ -110,7 +111,7 @@ module.exports = {
         path.resolve(__dirname, 'plugins/custom-webpack-config')
     ],
     customFields: {
-        typedocsLocation: 'typedocs',
+        typedocsLocation: `${typedocsLocation}`,
         gitlabDocsUrl: `${gitlabRepoUrl}/blob/${gitlabBranch}/packages/docs`
     }
 };
