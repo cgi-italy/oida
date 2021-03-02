@@ -139,7 +139,7 @@ export class AdamOpensearchDatasetDiscoveryClient {
                 coverages = {
                 id: 'bands',
                 name: 'Bands',
-                wcsCoverage: wcsCoverage ? wcsCoverage.id : metadata.datasetId,
+                wcsCoverage: metadata.datasetId,
                 presets: [],
                 bandGroups: [{
                     id: 'bands',
@@ -172,7 +172,7 @@ export class AdamOpensearchDatasetDiscoveryClient {
                 coverages = [{
                     id: `${metadata.datasetId}_${variable.name}`,
                     name: variable.name,
-                    wcsCoverage: wcsCoverage ? wcsCoverage.id : metadata.datasetId,
+                    wcsCoverage: metadata.datasetId,
                     domain: minMax ? {
                         min: minMax[0],
                         max: minMax[1],
