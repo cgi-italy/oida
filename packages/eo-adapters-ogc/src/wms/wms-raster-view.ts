@@ -12,6 +12,7 @@ import { transformExtent } from 'ol/proj';
 export const createWmsRasterSourceProvider = (
     layer: WmsLayer,
     wmsUrl: string,
+    wmsVersion: string,
     spatialCoverageProvider?: DatasetSpatialCoverageProvider
 ) => {
 
@@ -45,13 +46,18 @@ export const createWmsRasterSourceProvider = (
         let extent = Promise.resolve(bbox.extent);
         let crs = bbox.crs;
 
+        //WMS 1.3.0 use lat lon ordering for EPSG:4326
+        if (crs === 'EPSG:4326' && wmsVersion === '1.3.0') {
+            extent = Promise.resolve([bbox.extent[1], bbox.extent[0], bbox.extent[3], bbox.extent[2]]);
+        }
+
         if (spatialCoverageProvider) {
             extent = spatialCoverageProvider(rasterView).then((coverageExtent) => {
                 if (coverageExtent) {
                     crs = 'EPSG:4326';
                     return coverageExtent;
                 } else {
-                    return bbox.extent;
+                    return extent;
                 }
             });
         }
@@ -80,13 +86,19 @@ export const createWmsRasterSourceProvider = (
                 tileGrid: {
                     extent: extent,
                     forceUniformResolution: true
-                }
+                },
+                extent: extent
             });
         });
     };
 };
 
-export const getWmsLayerRasterView = (layer: WmsLayer, wmsUrl: string, spatialCoverageProvider?: DatasetSpatialCoverageProvider) => {
+export const getWmsLayerRasterView = (
+    layer: WmsLayer,
+    wmsUrl: string,
+    wmsVersion: string,
+    spatialCoverageProvider?: DatasetSpatialCoverageProvider
+) => {
 
     let dimensions = layer.Dimension;
     if (dimensions) {
@@ -109,7 +121,7 @@ export const getWmsLayerRasterView = (layer: WmsLayer, wmsUrl: string, spatialCo
     }];
 
     let rasterVizConfig: RasterMapVizConfig = {
-        rasterSourceProvider: createWmsRasterSourceProvider(layer, wmsUrl, spatialCoverageProvider),
+        rasterSourceProvider: createWmsRasterSourceProvider(layer, wmsUrl, wmsVersion, spatialCoverageProvider),
         bandMode: {
             supportedModes: [{
                 type: RasterBandModeType.Preset,
