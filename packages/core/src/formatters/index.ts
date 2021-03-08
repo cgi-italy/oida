@@ -1,3 +1,9 @@
+/**
+ * Quantity definitions and formatters
+ * @packageDocumentation
+ * @module core/formatters
+ */
+
 export * from './formatter';
 export * from './map-coord';
 export * from './area';

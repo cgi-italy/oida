@@ -47,13 +47,9 @@ export const DatasetExplorerTimelineToolbar = (props: DatasetDiscoveryTimelineTo
                 config={{
                     withTime: true
                 }}
-                rendererConfig={{
-                    props: {
-                        size: 'small',
-                        bordered: false,
-                        suffixIcon: null
-                    }
-                }}
+                size='small'
+                bordered={false}
+                suffixIcon={null}
                 required={true}
                 value={props.selectedTime as Date}
                 onChange={props.onSelectedTimeChange}
@@ -67,13 +63,9 @@ export const DatasetExplorerTimelineToolbar = (props: DatasetDiscoveryTimelineTo
                 config={{
                     withTime: true
                 }}
-                rendererConfig={{
-                    props: {
-                        size: 'small',
-                        bordered: false,
-                        suffixIcon: null
-                    }
-                }}
+                size='small'
+                bordered={false}
+                suffixIcon={null}
                 required={false}
                 value={props.selectedTime as DateRangeValue}
                 onChange={props.onSelectedTimeChange}

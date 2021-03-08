@@ -1,44 +1,91 @@
+/**
+ * Form field renderer specific configuration type
+ */
 export type FormFieldRendererConfig = {
+    /**
+     * The renderer unique identifier
+     */
     id?: string,
-    props?: {[x: string] : any}
+    /**
+     * The renderer specific properties
+     */
+    props?: Record<string, any>
 };
 
-export type FormFieldCommonConfig<TYPE extends string> = {
+/**
+ * Common form field definition parameters
+ * @template TYPE The form field string identifier
+ */
+export type FormFieldCommon<TYPE extends string> = {
+    /**
+     * Unique form field identifier
+     */
     type: TYPE;
+    /**
+     * Form field name
+     */
     name: string;
+    /**
+     * Form field title
+     */
     title?: string;
+    /**
+     * Flag indicating if this field is required
+     */
     required?: boolean;
+    /**
+     * Flag indicating if the field should be focused on form creation
+     */
     autoFocus?: boolean;
+    /**
+     * renderer specific configuration
+     */
     rendererConfig?: FormFieldRendererConfig;
 };
 
-export type FormFieldConfig<TYPE extends string, CONFIG> = {
-    config: CONFIG;
-} & FormFieldCommonConfig<TYPE>;
 
-
+/**
+ * Form field state type
+ * @template T The form field value type
+ */
 export type FormFieldState<T> = {
     value: T | undefined;
     onChange: (value: T | undefined) => void;
 };
 
-export type FormFieldConfigFromState<TYPE extends string, CONFIG, T> = {
-    config: (state: FormFieldState<T>) => CONFIG;
-} & FormFieldCommonConfig<TYPE>;
+/**
+ * Form field type specific config. Config can also be defined as a function of the form field state
+ * @template CONFIG the form field config
+ */
+export type FormFieldConfig<CONFIG, T> = CONFIG | ((state: FormFieldState<T>) => CONFIG);
 
-export type FormField<TYPE extends string, T, CONFIG> = FormFieldConfig<TYPE, CONFIG> & FormFieldState<T>;
-
-
-export type FormFieldDefinition<TYPE extends string, T, CONFIG> =
-    FormFieldConfig<TYPE, CONFIG> | FormFieldConfigFromState<TYPE, CONFIG, T>;
-
-export const isFormFieldConfigFromState = <TYPE extends string, T, CONFIG>(definition: FormFieldDefinition<TYPE, T, CONFIG>):
-definition is FormFieldConfigFromState<TYPE, CONFIG, T> => {
-    return typeof(definition.config) === 'function';
+/**
+ * Form field definition type. It combines common and field specific configuration
+ */
+export type FormFieldDefinition<TYPE extends string, T, CONFIG> = FormFieldCommon<TYPE> & {
+    config: FormFieldConfig<CONFIG, T>;
 };
+
+/**
+ * Form field type. It combines field configuration and state
+ */
+export type FormField<TYPE extends string, T, CONFIG> = FormFieldCommon<TYPE> & {config: CONFIG} & FormFieldState<T>;
+
+
+// use declaration merging to register new form fields
+export interface IFormFieldDefinitions {
+
+}
+
+export interface IFormFieldValueTypes {
+
+}
+
+export type IFormFieldType = keyof IFormFieldDefinitions;
+export type IFormFieldDefinition<TYPE extends IFormFieldType = IFormFieldType> = IFormFieldDefinitions[TYPE];
+export type IFormFieldValueType<TYPE extends IFormFieldType = IFormFieldType> = IFormFieldValueTypes[TYPE];
+export type IFormField<TYPE extends IFormFieldType =
+    IFormFieldType> = IFormFieldDefinition<TYPE> & FormFieldState<IFormFieldValueTypes[TYPE]>;
 
 
 export type FormFieldValues = Map<string, any>;
-
-export type AnyFormFieldDefinition = FormFieldDefinition<string, any, any>;
-export type AnyFormField = FormField<string, any, any>;

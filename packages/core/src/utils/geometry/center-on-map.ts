@@ -1,7 +1,7 @@
 import bboxPolygon from '@turf/bbox-polygon';
 import booleanDisjoint from '@turf/boolean-disjoint';
 
-import { Geometry } from '../../types';
+import { Geometry } from '../../common';
 import { IMapRenderer, BBox } from '../../map-render';
 import { getGeometryExtent } from './get-geometry-extent';
 

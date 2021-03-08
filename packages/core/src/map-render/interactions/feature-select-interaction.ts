@@ -1,6 +1,6 @@
 import { IMapInteractionImplementation, IMMapInteractionProps } from './map-interaction-implementation';
 import { IMapRenderer } from '../map/map-renderer';
-import { SelectionMode } from '../../types/selection-mode';
+import { SelectionMode } from '../../common';
 
 export const FEATURE_SELECT_INTERACTION_ID = 'featureselect';
 

@@ -1,17 +1,24 @@
 import React from 'react';
-
-import { InputNumber, Slider, Row, Col } from 'antd';
+import { InputNumber, Slider } from 'antd';
+import { InputNumberProps } from 'antd/lib/input-number';
+import { SliderProps } from 'antd/lib/slider';
+import classnames from 'classnames';
 
 import { NumericRangeField, NUMERIC_RANGE_FIELD_ID } from '@oida/core';
+import { FormFieldRendererBaseProps } from '@oida/ui-react-core';
 
 import { antdFormFieldRendererFactory } from './antd-form-field-renderer-factory';
 
-export const NumericRangeFieldRenderer = (props: Omit<NumericRangeField, 'name' | 'type'>) => {
+export type NumericRangeFieldRendererProps = FormFieldRendererBaseProps<NumericRangeField> & {
+    sliderProps?: SliderProps,
+    numericInputProps?: InputNumberProps
+};
 
-    let { value, onChange, config, rendererConfig } = props;
+export const NumericRangeFieldRenderer = (props: NumericRangeFieldRendererProps) => {
 
-    let hasLimits = config.min !== undefined && config.max !== undefined;
+    const {value, onChange, title, required, config, autoFocus, sliderProps, numericInputProps} = props;
 
+    const hasLimits = config.min !== undefined && config.max !== undefined;
 
     const onRangeChange = (range) => {
         if (range && range.length === 2) {
@@ -25,52 +32,64 @@ export const NumericRangeFieldRenderer = (props: Omit<NumericRangeField, 'name' 
     };
 
 
-    let renderProps = rendererConfig ? rendererConfig.props : {};
+    let domainSlider: JSX.Element | undefined;
+    if (hasLimits) {
+        let marks = {
+            [config.min!]: `${config.min}`,
+            [config.max!]: `${config.max}`,
+        };
+
+        domainSlider = (
+            <Slider
+                style={{minWidth: '140px'}}
+                value={value ? [value.from, value.to] : undefined}
+                defaultValue={value ? [value.from, value.to] : [config.min!, config.max!]}
+                onChange={onRangeChange}
+                min={config.min}
+                max={config.max}
+                marks={marks}
+                tooltipVisible={false}
+                step={config.step || ((config.max! - config.min!) / 100)}
+                range={true}
+                {...sliderProps}
+            />
+        );
+    }
 
     return (
-        <React.Fragment>
-            {hasLimits &&
-                <Slider
-                    style={{minWidth: '140px'}}
-                    value={value ? [value.from, value.to] : undefined}
-                    onChange={onRangeChange}
+        <div className={classnames('numeric-range-field', {'with-slider': hasLimits})}>
+            <div className='numeric-range-field-inputs'>
+                <InputNumber
+                    value={value ? value.from : undefined}
+                    min={config.min}
+                    max={config.max}
+                    size='small'
+                    step={config.step}
+                    formatter={value => `≥ ${value}`}
+                    onChange={(minValue) => {
+                        if (typeof(minValue) === 'number') {
+                            onRangeChange([minValue, value ? value.to : undefined]);
+                        }
+                    }}
+                    {...numericInputProps}
+                />
+                <InputNumber
+                    value={value ? value.to : undefined}
                     min={config.min}
                     max={config.max}
                     step={config.step}
-                    range={true}
-                    {...renderProps}
+                    size='small'
+                    formatter={value => `≤ ${value}`}
+                    onChange={(maxValue) => {
+                        if (typeof(maxValue) === 'number') {
+                            onRangeChange([value ? value.from : undefined, maxValue]);
+                        }
+                    }}
+                    {...numericInputProps}
                 />
-            }
-            {!hasLimits &&
-                <React.Fragment>
-                    <InputNumber
-                        value={value ? value.from : undefined}
-                        min={config.min}
-                        max={config.max}
-                        onChange={(minValue) => {
-                            if (typeof(minValue) === 'number') {
-                                onRangeChange([minValue, value ? Math.max(minValue, value.to) : minValue]);
-                            }
-                        }}
-                        step={config.step}
-                        {...renderProps}
-                    />
-                    <span> - </span>
-                    <InputNumber
-                        value={value ? value.to : undefined}
-                        min={config.min}
-                        max={config.max}
-                        step={config.step}
-                        onChange={(maxValue) => {
-                            if (typeof(maxValue) === 'number') {
-                                onRangeChange([value ? Math.min(value.from, maxValue) : maxValue, maxValue]);
-                            }
-                        }}
-                        {...renderProps}
-                    />
-                </React.Fragment>
-            }
-        </React.Fragment>
+            </div>
+            {domainSlider}
+        </div>
     );
 
 };

@@ -1,9 +1,6 @@
-import { AnyFormFieldDefinition, FormFieldValues } from '@oida/core';
+import { FormRendererProps } from '../form';
 
-export type DataFiltererProps = {
-    filters: Array<AnyFormFieldDefinition>;
-    values: FormFieldValues;
-    onFilterChange: (name: string, value: any) => void;
+export type DataFiltererProps = FormRendererProps & {
     mainFilter?: string;
 };
 

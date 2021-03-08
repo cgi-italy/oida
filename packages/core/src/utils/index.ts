@@ -1,3 +1,9 @@
+/**
+ * Common utilities
+ * @packageDocumentation
+ * @module core/utils
+ */
+
 export * from './dynamic-factory';
 export * from './subscription-tracker';
 export * from './cancelable-promise';

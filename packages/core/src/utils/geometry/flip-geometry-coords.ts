@@ -1,7 +1,7 @@
 
 import flip from '@turf/flip';
 
-import { Geometry } from '../../types';
+import { Geometry } from '../../common';
 
 export const flipGeometryCoords: (geometry: Geometry) => Geometry = (geometry: Geometry) => {
     if (geometry.type === 'GeometryCollectionEx') {

@@ -1,4 +1,4 @@
-import { AnyFormFieldDefinition } from '@oida/core';
+import { IFormFieldDefinition } from '@oida/core';
 
 import { DatasetTimeDistributionConfig } from './dataset-time-distribution-config';
 import { DatasetProductSearchConfig } from './dataset-product-search-config';
@@ -13,7 +13,7 @@ export type DatasetConfig = {
     description?: string;
     color?: string;
     icon?: string;
-    filters: AnyFormFieldDefinition[];
+    filters: IFormFieldDefinition[];
     timeDistribution?: DatasetTimeDistributionConfig;
     productSearch?: DatasetProductSearchConfig;
     spatialCoverageProvider?: DatasetSpatialCoverageProvider;

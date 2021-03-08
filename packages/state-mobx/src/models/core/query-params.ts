@@ -11,16 +11,47 @@ export const setReactionForFilterType = (type: string, reaction: FilterTypeReact
     filterTypeReactions[type] = reaction;
 };
 
-export type DataFiltersProps = {
-    values?: Record<string, QueryFilter>
+export type DataFiltersProps<FILTER extends QueryFilter = any> = {
+    /**the initial filter values */
+    values?: Record<string, FILTER>
 };
 
-export class DataFilters {
-    items: ObservableMap<string, QueryFilter>;
+
+type FindByKey<Union, Key> = Union extends { key: Key } ? Union : never;
+
+/**
+ * A class to manage the state of a set of form fields or filters
+ *
+ * ```
+ * // 1. A weakly typed example
+ * const filterValues = new DataFilters();
+ * autorun(() => console.log(filterValues.asArray())) // will be called every time a filter value is updated
+ * filterValues.set('fieldname', 33, 'number');
+ *
+ *
+ * // 2. A strongly typed example
+ * const filterValues = new DataFilters<QueryFilter<'time', 'daterange'> | QueryFilter<'q', 'string'>>();
+
+ * filterValues.set('q', 'test', 'string'); // OK
+ *
+ * filterValues.set('otherKey', 'test', 'string'); // Type error: Argument of type '"otherKey"' \
+ * // is not assignable to parameter of type '"time" | "q"'
+ *
+ * filterValues.set('time', 666, 'daterange'); // Type error: Argument of type 'number'
+ * // is not assignable to parameter of type 'DateRangeValue'
+ *
+ * filterValues.set('q', 'sss', 'daterange'); // Type error: Argument of type '"daterange"'
+ * // is not assignable to parameter of type '"string"'
+ * ```
+ *
+ * @template FILTERS used to define the allowed filter types
+ */
+export class DataFilters<FILTERS extends QueryFilter = any> {
+    items: ObservableMap<string, FILTERS>;
 
     protected reactionsDisposer_: Record<string, () => void>;
 
-    constructor(props?: DataFiltersProps) {
+    constructor(props?: DataFiltersProps<FILTERS>) {
 
         this.items =  observable.map(props?.values || {}, {
             deep: false
@@ -35,16 +66,22 @@ export class DataFilters {
         });
     }
 
-    get(key: string) {
-        return this.items.get(key);
+    /**
+     * Get the value of a specific filter
+     * @param key The filter key
+     * @returns the filter value if defined
+     */
+    get<KEY extends FILTERS['key']>(key: KEY): FindByKey<FILTERS, KEY> | undefined {
+        return this.items.get(key) as FindByKey<FILTERS, KEY> | undefined;
     }
 
-    set(key: string, value: any, type: string) {
+
+    set<KEY extends FILTERS['key']>(key: KEY, value: FindByKey<FILTERS, KEY>['value'], type: FindByKey<FILTERS, KEY>['type']) {
         this.items.set(key, {
-            key: key,
-            value: value,
-            type: type
-        });
+            key,
+            value,
+            type
+        } as unknown as FILTERS);
         if (filterTypeReactions[type] && !this.reactionsDisposer_[key]) {
             this.reactionsDisposer_[key] = filterTypeReactions[type](this, key);
         }
@@ -171,18 +208,18 @@ export class DataPaging {
 }
 
 
-export type QueryParamsProps = {
-    filters?: DataFilters | DataFiltersProps,
+export type QueryParamsProps<FILTERS extends QueryFilter = any> = {
+    filters?: DataFilters<FILTERS> | DataFiltersProps<FILTERS>,
     paging?: DataPaging | DataPagingProps,
     sorting?: DataSorting | DataSortingProps,
 };
 
-export class QueryParams {
-    filters: DataFilters;
+export class QueryParams<FILTERS extends QueryFilter = any> {
+    filters: DataFilters<FILTERS>;
     paging: DataPaging;
     sorting: DataSorting;
 
-    constructor(props?: QueryParamsProps) {
+    constructor(props?: QueryParamsProps<FILTERS>) {
         if (props?.filters instanceof DataFilters) {
             this.filters = props.filters;
         } else {

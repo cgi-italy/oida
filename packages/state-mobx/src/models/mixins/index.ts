@@ -1,3 +1,9 @@
+/**
+ * Small composable pieces of state
+ * @packageDocumentation
+ * @module state-mobx/mixins
+ */
+
 export * from './has-visibility';
 export * from './is-hoverable';
 export * from './is-selectable';

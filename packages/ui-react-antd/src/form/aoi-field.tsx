@@ -4,18 +4,18 @@ import { Tag, Button, Tooltip, Drawer, Popover } from 'antd';
 
 import { EnvironmentOutlined, LinkOutlined, EditOutlined, ImportOutlined } from '@ant-design/icons';
 import { AoiField, AoiAction, AOI_FIELD_ID } from '@oida/core';
-
-import { antdFormFieldRendererFactory } from './antd-form-field-renderer-factory';
+import { AoiImportConfig, FormFieldRendererBaseProps } from '@oida/ui-react-core';
 
 import { DrawLineIcon } from '../icons/draw-line';
 import { DrawBboxIcon } from '../icons/draw-bbox';
 import { DrawPolygonIcon } from '../icons/draw-polygon';
 
+import { antdFormFieldRendererFactory } from './antd-form-field-renderer-factory';
 import { AoiImportRenderer } from './aoi-import';
 import { AoiEditor } from './aoi-editor';
-import { AoiImportConfig } from '@oida/ui-react-core';
 
-export type AoiFieldRendererProps = Omit<AoiField<AoiImportConfig>, 'name' | 'type'> & {
+
+export type AoiFieldRendererProps = FormFieldRendererBaseProps<AoiField<AoiImportConfig>> & {
     importDrawerPlacement?: 'left' | 'right'
 };
 

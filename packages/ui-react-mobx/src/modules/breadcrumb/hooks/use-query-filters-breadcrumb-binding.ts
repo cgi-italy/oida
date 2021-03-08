@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { values, autorun } from 'mobx';
 
-import { getFormFieldSerializer, AnyFormFieldDefinition, QueryFilter } from '@oida/core';
+import { getFormFieldSerializer, IFormFieldDefinition, QueryFilter } from '@oida/core';
 import { DataFilters } from '@oida/state-mobx';
 
 import { BreadcrumbItemProps } from '@oida/ui-react-core';
@@ -12,7 +12,7 @@ import { useBreadcrumbModule } from './use-breadcrumb-module';
 
 
 export type QueryFilterBreadcrumbBindingProps = {
-    filtersConfig: AnyFormFieldDefinition[];
+    filtersConfig: IFormFieldDefinition[];
     filteringState: DataFilters;
     breadcrumbModule: BreadcrumbModule;
 };
@@ -49,9 +49,9 @@ export const useQueryFiltersBreadcrumbBinding = (props: QueryFilterBreadcrumbBin
                     if (serializer) {
 
                         const filterTitle = serializer.toString({
-                            title: filterConfig.title || filterConfig.name,
-                            config: filterConfig.config,
-                            value: filter.value
+                            value: filter.value,
+                            onChange: () => {},
+                            ...filterConfig
                         });
 
                         const breadcrumbItem = {

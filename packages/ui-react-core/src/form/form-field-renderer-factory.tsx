@@ -1,19 +1,24 @@
 
 import React from 'react';
 
-import { FormField, FormFieldDefinition, isFormFieldConfigFromState, FormFieldState } from '@oida/core';
+import { FormField, FormFieldConfig, FormFieldDefinition, FormFieldState } from '@oida/core';
 
 type ExtractType<IT extends FormField<any, any, any>> = IT extends FormField<infer TYPE, any, any> ? TYPE : never;
 type ExtractValue<IT extends FormField<any, any, any>> = IT extends FormField<any, infer T, any> ? T : never;
 type ExtractConfig<IT extends FormField<any, any, any>> = IT extends FormField<any, any, infer CONFIG> ? CONFIG : never;
 
 
-export type FormFieldRenderer<T extends FormField<any, any, any>> = (props: T) => JSX.Element | null;
-export type FormFieldExtendedRenderer<T extends FormField<any, any, any>> = (
-    props: Omit<
-        FormFieldDefinition<ExtractType<T>, ExtractValue<T>, ExtractConfig<T>> & FormFieldState<ExtractValue<T>>, 'rendererConfig'
-    > & Record<string, any>
+export type FormFieldRendererBaseProps<F extends FormField<any, any, any>> = Omit<F, 'type' | 'name' | 'rendererConfig'>;
+export type FormFieldRenderer<T extends FormField<any, any, any>> = (
+    props: FormFieldRendererBaseProps<T> & Record<string, any>
 ) => JSX.Element | null;
+
+export type FormFieldRendererWrapper<T extends FormField<any, any, any>> = (
+    props : Omit<FormFieldRendererBaseProps<T>, 'config'>
+        & {config: FormFieldConfig<ExtractConfig<T>, ExtractValue<T>>}
+        & Record<string, any>
+) => JSX.Element | null;
+
 
 export const formFieldRendererFactory = () => {
     const REGISTERED_RENDERERS = new Map<string, Map<string, FormFieldRenderer<any>>>();
@@ -47,7 +52,8 @@ export const formFieldRendererFactory = () => {
 
         let FormFieldRenderer =  renderers.get(rendererId)!;
 
-        if (isFormFieldConfigFromState(definition)) {
+        if (typeof(definition.config) === 'function') {
+            //wrap the field renderer to extract the config from the state and pass it to over
             let Renderer = FormFieldRenderer;
             FormFieldRenderer = (props) => {
 
@@ -70,7 +76,7 @@ export const formFieldRendererFactory = () => {
 
         return {
             rendererId: rendererId,
-            FormFieldRenderer: FormFieldRenderer as FormFieldExtendedRenderer<T>
+            FormFieldRenderer: FormFieldRenderer as FormFieldRendererWrapper<T>
         };
     };
 

@@ -1,9 +1,9 @@
 import React from 'react';
 
 import { SearchOutlined, PlusOutlined } from '@ant-design/icons';
-import { STRING_FIELD_ID } from '@oida/core';
+import { STRING_FIELD_ID, IFormFieldDefinition } from '@oida/core';
 
-import { useEntityCollectionList, useDataPaging, useDataSorting, useDataFiltering, useSelector } from '@oida/ui-react-mobx';
+import { useEntityCollectionList, useDataPaging, useDataSorting, useFormData, useSelector } from '@oida/ui-react-mobx';
 import { DataCollectionList } from '@oida/ui-react-antd';
 import { DatasetExplorer } from '@oida/eo-mobx';
 
@@ -22,7 +22,7 @@ export type WmsDiscoveryProviderResultsProps = {
 
 export const WmsDiscoveryProviderResults = (props: WmsDiscoveryProviderResultsProps) => {
 
-    const searchFilters = [
+    const searchFilters: IFormFieldDefinition[] = [
         {
             name: 'search',
             type: STRING_FIELD_ID,
@@ -67,9 +67,9 @@ export const WmsDiscoveryProviderResults = (props: WmsDiscoveryProviderResultsPr
 
     let pagingProps = useDataPaging(props.provider.criteria.paging);
 
-    let filteringProps = useDataFiltering({
-        filteringState: props.provider.criteria.filters,
-        filters: searchFilters
+    let filteringProps = useFormData({
+        fieldValues: props.provider.criteria.filters,
+        fields: searchFilters
     });
 
     let sortingProps = useDataSorting({

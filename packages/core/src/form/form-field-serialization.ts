@@ -1,20 +1,22 @@
 
 import { createDynamicFactory } from '../utils';
 
-import { FormField } from './form-field';
+import { IFormFieldType, IFormFieldValueType, IFormField, IFormFieldDefinitions } from './form-field';
 
-type ExtractType<IT extends FormField<any, any, any>> = IT extends FormField<infer TYPE, any, any> ? TYPE : never;
-type ExtractValue<IT extends FormField<any, any, any>> = IT extends FormField<any, infer T, any> ? T : never;
-type ExtractConfig<IT extends FormField<any, any, any>> = IT extends FormField<any, any, infer CONFIG> ? CONFIG : never;
 
-export type FormFieldFromJSON<T> = (value: any) => T;
-export type FormFieldToJSON<T> = (value: T) => any;
-export type FormFieldToString<CONFIG, T> = (formField: {title: string, config: CONFIG, value: T}) => string;
+export type FormFieldFromJSON<TYPE extends IFormFieldType> = (value: any) => IFormFieldValueType<TYPE>;
+export type FormFieldToJSON<TYPE extends IFormFieldType> = (value: IFormFieldValueType<TYPE>) => any;
+export type FormFieldToStringOptions = {
+};
+export type FormFieldToString<TYPE extends IFormFieldType> = (
+    formField: IFormField<TYPE>,
+    options?: FormFieldToStringOptions & Record<string, any>
+) => string;
 
-export type FormFieldSerializer<CONFIG, T> = {
-    fromJSON: FormFieldFromJSON<T>;
-    toJSON: FormFieldToJSON<T>;
-    toString: FormFieldToString<CONFIG, T>;
+export type FormFieldSerializer<TYPE extends IFormFieldType> = {
+    fromJSON: FormFieldFromJSON<TYPE>;
+    toJSON: FormFieldToJSON<TYPE>;
+    toString: FormFieldToString<TYPE>;
 };
 
 const defaultFormFieldFromJSON = (value) => {
@@ -36,23 +38,25 @@ let defaultFormFieldSerializer = {
 };
 
 
-const formFieldSerializers = createDynamicFactory<FormFieldSerializer<any, any>>('formFieldsIO');
+const formFieldSerializers = createDynamicFactory<FormFieldSerializer<any>>('formFieldsIO');
 
-export const setFormFieldSerializer = <T extends FormField<any, any, any>>
-(type: ExtractType<T>, serializer: Partial<FormFieldSerializer<ExtractConfig<T>, ExtractValue<T>>>) => {
+export type FormFieldSerializerSetter<TYPE extends IFormFieldType> =
+ (type: TYPE, serializer: Partial<FormFieldSerializer<TYPE>>) => void;
+
+export function setFormFieldSerializer<TYPE extends IFormFieldType>(type: TYPE, serializer: Partial<FormFieldSerializer<TYPE>>) {
     formFieldSerializers.register(type, (config) => {
         return {
             ...defaultFormFieldSerializer,
             ...serializer
         };
     });
-};
+}
 
-export const getFormFieldSerializer = (type: string) => {
+
+export function getFormFieldSerializer<TYPE extends IFormFieldType>(type: TYPE): FormFieldSerializer<TYPE> {
     if (formFieldSerializers.isRegistered(type)) {
-        return formFieldSerializers.create(type);
+        return formFieldSerializers.create(type)!;
     } else {
         return defaultFormFieldSerializer;
     }
-};
-
+}

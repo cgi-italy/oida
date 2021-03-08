@@ -36,11 +36,12 @@ export const DatasetValueRangeSelector = (props: DatasetValueRangeSelectorProps)
                     max: domain?.max,
                     step: domain?.step
                 }}
-                rendererConfig={{props: {
+                sliderProps={{
                     tipFormatter: (value) => {
                         return `${value} ${units}`;
                     }
-                }}}
+                }}
+
             />
         </Form.Item>
     );

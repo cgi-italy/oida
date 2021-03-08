@@ -1,3 +1,9 @@
+/**
+ * Basic state objects definitions
+ * @packageDocumentation
+ * @module state-mobx/core
+ */
+
 export * from './collection';
 export * from './indexed-collection';
 export * from './query-params';

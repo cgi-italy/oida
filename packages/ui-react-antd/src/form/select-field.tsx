@@ -1,18 +1,21 @@
 import React, { useState, useEffect } from 'react';
 
 import { Select } from 'antd';
+import { SelectProps } from 'antd/lib/select';
 
 import { EnumField, ENUM_FIELD_ID, EnumChoice } from '@oida/core';
+import { FormFieldRendererBaseProps } from '@oida/ui-react-core';
 
 import { antdFormFieldRendererFactory } from './antd-form-field-renderer-factory';
 
+
 const Option = Select.Option;
 
-export type SelectFieldRendererProps = {
-    placeholder?: string;
-};
+export const SelectEnumRenderer = (
+    props: FormFieldRendererBaseProps<EnumField> & Omit<SelectProps<string | string[]>, 'onChange' | 'value'>
+) => {
 
-export const SelectEnumRenderer = (props: Omit<EnumField, 'name' | 'type'> & SelectFieldRendererProps) => {
+    const {value, onChange, title, required, config, autoFocus, ...renderProps} = props;
 
     const [options, setOptions] = useState<JSX.Element[]>([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -57,9 +60,9 @@ export const SelectEnumRenderer = (props: Omit<EnumField, 'name' | 'type'> & Sel
             value={props.value}
             onChange={onSelectChange}
             allowClear={!props.required}
-            placeholder={props.placeholder}
             mode={props.config.multiple ? 'multiple' : undefined}
             loading={isLoading}
+            {...renderProps}
         >
             {options}
         </Select>

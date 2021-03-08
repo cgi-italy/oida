@@ -1,17 +1,15 @@
 import React, { useState } from 'react';
-import { Input, Dropdown, Tag, Tooltip, Button, Space } from 'antd';
+import { Dropdown, Tag, Tooltip, Button, Space } from 'antd';
 import { DownOutlined, UpOutlined, SearchOutlined } from '@ant-design/icons';
 
+import { getFormFieldSerializer, IFormField } from '@oida/core';
 import { DataFiltererProps } from '@oida/ui-react-core';
 
-import { FormRenderer, InputFieldRenderer } from '../form';
-import { FormFieldValues, AnyFormFieldDefinition, QueryFilter, getFormFieldSerializer } from '@oida/core';
+import { DataForm, InputFieldRenderer } from '../form';
 
 
-type QueryFilterWithConfig = (QueryFilter & {config: any});
 type QueryFiltersTagsProps = {
-    filters: QueryFilterWithConfig[];
-    onFilterClear: (key: string) => void;
+    filters: IFormField[];
 };
 
 const QueryFiltersTags = (props: QueryFiltersTagsProps) => {
@@ -19,16 +17,14 @@ const QueryFiltersTags = (props: QueryFiltersTagsProps) => {
     const tags = props.filters.map((filter) => {
         const serializer = getFormFieldSerializer(filter.type);
         if (serializer) {
-            const tagContent = serializer.toString({
-                title: filter.key, value: filter.value, config: filter.config
-            });
+            const tagContent = serializer.toString(filter);
             if (tagContent) {
                 return (
                     <Tag
-                        key={filter.key}
-                        closable={true} onClose={() => props.onFilterClear(filter.key)}
+                        key={filter.name}
+                        closable={true} onClose={() => filter.onChange(undefined)}
                     >
-                        {filter.key}:{tagContent}
+                        {filter.name}:{tagContent}
                     </Tag>
                 );
             } else {
@@ -49,22 +45,24 @@ const QueryFiltersTags = (props: QueryFiltersTagsProps) => {
 
 export const AdvancedSearchFilterer = (props: DataFiltererProps) => {
 
+    const { mainFilter, ...formProps } = props;
     const [advancedSearchVisible, setAdvancedSearchVisible] = useState(false);
 
-    const tagsFilters: QueryFilterWithConfig[] = props.filters.filter((filter) => {
-        return (filter.name !== props.mainFilter && props.values.has(filter.name));
+    const tagsFilters: IFormField[] = formProps.fields.filter((filter) => {
+        return (filter.name !== mainFilter && formProps.values.has(filter.name));
     }).map((filter) => {
         return {
-            key: filter.name,
-            type: filter.type,
-            value: props.values.get(filter.name),
-            config: filter.config
+            ...filter,
+            value: formProps.values.get(filter.name),
+            onChange: (value) => {
+                formProps.onFieldChange(filter.name, value);
+            }
         };
     });
 
     const clearFilters = () => {
-        props.filters.forEach((filter) => {
-            props.onFilterChange(filter.name, undefined);
+        formProps.fields.forEach((filter) => {
+            formProps.onFieldChange(filter.name, undefined);
         });
     };
 
@@ -77,11 +75,9 @@ export const AdvancedSearchFilterer = (props: DataFiltererProps) => {
                 <React.Fragment>
                     {advancedSearchVisible &&
                     <React.Fragment>
-                        <FormRenderer
-                            fields={props.filters}
-                            values={props.values}
-                            onFieldChange={props.onFilterChange}
+                        <DataForm
                             className='antd-data-filterer'
+                            {...formProps}
                         />
                         <div className='advanced-search-actions'>
                             <Space>
@@ -98,23 +94,23 @@ export const AdvancedSearchFilterer = (props: DataFiltererProps) => {
             overlayClassName='advanced-search-filterer-dropdown'
         >
             <InputFieldRenderer
-                readOnly={!props.mainFilter}
-                value={props.mainFilter ? props.values.get(props.mainFilter) : undefined}
+                readOnly={!mainFilter}
+                value={mainFilter ? formProps.values.get(mainFilter) : undefined}
                 config={{}}
                 onChange={(value) => {
-                    if (props.mainFilter) {
-                        props.onFilterChange(props.mainFilter, value);
+                    if (mainFilter) {
+                        formProps.onFieldChange(mainFilter, value);
                     }
                 }}
                 onClick={(evt) => {
-                    if (!props.mainFilter) {
+                    if (!mainFilter) {
                         setAdvancedSearchVisible(true);
                     }
                 }}
                 prefix={
                     <React.Fragment>
                         <SearchOutlined/>
-                        <QueryFiltersTags filters={tagsFilters} onFilterClear={(key) => props.onFilterChange(key, undefined)}/>
+                        <QueryFiltersTags filters={tagsFilters}/>
                     </React.Fragment>
                 }
                 suffix={
@@ -131,6 +127,5 @@ export const AdvancedSearchFilterer = (props: DataFiltererProps) => {
     );
 
     return advancedSearchPanel;
-
 
 };

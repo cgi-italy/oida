@@ -1,4 +1,4 @@
-import { Geometry } from '../../types';
+import { Geometry } from '../../common';
 import { ILayerRenderer } from './map-layer-renderer';
 
 interface IGeometryStyle {

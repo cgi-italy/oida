@@ -1,19 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-import { Input } from 'antd';
-import { InputProps } from 'antd/lib/input/Input';
+import { InputNumber } from 'antd';
+import { InputNumberProps } from 'antd/lib/input-number';
 
-import { StringField, STRING_FIELD_ID } from '@oida/core';
+import { NumericField, NUMERIC_FIELD_ID } from '@oida/core';
 import { FormFieldRendererBaseProps } from '@oida/ui-react-core';
 
 import { antdFormFieldRendererFactory } from './antd-form-field-renderer-factory';
 
 
-export type InputFieldRendererProps = {
+export type NumericFieldRendererProps = {
     changeDelay?: number;
-} & Omit<InputProps, 'onChange' | 'onPressEnter' | 'value'>;
+} & Omit<InputNumberProps, 'onChange' | 'onPressEnter' | 'value'>;
 
-export const InputFieldRenderer = (props: FormFieldRendererBaseProps<StringField> & InputFieldRendererProps) => {
+export const NumericFieldRenderer = (props: FormFieldRendererBaseProps<NumericField> & NumericFieldRendererProps) => {
 
     const [inputValue, setInputValue] = useState(props.value);
 
@@ -39,8 +39,8 @@ export const InputFieldRenderer = (props: FormFieldRendererBaseProps<StringField
         }
     }, [inputValue]);
 
-    const onInputChange = (evt) => {
-        setInputValue(evt.target.value || undefined);
+    const onInputChange = (value) => {
+        setInputValue(value || undefined);
     };
 
     const onEnterPress = () => {
@@ -50,23 +50,26 @@ export const InputFieldRenderer = (props: FormFieldRendererBaseProps<StringField
     let { value, onChange, title, required, config, autoFocus, changeDelay, ...renderProps } =  props;
 
     return (
-        <Input
+        <InputNumber
             value={inputValue}
             onPressEnter={onEnterPress}
             onChange={onInputChange}
             autoFocus={props.autoFocus}
+            min={config.min}
+            max={config.max}
+            step={config.step}
             {...renderProps}
         >
-        </Input>
+        </InputNumber>
     );
 };
 
 
-InputFieldRenderer.defaultProps = {
+NumericFieldRenderer.defaultProps = {
     changeDelay: 1000
 };
 
-antdFormFieldRendererFactory.register<StringField>(
-    STRING_FIELD_ID, 'input',
-    InputFieldRenderer
+antdFormFieldRendererFactory.register<NumericField>(
+    NUMERIC_FIELD_ID, 'input',
+    NumericFieldRenderer
 );

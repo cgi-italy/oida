@@ -2,7 +2,7 @@
 import bbox from '@turf/bbox';
 import circle from '@turf/circle';
 
-import { Geometry } from '../../types';
+import { Geometry } from '../../common';
 
 export const circleApproxSteps = 50;
 

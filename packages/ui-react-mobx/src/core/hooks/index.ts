@@ -1,5 +1,5 @@
 export * from './use-selector';
-export * from './use-data-filtering';
+export * from './use-form-data';
 export * from './use-data-paging';
 export * from './use-data-sorting';
 export * from './use-entity-list-item';

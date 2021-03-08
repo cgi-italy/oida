@@ -1,10 +1,10 @@
 import { useEffect } from 'react';
 
-import { LoadingState, AoiValue, AoiAction, FormFieldState } from '@oida/core';
+import { LoadingState, AoiValue, AoiAction, FormFieldState, IFormFieldDefinition } from '@oida/core';
 
 import { AoiImportConfig } from '@oida/ui-react-core';
 
-import { useEntityCollectionList, useDataFiltering, useDataPaging, useDataSorting, useSelector } from '../../../core/hooks';
+import { useEntityCollectionList, useFormData, useDataPaging, useDataSorting, useSelector } from '../../../core/hooks';
 import { useCenterOnMap } from '../../map';
 import { Aoi, AoiSource } from '../models';
 import { createInMemoryAoiProvider } from '../utils';
@@ -146,7 +146,7 @@ const useMapAoiImporterBase = (props: MapAoiImporterProps) => {
 
     let paging = useDataPaging(selectedSourceGroup ? selectedSourceGroup.queryParams.paging : undefined);
 
-    let filters = [{
+    let filters: IFormFieldDefinition[] = [{
         name: 'geometryType',
         title: 'Geometry',
         type: 'enum',
@@ -161,7 +161,7 @@ const useMapAoiImporterBase = (props: MapAoiImporterProps) => {
             ],
             multiple: true
         }
-    }] as any;
+    }];
 
     let sortableFields;
     if (selectedSourceGroup && selectedSourceGroup.propertiesSchema) {
@@ -171,7 +171,7 @@ const useMapAoiImporterBase = (props: MapAoiImporterProps) => {
                 title: key.toLowerCase(),
                 type: 'string',
                 config: {}
-            };
+            } as IFormFieldDefinition;
         }));
 
         sortableFields = Object.keys(selectedSourceGroup.propertiesSchema).map((key) => {
@@ -193,9 +193,9 @@ const useMapAoiImporterBase = (props: MapAoiImporterProps) => {
             {key: 'name', name: 'Name'}
         ];
     }
-    let filtering = useDataFiltering({
-        filters: filters,
-        filteringState: selectedSourceGroup ? selectedSourceGroup.queryParams.filters : undefined
+    let filtering = useFormData({
+        fields: filters,
+        fieldValues: selectedSourceGroup ? selectedSourceGroup.queryParams.filters : undefined
     });
 
     let sorting = useDataSorting({

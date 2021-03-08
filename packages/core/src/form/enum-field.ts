@@ -10,13 +10,18 @@ export type EnumChoice = {
     description?: string
 };
 
-export type EnumField = FormField<typeof ENUM_FIELD_ID, string | string[], {
+export type EnumFieldConfig = {
     choices: EnumChoice[] | (() => Promise<EnumChoice[]>);
     multiple?: boolean;
-}>;
+};
 
-setFormFieldSerializer<EnumField>(ENUM_FIELD_ID, {
-    toString: (formField) => {
+export type EnumField = FormField<typeof ENUM_FIELD_ID, string | string[], EnumFieldConfig>;
+
+setFormFieldSerializer(ENUM_FIELD_ID, {
+    toString: (formField, options) => {
+        if (!formField.value) {
+            return 'unspecified';
+        }
         let selection: string[] = [];
         if (Array.isArray(formField.value)) {
             selection = [...formField.value];
@@ -24,18 +29,35 @@ setFormFieldSerializer<EnumField>(ENUM_FIELD_ID, {
             selection = [formField.value];
         }
 
-        if (selection.length <= 2) {
+        const maxExpand = options?.enumMaxExpand || 2;
+        if (selection.length <= maxExpand) {
+            let config: EnumFieldConfig;
+            if (typeof(formField.config) === 'function') {
+                config = formField.config(formField);
+            } else {
+                config = formField.config;
+            }
             return selection.map((val) => {
                 let choice: EnumChoice | undefined;
-                if (Array.isArray(formField.config.choices)) {
-                    choice = formField.config.choices.find((choice) => {
-                    return choice.value === val;
+                if (Array.isArray(config.choices)) {
+                    choice = config.choices.find((choice) => {
+                        return choice.value === val;
                     });
                 }
                 return choice ? choice.name : val;
             }).join(' or ');
         } else {
-            return `${formField.title}: ${selection.length} selected`;
+            return `${selection.length} selected`;
         }
     }
 });
+
+
+declare module './form-field' {
+    interface IFormFieldDefinitions {
+        [ENUM_FIELD_ID]:  FormFieldDefinition<typeof ENUM_FIELD_ID, string | string[], EnumFieldConfig>;
+    }
+    interface IFormFieldValueTypes {
+        [ENUM_FIELD_ID]: string | string[];
+    }
+}

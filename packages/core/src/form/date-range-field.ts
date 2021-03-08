@@ -1,4 +1,5 @@
 
+import moment from 'moment';
 import { FormField } from './form-field';
 import { setFormFieldSerializer } from './form-field-serialization';
 
@@ -9,11 +10,13 @@ export type DateRangeValue = {
     end: Date
 };
 
-export type DateRangeField = FormField<typeof DATE_RANGE_FIELD_ID, DateRangeValue, {
+export type DateRangeFieldConfig = {
     minDate?: Date,
     maxDate?: Date,
     withTime?: boolean;
-}>;
+};
+
+export type DateRangeField = FormField<typeof DATE_RANGE_FIELD_ID, DateRangeValue, DateRangeFieldConfig>;
 
 
 setFormFieldSerializer(DATE_RANGE_FIELD_ID, {
@@ -29,11 +32,33 @@ setFormFieldSerializer(DATE_RANGE_FIELD_ID, {
             end: new Date(value.end)
         };
     },
-    toString: (formField) => {
-        if (formField.config.withTime) {
-            return `From ${formField.value.start.toISOString()} to ${formField.value.end.toISOString()}`;
+    toString: (formField, options) => {
+        let config: DateRangeFieldConfig;
+        if (typeof(formField.config) === 'function') {
+            config = formField.config(formField);
         } else {
-            return `From ${formField.value.start.toISOString().substr(0, 10)} to ${formField.value.end.toISOString().substr(0, 10)}`;
+            config = formField.config;
         }
+        let format = options?.dateFormat;
+        if (!format) {
+            if (config.withTime) {
+                format = 'YYYY-MM-DD HH:mm:ss [UTC]';
+            } else {
+                format = 'YYYY-MM-DD';
+            }
+        }
+        return formField.value
+            ? `From ${moment.utc(formField.value.start).format(format)} to ${moment.utc(formField.value.end).format(format)}`
+            : 'unspecified';
     }
 });
+
+declare module './form-field' {
+    interface IFormFieldDefinitions {
+        [DATE_RANGE_FIELD_ID]:  FormFieldDefinition<typeof DATE_RANGE_FIELD_ID, DateRangeValue, DateRangeFieldConfig>;
+    }
+    interface IFormFieldValueTypes {
+        [DATE_RANGE_FIELD_ID]: DateRangeValue;
+    }
+}
+

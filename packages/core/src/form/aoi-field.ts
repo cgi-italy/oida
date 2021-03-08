@@ -1,4 +1,4 @@
-import { Geometry, GeometryTypes } from '../types/geometry';
+import { Geometry, GeometryTypes } from '../common';
 
 import { FormField, FormFieldDefinition, FormFieldRendererConfig } from './form-field';
 import { setFormFieldSerializer } from './form-field-serialization';
@@ -48,8 +48,8 @@ export type AoiField<IMPORT_CONFIG = any> = FormField<typeof AOI_FIELD_ID, AoiVa
 
 
 setFormFieldSerializer(AOI_FIELD_ID, {
-    toString: (formField) => {
-        return `${formField.title}: ${formField.value.name}`;
+    toString: (formField, options) => {
+        return formField.value?.props?.name || formField.value?.geometry.type || 'unspecified';
     }
 });
 
@@ -86,3 +86,15 @@ export const getAoiFieldFactory = () => {
     }
     return aoiFieldFactory;
 };
+
+declare module './form-field' {
+    interface IFormFieldDefinitions {
+        [AOI_FIELD_ID]:  {
+            type: typeof AOI_FIELD_ID
+         } & AoiFieldDefinition;
+    }
+
+    interface IFormFieldValueTypes {
+        [AOI_FIELD_ID]: AoiValue;
+    }
+}

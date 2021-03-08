@@ -1,30 +1,43 @@
 import React from 'react';
-
 import { Checkbox, Switch } from 'antd';
+import { SwitchProps } from 'antd/lib/switch';
+import { CheckboxProps } from 'antd/lib/checkbox';
 
 import { BooleanField, BOOLEAN_FIELD_ID } from '@oida/core';
+import { FormFieldRendererBaseProps } from '@oida/ui-react-core';
 
 import { antdFormFieldRendererFactory } from './antd-form-field-renderer-factory';
 
-export const BooleanCheckboxFieldRenderer = (props: Omit<BooleanField, 'name' | 'type'>) => {
 
-    const onChange = (evt) => props.onChange(evt.target.checked);
+export const BooleanCheckboxFieldRenderer = (
+    props: FormFieldRendererBaseProps<BooleanField> & Omit<CheckboxProps, 'onChange' | 'value'>
+) => {
+
+    const {value, onChange, title, required, config, autoFocus, ...renderProps} = props;
+
+    const onCheckboxChange = (evt) => onChange(evt.target.checked);
     return (
         <Checkbox
-            checked={props.value}
-            onChange={onChange}
-        >{props.title}
+            checked={value}
+            onChange={onCheckboxChange}
+            {...renderProps}
+        >
+            {props.title}
         </Checkbox>
     );
 };
 
-export const BooleanSwitchFieldRenderer = (props: Omit<BooleanField, 'name' | 'type'>) => {
+export const BooleanSwitchFieldRenderer = (props:
+    FormFieldRendererBaseProps<BooleanField> & Omit<SwitchProps, 'onChange'>
+) => {
 
-    const onChange = (checked) => props.onChange(checked);
+    const {value, onChange, title, required, config, autoFocus, ...renderProps} = props;
+
     return (
         <Switch
-            checked={props.value}
+            checked={value}
             onChange={onChange}
+            {...renderProps}
         />
     );
 };

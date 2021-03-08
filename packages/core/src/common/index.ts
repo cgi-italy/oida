@@ -1,3 +1,9 @@
+/**
+ * Simple Common types
+ * @packageDocumentation
+ * @module core/common
+ */
+
 export * from './loading-state';
 export * from './sort-order';
 export * from './query-params';
