@@ -46,7 +46,7 @@ export const DatasetToolsMenu = (props: DatasetToolsMenuProps) => {
     return (
         <Dropdown
             overlay={
-                <Menu onClick={(evt) => onToolClick(evt.key)}>
+                <Menu onClick={(evt) => onToolClick(evt.key as string)}>
                     {toolsMenuItems}
                 </Menu>
             }
