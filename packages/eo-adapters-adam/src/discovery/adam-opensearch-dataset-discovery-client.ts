@@ -144,7 +144,7 @@ export class AdamOpensearchDatasetDiscoveryClient {
                 bandGroups: [{
                     id: 'bands',
                     name: 'Bands',
-                    bandIndices: metadata.subDataset.map((subdataset, idx) => idx + 1)
+                    bandIndices: metadata.subDataset.map((subdataset, idx) => idx)
                 }],
                 bands: metadata.subDataset.map((subdataset, idx) => {
                     const minMax = this.getRoundedMinMax_(subdataset.minValue, subdataset.maxValue);

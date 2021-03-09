@@ -89,11 +89,12 @@ export const getRasterBandCombinationConfig = (options: getRasterBandCombination
         });
     } else {
         const bands = options.bands;
+
         return Promise.resolve({
             type: RasterBandModeType.Combination,
             red: bands[0].id,
-            green: bands[1].id,
-            blue: bands[2].id
+            green: bands[Math.min(1, bands.length - 1)].id,
+            blue: bands[Math.min(2, bands.length - 1)].id
         });
     }
 };

@@ -100,6 +100,8 @@ export function DatasetDimensionSeriesChart(props: DatasetDimensionSeriesChartPr
                 loadingState = LoadingState.Loading;
             } else if (series.loadingState.value === LoadingState.Success && loadingState !== LoadingState.Loading) {
                 loadingState = LoadingState.Success;
+            } else if (series.loadingState.value === LoadingState.Error && loadingState !== LoadingState.Success) {
+                loadingState = LoadingState.Error;
             }
 
             if (isStatsDimensionSeriesData(series.data)) {

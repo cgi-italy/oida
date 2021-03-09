@@ -169,6 +169,10 @@ export class DatasetDimensionSeries extends DatasetAnalysis<undefined> implement
                     runInAction(() => {
                         this.data = data || [];
                     });
+                }).catch(() => {
+                    runInAction(() => {
+                        this.data = [];
+                    });
                 });
             }
         });

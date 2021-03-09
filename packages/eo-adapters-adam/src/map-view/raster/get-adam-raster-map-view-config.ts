@@ -5,7 +5,8 @@ import {
     RasterMapViz,
     RASTER_VIZ_TYPE,
     RasterMapVizConfig,
-    RasterBandModeType
+    RasterBandModeType,
+    RasterBandModeChoice
 } from '@oida/eo-mobx';
 
 import { getPlottyColorScales } from '@oida/eo-geotiff';
@@ -56,26 +57,31 @@ export const getAdamRasterMapViewConfig = (
     let rasterVizconfig: RasterMapVizConfig;
 
     if (isMultiBandCoverage(datasetConfig.coverages)) {
+
+        const supportedModes: RasterBandModeChoice[] = [{
+            type: RasterBandModeType.Single,
+            default: {
+                band: datasetConfig.coverages.bands[0].idx.toString()
+            }
+        }];
+
+        if (datasetConfig.coverages.presets && datasetConfig.coverages.presets.length) {
+            supportedModes.push(                    {
+                type: RasterBandModeType.Preset,
+                default: {
+                    preset: datasetConfig.coverages.presets[0].id
+                }
+            });
+        }
+
+        supportedModes.push({
+            type: RasterBandModeType.Combination
+        });
+
         rasterVizconfig = {
             rasterSourceProvider: provider,
             bandMode: {
-                supportedModes: [
-                    {
-                        type: RasterBandModeType.Single,
-                        default: {
-                            band: datasetConfig.coverages.bands[0].idx.toString()
-                        }
-                    },
-                    {
-                        type: RasterBandModeType.Preset,
-                        default: {
-                            preset: datasetConfig.coverages.presets[0].id
-                        }
-                    },
-                    {
-                        type: RasterBandModeType.Combination
-                    }
-                ],
+                supportedModes: supportedModes,
                 bands: datasetConfig.coverages.bands.map((band) => {
                     return {
                         id: band.idx.toString(),
@@ -85,7 +91,7 @@ export const getAdamRasterMapViewConfig = (
                 }),
                 bandGroups: datasetConfig.coverages.bandGroups,
                 presets: datasetConfig.coverages.presets,
-                defaultMode: 1
+                defaultMode: 0
             },
             afterInit: afterInit,
             dimensions: datasetConfig.dimensions

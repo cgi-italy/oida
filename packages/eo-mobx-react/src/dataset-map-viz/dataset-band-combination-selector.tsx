@@ -8,6 +8,7 @@ import { QuestionCircleOutlined } from '@ant-design/icons';
 
 import { RasterBandModeCombination, RasterBandConfig, RasterBandGroup } from '@oida/eo-mobx';
 import { useSelector } from '@oida/ui-react-mobx';
+import { getColorFromString } from '@oida/core';
 
 
 const DatasetBandDnDType = 'DATASET_BAND';
@@ -30,16 +31,22 @@ const DatasetBandItem = (props: DatasetBandItemProps) => {
         }
     });
 
+    const {id, name, color} = props.band;
+
+    let label = name.length <= 5 ? name : `B${id.substr(0, 4)}`;
+    let backgroundColor = color || getColorFromString(name, 0.7, 0.7);
+
     return (
         <div
             className={classnames('dataset-band-item', {
                 'is-dragging': isDragging
             })}
             ref={drag}
+            title={name}
         >
-            <Avatar size='large' style={{backgroundColor: props.band.color}}
+            <Avatar size='large' style={{backgroundColor: backgroundColor}}
             >
-                {props.band.name}
+                {label}
             </Avatar>
         </div>
     );
@@ -67,6 +74,11 @@ const DatasetChannelItem = (props: DatasetChannelItemProps) => {
         }
     });
 
+    const {id, name, color} = props.band;
+
+    let label = name.length <= 5 ? name : `B${id.substr(0, 4)}`;
+    let backgroundColor = color || getColorFromString(name, 0.7, 0.7);
+
     return (
         <div className={classnames('dataset-channel-item', {
             'can-drop': canDrop,
@@ -75,10 +87,10 @@ const DatasetChannelItem = (props: DatasetChannelItemProps) => {
             <div className='dataset-channel-item-label'>
                 {props.channel}:
             </div>
-            <div className='dataset-channel-item-target' ref={drop}>
-                <Avatar size={50} style={{backgroundColor: props.band.color}}
+            <div className='dataset-channel-item-target' ref={drop} title={name}>
+                <Avatar size={50} style={{backgroundColor: backgroundColor}}
                 >
-                    {props.band.name}
+                    {label}
                 </Avatar>
             </div>
         </div>
