@@ -99,6 +99,7 @@ export const AdvancedSearchFilterer = (props: AdvancedSearchFiltererProps) => {
         >
             <InputFieldRenderer
                 readOnly={!mainFilter}
+                allowClear={true}
                 value={mainFilter ? formProps.values.get(mainFilter) : undefined}
                 config={{}}
                 onChange={(value) => {
@@ -118,27 +119,29 @@ export const AdvancedSearchFilterer = (props: AdvancedSearchFiltererProps) => {
                     </React.Fragment>
                 }
                 suffix={
-                    <React.Fragment>
-                        {!!mainFilter &&
-                            <Tooltip title={expandButtonTooltip || 'Advanced filtering'}>
-                            {
-                                advancedSearchVisible
-                                ? <UpOutlined onClick={() => setAdvancedSearchVisible(false)}/>
-                                : <DownOutlined onClick={() => setAdvancedSearchVisible(true)}/>
+                    !mainFilter || tagsFilters.length
+                    ? <React.Fragment>
+                            {!!mainFilter && tagsFilters.length &&
+                                <Tooltip title={expandButtonTooltip || 'Advanced filtering'}>
+                                {
+                                    advancedSearchVisible
+                                    ? <UpOutlined onClick={() => setAdvancedSearchVisible(false)}/>
+                                    : <DownOutlined onClick={() => setAdvancedSearchVisible(true)}/>
+                                }
+                                </Tooltip>
                             }
-                            </Tooltip>
-                        }
-                        {!mainFilter &&
-                            <Tooltip title={expandButtonTooltip || 'Filters'}>
-                                {expandButtonIcon &&
-                                    <div onClick={() => setAdvancedSearchVisible(!advancedSearchVisible)}>{props.expandButtonIcon}</div>
-                                }
-                                {!expandButtonIcon &&
-                                    <FilterOutlined onClick={() => setAdvancedSearchVisible(!advancedSearchVisible)}/>
-                                }
-                            </Tooltip>
-                        }
-                    </React.Fragment>
+                            {!mainFilter &&
+                                <Tooltip title={expandButtonTooltip || 'Filters'}>
+                                    {expandButtonIcon &&
+                                        <div onClick={() => setAdvancedSearchVisible(!advancedSearchVisible)}>{props.expandButtonIcon}</div>
+                                    }
+                                    {!expandButtonIcon &&
+                                        <FilterOutlined onClick={() => setAdvancedSearchVisible(!advancedSearchVisible)}/>
+                                    }
+                                </Tooltip>
+                            }
+                        </React.Fragment>
+                    : undefined
                 }
             />
         </Dropdown>

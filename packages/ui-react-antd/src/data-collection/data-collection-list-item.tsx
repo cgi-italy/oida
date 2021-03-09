@@ -1,12 +1,55 @@
-import React from 'react';
+import React, { useState } from 'react';
 import classnames from 'classnames';
-import { Descriptions } from 'antd';
+import { Descriptions, Typography } from 'antd';
 import {
     LoadingOutlined, PictureFilled
 } from '@ant-design/icons';
 
 import { AsyncImage } from '@oida/ui-react-core';
 
+
+type ExpandableDescriptionProps = {
+    description: React.ReactNode;
+    maxRows?: number;
+    className?: string;
+};
+
+const ExpandableDescription = (props: ExpandableDescriptionProps) => {
+
+    const [descriptionExpanded, setDescriptionExpanded] = useState(false);
+
+    return (
+        <React.Fragment>
+            {!descriptionExpanded &&
+                <Typography.Paragraph
+                    title={typeof(props.description) === 'string' ? props.description : undefined}
+                    className={classnames('data-collection-list-item-description', props.className)}
+                    type='secondary'
+                    ellipsis={{
+                        expandable: true,
+                        rows: props.maxRows || 2,
+                        symbol: 'more',
+                        onExpand: () => setDescriptionExpanded(true)
+                    }}
+                >
+                    {props.description}
+                </Typography.Paragraph>
+            }
+            {descriptionExpanded &&
+                <Typography.Paragraph
+                    className={classnames('data-collection-list-item-description', props.className)}
+                    type='secondary'
+                    ellipsis={false}
+                >
+                    {props.description}
+                    <a className='compress-link' onClick={() => setDescriptionExpanded(false)}>
+                        less
+                    </a>
+                </Typography.Paragraph>
+            }
+        </React.Fragment>
+    );
+};
 
 export type DatasetCollectionListItemMeta = {
     label: React.ReactNode,
@@ -18,7 +61,9 @@ export type DatasetCollectionListItemProps = {
     preview?: string | Promise<string>;
     icon?: React.ReactNode;
     metadata?: DatasetCollectionListItemMeta[];
+    description?: React.ReactNode;
     className?: string
+    maxDescriptionRows?: number;
 };
 
 export function DataCollectionDetailedListItem(props: DatasetCollectionListItemProps) {
@@ -36,6 +81,11 @@ export function DataCollectionDetailedListItem(props: DatasetCollectionListItemP
             >
                 {props.title}
             </div>
+            <ExpandableDescription
+                description={props.description}
+                maxRows={props.maxDescriptionRows}
+                className='data-collection-list-item-detailed-description'
+            />
             <div className='data-collection-list-item-detailed-content'>
                 <Descriptions
                     className={'data-collection-list-item-detailed-meta'}
@@ -87,6 +137,11 @@ export function DataCollectionCompactListItem(props: DatasetCollectionListItemPr
                 <div className='data-collection-compact-list-item-title'>
                     {props.title}
                 </div>
+                <ExpandableDescription
+                    description={props.description}
+                    maxRows={props.maxDescriptionRows}
+                    className='data-collection-compact-list-item-description'
+                />
                 {metadata}
             </div>
         </div>
