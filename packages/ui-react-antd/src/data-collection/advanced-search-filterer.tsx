@@ -64,6 +64,10 @@ export const AdvancedSearchFilterer = (props: AdvancedSearchFiltererProps) => {
         };
     });
 
+    const enableAdvancedSearch = !mainFilter || formProps.fields.some((filter) => {
+        return filter.name !== mainFilter;
+    });
+
     const clearFilters = () => {
         formProps.fields.forEach((filter) => {
             formProps.onFieldChange(filter.name, undefined);
@@ -119,9 +123,9 @@ export const AdvancedSearchFilterer = (props: AdvancedSearchFiltererProps) => {
                     </React.Fragment>
                 }
                 suffix={
-                    !mainFilter || tagsFilters.length
+                    !mainFilter || enableAdvancedSearch
                     ? <React.Fragment>
-                            {!!mainFilter && tagsFilters.length &&
+                            {!!mainFilter && enableAdvancedSearch &&
                                 <Tooltip title={expandButtonTooltip || 'Advanced filtering'}>
                                 {
                                     advancedSearchVisible
