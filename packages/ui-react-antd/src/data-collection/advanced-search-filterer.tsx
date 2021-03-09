@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Dropdown, Tag, Tooltip, Button, Space } from 'antd';
-import { DownOutlined, UpOutlined, SearchOutlined } from '@ant-design/icons';
+import { DownOutlined, UpOutlined, SearchOutlined, FilterOutlined } from '@ant-design/icons';
+import classnames from 'classnames';
 
 import { getFormFieldSerializer, IFormField } from '@oida/core';
 import { DataFiltererProps } from '@oida/ui-react-core';
@@ -24,7 +25,7 @@ const QueryFiltersTags = (props: QueryFiltersTagsProps) => {
                         key={filter.name}
                         closable={true} onClose={() => filter.onChange(undefined)}
                     >
-                        {filter.name}:{tagContent}
+                        {filter.title || filter.name}:{tagContent}
                     </Tag>
                 );
             } else {
@@ -42,10 +43,13 @@ const QueryFiltersTags = (props: QueryFiltersTagsProps) => {
     );
 };
 
+export type AdvancedSearchFiltererProps = {
+    expandButtonTooltip?: string;
+    expandButtonIcon?: React.ReactNode;
+} & DataFiltererProps;
+export const AdvancedSearchFilterer = (props: AdvancedSearchFiltererProps) => {
 
-export const AdvancedSearchFilterer = (props: DataFiltererProps) => {
-
-    const { mainFilter, ...formProps } = props;
+    const { mainFilter, expandButtonTooltip, expandButtonIcon, ...formProps } = props;
     const [advancedSearchVisible, setAdvancedSearchVisible] = useState(false);
 
     const tagsFilters: IFormField[] = formProps.fields.filter((filter) => {
@@ -90,7 +94,7 @@ export const AdvancedSearchFilterer = (props: DataFiltererProps) => {
                 </React.Fragment>
 
             }
-            className='advanced-search-filterer'
+            className={classnames('advanced-search-filterer', {'without-main-filter': !mainFilter})}
             overlayClassName='advanced-search-filterer-dropdown'
         >
             <InputFieldRenderer
@@ -104,23 +108,37 @@ export const AdvancedSearchFilterer = (props: DataFiltererProps) => {
                 }}
                 onClick={(evt) => {
                     if (!mainFilter) {
-                        setAdvancedSearchVisible(true);
+                        setAdvancedSearchVisible(!advancedSearchVisible);
                     }
                 }}
                 prefix={
                     <React.Fragment>
-                        <SearchOutlined/>
+                        {!!mainFilter && <SearchOutlined/>}
                         <QueryFiltersTags filters={tagsFilters}/>
                     </React.Fragment>
                 }
                 suffix={
-                    <Tooltip title='Advanced filtering'>
-                    {
-                        advancedSearchVisible
-                        ? <UpOutlined onClick={() => setAdvancedSearchVisible(false)}/>
-                        : <DownOutlined onClick={() => setAdvancedSearchVisible(true)}/>
-                    }
-                    </Tooltip>
+                    <React.Fragment>
+                        {!!mainFilter &&
+                            <Tooltip title={expandButtonTooltip || 'Advanced filtering'}>
+                            {
+                                advancedSearchVisible
+                                ? <UpOutlined onClick={() => setAdvancedSearchVisible(false)}/>
+                                : <DownOutlined onClick={() => setAdvancedSearchVisible(true)}/>
+                            }
+                            </Tooltip>
+                        }
+                        {!mainFilter &&
+                            <Tooltip title={expandButtonTooltip || 'Filters'}>
+                                {expandButtonIcon &&
+                                    <div onClick={() => setAdvancedSearchVisible(!advancedSearchVisible)}>{props.expandButtonIcon}</div>
+                                }
+                                {!expandButtonIcon &&
+                                    <FilterOutlined onClick={() => setAdvancedSearchVisible(!advancedSearchVisible)}/>
+                                }
+                            </Tooltip>
+                        }
+                    </React.Fragment>
                 }
             />
         </Dropdown>
