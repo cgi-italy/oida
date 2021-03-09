@@ -1,7 +1,8 @@
 import React from 'react';
 import { InputNumber, Slider } from 'antd';
 import { InputNumberProps } from 'antd/lib/input-number';
-import { SliderProps } from 'antd/lib/slider';
+import { SliderRangeProps } from 'antd/lib/slider';
+
 import classnames from 'classnames';
 
 import { NumericRangeField, NUMERIC_RANGE_FIELD_ID } from '@oida/core';
@@ -9,9 +10,10 @@ import { FormFieldRendererBaseProps } from '@oida/ui-react-core';
 
 import { antdFormFieldRendererFactory } from './antd-form-field-renderer-factory';
 
+
 export type NumericRangeFieldRendererProps = FormFieldRendererBaseProps<NumericRangeField> & {
-    sliderProps?: SliderProps,
-    numericInputProps?: InputNumberProps
+    sliderProps?: Partial<SliderRangeProps>,
+    numericInputProps?: Partial<InputNumberProps>
 };
 
 export const NumericRangeFieldRenderer = (props: NumericRangeFieldRendererProps) => {

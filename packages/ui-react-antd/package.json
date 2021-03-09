@@ -29,7 +29,7 @@
     "registry": "https://nexus.dev.eoss-cloud.it/repository/npm-cgi-eo/"
   },
   "peerDependencies": {
-    "antd": "^4.2.4",
+    "antd": "^4.x",
     "classnames": "^2.2.6",
     "moment": "^2.x",
     "react": "^16.8.6",
