@@ -50,7 +50,8 @@ export const bindAoiValueToMap = (props: bindAoiValueToMapProps) => {
                     id: `filterAoi${nextAoiId++}`,
                     name: valueProps.name ? valueProps.name : value.geometry.type,
                     geometry: value.geometry,
-                    color: color
+                    color: color,
+                    visible: false
                 });
 
                 props.aois.add(aoiInstance);
