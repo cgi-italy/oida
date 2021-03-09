@@ -30,6 +30,7 @@
     "@oida/core": "file:../core",
     "@oida/eo-mobx": "file:../eo-mobx",
     "@oida/state-mobx": "file:../state-mobx",
+    "@oida/ui-react-mobx": "file:../ui-react-mobx",
     "mediaelement": "^4.2.16",
     "tslib": "^2.0.1",
     "uuid": "^8.0.0"
