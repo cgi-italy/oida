@@ -45,11 +45,14 @@ export class OLFeatureSelectInteraction  implements IFeatureSelectInteractionImp
     initInteraction_(onFeatureSelect) {
         this.olInteraction_ = new OLSelectInteraction({
             condition: click,
-            hitTolerance: 5
+            hitTolerance: 5,
+            drillPick: true
         });
 
+        let lastSelectedFeatureIdx = -1;
+
         this.olInteraction_.on('select', (evt) => {
-            let feature = evt.selected;
+            let features = evt.selected;
 
             let selectionMode = SelectionMode.Replace;
             if (this.multiple_) {
@@ -59,13 +62,29 @@ export class OLFeatureSelectInteraction  implements IFeatureSelectInteractionImp
                     selectionMode = SelectionMode.Add;
                 }
             }
-            if (feature) {
-                onFeatureSelect({
-                    featureId: feature.getId(),
-                    data: feature.get(OLFeatureLayer.FEATURE_DATA_KEY),
-                    mode: selectionMode
-                });
+            if (features.length) {
+                if (selectionMode === SelectionMode.Replace) {
+                    // implement cycle picking: when clicking multiple times on the same point the selection
+                    // will cycle through the features under the cursor
+                    lastSelectedFeatureIdx = (lastSelectedFeatureIdx + 1) % features.length;
+                    const feature = features[lastSelectedFeatureIdx];
+                    onFeatureSelect({
+                        featureId: feature.getId(),
+                        data: feature.get(OLFeatureLayer.FEATURE_DATA_KEY),
+                        mode: selectionMode
+                    });
+                } else {
+                    lastSelectedFeatureIdx = -1;
+                    features.forEach((feature) => {
+                        onFeatureSelect({
+                            featureId: feature.getId(),
+                            data: feature.get(OLFeatureLayer.FEATURE_DATA_KEY),
+                            mode: selectionMode
+                        });
+                    });
+                }
             } else {
+                lastSelectedFeatureIdx = -1;
                 onFeatureSelect({
                     featureId: undefined,
                     mode: selectionMode

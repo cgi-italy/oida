@@ -22,6 +22,7 @@ export class CesiumFeatureSelectInteraction implements IFeatureSelectInteraction
     private handler_;
     private onFeatureSelect_;
     private multiple_: boolean;
+    private lastSelectedFeatureIdx_ = -1;
 
     constructor(props: IFeatureSelectInteractionProps<CesiumMapRenderer>) {
         this.viewer_ = props.mapRenderer.getViewer();
@@ -82,23 +83,39 @@ export class CesiumFeatureSelectInteraction implements IFeatureSelectInteraction
 
     selectClickedEntity_(selectionMode, movement) {
 
-        let pickedObjects = this.viewer_.scene.drillPick(movement.position);
-        const pickInfo = pickedObjects.find(pickInfo => isFeaturePickable(pickInfo));
+        const pickedObjects = this.viewer_.scene.drillPick(movement.position).filter((pickInfo) => isFeaturePickable(pickInfo));
 
-        if (pickInfo) {
-            let feature = getPickedFeature(pickInfo);
-
-            let layer = getPickedLayer(pickInfo);
-            if (layer && layer.onLayerPick) {
-                setNonPickableFeaturesVisibility(pickedObjects, false);
-                this.viewer_.scene.render();
-                let coordinate = this.viewer_.scene.pickPosition(movement.position);
-                setNonPickableFeaturesVisibility(pickedObjects, true);
-                layer.onLayerPick(coordinate, feature?.id, pickInfo);
+        if (pickedObjects.length) {
+            if (selectionMode === SelectionMode.Replace) {
+                this.lastSelectedFeatureIdx_ = (this.lastSelectedFeatureIdx_ + 1) % pickedObjects.length;
+                const pickInfo = pickedObjects[this.lastSelectedFeatureIdx_];
+                const feature = getPickedFeature(pickInfo);
+                const layer = getPickedLayer(pickInfo);
+                if (layer && layer.onLayerPick) {
+                    setNonPickableFeaturesVisibility(pickedObjects, false);
+                    this.viewer_.scene.render();
+                    let coordinate = this.viewer_.scene.pickPosition(movement.position);
+                    setNonPickableFeaturesVisibility(pickedObjects, true);
+                    layer.onLayerPick(coordinate, feature?.id, pickInfo);
+                }
+                this.onFeatureSelect_({
+                    featureId: feature?.id,
+                    data: feature?.data,
+                    mode: selectionMode
+                });
+            } else {
+                this.lastSelectedFeatureIdx_ = -1;
+                pickedObjects.forEach((pickInfo) => {
+                    const feature = getPickedFeature(pickInfo);
+                    this.onFeatureSelect_({
+                        featureId: feature?.id,
+                        data: feature?.data,
+                        mode: selectionMode
+                    });
+                });
             }
-
-            this.onFeatureSelect_({featureId: feature?.id, data: feature?.data, mode: selectionMode});
         } else {
+            this.lastSelectedFeatureIdx_ = -1;
             this.onFeatureSelect_({
                 featureId: undefined,
                 mode: selectionMode

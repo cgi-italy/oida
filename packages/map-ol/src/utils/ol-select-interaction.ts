@@ -23,6 +23,7 @@ export class OLSelectInteraction extends Interaction {
 
     private condition_;
     private hitTolerance_: number;
+    private drillPick_: boolean;
 
     constructor(options) {
         super({
@@ -33,6 +34,7 @@ export class OLSelectInteraction extends Interaction {
 
         this.hitTolerance_ = options.hitTolerance ? options.hitTolerance : 0;
         this.condition_ = options.condition || singleClick;
+        this.drillPick_ = options.drillPick || false;
     }
 
     protected handleEvent_(mapBrowserEvent) {
@@ -42,19 +44,19 @@ export class OLSelectInteraction extends Interaction {
 
         let map = mapBrowserEvent.map;
 
-        let selected = null;
+        let selected: any[] = [];
 
         map.forEachFeatureAtPixel(mapBrowserEvent.pixel, (feature, layer) => {
             if (feature && !feature.get(OLFeatureLayer.FEATURE_PICKING_DISABLED_KEY)) {
-                selected = feature;
-                return true;
+                selected.push(feature);
+                return !this.drillPick_;
             }
         }, {
             hitTolerance: this.hitTolerance_
         });
 
         super.dispatchEvent(
-            new SelectEvent('select', selected, mapBrowserEvent)
+            new SelectEvent('select', this.drillPick_ ? selected : selected[0], mapBrowserEvent)
         );
 
         return pointerMove(mapBrowserEvent);
