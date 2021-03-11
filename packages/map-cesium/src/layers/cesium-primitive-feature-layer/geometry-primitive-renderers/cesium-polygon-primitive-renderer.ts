@@ -8,16 +8,27 @@ import PolygonHierarchy from 'cesium/Source/Core/PolygonHierarchy';
 import RectangleGeometry from 'cesium/Source/Core/RectangleGeometry';
 import RectangleOutlineGeometry from 'cesium/Source/Core/RectangleOutlineGeometry';
 import Rectangle from 'cesium/Source/Core/Rectangle';
-import CircleGeometry from 'cesium/Source/Core/CircleGeometry';
+import CesiumCircleGeometry from 'cesium/Source/Core/CircleGeometry';
 import CircleOutlineGeometry from 'cesium/Source/Core/CircleOutlineGeometry';
 import ColorGeometryInstanceAttribute from 'cesium/Source/Core/ColorGeometryInstanceAttribute';
 import GroundPrimitive from 'cesium/Source/Scene/GroundPrimitive';
 import Primitive from 'cesium/Source/Scene/Primitive';
 import PerInstanceColorAppearance from 'cesium/Source/Scene/PerInstanceColorAppearance';
 
-import { CesiumGeometryPrimitiveRenderer } from './cesium-geometry-primitive-renderer';
+import { BBoxGeometry, CircleGeometry, IPolygonStyle } from '@oida/core';
 
-export class CesiumPolygonPrimitiveRenderer implements CesiumGeometryPrimitiveRenderer {
+import { CesiumGeometryPrimitiveFeature, CesiumGeometryPrimitiveRenderer } from './cesium-geometry-primitive-renderer';
+
+type PolygonGeometry = GeoJSON.Polygon | GeoJSON.MultiPolygon | BBoxGeometry | CircleGeometry;
+export type CesiumPolygonPrimitiveRenderProps = {
+    fillPrimitive: Primitive | GroundPrimitive;
+    strokePrimitive: Primitive;
+    numGeometries: number;
+};
+
+export type CesiumPolygonPrimitiveFeature = CesiumGeometryPrimitiveFeature<CesiumPolygonPrimitiveRenderProps, IPolygonStyle>;
+
+export class CesiumPolygonPrimitiveRenderer implements CesiumGeometryPrimitiveRenderer<CesiumPolygonPrimitiveFeature> {
 
     protected polygons_: PrimitiveCollection;
     protected clampToGround_: boolean = false;
@@ -34,7 +45,7 @@ export class CesiumPolygonPrimitiveRenderer implements CesiumGeometryPrimitiveRe
         return this.polygons_;
     }
 
-    addFeature(id, geometry, style, data) {
+    addFeature(id: string, geometry: PolygonGeometry, style: IPolygonStyle, data: any) {
         let fillInstances: any = null;
         let outlineInstances: any = null;
 
@@ -102,47 +113,45 @@ export class CesiumPolygonPrimitiveRenderer implements CesiumGeometryPrimitiveRe
 
         let feature = {
             id: id,
-            fill: fill,
-            stroke: stroke,
-            numGeometries: fillInstances.length,
+            geometryRenderer: this as CesiumPolygonPrimitiveRenderer,
+            geometryType: geometry.type,
             style: style,
-            data: data
+            data: data,
+            renderProps: {
+                fillPrimitive: fill,
+                strokePrimitive: stroke,
+                numGeometries: fillInstances.length
+            }
         };
 
         return feature;
     }
 
-
-    updateGeometry(feature, geometry) {
+    updateGeometry(feature: CesiumPolygonPrimitiveFeature, geometry: PolygonGeometry) {
         this.removeFeature(feature);
 
         let updatedFeature = this.addFeature(feature.id, geometry, feature.style, feature.data);
-        feature.fill = updatedFeature.fill;
-        feature.stroke = updatedFeature.stroke;
-        feature.numGeometries = updatedFeature.numGeometries;
-
+        feature.renderProps = updatedFeature.renderProps;
     }
 
-    updateStyle(feature, style) {
+    updateStyle(feature: CesiumPolygonPrimitiveFeature, style: IPolygonStyle) {
 
-        this.updatePrimitiveColor_(feature.fill, style.fillColor);
-        this.updatePrimitiveColor_(feature.stroke, style.strokeColor);
+        this.updatePrimitiveColor_(feature.renderProps.fillPrimitive, style.fillColor);
+        this.updatePrimitiveColor_(feature.renderProps.strokePrimitive, style.strokeColor);
 
-        feature.stroke.show = style.visible;
-        feature.fill.show = style.visible;
-
-        feature.fill.pickingDisabled_ = style.pickingDisabled || false;
-        feature.stroke.pickingDisabled_ = style.pickingDisabled || false;
+        feature.renderProps.fillPrimitive.show = style.visible;
+        feature.renderProps.strokePrimitive.show = style.visible;
+        feature.renderProps.fillPrimitive.pickingDisabled_ = style.pickingDisabled || false;
+        feature.renderProps.strokePrimitive.pickingDisabled_ = style.pickingDisabled || false;
 
         feature.style = style;
 
     }
 
-    removeFeature(feature) {
-        this.polygons_.remove(feature.fill);
-        this.polygons_.remove(feature.stroke);
+    removeFeature(feature: CesiumPolygonPrimitiveFeature) {
+        this.polygons_.remove(feature.renderProps.fillPrimitive);
+        this.polygons_.remove(feature.renderProps.strokePrimitive);
     }
-
 
     clear() {
         this.polygons_.removeAll();
@@ -152,13 +161,13 @@ export class CesiumPolygonPrimitiveRenderer implements CesiumGeometryPrimitiveRe
         this.polygons_.destroy();
     }
 
-    protected createPolygonInstance_(id, coordinates, style) {
+    protected createPolygonInstance_(id: string, coordinates, style: IPolygonStyle) {
 
-        let polygonInstance = null;
-        let outlineInstance = null;
+        let polygonInstance: GeometryInstance | undefined;
+        let outlineInstance: GeometryInstance | undefined;
 
-        let outer = coordinates[0];
-        let holes: any[] = [];
+        const outer = coordinates[0];
+        const holes: PolygonHierarchy[] = [];
         for (let i = 1; i < coordinates.length; ++i) {
             if (coordinates[i].length > 2) {
                 holes.push(new PolygonHierarchy(
@@ -168,7 +177,7 @@ export class CesiumPolygonPrimitiveRenderer implements CesiumGeometryPrimitiveRe
         }
 
         if (outer.length >= 2) {
-            let polygonHierarchy = new PolygonHierarchy(
+            const polygonHierarchy = new PolygonHierarchy(
                 Cartesian3.fromDegreesArray([].concat(...outer)),
                 holes
             );
@@ -179,7 +188,7 @@ export class CesiumPolygonPrimitiveRenderer implements CesiumGeometryPrimitiveRe
                     vertexFormat : PerInstanceColorAppearance.VERTEX_FORMAT
                 }),
                 attributes: {
-                    color: new ColorGeometryInstanceAttribute(...style.fillColor)
+                    color: new ColorGeometryInstanceAttribute(...style.fillColor!)
                 },
                 id: id
             });
@@ -190,7 +199,7 @@ export class CesiumPolygonPrimitiveRenderer implements CesiumGeometryPrimitiveRe
                     vertexFormat : PerInstanceColorAppearance.VERTEX_FORMAT
                 }),
                 attributes: {
-                    color: new ColorGeometryInstanceAttribute(...style.strokeColor)
+                    color: new ColorGeometryInstanceAttribute(...style.strokeColor!)
                 },
                 id: id
             });
@@ -203,7 +212,7 @@ export class CesiumPolygonPrimitiveRenderer implements CesiumGeometryPrimitiveRe
         };
     }
 
-    protected createRectangleInstance_(id, extent, style) {
+    protected createRectangleInstance_(id: string, extent, style: IPolygonStyle) {
 
         let rectangleInstance = new GeometryInstance({
             geometry: new RectangleGeometry({
@@ -211,7 +220,7 @@ export class CesiumPolygonPrimitiveRenderer implements CesiumGeometryPrimitiveRe
                 vertexFormat : PerInstanceColorAppearance.VERTEX_FORMAT
             }),
             attributes: {
-                color: new ColorGeometryInstanceAttribute(...style.fillColor)
+                color: new ColorGeometryInstanceAttribute(...style.fillColor!)
             },
             id: id
         });
@@ -222,7 +231,7 @@ export class CesiumPolygonPrimitiveRenderer implements CesiumGeometryPrimitiveRe
                 vertexFormat : PerInstanceColorAppearance.VERTEX_FORMAT
             }),
             attributes: {
-                color: new ColorGeometryInstanceAttribute(...style.strokeColor)
+                color: new ColorGeometryInstanceAttribute(...style.strokeColor!)
             },
             id: id
         });
@@ -234,16 +243,16 @@ export class CesiumPolygonPrimitiveRenderer implements CesiumGeometryPrimitiveRe
         };
     }
 
-    protected createCircleInstance_(id, center, radius, style) {
+    protected createCircleInstance_(id: string, center: GeoJSON.Position, radius: number, style: IPolygonStyle) {
 
         let circleInstance = new GeometryInstance({
-            geometry: new CircleGeometry({
+            geometry: new CesiumCircleGeometry({
                 center: Cartesian3.fromDegrees(...center),
                 radius: radius,
                 vertexFormat : PerInstanceColorAppearance.VERTEX_FORMAT
             }),
             attributes: {
-                color: new ColorGeometryInstanceAttribute(...style.fillColor)
+                color: new ColorGeometryInstanceAttribute(...style.fillColor!)
             },
             id: id
         });
@@ -255,7 +264,7 @@ export class CesiumPolygonPrimitiveRenderer implements CesiumGeometryPrimitiveRe
                 vertexFormat : PerInstanceColorAppearance.VERTEX_FORMAT
             }),
             attributes: {
-                color: new ColorGeometryInstanceAttribute(...style.strokeColor)
+                color: new ColorGeometryInstanceAttribute(...style.strokeColor!)
             },
             id: id
         });
@@ -267,7 +276,7 @@ export class CesiumPolygonPrimitiveRenderer implements CesiumGeometryPrimitiveRe
         };
     }
 
-    protected updatePrimitiveColor_(primitive, color) {
+    protected updatePrimitiveColor_(primitive: Primitive, color) {
 
         if (primitive.ready) {
             const instanceIds = primitive._instanceIds;

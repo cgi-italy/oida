@@ -1,16 +1,19 @@
 import { CesiumMapLayer } from '../cesium-map-layer';
 
-import { IFeatureLayerRenderer, IFeatureStyle, GeometryTypes } from '@oida/core';
+import { IFeatureLayerRenderer, IFeatureStyle, FeatureGeometry } from '@oida/core';
 
-import { CesiumPointPrimitiveRenderer, CesiumLinePrimitiveRenderer, CesiumPolygonPrimitiveRenderer } from './geometry-primitive-renderers';
+import {
+    CesiumPointPrimitiveRenderer, CesiumLinePrimitiveRenderer, CesiumPolygonPrimitiveRenderer,
+    CesiumGeometryPrimitiveRenderer, GeometryStyle, CesiumGeometryPrimitiveFeature
+} from './geometry-primitive-renderers';
 
 export class CesiumPrimitiveFeatureLayer extends CesiumMapLayer implements IFeatureLayerRenderer {
 
-    protected featureMap_ = {};
+    protected featureMap_: Record<string, CesiumGeometryPrimitiveFeature> = {};
 
-    protected pointRenderer_;
-    protected lineRenderer_;
-    protected polygonRenderer_;
+    protected pointRenderer_: CesiumPointPrimitiveRenderer | undefined;
+    protected lineRenderer_: CesiumLinePrimitiveRenderer | undefined;
+    protected polygonRenderer_: CesiumPolygonPrimitiveRenderer | undefined;
 
     protected clampToGround_: boolean = false;
     protected pickCallbacks_;
@@ -26,22 +29,22 @@ export class CesiumPrimitiveFeatureLayer extends CesiumMapLayer implements IFeat
         };
     }
 
-    addFeature(id, geometry, style, data) {
+    addFeature(id: string, geometry: FeatureGeometry, style: IFeatureStyle, data: any) {
 
         if (!geometry) {
             return;
         }
 
-        let geometryRenderer = this.getOrCreateGeometryRenderer_(geometry.type);
-
-        if (geometryRenderer) {
+        const geometryRenderer = this.getOrCreateGeometryRenderer_(geometry.type);
+        const geometryStyle = this.getStyleForGeometry_(style, geometry.type);
+        if (geometryRenderer && geometryStyle) {
 
             try {
-                let feature = geometryRenderer.addFeature(id, geometry, this.getStyleForGeometry_(style, geometry.type), data);
+                const feature: CesiumGeometryPrimitiveFeature = geometryRenderer.addFeature(id, geometry, geometryStyle, data);
                 feature.geometryRenderer = geometryRenderer;
                 feature.geometryType = geometry.type;
-
                 feature.data = data;
+
                 this.featureMap_[id] = feature;
 
                 this.mapRenderer_.getViewer().scene.requestRender();
@@ -54,7 +57,7 @@ export class CesiumPrimitiveFeatureLayer extends CesiumMapLayer implements IFeat
 
     }
 
-    updateFeatureGeometry(id, geometry) {
+    updateFeatureGeometry(id: string, geometry: FeatureGeometry) {
 
         let feature = this.getFeature(id);
         if (feature) {
@@ -68,17 +71,20 @@ export class CesiumPrimitiveFeatureLayer extends CesiumMapLayer implements IFeat
         }
     }
 
-    updateFeatureStyle(id, style) {
+    updateFeatureStyle(id: string, style: IFeatureStyle) {
 
-        let feature = this.getFeature(id);
+        const feature = this.getFeature(id);
         if (feature) {
-            feature.geometryRenderer.updateStyle(feature, this.getStyleForGeometry_(style, feature.geometryType));
-            this.mapRenderer_.getViewer().scene.requestRender();
+            const geometryStyle = this.getStyleForGeometry_(style, feature.geometryType);
+            if (geometryStyle) {
+                feature.geometryRenderer.updateStyle(feature, geometryStyle);
+                this.mapRenderer_.getViewer().scene.requestRender();
+            }
         }
     }
 
 
-    removeFeature(id) {
+    removeFeature(id: string) {
 
         let feature = this.getFeature(id);
 
@@ -91,9 +97,15 @@ export class CesiumPrimitiveFeatureLayer extends CesiumMapLayer implements IFeat
     }
 
     removeAllFeatures() {
-        this.pointRenderer_.clear();
-        this.lineRenderer_.clear();
-        this.polygonRenderer_.clear();
+        if (this.pointRenderer_) {
+            this.pointRenderer_.clear();
+        }
+        if (this.lineRenderer_) {
+            this.lineRenderer_.clear();
+        }
+        if (this.polygonRenderer_) {
+            this.polygonRenderer_.clear();
+        }
 
         this.featureMap_ = {};
 
@@ -109,7 +121,7 @@ export class CesiumPrimitiveFeatureLayer extends CesiumMapLayer implements IFeat
         return feature ? feature.data : undefined;
     }
 
-    getFeature(id) {
+    getFeature(id: string) {
         return this.featureMap_[id];
     }
 
@@ -129,9 +141,9 @@ export class CesiumPrimitiveFeatureLayer extends CesiumMapLayer implements IFeat
         }
     }
 
-    protected getStyleForGeometry_(style: IFeatureStyle, geometryType: GeometryTypes) {
+    protected getStyleForGeometry_(style: IFeatureStyle, geometryType: FeatureGeometry['type']): GeometryStyle | undefined {
 
-        let geometryStyle;
+        let geometryStyle: GeometryStyle | undefined;
 
         switch (geometryType) {
             case 'Point':
@@ -153,9 +165,9 @@ export class CesiumPrimitiveFeatureLayer extends CesiumMapLayer implements IFeat
         return geometryStyle;
     }
 
-    protected getOrCreateGeometryRenderer_(geometryType: GeometryTypes) {
+    protected getOrCreateGeometryRenderer_(geometryType: FeatureGeometry['type']) {
 
-        let geometryRenderer;
+        let geometryRenderer: CesiumGeometryPrimitiveRenderer;
 
         switch (geometryType) {
             case 'Point':

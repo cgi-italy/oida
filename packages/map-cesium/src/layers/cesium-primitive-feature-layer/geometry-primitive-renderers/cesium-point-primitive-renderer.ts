@@ -4,12 +4,20 @@ import Color from 'cesium/Source/Core/Color';
 import HeightReference from 'cesium/Source/Scene/HeightReference';
 import BillboardCollection from 'cesium/Source/Scene/BillboardCollection';
 import PointPrimitiveCollection  from 'cesium/Source/Scene/PointPrimitiveCollection';
+import Billboard from 'cesium/Source/Scene/Billboard';
+import PointPrimitive from 'cesium/Source/Scene/PointPrimitive';
 
-import { IPointStyle, isIcon } from '@oida/core';
+import { IPointStyle, IIconStyle, ICircleStyle, isIcon } from '@oida/core';
 
-import { CesiumGeometryPrimitiveRenderer } from './cesium-geometry-primitive-renderer';
+import { CesiumGeometryPrimitiveFeature, CesiumGeometryPrimitiveRenderer } from './cesium-geometry-primitive-renderer';
 
-export class CesiumPointPrimitiveRenderer implements CesiumGeometryPrimitiveRenderer {
+export type CesiumPointPrimitiveRenderProps = {
+    primitives: (Billboard | PointPrimitive)[];
+};
+
+export type CesiumPointPrimitiveFeature = CesiumGeometryPrimitiveFeature<CesiumPointPrimitiveRenderProps, IPointStyle>;
+
+export class CesiumPointPrimitiveRenderer implements CesiumGeometryPrimitiveRenderer<CesiumPointPrimitiveFeature> {
     private billboards_: BillboardCollection;
     private points_: PointPrimitiveCollection;
     private primitives_: PrimitiveCollection;
@@ -38,109 +46,107 @@ export class CesiumPointPrimitiveRenderer implements CesiumGeometryPrimitiveRend
         return this.primitives_;
     }
 
-    addFeature(id, geometry, style: IPointStyle, data) {
+    addFeature(id: string, geometry: GeoJSON.Point | GeoJSON.MultiPoint, style: IPointStyle, data: any) {
 
-        let feature: any = null;
+        let feature: CesiumPointPrimitiveFeature = {
+            id: id,
+            data: data,
+            geometryType: geometry.type,
+            geometryRenderer: this,
+            style: style,
+            renderProps: {
+                primitives: []
+            }
+        };
 
         if (geometry.type === 'Point') {
+            let primitive;
             if (isIcon(style)) {
-                feature = this.createBillboard_(id, geometry.coordinates, style);
+                primitive = this.createBillboard_(id, geometry.coordinates, style);
             } else {
-                feature = this.createPoint_(id, geometry.coordinates, style);
+                primitive = this.createPoint_(id, geometry.coordinates, style);
             }
 
-            feature.entityId_ = id;
-            feature.pickingDisabled_ = style.pickingDisabled || false;
-            feature.pickCallbacks_ = this.pickCallbacks_;
-            feature.data_ = data;
+            primitive.entityId_ = id;
+            primitive.pickingDisabled_ = style.pickingDisabled || false;
+            primitive.pickCallbacks_ = this.pickCallbacks_;
+            primitive.data_ = data;
+            primitive.feature_ = feature;
+
+            feature.renderProps.primitives.push(primitive);
 
         } else if (geometry.type === 'MultiPoint') {
-            feature = [];
             let points = geometry.coordinates;
             for (let i = 0; i < points.length; ++i) {
-                let pointFeature;
+                let primitive;
                 if (isIcon(style)) {
-                    pointFeature = this.createBillboard_(`${id}_${i}`, points[i], style);
+                    primitive = this.createBillboard_(`${id}_${i}`, points[i], style);
                 } else {
-                    pointFeature = this.createPoint_(`${id}_${i}`, points[i], style);
+                    primitive = this.createPoint_(`${id}_${i}`, points[i], style);
                 }
 
-                pointFeature.entityId_ = id;
-                pointFeature.pickingDisabled_ = style.pickingDisabled || false;
-                pointFeature.pickCallbacks_ = this.pickCallbacks_;
-                pointFeature.data_ = data;
+                primitive.entityId_ = id;
+                primitive.pickingDisabled_ = style.pickingDisabled || false;
+                primitive.pickCallbacks_ = this.pickCallbacks_;
+                primitive.data_ = data;
+                primitive.feature_ = feature;
 
-                feature.push(pointFeature);
+                feature.renderProps.primitives.push(primitive);
             }
-
-            feature.id = id;
-            feature.style = style;
-            feature.data = data;
         }
 
         return feature;
     }
 
-    updateGeometry(feature, geometry) {
-        if (this.isMultiPoint_(feature)) {
-            let i = 0;
-            for (i = 0; i < feature.length; ++i) {
-                if (geometry.coordinates[i])
-                    this.updateBillboardGeometry_(feature[i], geometry.coordinates[i]);
-                else {
-                    this.billboards_.remove(feature[i]);
-                    this.points_.remove(feature[i]);
-                }
-            }
-            for (let j = i; j < geometry.coordinates.length; ++j) {
-                let pointFeature;
-                if (isIcon(feature.style)) {
-                    pointFeature = this.createBillboard_(`${feature.id}_${i}`, geometry.coordinates[j], feature.style);
-                } else {
-                    pointFeature = this.createPoint_(`${feature.id}_${i}`, geometry.coordinates[j], feature.style);
-                }
+    updateGeometry(feature: CesiumPointPrimitiveFeature, geometry: GeoJSON.Point | GeoJSON.MultiPoint) {
+        const primitives = feature.renderProps.primitives;
+        const coordinates = geometry.type === 'Point' ? [geometry.coordinates] : geometry.coordinates;
 
-                pointFeature.entityId_ = feature.id;
-                pointFeature.pickingDisabled_ = feature.style.pickingDisabled || false;
-                pointFeature.pickCallbacks_ = this.pickCallbacks_;
-                pointFeature.data_ = feature.data;
-
-                feature.push(pointFeature);
+        let i = 0;
+        for (i = 0; i < primitives.length; ++i) {
+            if (coordinates[i])
+                this.updatePrimitivedGeometry_(primitives[i], coordinates[i]);
+            else {
+                this.billboards_.remove(primitives[i]);
+                this.points_.remove(primitives[i]);
             }
-        } else {
-            this.updateBillboardGeometry_(feature, geometry.coordinates);
         }
+        for (let j = i; j < coordinates.length; ++j) {
+            let primitive;
+            if (isIcon(feature.style)) {
+                primitive = this.createBillboard_(`${feature.id}_${i}`, coordinates[j], feature.style);
+            } else {
+                primitive = this.createPoint_(`${feature.id}_${i}`, coordinates[j], feature.style);
+            }
+
+            primitive.entityId_ = feature.id;
+            primitive.pickingDisabled_ = feature.style.pickingDisabled || false;
+            primitive.pickCallbacks_ = this.pickCallbacks_;
+            primitive.data_ = feature.data;
+            primitive.feature_ = feature;
+
+            primitives.push(primitive);
+        }
+
+        feature.renderProps.primitives = primitives.slice(0, geometry.coordinates.length);
     }
 
-    updateStyle(feature, style) {
-        if (this.isMultiPoint_(feature)) {
-            for (let point of feature) {
-                if (isIcon(style)) {
-                    this.updateBillboardStyle_(point, style);
-                } else {
-                    this.updatePointStyle_(point, style);
-                }
-            }
-            feature.style = style;
-        } else {
+    updateStyle(feature: CesiumPointPrimitiveFeature, style: IPointStyle) {
+        feature.renderProps.primitives.forEach((primitive) => {
             if (isIcon(style)) {
-                this.updateBillboardStyle_(feature, style);
+                this.updateBillboardStyle_(primitive, style);
             } else {
-                this.updatePointStyle_(feature, style);
+                this.updatePointStyle_(primitive, style);
             }
-        }
+        });
+        feature.style = style;
     }
 
     removeFeature(feature) {
-        if (this.isMultiPoint_(feature)) {
-            for (let point of feature) {
-                this.billboards_.remove(point);
-                this.points_.remove(point);
-            }
-        } else {
-            this.billboards_.remove(feature);
-            this.points_.remove(feature);
-        }
+        feature.renderProps.primitives.forEach((primitive) => {
+            this.billboards_.remove(primitive);
+            this.points_.remove(primitive);
+        });
     }
 
 
@@ -172,11 +178,7 @@ export class CesiumPointPrimitiveRenderer implements CesiumGeometryPrimitiveRend
         return billboard;
     }
 
-    protected updateBillboardGeometry_(billboard, coordinates) {
-        billboard.position = Cartesian3.fromDegrees(...coordinates);
-    }
-
-    protected updateBillboardStyle_(billboard, style) {
+    protected updateBillboardStyle_(billboard: Billboard, style: IIconStyle) {
         if (style.color) {
             billboard.color = new Color(...style.color);
         }
@@ -201,7 +203,7 @@ export class CesiumPointPrimitiveRenderer implements CesiumGeometryPrimitiveRend
         billboard.pickingDisabled_ = style.pickingDisabled || false;
     }
 
-    protected createPoint_(id, coordinates, style) {
+    protected createPoint_(id: string, coordinates: GeoJSON.Position, style: ICircleStyle) {
         return this.points_.add({
             id: id,
             show: style.visible,
@@ -212,7 +214,7 @@ export class CesiumPointPrimitiveRenderer implements CesiumGeometryPrimitiveRend
         });
     }
 
-    protected updatePointStyle_(point, style) {
+    protected updatePointStyle_(point: PointPrimitive, style: ICircleStyle) {
 
         point.show = style.visible;
 
@@ -233,8 +235,8 @@ export class CesiumPointPrimitiveRenderer implements CesiumGeometryPrimitiveRend
 
     }
 
-    protected isMultiPoint_(feature) {
-        return Array.isArray(feature);
+    protected updatePrimitivedGeometry_(primitive: Billboard | PointPrimitive, coordinates: GeoJSON.Position) {
+        primitive.position = Cartesian3.fromDegrees(...coordinates);
     }
 
 }

@@ -9,9 +9,18 @@ import GroundPolylinePrimitive from 'cesium/Source/Scene/GroundPolylinePrimitive
 import Primitive from 'cesium/Source/Scene/Primitive';
 import PolylineColorAppearance from 'cesium/Source/Scene/PolylineColorAppearance';
 
-import { CesiumGeometryPrimitiveRenderer } from './cesium-geometry-primitive-renderer';
+import { CesiumGeometryPrimitiveRenderer, CesiumGeometryPrimitiveFeature } from './cesium-geometry-primitive-renderer';
+import { ILineStyle } from '@oida/core';
 
-export class CesiumLinePrimitiveRenderer implements CesiumGeometryPrimitiveRenderer {
+export type CesiumLinePrimitiveRenderProps = {
+    geometry: GeoJSON.LineString | GeoJSON.MultiLineString;
+    numGeometries: number;
+    primitive: Primitive | GroundPolylinePrimitive;
+    oldPrimitive?: Primitive | GroundPolylinePrimitive
+};
+
+export type CesiumLinePrimitiveFeature = CesiumGeometryPrimitiveFeature<CesiumLinePrimitiveRenderProps, ILineStyle>;
+export class CesiumLinePrimitiveRenderer implements CesiumGeometryPrimitiveRenderer<CesiumLinePrimitiveFeature> {
 
     protected polylines_: PrimitiveCollection;
     protected clampToGround_: boolean = false;
@@ -28,7 +37,7 @@ export class CesiumLinePrimitiveRenderer implements CesiumGeometryPrimitiveRende
         return this.polylines_;
     }
 
-    addFeature(id, geometry, style, data) {
+    addFeature(id: string, geometry: GeoJSON.LineString | GeoJSON.MultiLineString, style: ILineStyle, data: any) {
 
         let instances;
         if (geometry.type === 'LineString') {
@@ -61,14 +70,19 @@ export class CesiumLinePrimitiveRenderer implements CesiumGeometryPrimitiveRende
         primitive.pickCallbacks_ = this.pickCallbacks_;
         primitive.data_ = data;
 
-        let feature = {
+        const feature = {
             id: id,
-            primitive: primitive,
-            numGeometries: instances.length,
             style: style,
-            geometry: geometry,
-            data: data
+            data: data,
+            geometryType: geometry.type,
+            geometryRenderer: this as CesiumLinePrimitiveRenderer,
+            renderProps: {
+                geometry: geometry,
+                numGeometries: instances.length,
+                primitive: primitive
+            }
         };
+        primitive.feature_ = feature;
 
         return feature;
     }
@@ -77,36 +91,40 @@ export class CesiumLinePrimitiveRenderer implements CesiumGeometryPrimitiveRende
         this.updateFeature_(feature, {geometry: geometry});
     }
 
-    updateStyle(feature, style) {
+    updateStyle(feature: CesiumLinePrimitiveFeature, style: ILineStyle) {
 
         if (style.width !== feature.style.width) {
             // line width cannot be updated. recreate the feature
             this.updateFeature_(feature, {style: style});
         } else {
-            const {id, primitive, numGeometries} = feature;
-            primitive.readyPromise.then(() => {
-                if (numGeometries) {
-                    for (let i = 0; i < numGeometries; ++i) {
-                        let attributes = primitive.getGeometryInstanceAttributes(`${id}_${i}`);
-                        attributes.color = ColorGeometryInstanceAttribute.toValue(new Color(...style.color));
+            const {id, renderProps} = feature;
+            renderProps.primitive.readyPromise.then(() => {
+                if (renderProps.numGeometries) {
+                    for (let i = 0; i < renderProps.numGeometries; ++i) {
+                        let attributes = renderProps.primitive.getGeometryInstanceAttributes(`${id}_${i}`);
+                        if (style.color) {
+                            attributes.color = ColorGeometryInstanceAttribute.toValue(new Color(...style.color!));
+                        }
                     }
                 } else {
-                    let attributes = primitive.getGeometryInstanceAttributes(id);
-                    attributes.color = ColorGeometryInstanceAttribute.toValue(new Color(...style.color));
+                    let attributes = renderProps.primitive.getGeometryInstanceAttributes(id);
+                    if (style.color) {
+                        attributes.color = ColorGeometryInstanceAttribute.toValue(new Color(...style.color!));
+                    }
                 }
             });
 
-            feature.primitive.show = style.visible;
+            renderProps.primitive.show = style.visible;
             feature.style = style;
-            feature.primitive.pickingDisabled_ = style.pickingDisabled || false;
+            renderProps.primitive.pickingDisabled_ = style.pickingDisabled || false;
         }
     }
 
-    removeFeature(feature) {
-        if (feature.oldPrimitive) {
-            this.polylines_.remove(feature.oldPrimitive);
+    removeFeature(feature: CesiumLinePrimitiveFeature) {
+        if (feature.renderProps.oldPrimitive) {
+            this.polylines_.remove(feature.renderProps.oldPrimitive);
         }
-        this.polylines_.remove(feature.primitive);
+        this.polylines_.remove(feature.renderProps.primitive);
     }
 
 
@@ -124,7 +142,7 @@ export class CesiumLinePrimitiveRenderer implements CesiumGeometryPrimitiveRende
     }
 
 
-    protected createPolylineInstance_(id, coordinates, style) {
+    protected createPolylineInstance_(id: string, coordinates, style: ILineStyle) {
 
         let polylineGeometry;
         let polylineProps = {
@@ -142,7 +160,7 @@ export class CesiumLinePrimitiveRenderer implements CesiumGeometryPrimitiveRende
         let polygonInstance = new GeometryInstance({
             geometry: polylineGeometry,
             attributes : {
-                color : new ColorGeometryInstanceAttribute(...style.color)
+                color : new ColorGeometryInstanceAttribute(...style.color!)
             },
             id: id
         });
@@ -150,28 +168,29 @@ export class CesiumLinePrimitiveRenderer implements CesiumGeometryPrimitiveRende
         return polygonInstance;
     }
 
-    protected updateFeature_(feature, props: {geometry?, style?}) {
-        if (feature.oldPrimitive) {
+    protected updateFeature_(feature: CesiumLinePrimitiveFeature, props: {geometry?, style?}) {
+        const renderProps = feature.renderProps;
+        if (renderProps.oldPrimitive) {
             // there was a pending primitive update but the new primitive was not rendered yet.
             // remove it and act as if it was never updated
-            this.polylines_.remove(feature.primitive);
-            feature.primitive = feature.oldPrimitive;
+            this.polylines_.remove(renderProps.primitive);
+            renderProps.primitive = renderProps.oldPrimitive;
         }
-        let oldPrimitive = feature.primitive;
-        let updatedFeature = this.addFeature(
-            feature.id, props.geometry || feature.geometry, props.style || feature.style, feature.data
+        const oldPrimitive = renderProps.primitive;
+        const updatedFeature = this.addFeature(
+            feature.id, props.geometry || renderProps.geometry, props.style || feature.style, feature.data
         );
-        feature.primitive = updatedFeature.primitive;
-        feature.oldPrimitive = oldPrimitive;
+        renderProps.primitive = updatedFeature.renderProps.primitive;
+        renderProps.oldPrimitive = oldPrimitive;
         feature.style = updatedFeature.style;
-        feature.geometry = updatedFeature.geometry;
-        feature.numGeometries = updatedFeature.numGeometries;
+        renderProps.geometry = updatedFeature.renderProps.geometry;
+        renderProps.numGeometries = updatedFeature.renderProps.numGeometries;
 
         // to avoid flickering remove the old primitive only when the new primitive is ready to be rendered
-        updatedFeature.primitive.readyPromise.then(() => {
+        updatedFeature.renderProps.primitive.readyPromise.then(() => {
             this.polylines_.remove(oldPrimitive);
-            if (feature.oldPrimitive === oldPrimitive) {
-                delete feature.oldPrimitive;
+            if (feature.renderProps.oldPrimitive === oldPrimitive) {
+                delete feature.renderProps.oldPrimitive;
             }
         });
     }

@@ -1,4 +1,4 @@
-import { Geometry } from '../../common';
+import { Geometry, GeometryCollection } from '../../common';
 import { ILayerRenderer } from './map-layer-renderer';
 
 interface IGeometryStyle {
@@ -9,13 +9,13 @@ interface IGeometryStyle {
 
 export type Color = [number, number, number, number?];
 
-interface ICircleStyle extends IGeometryStyle {
+export interface ICircleStyle extends IGeometryStyle {
     radius?: number;
     fillColor?: Color;
     strokeColor?: Color;
 }
 
-interface IIconStyle extends IGeometryStyle {
+export interface IIconStyle extends IGeometryStyle {
     url: string;
     scale?: number;
     color?: Color;
@@ -45,11 +45,13 @@ export interface IFeatureStyle {
     polygon?: IPolygonStyle;
 }
 
+export type FeatureGeometry = Exclude<Geometry, GeoJSON.GeometryCollection | GeometryCollection>;
+
 export interface IFeatureLayerRenderer<T = any> extends ILayerRenderer {
-    addFeature(id: string, geometry: Geometry, style: IFeatureStyle, data?: T);
+    addFeature(id: string, geometry: FeatureGeometry, style: IFeatureStyle, data?: T);
     hasFeature(id: string): boolean;
     getFeatureData(id: string): T | undefined;
-    updateFeatureGeometry(id: string, geometry: Geometry);
+    updateFeatureGeometry(id: string, geometry: FeatureGeometry);
     updateFeatureStyle(id: string, style: IFeatureStyle);
     removeFeature(id: string);
     removeAllFeatures();
