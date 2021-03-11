@@ -73,47 +73,39 @@ export class CesiumLinePrimitiveRenderer implements CesiumGeometryPrimitiveRende
         return feature;
     }
 
-
     updateGeometry(feature, geometry) {
-
-        this.removeFeature(feature);
-
-        let updatedFeature = this.addFeature(feature.id, geometry, feature.style, feature.data);
-        feature.primitive = updatedFeature.primitive;
-        feature.numGeometries = updatedFeature.numGeometries;
-        feature.geometry = geometry;
+        this.updateFeature_(feature, {geometry: geometry});
     }
 
     updateStyle(feature, style) {
 
         if (style.width !== feature.style.width) {
-            let oldPrimitive = feature.primitive;
-            let updatedFeature = this.addFeature(feature.id, feature.geometry, style, feature.data);
-            feature.primitive = updatedFeature.primitive;
-            //updatedFeature.primitive.readyPromise.then(() => {
-                this.polylines_.remove(oldPrimitive);
-            //});
-
+            // line width cannot be updated. recreate the feature
+            this.updateFeature_(feature, {style: style});
         } else {
-            if (feature.numGeometries) {
-                for (let i = 0; i < feature.numGeometries; ++i) {
-                    let attributes = feature.primitive.getGeometryInstanceAttributes(`${feature.id}_${i}`);
+            const {id, primitive, numGeometries} = feature;
+            primitive.readyPromise.then(() => {
+                if (numGeometries) {
+                    for (let i = 0; i < numGeometries; ++i) {
+                        let attributes = primitive.getGeometryInstanceAttributes(`${id}_${i}`);
+                        attributes.color = ColorGeometryInstanceAttribute.toValue(new Color(...style.color));
+                    }
+                } else {
+                    let attributes = primitive.getGeometryInstanceAttributes(id);
                     attributes.color = ColorGeometryInstanceAttribute.toValue(new Color(...style.color));
                 }
-            } else {
-                let attributes = feature.primitive.getGeometryInstanceAttributes(feature.id);
-                attributes.color = ColorGeometryInstanceAttribute.toValue(new Color(...style.color));
-            }
+            });
 
             feature.primitive.show = style.visible;
+            feature.style = style;
+            feature.primitive.pickingDisabled_ = style.pickingDisabled || false;
         }
-
-        feature.style = style;
-
-        feature.primitive.pickingDisabled_ = style.pickingDisabled || false;
     }
 
     removeFeature(feature) {
+        if (feature.oldPrimitive) {
+            this.polylines_.remove(feature.oldPrimitive);
+        }
         this.polylines_.remove(feature.primitive);
     }
 
@@ -156,6 +148,32 @@ export class CesiumLinePrimitiveRenderer implements CesiumGeometryPrimitiveRende
         });
 
         return polygonInstance;
+    }
+
+    protected updateFeature_(feature, props: {geometry?, style?}) {
+        if (feature.oldPrimitive) {
+            // there was a pending primitive update but the new primitive was not rendered yet.
+            // remove it and act as if it was never updated
+            this.polylines_.remove(feature.primitive);
+            feature.primitive = feature.oldPrimitive;
+        }
+        let oldPrimitive = feature.primitive;
+        let updatedFeature = this.addFeature(
+            feature.id, props.geometry || feature.geometry, props.style || feature.style, feature.data
+        );
+        feature.primitive = updatedFeature.primitive;
+        feature.oldPrimitive = oldPrimitive;
+        feature.style = updatedFeature.style;
+        feature.geometry = updatedFeature.geometry;
+        feature.numGeometries = updatedFeature.numGeometries;
+
+        // to avoid flickering remove the old primitive only when the new primitive is ready to be rendered
+        updatedFeature.primitive.readyPromise.then(() => {
+            this.polylines_.remove(oldPrimitive);
+            if (feature.oldPrimitive === oldPrimitive) {
+                delete feature.oldPrimitive;
+            }
+        });
     }
 
 }
