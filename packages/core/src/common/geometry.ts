@@ -12,9 +12,13 @@ export interface CircleGeometry {
 
 export type Geometry =  GeoJSON.Geometry | BBoxGeometry | CircleGeometry | GeometryCollection;
 
+export type IndexableGeometry = Geometry & {
+    id?: string
+};
+
 export interface GeometryCollection {
     type: 'GeometryCollectionEx';
-    geometries: Geometry[];
+    geometries: IndexableGeometry[];
 }
 
 export type GeometryTypes = Geometry['type'];

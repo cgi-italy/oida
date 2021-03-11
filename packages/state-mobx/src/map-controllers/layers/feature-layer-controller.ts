@@ -1,13 +1,13 @@
 import { reaction, IReactionDisposer, IObservableArray, makeObservable, observable } from 'mobx';
+import { v4 as uuid } from 'uuid';
 
 import { FEATURE_LAYER_ID, IFeatureLayerRenderer, IMapRenderer, IFeatureStyle, Geometry, GeometryCollection } from '@oida/core';
 
+import { ArrayTracker } from '../../utils';
+import { FeatureLayer, FeatureInterface, FeatureStyleGetter, FeatureGeometryGetter } from '../../models/map/layers/feature-layer';
 import { MapLayerController } from './map-layer-controller';
 import { layerControllersFactory } from './layer-controllers-factory';
 
-import { ArrayTracker } from '../../utils';
-
-import { FeatureLayer, FeatureInterface, FeatureStyleGetter, FeatureGeometryGetter } from '../../models/map/layers/feature-layer';
 
 type FeatureTracker = {
     ids: Set<string>,
@@ -198,21 +198,31 @@ export class FeatureLayerController
                     });
                     this.addSimpleGeometryFeature_(feature, featureTracker);
                 } else {
-                    featureTracker.ids.forEach((id) => {
-                        layerRenderer.removeFeature(id);
-                    });
-                    featureTracker.ids.clear();
 
+                    const newIds = new Set<string>();
                     const style = this.styleGetter_(feature);
+
                     geometry.geometries.forEach((geometry, idx) => {
-                        let id = `${feature.id}_${idx}`;
-                        layerRenderer.addFeature(id, geometry, style[idx] || style, {
-                            model: feature,
-                            layer: layerRenderer
-                        });
-                        featureTracker.ids.add(id);
+                        const id = `${feature.id}_${geometry.id || uuid()}`;
+                        if (featureTracker.ids.has(id)) {
+                            layerRenderer.updateFeatureGeometry(id, geometry);
+                        } else {
+                            layerRenderer.addFeature(id, geometry, style[idx] || style, {
+                                model: feature,
+                                layer: layerRenderer
+                            });
+                        }
+                        newIds.add(id);
                     });
-                    featureTracker.geometryType = geometry.type;
+
+                    featureTracker.ids.forEach((id) => {
+                        if (!newIds.has(id)) {
+                            layerRenderer.removeFeature(id);
+                        }
+                    });
+
+                    featureTracker.ids = newIds;
+
                 }
             } else {
                 featureTracker.ids.forEach((id) => {
