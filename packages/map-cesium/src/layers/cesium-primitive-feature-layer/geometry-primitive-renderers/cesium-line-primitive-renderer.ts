@@ -9,8 +9,12 @@ import GroundPolylinePrimitive from 'cesium/Source/Scene/GroundPolylinePrimitive
 import Primitive from 'cesium/Source/Scene/Primitive';
 import PolylineColorAppearance from 'cesium/Source/Scene/PolylineColorAppearance';
 
-import { CesiumGeometryPrimitiveRenderer, CesiumGeometryPrimitiveFeature } from './cesium-geometry-primitive-renderer';
 import { ILineStyle } from '@oida/core';
+
+import { PICK_INFO_KEY, PickInfo } from '../../../utils/picking';
+import { CesiumPrimitiveFeatureLayer } from '../cesium-primitive-feature-layer';
+import { CesiumGeometryPrimitiveRenderer, CesiumGeometryPrimitiveFeature } from './cesium-geometry-primitive-renderer';
+
 
 export type CesiumLinePrimitiveRenderProps = {
     geometry: GeoJSON.LineString | GeoJSON.MultiLineString;
@@ -24,11 +28,11 @@ export class CesiumLinePrimitiveRenderer implements CesiumGeometryPrimitiveRende
 
     protected polylines_: PrimitiveCollection;
     protected clampToGround_: boolean = false;
-    protected pickCallbacks_;
+    protected layer_: CesiumPrimitiveFeatureLayer;
 
     constructor(config) {
         this.clampToGround_ = config.clampToGround || false;
-        this.pickCallbacks_ = config.pickCallbacks;
+        this.layer_ = config.layer;
 
         this.polylines_ = new PrimitiveCollection();
     }
@@ -65,11 +69,6 @@ export class CesiumLinePrimitiveRenderer implements CesiumGeometryPrimitiveRende
             primitive = this.polylines_.add(new Primitive(primitiveProps));
         }
 
-        primitive.entityId_ = id;
-        primitive.pickingDisabled_ = style.pickingDisabled || false;
-        primitive.pickCallbacks_ = this.pickCallbacks_;
-        primitive.data_ = data;
-
         const feature = {
             id: id,
             style: style,
@@ -82,7 +81,15 @@ export class CesiumLinePrimitiveRenderer implements CesiumGeometryPrimitiveRende
                 primitive: primitive
             }
         };
-        primitive.feature_ = feature;
+
+        const pickInfo: PickInfo = {
+            id: id,
+            data: data,
+            layer: this.layer_,
+            pickable: !style.pickingDisabled
+        };
+
+        primitive[PICK_INFO_KEY] = pickInfo;
 
         return feature;
     }
@@ -116,7 +123,8 @@ export class CesiumLinePrimitiveRenderer implements CesiumGeometryPrimitiveRende
 
             renderProps.primitive.show = style.visible;
             feature.style = style;
-            renderProps.primitive.pickingDisabled_ = style.pickingDisabled || false;
+
+            renderProps.primitive[PICK_INFO_KEY].pickable = !style.pickingDisabled;
         }
     }
 

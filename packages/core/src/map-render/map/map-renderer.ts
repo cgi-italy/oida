@@ -32,7 +32,7 @@ export interface IMapRendererProps {
 export type Size = [number, number];
 
 export interface IMapRenderer {
-
+    id: string;
     setTarget(target: HTMLElement): void;
     setViewport(viewport: IMapViewport, animate?: boolean): void;
     updateRendererProps(props: {[key: string]: any}): void;

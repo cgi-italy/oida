@@ -60,11 +60,6 @@ export const createPolygonEntity = (id: string, geometry: GeoJSON.Polygon, featu
         zIndex: style.zIndex || undefined
     });
 
-    Object.defineProperty(polygonEntity, 'pickingDisabled', {
-        value: style.pickingDisabled || false,
-        writable: true
-    });
-
     return polygonEntity;
 
 };
@@ -102,7 +97,6 @@ export const updatePolygonEntityStyle = (polygonEntity, featureStyle: IFeatureSt
         polygon.height = 0;
     }
 
-    polygonEntity.pickingDisabled = style.pickingDisabled || false;
 };
 
 export const createMultiPolygonEntity = (id, geometry: GeoJSON.MultiPolygon, featureStyle: IFeatureStyle, layerOptions) => {

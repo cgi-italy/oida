@@ -29,6 +29,10 @@ export class OLMapRenderer implements IMapRenderer {
         this.initRenderer_(props);
     }
 
+    get id() {
+        return OL_RENDERER_ID;
+    }
+
     setTarget(target: HTMLElement) {
         this.viewer_.setTarget(target);
     }

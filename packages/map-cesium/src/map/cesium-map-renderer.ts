@@ -46,6 +46,10 @@ export class CesiumMapRenderer implements IMapRenderer {
         this.initRenderer_(props);
     }
 
+    get id() {
+        return CESIUM_RENDERER_ID;
+    }
+
     setTarget(target: HTMLElement) {
 
         let parent = this.viewer_.container.parentNode;

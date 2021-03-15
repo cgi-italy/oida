@@ -12,7 +12,7 @@ import { CesiumMapLayer } from './cesium-map-layer';
 
 import { IVerticalProfileLayerRenderer, IVerticalProfile, IVerticalProfileStyle, VerticalProfileCoordinate } from '@oida/core';
 
-import { updateDataSource } from '../utils';
+import { PickInfo, PICK_INFO_KEY, updateDataSource } from '../utils';
 
 const cursor = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAADsQAAA7EB9YPtSQAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAF6SURBVDiNnZO9TgJBEMf/7NGcJFMsXCWKxo+EHA8gak8N9xDG5+HjMDwDodWWcOEFIBRiocT2riBhi729tYAjeh4R/HW72d/MzuxOBumcAqiZpnkBAEKINwDPABbJg5nE+oxz/mQYxq3jOEa5XDYBYDabiX6/r5RSnu/7DwDe07LeEVHguq4Kw1AnkVLqTqejiCgAUE3K50QUjMfjX2ISz/P0Jkhpa3POX1zXVX/aG9rttsrn88/bhlmWtUy79i6klLpQKCwBFBmAmuM4hmEYOx7kN9lsFo1GgwGosVwud23btrm3vcG27SPTNK9YtOZQH1prANBMCDGfTqerQwNMJpOVEGIOACeWZS2llP9p4jEDsFBKeb1eb+86ut2uiqJoCOAz3isRUeB53p/ZR6ORJiIf63n5QZWIglarFaaVI6XUzWYz3PzCm1hKDlOJc95ljN3X63VWqVSO4oYNBoMoiqKh7/uPAD52BYgpYj3OlwAghHgF8PK95pgvLpeADirdFxkAAAAASUVORK5CYII=';
 
@@ -66,8 +66,14 @@ export class CesiumVerticalProfileLayer extends CesiumMapLayer implements IVerti
             }
         });
 
-        entity.layer_ = this;
-        entity.data = data;
+        const pickInfo: PickInfo = {
+            id: id,
+            data: data,
+            layer: this,
+            pickable: true
+        };
+
+        entity[PICK_INFO_KEY] = pickInfo;
 
         this.dataSource_.entities.add(entity);
         this.updateDataSource_();
@@ -165,7 +171,15 @@ export class CesiumVerticalProfileLayer extends CesiumMapLayer implements IVerti
 
     }
 
-    onLayerHover(coordinate, itemId, pickInfo) {
+    shouldReceiveFeatureHoverEvents() {
+        return true;
+    }
+
+    shouldReceiveFeatureSelectEvents() {
+        return true;
+    }
+
+    onFeatureHover(coordinate: Cartesian3, pickInfo: PickInfo) {
         if (this.onCoordinateHover_) {
             if (coordinate) {
                 let cartographic = Cartographic.fromCartesian(coordinate);
@@ -173,14 +187,14 @@ export class CesiumVerticalProfileLayer extends CesiumMapLayer implements IVerti
                     CesiumMath.toDegrees(cartographic.longitude),
                     CesiumMath.toDegrees(cartographic.latitude),
                     cartographic.height
-                ], itemId);
+                ], pickInfo.id);
             } else {
                 this.onCoordinateHover_(undefined);
             }
         }
     }
 
-    onLayerPick(coordinate, itemId, pickInfo) {
+    onFeatureSelect(coordinate: Cartesian3, pickInfo: PickInfo) {
         if (this.onCoordinateSelect_) {
             if (coordinate) {
                 let cartographic = Cartographic.fromCartesian(coordinate);
@@ -188,7 +202,7 @@ export class CesiumVerticalProfileLayer extends CesiumMapLayer implements IVerti
                     CesiumMath.toDegrees(cartographic.longitude),
                     CesiumMath.toDegrees(cartographic.latitude),
                     cartographic.height
-                ], itemId);
+                ], pickInfo.id);
             } else {
                 this.onCoordinateSelect_(undefined);
             }
@@ -226,7 +240,10 @@ export class CesiumVerticalProfileLayer extends CesiumMapLayer implements IVerti
             entity.position_ = Cartesian3.fromDegrees(0, 0, 0);
 
             entity.position = new CallbackProperty(() => entity.position_, false);
-            entity.pickingDisabled = true;
+
+            entity[PICK_INFO_KEY] = {
+                pickable: false
+            };
         }
         return entity;
     }
@@ -248,7 +265,10 @@ export class CesiumVerticalProfileLayer extends CesiumMapLayer implements IVerti
             entity.position_ = Cartesian3.fromDegrees(0, 0, 0);
 
             entity.position = new CallbackProperty(() => entity.position_, false);
-            entity.pickingDisabled = true;
+
+            entity[PICK_INFO_KEY] = {
+                pickable: false
+            };
         }
         return entity;
     }

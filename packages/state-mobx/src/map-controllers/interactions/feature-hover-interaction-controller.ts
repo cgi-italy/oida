@@ -2,13 +2,12 @@ import { reaction } from 'mobx';
 
 import { MapInteractionController } from './map-interaction-controller';
 
-import { IFeatureHoverInteractionImplementation, FEATURE_HOVER_INTERACTION_ID } from '@oida/core';
+import { IFeatureHoverInteractionImplementation, FEATURE_HOVER_INTERACTION_ID, IFeature } from '@oida/core';
 
 import { interactionControllersFactory } from './interaction-controllers-factory';
 
 import { FeatureHoverInteraction } from '../../models/map/interactions/feature-hover-interaction';
 import { FeatureData } from '../layers/feature-layer-controller';
-import { FeatureInterface } from '../../models/map/layers/feature-layer';
 
 
 export class FeatureHoverInteractionController extends
@@ -33,10 +32,7 @@ export class FeatureHoverInteractionController extends
     protected getImplementationProps_() {
         return {
             ...super.getImplementationProps_(),
-            onFeatureHover: (hovered?: {
-                featureId: string,
-                data: FeatureData<FeatureInterface>
-            }) => {
+            onFeatureHover: (hovered: IFeature<FeatureData> | undefined) => {
                 if (hovered?.data) {
                     this.interaction_.selectionManager.setHovered(hovered?.data.model);
                 } else {

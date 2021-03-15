@@ -7,7 +7,7 @@ import { transform } from 'ol/proj';
 
 import bboxPolygon from '@turf/bbox-polygon';
 
-import { FEATURE_LAYER_ID, IFeatureLayerRenderer } from '@oida/core';
+import { FeatureLayerConfig, FEATURE_LAYER_ID, IFeature, IFeatureLayerRenderer } from '@oida/core';
 
 import { OLMapLayer } from './ol-map-layer';
 import { olLayersFactory } from './ol-layers-factory';
@@ -16,15 +16,20 @@ import { OLStyleParser } from '../utils/ol-style-parser';
 export class OLFeatureLayer extends OLMapLayer<VectorLayer> implements IFeatureLayerRenderer {
 
     static readonly FEATURE_DATA_KEY = 'data';
+    static readonly FEATURE_LAYER_KEY = 'layer';
     static readonly FEATURE_PICKING_DISABLED_KEY = 'pickingDisabled';
 
     protected geomParser_;
-    protected styleParser_;
+    protected styleParser_: OLStyleParser;
+    protected onFeatureHover_: ((feature: IFeature<any>, coordinate: GeoJSON.Position) => void) | undefined;
+    protected onFeatureSelect_: ((feature: IFeature<any>, coordinate: GeoJSON.Position) => void) | undefined;
 
-    constructor(config) {
+    constructor(config: FeatureLayerConfig) {
         super(config);
         this.geomParser_ = new GeoJSON();
         this.styleParser_ = new OLStyleParser();
+        this.onFeatureHover_ = config.onFeatureHover;
+        this.onFeatureSelect_ = config.onFeatureSelect;
     }
 
 
@@ -47,6 +52,7 @@ export class OLFeatureLayer extends OLMapLayer<VectorLayer> implements IFeatureL
             if (data) {
                 feature.set(OLFeatureLayer.FEATURE_DATA_KEY, data);
             }
+            feature.set(OLFeatureLayer.FEATURE_LAYER_KEY, this);
             this.olImpl_.getSource().addFeature(feature);
             return feature;
         }
@@ -95,6 +101,22 @@ export class OLFeatureLayer extends OLMapLayer<VectorLayer> implements IFeatureL
 
     removeAllFeatures() {
         this.olImpl_.getSource().clear(true);
+    }
+
+    shouldReceiveFeatureHoverEvents() {
+        return !!this.onFeatureHover_;
+    }
+
+    shouldReceiveFeatureSelectEvents() {
+        return !!this.onFeatureSelect_;
+    }
+
+    onFeatureHover(coordinate: GeoJSON.Position, feature: IFeature) {
+        this.onFeatureHover_!(feature.data, coordinate);
+    }
+
+    onFeatureSelect(coordinate: GeoJSON.Position, feature: IFeature) {
+        this.onFeatureSelect_!(feature.data, coordinate);
     }
 
     protected parseGeometry_(geometry) {

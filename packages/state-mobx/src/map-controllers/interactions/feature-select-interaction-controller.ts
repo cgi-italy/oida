@@ -2,14 +2,12 @@ import { autorun } from 'mobx';
 
 import { MapInteractionController } from './map-interaction-controller';
 
-import { IFeatureSelectInteractionImplementation, FEATURE_SELECT_INTERACTION_ID, SelectionMode } from '@oida/core';
+import { IFeatureSelectInteractionImplementation, FEATURE_SELECT_INTERACTION_ID, SelectionMode, IFeature } from '@oida/core';
 
 import { interactionControllersFactory } from './interaction-controllers-factory';
 
 import { FeatureSelectInteraction } from '../../models/map/interactions/feature-select-interaction';
 import { FeatureData } from '../layers/feature-layer-controller';
-import { FeatureInterface } from '../../models/map/layers/feature-layer';
-
 
 export class FeatureSelectInteractionController extends
     MapInteractionController<IFeatureSelectInteractionImplementation, FeatureSelectInteraction> {
@@ -22,12 +20,11 @@ export class FeatureSelectInteractionController extends
         return {
             ...super.getImplementationProps_(),
             onFeatureSelect: (selected: {
-                featureId?: string,
-                data?: FeatureData<FeatureInterface>,
+                feature: IFeature<FeatureData> | undefined,
                 mode: SelectionMode
             }) => {
-                if (selected.data) {
-                    this.interaction_.selectionManager.selection.modifySelection(selected.data.model, selected.mode);
+                if (selected.feature) {
+                    this.interaction_.selectionManager.selection.modifySelection(selected.feature.data.model, selected.mode);
                 } else {
                     this.interaction_.selectionManager.selection.modifySelection(undefined, selected.mode);
                 }

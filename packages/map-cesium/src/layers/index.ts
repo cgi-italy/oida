@@ -1,9 +1,12 @@
-import { GROUP_LAYER_ID, TILE_LAYER_ID, FEATURE_LAYER_ID, VERTICAL_PROFILE_LAYER_ID, VOLUME_LAYER_ID } from '@oida/core';
+import {
+    GROUP_LAYER_ID, TILE_LAYER_ID, FEATURE_LAYER_ID,
+    VERTICAL_PROFILE_LAYER_ID, VOLUME_LAYER_ID
+} from '@oida/core';
 
 import { cesiumLayersFactory } from './cesium-layers-factory';
 import { CesiumGroupLayer } from './cesium-group-layer';
 import { CesiumTileLayer } from './cesium-tile-layer';
-import { createCesiumFeatureLayer, getPickedFeature, getPickedLayer, CesiumEntityFeatureLayer, CesiumPrimitiveFeatureLayer } from './cesium-feature-layer';
+import { createCesiumFeatureLayer, CesiumEntityFeatureLayer, CesiumPrimitiveFeatureLayer } from './cesium-feature-layer';
 import { CesiumVerticalProfileLayer } from './cesium-vertical-profile-layer';
 import { CesiumVolumeLayer } from './volume';
 
@@ -16,12 +19,7 @@ cesiumLayersFactory.register(TILE_LAYER_ID, (config) => {
 });
 
 cesiumLayersFactory.register(FEATURE_LAYER_ID, (config) => {
-    let {rendererOptions, ...others} = config;
-
-    return createCesiumFeatureLayer({
-        ...others,
-        ...(rendererOptions ? rendererOptions.cesium : undefined)
-    });
+    return createCesiumFeatureLayer(config);
 });
 
 cesiumLayersFactory.register(VERTICAL_PROFILE_LAYER_ID, (config) => {
@@ -38,9 +36,7 @@ export {
     CesiumGroupLayer,
     CesiumTileLayer,
     CesiumEntityFeatureLayer,
-    CesiumPrimitiveFeatureLayer,
-    getPickedFeature,
-    getPickedLayer
+    CesiumPrimitiveFeatureLayer
 };
 export * from './tilesources';
 export * from './volume';

@@ -9,7 +9,9 @@ import PointPrimitive from 'cesium/Source/Scene/PointPrimitive';
 
 import { IPointStyle, IIconStyle, ICircleStyle, isIcon } from '@oida/core';
 
+import { PICK_INFO_KEY, PickInfo } from '../../../utils/picking';
 import { CesiumGeometryPrimitiveFeature, CesiumGeometryPrimitiveRenderer } from './cesium-geometry-primitive-renderer';
+import { CesiumPrimitiveFeatureLayer } from '../cesium-primitive-feature-layer';
 
 export type CesiumPointPrimitiveRenderProps = {
     primitives: (Billboard | PointPrimitive)[];
@@ -22,13 +24,13 @@ export class CesiumPointPrimitiveRenderer implements CesiumGeometryPrimitiveRend
     private points_: PointPrimitiveCollection;
     private primitives_: PrimitiveCollection;
 
+    private layer_: CesiumPrimitiveFeatureLayer;
     private clampToGround_: boolean = false;
-    private pickCallbacks_;
 
     constructor(config) {
 
         this.clampToGround_ = config.clampToGround || false;
-        this.pickCallbacks_ = config.pickCallbacks;
+        this.layer_ = config.layer;
 
         this.primitives_ = new PrimitiveCollection();
         this.billboards_ = new BillboardCollection({
@@ -59,6 +61,13 @@ export class CesiumPointPrimitiveRenderer implements CesiumGeometryPrimitiveRend
             }
         };
 
+        const pickInfo: PickInfo = {
+            id: id,
+            data: data,
+            layer: this.layer_,
+            pickable: !style.pickingDisabled
+        };
+
         if (geometry.type === 'Point') {
             let primitive;
             if (isIcon(style)) {
@@ -67,11 +76,7 @@ export class CesiumPointPrimitiveRenderer implements CesiumGeometryPrimitiveRend
                 primitive = this.createPoint_(id, geometry.coordinates, style);
             }
 
-            primitive.entityId_ = id;
-            primitive.pickingDisabled_ = style.pickingDisabled || false;
-            primitive.pickCallbacks_ = this.pickCallbacks_;
-            primitive.data_ = data;
-            primitive.feature_ = feature;
+            primitive[PICK_INFO_KEY] = pickInfo;
 
             feature.renderProps.primitives.push(primitive);
 
@@ -85,11 +90,7 @@ export class CesiumPointPrimitiveRenderer implements CesiumGeometryPrimitiveRend
                     primitive = this.createPoint_(`${id}_${i}`, points[i], style);
                 }
 
-                primitive.entityId_ = id;
-                primitive.pickingDisabled_ = style.pickingDisabled || false;
-                primitive.pickCallbacks_ = this.pickCallbacks_;
-                primitive.data_ = data;
-                primitive.feature_ = feature;
+                primitive[PICK_INFO_KEY] = pickInfo;
 
                 feature.renderProps.primitives.push(primitive);
             }
@@ -119,11 +120,13 @@ export class CesiumPointPrimitiveRenderer implements CesiumGeometryPrimitiveRend
                 primitive = this.createPoint_(`${feature.id}_${i}`, coordinates[j], feature.style);
             }
 
-            primitive.entityId_ = feature.id;
-            primitive.pickingDisabled_ = feature.style.pickingDisabled || false;
-            primitive.pickCallbacks_ = this.pickCallbacks_;
-            primitive.data_ = feature.data;
-            primitive.feature_ = feature;
+            const pickInfo: PickInfo = {
+                id: feature.id,
+                data: feature.data,
+                layer: this.layer_,
+                pickable: !feature.style.pickingDisabled
+            };
+            primitive[PICK_INFO_KEY] = pickInfo;
 
             primitives.push(primitive);
         }
@@ -138,6 +141,7 @@ export class CesiumPointPrimitiveRenderer implements CesiumGeometryPrimitiveRend
             } else {
                 this.updatePointStyle_(primitive, style);
             }
+            primitive[PICK_INFO_KEY].pickable = !style.pickingDisabled;
         });
         feature.style = style;
     }
@@ -199,8 +203,6 @@ export class CesiumPointPrimitiveRenderer implements CesiumGeometryPrimitiveRend
         } else {
             billboard.eyeOffset = Cartesian3.ZERO;
         }
-
-        billboard.pickingDisabled_ = style.pickingDisabled || false;
     }
 
     protected createPoint_(id: string, coordinates: GeoJSON.Position, style: ICircleStyle) {
@@ -230,8 +232,6 @@ export class CesiumPointPrimitiveRenderer implements CesiumGeometryPrimitiveRend
         } else {
             point.pixelSize = 1;
         }
-
-        point.pickingDisabled_ = style.pickingDisabled || false;
 
     }
 

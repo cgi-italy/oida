@@ -1,4 +1,7 @@
+import { IMapRenderer } from '../map/map-renderer';
+
 export type MapLayerConfig = {
+    mapRenderer: IMapRenderer;
     zIndex?: number;
     visible?: boolean;
     opacity?: number;

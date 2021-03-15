@@ -16,9 +16,9 @@ type FeatureTracker = {
     disposeStyleObserver?: IReactionDisposer
 };
 
-export type FeatureData<T> = {
+export type FeatureData<T extends FeatureInterface = FeatureInterface> = {
     model: T,
-    layer: IFeatureLayerRenderer<FeatureData<T>>
+    layer: FeatureLayer<T>
 };
 
 export class FeatureLayerController
@@ -41,7 +41,11 @@ export class FeatureLayerController
     }
 
     protected createLayerRenderer_(mapRenderer: IMapRenderer) {
-        const { styleGetter, geometryGetter, ...others } = this.mapLayer_.config.value || {};
+        const {
+            styleGetter, geometryGetter,
+            onFeatureSelect, onFeatureHover,
+            rendererOptions, ...others
+        } = this.mapLayer_.config.value || {};
         if (styleGetter) {
             this.styleGetter_ = styleGetter;
         }
@@ -49,9 +53,17 @@ export class FeatureLayerController
             this.geometryGetter_ = geometryGetter;
         }
 
+        const layerRendererOptions = rendererOptions ? rendererOptions[mapRenderer.id] : undefined;
         return <IFeatureLayerRenderer>mapRenderer.getLayersFactory().create(FEATURE_LAYER_ID, {
             mapRenderer: mapRenderer,
-            ...others
+            onFeatureHover: onFeatureHover ? (data: FeatureData<T>, coordinate: GeoJSON.Position) => {
+                onFeatureHover(data.model, coordinate);
+            } : undefined,
+            onFeatureSelect: onFeatureSelect ? (data: FeatureData<T>, coordinate: GeoJSON.Position) => {
+                onFeatureSelect(data.model, coordinate);
+            } : undefined,
+            ...others,
+            ...layerRendererOptions
         });
     }
 
@@ -152,7 +164,7 @@ export class FeatureLayerController
                         const style = this.styleGetter_(feature);
                         layerRenderer.addFeature(featureId, geometry, style[0] || style, {
                             model: feature,
-                            layer: layerRenderer
+                            layer: this.mapLayer_
                         });
                     }
                     featureTracker.ids.add(featureId);
@@ -209,7 +221,7 @@ export class FeatureLayerController
                         } else {
                             layerRenderer.addFeature(id, geometry, style[idx] || style, {
                                 model: feature,
-                                layer: layerRenderer
+                                layer: this.mapLayer_
                             });
                         }
                         newIds.add(id);

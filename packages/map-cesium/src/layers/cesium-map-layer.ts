@@ -1,14 +1,16 @@
+import Cartesian3 from 'cesium/Source/Core/Cartesian3';
 import PrimitiveCollection from 'cesium/Source/Scene/PrimitiveCollection';
-
 import DataSourceCollection from 'cesium/Source/DataSources/DataSourceCollection';
 import CustomDataSource from 'cesium/Source/DataSources/CustomDataSource';
 import ImageryLayerCollection from 'cesium/Source/Scene/ImageryLayerCollection';
 import ImageryLayer from 'cesium/Source/Scene/ImageryLayer';
 
+
 import { ILayerRenderer } from '@oida/core';
 
 import { CesiumMapRenderer } from '../map/cesium-map-renderer';
 import { updateDataSource } from '../utils/render';
+import { PickInfo, CesiumFeatureCoordPickMode } from '../utils/picking';
 
 export class CesiumMapLayer implements ILayerRenderer {
 
@@ -91,6 +93,47 @@ export class CesiumMapLayer implements ILayerRenderer {
 
     getDataSources() {
         return this.dataSources_;
+    }
+
+
+    /**
+     * Override this in inherited classes to enable custom primitive hovering behaviours
+     *
+     * @returns a flag indicating if this layer should receive primitive mouse hovering events
+     */
+    shouldReceiveFeatureHoverEvents() {
+        return false;
+    }
+
+    /**
+     * Called by {@link CesiumFeatureHoverInteraction} when the mouse is overing a primitive of this layer
+     * Called only when {@link CesiumMapLayer.shouldReceiveFeatureHoverEvents} returns true
+     *
+     * @param coordinate the hovered primitive coordinate
+     * @param pickInfo the pick info extracted from the primitive
+     */
+    onFeatureHover(coordinate: Cartesian3, pickInfo: PickInfo) {}
+
+    /**
+     * Override this in inherited classes to enable custom primitive select behaviours
+     *
+     * @returns a flag indicating if this layer should receive primitive mouse hovering events
+     */
+    shouldReceiveFeatureSelectEvents() {
+        return false;
+    }
+
+    /**
+     * Called by {@link CesiumFeatureSelectInteraction} when the user select a primitive of this layer
+     * Called only when {@link CesiumMapLayer.shouldReceiveFeatureSelectEvents} returns true
+     *
+     * @param coordinate the selected primitive coordinate
+     * @param pickInfo the pick info extracted from the primitive
+     */
+    onFeatureSelect(coordinate: Cartesian3, pickInfo: PickInfo) {}
+
+    getFeaturePickMode() {
+        return CesiumFeatureCoordPickMode.Primitive;
     }
 
     destroy() {

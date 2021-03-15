@@ -1,3 +1,4 @@
+import Cartesian3 from 'cesium/Source/Core/Cartesian3';
 import ScreenSpaceEventHandler from 'cesium/Source/Core/ScreenSpaceEventHandler';
 import ScreenSpaceEventType from 'cesium/Source/Core/ScreenSpaceEventType';
 import KeyboardEventModifier from 'cesium/Source/Core/KeyboardEventModifier';
@@ -6,21 +7,22 @@ import {
     IFeatureSelectInteractionImplementation,
     IFeatureSelectInteractionProps,
     FEATURE_SELECT_INTERACTION_ID,
-    SelectionMode
+    SelectionMode,
+    FeatureSelectCallback
 } from '@oida/core';
 
 import { cesiumInteractionsFactory } from './cesium-interactions-factory';
 import { CesiumMapRenderer } from '../map/cesium-map-renderer';
+
 import {
-    getPickedFeature, getPickedLayer,
-    isFeaturePickable, setNonPickableFeaturesVisibility
-} from '../layers/cesium-feature-layer';
+    getPickInfo, PickInfo, setNonPickableFeaturesVisibility, CesiumFeatureCoordPickMode
+} from '../utils';
 
 export class CesiumFeatureSelectInteraction implements IFeatureSelectInteractionImplementation {
 
     private viewer_;
     private handler_;
-    private onFeatureSelect_;
+    private onFeatureSelect_: FeatureSelectCallback;
     private multiple_: boolean;
     private lastSelectedFeatureIdx_ = -1;
 
@@ -52,7 +54,7 @@ export class CesiumFeatureSelectInteraction implements IFeatureSelectInteraction
         this.setActive(false);
     }
 
-    bindClick_() {
+    protected bindClick_() {
 
         if (this.handler_) {
             this.handler_.destroy();
@@ -81,35 +83,49 @@ export class CesiumFeatureSelectInteraction implements IFeatureSelectInteraction
 
     }
 
-    selectClickedEntity_(selectionMode, movement) {
+    protected selectClickedEntity_(selectionMode, movement) {
 
-        const pickedObjects = this.viewer_.scene.drillPick(movement.position).filter((pickInfo) => isFeaturePickable(pickInfo));
+        const pickedObjects = this.viewer_.scene.drillPick(movement.position);
 
-        if (pickedObjects.length) {
+        const pickInfos: PickInfo[] = pickedObjects
+            .map(pickedObject => getPickInfo(pickedObject))
+            .filter(pickInfo => !!pickInfo && pickInfo.pickable);
+
+        if (pickInfos.length) {
             if (selectionMode === SelectionMode.Replace) {
                 this.lastSelectedFeatureIdx_ = (this.lastSelectedFeatureIdx_ + 1) % pickedObjects.length;
-                const pickInfo = pickedObjects[this.lastSelectedFeatureIdx_];
-                const feature = getPickedFeature(pickInfo);
-                const layer = getPickedLayer(pickInfo);
-                if (layer && layer.onLayerPick) {
-                    setNonPickableFeaturesVisibility(pickedObjects, false);
-                    this.viewer_.scene.render();
-                    let coordinate = this.viewer_.scene.pickPosition(movement.position);
-                    setNonPickableFeaturesVisibility(pickedObjects, true);
-                    layer.onLayerPick(coordinate, feature?.id, pickInfo);
+                const pickInfo = pickInfos[this.lastSelectedFeatureIdx_];
+
+                const layer = pickInfo.layer;
+                if (layer && layer.shouldReceiveFeatureSelectEvents()) {
+                    let coordinate: Cartesian3;
+                    if (layer.getFeaturePickMode() === CesiumFeatureCoordPickMode.Ellipsoid) {
+                        coordinate = this.viewer_.camera.pickEllipsoid(movement.position, this.viewer_.scene.globe.ellipsoid);
+                    } else {
+                        setNonPickableFeaturesVisibility(pickedObjects, false);
+                        this.viewer_.scene.render();
+                        coordinate = this.viewer_.scene.pickPosition(movement.position);
+                        setNonPickableFeaturesVisibility(pickedObjects, true);
+
+                    }
+                    layer.onFeatureSelect(coordinate, pickInfo);
                 }
+
                 this.onFeatureSelect_({
-                    featureId: feature?.id,
-                    data: feature?.data,
+                    feature: {
+                        id: pickInfo.id,
+                        data: pickInfo.data
+                    },
                     mode: selectionMode
                 });
             } else {
                 this.lastSelectedFeatureIdx_ = -1;
-                pickedObjects.forEach((pickInfo) => {
-                    const feature = getPickedFeature(pickInfo);
+                pickInfos.forEach((pickInfo) => {
                     this.onFeatureSelect_({
-                        featureId: feature?.id,
-                        data: feature?.data,
+                        feature: {
+                            id: pickInfo.id,
+                            data: pickInfo.data
+                        },
                         mode: selectionMode
                     });
                 });
@@ -117,7 +133,7 @@ export class CesiumFeatureSelectInteraction implements IFeatureSelectInteraction
         } else {
             this.lastSelectedFeatureIdx_ = -1;
             this.onFeatureSelect_({
-                featureId: undefined,
+                feature: undefined,
                 mode: selectionMode
             });
         }

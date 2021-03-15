@@ -1,7 +1,11 @@
+import Cartesian3 from 'cesium/Source/Core/Cartesian3';
+import Cartographic from 'cesium/Source/Core/Cartographic';
+import CesiumMath from 'cesium/Source/Core/Math';
+
+import { IFeatureLayerRenderer, IFeatureStyle, FeatureLayerConfig, FeatureGeometry, IFeature } from '@oida/core';
+
+import { CesiumFeatureCoordPickMode, PickInfo } from '../../utils/picking';
 import { CesiumMapLayer } from '../cesium-map-layer';
-
-import { IFeatureLayerRenderer, IFeatureStyle, FeatureGeometry } from '@oida/core';
-
 import {
     CesiumPointPrimitiveRenderer, CesiumLinePrimitiveRenderer, CesiumPolygonPrimitiveRenderer,
     CesiumGeometryPrimitiveRenderer, GeometryStyle, CesiumGeometryPrimitiveFeature
@@ -16,17 +20,17 @@ export class CesiumPrimitiveFeatureLayer extends CesiumMapLayer implements IFeat
     protected polygonRenderer_: CesiumPolygonPrimitiveRenderer | undefined;
 
     protected clampToGround_: boolean = false;
-    protected pickCallbacks_;
+    protected onFeatureHover_: ((feature: IFeature<any>, coordinate: GeoJSON.Position) => void) | undefined;
+    protected onFeatureSelect_: ((feature: IFeature<any>, coordinate: GeoJSON.Position) => void) | undefined;
+    protected coordPickMode_: CesiumFeatureCoordPickMode;
 
-    constructor(config) {
+    constructor(config: FeatureLayerConfig) {
         super(config);
 
         this.clampToGround_ = config.clampToGround || false;
-        this.pickCallbacks_ = {
-            selectCb: config.onFeatureSelect,
-            hoverCb: config.onFeatureHover,
-            coordPickMode: config.coordPickMode
-        };
+        this.onFeatureHover_ = config.onFeatureHover;
+        this.onFeatureSelect_ = config.onFeatureSelect;
+        this.coordPickMode_ = config.coordPickMode || CesiumFeatureCoordPickMode.Ellipsoid;
     }
 
     addFeature(id: string, geometry: FeatureGeometry, style: IFeatureStyle, data: any) {
@@ -125,6 +129,36 @@ export class CesiumPrimitiveFeatureLayer extends CesiumMapLayer implements IFeat
         return this.featureMap_[id];
     }
 
+    shouldReceiveFeatureHoverEvents() {
+        return !!this.onFeatureHover_;
+    }
+
+    shouldReceiveFeatureSelectEvents() {
+        return !!this.onFeatureSelect_;
+    }
+
+    onFeatureHover(coordinate: Cartesian3, pickInfo: PickInfo) {
+        let cartographic = Cartographic.fromCartesian(coordinate);
+        this.onFeatureHover_!(pickInfo.data, [
+            CesiumMath.toDegrees(cartographic.longitude),
+            CesiumMath.toDegrees(cartographic.latitude),
+            cartographic.height
+        ]);
+    }
+
+    onFeatureSelect(coordinate: Cartesian3, pickInfo: PickInfo) {
+        let cartographic = Cartographic.fromCartesian(coordinate);
+        this.onFeatureSelect_!(pickInfo.data, [
+            CesiumMath.toDegrees(cartographic.longitude),
+            CesiumMath.toDegrees(cartographic.latitude),
+            cartographic.height
+        ]);
+    }
+
+    getFeaturePickMode() {
+        return this.coordPickMode_;
+    }
+
     destroy() {
         super.destroy();
         if (this.pointRenderer_) {
@@ -176,7 +210,7 @@ export class CesiumPrimitiveFeatureLayer extends CesiumMapLayer implements IFeat
                     this.pointRenderer_ = new CesiumPointPrimitiveRenderer({
                         scene: this.mapRenderer_.getViewer().scene,
                         clampToGround: this.clampToGround_,
-                        pickCallbacks: this.pickCallbacks_
+                        layer: this
                     });
                     this.primitives_.add(this.pointRenderer_.getPrimitives());
                 }
@@ -187,7 +221,7 @@ export class CesiumPrimitiveFeatureLayer extends CesiumMapLayer implements IFeat
                 if (!this.lineRenderer_) {
                     this.lineRenderer_ = new CesiumLinePrimitiveRenderer({
                         clampToGround: this.clampToGround_,
-                        pickCallbacks: this.pickCallbacks_
+                        layer: this
                     });
                     this.primitives_.add(this.lineRenderer_.getPrimitives());
                 }
@@ -200,7 +234,7 @@ export class CesiumPrimitiveFeatureLayer extends CesiumMapLayer implements IFeat
                 if (!this.polygonRenderer_) {
                     this.polygonRenderer_ = new CesiumPolygonPrimitiveRenderer({
                         clampToGround: this.clampToGround_,
-                        pickCallbacks: this.pickCallbacks_
+                        layer: this
                     });
                     this.primitives_.add(this.polygonRenderer_.getPrimitives());
                 }

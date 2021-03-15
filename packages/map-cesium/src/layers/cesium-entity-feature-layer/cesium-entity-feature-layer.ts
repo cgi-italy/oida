@@ -1,33 +1,35 @@
+import Cartesian3 from 'cesium/Source/Core/Cartesian3';
+import Cartographic from 'cesium/Source/Core/Cartographic';
+import CesiumMath from 'cesium/Source/Core/Math';
 import CustomDataSource from 'cesium/Source/DataSources/CustomDataSource';
 
+import { IFeatureLayerRenderer, IFeatureStyle, Geometry, IFeature, FeatureLayerConfig, FeatureGeometry } from '@oida/core';
+
+import { CesiumFeatureCoordPickMode, PickInfo, PICK_INFO_KEY, updateDataSource } from '../../utils';
 import { CesiumMapLayer } from '../cesium-map-layer';
 import { geometryEntityRendererFactory } from './geometry-entity-renderers';
-
-import { IFeatureLayerRenderer, IFeatureStyle, Geometry } from '@oida/core';
-
-import { updateDataSource } from '../../utils';
 
 export class CesiumEntityFeatureLayer extends CesiumMapLayer implements IFeatureLayerRenderer {
 
     protected clampToGround_: boolean = false;
-    protected pickCallbacks_;
+    protected onFeatureHover_: ((feature: IFeature<any>, coordinate: GeoJSON.Position) => void) | undefined;
+    protected onFeatureSelect_: ((feature: IFeature<any>, coordinate: GeoJSON.Position) => void) | undefined;
+    protected coordPickMode_: CesiumFeatureCoordPickMode;
     protected dataSource_;
 
-    constructor(config) {
+    constructor(config: FeatureLayerConfig) {
         super(config);
 
         this.clampToGround_ = config.clampToGround || false;
-        this.pickCallbacks_ = {
-            selectCb: config.onFeatureSelect,
-            hoverCb: config.onFeatureHover,
-            coordPickMode: config.coordPickMode
-        };
+        this.onFeatureHover_ = config.onFeatureHover;
+        this.onFeatureSelect_ = config.onFeatureSelect;
+        this.coordPickMode_ = config.coordPickMode || CesiumFeatureCoordPickMode.Ellipsoid;
 
         this.dataSource_ = new CustomDataSource();
         this.dataSources_.add(this.dataSource_);
     }
 
-    addFeature(id: string, geometry: Geometry, style: IFeatureStyle, data: any) {
+    addFeature(id: string, geometry: FeatureGeometry, style: IFeatureStyle, data: any) {
 
         if (!geometry) {
             return;
@@ -46,11 +48,18 @@ export class CesiumEntityFeatureLayer extends CesiumMapLayer implements IFeature
                     this.dataSource_.entities.add(entity);
                     entity._children.forEach(childEntity => {
                         this.dataSource_.entities.add(childEntity);
-                        childEntity.pickCallbacks_ = this.pickCallbacks_;
                     });
                     entity.geometryRenderer = geometryRenderer;
-                    entity.pickCallbacks_ = this.pickCallbacks_;
-                    entity.data = data;
+                    entity.geometryType = geometry.type;
+
+                    const pickInfo: PickInfo = {
+                        id: id,
+                        data: data,
+                        layer: this,
+                        pickable: this.isPickable_(geometry.type, style)
+                    };
+
+                    entity[PICK_INFO_KEY] = pickInfo;
 
                     this.updateDataSource_();
                 }
@@ -62,27 +71,25 @@ export class CesiumEntityFeatureLayer extends CesiumMapLayer implements IFeature
         }
     }
 
-    updateFeatureGeometry(id: string, geometry: Geometry) {
+    updateFeatureGeometry(id: string, geometry: FeatureGeometry) {
 
         let entity = this.dataSource_.entities.getById(id);
         if (entity) {
-            let geometryRenderer = geometryEntityRendererFactory.create(geometry.type);
-            if (geometryRenderer) {
-                if (geometryRenderer === entity.geometryRenderer) {
-                    geometryRenderer.updateGeometry(entity, geometry);
-                    this.updateDataSource_();
-                } else {
-                    throw 'Feature geometry must be of the same class';
-                }
+            if (entity.geometryType === geometry.type) {
+                entity.geometryRenderer.updateGeometry(entity, geometry);
+                this.updateDataSource_();
+            } else {
+                throw 'Feature geometry must be of the same class';
             }
         }
     }
 
-    updateFeatureStyle(id, style) {
+    updateFeatureStyle(id: string, style: IFeatureStyle) {
 
         let entity = this.dataSource_.entities.getById(id);
         if (entity) {
             entity.geometryRenderer.updateStyle(entity, style);
+            entity[PICK_INFO_KEY].pickable = this.isPickable_(entity.geometryType, style);
             this.updateDataSource_();
         }
     }
@@ -117,6 +124,48 @@ export class CesiumEntityFeatureLayer extends CesiumMapLayer implements IFeature
     removeAllFeatures() {
         this.dataSource_.entities.removeAll();
         this.updateDataSource_();
+    }
+
+    shouldReceiveFeatureHoverEvents() {
+        return !!this.onFeatureHover_;
+    }
+
+    shouldReceiveFeatureSelectEvents() {
+        return !!this.onFeatureSelect_;
+    }
+
+    onFeatureHover(coordinate: Cartesian3, pickInfo: PickInfo) {
+        let cartographic = Cartographic.fromCartesian(coordinate);
+        this.onFeatureHover_!(pickInfo.data, [
+            CesiumMath.toDegrees(cartographic.longitude),
+            CesiumMath.toDegrees(cartographic.latitude),
+            cartographic.height
+        ]);
+    }
+
+    onFeatureSelect(coordinate: Cartesian3, pickInfo: PickInfo) {
+        let cartographic = Cartographic.fromCartesian(coordinate);
+        this.onFeatureSelect_!(pickInfo.data, [
+            CesiumMath.toDegrees(cartographic.longitude),
+            CesiumMath.toDegrees(cartographic.latitude),
+            cartographic.height
+        ]);
+    }
+
+    getFeaturePickMode() {
+        return this.coordPickMode_;
+    }
+
+    protected isPickable_(geometryType, style: IFeatureStyle) {
+        let pickable: boolean;
+        if (geometryType === 'Point' || geometryType === 'MultiPoint') {
+            pickable = !style.point?.pickingDisabled;
+        } else if (geometryType === 'LineString' || geometryType === 'MultiLineString') {
+            pickable = !style.line?.pickingDisabled;
+        } else {
+            pickable = !style.polygon?.pickingDisabled;
+        }
+        return pickable;
     }
 
     protected updateDataSource_() {

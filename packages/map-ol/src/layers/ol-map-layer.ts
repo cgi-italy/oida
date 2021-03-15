@@ -2,7 +2,7 @@
 import LayerBase from 'ol/layer/Base';
 import { transformExtent } from 'ol/proj';
 
-import { ILayerRenderer } from '@oida/core';
+import { IFeature, ILayerRenderer } from '@oida/core';
 
 import { OLMapRenderer } from '../map/ol-map-renderer';
 
@@ -56,6 +56,42 @@ export abstract class OLMapLayer<T extends LayerBase = LayerBase> implements ILa
     getOLObject() {
         return this.olImpl_;
     }
+
+    /**
+     * Override this in inherited classes to enable custom feature hovering behaviours
+     *
+     * @returns a flag indicating if this layer should receive feature mouse hovering events
+     */
+    shouldReceiveFeatureHoverEvents() {
+        return false;
+    }
+
+    /**
+     * Called by {@link OLFeatureHoverInteraction} when the mouse is overing a feature of this layer
+     * Called only when {@link OLMapLayer.shouldReceiveFeatureHoverEvents} returns true
+     *
+     * @param coordinate the hovered feature geographic coordinate
+     * @param feature the hovered feature
+     */
+    onFeatureHover(coordinate: GeoJSON.Position, feature: IFeature) {}
+
+    /**
+     * Override this in inherited classes to enable custom feature select behaviours
+     *
+     * @returns a flag indicating if this layer should receive feature mouse hovering events
+     */
+    shouldReceiveFeatureSelectEvents() {
+        return false;
+    }
+
+    /**
+     * Called by {@link OLFeatureSelectInteraction} when the mouse is overing a feature of this layer
+     * Called only when {@link OLMapLayer.shouldReceiveFeatureSelectEvents} returns true
+     *
+     * @param coordinate the hovered feature geographic coordinate
+     * @param feature the hovered feature
+     */
+    onFeatureSelect(coordinate: GeoJSON.Position, feature: IFeature) {}
 
     protected abstract createOLObject_(config);
     protected abstract destroyOLObject_();

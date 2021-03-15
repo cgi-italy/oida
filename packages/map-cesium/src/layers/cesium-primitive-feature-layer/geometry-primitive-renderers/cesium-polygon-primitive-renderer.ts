@@ -17,7 +17,10 @@ import PerInstanceColorAppearance from 'cesium/Source/Scene/PerInstanceColorAppe
 
 import { BBoxGeometry, CircleGeometry, IPolygonStyle } from '@oida/core';
 
+import { PICK_INFO_KEY, PickInfo } from '../../../utils/picking';
+import { CesiumPrimitiveFeatureLayer } from '../cesium-primitive-feature-layer';
 import { CesiumGeometryPrimitiveFeature, CesiumGeometryPrimitiveRenderer } from './cesium-geometry-primitive-renderer';
+
 
 type PolygonGeometry = GeoJSON.Polygon | GeoJSON.MultiPolygon | BBoxGeometry | CircleGeometry;
 export type CesiumPolygonPrimitiveRenderProps = {
@@ -32,12 +35,14 @@ export class CesiumPolygonPrimitiveRenderer implements CesiumGeometryPrimitiveRe
 
     protected polygons_: PrimitiveCollection;
     protected clampToGround_: boolean = false;
+    protected layer_: CesiumPrimitiveFeatureLayer;
     protected pickCallbacks_;
 
     constructor(config) {
         this.polygons_ = new PrimitiveCollection();
 
         this.clampToGround_ = config.clampToGround || false;
+        this.layer_ = config.layer;
         this.pickCallbacks_ = config.pickCallbacks;
     }
 
@@ -102,15 +107,6 @@ export class CesiumPolygonPrimitiveRenderer implements CesiumGeometryPrimitiveRe
             })
         }));
 
-        fill.entityId_ = id;
-        stroke.entityId_  = id;
-        fill.pickingDisabled_ = style.pickingDisabled || false;
-        stroke.pickingDisabled_ = style.pickingDisabled || false;
-        fill.pickCallbacks_ = this.pickCallbacks_;
-        stroke.pickCallbacks_ = this.pickCallbacks_;
-        fill.data_ = data;
-        stroke.data_ = data;
-
         let feature = {
             id: id,
             geometryRenderer: this as CesiumPolygonPrimitiveRenderer,
@@ -123,6 +119,16 @@ export class CesiumPolygonPrimitiveRenderer implements CesiumGeometryPrimitiveRe
                 numGeometries: fillInstances.length
             }
         };
+
+        const pickInfo: PickInfo = {
+            id: id,
+            data: data,
+            layer: this.layer_,
+            pickable: !style.pickingDisabled
+        };
+
+        fill[PICK_INFO_KEY] = pickInfo;
+        stroke[PICK_INFO_KEY] = pickInfo;
 
         return feature;
     }
@@ -141,8 +147,8 @@ export class CesiumPolygonPrimitiveRenderer implements CesiumGeometryPrimitiveRe
 
         feature.renderProps.fillPrimitive.show = style.visible;
         feature.renderProps.strokePrimitive.show = style.visible;
-        feature.renderProps.fillPrimitive.pickingDisabled_ = style.pickingDisabled || false;
-        feature.renderProps.strokePrimitive.pickingDisabled_ = style.pickingDisabled || false;
+        feature.renderProps.fillPrimitive[PICK_INFO_KEY].pickable = !style.pickingDisabled;
+        feature.renderProps.strokePrimitive[PICK_INFO_KEY].pickable = !style.pickingDisabled;
 
         feature.style = style;
 

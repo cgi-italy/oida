@@ -1,5 +1,5 @@
 import { Geometry, GeometryCollection } from '../../common';
-import { ILayerRenderer } from './map-layer-renderer';
+import { ILayerRenderer, MapLayerConfig } from './map-layer-renderer';
 
 interface IGeometryStyle {
     visible: boolean;
@@ -47,8 +47,18 @@ export interface IFeatureStyle {
 
 export type FeatureGeometry = Exclude<Geometry, GeoJSON.GeometryCollection | GeometryCollection>;
 
+export type IFeature<T = any> = {
+    id: string;
+    data: T;
+};
+
+export type FeatureLayerConfig<T = any> = {
+    onFeatureHover?: (feature: IFeature<T>, coordinate: GeoJSON.Position) => void;
+    onFeatureSelect?: (feature: IFeature<T>, coordinate: GeoJSON.Position) => void;
+} & MapLayerConfig & Record<string, any>;
+
 export interface IFeatureLayerRenderer<T = any> extends ILayerRenderer {
-    addFeature(id: string, geometry: FeatureGeometry, style: IFeatureStyle, data?: T);
+    addFeature(id: string, geometry: FeatureGeometry, style: IFeatureStyle, data?: T): IFeature<T> | undefined;
     hasFeature(id: string): boolean;
     getFeatureData(id: string): T | undefined;
     updateFeatureGeometry(id: string, geometry: FeatureGeometry);
