@@ -1,38 +1,27 @@
 import React, { useEffect } from 'react';
 
-import { DatasetExplorer, Dataset, ComboAnalysis } from '@oida/eo-mobx';
+import { DatasetExplorer, ComboAnalysis } from '@oida/eo-mobx';
 import { LayoutSectionItem } from '@oida/ui-react-core';
 
-import { DashboardPane, DashboardGridBreakpoint } from './dashboard-pane';
+import { DashboardPane, DashboardPaneProps } from './dashboard-pane';
 
 import { DatasetAnalysisWidgetFactory } from './dataset-analysis-widget-factory';
 
 import 'react-grid-layout/css/styles.css';
 import { useSelector } from '@oida/ui-react-mobx';
 
-
-export type DatasetAnalysisToolbarProps = {
-    datasets: Dataset[]
-};
-
-export const DatasetAnalysisToolbar = (props: DatasetAnalysisToolbarProps) => {
-    props.datasets.forEach((dataset) => {
-        if (dataset.config.tools) {
-            dataset.config.tools.forEach((tool) => {
-
-            });
-        }
-    });
-};
-
-export type DatasetAnalysesDashboardProps = {
-    gridBreakpoints: DashboardGridBreakpoint[],
-    rowSnapHeight?: number;
-    style?: React.CSSProperties;
+/**
+ * {@link DatasetAnalysesDashboard} component properties
+ */
+export type DatasetAnalysesDashboardProps = DashboardPaneProps & {
+    /** the dataset explorer instance */
     datasetsExplorer: DatasetExplorer
 };
 
-
+/**
+ * A component that renders the dataset explorer analyisis into a {@link DashboardPane}
+ * @param props the component properties
+ */
 export const DatasetAnalysesDashboard = (props: DatasetAnalysesDashboardProps) => {
 
     useEffect(() => {
@@ -111,8 +100,11 @@ export const DatasetAnalysesDashboard = (props: DatasetAnalysesDashboardProps) =
 
     return (
         <DashboardPane
-            gridBreakpoints={props.gridBreakpoints}
+            numCols={props.numCols}
             rowSnapHeight={props.rowSnapHeight}
+            compactType={props.compactType}
+            preventCollision={props.preventCollision}
+            defaultWidgetPosition={props.defaultWidgetPosition}
             setExpanded={() => {}}
             expanded={true}
             showComponent={() => {}}
