@@ -25,7 +25,7 @@ type AoiItemType = {
 };
 
 export const AnalysisAoiFilter = (props: AnalysisAoiFilterProps) => {
-    let geometryValue = useSelector(() => props.analysis.geometry);
+    let geometryValue = useSelector(() => props.analysis.aoi?.geometry.value);
 
     let { activeAction, onActiveActionChange } = useAoiAction();
 

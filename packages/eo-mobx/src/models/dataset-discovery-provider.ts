@@ -42,7 +42,8 @@ export abstract class DatasetDiscoveryProvider<
     readonly name: string;
     readonly description: string | undefined;
     readonly active: Active;
-    readonly results: IObservableArray<T>;
+
+    protected results_: IObservableArray<T>;
 
     constructor(props: DatasetDiscoveryProviderProps) {
         this.id = props.id;
@@ -51,11 +52,15 @@ export abstract class DatasetDiscoveryProvider<
         this.description = props.description;
 
         this.active = new Active(props);
-        this.results = observable.array([], {
+        this.results_ = observable.array([], {
             deep: false
         });
 
         makeObservable(this);
+    }
+
+    get results() {
+        return this.results_;
     }
 
     @action

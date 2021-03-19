@@ -1,4 +1,4 @@
-import { IObservableArray, observable, action, ObservableSet, makeObservable, ObservableMap } from 'mobx';
+import { IObservableArray, observable, action, makeObservable, ObservableMap } from 'mobx';
 import chroma from 'chroma-js';
 
 import { IFeatureStyle } from '@oida/core';
@@ -80,11 +80,8 @@ export class DatasetAnalyses {
             config: {
                 geometryGetter: (analysis => analysis.geometry),
                 styleGetter: props?.analysisGeometryStyle || defaultAnalysisStyleGetter,
-                rendererOptions: {
-                    cesium: {
-                        entityMode: false,
-                        coordPickMode: 'ellipsoid'
-                    }
+                onFeatureHover: (feature, coord) => {
+                    feature.onGeometryHover(coord);
                 }
             }
         });

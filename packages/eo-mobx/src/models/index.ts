@@ -12,6 +12,7 @@ export * from './dataset-analysis';
 export * from './combo-analysis';
 export * from './dataset-analyses';
 export * from './dataset-dimension-series';
+export * from './dataset-transect-series';
 export * from './dataset-explorer';
 export * from './dataset-discovery-provider';
 export * from './dataset-discovery';

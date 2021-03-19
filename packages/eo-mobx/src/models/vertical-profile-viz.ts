@@ -185,8 +185,10 @@ export class DatasetVerticalProfileViz extends DatasetViz<VerticalProfileLayer<V
                 const profiles = profileData.map((profile) => {
                     return new VerticalProfileItem(profile);
                 });
-                this.profiles.push(...profiles);
-                this.mapLayer.loadingStatus.setValue(LoadingState.Success);
+                runInAction(() => {
+                    this.profiles.push(...profiles);
+                    this.mapLayer.loadingStatus.setValue(LoadingState.Success);
+                });
             }).catch((error) => {
                 this.mapLayer.loadingStatus.setValue(LoadingState.Error);
             });

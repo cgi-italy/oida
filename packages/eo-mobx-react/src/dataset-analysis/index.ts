@@ -1,4 +1,5 @@
 export * from './dataset-dimension-series';
+export * from './dataset-transect-series';
 export * from './dataset-vertical-profile';
 export * from './dashboard-pane';
 export * from './dataset-analyses-dashboard';

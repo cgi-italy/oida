@@ -74,6 +74,14 @@ implements HasVisibility, IsHoverable, IsSelectable {
         return this.aoi?.geometry.value;
     }
 
+    /**
+     * Override in inherited class to enable specific geometry hovering behaviours
+     *
+     * @param coordinate The hovered geometry lat lon position
+     * @memberof DatasetAnalysis
+     */
+    onGeometryHover(coordinate: GeoJSON.Position) {}
+
     dispose() {
         if (this.aoi) {
             this.aoi.unref();
