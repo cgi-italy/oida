@@ -29,10 +29,18 @@
 
             &.hovered {
                 background-color: @table-row-hover-bg;
+
+                .ant-table-cell {
+                    background: transparent;
+                }
             }
 
             &.selected {
                 background-color: @table-selected-row-bg;
+
+                .ant-table-cell {
+                    background: transparent;
+                }
             }
 
             &.can-drop {

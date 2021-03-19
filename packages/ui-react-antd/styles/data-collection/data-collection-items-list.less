@@ -5,9 +5,21 @@
 
     .scrollbar(8px, @primary-color, @primary-2);
 
-    overflow: auto;
-    scroll-behavior: smooth;
-    padding-right: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+
+    .ant-spin-nested-loading {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+
+        .ant-spin-container {
+            overflow: auto;
+            scroll-behavior: smooth;
+            padding-right: 0.5rem;
+        }
+    }
 
     .ant-list-item {
 

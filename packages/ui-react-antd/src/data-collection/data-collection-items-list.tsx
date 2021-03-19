@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import classnames from 'classnames';
 
 import { List, Tooltip, Empty } from 'antd';
+import { CloseCircleOutlined } from '@ant-design/icons';
 import { useDrop } from 'react-dnd';
 import { NativeTypes } from 'react-dnd-html5-backend';
 
@@ -155,6 +156,9 @@ export function DataCollectionItemsList<T>(props: DataCollectionItemsListProps<T
 
     const {data, loadingState, ...listProps} = renderProps;
 
+    if (loadingState === LoadingState.Error) {
+        return <Empty image={<CloseCircleOutlined/>} description='Error retrieving data' imageStyle={{fontSize: '30px', height: '40px'}} />;
+    }
     if (loadingState === LoadingState.Success && !data.length) {
         return <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />;
     } else {

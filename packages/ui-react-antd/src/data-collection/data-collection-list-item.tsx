@@ -81,19 +81,22 @@ export function DataCollectionDetailedListItem(props: DatasetCollectionListItemP
             >
                 {props.title}
             </div>
-            <ExpandableDescription
+            {props.description && <ExpandableDescription
                 description={props.description}
                 maxRows={props.maxDescriptionRows}
                 className='data-collection-list-item-detailed-description'
-            />
+            />}
             <div className='data-collection-list-item-detailed-content'>
                 <Descriptions
                     className={'data-collection-list-item-detailed-meta'}
-                    column={props.preview ? 1 : 2}
+                    column={1}
                     size={'small'}
                 >
                     {metadata}
                 </Descriptions>
+                {props.icon && !props.preview &&
+                    <div className='data-collection-list-item-detailed-icon'>{props.icon}</div>
+                }
                 {props.preview && <div className='data-collection-list-item-detailed-preview'>
                     <AsyncImage
                         imageUrl={props.preview}
@@ -137,11 +140,11 @@ export function DataCollectionCompactListItem(props: DatasetCollectionListItemPr
                 <div className='data-collection-compact-list-item-title'>
                     {props.title}
                 </div>
-                <ExpandableDescription
+                {props.description && <ExpandableDescription
                     description={props.description}
                     maxRows={props.maxDescriptionRows}
                     className='data-collection-compact-list-item-description'
-                />
+                />}
                 {metadata}
             </div>
         </div>
