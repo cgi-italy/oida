@@ -14,7 +14,7 @@ import { getAdamDatasetSpatialCoverageProvider } from './get-adam-dataset-spatia
 export type AdamDatasetFactoryConfig = {
     wcsServiceUrl: string;
     cswServiceUrl: string;
-    wpsServiceUrl: string;
+    wpsServiceUrl?: string;
     productSearchRecordContent?: (item: ProductSearchRecord) => any
 };
 
