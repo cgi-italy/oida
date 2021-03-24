@@ -1,4 +1,5 @@
 import XYZSource from 'ol/source/XYZ';
+
 import UrlTemplateImageryProvider from 'cesium/Source/Scene/UrlTemplateImageryProvider';
 
 import { TileGridConfig } from '@oida/core';
@@ -81,11 +82,12 @@ olTileSourcesFactory.register(ADAM_WCS_SOURCE_ID, (config: AdamWcsTileSourceConf
         },
         tileLoadFunction: ((tile, source) => {
             if (config.tileLoadFunction) {
-                config.tileLoadFunction({
-                    ...source,
-                    requestExtent: tileGrid.getTileCoordExtent(tile.getTileCoord()),
-                    requestSrs: config.srs || 'EPSG:4326'
-                }).then((sourceDataUrl) => {
+                const tileLoadParams = source;
+                if (config.srs !== 'unprojected') {
+                    tileLoadParams.requestExtent = tileGrid.getTileCoordExtent(tile.getTileCoord());
+                    tileLoadParams.srs = config.srs || 'EPSG:4326';
+                }
+                config.tileLoadFunction(tileLoadParams).then((sourceDataUrl) => {
                     if (sourceDataUrl) {
                         tile.getImage().src = sourceDataUrl;
                     } else {
@@ -93,7 +95,44 @@ olTileSourcesFactory.register(ADAM_WCS_SOURCE_ID, (config: AdamWcsTileSourceConf
                     }
                 });
             } else {
-                tile.getImage().src = source.url;
+
+                let retryCount = 3;
+
+                const tryImageLoad = () => {
+
+                    const onLoadError = () => {
+                        if (retryCount) {
+                            retryCount--;
+                            // add random timout to avoid rerunning all failing requests together
+                            setTimeout(() => {
+                                tryImageLoad();
+                            }, 1000 + Math.round((Math.random() * 2000)));
+                        } else {
+                            tile.handleImageError_();
+                        }
+                    };
+
+                    fetch(source.url).then((response) => {
+                        if (!response.ok) {
+                            onLoadError();
+                        } else {
+                            response.blob().then((blob) => {
+                                const dataUri = URL.createObjectURL(blob);
+                                if (!dataUri) {
+                                    tile.handleImageError_();
+                                } else {
+                                    tile.getImage().src = dataUri;
+                                }
+                            }).catch(() => {
+                                tile.handleImageError_();
+                            });
+                        }
+                    }, () => {
+                        onLoadError();
+                    });
+                };
+
+                tryImageLoad();
             }
         }),
         crossOrigin: config.crossOrigin,

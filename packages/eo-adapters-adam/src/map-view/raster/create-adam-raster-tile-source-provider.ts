@@ -1,3 +1,5 @@
+import { transformExtent } from 'ol/proj';
+
 import { AxiosInstanceWithCancellation } from '@oida/core';
 import {
     RasterMapViz, RasterBandModeSingle, RasterBandModePreset, RasterBandModeCombination, RasterBandMode
@@ -94,6 +96,7 @@ export const createAdamRasterTileSourceProvider = (
         subsets.push(...wcsCoverageParams.dimensionSubsets);
 
         let format: string;
+        let tileSize = 256;
         let tileLoadFunction: ((tile, source) => void) | undefined = undefined;
         let colorTable: string | undefined;
         let colorRange: string | undefined;
@@ -106,6 +109,8 @@ export const createAdamRasterTileSourceProvider = (
             const colorMapParams = getColormapWcsParams(bandMode);
             colorTable = colorMapParams.colorTable;
             colorRange = colorMapParams.colorRange;
+            // for non geotiff data use a bigger tile size to reduce the number of requests
+            tileSize = 384;
             if (!colorRange && !(bandMode.value instanceof RasterBandModeSingle)) {
                 colorRange = getMultiBandColorRange(datasetConfig, bandMode, datasetBandsDict);
             }
@@ -118,6 +123,13 @@ export const createAdamRasterTileSourceProvider = (
                 return Promise.reject(new Error('The layer extent does not intersect the selected area of interest'));
             }
 
+            let geographicExtent;
+            if (datasetConfig.coverageSrs !== 'EPSG:4326') {
+                geographicExtent = transformExtent(aoiParams.extent, datasetConfig.coverageSrs, 'EPSG:4326');
+            } else {
+                geographicExtent = aoiParams.extent;
+            }
+
             return {
                 id: ADAM_WCS_SOURCE_ID,
                 url: factoryConfig.wcsServiceUrl,
@@ -128,8 +140,10 @@ export const createAdamRasterTileSourceProvider = (
                 subsets: subsets,
                 tileGrid: {
                     extent: aoiParams.extent,
-                    forceUniformResolution: true
+                    forceUniformResolution: true,
+                    tileSize: tileSize
                 },
+                extent: geographicExtent,
                 crossOrigin: true,
                 wktFilter: aoiParams.wktFilter,
                 tileLoadFunction: tileLoadFunction,
