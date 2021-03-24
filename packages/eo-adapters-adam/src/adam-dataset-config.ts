@@ -36,6 +36,7 @@ export type AdamDatasetMultiBandCoverage = {
     id: string;
     name: string;
     wcsCoverage: string;
+    isTrueColor?: boolean;
     bands: AdamDatasetCoverageBand[];
     bandGroups: RasterBandGroup[];
     presets: AdamDatasetMultiBandCoveragePreset[];

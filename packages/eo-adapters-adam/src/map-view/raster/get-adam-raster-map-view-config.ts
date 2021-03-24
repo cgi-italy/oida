@@ -16,6 +16,7 @@ import { AdamDatasetFactoryConfig } from '../../get-adam-dataset-factory';
 import { createAdamRasterTileSourceProvider } from './create-adam-raster-tile-source-provider';
 import { AdamSpatialCoverageProvider } from '../../get-adam-dataset-spatial-coverage-provider';
 
+import trueColorPreview from './true-color-preset-preview';
 
 export const getAdamRasterMapViewConfig = (
     axiosInstance: AxiosInstanceWithCancellation,
@@ -58,44 +59,61 @@ export const getAdamRasterMapViewConfig = (
 
     if (isMultiBandCoverage(datasetConfig.coverages)) {
 
-        const supportedModes: RasterBandModeChoice[] = [{
-            type: RasterBandModeType.Single,
-            default: {
-                band: datasetConfig.coverages.bands[0].idx.toString()
-            }
-        }];
-
-        if (datasetConfig.coverages.presets && datasetConfig.coverages.presets.length) {
-            supportedModes.push(                    {
-                type: RasterBandModeType.Preset,
-                default: {
-                    preset: datasetConfig.coverages.presets[0].id
+        if (datasetConfig.coverages.isTrueColor) {
+            rasterVizconfig = {
+                rasterSourceProvider: provider,
+                bandMode: {
+                    supportedModes: [{
+                        type: RasterBandModeType.Preset,
+                    }],
+                    presets: [{
+                        id: 'tci',
+                        name: 'True color image',
+                        preview: trueColorPreview
+                    }],
+                    defaultMode: 0
                 }
+            };
+        } else {
+            const supportedModes: RasterBandModeChoice[] = [{
+                type: RasterBandModeType.Single,
+                default: {
+                    band: datasetConfig.coverages.bands[0].idx.toString()
+                }
+            }];
+
+            if (datasetConfig.coverages.presets && datasetConfig.coverages.presets.length) {
+                supportedModes.push(                    {
+                    type: RasterBandModeType.Preset,
+                    default: {
+                        preset: datasetConfig.coverages.presets[0].id
+                    }
+                });
+            }
+
+            supportedModes.push({
+                type: RasterBandModeType.Combination
             });
+
+            rasterVizconfig = {
+                rasterSourceProvider: provider,
+                bandMode: {
+                    supportedModes: supportedModes,
+                    bands: datasetConfig.coverages.bands.map((band) => {
+                        return {
+                            id: band.idx.toString(),
+                            colorScales: colorScales,
+                            ...band
+                        };
+                    }),
+                    bandGroups: datasetConfig.coverages.bandGroups,
+                    presets: datasetConfig.coverages.presets,
+                    defaultMode: 0
+                },
+                afterInit: afterInit,
+                dimensions: datasetConfig.dimensions
+            };
         }
-
-        supportedModes.push({
-            type: RasterBandModeType.Combination
-        });
-
-        rasterVizconfig = {
-            rasterSourceProvider: provider,
-            bandMode: {
-                supportedModes: supportedModes,
-                bands: datasetConfig.coverages.bands.map((band) => {
-                    return {
-                        id: band.idx.toString(),
-                        colorScales: colorScales,
-                        ...band
-                    };
-                }),
-                bandGroups: datasetConfig.coverages.bandGroups,
-                presets: datasetConfig.coverages.presets,
-                defaultMode: 0
-            },
-            afterInit: afterInit,
-            dimensions: datasetConfig.dimensions
-        };
     } else {
         rasterVizconfig = {
             rasterSourceProvider: provider,
@@ -117,6 +135,7 @@ export const getAdamRasterMapViewConfig = (
             dimensions: datasetConfig.dimensions,
             afterInit: afterInit
         };
+
     }
 
 

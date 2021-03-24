@@ -18,13 +18,17 @@ export const getAdamDatasetProductSearchConfig = (
 
     let wcsPreviewConfig: AdamWcsPreviewConfig;
     if (isMultiBandCoverage(datasetConfig.coverages)) {
-        const bands = datasetConfig.coverages.presets[0].bands;
+
         wcsPreviewConfig = {
             serviceUrl: factoryConfig.wcsServiceUrl,
             coverageId: datasetConfig.coverages.wcsCoverage,
-            size: 64,
-            subsets: [`bands(${bands.join(',')})`]
+            size: 64
         };
+
+        if (!datasetConfig.coverages.isTrueColor) {
+            const bands = datasetConfig.coverages.presets[0].bands;
+            wcsPreviewConfig.subsets = [`bands(${bands.join(',')})`];
+        }
     } else {
         const defaultCoverage = datasetConfig.coverages[0];
 

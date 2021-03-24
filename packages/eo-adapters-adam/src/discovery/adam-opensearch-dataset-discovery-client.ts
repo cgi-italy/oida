@@ -77,6 +77,8 @@ export class AdamOpensearchDatasetDiscoveryClient {
 
         const params: AdamDatasetDiscoveryRequest = {};
 
+        // currently the opensearch endpoint doesn't support pagination
+        // TODO: enable this once available
         if (queryParams.paging) {
             //params.maxRecords = queryParams.paging.pageSize;
             //params.startIndex = queryParams.paging.offset;
@@ -107,16 +109,41 @@ export class AdamOpensearchDatasetDiscoveryClient {
         try {
 
             //TODO: more than one coverages could be associated to a dataset. Since raster viz currently support
-            // only one layer if there are two or more coverages fallback to the 4326 reprojection through
-            // eo-geotiff library
+            // only one layer if there are two or more coverages in different spatial references we init the layer
+            // with 4326 projection and let eo-geotiff library handle the reprojection (not accurate)
             let wcsCoverage = wcsCoverages.length === 1 ? wcsCoverages[0] : undefined;
 
-            let extent: number[];
+            let extent: number[] | undefined;
             let srs: string;
+            let srsDef: string | undefined;
 
             if (!wcsCoverage) {
-                extent = getGeometryExtent(metadata.geometry)!;
-                srs = 'EPSG:4326';
+                srs = wcsCoverages[0].srs;
+                srsDef = wcsCoverages[0].srsDef;
+                extent = wcsCoverages[0].extent;
+
+                // if all coverages share the same srs compute the combined extent and init
+                // the layer with the native coverages projection
+                for (let i = 0; i < wcsCoverages.length; ++i) {
+                    if (wcsCoverages[i].srs !== srs) {
+                        extent = undefined;
+                        break;
+                    } else {
+                        const coverageExtent = wcsCoverages[i].extent;
+                        extent = [
+                            Math.min(extent[0], coverageExtent[0]),
+                            Math.min(extent[1], coverageExtent[1]),
+                            Math.max(extent[2], coverageExtent[2]),
+                            Math.max(extent[3], coverageExtent[3]),
+                        ];
+                    }
+                }
+                //otherwise fallback to the 4326 reprojection through eo-geotiff library (not accurate)
+                if (!extent) {
+                    srs = 'EPSG:4326';
+                    srsDef = undefined;
+                    extent = getGeometryExtent(metadata.geometry)!;
+                }
                 if (!extent || !isValidExtent(extent)) {
                     //no valid extent available in opensearch metadata. use the first available coverage
                     wcsCoverage = wcsCoverages[0];
@@ -125,47 +152,65 @@ export class AdamOpensearchDatasetDiscoveryClient {
                     } else {
                         extent = wcsCoverage.extent;
                         srs = wcsCoverage.srs;
+                        srsDef = wcsCoverage.srsDef;
                     }
                 }
             } else {
                 extent = wcsCoverage.extent;
                 srs = wcsCoverage.srs;
+                srsDef = wcsCoverage.srsDef;
             }
 
             const dimensions: AdamDatasetDimension[] = [];
             let coverages: AdamDatasetSingleBandCoverage[] | AdamDatasetMultiBandCoverage;
 
             if (metadata.subDataset.length > 1) {
-                coverages = {
-                id: 'bands',
-                name: 'Bands',
-                wcsCoverage: metadata.datasetId,
-                presets: [],
-                bandGroups: [{
-                    id: 'bands',
-                    name: 'Bands',
-                    bandIndices: metadata.subDataset.map((subdataset, idx) => idx)
-                }],
-                bands: metadata.subDataset.map((subdataset, idx) => {
-                    const minMax = this.getRoundedMinMax_(subdataset.minValue, subdataset.maxValue);
-                    return {
-                        idx: idx + 1,
-                        name: subdataset.name,
-                        domain: minMax ? {
-                            min: minMax[0],
-                            max: minMax[1],
-                            noData: subdataset.noDataValue
-                        } : undefined,
-                        // if data range is not defined set a default range to initialize the colormap object
-                        default: minMax ? undefined : {
-                            range: {
-                                min: 0,
-                                max: 10
-                            }
-                        }
+
+                //check for true color dataset
+                if (metadata.subDataset.length === 3 && metadata.subDataset.every((subdataset) => {
+                    return subdataset.minValue === 0 && subdataset.maxValue === 255;
+                })) {
+                    coverages = {
+                        id: `tci`,
+                        name: 'True color image',
+                        wcsCoverage: metadata.datasetId,
+                        isTrueColor: true,
+                        bands: [],
+                        bandGroups: [],
+                        presets: []
                     };
-                })
-                };
+                } else {
+                    coverages = {
+                        id: 'bands',
+                        name: 'Bands',
+                        wcsCoverage: metadata.datasetId,
+                        presets: [],
+                        bandGroups: [{
+                            id: 'bands',
+                            name: 'Bands',
+                            bandIndices: metadata.subDataset.map((subdataset, idx) => idx)
+                        }],
+                        bands: metadata.subDataset.map((subdataset, idx) => {
+                            const minMax = this.getRoundedMinMax_(subdataset.minValue, subdataset.maxValue);
+                            return {
+                                idx: idx + 1,
+                                name: subdataset.name,
+                                domain: minMax ? {
+                                    min: minMax[0],
+                                    max: minMax[1],
+                                    noData: subdataset.noDataValue
+                                } : undefined,
+                                // if data range is not defined set a default range to initialize the colormap object
+                                default: minMax ? undefined : {
+                                    range: {
+                                        min: 0,
+                                        max: 10
+                                    }
+                                }
+                            };
+                        })
+                    };
+                }
             } else {
                 const variable = metadata.subDataset[0];
                 const minMax = this.getRoundedMinMax_(variable.minValue, variable.maxValue);
@@ -249,7 +294,7 @@ export class AdamOpensearchDatasetDiscoveryClient {
                 type: 'raster',
                 coverageExtent: extent,
                 coverageSrs: srs,
-                srsDef: wcsCoverage?.srsDef,
+                srsDef: srsDef,
                 name: metadata.datasetId,
                 fixedTime: fixedTime,
                 renderMode: AdamDatasetRenderMode.ClientSide,
