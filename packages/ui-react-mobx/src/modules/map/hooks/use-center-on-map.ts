@@ -13,9 +13,9 @@ export type CenterOnMapProps = {
 
 export const useCenterOnMap = (props: CenterOnMapProps) => {
 
-    let pendingRequest = useRef<(renderer: IMapRenderer) => void>();
+    const pendingRequest = useRef<(renderer: IMapRenderer) => void>();
 
-    let renderer = useSelector(() => {
+    const renderer = useSelector(() => {
         return props.map.renderer.implementation;
     });
 
@@ -26,10 +26,9 @@ export const useCenterOnMap = (props: CenterOnMapProps) => {
         }
     }, [renderer]);
 
-
     return (geometry: Geometry, options?: CenterOnMapOptions) => {
-        if (renderer) {
-            centerOnMap(renderer, geometry, options);
+        if (props.map.renderer.implementation) {
+            centerOnMap(props.map.renderer.implementation, geometry, options);
         } else {
             pendingRequest.current = (renderer) => {
                 centerOnMap(renderer, geometry, {
