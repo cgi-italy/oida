@@ -21,9 +21,6 @@ export class IndexedCollection<T> extends Collection<T> {
 
         makeObservable<IndexedCollection<T>, 'idMap_'>(this, {
             idMap_: observable,
-            add: action,
-            remove: action,
-            clear: action,
             removeItemWithId: action
         });
     }
