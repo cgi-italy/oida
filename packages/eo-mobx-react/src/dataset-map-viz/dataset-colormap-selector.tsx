@@ -166,10 +166,12 @@ export const DatasetColorMapRangeSelector = (props: DatasetColorMapRangeSelector
                     formatter={value => `${clamp ? '≤ ' : ''}${value}`}
                     onChange={(value) => {
                         if (typeof(value) === 'number') {
-                            props.colorMap.domain?.setRange({
-                                min: value,
-                                max: Math.max(value, props.colorMap.domain.mapRange.max)
-                            });
+                            if (value !== props.colorMap.domain?.mapRange.min) {
+                                props.colorMap.domain?.setRange({
+                                    min: value,
+                                    max: props.colorMap.domain.mapRange.max
+                                });
+                            }
                         }
                     }}
                 />
@@ -181,10 +183,12 @@ export const DatasetColorMapRangeSelector = (props: DatasetColorMapRangeSelector
                     step={variableDomain?.step}
                     onChange={(value) => {
                         if (typeof(value) === 'number') {
-                            props.colorMap.domain?.setRange({
-                                min: Math.min(props.colorMap.domain.mapRange.min, value),
-                                max: value
-                            });
+                            if (value !== props.colorMap.domain?.mapRange.max) {
+                                props.colorMap.domain?.setRange({
+                                    min: props.colorMap.domain.mapRange.min,
+                                    max: value
+                                });
+                            }
                         }
                     }}
                     size='small'

@@ -12,6 +12,8 @@ export type ColorScale = {
     name: string;
     type: ColorScaleType;
     legend: HTMLImageElement | HTMLCanvasElement;
+    colors?: string[];
+    positions?: string[];
 };
 
 
