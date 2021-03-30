@@ -24,6 +24,14 @@ export type WmsLayerPreviewOptions = {
     transparent?: boolean
 };
 
+export type WmsFeatureInfoParams = {
+    layer: string,
+    position: number[],
+    format: string,
+    buffer?: number[],
+    additionalParams?: Record<string, string>
+};
+
 export type WmsTimeSeriesParams = {
     layer: string,
     position: number[],
@@ -104,6 +112,28 @@ export class WmsService {
         }
     }
 
+    getFeatureInfo(params: WmsFeatureInfoParams) {
+        const buffer = params.buffer || [0.1, 0.2];
+        return this.wmsClient_.getFeatureInfo({
+            url: this.config_.url,
+            layers: params.layer,
+            styles: '',
+            srs: 'EPSG:4326',
+            bbox: [
+                params.position[1] - buffer[1],
+                params.position[0] - buffer[0],
+                params.position[1] + buffer[1],
+                params.position[0] + buffer[0]
+            ],
+            width: 64,
+            height: 64,
+            i: 32,
+            j: 32,
+            format: params.format,
+            vendorParams: params.additionalParams
+        });
+    }
+
     getTimeSeries(params: WmsTimeSeriesParams) {
 
         if (!this.config_.ncWms) {
@@ -164,14 +194,15 @@ export class WmsService {
 
                 let width: number, height: number;
 
+                let crs: string = 'EPSG:4326';
                 let [miny, minx, maxy, maxx] = layer.EX_GeographicBoundingBox;
 
-                let crs = layer.CRS[0];
-                let nativeBBox = layer.BoundingBox.find(bbox => bbox.crs === crs);
-                if (!nativeBBox) {
-                    crs = 'EPSG:4326';
-                } else {
-                    [minx, miny, maxx, maxy] = nativeBBox.extent;
+                if (layer.CRS && layer.CRS.length) {
+                    let nativeBBox = layer.BoundingBox.find(bbox => bbox.crs === layer.CRS[0]);
+                    if (nativeBBox) {
+                        crs = nativeBBox.crs;
+                        [minx, miny, maxx, maxy] = nativeBBox.extent;
+                    }
                 }
 
                 let sizeX = maxx - minx;

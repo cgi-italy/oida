@@ -39,6 +39,7 @@ export type WmsLayer = {
     Title?: string,
     Abstract?: string,
     KeywordList?: string[],
+    Identifier?: string[],
     CRS: string[],
     BoundingBox: WmsLayerBBox[],
     EX_GeographicBoundingBox: number[],
@@ -136,7 +137,7 @@ export class WmsClient {
             bbox: params.bbox.join(','),
             width: params.width,
             height: params.height,
-            format: format,
+            info_format: format,
             ...params.vendorParams
         };
 
@@ -162,7 +163,7 @@ export class WmsClient {
                     case 'text/html':
                         return response.data;
                     case 'application/json':
-                        return JSON.parse(response.data);
+                        return response.data;
                     default:
                         let features = this.featureInfoParser_.read(response.data);
                         return this.geoJsonParser_.writeFeaturesObject(features);

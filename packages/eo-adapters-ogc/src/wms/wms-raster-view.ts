@@ -20,7 +20,8 @@ export const createWmsRasterSourceProvider = (
 
         let params: Record<string, string> = {
             transparent: 'TRUE',
-            format: 'image/png'
+            format: 'image/png',
+            styles: ''
         };
 
         if (layer.BoundingBox.find((bbox) => bbox.crs === 'EPSG:404000')) {
@@ -36,10 +37,9 @@ export const createWmsRasterSourceProvider = (
             }
         }
 
-        let style = '';
         const bandMode = rasterView.bandMode.value;
         if (bandMode instanceof RasterBandModePreset) {
-            style = bandMode.preset;
+            params.styles = bandMode.preset;
         }
 
         let bbox = layer.BoundingBox[0];
@@ -62,8 +62,9 @@ export const createWmsRasterSourceProvider = (
             });
         }
 
+        const aoiFilter = rasterView.dataset.aoiFilter;
+
         return extent.then((extent) => {
-            let aoiFilter = rasterView.dataset.aoiFilter;
 
             if (aoiFilter && !aoiFilter.props?.fromMapViewport) {
                 let aoiExtent = getGeometryExtent(aoiFilter.geometry);
@@ -76,18 +77,24 @@ export const createWmsRasterSourceProvider = (
                 }
             }
 
+            let geographicExtent;
+            if (crs !== 'EPSG:4326') {
+                geographicExtent = transformExtent(extent, crs, 'EPSG:4326');
+            } else {
+                geographicExtent = extent;
+            }
+
             return Promise.resolve({
                 id: 'wms',
                 url: wmsUrl,
                 layers: layer.Name,
-                styles: style,
                 srs: crs,
                 parameters: params,
                 tileGrid: {
                     extent: extent,
                     forceUniformResolution: true
                 },
-                extent: extent
+                extent: geographicExtent
             });
         });
     };
