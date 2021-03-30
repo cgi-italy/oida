@@ -80,8 +80,8 @@ export const getTileGridFromSRS = (srs: string, tileGridConfig?: TileGridConfig)
 
     } else if (projection === ProjectionType.GlobalMercator) {
         if (extent) {
-            tileSchemeConfig.rectangleSouthwestInMeters = new Cartesian2(extent[0], extent[2]);
-            tileSchemeConfig.rectangleNortheastInMeters = new Cartesian2(extent[1], extent[3]);
+            tileSchemeConfig.rectangleSouthwestInMeters = new Cartesian2(extent[0], extent[1]);
+            tileSchemeConfig.rectangleNortheastInMeters = new Cartesian2(extent[2], extent[3]);
         }
         tilingScheme = new WebMercatorTilingScheme(tileSchemeConfig);
     }

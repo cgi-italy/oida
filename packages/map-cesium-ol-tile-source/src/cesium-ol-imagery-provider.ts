@@ -195,8 +195,7 @@ CesiumOLImageryProvider.prototype.getTileCredits = function(x, y, level) {
 
 CesiumOLImageryProvider.prototype.requestImage = function(x, y, level) {
 
-    // 1) Cesium zoom level 0 is OpenLayers zoom level 1 for EPSG:4326
-    const z = this.tilingScheme_ instanceof GeographicTilingScheme ? level + 1 : level;
+    const z = level;
 
     const tilegrid = this.source_.getTileGridForProjection(this.projection_);
     if (z < tilegrid.getMinZoom() || z > tilegrid.getMaxZoom()) {
