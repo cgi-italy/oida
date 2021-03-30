@@ -161,6 +161,14 @@ export class DatasetDimensionSeries extends DatasetAnalysis<undefined> implement
     }
 
     protected afterInit_() {
+
+        if (!this.seriesVariable) {
+            this.setVariable(this.config.variables[0].id);
+        }
+        if (!this.seriesDimension) {
+            this.setDimension(this.config.dimensions[0].id);
+        }
+
         const seriesUpdaterDisposer = autorun(() => {
 
             if (this.canRunQuery_()) {
