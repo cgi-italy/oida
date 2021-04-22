@@ -3,10 +3,11 @@ import Cartographic from 'cesium/Source/Core/Cartographic';
 import CesiumMath from 'cesium/Source/Core/Math';
 import CustomDataSource from 'cesium/Source/DataSources/CustomDataSource';
 
-import { IFeatureLayerRenderer, IFeatureStyle, Geometry, IFeature, FeatureLayerConfig, FeatureGeometry } from '@oida/core';
+import { IFeatureLayerRenderer, IFeatureStyle, IFeature, FeatureGeometry, MapLayerRendererConfig, FeatureLayerRendererConfig } from '@oida/core';
 
 import { CesiumFeatureCoordPickMode, PickInfo, PICK_INFO_KEY, updateDataSource } from '../../utils';
 import { CesiumMapLayer } from '../cesium-map-layer';
+import { CesiumFeatureLayerProps } from '../cesium-feature-layer';
 import { geometryEntityRendererFactory } from './geometry-entity-renderers';
 
 export class CesiumEntityFeatureLayer extends CesiumMapLayer implements IFeatureLayerRenderer {
@@ -17,7 +18,7 @@ export class CesiumEntityFeatureLayer extends CesiumMapLayer implements IFeature
     protected coordPickMode_: CesiumFeatureCoordPickMode;
     protected dataSource_;
 
-    constructor(config: FeatureLayerConfig) {
+    constructor(config: FeatureLayerRendererConfig & CesiumFeatureLayerProps) {
         super(config);
 
         this.clampToGround_ = config.clampToGround || false;
@@ -35,7 +36,7 @@ export class CesiumEntityFeatureLayer extends CesiumMapLayer implements IFeature
             return;
         }
 
-        let geometryRenderer = geometryEntityRendererFactory.create(geometry.type);
+        let geometryRenderer = geometryEntityRendererFactory.create(geometry.type, {});
 
         if (geometryRenderer) {
 
@@ -136,7 +137,10 @@ export class CesiumEntityFeatureLayer extends CesiumMapLayer implements IFeature
 
     onFeatureHover(coordinate: Cartesian3, pickInfo: PickInfo) {
         let cartographic = Cartographic.fromCartesian(coordinate);
-        this.onFeatureHover_!(pickInfo.data, [
+        this.onFeatureHover_!({
+            id: pickInfo.id,
+            data: pickInfo.data
+        }, [
             CesiumMath.toDegrees(cartographic.longitude),
             CesiumMath.toDegrees(cartographic.latitude),
             cartographic.height
@@ -145,7 +149,10 @@ export class CesiumEntityFeatureLayer extends CesiumMapLayer implements IFeature
 
     onFeatureSelect(coordinate: Cartesian3, pickInfo: PickInfo) {
         let cartographic = Cartographic.fromCartesian(coordinate);
-        this.onFeatureSelect_!(pickInfo.data, [
+        this.onFeatureSelect_!({
+            id: pickInfo.id,
+            data: pickInfo.data
+        }, [
             CesiumMath.toDegrees(cartographic.longitude),
             CesiumMath.toDegrees(cartographic.latitude),
             cartographic.height

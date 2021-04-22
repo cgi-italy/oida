@@ -29,6 +29,6 @@
     "@oida/eo-mobx": "file:../eo-mobx",
     "@oida/map-cesium": "file:../map-cesium",
     "@oida/map-ol": "file:../map-ol",
-    "tslib": "^2.0.1"
+    "tslib": "^2.2.0"
   }
 }

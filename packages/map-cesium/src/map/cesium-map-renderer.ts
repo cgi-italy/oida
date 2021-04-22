@@ -20,7 +20,7 @@ import DataSourceDisplay from 'cesium/Source/DataSources/DataSourceDisplay';
 
 import 'cesium/Source/Widgets/CesiumWidget/CesiumWidget.css';
 
-import { mapRendererFactory, IMapRenderer, IMapRendererProps, IMapViewport, IDynamicFactory, ILayerRenderer, BBox, Size } from '@oida/core';
+import { IMapRenderer, IMapRendererProps, IMapViewport, BBox, Size } from '@oida/core';
 
 import { cesiumLayersFactory } from '../layers/cesium-layers-factory';
 import { cesiumInteractionsFactory } from '../interactions/cesium-interactions-factory';
@@ -30,9 +30,9 @@ import { updateDataSource } from '../utils';
 
 export const CESIUM_RENDERER_ID = 'cesium';
 
-export type CesiumMapRendererProps = {
-    allowFreeCameraRotation: boolean;
-    sceneMode: string
+export type CesiumMapRendererProps = IMapRendererProps & {
+    allowFreeCameraRotation?: boolean;
+    sceneMode?: string
 };
 
 export class CesiumMapRenderer implements IMapRenderer {
@@ -42,7 +42,7 @@ export class CesiumMapRenderer implements IMapRenderer {
     private dataSourceCollection_;
     private dataSourceDisplay_;
 
-    constructor(props: IMapRendererProps & CesiumMapRendererProps) {
+    constructor(props: CesiumMapRendererProps) {
         this.initRenderer_(props);
     }
 
@@ -79,7 +79,7 @@ export class CesiumMapRenderer implements IMapRenderer {
         }
     }
 
-    updateRendererProps(props: Partial<CesiumMapRendererProps>) {
+    updateRendererProps(props: CesiumMapRendererProps) {
         if (props.sceneMode !== undefined) {
             let sceneMode = this.getSceneMode_(props);
             this.viewer_.scene.mode = sceneMode;
@@ -129,7 +129,7 @@ export class CesiumMapRenderer implements IMapRenderer {
     }
 
     getLayersFactory() {
-        return cesiumLayersFactory as unknown as IDynamicFactory<ILayerRenderer>;
+        return cesiumLayersFactory;
     }
 
     getInteractionsFactory() {
@@ -348,7 +348,7 @@ export class CesiumMapRenderer implements IMapRenderer {
     }
 
 
-    protected initRenderer_(props: IMapRendererProps & CesiumMapRendererProps) {
+    protected initRenderer_(props: CesiumMapRendererProps) {
 
         const {projection, viewport, target, onViewUpdating, onViewUpdated, ...renderProps} = props;
 
@@ -419,7 +419,7 @@ export class CesiumMapRenderer implements IMapRenderer {
         }
     }
 
-    protected getSceneMode_(props) {
+    protected getSceneMode_(props: Omit<CesiumMapRendererProps, keyof IMapRendererProps>) {
         if (props.sceneMode === 'columbus') {
             return SceneMode.COLUMBUS_VIEW;
         } else if (props.sceneMode === '2D') {
@@ -536,9 +536,3 @@ export class CesiumMapRenderer implements IMapRenderer {
     }
 
 }
-
-mapRendererFactory.register(CESIUM_RENDERER_ID, (props) => {
-    let renderer =  new CesiumMapRenderer(props);
-    return renderer;
-});
-

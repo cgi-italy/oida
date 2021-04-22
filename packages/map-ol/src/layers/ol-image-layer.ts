@@ -1,6 +1,6 @@
 import ImageLayer from 'ol/layer/Image';
 
-import { IMAGE_LAYER_ID, IImageLayerRenderer, ImageLayerConfig, ImageSourceConfig } from '@oida/core';
+import { IMAGE_LAYER_ID, IImageLayerRenderer, MapLayerRendererConfig, ImageLayerRendererConfig, ImageSourceConfig } from '@oida/core';
 
 import { olImageSourceFactory } from './image-sources/ol-image-source-factory';
 
@@ -12,7 +12,7 @@ export class OLImageLayer extends OLMapLayer<ImageLayer> implements IImageLayerR
     protected onImageLoadStart_;
     protected onImageLoadEnd_;
 
-    constructor(config: ImageLayerConfig) {
+    constructor(config: ImageLayerRendererConfig) {
         super(config);
     }
 
@@ -38,15 +38,10 @@ export class OLImageLayer extends OLMapLayer<ImageLayer> implements IImageLayerR
         //TODO
     }
 
-    protected createOLObject_(config: ImageLayerConfig) {
+    protected createOLObject_(config: ImageLayerRendererConfig) {
 
-        this.onImageLoadStart_ = () => {
-            config.onImageLoadStart();
-        };
-
-        this.onImageLoadEnd_ = () => {
-            config.onImageLoadEnd();
-        };
+        this.onImageLoadStart_ = config.onImageLoadStart;
+        this.onImageLoadEnd_ = config.onImageLoadEnd;
 
         return new ImageLayer({
             source: config.source ? this.createImageSource_(config.source) : undefined,

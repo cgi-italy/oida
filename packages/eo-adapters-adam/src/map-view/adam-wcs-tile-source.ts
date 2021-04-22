@@ -10,7 +10,8 @@ import { AdamServiceParamsSerializer } from '../utils';
 
 export const ADAM_WCS_SOURCE_ID = 'adam_wcs';
 
-export type AdamWcsTileSourceConfig = {
+export type AdamWcsTileSource = {
+    id: typeof ADAM_WCS_SOURCE_ID;
     url: string;
     srs: string;
     coverage: string;
@@ -18,7 +19,7 @@ export type AdamWcsTileSourceConfig = {
     subsets: string[];
     tileGrid: TileGridConfig;
     minZoomLevel?: number;
-    crossOrigin?: boolean;
+    crossOrigin?: 'anonymous' | 'use-credentials';
     wktFilter?: string;
     tileLoadFunction?: (source: {
         url: string,
@@ -29,10 +30,17 @@ export type AdamWcsTileSourceConfig = {
     colortable?: string;
     colorrange?: string;
     requestExtentOffset?: number[];
-    wrapX?: boolean
 };
 
-olTileSourcesFactory.register(ADAM_WCS_SOURCE_ID, (config: AdamWcsTileSourceConfig) => {
+
+declare module '@oida/core' {
+    export interface ITileSourceDefinitions {
+        [ADAM_WCS_SOURCE_ID]: AdamWcsTileSource;
+    }
+}
+
+
+olTileSourcesFactory.register(ADAM_WCS_SOURCE_ID, (config) => {
 
     let tileGrid = getTileGridFromConfig(config.srs, config.tileGrid);
     let tileSize = tileGrid.getTileSize();
@@ -168,7 +176,7 @@ function cesiumBuildImageResource(imageryProvider, x, y, level, request) {
     });
 }
 
-cesiumTileSourcesFactory.register(ADAM_WCS_SOURCE_ID, (config: AdamWcsTileSourceConfig) => {
+cesiumTileSourcesFactory.register(ADAM_WCS_SOURCE_ID, (config) => {
     const tileGrid = getTileGridFromSRS(config.srs || 'EPSG:4326', config.tileGrid);
     if (tileGrid) {
 

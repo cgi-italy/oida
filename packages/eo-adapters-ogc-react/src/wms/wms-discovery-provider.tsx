@@ -5,10 +5,7 @@ import { Select } from 'antd';
 import { useSelector } from '@oida/ui-react-mobx';
 import { DatasetExplorer } from '@oida/eo-mobx';
 
-import { DatasetDiscoveryProviderFactory } from '@oida/eo-mobx-react';
-import {
-    WmsDatasetDiscoveryProvider, WMS_DATASET_DISCOVERY_PROVIDER_TYPE
- } from '@oida/eo-adapters-ogc';
+import { WmsDatasetDiscoveryProvider } from '@oida/eo-adapters-ogc';
 
 import { useHistory, useRouteMatch, Redirect, Route, Switch, useParams } from 'react-router';
 import { WmsDiscoveryProviderResults } from './wms-discovery-provider-results';
@@ -35,7 +32,7 @@ const WmsDiscoveryProviderRedirect = (props: {provider: WmsDatasetDiscoveryProvi
 
 export const WmsDiscoveryProviderRoute = (props: WmsDiscoveryProviderRouterProps) => {
 
-    const { serviceId } = useParams();
+    const { serviceId } = useParams<{serviceId: string}>();
 
     useEffect(() => {
         props.provider.selectService(serviceId);
@@ -119,11 +116,3 @@ export const WmsDiscoveryProvider = (props: WmsDiscoveryProviderProps) => {
         </div>
     );
 };
-
-DatasetDiscoveryProviderFactory.register(WMS_DATASET_DISCOVERY_PROVIDER_TYPE, (config) => {
-    return (
-        <WmsDiscoveryProvider
-            {...config}
-        />
-    );
-});

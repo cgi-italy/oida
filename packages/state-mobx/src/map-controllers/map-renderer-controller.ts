@@ -1,11 +1,17 @@
-import { reaction, observable, IObservableValue } from 'mobx';
+import { reaction } from 'mobx';
 
-import { SubscriptionTracker, mapRendererFactory, IMapRenderer, IMapViewport, MapCoord } from '@oida/core';
+import { SubscriptionTracker, mapRendererFactory, IMapRenderer, MapCoord } from '@oida/core';
 
 import { Map } from '../models/map/map';
+import { MapRenderer } from '../models/map/map-renderer';
 
 import { GroupLayerController } from './layers/group-layer-controller';
 import { InteractionListController } from './interactions/interaction-list-controller';
+
+
+export type MapRendererControllerConfig = {
+    state: Map;
+};
 
 export class MapRendererController {
 
@@ -16,7 +22,7 @@ export class MapRendererController {
     private interactionsController_: InteractionListController;
     private ignoreNextViewportChange_: boolean = false;
 
-    constructor(config) {
+    constructor(config: MapRendererControllerConfig) {
 
         this.mapState_ = config.state;
 
@@ -45,14 +51,14 @@ export class MapRendererController {
         }
     }
 
-    private initMapRenderer_(rendererConfig) {
+    private initMapRenderer_(renderer: MapRenderer) {
         if (this.mapRenderer_) {
             this.layersController_.destroy();
             this.mapRenderer_.destroy();
             delete this.mapRenderer_;
         }
-        if (rendererConfig) {
-            this.mapRenderer_ = mapRendererFactory.create(rendererConfig.id, {
+        if (renderer) {
+            this.mapRenderer_ = mapRendererFactory.create(renderer.id, {
                 target: this.mapState_.view.target,
                 viewport: this.mapState_.view.viewport,
                 projection: this.mapState_.view.projection,
@@ -66,7 +72,7 @@ export class MapRendererController {
                     this.updateViewportState_(view);
                     this.mapState_.view.setUpdating(false);
                 },
-                ...rendererConfig.props
+                ...renderer.options
             });
 
             this.layersController_.setMapRenderer(this.mapRenderer_);

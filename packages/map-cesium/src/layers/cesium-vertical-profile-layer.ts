@@ -10,7 +10,10 @@ import CustomDataSource from 'cesium/Source/DataSources/CustomDataSource';
 
 import { CesiumMapLayer } from './cesium-map-layer';
 
-import { IVerticalProfileLayerRenderer, IVerticalProfile, IVerticalProfileStyle, VerticalProfileCoordinate } from '@oida/core';
+import {
+    IVerticalProfileLayerRenderer, VerticalProfileLayerRendererConfig,
+    IVerticalProfile, IVerticalProfileStyle, VerticalProfileCoordinate
+} from '@oida/core';
 
 import { PickInfo, PICK_INFO_KEY, updateDataSource } from '../utils';
 
@@ -19,10 +22,10 @@ const cursor = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/
 export class CesiumVerticalProfileLayer extends CesiumMapLayer implements IVerticalProfileLayerRenderer {
 
     protected dataSource_;
-    protected onCoordinateSelect_;
-    protected onCoordinateHover_;
+    protected onCoordinateSelect_: ((selected?: {profileId: string, coordinate: number[]}) => void) | undefined;
+    protected onCoordinateHover_: ((selected?: {profileId: string, coordinate: number[]}) => void) | undefined;
 
-    constructor(config) {
+    constructor(config: VerticalProfileLayerRendererConfig) {
         super(config);
 
         this.dataSource_ = new CustomDataSource();
@@ -183,11 +186,14 @@ export class CesiumVerticalProfileLayer extends CesiumMapLayer implements IVerti
         if (this.onCoordinateHover_) {
             if (coordinate) {
                 let cartographic = Cartographic.fromCartesian(coordinate);
-                this.onCoordinateHover_([
-                    CesiumMath.toDegrees(cartographic.longitude),
-                    CesiumMath.toDegrees(cartographic.latitude),
-                    cartographic.height
-                ], pickInfo.id);
+                this.onCoordinateHover_({
+                    profileId: pickInfo.id,
+                    coordinate: [
+                        CesiumMath.toDegrees(cartographic.longitude),
+                        CesiumMath.toDegrees(cartographic.latitude),
+                        cartographic.height
+                    ]
+                });
             } else {
                 this.onCoordinateHover_(undefined);
             }
@@ -198,11 +204,14 @@ export class CesiumVerticalProfileLayer extends CesiumMapLayer implements IVerti
         if (this.onCoordinateSelect_) {
             if (coordinate) {
                 let cartographic = Cartographic.fromCartesian(coordinate);
-                this.onCoordinateSelect_([
-                    CesiumMath.toDegrees(cartographic.longitude),
-                    CesiumMath.toDegrees(cartographic.latitude),
-                    cartographic.height
-                ], pickInfo.id);
+                this.onCoordinateSelect_({
+                    profileId: pickInfo.id,
+                    coordinate: [
+                        CesiumMath.toDegrees(cartographic.longitude),
+                        CesiumMath.toDegrees(cartographic.latitude),
+                        cartographic.height
+                    ]
+                });
             } else {
                 this.onCoordinateSelect_(undefined);
             }

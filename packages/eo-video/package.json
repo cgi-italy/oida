@@ -32,7 +32,7 @@
     "@oida/state-mobx": "file:../state-mobx",
     "@oida/ui-react-mobx": "file:../ui-react-mobx",
     "mediaelement": "^4.2.16",
-    "tslib": "^2.0.1",
+    "tslib": "^2.2.0",
     "uuid": "^8.0.0"
   }
 }

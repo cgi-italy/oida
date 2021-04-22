@@ -26,6 +26,6 @@
   "dependencies": {
     "@oida/core": "file:../core",
     "@oida/eo-mobx": "file:../eo-mobx",
-    "tslib": "^2.0.1"
+    "tslib": "^2.2.0"
   }
 }

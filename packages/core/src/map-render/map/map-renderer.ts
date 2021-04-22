@@ -1,6 +1,6 @@
 import { IDynamicFactory } from '../../utils/dynamic-factory';
 import { IMapInteractionImplementation } from '../interactions/map-interaction-implementation';
-import { ILayerRenderer } from '../layers/map-layer-renderer';
+import { IMapLayerRenderer, IMapLayerRendererConfigDefinitions, MapLayerRendererConfig } from '../layers/map-layer-renderer';
 import { IGroupLayerRenderer } from '../layers/group-layer-renderer';
 
 export type BBox = [number, number, number, number];
@@ -38,7 +38,7 @@ export interface IMapRenderer {
     updateRendererProps(props: {[key: string]: any}): void;
     fitExtent(extent: BBox, animate?: boolean): void;
     getViewportExtent(): BBox;
-    getLayersFactory(): IDynamicFactory<ILayerRenderer>;
+    getLayersFactory(): IDynamicFactory<IMapLayerRenderer, IMapLayerRendererConfigDefinitions>;
     getInteractionsFactory(): IDynamicFactory<IMapInteractionImplementation>;
     setLayerGroup(group: IGroupLayerRenderer);
     getSize(): Size;

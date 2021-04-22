@@ -1,6 +1,6 @@
 import TileLayer from 'ol/layer/Tile';
 
-import { TILE_LAYER_ID, ITileLayerRenderer } from '@oida/core';
+import { TILE_LAYER_ID, ITileLayerRenderer, MapLayerRendererConfig, TileLayerRendererConfig, TileSource } from '@oida/core';
 
 import { olTileSourcesFactory } from './tilesources/ol-tilesources-factory';
 
@@ -9,14 +9,14 @@ import { OLMapLayer } from './ol-map-layer';
 
 export class OLTileLayer extends OLMapLayer<TileLayer> implements ITileLayerRenderer {
 
-    protected onTileLoadStart_;
-    protected onTileLoadEnd_;
+    protected onTileLoadStart_: (() => void) | undefined;
+    protected onTileLoadEnd_: (() => void) | undefined;
 
-    constructor(config) {
+    constructor(config: TileLayerRendererConfig) {
         super(config);
     }
 
-    updateSource(config) {
+    updateSource(sourceConfig: TileSource) {
 
         let prevSource = this.olImpl_.getSource();
         if (prevSource) {
@@ -25,7 +25,7 @@ export class OLTileLayer extends OLMapLayer<TileLayer> implements ITileLayerRend
             prevSource.un('tileloaderror', this.onTileLoadEnd_);
         }
 
-        let source = config ? this.createTileSource_(config) : undefined;
+        let source = sourceConfig ? this.createTileSource_(sourceConfig) : undefined;
         this.olImpl_.setSource(source);
     }
 
@@ -48,15 +48,10 @@ export class OLTileLayer extends OLMapLayer<TileLayer> implements ITileLayerRend
     }
 
 
-    protected createOLObject_(config) {
+    protected createOLObject_(config: TileLayerRendererConfig) {
 
-        this.onTileLoadStart_ = () => {
-            config.onTileLoadStart();
-        };
-
-        this.onTileLoadEnd_ = () => {
-            config.onTileLoadEnd();
-        };
+        this.onTileLoadStart_ = config.onTileLoadStart;
+        this.onTileLoadEnd_ = config.onTileLoadEnd;
 
         return new TileLayer({
             source: config.source ? this.createTileSource_(config.source) : undefined,
@@ -71,13 +66,13 @@ export class OLTileLayer extends OLMapLayer<TileLayer> implements ITileLayerRend
     protected destroyOLObject_() {
     }
 
-    protected createTileSource_(config) {
+    protected createTileSource_(config: TileSource) {
         let source = olTileSourcesFactory.create(config.id, {
             ...config,
             wrapX: this.mapRenderer_.getViewer().getView()['wrapX']
         });
 
-        if (source) {
+        if (source && this.onTileLoadStart_ && this.onTileLoadEnd_) {
             source.on('tileloadstart', this.onTileLoadStart_);
             source.on('tileloadend', this.onTileLoadEnd_);
             source.on('tileloaderror', this.onTileLoadEnd_);

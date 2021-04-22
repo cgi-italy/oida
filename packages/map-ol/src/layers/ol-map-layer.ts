@@ -2,46 +2,45 @@
 import LayerBase from 'ol/layer/Base';
 import { transformExtent } from 'ol/proj';
 
-import { IFeature, ILayerRenderer } from '@oida/core';
+import { IFeature, IMapLayerRenderer, MapLayerRendererConfig } from '@oida/core';
 
 import { OLMapRenderer } from '../map/ol-map-renderer';
 
-export abstract class OLMapLayer<T extends LayerBase = LayerBase> implements ILayerRenderer {
+export abstract class OLMapLayer<T extends LayerBase = LayerBase> implements IMapLayerRenderer {
 
     protected mapRenderer_: OLMapRenderer;
     protected olImpl_: T;
 
-    constructor(config) {
-        let {mapRenderer, mapLayer, ...other} = config;
+    constructor(config: MapLayerRendererConfig) {
+        let {mapRenderer, ...other} = config;
 
-        this.mapRenderer_ = mapRenderer;
-        this.olImpl_ = this.createOLObject_({
-            ...mapLayer,
-            ...other
-        });
+        this.mapRenderer_ = mapRenderer as OLMapRenderer;
+        this.olImpl_ = this.createOLObject_(other);
     }
 
-    setVisible(visible) {
+    setVisible(visible: boolean) {
         this.olImpl_.setVisible(visible);
     }
 
-    setOpacity(opacity) {
+    setOpacity(opacity: number) {
         this.olImpl_.setOpacity(opacity);
     }
 
-    setZIndex(zIndex) {
+    setZIndex(zIndex: number) {
         this.olImpl_.setZIndex(zIndex);
     }
 
-    setExtent(extent) {
+    setExtent(extent: number[] | undefined) {
 
         if (extent) {
             let projection = this.mapRenderer_.getViewer().getView().getProjection();
 
             if (projection.getCode() !== 'EPSG:4326') {
                 extent = transformExtent(extent, 'EPSG:4326', projection);
-                if (isNaN(extent[0]) || isNaN(extent[1]) || isNaN(extent[2]) || isNaN(extent[3])) {
-                    extent = undefined;
+                if (extent) {
+                    if (isNaN(extent[0]) || isNaN(extent[1]) || isNaN(extent[2]) || isNaN(extent[3])) {
+                        extent = undefined;
+                    }
                 }
             }
         }

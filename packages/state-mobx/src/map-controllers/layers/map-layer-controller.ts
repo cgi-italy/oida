@@ -1,10 +1,10 @@
 import { autorun } from 'mobx';
 
-import { SubscriptionTracker, ILayerRenderer, IMapRenderer } from '@oida/core';
+import { SubscriptionTracker, IMapLayerRenderer, IMapRenderer, MapLayerRendererConfig } from '@oida/core';
 
 import { MapLayer } from '../../models/map/layers/map-layer';
 
-export abstract class MapLayerController<T extends ILayerRenderer = ILayerRenderer, U extends MapLayer = MapLayer> {
+export abstract class MapLayerController<T extends IMapLayerRenderer = IMapLayerRenderer, U extends MapLayer = MapLayer> {
 
     protected mapLayer_: U;
     protected layerRenderer_: T | undefined;
@@ -59,6 +59,16 @@ export abstract class MapLayerController<T extends ILayerRenderer = ILayerRender
 
     protected unbindFromLayerState_() {
         this.subscriptionTracker_.unsubscribe();
+    }
+
+    protected getRendererConfig_(mapRenderer: IMapRenderer): MapLayerRendererConfig {
+        return {
+            extent: this.mapLayer_.extent,
+            opacity: this.mapLayer_.opacity.value,
+            visible: this.mapLayer_.visible.value,
+            zIndex: this.mapLayer_.zIndex,
+            mapRenderer: mapRenderer
+        };
     }
 
 }

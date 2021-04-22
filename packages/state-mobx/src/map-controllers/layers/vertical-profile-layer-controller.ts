@@ -23,34 +23,40 @@ extends MapLayerController<IVerticalProfileLayerRenderer, VerticalProfileLayer<T
 
     protected createLayerRenderer_(mapRenderer: IMapRenderer) {
 
-        const onCoordinateSelect = (coordinate, profileId) => {
+        const onCoordinateSelect = (selected?: {profileId: string, coordinate: number[]}) => {
 
-            const profile = this.mapLayer_.source?.find(profile => profile.selected.value && profile.id === profileId);
-            if (profile) {
+            let selectedProfile: T | undefined;
+            if (selected) {
+                selectedProfile = this.mapLayer_.source?.find(profile => profile.selected.value && profile.id === selected.profileId);
+            }
+            if (selectedProfile) {
                 this.mapLayer_.setSelectedCoordinate({
-                    profileId: profile.id.toString(),
-                    geographic: coordinate
+                    profileId: selectedProfile.id.toString(),
+                    geographic: selected!.coordinate
                 });
             } else {
                 this.mapLayer_.setSelectedCoordinate(undefined);
             }
         };
 
-        const onCoordinateHover = (coordinate, profileId) => {
+        const onCoordinateHover = (hovered?: {profileId: string, coordinate: number[]}) => {
 
-            const profile = this.mapLayer_.source?.find(profile => profile.selected.value && profile.id === profileId);
-            if (profile) {
-                this.mapLayer_.setHighlihgtedCoordinate({
-                    profileId: profile.id.toString(),
-                    geographic: coordinate
+            let hoveredProfile: T | undefined;
+            if (hovered) {
+                hoveredProfile = this.mapLayer_.source?.find(profile => profile.selected.value && profile.id === hovered.profileId);
+            }
+            if (hoveredProfile) {
+                this.mapLayer_.setSelectedCoordinate({
+                    profileId: hoveredProfile.id.toString(),
+                    geographic: hovered!.coordinate
                 });
             } else {
-                this.mapLayer_.setHighlihgtedCoordinate(undefined);
+                this.mapLayer_.setSelectedCoordinate(undefined);
             }
         };
 
         return <IVerticalProfileLayerRenderer>mapRenderer.getLayersFactory().create(VERTICAL_PROFILE_LAYER_ID, {
-            mapRenderer: mapRenderer,
+            ...this.getRendererConfig_(mapRenderer),
             onCoordinateSelect: onCoordinateSelect,
             onCoordinateHover: onCoordinateHover,
             ...this.mapLayer_.config

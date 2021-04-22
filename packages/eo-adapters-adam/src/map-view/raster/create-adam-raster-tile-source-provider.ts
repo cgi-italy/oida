@@ -1,6 +1,6 @@
 import { transformExtent } from 'ol/proj';
 
-import { AxiosInstanceWithCancellation } from '@oida/core';
+import { AxiosInstanceWithCancellation, TileSource } from '@oida/core';
 import {
     RasterMapViz, RasterBandModeSingle, RasterBandModePreset, RasterBandModeCombination, RasterBandMode
 } from '@oida/eo-mobx';
@@ -131,25 +131,27 @@ export const createAdamRasterTileSourceProvider = (
             }
 
             return {
-                id: ADAM_WCS_SOURCE_ID,
-                url: factoryConfig.wcsServiceUrl,
-                srs: datasetConfig.coverageSrs,
-                coverage: wcsCoverageParams.coverageId,
-                minZoomLevel: datasetConfig.minZoomLevel,
-                format: format,
-                subsets: subsets,
-                tileGrid: {
-                    extent: aoiParams.extent,
-                    forceUniformResolution: true,
-                    tileSize: tileSize
-                },
-                extent: geographicExtent,
-                crossOrigin: true,
-                wktFilter: aoiParams.wktFilter,
-                tileLoadFunction: tileLoadFunction,
-                colortable: colorTable,
-                colorrange: colorRange,
-                requestExtentOffset: datasetConfig.requestExtentOffset
+                config: {
+                    id: ADAM_WCS_SOURCE_ID,
+                    url: factoryConfig.wcsServiceUrl,
+                    srs: datasetConfig.coverageSrs,
+                    coverage: wcsCoverageParams.coverageId,
+                    minZoomLevel: datasetConfig.minZoomLevel,
+                    format: format,
+                    subsets: subsets,
+                    tileGrid: {
+                        extent: aoiParams.extent,
+                        forceUniformResolution: true,
+                        tileSize: tileSize
+                    },
+                    crossOrigin: 'anonymous',
+                    wktFilter: aoiParams.wktFilter,
+                    tileLoadFunction: tileLoadFunction,
+                    colortable: colorTable,
+                    colorrange: colorRange,
+                    requestExtentOffset: datasetConfig.requestExtentOffset
+                } as TileSource,
+                geographicExtent: geographicExtent
             };
         });
     };

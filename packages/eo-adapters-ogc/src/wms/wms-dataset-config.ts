@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid';
 
-import { DatasetConfig, DatasetSpatialCoverageProvider } from '@oida/eo-mobx';
+import { DatasetConfig, DatasetSpatialCoverageProvider, RASTER_VIZ_TYPE } from '@oida/eo-mobx';
 
 import { WmsService } from './wms-service';
 import { WmsTimeDistributionProvider } from './wms-time-distribution-provider';
@@ -58,6 +58,6 @@ export const getWmsDatasetConfig = (config: WmsDatasetConfig) => {
                 provider: timeDistributionProvider
             } : undefined,
             tools: tools
-        } as DatasetConfig;
+        } as DatasetConfig<typeof RASTER_VIZ_TYPE>;
     });
 };

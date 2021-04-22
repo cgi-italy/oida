@@ -26,7 +26,7 @@
   "dependencies": {
     "@oida/core": "file:../core",
     "@turf/bbox-polygon": "^6.0.1",
-    "tslib": "^2.0.1"
+    "tslib": "^2.2.0"
   },
   "peerDependencies": {
     "ol": "^6.2.0",

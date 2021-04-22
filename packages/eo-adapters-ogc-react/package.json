@@ -44,6 +44,6 @@
     "@oida/ui-react-antd": "file:../ui-react-antd",
     "@oida/ui-react-core": "file:../ui-react-core",
     "@oida/ui-react-mobx": "file:../ui-react-mobx",
-    "tslib": "^2.0.1"
+    "tslib": "^2.2.0"
   }
 }

@@ -22,9 +22,7 @@ export type DatasetVideoMapVizConfig = {
     duration?: number;
 };
 
-export type DatasetVideoMapVizProps = {
-    config: DatasetVideoMapVizConfig;
-} & DatasetVizProps;
+export type DatasetVideoMapVizProps = DatasetVizProps<typeof VIDEO_VIZ_TYPE, DatasetVideoMapVizConfig>;
 
 export class DatasetVideoMapViz extends DatasetViz<GeoImageLayer> {
 
@@ -53,6 +51,8 @@ export class DatasetVideoMapViz extends DatasetViz<GeoImageLayer> {
 
     protected initMapLayer_(props: DatasetVideoMapVizProps) {
 
+        //TODO: this enforce a dependency on ui-react-mobx
+        //Add map as part of DatasetVizProps?
         const mapState = getMapModule().map;
 
         this.source = new AdaptiveVideoLayer({
@@ -127,4 +127,3 @@ export class DatasetVideoMapViz extends DatasetViz<GeoImageLayer> {
     }
 }
 
-DatasetViz.register(VIDEO_VIZ_TYPE, DatasetVideoMapViz);

@@ -27,11 +27,10 @@ export class AdamFeaturedDatasetDiscoveryProviderItem extends Entity {
 export const ADAM_FEATURED_DATASET_DISCOVERY_PROVIDER_TYPE = 'adam_featured';
 
 export type AdamFeaturedDatasetDiscoveryProviderProps = {
-    providerType: typeof ADAM_FEATURED_DATASET_DISCOVERY_PROVIDER_TYPE;
     datasets: AdamFeaturedDataset[];
     factoryConfig: AdamDatasetFactoryConfig;
     queryParams?: QueryParamsProps;
-} & Omit<DatasetDiscoveryProviderProps, 'providerType'>;
+} & DatasetDiscoveryProviderProps<typeof ADAM_FEATURED_DATASET_DISCOVERY_PROVIDER_TYPE>;
 
 export class AdamFeaturedDatasetDiscoveryProvider extends DatasetDiscoveryProvider<AdamFeaturedDatasetDiscoveryProviderItem> {
 
@@ -39,7 +38,9 @@ export class AdamFeaturedDatasetDiscoveryProvider extends DatasetDiscoveryProvid
     readonly searchClient: AdamFeaturedDatasetDiscoveryClient;
     protected datasetFactory_: AdamDatasetFactory;
 
-    constructor(props: Omit<AdamFeaturedDatasetDiscoveryProviderProps, 'providerType'>) {
+    constructor(props:
+        Omit<AdamFeaturedDatasetDiscoveryProviderProps, 'providerType'>
+    ) {
         super({
             providerType: ADAM_FEATURED_DATASET_DISCOVERY_PROVIDER_TYPE,
             ...props
@@ -63,8 +64,8 @@ export class AdamFeaturedDatasetDiscoveryProvider extends DatasetDiscoveryProvid
         this.afterInit_();
     }
 
-    createDataset(dataset: AdamFeaturedDataset) {
-        return this.searchClient.getAdamDatasetConfig(dataset).then((config) => {
+    createDataset(item: AdamFeaturedDatasetDiscoveryProviderItem) {
+        return this.searchClient.getAdamDatasetConfig(item.dataset).then((config) => {
             return this.datasetFactory_(config);
         });
     }
@@ -86,5 +87,3 @@ export class AdamFeaturedDatasetDiscoveryProvider extends DatasetDiscoveryProvid
         });
     }
 }
-
-DatasetDiscoveryProvider.register(ADAM_FEATURED_DATASET_DISCOVERY_PROVIDER_TYPE, AdamFeaturedDatasetDiscoveryProvider);

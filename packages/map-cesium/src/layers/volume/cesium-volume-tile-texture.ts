@@ -59,7 +59,7 @@ export class CesiumVolumeTileTexture {
 
     load(context) {
 
-        return new Promise((resolve, reject) => {
+        return new Promise<void>((resolve, reject) => {
 
             let slices = this.config_.source.loadTileData(this.config_.tileKey, (slice) => {
                 this.updateTextureSlice_(slice, context);

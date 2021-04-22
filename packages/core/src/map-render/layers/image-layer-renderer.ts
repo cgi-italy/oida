@@ -1,4 +1,4 @@
-import { ILayerRenderer, MapLayerConfig } from './map-layer-renderer';
+import { IMapLayerRenderer, MapLayerRendererConfig } from './map-layer-renderer';
 
 export type ImageSourceConfig = {
     type: string;
@@ -7,15 +7,21 @@ export type ImageSourceConfig = {
     }
 };
 
-export type ImageLayerConfig = {
+export type ImageLayerRendererConfig = MapLayerRendererConfig & {
     onImageLoadStart: () => void;
     onImageLoadEnd: () => void;
-    source: ImageSourceConfig
-} & MapLayerConfig;
+    source?: ImageSourceConfig
+};
 
-export interface IImageLayerRenderer extends ILayerRenderer {
+export interface IImageLayerRenderer extends IMapLayerRenderer {
     updateSource(source?: ImageSourceConfig);
     forceRefresh() : void;
 }
 
 export const IMAGE_LAYER_ID = 'image';
+
+declare module './map-layer-renderer' {
+    export interface IMapLayerRendererConfigDefinitions {
+        [IMAGE_LAYER_ID]: ImageLayerRendererConfig;
+    }
+}

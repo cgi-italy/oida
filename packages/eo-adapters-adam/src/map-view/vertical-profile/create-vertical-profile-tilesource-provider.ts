@@ -1,5 +1,5 @@
 
-import { AxiosInstanceWithCancellation } from '@oida/core';
+import { AxiosInstanceWithCancellation, TileSource } from '@oida/core';
 
 import { DatasetVerticalProfileViz, RasterBandModeSingle } from '@oida/eo-mobx';
 
@@ -61,7 +61,7 @@ export const createAdamVerticalProfileTileSourceProvider = (
                         gridSize: gridSize
                     },
                     tileLoadFunction: geotiffLoader.load
-                };
+                } as TileSource;
             });
         }
     };

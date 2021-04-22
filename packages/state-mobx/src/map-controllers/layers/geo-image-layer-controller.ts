@@ -16,14 +16,10 @@ export class GeoImageLayerController extends MapLayerController<IGeoImageLayerRe
     protected createLayerRenderer_(mapRenderer: IMapRenderer) {
 
         return <IGeoImageLayerRenderer>mapRenderer.getLayersFactory().create(GEO_IMAGE_LAYER_ID, {
-            mapRenderer: mapRenderer,
+            ...this.getRendererConfig_(mapRenderer),
+            ...this.mapLayer_.config,
             source: this.mapLayer_.source,
-            footprint: this.mapLayer_.footprint,
-            visible: this.mapLayer_.visible.value,
-            opacity: this.mapLayer_.opacity.value,
-            zIndex: this.mapLayer_.zIndex,
-            extent: this.mapLayer_.extent,
-            ...this.mapLayer_.config
+            footprint: this.mapLayer_.footprint
         });
     }
 

@@ -44,7 +44,7 @@ export type FormFieldSerializerSetter<TYPE extends IFormFieldType> =
  (type: TYPE, serializer: Partial<FormFieldSerializer<TYPE>>) => void;
 
 export function setFormFieldSerializer<TYPE extends IFormFieldType>(type: TYPE, serializer: Partial<FormFieldSerializer<TYPE>>) {
-    formFieldSerializers.register(type, (config) => {
+    formFieldSerializers.register(type, () => {
         return {
             ...defaultFormFieldSerializer,
             ...serializer
@@ -55,7 +55,7 @@ export function setFormFieldSerializer<TYPE extends IFormFieldType>(type: TYPE, 
 
 export function getFormFieldSerializer<TYPE extends IFormFieldType>(type: TYPE): FormFieldSerializer<TYPE> {
     if (formFieldSerializers.isRegistered(type)) {
-        return formFieldSerializers.create(type)!;
+        return formFieldSerializers.create(type, undefined)!;
     } else {
         return defaultFormFieldSerializer;
     }

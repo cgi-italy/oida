@@ -2,47 +2,153 @@ import { IObservableArray, observable, action, makeObservable } from 'mobx';
 
 import { Active, ActiveProps, IsActivable, IsEntity } from '@oida/state-mobx';
 import { Geometry, createDynamicFactory } from '@oida/core';
+import { DatasetConfig } from '../types/dataset-config';
 
 export interface DatasetDiscoveryProviderItem extends IsEntity {
     geometry?: Geometry;
 }
 
-export type DatasetDiscoveryProviderProps = {
+export type DatasetDiscoveryProviderProps<TYPE extends string = string> = {
     id: string;
-    providerType: string;
+    providerType: TYPE;
     name: string;
     description?: string;
 } & ActiveProps;
 
-const discoveryProviderFactory = createDynamicFactory<DatasetDiscoveryProvider>('datasetDiscoveryProviderFactory');
+export interface DatasetDiscoveryProviderDefinitions {
+}
+export interface DatasetDiscoveryProviderTypes {
+}
 
+export type DatasetDiscoveryProviderDefinition<TYPE extends string = keyof DatasetDiscoveryProviderDefinitions> =
+    TYPE extends keyof DatasetDiscoveryProviderDefinitions
+        ? DatasetDiscoveryProviderDefinitions[TYPE]
+        : (DatasetDiscoveryProviderProps<TYPE> & Record<string, any>);
+
+export type DatasetDiscoveryProviderType<TYPE extends string> =
+    TYPE extends keyof DatasetDiscoveryProviderTypes
+        ? DatasetDiscoveryProviderTypes[TYPE]
+        : DatasetDiscoveryProvider;
+
+
+const discoveryProviderFactory = createDynamicFactory<
+    DatasetDiscoveryProvider
+>('datasetDiscoveryProviderFactory');
+
+
+/**
+ * A class to manage the state of an EO dataset discovery provider.
+ * Inherited classes shall implement the data retrieval logic and populate
+ * the {@Link DatasetDiscoveryProvider.results_} array
+ *
+ * Example:
+ *
+ * ```
+ * // define a unique type identifier for the provider
+ * const MY_DISCOVERY_PROVIDER_TYPE = 'my-provider'
+ * // define the provider discovery item type
+ * type MyDiscoveryProviderItemType = {
+ *     dummyProp: string;
+ *     geometry: Geometry;
+ * };
+ * // define the provider configuration type
+ * type MyDiscoveryProviderProps = DatasetDiscoveryProviderProps<typeof MY_DISCOVERY_PROVIDER_TYPE> & {
+ *    providerProp1: string
+ * }
+ * // define the new provider
+ * class MyDiscoveryPrvider extends DatasetDiscoveryProvider<MyDiscoveryProviderItemType> {
+ *    constructor(props: Omit<MyDiscoveryProviderProps, 'providerType'>) {
+ *        super({
+ *            providerType: MY_DISCOVERY_PROVIDER_TYPE,
+ *            ...props
+ *        })
+ *    }
+ * }
+ *
+ * // Optionally if there is the need to create a provider instance
+ * // from a configuration object the following steps should be implemented
+ *
+ * // declaration merging to register the provider configuration and type (this is required for typings)
+ * declare module '@oida/eo-mobx' {
+ *     interface DatasetDiscoveryProviderDefinitions {
+ *         [MY_DISCOVERY_PROVIDER_TYPE]: MyDiscoveryProviderProps;
+ *     }
+ *
+ *     interface DatasetDiscoveryProviderTypes {
+ *         [MY_DISCOVERY_PROVIDER_TYPE]: MyDiscoveryPrvider;
+ *     }
+ * }
+ *
+ * // registration of the new type
+ * DatasetDiscoveryProvider.register(MY_DISCOVERY_PROVIDER_TYPE, MyDiscoveryPrvider);
+ *
+ * // Now we can create an instance of the new provider
+ * DatasetDiscoveryProvider.create(MY_DISCOVERY_PROVIDER_TYPE, {
+ *     id: 'my_provider_instance',
+ *     providerProp1: 'test'
+ * })
+ * ```
+ *
+ * @template T the provider dataset record type
+ */
 export abstract class DatasetDiscoveryProvider<
     T extends DatasetDiscoveryProviderItem = DatasetDiscoveryProviderItem
 > implements IsActivable {
 
-    static create<P extends DatasetDiscoveryProviderProps>(props: P) {
-        const { providerType, ...config } = props;
-        const provider = discoveryProviderFactory.create(providerType, config);
+    /**
+     * Create a dataset discovery provider instance given a configuration object
+     * @template P The provider specific configuration object type
+     * @param props The provider configuration
+     * @returns The dataset discovery provider instance or undefined if no provider with the provided type was registered
+     */
+    static create<
+        TYPE extends string
+    >(
+        providerType: TYPE, props: Omit<DatasetDiscoveryProviderDefinition<TYPE>, 'providerType'>
+    ) {
+
+        const provider = discoveryProviderFactory.create(providerType, props);
         if (!provider) {
             throw new Error(`DatasetDiscoveryProvider.create: Unable to create provider of type ${providerType}`);
         }
-        return provider;
+        return provider as DatasetDiscoveryProviderType<TYPE>;
     }
 
-    static register<P extends Omit<DatasetDiscoveryProviderProps, 'providerType'>, T extends DatasetDiscoveryProvider>(
-        providerType: string, layerCtor: new(props: P) => T
+    /**
+     * Register a dataset discovery provider type for factory creation thorugh {@Link DatasetDiscoveryProvider.create}
+     * @param providerType The unique discovery provider type identifier
+     * @param providerCtor The provider constructor
+     */
+    static register<
+        TYPE extends string,
+        P extends DatasetDiscoveryProvider,
+        PROPS extends Omit<DatasetDiscoveryProviderProps, 'providerType'> = DatasetDiscoveryProviderDefinition<TYPE>
+    >(
+        providerType: TYPE, providerCtor: new(
+            props: PROPS
+        ) => P
     ) {
-        discoveryProviderFactory.register(providerType, (props: P) => {
-            return new layerCtor(props);
+        discoveryProviderFactory.register(providerType, (props) => {
+            return new providerCtor(props);
         });
     }
 
+    /** The provider identifier */
     readonly id: string;
+    /** The provider type identifier */
     readonly type: string;
+    /** The provider name */
     readonly name: string;
+    /** The provider description */
     readonly description: string | undefined;
+    /** Indicate if the provider is currently active (e.g. enable data retrieval).
+     * It is usually set by the {@Link DatasetDiscovery} based on the currently selected provider
+     **/
     readonly active: Active;
 
+    /**
+     * The results datasets array. Its population is responsability of the inherited class
+     */
     protected results_: IObservableArray<T>;
 
     constructor(props: DatasetDiscoveryProviderProps) {
@@ -58,6 +164,11 @@ export abstract class DatasetDiscoveryProvider<
 
         makeObservable(this);
     }
+
+    /**
+     * create the dataset configuration for a specific item
+     */
+    abstract createDataset(item: T): Promise<DatasetConfig | undefined>;
 
     get results() {
         return this.results_;

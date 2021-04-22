@@ -118,7 +118,7 @@ export type VolumeLayerProps = {
     verticalScale?: number;
     colorMap?: VolumeColorMap | VolumeColorMapProps;
     viewMode: VolumeViewMode
-} & Omit<MapLayerProps, 'layerType'>;
+} & MapLayerProps<typeof VOLUME_LAYER_ID>;
 
 export class VolumeLayer extends MapLayer {
     @observable.ref source: VolumeSourceConfig | undefined;
@@ -127,7 +127,7 @@ export class VolumeLayer extends MapLayer {
     @observable.ref colorMap: VolumeColorMap | undefined;
     @observable.ref viewMode: VolumeViewMode;
 
-    constructor(props: VolumeLayerProps) {
+    constructor(props: Omit<VolumeLayerProps, 'layerType'>) {
         super({
             ...props,
             layerType: VOLUME_LAYER_ID

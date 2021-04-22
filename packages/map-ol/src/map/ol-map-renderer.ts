@@ -6,10 +6,7 @@ import { register } from 'ol/proj/proj4';
 import proj4 from 'proj4';
 import { getCenter as getExtentCenter } from 'ol/extent';
 
-import {
-    mapRendererFactory, IMapRenderer, IMapRendererProps, IMapViewport, IMapProjection,
-    IDynamicFactory, ILayerRenderer
-} from '@oida/core';
+import { IMapRenderer, IMapRendererProps, IMapViewport, IMapProjection } from '@oida/core';
 
 import { olLayersFactory } from '../layers/ol-layers-factory';
 import { olInteractionsFactory } from '../interactions/ol-interactions-factory';
@@ -96,7 +93,7 @@ export class OLMapRenderer implements IMapRenderer {
     }
 
     getLayersFactory() {
-        return olLayersFactory as unknown as IDynamicFactory<ILayerRenderer>;
+        return olLayersFactory;
     }
 
     getInteractionsFactory() {
@@ -229,9 +226,3 @@ export class OLMapRenderer implements IMapRenderer {
     }
 
 }
-
-mapRendererFactory.register(OL_RENDERER_ID, (props) => {
-    let renderer =  new OLMapRenderer(props);
-    return renderer;
-});
-

@@ -1,7 +1,7 @@
 import { reaction, IReactionDisposer, IObservableArray, makeObservable, observable } from 'mobx';
 import { v4 as uuid } from 'uuid';
 
-import { FEATURE_LAYER_ID, IFeatureLayerRenderer, IMapRenderer, IFeatureStyle, Geometry, GeometryCollection } from '@oida/core';
+import { FEATURE_LAYER_ID, IFeatureLayerRenderer, IMapRenderer, IFeatureStyle, Geometry, GeometryCollection, IFeature } from '@oida/core';
 
 import { ArrayTracker } from '../../utils';
 import { FeatureLayer, FeatureInterface, FeatureStyleGetter, FeatureGeometryGetter } from '../../models/map/layers/feature-layer';
@@ -44,7 +44,7 @@ export class FeatureLayerController
         const {
             styleGetter, geometryGetter,
             onFeatureSelect, onFeatureHover,
-            rendererOptions, ...others
+            rendererOptions
         } = this.mapLayer_.config.value || {};
         if (styleGetter) {
             this.styleGetter_ = styleGetter;
@@ -55,14 +55,13 @@ export class FeatureLayerController
 
         const layerRendererOptions = rendererOptions ? rendererOptions[mapRenderer.id] : undefined;
         return <IFeatureLayerRenderer>mapRenderer.getLayersFactory().create(FEATURE_LAYER_ID, {
-            mapRenderer: mapRenderer,
-            onFeatureHover: onFeatureHover ? (data: FeatureData<T>, coordinate: GeoJSON.Position) => {
-                onFeatureHover(data.model, coordinate);
+            ...this.getRendererConfig_(mapRenderer),
+            onFeatureHover: onFeatureHover ? (feature: IFeature<FeatureData<T>>, coordinate: GeoJSON.Position) => {
+                onFeatureHover(feature.data.model, coordinate);
             } : undefined,
-            onFeatureSelect: onFeatureSelect ? (data: FeatureData<T>, coordinate: GeoJSON.Position) => {
-                onFeatureSelect(data.model, coordinate);
+            onFeatureSelect: onFeatureSelect ? (feature: IFeature<FeatureData<T>>, coordinate: GeoJSON.Position) => {
+                onFeatureSelect(feature.data.model, coordinate);
             } : undefined,
-            ...others,
             ...layerRendererOptions
         });
     }

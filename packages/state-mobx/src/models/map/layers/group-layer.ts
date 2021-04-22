@@ -1,17 +1,17 @@
 import { GROUP_LAYER_ID } from '@oida/core';
 
 import { IndexedCollection } from '../../core';
-import { MapLayer, MapLayerProps } from './map-layer';
+import { MapLayer, MapLayerDefinition, MapLayerProps } from './map-layer';
 
 export type GroupLayerProps = {
-    children?: Array<MapLayer | MapLayerProps>
-} & Omit<MapLayerProps, 'layerType'>;
+    children?: Array<MapLayer | MapLayerDefinition>
+} & MapLayerProps<typeof GROUP_LAYER_ID>;
 
 export class GroupLayer extends MapLayer {
 
     children: IndexedCollection<MapLayer>;
 
-    constructor(props: GroupLayerProps) {
+    constructor(props: Omit<GroupLayerProps, 'layerType'>) {
         super({
             ...props,
             layerType: GROUP_LAYER_ID
@@ -23,5 +23,3 @@ export class GroupLayer extends MapLayer {
         });
     }
 }
-
-MapLayer.register(GROUP_LAYER_ID, GroupLayer);

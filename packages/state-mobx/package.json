@@ -29,6 +29,6 @@
   },
   "dependencies": {
     "@oida/core": "file:../core",
-    "tslib": "^2.0.1"
+    "tslib": "^2.2.0"
   }
 }

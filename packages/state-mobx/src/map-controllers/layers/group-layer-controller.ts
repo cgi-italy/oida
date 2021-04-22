@@ -26,6 +26,7 @@ export class GroupLayerController extends MapLayerController<IGroupLayerRenderer
 
     protected createLayerRenderer_(mapRenderer: IMapRenderer) {
         return <IGroupLayerRenderer>mapRenderer.getLayersFactory().create(GROUP_LAYER_ID, {
+            ...this.getRendererConfig_(mapRenderer),
             mapRenderer: mapRenderer
         });
     }

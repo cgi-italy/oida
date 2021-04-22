@@ -1,14 +1,15 @@
+import { MapCoord } from '@oida/core';
 import { makeAutoObservable, observable } from 'mobx';
 
 export type MapViewportProps = {
-    center: number[];
+    center: MapCoord;
     resolution: number;
     rotation?: number;
     pitch?: number;
 };
 
 export class MapViewport {
-    center: number[];
+    center: MapCoord;
     resolution: number;
     rotation: number;
     pitch: number;
@@ -25,7 +26,7 @@ export class MapViewport {
 
     }
 
-    setCenter(center: number[]) {
+    setCenter(center: MapCoord) {
         this.center = center;
     }
 

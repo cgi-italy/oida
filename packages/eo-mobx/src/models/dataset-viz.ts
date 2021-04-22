@@ -9,29 +9,51 @@ import { observable, makeObservable, action } from 'mobx';
 
 const datasetVizFactory = createDynamicFactory<DatasetViz<MapLayer | undefined>>('datasetVizFactory');
 
-export type DatasetVizProps = {
+export type DatasetVizProps<TYPE extends string = string, CONFIG extends Record<string, any> = Record<string, any>> = {
     dataset: Dataset;
-    vizType: string;
+    vizType: TYPE;
+    config: CONFIG;
     id?: string;
     parent?: DatasetViz<any>
 };
 
+export interface DatasetVizDefinitions {
+}
+export interface DatasetVizTypes {
+}
+
+export type DatasetVizDefinition<TYPE extends keyof DatasetVizDefinitions = keyof DatasetVizDefinitions> =
+    {vizType: TYPE} & Extract<DatasetVizDefinitions[TYPE], DatasetVizProps<TYPE>>;
+
+export type DatasetVizType<TYPE extends keyof DatasetVizTypes = keyof DatasetVizTypes> =
+    Extract<DatasetVizTypes[TYPE], DatasetViz<MapLayer | undefined>>;
+
+export type DatasetVizConfig<TYPE extends keyof DatasetVizDefinitions = keyof DatasetVizDefinitions> =
+    DatasetVizDefinition<TYPE>['config'];
+
+
+/**
+ * Base abstract class for {@link Dataset} visualization. A dataset visualization can include a {@link MapLayer}
+ * and a control widget
+ *
+ * @template T the type of MapLayer associated to this visualization
+ */
 export abstract class DatasetViz<T extends (MapLayer | undefined) = undefined> {
 
-    static create(props: DatasetVizProps & Record<string, any>) {
-        const { vizType, ...config } = props;
-        const datasetViz = datasetVizFactory.create(vizType, config);
+    static create<TYPE extends keyof DatasetVizTypes>(props: DatasetVizDefinition<TYPE>): DatasetVizType<TYPE> {
+        const datasetViz = datasetVizFactory.create(props.vizType, props);
         if (!datasetViz) {
-            throw new Error(`DatasetViz.create: Unable to create dataset viz of type ${vizType}`);
+            throw new Error(`DatasetViz.create: Unable to create dataset viz of type ${props.vizType}`);
         }
-        return datasetViz;
+        return datasetViz as DatasetVizType<TYPE>;
     }
 
-    static register<P extends Omit<DatasetVizProps, 'vizType'>, T extends DatasetViz<any>>(
-        vizType: string, layerCtor: new(props: P) => T
+    static register<TYPE extends keyof DatasetVizDefinitions, V extends DatasetViz<MapLayer | undefined>>(
+        vizType: TYPE,
+        vizCtor: new(props: Omit<DatasetVizDefinition<TYPE>, 'vizType'>) => V
     ) {
-        datasetVizFactory.register(vizType, (props: P) => {
-            return new layerCtor(props);
+        datasetVizFactory.register(vizType, (props) => {
+            return new vizCtor(props);
         });
     }
 

@@ -1,13 +1,13 @@
-import { IGroupLayerRenderer } from '@oida/core';
+import { IGroupLayerRenderer, MapLayerRendererConfig } from '@oida/core';
 
 import { CesiumMapLayer } from './cesium-map-layer';
 
 export class CesiumGroupLayer extends CesiumMapLayer implements IGroupLayerRenderer {
-    constructor(config) {
+    constructor(config: MapLayerRendererConfig) {
         super(config);
     }
 
-    addLayer(layer, idx) {
+    addLayer(layer: CesiumMapLayer, idx?: number) {
 
         layer.setParent(this);
 
@@ -19,7 +19,7 @@ export class CesiumGroupLayer extends CesiumMapLayer implements IGroupLayerRende
 
     }
 
-    removeLayer(layer) {
+    removeLayer(layer: CesiumMapLayer) {
 
         let layerImageries = layer.getImageries();
 

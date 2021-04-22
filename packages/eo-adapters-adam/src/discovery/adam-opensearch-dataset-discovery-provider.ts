@@ -31,11 +31,10 @@ export class AdamOpensearchDatasetDiscoveryProviderItem extends Entity {
 export const ADAM_OPENSEARCH_DATASET_DISCOVERY_PROVIDER_TYPE = 'adam_opensearch';
 
 export type AdamOpensearchDatasetDiscoveryProviderProps = {
-    providerType: typeof ADAM_OPENSEARCH_DATASET_DISCOVERY_PROVIDER_TYPE;
     searchClient: AdamOpensearchDatasetDiscoveryClient;
     factoryConfig: AdamDatasetFactoryConfig;
     queryParams?: QueryParamsProps;
-} & Omit<DatasetDiscoveryProviderProps, 'providerType'>;
+} & DatasetDiscoveryProviderProps<typeof ADAM_OPENSEARCH_DATASET_DISCOVERY_PROVIDER_TYPE>;
 
 export class AdamOpensearchDatasetDiscoveryProvider extends DatasetDiscoveryProvider<AdamOpensearchDatasetDiscoveryProviderItem> {
 
@@ -68,8 +67,8 @@ export class AdamOpensearchDatasetDiscoveryProvider extends DatasetDiscoveryProv
         return this.asyncDataFetcher_.loadingStatus;
     }
 
-    createDataset(metadata: AdamDatasetMetadata) {
-        return this.searchClient.getAdamDatasetConfig(metadata).then((datasetConfig) => {
+    createDataset(item: AdamOpensearchDatasetDiscoveryProviderItem) {
+        return this.searchClient.getAdamDatasetConfig(item.metadata).then((datasetConfig) => {
             return this.datasetFactory_(datasetConfig);
         });
     }
@@ -91,5 +90,3 @@ export class AdamOpensearchDatasetDiscoveryProvider extends DatasetDiscoveryProv
         });
     }
 }
-
-DatasetDiscoveryProvider.register(ADAM_OPENSEARCH_DATASET_DISCOVERY_PROVIDER_TYPE, AdamOpensearchDatasetDiscoveryProvider);

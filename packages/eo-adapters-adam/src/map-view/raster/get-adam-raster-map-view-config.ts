@@ -6,7 +6,8 @@ import {
     RASTER_VIZ_TYPE,
     RasterMapVizConfig,
     RasterBandModeType,
-    RasterBandModeChoice
+    RasterBandModeChoice,
+    DatasetMapViewConfig
 } from '@oida/eo-mobx';
 
 import { getPlottyColorScales } from '@oida/eo-geotiff';
@@ -141,10 +142,8 @@ export const getAdamRasterMapViewConfig = (
 
     return {
         type: RASTER_VIZ_TYPE,
-        props: {
-            config: rasterVizconfig
-        }
-    };
+        config: rasterVizconfig
+    } as DatasetMapViewConfig<typeof RASTER_VIZ_TYPE>;
 
 };
 

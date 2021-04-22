@@ -51,8 +51,14 @@ export class VolumeLayerController extends MapLayerController<IVolumeLayerRender
 
 
         return <IVolumeLayerRenderer>mapRenderer.getLayersFactory().create(VOLUME_LAYER_ID, {
-            mapLayer: this.mapLayer_,
-            mapRenderer: mapRenderer,
+            ...this.getRendererConfig_(mapRenderer),
+            source: this.mapLayer_.source,
+            colorMap: this.mapLayer_.colorMap ? {
+                clamp: this.mapLayer_.colorMap.clamp,
+                noData: this.mapLayer_.colorMap.noDataValue,
+                range: this.mapLayer_.colorMap.mapRange,
+                image: this.mapLayer_.colorMap.colorScale
+            } : undefined,
             onSliceLoadStart: onSliceLoadStart,
             onSliceLoadEnd: onSliceLoadEnd
         });

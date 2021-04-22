@@ -1,6 +1,6 @@
-import { ILayerRenderer } from './map-layer-renderer';
+import { IMapLayerRenderer, MapLayerRendererConfig } from './map-layer-renderer';
+import { TileSource } from './tile-sources/tile-source';
 
-export type TileSource = Record<string, any>;
 
 export type TileGridConfig = {
     tileSize?: number | number[];
@@ -55,11 +55,25 @@ export const computeTileGridParams = (options: TileGridParamsOptions) => {
     };
 };
 
-export interface ITileLayerRenderer extends ILayerRenderer {
-    updateSource(source: any): void;
+export type TileLayerRendererConfig = MapLayerRendererConfig & {
+    source?: TileSource;
+    minZoomLevel?: number;
+    maxZoomLevel?: number;
+    onTileLoadStart?: () => void;
+    onTileLoadEnd?: () => void;
+};
+
+export interface ITileLayerRenderer extends IMapLayerRenderer {
+    updateSource(source: TileSource | undefined): void;
     setMinZoomLevel(level: number | undefined): void;
     setMaxZoomLevel(level: number | undefined): void;
     forceRefresh() : void;
 }
 
 export const TILE_LAYER_ID = 'tile';
+
+declare module './map-layer-renderer' {
+    export interface IMapLayerRendererConfigDefinitions {
+        [TILE_LAYER_ID]: TileLayerRendererConfig;
+    }
+}

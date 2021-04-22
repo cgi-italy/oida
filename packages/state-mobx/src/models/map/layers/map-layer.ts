@@ -1,6 +1,6 @@
 import { makeObservable, observable, action } from 'mobx';
 
-import { createDynamicFactory, ILayerRenderer } from '@oida/core';
+import { createDynamicFactory, IMapLayerRenderer } from '@oida/core';
 
 import { Entity, EntityProps } from '../../core';
 import {
@@ -10,28 +10,38 @@ import {
 
 export const MAP_LAYER_TYPE = 'mapLayer';
 
-const mapLayerFactory = createDynamicFactory<MapLayer>('mapLayerFactory');
+export interface MapLayerDefinitions {}
+export interface MapLayerTypes {}
+export type MapLayerDefinition<TYPE extends keyof MapLayerDefinitions = keyof MapLayerDefinitions> = MapLayerDefinitions[TYPE];
+export type MapLayerType<TYPE extends keyof MapLayerTypes> = MapLayerTypes[TYPE];
 
-export type MapLayerProps = {
+const mapLayerFactory = createDynamicFactory<
+    MapLayer,
+    MapLayerDefinitions
+>('datasetDiscoveryProviderFactory');
+
+export type MapLayerProps<TYPE extends string = string> = {
     name?: string;
     zIndex?: number;
     extent?: number[];
-    layerType: string;
+    layerType: TYPE;
 } & Omit<EntityProps, 'entityType'> & OpacityProps & LoadingStatusProps;
 
 export class MapLayer extends Entity implements HasOpacity, HasLoadingStatus {
 
-    static create(props: MapLayerProps & Record<string, any>) {
-        const { layerType, ...config } = props;
-        const mapLayer = mapLayerFactory.create(layerType, config);
+    static create<TYPE extends keyof MapLayerDefinitions>(props: MapLayerDefinition<TYPE>): MapLayerType<TYPE> {
+        const mapLayer = mapLayerFactory.create(props.layerType, props);
         if (!mapLayer) {
-            throw new Error(`Unable to create layer of type ${layerType}`);
+            throw new Error(`Unable to create layer of type ${props.layerType}`);
         }
-        return mapLayer;
+        return mapLayer as MapLayerType<TYPE>;
     }
 
-    static register<P extends Omit<MapLayerProps, 'layerType'>>(layerType: string, layerCtor: new(props: P) => MapLayer) {
-        mapLayerFactory.register(layerType, (props: P) => {
+    static register<TYPE extends keyof MapLayerDefinitions, L extends MapLayer>(
+        layerType: TYPE,
+        layerCtor: new(props: Omit<MapLayerDefinition<TYPE>, 'layerType'>) => L
+    ) {
+        mapLayerFactory.register(layerType, (props) => {
             return new layerCtor(props);
         });
     }
@@ -42,7 +52,7 @@ export class MapLayer extends Entity implements HasOpacity, HasLoadingStatus {
     @observable name: string;
     @observable zIndex: number;
     @observable.ref extent: number[] | undefined;
-    @observable.ref renderer: ILayerRenderer | undefined;
+    @observable.ref renderer: IMapLayerRenderer | undefined;
 
     constructor(props: MapLayerProps) {
         super({
@@ -77,7 +87,7 @@ export class MapLayer extends Entity implements HasOpacity, HasLoadingStatus {
     }
 
     @action
-    setRenderer(renderer: ILayerRenderer | undefined) {
+    setRenderer(renderer: IMapLayerRenderer | undefined) {
         this.renderer = renderer;
     }
 

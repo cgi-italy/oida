@@ -48,8 +48,10 @@ export class TileLayerController extends MapLayerController<ITileLayerRenderer, 
 
 
         return <ITileLayerRenderer>mapRenderer.getLayersFactory().create(TILE_LAYER_ID, {
-            mapLayer: this.mapLayer_,
-            mapRenderer: mapRenderer,
+            ...this.getRendererConfig_(mapRenderer),
+            source: this.mapLayer_.source,
+            minZoomLevel: this.mapLayer_.minZoomLevel,
+            maxZoomLevel: this.mapLayer_.maxZoomLevel,
             onTileLoadStart: onTileLoadStart,
             onTileLoadEnd: onTileLoadEnd
         });
@@ -64,6 +66,20 @@ export class TileLayerController extends MapLayerController<ITileLayerRenderer, 
             reaction(() => this.mapLayer_.source, (source) => {
                 this.resetLoadingState_();
                 layerRenderer.updateSource(source);
+            })
+        );
+
+        this.subscriptionTracker_.addSubscription(
+            reaction(() => this.mapLayer_.minZoomLevel, (level) => {
+                this.resetLoadingState_();
+                layerRenderer.setMinZoomLevel(level);
+            })
+        );
+
+        this.subscriptionTracker_.addSubscription(
+            reaction(() => this.mapLayer_.maxZoomLevel, (level) => {
+                this.resetLoadingState_();
+                layerRenderer.setMaxZoomLevel(level);
             })
         );
 

@@ -12,7 +12,7 @@ export type GeoImageLayerProps = {
     source?: GeoImageLayerSource,
     footprint: GeoImageLayerFootprint,
     config: GeoImageLayerConfig
-} & Omit<MapLayerProps, 'layerType'>;
+} & MapLayerProps<typeof GEO_IMAGE_LAYER_ID>;
 
 export class GeoImageLayer extends MapLayer {
 
@@ -21,7 +21,7 @@ export class GeoImageLayer extends MapLayer {
     @observable.ref footprint: GeoImageLayerFootprint;
     readonly config: GeoImageLayerConfig;
 
-    constructor(props: GeoImageLayerProps) {
+    constructor(props: Omit<GeoImageLayerProps, 'layerType'>) {
         super({
             ...props,
             layerType: GEO_IMAGE_LAYER_ID
@@ -53,5 +53,3 @@ export class GeoImageLayer extends MapLayer {
         this.sourceRevision++;
     }
 }
-
-MapLayer.register(GEO_IMAGE_LAYER_ID, GeoImageLayer);

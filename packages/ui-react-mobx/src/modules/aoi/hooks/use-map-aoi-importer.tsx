@@ -71,7 +71,7 @@ const useMapAoiImporterBase = (props: MapAoiImporterProps) => {
 
     const onFileImportAction = aoiFormats && aoiFormats.length ? (file: File) => {
 
-        return new Promise((resolve, reject) => {
+        return new Promise<void>((resolve, reject) => {
 
             if (props.aoiModule.aoiSources.itemWithId(file.name)) {
                 props.aoiModule.setActiveSource(file.name);

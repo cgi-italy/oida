@@ -13,16 +13,16 @@ import { getRasterBandModeFromConfig } from '../utils';
 
 export const RASTER_VIZ_TYPE = 'raster';
 
+export type RasterSourceProvider = (rasterViz: RasterMapViz) => Promise<({config: TileSource, geographicExtent?: number[]}) | undefined>;
+
 export type RasterMapVizConfig = {
     bandMode: RasterBandModeConfig;
     dimensions?: DatasetDimension<DataDomain<string | number | Date>>[];
-    rasterSourceProvider: (rasterViz: RasterMapViz) => Promise<(TileSource & {extent?: number[]}) | undefined>
+    rasterSourceProvider: RasterSourceProvider;
     afterInit?: (rasterViz: RasterMapViz) => void;
 };
 
-export type RasterMapVizProps = {
-    config: RasterMapVizConfig
-} & DatasetVizProps & DatasetDimensionsProps;
+export type RasterMapVizProps = DatasetVizProps<typeof RASTER_VIZ_TYPE, RasterMapVizConfig> & DatasetDimensionsProps;
 
 export class RasterMapViz extends DatasetViz<TileLayer> implements HasDatasetDimensions {
 
@@ -94,10 +94,10 @@ export class RasterMapViz extends DatasetViz<TileLayer> implements HasDatasetDim
                 value: LoadingState.Loading,
                 percentage: 30
             });
-            this.config.rasterSourceProvider(this).then((sourceConfig) => {
-                this.mapLayer.setSource(sourceConfig);
-                if (sourceConfig) {
-                    this.mapLayer.setExtent(sourceConfig.extent);
+            this.config.rasterSourceProvider(this).then((source) => {
+                this.mapLayer.setSource(source?.config);
+                if (source) {
+                    this.mapLayer.setExtent(source.geographicExtent);
                 }
                 this.mapLayer.loadingStatus.setValue(LoadingState.Init);
             }).catch((error) => {
@@ -118,5 +118,3 @@ export class RasterMapViz extends DatasetViz<TileLayer> implements HasDatasetDim
         }
     }
 }
-
-DatasetViz.register(RASTER_VIZ_TYPE, RasterMapViz);

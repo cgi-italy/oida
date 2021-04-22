@@ -18,10 +18,9 @@ export const DatasetToolsMenu = (props: DatasetToolsMenuProps) => {
         let tool = tools.find(tool => tool.type === type);
 
         if (tool) {
-            const analysis = DatasetViz.create({
+            const analysis = DatasetViz.create<any>({
                 vizType: tool.type,
                 dataset: props.datasetViz.dataset,
-                name: tool.name,
                 parent: props.datasetViz,
                 config: tool.config
             });

@@ -1,7 +1,8 @@
-import { getGeometryExtent } from '@oida/core';
+import { getGeometryExtent, TileSource } from '@oida/core';
 import {
     RasterMapViz, RasterMapVizConfig, RASTER_VIZ_TYPE, RasterBandModeType, RasterBandPreset, RasterBandModePreset,
-    DatasetSpatialCoverageProvider
+    DatasetSpatialCoverageProvider,
+    DatasetMapViewConfig
 } from '@oida/eo-mobx';
 
 import { WmsLayer } from './wms-client';
@@ -85,16 +86,18 @@ export const createWmsRasterSourceProvider = (
             }
 
             return Promise.resolve({
-                id: 'wms',
-                url: wmsUrl,
-                layers: layer.Name,
-                srs: crs,
-                parameters: params,
-                tileGrid: {
-                    extent: extent,
-                    forceUniformResolution: true
-                },
-                extent: geographicExtent
+                config: {
+                    id: 'wms',
+                    url: wmsUrl,
+                    layers: layer.Name,
+                    srs: crs,
+                    parameters: params,
+                    tileGrid: {
+                        extent: extent,
+                        forceUniformResolution: true
+                    }
+                } as TileSource,
+                geographicExtent: geographicExtent
             });
         });
     };
@@ -142,8 +145,6 @@ export const getWmsLayerRasterView = (
 
     return {
         type: RASTER_VIZ_TYPE,
-        props: {
-            config: rasterVizConfig
-        }
-    };
+        config: rasterVizConfig
+    } as DatasetMapViewConfig<typeof RASTER_VIZ_TYPE>;
 };

@@ -1,12 +1,5 @@
-import { createDynamicFactory } from '@oida/core';
+import ImageryProvider from 'cesium/Source/Scene/ImageryProvider';
 
-let factory = createDynamicFactory('ol-tilesources');
+import { createDynamicFactory, ITileSourceDefinitions } from '@oida/core';
 
-export const cesiumTileSourcesFactory = {
-    ...factory,
-    create: (id, config) => {
-        return factory.create(id, {
-            ...config
-        });
-    }
-};
+export const cesiumTileSourcesFactory = createDynamicFactory<ImageryProvider, ITileSourceDefinitions>('cesium-tile-sources');

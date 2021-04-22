@@ -18,7 +18,7 @@ export type VerticalProfileLayerConfig<T extends FeatureInterface> = {
 
 export type VerticalProfileLayerProps<T extends FeatureInterface> = {
     source?: IObservableArray<T>
-} & Omit<MapLayerProps, 'layerType'> & ConfigProps<VerticalProfileLayerConfig<T>>;
+} & MapLayerProps<typeof VERTICAL_PROFILE_LAYER_ID> & ConfigProps<VerticalProfileLayerConfig<T>>;
 
 export class VerticalProfileLayer<T extends FeatureInterface> extends MapLayer implements HasConfig<VerticalProfileLayerConfig<T>> {
     readonly config: Config<VerticalProfileLayerConfig<T>>;
@@ -27,7 +27,7 @@ export class VerticalProfileLayer<T extends FeatureInterface> extends MapLayer i
     @observable.ref selectedCoordinate: VerticalProfileCoordinate | undefined;
     @observable.ref highlightedRegion: number[] | undefined;
 
-    constructor(props: VerticalProfileLayerProps<T>) {
+    constructor(props: Omit<VerticalProfileLayerProps<T>, 'layerType'>) {
         super({
             ...props,
             layerType: VERTICAL_PROFILE_LAYER_ID

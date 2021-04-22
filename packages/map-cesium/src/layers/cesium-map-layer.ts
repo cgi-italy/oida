@@ -6,13 +6,13 @@ import ImageryLayerCollection from 'cesium/Source/Scene/ImageryLayerCollection';
 import ImageryLayer from 'cesium/Source/Scene/ImageryLayer';
 
 
-import { ILayerRenderer } from '@oida/core';
+import { IMapLayerRenderer, MapLayerRendererConfig } from '@oida/core';
 
 import { CesiumMapRenderer } from '../map/cesium-map-renderer';
 import { updateDataSource } from '../utils/render';
 import { PickInfo, CesiumFeatureCoordPickMode } from '../utils/picking';
 
-export class CesiumMapLayer implements ILayerRenderer {
+export class CesiumMapLayer implements IMapLayerRenderer {
 
     protected mapRenderer_: CesiumMapRenderer;
     protected parent_: CesiumMapLayer | undefined;
@@ -22,15 +22,25 @@ export class CesiumMapLayer implements ILayerRenderer {
     protected primitives_;
     protected dataSources_;
 
-    constructor(config) {
-        this.mapRenderer_ = config.mapRenderer;
+    constructor(config: MapLayerRendererConfig) {
+        this.mapRenderer_ = config.mapRenderer as unknown as CesiumMapRenderer;
 
         this.initImageries_();
         this.initPrimitives_();
         this.initDataSources_();
+
+        if (config.visible !== undefined) {
+            this.setVisible(config.visible);
+        }
+        if (config.opacity !== undefined) {
+            this.setOpacity(config.opacity);
+        }
+        if (config.zIndex !== undefined) {
+            this.setZIndex(config.zIndex);
+        }
     }
 
-    setVisible(visible) {
+    setVisible(visible: boolean) {
         this.visible_ = visible;
         this.primitives_.show = visible;
         this.updateImageryVisibility_(this.imageries_, this.parent_ ? this.parent_.isVisible() : true);

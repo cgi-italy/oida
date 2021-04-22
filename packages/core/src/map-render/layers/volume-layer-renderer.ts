@@ -1,4 +1,4 @@
-import { ILayerRenderer, MapLayerConfig } from './map-layer-renderer';
+import { IMapLayerRenderer, MapLayerRendererConfig } from './map-layer-renderer';
 
 export type VolumeExtent = {
     minX: number;
@@ -44,7 +44,7 @@ export type VolumeColorMap = {
         max: number
     };
     clamp: boolean;
-    noData: number;
+    noData: number | undefined;
     image: HTMLImageElement | HTMLCanvasElement
 };
 
@@ -66,28 +66,32 @@ export const SLICE_VOLUME_VIEW_ID = 'sliceView';
 export const STACK_VOLUME_VIEW_ID = 'stackView';
 
 
-export type VolumeLayerConfig = {
+export type VolumeLayerRendererConfig = MapLayerRendererConfig & {
     onSliceLoadStart: () => void;
     onSliceLoadEnd: () => void;
-    mapLayer: MapLayerConfig & {
-        source: VolumeSourceConfig,
-        colorMap?: VolumeColorMap
-    }
+    source?: VolumeSourceConfig,
+    colorMap?: VolumeColorMap
 };
 
 
-export interface IVolumeLayerRenderer extends ILayerRenderer {
-    setViewMode: (mode: string) => IVolumeViewMode | undefined;
-    updateSource: (source?: VolumeSourceConfig) => void;
-    forceRefresh: () => void;
-    setColorMap: (colorMap: HTMLImageElement | HTMLCanvasElement) => void;
-    setMapRange: (range: {
+export interface IVolumeLayerRenderer extends IMapLayerRenderer {
+    setViewMode(mode: string): IVolumeViewMode | undefined;
+    updateSource(source?: VolumeSourceConfig): void;
+    forceRefresh(): void;
+    setColorMap(colorMap: HTMLImageElement | HTMLCanvasElement): void;
+    setMapRange(range: {
         min: number,
         max: number
-    }) => void;
-    setClamp: (clamp: boolean) => void;
-    setNoDataValue: (noDataValue: number) => void;
-    setVerticalScale: (verticalScale: number) => void;
+    }): void;
+    setClamp(clamp: boolean): void;
+    setNoDataValue(noDataValue: number): void;
+    setVerticalScale(verticalScale: number): void;
 }
 
 export const VOLUME_LAYER_ID = 'volume';
+
+declare module './map-layer-renderer' {
+    export interface IMapLayerRendererConfigDefinitions {
+        [VOLUME_LAYER_ID]: VolumeLayerRendererConfig;
+    }
+}

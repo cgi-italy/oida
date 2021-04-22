@@ -15,7 +15,7 @@
   ],
   "scripts": {
     "pack-icons": "rimraf ./src/icons && svgr --config-file ./config/svgr.config.js --ext tsx --filename-case kebab --out-dir ./src/icons ./assets/icons",
-    "prebuild": "npm run pack-icons",
+    "prebuild:es": "npm run pack-icons",
     "build:es": "tsc",
     "build:umd": "tsc --project tsconfig.umd.json",
     "clean": "rimraf ./lib ./es ./types ./tsconfig.tsbuildinfo",
@@ -39,6 +39,6 @@
     "@oida/core": "file:../core",
     "@oida/ui-react-core": "file:../ui-react-core",
     "lodash": "4.17.15",
-    "tslib": "^2.0.1"
+    "tslib": "^2.2.0"
   }
 }

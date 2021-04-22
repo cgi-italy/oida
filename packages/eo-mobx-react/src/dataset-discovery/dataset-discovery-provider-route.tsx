@@ -32,7 +32,7 @@ export type DatasetDiscoveryProviderRouteProps = {
 
 export const DatasetDiscoveryProviderRoute = (props: DatasetDiscoveryProviderRouteProps) => {
 
-    const { providerId } = useParams();
+    const { providerId } = useParams<{providerId: string}>();
 
     useEffect(() => {
         props.datasetDiscovery.selectProvider(providerId);

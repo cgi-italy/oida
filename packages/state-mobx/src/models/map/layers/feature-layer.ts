@@ -22,14 +22,14 @@ export type FeatureLayerConfig<T extends FeatureInterface> = {
 
 export type FeatureLayerProps<T extends FeatureInterface> = {
     source?: IObservableArray<T>
-} & Omit<MapLayerProps, 'layerType'> & ConfigProps<FeatureLayerConfig<T>>;
+} & MapLayerProps<typeof FEATURE_LAYER_ID> & ConfigProps<FeatureLayerConfig<T>>;
 
 export class FeatureLayer<T extends FeatureInterface> extends MapLayer implements HasConfig<FeatureLayerConfig<T>> {
 
     readonly config: Config<FeatureLayerConfig<T>>;
     @observable.ref source: IObservableArray<T> | undefined;
 
-    constructor(props: FeatureLayerProps<T>) {
+    constructor(props: Omit<FeatureLayerProps<T>, 'layerType'>) {
         super({
             ...props,
             layerType: FEATURE_LAYER_ID

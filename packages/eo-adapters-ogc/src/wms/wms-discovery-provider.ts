@@ -57,10 +57,9 @@ export type WmsItemProps = {
 };
 
 export type WmsDatasetDiscoveryProviderProps = {
-    providerType: typeof WMS_DATASET_DISCOVERY_PROVIDER_TYPE;
     services: (WmsItem | WmsItemProps)[];
     queryParams?: QueryParamsProps;
-} & Omit<DatasetDiscoveryProviderProps, 'providerType'>;
+}  & DatasetDiscoveryProviderProps<typeof WMS_DATASET_DISCOVERY_PROVIDER_TYPE>;
 
 export class WmsDatasetDiscoveryProvider extends DatasetDiscoveryProvider<WmsDatasetDiscoveryProviderItem> {
 
@@ -174,5 +173,3 @@ export class WmsDatasetDiscoveryProvider extends DatasetDiscoveryProvider<WmsDat
         this.subscriptionTracker_.addSubscription(dataUpdateDisposer);
     }
 }
-
-DatasetDiscoveryProvider.register(WMS_DATASET_DISCOVERY_PROVIDER_TYPE, WmsDatasetDiscoveryProvider);

@@ -7,7 +7,6 @@ import { DatasetVariable, DatasetDimension, DataDomain, DomainRange, isValueDoma
 import { DatasetDimensions, HasDatasetDimensions, DatasetDimensionsProps } from './dataset-dimensions';
 import { DatasetAnalysis, DatasetAnalysisProps } from './dataset-analysis';
 import { getDatasetVariableDomain } from '../utils';
-import { DatasetViz } from './dataset-viz';
 
 
 export const DIMENSION_SERIES_TYPE = 'dimension_series';
@@ -54,11 +53,10 @@ export type DatasetDimensionSeriesConfig<T = SeriesDimensionType> = {
 };
 
 export type DatasetDimensionSeriesProps = {
-    config: DatasetDimensionSeriesConfig;
     seriesDimension?: string;
     seriesVariable?: string;
     seriesRange?: DomainRange<SeriesDimensionType>;
-} & Omit<DatasetAnalysisProps, 'vizType'> & DatasetDimensionsProps;
+} & DatasetAnalysisProps<typeof DIMENSION_SERIES_TYPE, DatasetDimensionSeriesConfig> & DatasetDimensionsProps;
 
 export class DatasetDimensionSeries extends DatasetAnalysis<undefined> implements HasDatasetDimensions {
 
@@ -71,7 +69,7 @@ export class DatasetDimensionSeries extends DatasetAnalysis<undefined> implement
 
     protected dataFetcher_: AsyncDataFetcher<DatasetDimensionSeriesData | undefined>;
 
-    constructor(props: DatasetDimensionSeriesProps) {
+    constructor(props: Omit<DatasetDimensionSeriesProps, 'vizType'>) {
         super({
             vizType: DIMENSION_SERIES_TYPE,
             ...props
@@ -201,5 +199,3 @@ export class DatasetDimensionSeries extends DatasetAnalysis<undefined> implement
         return undefined;
     }
 }
-
-DatasetViz.register(DIMENSION_SERIES_TYPE, DatasetDimensionSeries);

@@ -2,42 +2,36 @@ import ImageryLayer from 'cesium/Source/Scene/ImageryLayer';
 import Rectangle from 'cesium/Source/Core/Rectangle';
 import Event from 'cesium/Source/Core/Event';
 
-import { ITileLayerRenderer } from '@oida/core';
+import { ITileLayerRenderer, TileLayerRendererConfig, TileSource } from '@oida/core';
 
 import { cesiumTileSourcesFactory } from './tilesources/cesium-tilesources-factory';
 import { CesiumMapLayer } from './cesium-map-layer';
 
 export class CesiumTileLayer extends CesiumMapLayer implements ITileLayerRenderer {
 
-    protected onTileLoadStart_;
-    protected onTileLoadEnd_;
-    protected source_;
-    protected extent_;
+    protected onTileLoadStart_: (() => void) | undefined;
+    protected onTileLoadEnd_: (() => void) | undefined;
+    protected extent_: number[] | undefined;
     protected minZoomLevel_: number | undefined;
     protected maxZoomLevel_: number | undefined;
-    protected sourceConfig_;
+    protected sourceConfig_: TileSource | undefined;
 
+    protected source_;
 
-    constructor(config) {
+    constructor(config: TileLayerRendererConfig) {
         super(config);
 
-        this.onTileLoadStart_ = () => {
-            config.onTileLoadStart();
-        };
+        this.onTileLoadStart_ = config.onTileLoadStart;
+        this.onTileLoadEnd_ = config.onTileLoadEnd;
 
-        this.onTileLoadEnd_ = () => {
-            config.onTileLoadEnd();
-        };
+        this.extent_ = config.extent;
+        this.minZoomLevel_ = config.minZoomLevel;
+        this.maxZoomLevel_ = config.maxZoomLevel;
 
-        this.extent_ = config.mapLayer.extent;
-        this.minZoomLevel_ = config.mapLayer.minZoomLevel;
-        this.maxZoomLevel_ = config.mapLayer.maxZoomLevel;
-
-        this.updateSource(config.mapLayer.source);
-
+        this.updateSource(config.source);
     }
 
-    updateSource(config) {
+    updateSource(sourceConfig: TileSource | undefined) {
 
         if (this.source_) {
             this.source_.tileLoadStartEvent.removeEventListener(this.onTileLoadStart_, this);
@@ -48,7 +42,7 @@ export class CesiumTileLayer extends CesiumMapLayer implements ITileLayerRendere
         this.source_ = undefined;
 
         try {
-            let source = config ? cesiumTileSourcesFactory.create(config.id, config) : undefined;
+            let source = sourceConfig ? cesiumTileSourcesFactory.create(sourceConfig.id, sourceConfig) : undefined;
             if (source) {
 
                 source.tileLoadStartEvent = new Event();
@@ -79,7 +73,7 @@ export class CesiumTileLayer extends CesiumMapLayer implements ITileLayerRendere
 
         }
 
-        this.sourceConfig_ = config;
+        this.sourceConfig_ = sourceConfig;
     }
 
     forceRefresh() {

@@ -3,7 +3,7 @@ import { autorun } from 'mobx';
 import nearestPointOnLine from '@turf/nearest-point-on-line';
 
 import { AxiosInstanceWithCancellation } from '@oida/core';
-import { VERTICAL_PROFILE_VIZ_TYPE, DatasetVerticalProfileViz, VerticalProfileVizConfig, RasterBandModeType } from  '@oida/eo-mobx';
+import { VERTICAL_PROFILE_VIZ_TYPE, DatasetVerticalProfileViz, VerticalProfileVizConfig, RasterBandModeType, DatasetMapViewConfig } from  '@oida/eo-mobx';
 
 import { AdamDatasetConfig, isMultiBandCoverage } from '../../adam-dataset-config';
 import { AdamDatasetFactoryConfig } from '../../get-adam-dataset-factory';
@@ -157,9 +157,7 @@ export const getAdamVerticalProfileViewConfig = (
 
     return {
         type: VERTICAL_PROFILE_VIZ_TYPE,
-        props: {
-            config: vizConfig
-        }
-    };
+        config: vizConfig
+    } as DatasetMapViewConfig<typeof VERTICAL_PROFILE_VIZ_TYPE>;
 
 };

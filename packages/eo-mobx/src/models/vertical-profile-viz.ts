@@ -94,9 +94,8 @@ export type VerticalProfileVizConfig = {
     afterInit?: (verticalProfileViz) => void;
 };
 
-export type DatasetVerticalProfileVizProps = {
-    config: VerticalProfileVizConfig;
-} & DatasetVizProps & VerticalScaleProps;
+export type DatasetVerticalProfileVizProps =
+    DatasetVizProps<typeof VERTICAL_PROFILE_VIZ_TYPE, VerticalProfileVizConfig> & VerticalScaleProps;
 
 export class DatasetVerticalProfileViz extends DatasetViz<VerticalProfileLayer<VerticalProfileItem>> {
     readonly config: VerticalProfileVizConfig;
@@ -240,5 +239,3 @@ export class DatasetVerticalProfileViz extends DatasetViz<VerticalProfileLayer<V
         });
     }
 }
-
-DatasetViz.register(VERTICAL_PROFILE_VIZ_TYPE, DatasetVerticalProfileViz);

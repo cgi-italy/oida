@@ -2,13 +2,12 @@ import { autorun, observable, makeObservable, action, runInAction, computed } fr
 import nearestPointOnLine from '@turf/nearest-point-on-line';
 import along from '@turf/along';
 
+import { Geometry, IndexableGeometry } from '@oida/core';
 import { AsyncDataFetcher } from '@oida/state-mobx';
 
-import { DatasetVariable, DatasetDimension, DataDomain } from '../types';
+import { DatasetVariable, DatasetDimension, DataDomain, TimeSearchDirection } from '../types';
 import { DatasetDimensions, HasDatasetDimensions, DatasetDimensionsProps } from './dataset-dimensions';
 import { DatasetAnalysis, DatasetAnalysisProps } from './dataset-analysis';
-import { DatasetViz } from './dataset-viz';
-import { Geometry, IndexableGeometry } from '@oida/core';
 
 
 export const TRANSECT_SERIES_TYPE = 'transect_series';
@@ -18,14 +17,19 @@ type TransectDimensionType = string | Date | number;
 export type DatasetTransectSeriesRequest = {
     variable: string;
     geometry: GeoJSON.LineString;
+    numSamples?: number;
     dimensionValues?: Map<string, TransectDimensionType>;
 };
+
+export type DatasetTransectSeriesProvider = (request: DatasetTransectSeriesRequest) => Promise<Array<{x: number, y: number}>>;
 
 export type DatasetTransectSeriesConfig = {
     variables: DatasetVariable<DataDomain<number>>[];
     maxLineStringLength?: number;
-    provider: (request: DatasetTransectSeriesRequest) => Promise<Array<{x: number, y: number}>>;
-    dimensions: DatasetDimension<DataDomain<string | number | Date>>[];
+    supportsNumSamples?: boolean;
+    maxNumSamples?: boolean;
+    provider: DatasetTransectSeriesProvider;
+    dimensions: DatasetDimension<DataDomain<TransectDimensionType>>[];
 };
 
 
@@ -36,9 +40,8 @@ export type TransectSeriesItem = {
 };
 
 export type DatasetTransectSeriesProps = {
-    config: DatasetTransectSeriesConfig;
     seriesVariable?: string;
-} & Omit<DatasetAnalysisProps, 'vizType'> & DatasetDimensionsProps;
+} & DatasetAnalysisProps<typeof TRANSECT_SERIES_TYPE, DatasetTransectSeriesConfig> & DatasetDimensionsProps;
 
 export class DatasetTransectSeries extends DatasetAnalysis<undefined> implements HasDatasetDimensions {
 
@@ -50,7 +53,7 @@ export class DatasetTransectSeries extends DatasetAnalysis<undefined> implements
 
     protected dataFetcher_: AsyncDataFetcher<TransectSeriesItem[] | undefined>;
 
-    constructor(props: DatasetTransectSeriesProps) {
+    constructor(props: Omit<DatasetTransectSeriesProps, 'vizType'>) {
         super({
             vizType: TRANSECT_SERIES_TYPE,
             ...props
@@ -171,6 +174,36 @@ export class DatasetTransectSeries extends DatasetAnalysis<undefined> implements
     }
 
     protected afterInit_() {
+
+        if (!this.seriesVariable) {
+            this.setVariable(this.config.variables[0].id);
+        }
+        if (!this.dimensions.values.has('time')) {
+            //if the time dimension have not been passed in config initialize the time
+            // dimension value to the current dataset selected time
+            const timeDimension = this.config.dimensions.find((dimension) => dimension.id === 'time');
+            if (timeDimension) {
+                const datasetTime = this.dataset.selectedTime;
+                if (datasetTime) {
+                    if (datasetTime instanceof Date) {
+                        this.dimensions.setValue('time', datasetTime);
+                    } else {
+                        //a time range is currently selected. try to find the time nearest to the range end time
+                        const timeProvider = this.dataset.config.timeDistribution?.provider;
+                        if (timeProvider) {
+                            timeProvider.getNearestItem(datasetTime.end, TimeSearchDirection.Backward).then((dt) => {
+                                if (dt) {
+                                    this.dimensions.setValue('time', dt.start);
+                                }
+                            });
+                        } else {
+                            this.dimensions.setValue('time', datasetTime.end);
+                        }
+                    }
+                }
+            }
+        }
+
         const seriesUpdaterDisposer = autorun(() => {
 
             if (this.canRunQuery_()) {
@@ -201,4 +234,3 @@ export class DatasetTransectSeries extends DatasetAnalysis<undefined> implements
     }
 }
 
-DatasetViz.register(TRANSECT_SERIES_TYPE, DatasetTransectSeries);

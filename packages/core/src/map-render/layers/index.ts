@@ -6,3 +6,4 @@ export * from './image-layer-renderer';
 export * from './vertical-profile-layer-renderer';
 export * from './volume-layer-renderer';
 export * from './geo-image-layer-renderer';
+export * from './tile-sources';

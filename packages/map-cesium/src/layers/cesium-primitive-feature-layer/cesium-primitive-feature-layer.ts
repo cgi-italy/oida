@@ -2,14 +2,16 @@ import Cartesian3 from 'cesium/Source/Core/Cartesian3';
 import Cartographic from 'cesium/Source/Core/Cartographic';
 import CesiumMath from 'cesium/Source/Core/Math';
 
-import { IFeatureLayerRenderer, IFeatureStyle, FeatureLayerConfig, FeatureGeometry, IFeature } from '@oida/core';
+import { IFeatureLayerRenderer, IFeatureStyle, MapLayerRendererConfig, FeatureLayerRendererConfig, FeatureGeometry, IFeature } from '@oida/core';
 
 import { CesiumFeatureCoordPickMode, PickInfo } from '../../utils/picking';
 import { CesiumMapLayer } from '../cesium-map-layer';
+import { CesiumFeatureLayerProps } from '../cesium-feature-layer';
 import {
     CesiumPointPrimitiveRenderer, CesiumLinePrimitiveRenderer, CesiumPolygonPrimitiveRenderer,
     CesiumGeometryPrimitiveRenderer, GeometryStyle, CesiumGeometryPrimitiveFeature
 } from './geometry-primitive-renderers';
+
 
 export class CesiumPrimitiveFeatureLayer extends CesiumMapLayer implements IFeatureLayerRenderer {
 
@@ -24,7 +26,7 @@ export class CesiumPrimitiveFeatureLayer extends CesiumMapLayer implements IFeat
     protected onFeatureSelect_: ((feature: IFeature<any>, coordinate: GeoJSON.Position) => void) | undefined;
     protected coordPickMode_: CesiumFeatureCoordPickMode;
 
-    constructor(config: FeatureLayerConfig) {
+    constructor(config: FeatureLayerRendererConfig & CesiumFeatureLayerProps) {
         super(config);
 
         this.clampToGround_ = config.clampToGround || false;
@@ -139,7 +141,10 @@ export class CesiumPrimitiveFeatureLayer extends CesiumMapLayer implements IFeat
 
     onFeatureHover(coordinate: Cartesian3, pickInfo: PickInfo) {
         let cartographic = Cartographic.fromCartesian(coordinate);
-        this.onFeatureHover_!(pickInfo.data, [
+        this.onFeatureHover_!({
+            id: pickInfo.id,
+            data: pickInfo.data
+        }, [
             CesiumMath.toDegrees(cartographic.longitude),
             CesiumMath.toDegrees(cartographic.latitude),
             cartographic.height
@@ -148,7 +153,10 @@ export class CesiumPrimitiveFeatureLayer extends CesiumMapLayer implements IFeat
 
     onFeatureSelect(coordinate: Cartesian3, pickInfo: PickInfo) {
         let cartographic = Cartographic.fromCartesian(coordinate);
-        this.onFeatureSelect_!(pickInfo.data, [
+        this.onFeatureSelect_!({
+            id: pickInfo.id,
+            data: pickInfo.data
+        }, [
             CesiumMath.toDegrees(cartographic.longitude),
             CesiumMath.toDegrees(cartographic.latitude),
             cartographic.height

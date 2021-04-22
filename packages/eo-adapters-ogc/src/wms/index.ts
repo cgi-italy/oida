@@ -1,3 +1,21 @@
+import { DatasetDiscoveryProvider } from '@oida/eo-mobx';
+
+import { WMS_DATASET_DISCOVERY_PROVIDER_TYPE, WmsDatasetDiscoveryProvider, WmsDatasetDiscoveryProviderProps } from './wms-discovery-provider';
+
+declare module '@oida/eo-mobx' {
+    interface DatasetDiscoveryProviderDefinitions {
+        [WMS_DATASET_DISCOVERY_PROVIDER_TYPE]: WmsDatasetDiscoveryProviderProps;
+    }
+
+    interface DatasetDiscoveryProviderTypes {
+        [WMS_DATASET_DISCOVERY_PROVIDER_TYPE]: WmsDatasetDiscoveryProvider;
+    }
+
+}
+
+DatasetDiscoveryProvider.register(WMS_DATASET_DISCOVERY_PROVIDER_TYPE, WmsDatasetDiscoveryProvider);
+
+
 export * from './wms-client';
 export * from './wms-service';
 export * from './wms-time-series-tool';

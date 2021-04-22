@@ -7,7 +7,7 @@ import { transform } from 'ol/proj';
 
 import bboxPolygon from '@turf/bbox-polygon';
 
-import { FeatureLayerConfig, FEATURE_LAYER_ID, IFeature, IFeatureLayerRenderer } from '@oida/core';
+import { FeatureLayerRendererConfig, FEATURE_LAYER_ID, IFeature, IFeatureLayerRenderer } from '@oida/core';
 
 import { OLMapLayer } from './ol-map-layer';
 import { olLayersFactory } from './ol-layers-factory';
@@ -24,7 +24,7 @@ export class OLFeatureLayer extends OLMapLayer<VectorLayer> implements IFeatureL
     protected onFeatureHover_: ((feature: IFeature<any>, coordinate: GeoJSON.Position) => void) | undefined;
     protected onFeatureSelect_: ((feature: IFeature<any>, coordinate: GeoJSON.Position) => void) | undefined;
 
-    constructor(config: FeatureLayerConfig) {
+    constructor(config: FeatureLayerRendererConfig) {
         super(config);
         this.geomParser_ = new GeoJSON();
         this.styleParser_ = new OLStyleParser();
@@ -112,11 +112,11 @@ export class OLFeatureLayer extends OLMapLayer<VectorLayer> implements IFeatureL
     }
 
     onFeatureHover(coordinate: GeoJSON.Position, feature: IFeature) {
-        this.onFeatureHover_!(feature.data, coordinate);
+        this.onFeatureHover_!(feature, coordinate);
     }
 
     onFeatureSelect(coordinate: GeoJSON.Position, feature: IFeature) {
-        this.onFeatureSelect_!(feature.data, coordinate);
+        this.onFeatureSelect_!(feature, coordinate);
     }
 
     protected parseGeometry_(geometry) {
@@ -147,7 +147,7 @@ export class OLFeatureLayer extends OLMapLayer<VectorLayer> implements IFeatureL
         });
     }
 
-    protected createOLObject_(config) {
+    protected createOLObject_(config: FeatureLayerRendererConfig) {
         let source = new VectorSource({
             wrapX: this.mapRenderer_.getViewer().getView().wrapX
         });

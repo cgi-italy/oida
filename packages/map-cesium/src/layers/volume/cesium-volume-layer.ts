@@ -1,6 +1,6 @@
 import Cartesian2 from 'cesium/Source/Core/Cartesian2';
 
-import { IVolumeLayerRenderer, VolumeLayerConfig, VolumeSourceConfig } from '@oida/core';
+import { IVolumeLayerRenderer, MapLayerRendererConfig, VolumeLayerRendererConfig, VolumeSourceConfig } from '@oida/core';
 
 import { CesiumMapLayer } from '../cesium-map-layer';
 import { CesiumVolumeSource } from './cesium-volume-source';
@@ -12,27 +12,27 @@ export class CesiumVolumeLayer extends CesiumMapLayer implements IVolumeLayerRen
     protected source_: CesiumVolumeSource | undefined;
     protected sourceConfig_: VolumeSourceConfig | undefined;
     protected volumeTileSet_: CesiumVolumeTileSet;
-    protected onSliceLoadStart_;
-    protected onSliceLoadEnd_;
+    protected onSliceLoadStart_: () => void;
+    protected onSliceLoadEnd_: () => void;
 
-    constructor(config: VolumeLayerConfig) {
+    constructor(config: MapLayerRendererConfig & VolumeLayerRendererConfig) {
         super(config);
 
         this.onSliceLoadStart_ = config.onSliceLoadStart;
         this.onSliceLoadEnd_ = config.onSliceLoadEnd;
 
-        let colorMap = config.mapLayer.colorMap;
+        let colorMap = config.colorMap;
 
         this.volumeTileSet_ = new CesiumVolumeTileSet({
-            source: config.mapLayer.source ? new CesiumVolumeSource({
-                ...config.mapLayer.source,
+            source: config.source ? new CesiumVolumeSource({
+                ...config.source,
                 onSliceLoadStart: config.onSliceLoadStart,
                 onSliceLoadEnd: config.onSliceLoadEnd
             }) : undefined,
             colorMap: colorMap ? {
                 clamp: colorMap.clamp,
                 colorMap: colorMap.image,
-                noDataValue: colorMap.noData,
+                noDataValue: colorMap.noData || -Number.MAX_VALUE,
                 range: new Cartesian2(colorMap.range.min, colorMap.range.max)
             } : undefined
         });

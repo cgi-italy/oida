@@ -1,4 +1,3 @@
-import { createDynamicFactory } from '@oida/core';
-import { OLMapLayer } from './ol-map-layer';
+import { createDynamicFactory, IMapLayerRenderer, IMapLayerRendererConfigDefinitions, MapLayerRendererConfig } from '@oida/core';
 
-export const olLayersFactory = createDynamicFactory<OLMapLayer>('ol-layers');
+export const olLayersFactory = createDynamicFactory<IMapLayerRenderer, IMapLayerRendererConfigDefinitions>('ol-layers');

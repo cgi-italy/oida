@@ -30,9 +30,8 @@ export type VolumetricMapVizConfig = {
 };
 
 export type DatasetVolumetricVizProps = {
-    config: VolumetricMapVizConfig;
     bandMode?: RasterBandModeSingleProps | RasterBandModeSingle;
-} & DatasetVizProps & VerticalScaleProps;
+} & DatasetVizProps<typeof VOLUMETRIC_VIZ_TYPE, VolumetricMapVizConfig> & VerticalScaleProps;
 
 export class DatasetVolumetricViz extends DatasetViz<VolumeLayer> {
     readonly config: VolumetricMapVizConfig;
@@ -140,4 +139,3 @@ export class DatasetVolumetricViz extends DatasetViz<VolumeLayer> {
 
 }
 
-DatasetViz.register(VOLUMETRIC_VIZ_TYPE, DatasetVolumetricViz);

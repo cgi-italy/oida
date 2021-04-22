@@ -1,4 +1,8 @@
-import { createDynamicFactory } from '../../utils/dynamic-factory';
-import { IMapRenderer } from './map-renderer';
+import { createDynamicFactory } from '../../utils';
+import { IMapRenderer, IMapRendererProps } from './map-renderer';
 
-export const mapRendererFactory = createDynamicFactory<IMapRenderer>('map');
+export interface IMapRendererPropsDefinitions {
+}
+
+
+export const mapRendererFactory = createDynamicFactory<IMapRenderer, IMapRendererPropsDefinitions, IMapRendererProps>('map');

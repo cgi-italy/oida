@@ -1,7 +1,10 @@
 import ImageLayer from 'ol/layer/Image';
 import CanvasSource from 'ol/source/ImageCanvas';
 
-import { GEO_IMAGE_LAYER_ID, IGeoImageLayerRenderer, GeoImageLayerSource, GeoImageLayerFootprint, GeoImageLayerConfig } from '@oida/core';
+import {
+    GEO_IMAGE_LAYER_ID, IGeoImageLayerRenderer, GeoImageLayerSource, GeoImageLayerFootprint,
+    MapLayerRendererConfig, GeoImageLayerRendererConfig
+} from '@oida/core';
 
 import { GLGeoImageProjector } from '../utils';
 import { olLayersFactory } from './ol-layers-factory';
@@ -13,7 +16,7 @@ export class OLGeoImageLayer extends OLMapLayer<ImageLayer> implements IGeoImage
     protected footprint_: GeoImageLayerFootprint;
     protected imageProjector_: GLGeoImageProjector;
 
-    constructor(config: GeoImageLayerConfig) {
+    constructor(config: GeoImageLayerRendererConfig) {
         super(config);
 
         this.source_ = config.source;
@@ -50,7 +53,7 @@ export class OLGeoImageLayer extends OLMapLayer<ImageLayer> implements IGeoImage
         this.olImpl_.getSource().refresh();
     }
 
-    protected createOLObject_(config) {
+    protected createOLObject_(config: GeoImageLayerRendererConfig) {
 
         const layer = new ImageLayer({
             source: config.source ? new CanvasSource({

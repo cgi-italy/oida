@@ -2,7 +2,7 @@ import { fromArrayBuffer } from 'geotiff';
 
 import { VolumeSliceUrl } from '@oida/core';
 import {
-    DatasetVolumetricViz, VolumetricMapVizConfig, VOLUMETRIC_VIZ_TYPE, isValueDomain, isDomainProvider
+    DatasetVolumetricViz, VolumetricMapVizConfig, VOLUMETRIC_VIZ_TYPE, isValueDomain, isDomainProvider, DatasetMapViewConfig
 } from '@oida/eo-mobx';
 
 import { AdamDatasetConfig, isMultiBandCoverage } from '../../adam-dataset-config';
@@ -157,10 +157,8 @@ export const getAdamVolumetricMapViewConfig = (
 
     return {
         type: VOLUMETRIC_VIZ_TYPE,
-        props: {
-            config: volumetricVizConfig
-        }
-    };
+        config: volumetricVizConfig
+    } as DatasetMapViewConfig<typeof VOLUMETRIC_VIZ_TYPE>;
 
 };
 

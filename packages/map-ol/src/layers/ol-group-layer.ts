@@ -1,17 +1,17 @@
 import Group from 'ol/layer/Group';
 
-import { GROUP_LAYER_ID, IGroupLayerRenderer } from '@oida/core';
+import { GROUP_LAYER_ID, IGroupLayerRenderer, MapLayerRendererConfig } from '@oida/core';
 
 import { OLMapLayer } from './ol-map-layer';
 import { olLayersFactory } from './ol-layers-factory';
 
 export class OLGroupLayer extends OLMapLayer<Group> implements IGroupLayerRenderer {
 
-    constructor(config) {
+    constructor(config: MapLayerRendererConfig) {
         super(config);
     }
 
-    addLayer(layer, position) {
+    addLayer(layer: OLMapLayer, position?: number) {
         if (typeof (position) === 'number') {
             this.olImpl_.getLayers().insertAt(position, layer.getOLObject());
         } else {
@@ -19,11 +19,11 @@ export class OLGroupLayer extends OLMapLayer<Group> implements IGroupLayerRender
         }
     }
 
-    removeLayer(layer) {
+    removeLayer(layer: OLMapLayer) {
         this.olImpl_.getLayers().remove(layer.getOLObject());
     }
 
-    protected createOLObject_(config) {
+    protected createOLObject_(config: MapLayerRendererConfig) {
         return new Group({
             extent: config.extent,
             zIndex: config.zIndex,

@@ -1,5 +1,5 @@
 import { Color } from './feature-layer-renderer';
-import { ILayerRenderer } from './map-layer-renderer';
+import { IMapLayerRenderer, MapLayerRendererConfig } from './map-layer-renderer';
 
 export type IVerticalProfile = {
     bottomCoords: GeoJSON.LineString,
@@ -20,7 +20,12 @@ export type VerticalProfileCoordinate = {
     unprojected?: GeoJSON.Position;
 };
 
-export interface IVerticalProfileLayerRenderer extends ILayerRenderer {
+export type VerticalProfileLayerRendererConfig = MapLayerRendererConfig & {
+    onCoordinateSelect?: (selected?: {profileId: string, coordinate: number[]}) => void;
+    onCoordinateHover?: (hovered?: {profileId: string, coordinate: number[]}) => void;
+};
+
+export interface IVerticalProfileLayerRenderer extends IMapLayerRenderer {
     addProfile(id: string, profile: IVerticalProfile, style: IVerticalProfileStyle, data?: any);
     getProfile(id: string);
     updateProfile(id: string, profile: IVerticalProfile);
@@ -33,3 +38,10 @@ export interface IVerticalProfileLayerRenderer extends ILayerRenderer {
 }
 
 export const VERTICAL_PROFILE_LAYER_ID = 'vertical_profile';
+
+
+declare module './map-layer-renderer' {
+    export interface IMapLayerRendererConfigDefinitions {
+        [VERTICAL_PROFILE_LAYER_ID]: VerticalProfileLayerRendererConfig;
+    }
+}
