@@ -17,6 +17,9 @@ export class MouseCoordsInteractionController extends MapInteractionController<I
             ...super.getImplementationProps_(),
             onMouseCoords: (mouseCoords) => {
                 this.interaction_.setMouseCoords(mouseCoords);
+            },
+            onMouseClick: (mouseCoords) => {
+                this.interaction_.setLastClickCoords(mouseCoords);
             }
         };
     }

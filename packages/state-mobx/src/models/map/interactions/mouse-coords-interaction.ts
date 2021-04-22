@@ -14,6 +14,8 @@ export type MouseCoordsInteractionProps = {
 
 export class MouseCoordsInteraction extends MapInteraction {
     @observable.ref mouseCoords: MouseCoords | undefined;
+    @observable.ref lastClickCoords: MouseCoords | undefined;
+
     constructor(props?: MouseCoordsInteractionProps) {
         super({
             ...props,
@@ -21,6 +23,7 @@ export class MouseCoordsInteraction extends MapInteraction {
         });
 
         this.mouseCoords = undefined;
+        this.lastClickCoords = undefined;
 
         makeObservable(this);
     }
@@ -28,6 +31,11 @@ export class MouseCoordsInteraction extends MapInteraction {
     @action
     setMouseCoords(mouseCoords: MouseCoords | undefined) {
         this.mouseCoords = mouseCoords;
+    }
+
+    @action
+    setLastClickCoords(clickCoords: MouseCoords | undefined) {
+        this.lastClickCoords = clickCoords;
     }
 }
 
