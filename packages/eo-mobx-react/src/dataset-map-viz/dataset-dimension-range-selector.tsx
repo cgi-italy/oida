@@ -102,7 +102,7 @@ export const DatasetCategoricalRangeSelector = (props: DatasetCategoricalRangeSe
                 value={props.value}
                 onChange={(value) => props.onChange(value as string[])}
                 config={{
-                    choices: domain.map(domainValue => {
+                    choices: domain.values.map(domainValue => {
                         return {
                             name: domainValue.label || domainValue.value.toString(),
                             value: domainValue.value.toString()

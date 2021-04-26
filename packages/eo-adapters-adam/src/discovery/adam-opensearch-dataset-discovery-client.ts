@@ -242,12 +242,14 @@ export class AdamOpensearchDatasetDiscoveryClient {
                             },
                             wcsResponseKey: 'gfix',
                             tarFilenameRegex: /^/,
-                            domain: gridName.values.map((item) => {
-                                return {
-                                    label: item.label,
-                                    value: item.value
-                                };
-                            })
+                            domain: {
+                                values: gridName.values.map((item) => {
+                                    return {
+                                        label: item.label,
+                                        value: item.value
+                                    };
+                                })
+                            }
                         });
                     });
                 }

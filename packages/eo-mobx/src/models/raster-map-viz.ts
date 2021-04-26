@@ -9,7 +9,7 @@ import { DatasetDimensions, DatasetDimensionsProps, HasDatasetDimensions } from 
 import {
     RasterBandModeConfig, RasterBandMode
 } from './raster-band-mode';
-import { getRasterBandModeFromConfig } from '../utils';
+import { getDatasetVariableDomain, getRasterBandModeFromConfig } from '../utils';
 
 export const RASTER_VIZ_TYPE = 'raster';
 
@@ -52,16 +52,11 @@ export class RasterMapViz extends DatasetViz<TileLayer> implements HasDatasetDim
 
         if (this.config.dimensions) {
             this.config.dimensions.forEach((dimension) => {
-                if (dimension.domain) {
-                    if (isDomainProvider(dimension.domain)) {
-                        dimension.domain().then(domain => {
-                            this.initDimensionValue_(dimension.id, domain);
-                        });
-                    } else {
-                        this.initDimensionValue_(dimension.id, dimension.domain);
+                getDatasetVariableDomain(dimension).then((domain) => {
+                    if (domain) {
+                        this.initDimensionValue_(dimension.id, domain);
                     }
-
-                }
+                });
             });
         }
 
@@ -81,9 +76,11 @@ export class RasterMapViz extends DatasetViz<TileLayer> implements HasDatasetDim
 
     protected initDimensionValue_(dimensionId: string, domain: DataDomain<string | number | Date>) {
         if (isValueDomain(domain)) {
-            this.dimensions.setValue(dimensionId, domain.min);
+            if (domain.min !== undefined) {
+                this.dimensions.setValue(dimensionId, domain.min);
+            }
         } else {
-            this.dimensions.setValue(dimensionId, domain[0].value);
+            this.dimensions.setValue(dimensionId, domain.values[0].value);
         }
     }
 

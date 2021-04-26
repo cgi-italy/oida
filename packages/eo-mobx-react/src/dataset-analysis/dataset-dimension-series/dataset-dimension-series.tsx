@@ -80,6 +80,7 @@ export const DatasetDimensionSeriesAnalysis = (props: DatasetAnalysisWidgetFacto
     return (
         <div className='dataset-chart'>
             <Collapse
+                className='dataset-chart-filters'
                 accordion={true}
                 activeKey={filtersVisible ? 'filters' : undefined}
                 bordered={false}

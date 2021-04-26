@@ -44,7 +44,8 @@ export type RasterBandModeChoice = {
     default?: Omit<RasterBandModePresetProps, 'type'>
 } | {
     type: RasterBandModeType.Combination,
-    default?: Omit<RasterBandModeCombinationProps, 'type'>
+    config?: RasterBandModeCombinationConfig,
+    default?: Omit<RasterBandModeCombinationProps, 'type' | 'config'>
 };
 
 export type RasterBandModeConfig = {
@@ -106,24 +107,57 @@ export class RasterBandModePreset {
     }
 }
 
+export enum BandScalingMode {
+    None = 'None',
+    Global = 'Global',
+    Channel = 'Channel'
+}
+
+export type RasterBandModeCombinationConfig = {
+    supportBandScalingMode?: BandScalingMode
+};
 
 export type RasterBandModeCombinationProps = {
     type: RasterBandModeType.Combination;
     red: string;
     green: string;
     blue: string;
+    config?: RasterBandModeCombinationConfig;
+    bandScalingMode?: BandScalingMode;
+    dataRange?: DomainRange<number>;
+    redRange?: DomainRange<number>;
+    greenRange?: DomainRange<number>;
+    blueRange?: DomainRange<number>;
 };
 
 export class RasterBandModeCombination {
     readonly type = RasterBandModeType.Combination;
+    readonly config: RasterBandModeCombinationConfig;
     @observable.ref red: string;
     @observable.ref green: string;
     @observable.ref blue: string;
 
+    @observable.ref bandScalingMode: BandScalingMode;
+    @observable.ref dataRange: DomainRange<number> | undefined;
+    @observable.ref redRange: DomainRange<number> | undefined;
+    @observable.ref greenRange: DomainRange<number> | undefined;
+    @observable.ref blueRange: DomainRange<number> | undefined;
+
     constructor(props: Omit<RasterBandModeCombinationProps, 'type'>) {
+
+        this.config = props.config || {
+            supportBandScalingMode: BandScalingMode.None
+        };
+
         this.red = props.red;
         this.green = props.green;
         this.blue = props.blue;
+
+        this.bandScalingMode = props.bandScalingMode || BandScalingMode.None;
+        this.dataRange = props.dataRange;
+        this.redRange = props.redRange;
+        this.greenRange = props.greenRange;
+        this.blueRange = props.blueRange;
 
         makeObservable(this);
     }
@@ -143,6 +177,26 @@ export class RasterBandModeCombination {
         this.blue = blue;
     }
 
+    @action
+    setBandScalingMode(mode: BandScalingMode) {
+        this.bandScalingMode = mode;
+    }
+
+    @action
+    setDataRange(dataRange: DomainRange<number> | undefined) {
+        this.dataRange = dataRange;
+    }
+
+    @action
+    setChannelRange(channel: 'red' | 'green' | 'blue', range: DomainRange<number> | undefined) {
+        if (channel === 'red') {
+            this.redRange = range;
+        } else if (channel === 'green') {
+            this.greenRange = range;
+        } else if (channel === 'blue') {
+            this.blueRange = range;
+        }
+    }
 }
 
 export type RasterBandModeProps = {

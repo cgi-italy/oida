@@ -1,11 +1,11 @@
-import { autorun, observable, makeObservable, action, runInAction, computed } from 'mobx';
+import { autorun, observable, makeObservable, action, runInAction } from 'mobx';
 import nearestPointOnLine from '@turf/nearest-point-on-line';
 import along from '@turf/along';
 
 import { Geometry, IndexableGeometry } from '@oida/core';
 import { AsyncDataFetcher } from '@oida/state-mobx';
 
-import { DatasetVariable, DatasetDimension, DataDomain, TimeSearchDirection } from '../types';
+import { DatasetDimension, DataDomain, TimeSearchDirection, NumericVariable } from '../types';
 import { DatasetDimensions, HasDatasetDimensions, DatasetDimensionsProps } from './dataset-dimensions';
 import { DatasetAnalysis, DatasetAnalysisProps } from './dataset-analysis';
 
@@ -24,7 +24,7 @@ export type DatasetTransectSeriesRequest = {
 export type DatasetTransectSeriesProvider = (request: DatasetTransectSeriesRequest) => Promise<Array<{x: number, y: number}>>;
 
 export type DatasetTransectSeriesConfig = {
-    variables: DatasetVariable<DataDomain<number>>[];
+    variables: NumericVariable[];
     maxLineStringLength?: number;
     supportsNumSamples?: boolean;
     maxNumSamples?: boolean;
@@ -220,7 +220,7 @@ export class DatasetTransectSeries extends DatasetAnalysis<undefined> implements
             }
         });
     }
-    protected canRunQuery_ = () => {
+    protected canRunQuery_() {
 
         return this.aoi?.geometry.value
             && this.seriesVariable

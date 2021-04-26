@@ -1,6 +1,9 @@
-import { RasterBandModeConfig, RasterBandModeType, RasterBandConfig,
-    RasterBandModeSingleProps, RasterBandModePresetProps, RasterBandPreset, RasterBandModeCombinationProps, RasterBandModeChoice
+import {
+    RasterBandModeConfig, RasterBandModeType, RasterBandConfig,
+    RasterBandModeSingleProps, RasterBandModePresetProps, RasterBandPreset, RasterBandModeCombinationProps,
+    RasterBandModeChoice, RasterBandModeCombinationConfig, BandScalingMode
 } from '../models/raster-band-mode';
+import { isValueDomain } from '../types';
 
 import { getDatasetVariableDomain } from './get-dataset-variable-domain';
 
@@ -29,8 +32,8 @@ export const getRasterBandSingleConfig = (options: getRasterBandSingleConfigOpti
     let noDataValue: number | undefined = undefined;
 
     return getDatasetVariableDomain(defaultBand).then((domain) => {
-        if (domain) {
-            if (!range) {
+        if (domain && isValueDomain(domain)) {
+            if (!range && domain.min !== undefined && domain.max !== undefined) {
                 range = {
                     min: domain.min,
                     max: domain.max
@@ -77,6 +80,7 @@ export const getRasterBandPresetConfig = (options: getRasterBandPresetConfigOpti
 
 type getRasterBandCombinationConfigOptions = {
     default?: Omit<RasterBandModeCombinationProps, 'type'>;
+    config?: RasterBandModeCombinationConfig;
     bands: RasterBandConfig[];
 };
 
@@ -85,16 +89,40 @@ export const getRasterBandCombinationConfig = (options: getRasterBandCombination
     if (options.default) {
         return Promise.resolve({
             type: RasterBandModeType.Combination,
+            config: options.config,
             ...options.default
         });
     } else {
         const bands = options.bands;
 
-        return Promise.resolve({
-            type: RasterBandModeType.Combination,
-            red: bands[0].id,
-            green: bands[Math.min(1, bands.length - 1)].id,
-            blue: bands[Math.min(2, bands.length - 1)].id
+        const rgb = [bands[0], bands[Math.min(1, bands.length - 1)], bands[Math.min(2, bands.length - 1)]];
+
+        const bandScalingMode = options.config?.supportBandScalingMode || BandScalingMode.None;
+
+        return Promise.all(rgb.map((band) => {
+            return getDatasetVariableDomain(band).then((domain) => {
+                if (domain && isValueDomain(domain) && domain.min !== undefined && domain.max !== undefined) {
+                    return {
+                        min: domain.min,
+                        max: domain.max
+                    };
+                } else {
+                    return undefined;
+                }
+            });
+        })).then((domains) => {
+            return {
+                type: RasterBandModeType.Combination,
+                red: rgb[0].id,
+                green: rgb[1].id,
+                blue: rgb[2].id,
+                dataRange: domains[0] || domains[1] || domains[2],
+                redRange: domains[0],
+                greenRange: domains[1],
+                blueRange: domains[2],
+                bandScalingMode: bandScalingMode !== BandScalingMode.None ? BandScalingMode.Global : BandScalingMode.None,
+                config: options.config
+            };
         });
     }
 };
@@ -138,7 +166,8 @@ export const getRasterBandModeFromConfig = (options: getRasterBandModeConfigOpti
         }
         return getRasterBandCombinationConfig({
             bands: options.config.bands,
-            default: modeConfig.default
+            default: modeConfig.default,
+            config: modeConfig.config
         });
     } else {
         throw new Error('getRasterBandModeConfig: unknown RasteBandModeType');

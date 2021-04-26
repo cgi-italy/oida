@@ -5,7 +5,7 @@ import classnames from 'classnames';
 import { Button, Dropdown, InputNumber, Slider, Checkbox } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
 
-import { ColorMap, ColorScale, NumericVariable, ColorScaleType } from '@oida/eo-mobx';
+import { ColorMap, ColorScale, NumericVariable, ColorScaleType, isValueDomain, NumericDomainMapper } from '@oida/eo-mobx';
 
 import { useSelector } from '@oida/ui-react-mobx';
 import { useDatasetVariableDomain } from '../hooks';
@@ -125,13 +125,22 @@ export const DatasetColorMapRangeSelector = (props: DatasetColorMapRangeSelector
 
     let domainSlider: JSX.Element | undefined;
 
-    const variableDomain = domain
-        ? {
-            min: domain.min,
-            max: domain.max,
-            step: domain.step || ((domain.max - domain.min) / 100)
+    const domainMapper = new NumericDomainMapper({
+        domain: domain,
+        unitsSymbol: props.variable.units
+    });
+    let variableDomain: {min: number, max: number, step: number} | undefined;
+    if (domain && isValueDomain(domain) && domain.min !== undefined && domain.max !== undefined) {
+        const min = domainMapper.normalizeValue(domain.min);
+        const max = domainMapper.normalizeValue(domain.max);
+        if (min !== undefined && max !== undefined) {
+            variableDomain = {
+                min: min,
+                max: max,
+                step: domain.step ? domain.step * (domain.scale || 1) : (max - min) / 100
+            };
         }
-        : undefined;
+    }
 
     if (variableDomain) {
 
@@ -141,7 +150,7 @@ export const DatasetColorMapRangeSelector = (props: DatasetColorMapRangeSelector
         };
 
         domainSlider = <Slider
-            value={[mapRange.min, mapRange.max]}
+            value={[domainMapper.normalizeValue(mapRange.min)!, domainMapper.normalizeValue(mapRange.max)!]}
             min={variableDomain.min}
             max={variableDomain.max}
             step={variableDomain.step}
@@ -149,7 +158,10 @@ export const DatasetColorMapRangeSelector = (props: DatasetColorMapRangeSelector
             marks={marks}
             tooltipVisible={false}
             onChange={(value) => {
-                props.colorMap.domain?.setRange({min: value[0], max: value[1]});
+                props.colorMap.domain?.setRange({
+                    min: domainMapper.denormalizeValue(value[0]),
+                    max: domainMapper.denormalizeValue(value[1])
+                });
             }}
         />;
     }
@@ -158,7 +170,7 @@ export const DatasetColorMapRangeSelector = (props: DatasetColorMapRangeSelector
         <div className='dataset-colormap-range'>
             <div className='dataset-colormap-range-inputs'>
                 <InputNumber
-                    value={mapRange.min}
+                    value={domainMapper.normalizeValue(mapRange.min)}
                     min={variableDomain?.min}
                     max={variableDomain?.max}
                     step={variableDomain?.step}
@@ -166,9 +178,10 @@ export const DatasetColorMapRangeSelector = (props: DatasetColorMapRangeSelector
                     formatter={value => `${clamp ? '≤ ' : ''}${value}`}
                     onChange={(value) => {
                         if (typeof(value) === 'number') {
-                            if (value !== props.colorMap.domain?.mapRange.min) {
+                            const unscaledValue = domainMapper.denormalizeValue(value);
+                            if (unscaledValue !== props.colorMap.domain?.mapRange.min) {
                                 props.colorMap.domain?.setRange({
-                                    min: value,
+                                    min: unscaledValue,
                                     max: props.colorMap.domain.mapRange.max
                                 });
                             }
@@ -177,16 +190,17 @@ export const DatasetColorMapRangeSelector = (props: DatasetColorMapRangeSelector
                 />
                 {props.variable.units && <span className='dataset-colormap-units'>{props.variable.units}</span>}
                 <InputNumber
-                    value={mapRange.max}
+                    value={domainMapper.normalizeValue(mapRange.max)}
                     min={variableDomain?.min}
                     max={variableDomain?.max}
                     step={variableDomain?.step}
                     onChange={(value) => {
                         if (typeof(value) === 'number') {
-                            if (value !== props.colorMap.domain?.mapRange.max) {
+                            const unscaledValue = domainMapper.denormalizeValue(value);
+                            if (unscaledValue !== props.colorMap.domain?.mapRange.max) {
                                 props.colorMap.domain?.setRange({
                                     min: props.colorMap.domain.mapRange.min,
-                                    max: value
+                                    max: unscaledValue
                                 });
                             }
                         }

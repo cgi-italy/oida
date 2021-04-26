@@ -7,7 +7,7 @@ import 'echarts/lib/component/legend';
 import 'echarts/lib/component/axisPointer';
 
 import { LoadingState } from '@oida/core';
-import { DatasetTransectSeries } from '@oida/eo-mobx';
+import { DatasetTransectSeries, isDomainProvider, NumericDomainMapper } from '@oida/eo-mobx';
 import { useSelector } from '@oida/ui-react-mobx';
 
 import { AnalysisLoadingStateMessage } from '../analysis-loading-state-message';
@@ -57,6 +57,12 @@ export function DatasetTransectSeriesChart(props: DatasetTransectSeriesChartProp
                 return;
             }
 
+            const variableDomain = variableConfig.domain;
+            const domainMapper = new NumericDomainMapper({
+                domain: variableDomain && !isDomainProvider(variableDomain) ? variableDomain : undefined,
+                unitsSymbol: variableConfig.units
+            });
+
             let yAxisUnits = variableConfig.units || variableConfig.id;
             if (!yAxes[yAxisUnits]) {
                 yAxes[yAxisUnits] = {
@@ -80,12 +86,20 @@ export function DatasetTransectSeriesChart(props: DatasetTransectSeriesChartProp
                 name: `${series.dataset.config.name}: ${variableConfig.name}`
             };
 
+            const chartData: Array<number[]> = [];
+            series.data.forEach((item) => {
+                const scaledValue = domainMapper.normalizeValue(item.value);
+                if (scaledValue !== undefined) {
+                    chartData.push([item.distance, scaledValue]);
+                }
+            });
+
             chartSeries.push({
                 type: 'line',
                 name: `${idx}`,
                 yAxisIndex: yAxes[yAxisUnits].idx,
                 smooth: true,
-                data: series.data.map((item) => [item.distance, item.value])
+                data: chartData
             });
 
         });
@@ -155,7 +169,7 @@ export function DatasetTransectSeriesChart(props: DatasetTransectSeriesChartProp
                     <div class="axis-item">
                         <div class="axis-header">
                             <span class="label">Position:</span>
-                            <span class="value">${line.coords[0].toFixed(3)} ${line.coords[1].toFixed(3)}</span>
+                            <span class="value">Lat: ${line.coords[1].toFixed(3)} Lon: ${line.coords[0].toFixed(3)}</span>
                         </div>
                         <div class="axis-values">
                             ${line.content.join('')}

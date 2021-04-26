@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-import { Slider, Select } from 'antd';
+import { Slider, Select, Input, InputNumber } from 'antd';
 
 import { DatasetDimensions, DatasetDimension, ValueDomain, CategoricalDomain, isValueDomain, DataDomain, isDomainProvider } from '@oida/eo-mobx';
 import { DateFieldRenderer } from '@oida/ui-react-antd';
@@ -31,25 +31,38 @@ export const DatasetValueDimensionSelector = (props: DatasetValueDimensionSelect
         return null;
     }
 
-    let marks = {
-        [domain.min]: `${domain.min} ${props.dimension.units}`,
-        [domain.max]: `${domain.max} ${props.dimension.units}`,
-    };
+    if (domain.min !== undefined && domain.max !== undefined) {
 
-    return (
-        <div className='dataset-dimension-value-selector dataset-slider-selector'>
-            <span>{props.dimension.name}: </span>
-            <Slider
-                min={domain.min}
-                max={domain.max}
-                step={domain.step}
-                value={value}
-                marks={marks}
-                onChange={(value) => props.dimensionsState.setValue(props.dimension.id, value as number)}
-                tipFormatter={(value) => `${value} ${props.dimension.units}`}
-            />
-        </div>
-    );
+        let marks = {
+            [domain.min]: `${domain.min} ${props.dimension.units}`,
+            [domain.max]: `${domain.max} ${props.dimension.units}`,
+        };
+
+        return (
+            <div className='dataset-dimension-value-selector dataset-slider-selector'>
+                <span>{props.dimension.name}: </span>
+                <Slider
+                    min={domain.min}
+                    max={domain.max}
+                    step={domain.step}
+                    value={value}
+                    marks={marks}
+                    onChange={(value) => props.dimensionsState.setValue(props.dimension.id, value as number)}
+                    tipFormatter={(value) => `${value} ${props.dimension.units}`}
+                />
+            </div>
+        );
+    } else {
+        return (
+            <div className='dataset-dimension-value-selector'>
+                <span>{props.dimension.name}: </span>
+                <InputNumber
+                    value={value}
+                    onChange={(value) => props.dimensionsState.setValue(props.dimension.id, value)}
+                />
+            </div>
+        );
+    }
 };
 
 export type DatasetTimeDimensionSelectorProps = {
@@ -71,9 +84,9 @@ export const DatasetTimeDimensionSelector = (props: DatasetTimeDimensionSelector
     useEffect(() => {
         if (domain) {
             let val = props.dimensionsState.values.get(props.dimension.id);
-            if (!val || val < domain.min) {
+            if (domain.min !== undefined && (!val || val < domain.min)) {
                 props.dimensionsState.setValue(props.dimension.id, domain.min);
-            } else if (val > domain.max) {
+            } else if (domain.max !== undefined && (!val || val > domain.max)) {
                 props.dimensionsState.setValue(props.dimension.id, domain.max);
             }
         }
@@ -116,7 +129,7 @@ export const DatasetCategoricalDimensionSelector = (props: DatasetCategoricalDim
         return null;
     }
 
-    const domainOptions = domain.map((item) => {
+    const domainOptions = domain.values.map((item) => {
         return (<Select.Option key={item.value} value={item.value}>{item.label || item.value}</Select.Option>);
     });
 

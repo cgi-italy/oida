@@ -4,11 +4,13 @@ import { NumericVariable, ValueDomain } from '@oida/eo-mobx';
 export type WcsVendor = 'geoserver';
 
 export type WcsCoverageBand = Omit<NumericVariable, 'domain'> & {
-    domain?: ValueDomain<number>
+    domain?: Partial<ValueDomain<number>>
 };
 
 export type WcsCoverage = {
     id: string;
+    name?: string;
+    description?: string;
     srs: string;
     time: {
         start: Date;
@@ -81,6 +83,9 @@ export class WcsClient {
             throw new Error();
         }
 
+        const name = getXmlStringNodeValue(coverageDescription.getElementsByTagNameNS(this.xmlNamespaces_.gml, 'name')[0]);
+        const description = getXmlStringNodeValue(coverageDescription.getElementsByTagNameNS(this.xmlNamespaces_.gml, 'description')[0]);
+
         let envelope = coverageDescription.getElementsByTagNameNS(this.xmlNamespaces_.gml, 'Envelope')[0];
         if (!envelope) {
             envelope = coverageDescription.getElementsByTagNameNS(this.xmlNamespaces_.gml, 'EnvelopeWithTimePeriod')[0];
@@ -149,16 +154,23 @@ export class WcsClient {
                 const name = getXmlStringNodeValue(fieldNode.getElementsByTagNameNS(this.xmlNamespaces_.swe, 'description')[0]);
                 const uomNode = fieldNode.getElementsByTagNameNS(this.xmlNamespaces_.swe, 'uom')[0];
                 const units = uomNode ? uomNode.getAttribute('code') || '' : '';
-                let domain: ValueDomain<number> | undefined;
+                let domain: Partial<ValueDomain<number>> | undefined;
                 const allowedValuesString = getXmlStringNodeValue(fieldNode.getElementsByTagNameNS(this.xmlNamespaces_.swe, 'interval')[0]);
                 if (allowedValuesString) {
                     const allowedValues = allowedValuesString.split(' ');
                     domain = {
                         min: parseFloat(allowedValues[0]),
                         max: parseFloat(allowedValues[1]),
-                        noData: getXmlFloatNodeValue(fieldNode.getElementsByTagNameNS(this.xmlNamespaces_.swe, 'nilValue')[0])
                     };
                 }
+                const noData = getXmlFloatNodeValue(fieldNode.getElementsByTagNameNS(this.xmlNamespaces_.swe, 'nilValue')[0]);
+                if (noData !== undefined) {
+                    domain = {
+                        ...domain,
+                        noData: noData
+                    };
+                }
+
                 return {
                     id: id,
                     name: name || id,
@@ -170,6 +182,8 @@ export class WcsClient {
 
         return {
             id: coverageId,
+            name,
+            description,
             srs,
             time: beginPosition && endPosition ? {
                 start: beginPosition,

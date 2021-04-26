@@ -1,4 +1,5 @@
 export * from './dataset-variable';
+export * from './domain-value-quantity';
 export * from './dataset-config';
 export * from './dataset-download-config';
 export * from './dataset-time-distribution-config';

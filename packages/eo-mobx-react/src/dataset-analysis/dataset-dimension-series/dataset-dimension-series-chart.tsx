@@ -1,7 +1,11 @@
 import React from 'react';
+import moment from 'moment';
 
 import { LoadingState } from '@oida/core';
-import { DatasetDimensionSeries, isStatsDimensionSeriesData, DatasetDimension, isValueDomain, DataDomain, isDomainProvider } from '@oida/eo-mobx';
+import {
+    DatasetDimensionSeries, isStatsDimensionSeriesData, DatasetDimension,
+    isValueDomain, DataDomain, isDomainProvider, NumericDomainMapper
+} from '@oida/eo-mobx';
 
 import { AnalysisLoadingStateMessage } from '../analysis-loading-state-message';
 
@@ -11,6 +15,7 @@ import 'echarts/lib/chart/line';
 import 'echarts/lib/component/tooltip';
 import 'echarts/lib/component/legend';
 import 'echarts/lib/component/axisPointer';
+import 'echarts/lib/component/dataZoom';
 import { EChartOption } from 'echarts';
 import { useSelector } from '@oida/ui-react-mobx';
 
@@ -55,6 +60,13 @@ export function DatasetDimensionSeriesChart(props: DatasetDimensionSeriesChartPr
             if (!variableConfig) {
                 return;
             }
+
+            const variableDomain = variableConfig.domain;
+            const domainMapper = new NumericDomainMapper({
+                domain: variableDomain && !isDomainProvider(variableDomain) ? variableDomain : undefined,
+                unitsSymbol: variableConfig.units
+            });
+
 
             let dimension = series.seriesDimension;
 
@@ -112,13 +124,28 @@ export function DatasetDimensionSeriesChart(props: DatasetDimensionSeriesChartPr
                     name: `${series.dataset.config.name}: ${variableConfig.name} stats`
                 };
 
+                const chartMinData: Array<number[]> = [];
+                const chartMaxData: Array<number[]> = [];
+                const chartMeanData: Array<number[]> = [];
+
+                series.data.forEach((item) => {
+                    const scaledMin = domainMapper.normalizeValue(item.min);
+                    const scaledMax = domainMapper.normalizeValue(item.max);
+                    const scaledMean = domainMapper.normalizeValue(item.min);
+                    if (scaledMin !== undefined && scaledMax !== undefined && scaledMean !== undefined) {
+                        chartMinData.push([item.x as number, scaledMin]);
+                        chartMaxData.push([item.x as number, scaledMax]);
+                        chartMeanData.push([item.x as number, scaledMean]);
+                    }
+                });
+
                 chartSeries.push({
                     type: 'line',
                     xAxisIndex: axes.x[dimensionConfig.id].idx,
                     yAxisIndex: axes.y[yAxisUnits].idx,
                     smooth: true,
                     name: `${idx}`,
-                    data: series.data.map((item) => [item.x as number, item.min]),
+                    data: chartMinData,
                     itemStyle: {
                         color: series.color
                     },
@@ -140,7 +167,7 @@ export function DatasetDimensionSeriesChart(props: DatasetDimensionSeriesChartPr
                     yAxisIndex: axes.y[yAxisUnits].idx,
                     smooth: true,
                     name: `${idx}`,
-                    data: series.data.map((item) => [item.x as number, item.max]),
+                    data: chartMaxData,
                     itemStyle: {
                         color: series.color
                     },
@@ -161,7 +188,7 @@ export function DatasetDimensionSeriesChart(props: DatasetDimensionSeriesChartPr
                     yAxisIndex: axes.y[yAxisUnits].idx,
                     smooth: true,
                     name: `${idx}`,
-                    data: series.data.map((item) => [item.x as number, item.mean]),
+                    data: chartMeanData,
                     itemStyle: {
                         color: series.color
                     },
@@ -178,13 +205,21 @@ export function DatasetDimensionSeriesChart(props: DatasetDimensionSeriesChartPr
                     name: `${series.dataset.config.name}: ${variableConfig.name}`
                 };
 
+                const chartData: Array<number[]> = [];
+                series.data.forEach((item) => {
+                    const scaledY = domainMapper.normalizeValue(item.y);
+                    if (scaledY !== undefined) {
+                        chartData.push([item.x as number, scaledY]);
+                    }
+                });
+
                 chartSeries.push({
                     type: 'line',
                     name: `${idx}`,
                     xAxisIndex: axes.x[dimensionConfig.id].idx,
                     yAxisIndex: axes.y[yAxisUnits].idx,
                     smooth: true,
-                    data: series.data.map((item) => [item.x as number, item.y])
+                    data: chartData
                 });
             }
 
@@ -222,8 +257,13 @@ export function DatasetDimensionSeriesChart(props: DatasetDimensionSeriesChartPr
         return {
             type: axes.x[dimensionId].type,
             name: axes.x[dimensionId].label,
+            axisLabel: {
+                formatter: axes.x[dimensionId].type === 'time' ? (value) => {
+                    return moment.utc(value).format('YYYY-MM-DD');
+                } : undefined
+            },
             nameLocation: 'middle',
-            nameGap: 40,
+            nameGap: 30,
             axisLine: {
                 onZero: false
             }
@@ -248,6 +288,18 @@ export function DatasetDimensionSeriesChart(props: DatasetDimensionSeriesChartPr
                             }
                         }
                     },
+                    dataZoom: [{
+                        xAxisIndex: xAxes.map((axis, idx) =>  idx),
+                        type: 'inside'
+                    }, {
+                        xAxisIndex: xAxes.map((axis, idx) =>  idx),
+                        type: 'slider',
+                        dataBackground: {
+                            lineStyle: {
+                                opacity: 1
+                            }
+                        }
+                    }],
                     tooltip: {
                         trigger: 'axis',
                         transitionDuration: 0,
@@ -335,7 +387,7 @@ export function DatasetDimensionSeriesChart(props: DatasetDimensionSeriesChartPr
                     grid: {
                         left: 40,
                         right: 40,
-                        bottom: 30,
+                        bottom: 60,
                         top: 60,
                         containLabel: true
                     },

@@ -1,9 +1,9 @@
-import { autorun, observable, makeObservable, action, runInAction, computed } from 'mobx';
+import { autorun, observable, makeObservable, action, runInAction } from 'mobx';
 
 import { Geometry, AoiSupportedGeometry } from '@oida/core';
 import { AsyncDataFetcher } from '@oida/state-mobx';
 
-import { DatasetVariable, DatasetDimension, DataDomain, DomainRange, isValueDomain } from '../types';
+import { DatasetDimension, DataDomain, DomainRange, isValueDomain, NumericVariable } from '../types';
 import { DatasetDimensions, HasDatasetDimensions, DatasetDimensionsProps } from './dataset-dimensions';
 import { DatasetAnalysis, DatasetAnalysisProps } from './dataset-analysis';
 import { getDatasetVariableDomain } from '../utils';
@@ -48,7 +48,7 @@ export type DatasetDimensionSeriesProvider<T = SeriesDimensionType> =
 export type DatasetDimensionSeriesConfig<T = SeriesDimensionType> = {
     provider: DatasetDimensionSeriesProvider<T>;
     supportedGeometries: AoiSupportedGeometry[],
-    variables: DatasetVariable<DataDomain<number>>[];
+    variables: NumericVariable[];
     dimensions: DatasetDimension<DataDomain<T>>[];
 };
 
@@ -117,7 +117,7 @@ export class DatasetDimensionSeries extends DatasetAnalysis<undefined> implement
 
             if (dimensionConfig) {
                 getDatasetVariableDomain(dimensionConfig).then((domain) => {
-                    if (domain && isValueDomain(domain)) {
+                    if (domain && isValueDomain(domain) && domain.min !== undefined && domain.max !== undefined) {
                         this.setRange({
                             min: domain.min,
                             max: domain.max
@@ -183,7 +183,7 @@ export class DatasetDimensionSeries extends DatasetAnalysis<undefined> implement
             }
         });
     }
-    protected canRunQuery_ = () => {
+    protected canRunQuery_() {
 
         const seriesRange = this.seriesRange;
 

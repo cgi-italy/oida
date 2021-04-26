@@ -176,7 +176,7 @@ export class AdamWcsSeriesProvider  {
                     } else {
                         return response.data.map((item, idx) => {
                             return {
-                                x: domain[idx].label || domain[idx].value,
+                                x: domain.values[idx].label || domain.values[idx].value,
                                 y: item.raster[0][0][0]
                             };
                         });

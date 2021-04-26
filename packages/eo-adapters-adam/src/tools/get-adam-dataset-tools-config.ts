@@ -36,12 +36,14 @@ export const getAdamDatasetToolsConfig = (
                 },
                 wcsResponseKey: '',
                 tarFilenameRegex: /band\(([^\)]*)\)/,
-                domain: datasetConfig.coverages.bands.map((band) => {
-                    return {
-                        label: band.name,
-                        value: band.idx
-                    };
-                })
+                domain: {
+                    values: datasetConfig.coverages.bands.map((band) => {
+                        return {
+                            label: band.name,
+                            value: band.idx
+                        };
+                    })
+                }
             };
             dimensions.push(bandDimension);
 
@@ -51,7 +53,7 @@ export const getAdamDatasetToolsConfig = (
             };
 
             datasetConfig.coverages.bands.forEach((band) => {
-                if (band.domain) {
+                if (band.domain && band.domain.min !== undefined && band.domain.max !== undefined) {
                     bandsDomain.min = Math.min(bandsDomain.min, band.domain.min);
                     bandsDomain.max = Math.max(bandsDomain.max, band.domain.max);
                 }
