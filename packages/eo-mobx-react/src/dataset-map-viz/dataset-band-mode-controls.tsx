@@ -15,7 +15,7 @@ import { DatasetBandCombinationSelector } from './dataset-band-combination-selec
 
 const BandModeTitles = {
     [RasterBandModeType.Single]: 'Single band',
-    [RasterBandModeType.Preset]: 'Band combination preset',
+    [RasterBandModeType.Preset]: 'Presets',
     [RasterBandModeType.Combination]: 'Custom band combination',
     [RasterBandModeType.Formula]: 'Band math',
 };
