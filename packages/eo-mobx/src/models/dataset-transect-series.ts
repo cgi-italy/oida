@@ -1,8 +1,8 @@
-import { autorun, observable, makeObservable, action, runInAction } from 'mobx';
+import { autorun, observable, makeObservable, action, runInAction, computed } from 'mobx';
 import nearestPointOnLine from '@turf/nearest-point-on-line';
 import along from '@turf/along';
 
-import { Geometry, IndexableGeometry } from '@oida/core';
+import { Geometry, IndexableGeometry, LoadingState } from '@oida/core';
 import { AsyncDataFetcher } from '@oida/state-mobx';
 
 import { DatasetDimension, DataDomain, TimeSearchDirection, NumericVariable } from '../types';
@@ -41,6 +41,7 @@ export type TransectSeriesItem = {
 
 export type DatasetTransectSeriesProps = {
     seriesVariable?: string;
+    autoUpdate?: boolean;
 } & DatasetAnalysisProps<typeof TRANSECT_SERIES_TYPE, DatasetTransectSeriesConfig> & DatasetDimensionsProps;
 
 export class DatasetTransectSeries extends DatasetAnalysis<undefined> implements HasDatasetDimensions {
@@ -49,9 +50,10 @@ export class DatasetTransectSeries extends DatasetAnalysis<undefined> implements
     readonly dimensions: DatasetDimensions;
     @observable.ref seriesVariable: string | undefined;
     @observable.ref data: TransectSeriesItem[];
+    @observable.ref autoUpdate: boolean;
     @observable.ref highlightedPosition: number | undefined;
 
-    protected dataFetcher_: AsyncDataFetcher<TransectSeriesItem[] | undefined>;
+    protected dataFetcher_: AsyncDataFetcher<TransectSeriesItem[] | undefined, DatasetTransectSeriesRequest>;
 
     constructor(props: Omit<DatasetTransectSeriesProps, 'vizType'>) {
         super({
@@ -63,40 +65,31 @@ export class DatasetTransectSeries extends DatasetAnalysis<undefined> implements
         this.dimensions = new DatasetDimensions(props);
         this.seriesVariable = props.seriesVariable;
         this.data = [];
+        this.autoUpdate = props.autoUpdate !== undefined ? props.autoUpdate : true;
+
         this.highlightedPosition = undefined;
 
         this.dataFetcher_ = new AsyncDataFetcher({
-            dataFetcher: () => {
-                if (this.canRunQuery_()) {
+            dataFetcher: (params) => {
+                return this.config.provider(params).then((data) => {
 
-                    const lineString = this.aoi!.geometry.value as GeoJSON.LineString;
+                    const line = {
+                        type: 'Feature',
+                        geometry: params.geometry,
+                        properties: {}
+                    } as GeoJSON.Feature<GeoJSON.LineString>;
 
-                    return this.config.provider({
-                        geometry: lineString,
-                        variable: this.seriesVariable!,
-                        dimensionValues: this.dimensions.values
-                    }).then((data) => {
-
-                        const line = {
-                            type: 'Feature',
-                            geometry: lineString,
-                            properties: {}
-                        } as GeoJSON.Feature<GeoJSON.LineString>;
-
-                        return data.map((item) => {
-                            const coordinates = along(line, item.x);
-                            return {
-                                value: item.y,
-                                distance: item.x,
-                                coordinates: coordinates.geometry.coordinates
-                            };
-                        });
+                    return data.map((item) => {
+                        const coordinates = along(line, item.x);
+                        return {
+                            value: item.y,
+                            distance: item.x,
+                            coordinates: coordinates.geometry.coordinates
+                        };
                     });
-                } else {
-                    return Promise.resolve(undefined);
-                }
+                });
             },
-            debounceInterval: 1000
+            debounceInterval: this.autoUpdate ? 1000 : 0
         });
 
         makeObservable(this);
@@ -165,12 +158,53 @@ export class DatasetTransectSeries extends DatasetAnalysis<undefined> implements
         }
     }
 
+    @action
+    setAutoUpdate(autoUpdate: boolean) {
+        this.autoUpdate = autoUpdate;
+        if (autoUpdate) {
+            this.dataFetcher_.setDebounceInterval(1000);
+        } else {
+            this.dataFetcher_.setDebounceInterval(0);
+        }
+    }
+
+    @computed
+    get canRunQuery() {
+        return !!this.aoi?.geometry.value
+        && !!this.seriesVariable
+        && this.config.dimensions.every((dim) => {
+            return this.dimensions.values.has(dim.id) && this.dimensions.values.get(dim.id);
+        });
+    }
+
+    retrieveData() {
+        if (this.canRunQuery) {
+            this.dataFetcher_.fetchData({
+                geometry: this.aoi?.geometry.value as GeoJSON.LineString,
+                variable: this.seriesVariable!,
+                dimensionValues: new Map(this.dimensions.values)
+            }).then((data) => {
+                this.setData_(data || []);
+            }).catch(() => {
+                this.setData_([]);
+            });
+        } else {
+            this.loadingState.setValue(LoadingState.Init);
+            this.setData_([]);
+        }
+    }
+
     clone() {
         return this.clone_({
             config: this.config,
             seriesVariable: this.seriesVariable,
             dimensionValues: this.dimensions.values
         }) as DatasetTransectSeries;
+    }
+
+    @action
+    protected setData_(data: TransectSeriesItem[]) {
+        this.data = data;
     }
 
     protected afterInit_() {
@@ -205,28 +239,10 @@ export class DatasetTransectSeries extends DatasetAnalysis<undefined> implements
         }
 
         const seriesUpdaterDisposer = autorun(() => {
-
-            if (this.canRunQuery_()) {
-
-                this.dataFetcher_.fetchData().then(data => {
-                    runInAction(() => {
-                        this.data = data || [];
-                    });
-                }).catch(() => {
-                    runInAction(() => {
-                        this.data = [];
-                    });
-                });
+            if (this.autoUpdate) {
+                this.retrieveData();
             }
         });
-    }
-    protected canRunQuery_() {
-
-        return this.aoi?.geometry.value
-            && this.seriesVariable
-            && this.config.dimensions.every((dim) => {
-                return this.dimensions.values.has(dim.id) && this.dimensions.values.get(dim.id);
-            });
     }
 
     protected initMapLayer_() {

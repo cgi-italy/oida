@@ -1,6 +1,6 @@
-import { autorun, observable, makeObservable, action, runInAction } from 'mobx';
+import { autorun, observable, makeObservable, action, runInAction, computed } from 'mobx';
 
-import { Geometry, AoiSupportedGeometry } from '@oida/core';
+import { Geometry, AoiSupportedGeometry, LoadingState } from '@oida/core';
 import { AsyncDataFetcher } from '@oida/state-mobx';
 
 import { DatasetDimension, DataDomain, DomainRange, isValueDomain, NumericVariable } from '../types';
@@ -56,6 +56,7 @@ export type DatasetDimensionSeriesProps = {
     seriesDimension?: string;
     seriesVariable?: string;
     seriesRange?: DomainRange<SeriesDimensionType>;
+    autoUpdate?: boolean;
 } & DatasetAnalysisProps<typeof DIMENSION_SERIES_TYPE, DatasetDimensionSeriesConfig> & DatasetDimensionsProps;
 
 export class DatasetDimensionSeries extends DatasetAnalysis<undefined> implements HasDatasetDimensions {
@@ -66,8 +67,9 @@ export class DatasetDimensionSeries extends DatasetAnalysis<undefined> implement
     @observable.ref seriesVariable: string | undefined;
     @observable.ref seriesRange: DomainRange<SeriesDimensionType> | undefined;
     @observable.ref data: DatasetDimensionSeriesData<SeriesDimensionType>;
+    @observable.ref autoUpdate: boolean;
 
-    protected dataFetcher_: AsyncDataFetcher<DatasetDimensionSeriesData | undefined>;
+    protected dataFetcher_: AsyncDataFetcher<DatasetDimensionSeriesData | undefined, DatasetDimensionSeriesRequest<SeriesDimensionType>>;
 
     constructor(props: Omit<DatasetDimensionSeriesProps, 'vizType'>) {
         super({
@@ -81,21 +83,13 @@ export class DatasetDimensionSeries extends DatasetAnalysis<undefined> implement
         this.seriesVariable = props.seriesVariable;
         this.seriesRange = props.seriesRange;
         this.data = [];
+        this.autoUpdate = props.autoUpdate !== undefined ? props.autoUpdate : true;
+
         this.dataFetcher_ = new AsyncDataFetcher({
-            dataFetcher: () => {
-                if (this.canRunQuery_()) {
-                    return this.config.provider({
-                        dimension: this.seriesDimension!,
-                        geometry: this.geometry!,
-                        variable: this.seriesVariable!,
-                        range: this.seriesRange,
-                        dimensionValues: this.dimensions.values
-                    });
-                } else {
-                    return Promise.resolve(undefined);
-                }
+            dataFetcher: (params) => {
+                return this.config.provider(params);
             },
-            debounceInterval: 1000
+            debounceInterval: this.autoUpdate ? 1000 : 0
         });
 
         makeObservable(this);
@@ -148,6 +142,45 @@ export class DatasetDimensionSeries extends DatasetAnalysis<undefined> implement
         this.seriesRange = range;
     }
 
+    @action
+    setAutoUpdate(autoUpdate: boolean) {
+        this.autoUpdate = autoUpdate;
+        if (autoUpdate) {
+            this.dataFetcher_.setDebounceInterval(1000);
+        } else {
+            this.dataFetcher_.setDebounceInterval(0);
+        }
+    }
+
+    @computed
+    get canRunQuery() {
+        return !!this.seriesDimension
+            && this.geometry
+            && !!this.seriesVariable
+            && this.config.dimensions.every((dim) => {
+                return (dim.id === this.seriesDimension) || this.dimensions.values.has(dim.id);
+            });
+    }
+
+    retrieveData() {
+        if (this.canRunQuery) {
+            this.dataFetcher_.fetchData({
+                dimension: this.seriesDimension!,
+                geometry: this.geometry!,
+                variable: this.seriesVariable!,
+                range: this.seriesRange,
+                dimensionValues: new Map(this.dimensions.values)
+            }).then((data) => {
+                this.setData_(data || []);
+            }).catch(() => {
+                this.setData_([]);
+            });
+        } else {
+            this.loadingState.setValue(LoadingState.Init);
+            this.setData_([]);
+        }
+    }
+
     clone() {
         return this.clone_({
             config: this.config,
@@ -156,6 +189,11 @@ export class DatasetDimensionSeries extends DatasetAnalysis<undefined> implement
             seriesRange: this.seriesRange,
             dimensionValues: this.dimensions.values
         }) as DatasetDimensionSeries;
+    }
+
+    @action
+    protected setData_(data: DatasetDimensionSeriesData<SeriesDimensionType>) {
+        this.data = data;
     }
 
     protected afterInit_() {
@@ -168,31 +206,10 @@ export class DatasetDimensionSeries extends DatasetAnalysis<undefined> implement
         }
 
         const seriesUpdaterDisposer = autorun(() => {
-
-            if (this.canRunQuery_()) {
-
-                this.dataFetcher_.fetchData().then(data => {
-                    runInAction(() => {
-                        this.data = data || [];
-                    });
-                }).catch(() => {
-                    runInAction(() => {
-                        this.data = [];
-                    });
-                });
+            if (this.autoUpdate) {
+                this.retrieveData();
             }
         });
-    }
-    protected canRunQuery_() {
-
-        const seriesRange = this.seriesRange;
-
-        return this.seriesDimension
-            && this.geometry
-            && this.seriesVariable
-            && this.config.dimensions.every((dim) => {
-                return (dim.id === this.seriesDimension) || (this.dimensions.values.has(dim.id) && this.dimensions.values.get(dim.id));
-            });
     }
 
     protected initMapLayer_() {

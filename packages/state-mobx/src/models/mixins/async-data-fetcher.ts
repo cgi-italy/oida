@@ -3,42 +3,61 @@ import debounce from 'lodash/debounce';
 import { LoadingStatus, HasLoadingStatus } from './has-loading-status';
 import { LoadingState, CancelablePromise } from '@oida/core';
 
-export type AsyncDataFetcherProps<T> = {
-    dataFetcher: () => Promise<T>;
+/** Constructor parameters for {@link AsyncDataFetcher} class */
+export type AsyncDataFetcherProps<RESPONSE = any, PARAMS = any> = {
+    /** The data retrieval function */
+    dataFetcher: (params: PARAMS) => Promise<RESPONSE>;
+    /** An optional debounce interval in milliseconds. */
     debounceInterval?: number;
 };
 
-export class AsyncDataFetcher<T> implements HasLoadingStatus {
+type DebouncedRequestType<RESPONSE = any, PARAMS = any> = (
+    params: PARAMS,
+    resolve: (value: RESPONSE | PromiseLike<RESPONSE>) => void,
+    reject: (reason: any) => void
+) => void;
 
-    loadingStatus: LoadingStatus;
+/**
+ * A class to manage async data fetching logic with loading state tracking and optional debouncing.
+ * @template RESPONSE the async response type
+ * @template PARAMS the params input of the data fetch method
+ */
+export class AsyncDataFetcher<RESPONSE = any, PARAMS = any> implements HasLoadingStatus {
 
-    protected debouncedRequest_;
-    protected pendingDataRequest_: Promise<T> | undefined;
-    protected dataFetcher_: () => Promise<T>;
+    /** The data fetching loading state */
+    readonly loadingStatus: LoadingStatus;
 
-    constructor(props: AsyncDataFetcherProps<T>) {
+    protected debouncedRequest_: DebouncedRequestType<RESPONSE, PARAMS> | undefined;
+    protected pendingDataRequest_: Promise<RESPONSE> | undefined;
+    protected dataFetcher_: (params: PARAMS) => Promise<RESPONSE>;
+
+    constructor(props: AsyncDataFetcherProps<RESPONSE, PARAMS>) {
 
         this.loadingStatus = new LoadingStatus();
         this.dataFetcher_ = props.dataFetcher;
         this.setDebounceInterval(props.debounceInterval);
     }
 
-    fetchData() {
+    /** Invoke data retrieval. It will be debounced if a debounceInterval is set*/
+    fetchData(params: PARAMS) {
         this.cancelPendingRequest();
         const debouncedRequest = this.debouncedRequest_;
         if (debouncedRequest) {
-            return new Promise<T>((resolve, reject) => {
-                return debouncedRequest(resolve, reject);
+            return new Promise<RESPONSE>((resolve, reject) => {
+                return debouncedRequest(params, resolve, reject);
             });
         } else {
-            return this.invokeFetchRequest_();
+            return this.invokeFetchRequest_(params);
         }
     }
 
+    /** Set the data retrieval debounce interval in milliseconds */
     setDebounceInterval(debounceInterval: number | undefined) {
         if (debounceInterval) {
-            this.debouncedRequest_ = debounce((resolve: (value: T | undefined) => void, reject: (reason: any) => void) => {
-                this.invokeFetchRequest_().then((response) => {
+            this.debouncedRequest_ = debounce((
+                params: PARAMS, resolve: (value: RESPONSE | PromiseLike<RESPONSE>) => void, reject: (reason: any) => void
+            ) => {
+                this.invokeFetchRequest_(params).then((response) => {
                     resolve(response);
                 }, (error) => {
                     reject(error);
@@ -49,6 +68,7 @@ export class AsyncDataFetcher<T> implements HasLoadingStatus {
         }
     }
 
+    /** Cancel any pending data request */
     cancelPendingRequest() {
         if (this.pendingDataRequest_) {
             if (this.pendingDataRequest_.cancel) {
@@ -60,11 +80,11 @@ export class AsyncDataFetcher<T> implements HasLoadingStatus {
         this.pendingDataRequest_ = undefined;
     }
 
-    protected invokeFetchRequest_() {
+    protected invokeFetchRequest_(params: PARAMS) {
         this.loadingStatus.setValue(LoadingState.Loading);
-        const dataRequest = this.dataFetcher_();
+        const dataRequest = this.dataFetcher_(params);
 
-        const requestWrapper = CancelablePromise(new Promise<T>((resolve, reject) => {
+        const requestWrapper = CancelablePromise(new Promise<RESPONSE>((resolve, reject) => {
             dataRequest.then((data) => {
                 if (!requestWrapper.isCanceled) {
                     this.loadingStatus.setValue(LoadingState.Success);

@@ -1,3 +1,4 @@
+import { QueryParams as QueryCriteria } from '@oida/core';
 import { DatasetDiscoveryProvider, DatasetDiscoveryProviderProps } from '@oida/eo-mobx';
 import { Entity, QueryParams, QueryParamsProps, AsyncDataFetcher } from '@oida/state-mobx';
 import { autorun } from 'mobx';
@@ -41,7 +42,7 @@ export class AdamOpensearchDatasetDiscoveryProvider extends DatasetDiscoveryProv
     readonly criteria: QueryParams;
     readonly searchClient: AdamOpensearchDatasetDiscoveryClient;
     protected datasetFactory_: AdamDatasetFactory;
-    protected readonly asyncDataFetcher_: AsyncDataFetcher<AdamDatasetDiscoveryResponse>;
+    protected readonly asyncDataFetcher_: AsyncDataFetcher<AdamDatasetDiscoveryResponse, QueryCriteria>;
 
     constructor(props: Omit<AdamOpensearchDatasetDiscoveryProviderProps, 'providerType'>) {
         super({
@@ -55,8 +56,8 @@ export class AdamOpensearchDatasetDiscoveryProvider extends DatasetDiscoveryProv
         this.datasetFactory_ = getAdamDatasetFactory(props.factoryConfig);
 
         this.asyncDataFetcher_ = new AsyncDataFetcher({
-            dataFetcher: () => {
-                return this.searchClient.searchDatasets(this.criteria.data);
+            dataFetcher: (params) => {
+                return this.searchClient.searchDatasets(params);
             }
         });
 
@@ -76,15 +77,13 @@ export class AdamOpensearchDatasetDiscoveryProvider extends DatasetDiscoveryProv
     protected afterInit_() {
         autorun(() => {
             if (this.active.value) {
-                const criteria = this.criteria.data;
-                this.asyncDataFetcher_.fetchData().then((data) => {
+                this.asyncDataFetcher_.fetchData(this.criteria.data).then((data) => {
                     const datasets = data.features.map((metadata) => {
                         return new AdamOpensearchDatasetDiscoveryProviderItem({
                             metadata: metadata
                         });
                     });
                     this.setResults_(datasets);
-                    return data;
                 });
             }
         });

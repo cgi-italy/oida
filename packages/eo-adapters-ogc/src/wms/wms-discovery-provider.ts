@@ -1,4 +1,6 @@
 import { v4 as uuid } from 'uuid';
+
+import { QueryParams as QueryCriteria } from '@oida/core';
 import { DatasetDiscoveryProvider, DatasetDiscoveryProviderProps, DatasetConfig } from '@oida/eo-mobx';
 import { Entity, QueryParams, QueryParamsProps, AsyncDataFetcher } from '@oida/state-mobx';
 import { IObservableArray, observable, action, makeObservable, autorun } from 'mobx';
@@ -67,7 +69,7 @@ export class WmsDatasetDiscoveryProvider extends DatasetDiscoveryProvider<WmsDat
     readonly services: IObservableArray<WmsItem>;
     @observable.ref selectedService: WmsItem | undefined;
 
-    protected readonly dataFetcher_: AsyncDataFetcher<WmsLayer[]>;
+    protected readonly dataFetcher_: AsyncDataFetcher<WmsLayer[], {selectedService: WmsItem, criteria: QueryCriteria}>;
     protected readonly subscriptionTracker_: SubscriptionTracker;
 
     constructor(props: Omit<WmsDatasetDiscoveryProviderProps, 'providerType'>) {
@@ -84,17 +86,13 @@ export class WmsDatasetDiscoveryProvider extends DatasetDiscoveryProvider<WmsDat
         this.selectedService = undefined;
 
         this.dataFetcher_ = new AsyncDataFetcher({
-            dataFetcher: () => {
-                if (this.selectedService) {
-                    return this.selectedService.service.getFilteredWmsLayers(this.criteria.data).then((response) => {
-                        this.criteria.paging.setTotal(response.total);
-                        return response.results;
-                    });
-                } else {
-                    return Promise.resolve([]);
-                }
+            dataFetcher: (params) => {
+                return params.selectedService.service.getFilteredWmsLayers(params.criteria).then((response) => {
+                    this.criteria.paging.setTotal(response.total);
+                    return response.results;
+                });
             },
-            debounceInterval: 0
+            debounceInterval: 500
         });
 
         this.subscriptionTracker_ = new SubscriptionTracker();
@@ -158,8 +156,10 @@ export class WmsDatasetDiscoveryProvider extends DatasetDiscoveryProvider<WmsDat
         const dataUpdateDisposer = autorun(() => {
             const wmsService = this.selectedService;
             if (this.active.value && wmsService) {
-                let criteria = this.criteria.data;
-                this.dataFetcher_.fetchData().then((data) => {
+                this.dataFetcher_.fetchData({
+                    criteria: this.criteria.data,
+                    selectedService: wmsService
+                }).then((data) => {
                     this.setResults_(data.map(item => new WmsDatasetDiscoveryProviderItem({
                         service: wmsService.service,
                         layer: item,

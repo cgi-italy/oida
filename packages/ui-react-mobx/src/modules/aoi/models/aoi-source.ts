@@ -29,7 +29,7 @@ export class AoiSource {
     readonly queryParams: QueryParamsState;
     readonly propertiesSchema: Record<string, any> | undefined;
 
-    protected readonly dataFetcher: AsyncDataFetcher<AoiSourceProviderResponse>;
+    protected readonly dataFetcher: AsyncDataFetcher<AoiSourceProviderResponse, QueryParams>;
     protected readonly aois_: IndexedCollection<Aoi>;
     protected readonly lazy_: boolean;
 
@@ -42,8 +42,8 @@ export class AoiSource {
             idGetter: (aoi) => aoi.id
         });
         this.dataFetcher = new AsyncDataFetcher({
-            dataFetcher: () => {
-                return props.provider(this.queryParams.data);
+            dataFetcher: (params) => {
+                return props.provider(params);
             }
         });
         this.lazy_ = props.lazy || false;
@@ -76,7 +76,7 @@ export class AoiSource {
 
     protected retrieveAois_() {
         this.aois_.clear();
-        this.dataFetcher.fetchData().then((data) => {
+        this.dataFetcher.fetchData(this.queryParams.data).then((data) => {
             this.queryParams.paging.setTotal(data.total);
             this.aois.add(data.results.map((aoiProps) => {
                 return new Aoi(aoiProps);
