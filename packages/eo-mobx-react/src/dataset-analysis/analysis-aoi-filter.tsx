@@ -25,11 +25,10 @@ type AoiItemType = {
 };
 
 export const AnalysisAoiFilter = (props: AnalysisAoiFilterProps) => {
-    let geometryValue = useSelector(() => props.analysis.aoi?.geometry.value);
+    const geometryValue = useSelector(() => props.analysis.aoi?.geometry.value, [props.analysis]);
+    const aoi = useSelector(() => props.analysis.aoi, [props.analysis]);
 
-    let { activeAction, onActiveActionChange } = useAoiAction();
-
-    const aoi = useSelector(() => props.analysis.aoi);
+    const { activeAction, onActiveActionChange } = useAoiAction();
 
     const [{isDragging}, drag, preview] = useDrag({
         item: {type: 'ANALYSIS_AOI', aoi: aoi},
@@ -59,7 +58,7 @@ export const AnalysisAoiFilter = (props: AnalysisAoiFilterProps) => {
         }
     });
 
-    const isLinked = useSelector(() => props.analysis.aoi?.shared || false);
+    const isLinked = useSelector(() => props.analysis.aoi?.shared || false, [props.analysis]);
 
     let value =  geometryValue ? {
         geometry: geometryValue

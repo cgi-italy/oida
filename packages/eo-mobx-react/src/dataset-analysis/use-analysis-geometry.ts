@@ -30,7 +30,7 @@ export const useAnalysisGeometry = (props: useAnalysisGeometryProps) => {
             color: analysis.color,
             name: analysis.aoi ? analysis.aoi.name : 'None'
         };
-    });
+    }, [props.analysis]);
 
     return {
         onHoverAction: onAnalysisHover,

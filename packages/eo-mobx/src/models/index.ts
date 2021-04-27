@@ -4,6 +4,7 @@ import { VERTICAL_PROFILE_VIZ_TYPE, DatasetVerticalProfileViz, DatasetVerticalPr
 import { VOLUMETRIC_VIZ_TYPE, DatasetVolumetricViz, DatasetVolumetricVizProps } from './volumetric-map-viz';
 import { DIMENSION_SERIES_TYPE, DatasetDimensionSeriesProps, DatasetDimensionSeries } from './dataset-dimension-series';
 import { TRANSECT_SERIES_TYPE, DatasetTransectSeries, DatasetTransectSeriesProps } from './dataset-transect-series';
+import { STATS_ANALYSIS_TYPE, DatasetStatsAnalysis, DatasetStatsAnalysisProps } from './dataset-stats-analysis';
 
 declare module './dataset-viz' {
     interface DatasetVizDefinitions {
@@ -12,6 +13,7 @@ declare module './dataset-viz' {
         [VOLUMETRIC_VIZ_TYPE]: DatasetVolumetricVizProps;
         [DIMENSION_SERIES_TYPE]: DatasetDimensionSeriesProps;
         [TRANSECT_SERIES_TYPE]: DatasetTransectSeriesProps;
+        [STATS_ANALYSIS_TYPE]: DatasetStatsAnalysisProps;
     }
 
     interface DatasetVizTypes {
@@ -20,7 +22,9 @@ declare module './dataset-viz' {
         [VOLUMETRIC_VIZ_TYPE]: DatasetVolumetricViz;
         [DIMENSION_SERIES_TYPE]: DatasetDimensionSeries;
         [TRANSECT_SERIES_TYPE]: DatasetTransectSeries;
+        [STATS_ANALYSIS_TYPE]: DatasetStatsAnalysis;
     }
+
 }
 
 DatasetViz.register(RASTER_VIZ_TYPE, RasterMapViz);
@@ -29,6 +33,7 @@ DatasetViz.register(VOLUMETRIC_VIZ_TYPE, DatasetVolumetricViz);
 
 DatasetViz.register(DIMENSION_SERIES_TYPE, DatasetDimensionSeries);
 DatasetViz.register(TRANSECT_SERIES_TYPE, DatasetTransectSeries);
+DatasetViz.register(STATS_ANALYSIS_TYPE, DatasetStatsAnalysis);
 
 
 export * from './dataset-dimensions';
@@ -47,6 +52,7 @@ export * from './combo-analysis';
 export * from './dataset-analyses';
 export * from './dataset-dimension-series';
 export * from './dataset-transect-series';
+export * from './dataset-stats-analysis';
 export * from './dataset-explorer';
 export * from './dataset-discovery-provider';
 export * from './dataset-discovery';

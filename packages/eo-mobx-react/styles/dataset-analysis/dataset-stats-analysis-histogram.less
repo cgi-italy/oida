@@ -1,0 +1,60 @@
+.dataset-stats-analysis {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    height: 100%;
+
+    .series-chart {
+        display: flex;
+        align-items: flex-start;
+
+        .chart {
+            flex-grow: 1;
+        }
+
+        .dataset-stats-table {
+            min-width: 210px;
+            max-width: 250px;
+            width: 30%;
+
+            .ant-collapse-header {
+                padding: 4px 16px;
+
+                .ant-collapse-arrow {
+                    padding: 4px 4px;
+                }
+            }
+
+            .ant-collapse-content-box {
+                padding: 5px 10px 10px 15px;
+
+                .ant-descriptions-view {
+
+                    .ant-descriptions-item {
+                        padding-bottom: 0;
+
+                        .ant-descriptions-item-label {
+                            font-size: 13px;
+                        }
+
+                        .ant-descriptions-item-content {
+                            font-size: 13px;
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+
+    .dataset-stats-analysis-ops {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        margin-top: 10px;
+
+        .ant-btn {
+            margin-left: 10px;
+        }
+    }
+}

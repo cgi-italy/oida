@@ -20,10 +20,14 @@ export type ChartWidgetProps = {
         dataIndex?: number,
         name?: string,
     },
+    brushMode?: 'none' | 'rect' | 'polygon' | 'lineX' | 'lineY';
+    onBrushEnd?: (evt) => void;
+    brushArea?: any;
     onMouseEnter?: (evt) => void;
     onMouseLeave?: (evt) => void;
     onItemClick?: (evt) => void;
     onHighlight?: (evt, highlighted?: boolean) => void;
+    onSizeChange?: (size: {width: number, height: number}) => void;
 };
 
 export const ChartWidget = (props: ChartWidgetProps) => {
@@ -98,6 +102,22 @@ export const ChartWidget = (props: ChartWidgetProps) => {
             } else {
                 chart.setOption(props.options, true, false);
             }
+            if (props.brushMode && props.brushMode !== 'none') {
+                chart!.dispatchAction({
+                    type: 'takeGlobalCursor',
+                    key: 'brush',
+                    brushOption: {
+                        brushType: props.brushMode,
+                        brushMode: 'single'
+                    }
+                });
+            }
+            if (props.brushArea) {
+                chart!.dispatchAction({
+                    type: 'brush',
+                    areas: [props.brushArea]
+                });
+            }
         }
     }, [chart, props.options]);
 
@@ -112,7 +132,10 @@ export const ChartWidget = (props: ChartWidgetProps) => {
                             splitNumber: Math.floor(size.height / 80)
                         };
                     })
-                });
+                }, false, true);
+            }
+            if (props.onSizeChange) {
+                props.onSizeChange(size);
             }
         }
     }, [size]);
@@ -147,6 +170,55 @@ export const ChartWidget = (props: ChartWidgetProps) => {
             }
         }
     }, [props.showTip]);
+
+    useEffect(() => {
+        if (chart) {
+            if (props.brushMode && props.brushMode !== 'none') {
+                chart!.dispatchAction({
+                    type: 'takeGlobalCursor',
+                    key: 'brush',
+                    brushOption: {
+                        brushType: props.brushMode,
+                        brushMode: 'single'
+                    }
+                });
+            } else {
+                chart.dispatchAction({
+                    type: 'takeGlobalCursor',
+                    key: undefined
+                });
+
+                chart.dispatchAction({
+                    type: 'brush',
+                    command: 'clear',
+                    areas: [],
+                });
+            }
+        }
+    }, [chart, props.brushMode]);
+
+    useEffect(() => {
+
+        const onBrushSelected = props.onBrushEnd;
+        const chartInstance = chart;
+
+        if (chartInstance && onBrushSelected) {
+            chartInstance.on('brushEnd', onBrushSelected);
+            return () => {
+                chartInstance.off('brushEnd', onBrushSelected);
+            };
+        }
+    }, [chart, props.onBrushEnd]);
+
+    useEffect(() => {
+        const chartInstance = chart;
+        if (chartInstance && props.brushArea) {
+            chartInstance.dispatchAction({
+                type: 'brush',
+                areas: [props.brushArea]
+            });
+        }
+    }, [chart, props.brushArea]);
 
     return (
         <React.Fragment>

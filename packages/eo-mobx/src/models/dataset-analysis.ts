@@ -92,7 +92,8 @@ implements HasVisibility, IsHoverable, IsSelectable {
     protected clone_(specProps?: Record<string, any>) {
         return super.clone_({
             ...specProps,
-            aoi: this.aoi
+            aoi: this.aoi,
+            parent: this.parent
         });
     }
 }
