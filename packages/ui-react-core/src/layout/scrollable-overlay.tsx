@@ -12,12 +12,20 @@ export const ScrollableOverlay = (props: ScrollableOverlayProps) => {
     const [resizeListener, size] = useResizeAware();
     const scrollableContentRef = useRef<HTMLDivElement>(null);
 
+    const childrenWithContainerHeight = React.Children.map(props.children, child => {
+        if (React.isValidElement(child)) {
+            //make children aware of the container visible height
+            return React.cloneElement(child, { containerHeight: scrollableContentRef.current?.clientHeight });
+        }
+        return child;
+    });
+
     return (
         <div className={classnames('scrollable-overlay', props.className)}>
             <div className='scrollable-overlay-content-wrapper' ref={scrollableContentRef}>
                 <div className='scrollable-overlay-content' >
                     {resizeListener}
-                    {props.children}
+                    {childrenWithContainerHeight}
                 </div>
             </div>
             <div className='scrollable-overlay-scroller' onScroll={(evt) => {

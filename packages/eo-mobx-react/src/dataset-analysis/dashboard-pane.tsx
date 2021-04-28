@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 
 import GridLayout from 'react-grid-layout';
 import useResizeAware from 'react-resize-aware';
@@ -6,7 +6,7 @@ import useResizeAware from 'react-resize-aware';
 import { Button } from 'antd';
 import { DragOutlined, CloseOutlined } from '@ant-design/icons';
 
-import { LayoutSectionProps } from '@oida/ui-react-core';
+import { LayoutSectionItem, LayoutSectionProps } from '@oida/ui-react-core';
 
 import 'react-grid-layout/css/styles.css';
 
@@ -30,18 +30,20 @@ export type DashboardItemPosition = {
  * on the layout specific properties
  */
 export type DashboardPaneProps = {
-    /** number of dashboard snap columns*/
+    /** Number of dashboard snap columns*/
     numCols: number;
-    /** dashboard snap row height*/
+    /** Dashboard snap row height*/
     rowSnapHeight?: number;
-    /** widget compacting method */
+    /** Widget compacting method */
     compactType?: 'vertical' | 'horizontal' | null;
-    /** prevent collisions between widgets */
+    /** Prevent collisions between widgets */
     preventCollision?: boolean;
-    /** dashboard style */
+    /** Dashboard style */
     style?: React.CSSProperties;
-    /** default position of newly added components */
+    /** Default position of newly added components */
     defaultWidgetPosition?: DashboardItemPosition;
+    /** Container visible height. it is used when compact type is null to try and avoid scrolling (vertical compacting) */
+    containerHeight?: number;
 };
 
 /**
@@ -52,23 +54,66 @@ export type DashboardPaneProps = {
  */
 export const DashboardPane = (props: LayoutSectionProps & DashboardPaneProps) => {
 
-    const [layout, setLayout] = useState({});
-    const [resizeListener, size] = useResizeAware();
+    const widgetMargin = 10;
 
-    useEffect(() => {
+    const rowSnapHeight = (props.rowSnapHeight || 30) + widgetMargin;
 
+    const getInitialLayout = (component: LayoutSectionItem) => {
+        //@ts-ignore
+        const preferredLayout = component.preferredLayout;
+        const height = props.containerHeight || size.height;
+        if (preferredLayout && size.width && height) {
+            const w = Math.floor(Math.min(preferredLayout.width / size.width, 1.0) * props.numCols);
+            const h = Math.floor(preferredLayout.height / rowSnapHeight);
+            let x = 0;
+            let y = 0;
+            if (!preferredLayout.position || preferredLayout.position === 'tr') {
+                x = props.numCols - w;
+            } else if (preferredLayout.position === 'bl') {
+                y = Math.floor((height - preferredLayout.height) / rowSnapHeight);
+            } else if (preferredLayout.position === 'br') {
+                x = props.numCols - w;
+                y = Math.floor((height - preferredLayout.height) / rowSnapHeight);
+            }
+            x = Math.max(0, x);
+            y = Math.max(0, y);
+            return {
+                x, y, w, h
+            };
+        } else {
+            return props.defaultWidgetPosition || {
+                x: 0,
+                y: 0,
+                w: props.numCols,
+                h: 8
+            };
+        }
+    };
+
+    const compactOverflowComponents = (updatedLayout) => {
+        //compute the maximum visible y (in dashboard coordinates)
+        const maxY = props.containerHeight ? Math.floor((props.containerHeight - widgetMargin) / rowSnapHeight) : undefined;
+        if (maxY) {
+            for (let id in updatedLayout) {
+                if (updatedLayout[id].y + updatedLayout[id].h > maxY) {
+                    updatedLayout[id] = {
+                        ...updatedLayout[id],
+                        y: maxY - updatedLayout[id].h,
+                        moved: true
+                    };
+                }
+            }
+        }
+    };
+
+    const getLayoutFromComponents = (currentLayout) => {
         let updatedLayout = {};
         props.components.forEach((component) => {
 
-            if (layout && layout[component.id]) {
-                updatedLayout[component.id] = layout[component.id];
+            if (currentLayout && currentLayout[component.id]) {
+                updatedLayout[component.id] = currentLayout[component.id];
             } else {
-                const position = props.defaultWidgetPosition || {
-                    x: 0,
-                    y: 0,
-                    w: props.numCols,
-                    h: 8
-                };
+                const position = closedWidgetsLayout[component.id] || getInitialLayout(component);
                 updatedLayout[component.id] = {
                     i: component.id,
                     ...position
@@ -76,37 +121,66 @@ export const DashboardPane = (props: LayoutSectionProps & DashboardPaneProps) =>
             }
         });
 
-        setLayout(updatedLayout);
+        if (!props.compactType && !props.preventCollision) {
+            compactOverflowComponents(updatedLayout);
+        }
+
+        return updatedLayout;
+    };
+
+    const [resizeListener, size] = useResizeAware();
+    const [closedWidgetsLayout, setClosedWidgetsLayout] = useState({});
+    const [layout, setLayout] = useState(() => getLayoutFromComponents({}));
+    const [updateTracker] = useState<{evt?: {type: string, item?: any}}>({
+        evt: undefined
+    });
+
+    const widgets = props.components.map((component) => {
+            return (
+                <div className='dashboard-widget' key={component.id}>
+                    <div className='widget-header'>
+                        <Button
+                            type='link'
+                            className='widget-drag-btn'
+                        >
+                            <DragOutlined/>
+                        </Button>
+                        {component.title}
+                        {component.onClose &&
+                            <Button
+                                type='link'
+                                className='widget-close-btn'
+                                onClick={() => {
+                                    setClosedWidgetsLayout((current) => {
+                                        return {
+                                            ...current,
+                                            [component.id]: layout[component.id]
+                                        };
+                                    });
+
+                                    component.onClose!();
+                                }}
+                            >
+                                <CloseOutlined/>
+                            </Button>
+                        }
+                    </div>
+                    <div className='widget-content'>
+                        {component.content}
+                    </div>
+                </div>
+            );
+        });
+
+
+    useEffect(() => {
+
+        setLayout((currentLayout) => {
+            return getLayoutFromComponents(currentLayout);
+        });
 
     }, [props.components]);
 
-    let widgets = props.components.map((component) => {
-        return (
-            <div className='dashboard-widget' key={component.id}>
-                <div className='widget-header'>
-                    <Button
-                        type='link'
-                        className='widget-drag-btn'
-                    >
-                        <DragOutlined/>
-                    </Button>
-                    {component.title}
-                    {component.onClose &&
-                        <Button
-                            type='link'
-                            className='widget-close-btn'
-                            onClick={() => component.onClose!()}
-                        >
-                            <CloseOutlined/>
-                        </Button>
-                    }
-                </div>
-                <div className='widget-content'>
-                    {component.content}
-                </div>
-            </div>
-        );
-    });
 
     return (
         <div className='dashboard-pane' style={props.style}>
@@ -120,14 +194,70 @@ export const DashboardPane = (props: LayoutSectionProps & DashboardPaneProps) =>
                 cols={props.numCols}
                 layout={Object.values(layout)}
                 draggableHandle='.widget-drag-btn'
-                onLayoutChange={(layout) => {
-                    const updateLayout = layout.reduce((updatedLayout, item) => {
-                        return {
-                            ...updatedLayout,
-                            [item.i]: item
-                        };
-                    }, {});
-                    setLayout(updateLayout);
+                onDragStop={(newLayout, oldItem, newItem) => {
+                    updateTracker.evt = {
+                        type: 'move',
+                        item: newItem
+                    };
+                }}
+                onResizeStop={(layout, oldItem, newItem) => {
+                    updateTracker.evt = {
+                        type: 'move',
+                        item: newItem
+                    };
+                }}
+                onLayoutChange={(updatedLayout) => {
+                    const newLayout: Record<string, any> = {};
+                    if (!props.compactType && !props.preventCollision) {
+                        // custom compact logic that try to keep the widgets
+                        // in their original positions if not affected by the new item positionn
+                        if (updateTracker.evt) {
+                            const updatedItem = updateTracker.evt.item;
+                            setLayout((currentLayout) => {
+                                updatedLayout.forEach((item) => {
+                                    const prevItemState = currentLayout[item.i];
+                                    if (updatedItem && prevItemState && item.i !== updatedItem.i) {
+                                        //check if previous widget position intersects the new updated item position
+                                        if ((prevItemState.x < updatedItem.x + updatedItem.w
+                                            && prevItemState.x + prevItemState.w > updatedItem.x
+                                        ) && (prevItemState.y < updatedItem.y + updatedItem.h
+                                            && prevItemState.y + prevItemState.h > updatedItem.y
+                                        )) {
+                                            let y = item.y;
+                                            if (prevItemState.y < item.y) {
+                                                // try to move it immediatly under the new item if the new y is greater than before
+                                                y = updatedItem.y + updatedItem.h;
+                                            }
+                                            newLayout[item.i] = {
+                                                ...item,
+                                                y: y,
+                                                moved: true
+                                            };
+                                        } else {
+                                            // restore previous widget position if not overlapping with the new item position
+                                            newLayout[item.i] = {
+                                                ...prevItemState,
+                                                moved: true
+                                            };
+                                        }
+                                    } else {
+                                        newLayout[item.i] = item;
+                                    }
+                                });
+
+                                // try to avoid overflow (scrolling)
+                                compactOverflowComponents(newLayout);
+
+                                delete updateTracker.evt;
+                                return newLayout;
+                            });
+                        }
+                    } else {
+                        updatedLayout.forEach((item) => {
+                            newLayout[item.i] = item;
+                        });
+                        setLayout(newLayout);
+                    }
                 }}
                 rowHeight={props.rowSnapHeight || 30}
             >

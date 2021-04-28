@@ -15,11 +15,21 @@ import { useSelector } from '@oida/ui-react-mobx';
  */
 export type DatasetAnalysesDashboardProps = DashboardPaneProps & {
     /** the dataset explorer instance */
-    datasetsExplorer: DatasetExplorer
+    datasetsExplorer: DatasetExplorer;
+    /** the container visible height */
+    containerHeight?: number;
+    /** a map of analysis type / preferred layout */
+    preferredLayout?: Record<string, {
+        width: number;
+        height: number;
+        position?: 'tl' | 'tr' | 'bl' | 'br';
+    }>
 };
 
 /**
- * A component that renders the dataset explorer analyisis into a {@link DashboardPane}
+ * A component that renders the {@link DatasetExplorer.analyses} into a {@link DashboardPane}
+ * The analyses widgets are created thorough the {@link DatasetAnalysisWidgetFactory} using
+ * the {@link DatasetAnalysis.type} as key for registered component retrieval
  * @param props the component properties
  */
 export const DatasetAnalysesDashboard = (props: DatasetAnalysesDashboardProps) => {
@@ -47,12 +57,12 @@ export const DatasetAnalysesDashboard = (props: DatasetAnalysesDashboardProps) =
             };
         }, {} as Record<string, ComboAnalysis[]>);
 
-        return comboAnalyses.filter(analysis => analysis.visible).map((analysis) => {
+        return comboAnalyses.filter(analysis => analysis.visible.value).map((analysis) => {
 
-            let analysisType = analysis.type;
+            const analysisType = analysis.type;
             if (DatasetAnalysisWidgetFactory.isRegistered(analysisType)) {
 
-                let chartWidget = DatasetAnalysisWidgetFactory.create(analysisType, {
+                const chartWidget = DatasetAnalysisWidgetFactory.create(analysisType, {
                     combinedAnalysis: analysis,
                     datasets: activeDatasets,
                     availableCombos: availableCombos
@@ -62,6 +72,7 @@ export const DatasetAnalysesDashboard = (props: DatasetAnalysesDashboardProps) =
                     id: analysis.id,
                     title: `${analysis.name}`,
                     content: chartWidget,
+                    preferredLayout: props.preferredLayout ? props.preferredLayout[analysisType] : undefined,
                     onClose: () => {
                         if (analysis.destroyOnClose) {
                             props.datasetsExplorer.analyses.removeComboAnalysis(analysis);
@@ -105,6 +116,7 @@ export const DatasetAnalysesDashboard = (props: DatasetAnalysesDashboardProps) =
             compactType={props.compactType}
             preventCollision={props.preventCollision}
             defaultWidgetPosition={props.defaultWidgetPosition}
+            containerHeight={props.containerHeight}
             setExpanded={() => {}}
             expanded={true}
             showComponent={() => {}}

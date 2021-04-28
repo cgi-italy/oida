@@ -50,7 +50,7 @@ export const DatasetDiscoveryDrawer = (props: DatasetDiscoveryDrawerProps) => {
                 </PageHeader>
             }
             placement='right'
-            closable={false}
+            closable={true}
             mask={false}
             {...drawerProps}
             visible={visible}
