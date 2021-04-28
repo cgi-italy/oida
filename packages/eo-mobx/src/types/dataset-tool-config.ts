@@ -4,5 +4,6 @@ export type DatasetToolConfig<TOOL_TYPE extends keyof DatasetVizDefinitions = ke
     type: TOOL_TYPE,
     name: string,
     config: DatasetVizConfig<TOOL_TYPE>;
+    hidden?: boolean;
     icon?: any
 };

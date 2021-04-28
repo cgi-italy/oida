@@ -11,7 +11,7 @@ export type DatasetToolsMenuProps = {
 
 export const DatasetToolsMenu = (props: DatasetToolsMenuProps) => {
 
-    let tools = props.datasetViz.dataset.config.tools || [];
+    let tools = props.datasetViz.dataset.config.tools ? props.datasetViz.dataset.config.tools.filter((tool) => !tool.hidden) : [];
 
     const onToolClick = (type: string) => {
 

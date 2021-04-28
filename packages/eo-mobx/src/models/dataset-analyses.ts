@@ -60,6 +60,10 @@ export class DatasetAnalyses {
     @observable.ref active: boolean;
     geometryLayer: FeatureLayer<DatasetAnalysis<any>>;
     analyses: ObservableMap<string, ComboAnalysis>;
+    /**
+     * Contains references to the combo analyses items. This array is used as source
+     * for the analyses geometry layer
+     */
     protected items_: IObservableArray<DatasetAnalysis<any>>;
 
     constructor(props?: DatasetAnalysesProps) {
@@ -95,30 +99,47 @@ export class DatasetAnalyses {
     }
 
     @action
-    addAnalysis(analysis: DatasetAnalysis<any>, parent: ComboAnalysis, idx?: number) {
-        if (!this.analyses.has(parent.id)) {
-            this.analyses.set(parent.id, parent);
+    addAnalysis(analysis: DatasetAnalysis<any>, parent?: ComboAnalysis, idx?: number) {
+        if (parent) {
+            if (!this.analyses.has(parent.id)) {
+                this.analyses.set(parent.id, parent);
+            }
         }
 
         if (this.items_.indexOf(analysis) === -1) {
             this.items_.push(analysis);
         }
 
-        if (typeof(idx) === 'number' && idx < parent.analyses.length) {
-            parent.analyses.splice(idx, 0, analysis);
-        } else {
-            parent.analyses.push(analysis);
+        if (parent) {
+            if (typeof(idx) === 'number' && idx < parent.analyses.length) {
+                parent.analyses.splice(idx, 0, analysis);
+            } else {
+                parent.analyses.push(analysis);
+            }
         }
     }
 
     @action
-    removeAnalysis(analysis: DatasetAnalysis<any>, parent: ComboAnalysis) {
+    removeAnalysis(analysis: DatasetAnalysis<any>, parent?: ComboAnalysis) {
         this.items_.remove(analysis);
-        parent.analyses.remove(analysis);
-        if (!parent.analyses.length) {
-            this.analyses.delete(parent.id);
+        if (parent) {
+            parent.analyses.remove(analysis);
+            if (!parent.analyses.length) {
+                this.analyses.delete(parent.id);
+                parent.dispose();
+            }
         }
         analysis.dispose();
+    }
+
+    @action
+    addComboAnalysis(comboAnalysis: ComboAnalysis) {
+        if (!this.analyses.has(comboAnalysis.id)) {
+            this.analyses.set(comboAnalysis.id, comboAnalysis);
+            comboAnalysis.analyses.forEach((analysis) => {
+                this.items_.push(analysis);
+            });
+        }
     }
 
     @action
@@ -128,6 +149,7 @@ export class DatasetAnalyses {
             analysis.dispose();
         });
         this.analyses.delete(analysis.id);
+        analysis.dispose();
     }
 
     @action
@@ -144,6 +166,7 @@ export class DatasetAnalyses {
         options.source.analyses.remove(analysis);
         if (!options.source.analyses.length) {
             this.analyses.delete(options.source.id);
+            options.source.dispose();
         }
         this.addAnalysis(analysis, target, options.idx);
     }

@@ -85,6 +85,7 @@ implements HasVisibility, IsHoverable, IsSelectable {
         if (this.aoi) {
             this.aoi.unref();
         }
+        super.dispose();
     }
 
     abstract clone(): DatasetAnalysis<T>;

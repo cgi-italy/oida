@@ -12,25 +12,25 @@ export const generateComboAnalysisName = (type: string) => {
     return `${type} ${nextComboIdx++}`;
 };
 
-export type ComboAnalysisProps = {
+export type ComboAnalysisProps<T extends DatasetAnalysis<any> = DatasetAnalysis<any>> = {
     type: string;
     name: string;
     parent: DatasetAnalyses;
-    analyses?: DatasetAnalysis<any>[];
+    analyses?: T[];
     destroyOnClose?: boolean;
 } & VisibleProps;
 
-export class ComboAnalysis {
+export class ComboAnalysis<T extends DatasetAnalysis<any> = DatasetAnalysis<any>> {
     readonly id: string;
     readonly type: string;
     readonly name: string;
     readonly destroyOnClose: boolean;
     readonly visible: Visible;
-    analyses: IObservableArray<DatasetAnalysis<any>>;
+    analyses: IObservableArray<T>;
 
     protected parent_: DatasetAnalyses;
 
-    constructor(props: ComboAnalysisProps) {
+    constructor(props: ComboAnalysisProps<T>) {
         this.id = uuid();
         this.type = props.type;
         this.name = props.name;
@@ -61,4 +61,7 @@ export class ComboAnalysis {
             target: target
         });
     }
+
+    dispose() {}
+
 }
