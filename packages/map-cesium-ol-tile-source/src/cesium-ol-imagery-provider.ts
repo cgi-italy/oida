@@ -1,15 +1,16 @@
 import Event from 'cesium/Source/Core/Event';
 import GeographicTilingScheme from 'cesium/Source/Core/GeographicTilingScheme';
-import WebMercatorTilingScheme from 'cesium/Source/Core/WebMercatorTilingScheme';
 import Credit from 'cesium/Source/Core/Credit';
 import DeveloperError from 'cesium/Source/Core/DeveloperError';
 
 import { get as getProj } from 'ol/proj';
 import TileState from 'ol/TileState';
 
+import { getTileGridFromSRS } from '@oida/map-cesium';
+
 /*
 *    adapted from:
-*    https://raw.githubusercontent.com/openlayers/ol-cesium/2df20fb04bba0aa8ac3251c118f272797e667ce3/src/olcs/core/olimageryprovider.js
+*    https://github.com/openlayers/ol-cesium/blob/master/src/olcs/core/OLImageryProvider.js
 *
 */
 
@@ -22,8 +23,8 @@ export const CesiumOLImageryProvider = function(this: any, olSource, options) {
     this.tilingScheme_ = undefined;
     this.credit_ = undefined;
     this.tileDiscardPolicy_ = options.tileDiscardPolicy;
-    this.fallbackProj_ = options.fallbackProj || null;
-    this.proxy_ = options.proxy;
+
+    this.sourceConfig_ = options;
 
     this.ready_ = false;
 
@@ -155,11 +156,10 @@ Object.defineProperties(CesiumOLImageryProvider.prototype, {
 
 CesiumOLImageryProvider.prototype.handleSourceChanged_ = function() {
     if (!this.ready_ && this.source_.getState() === 'ready') {
-        this.projection_ = this.source_.getProjection() || this.fallbackProj_;
-        if (this.projection_ === getProj('EPSG:4326')) {
-            this.tilingScheme_ = new GeographicTilingScheme();
-        } else if (this.projection_ === getProj('EPSG:3857')) {
-            this.tilingScheme_ = new WebMercatorTilingScheme();
+        this.projection_ = this.source_.getProjection();
+        if (this.projection_ === getProj('EPSG:4326') || this.projection_ === getProj('EPSG:3857')) {
+            const {scheme} = getTileGridFromSRS(this.projection_.getCode(), this.sourceConfig_.tileGrid)!;
+            this.tilingScheme_ = scheme;
         } else {
             this.tilingScheme_ = new GeographicTilingScheme();
             this.projection_ = getProj('EPSG:4326'); // reproject
