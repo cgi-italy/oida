@@ -6,6 +6,7 @@ import { DIMENSION_SERIES_TYPE, DatasetDimensionSeriesProps, DatasetDimensionSer
 import { TRANSECT_SERIES_TYPE, DatasetTransectSeries, DatasetTransectSeriesProps } from './dataset-transect-series';
 import { STATS_ANALYSIS_TYPE, DatasetStatsAnalysis, DatasetStatsAnalysisProps } from './dataset-stats-analysis';
 import { RASTER_POINT_INFO_TYPE, DatasetRasterPointInfo, DatasetRasterPointInfoProps } from './dataset-raster-point-info';
+import { GRID_VALUES_TYPE, DatasetGridValues, DatasetGridValuesProps } from './dataset-grid-values';
 
 declare module './dataset-viz' {
     interface DatasetVizDefinitions {
@@ -16,6 +17,7 @@ declare module './dataset-viz' {
         [TRANSECT_SERIES_TYPE]: DatasetTransectSeriesProps;
         [STATS_ANALYSIS_TYPE]: DatasetStatsAnalysisProps;
         [RASTER_POINT_INFO_TYPE]: DatasetRasterPointInfoProps;
+        [GRID_VALUES_TYPE]: DatasetGridValuesProps;
     }
 
     interface DatasetVizTypes {
@@ -26,6 +28,7 @@ declare module './dataset-viz' {
         [TRANSECT_SERIES_TYPE]: DatasetTransectSeries;
         [STATS_ANALYSIS_TYPE]: DatasetStatsAnalysis;
         [RASTER_POINT_INFO_TYPE]: DatasetRasterPointInfo;
+        [GRID_VALUES_TYPE]: DatasetGridValues;
     }
 
 }
@@ -38,6 +41,7 @@ DatasetViz.register(DIMENSION_SERIES_TYPE, DatasetDimensionSeries);
 DatasetViz.register(TRANSECT_SERIES_TYPE, DatasetTransectSeries);
 DatasetViz.register(STATS_ANALYSIS_TYPE, DatasetStatsAnalysis);
 DatasetViz.register(RASTER_POINT_INFO_TYPE, DatasetRasterPointInfo);
+DatasetViz.register(GRID_VALUES_TYPE, DatasetGridValues);
 
 
 export * from './dataset-dimensions';
@@ -58,7 +62,9 @@ export * from './dataset-dimension-series';
 export * from './dataset-transect-series';
 export * from './dataset-stats-analysis';
 export * from './dataset-raster-point-info';
+export * from './dataset-grid-values';
 export * from './map-rasters-point-info';
+export * from './grid-scatter-analysis';
 export * from './dataset-explorer';
 export * from './dataset-discovery-provider';
 export * from './dataset-discovery';

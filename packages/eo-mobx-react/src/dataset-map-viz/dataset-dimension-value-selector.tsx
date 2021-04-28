@@ -21,7 +21,7 @@ export const DatasetValueDimensionSelector = (props: DatasetValueDimensionSelect
     const value = useSelector(() => {
         let val = props.dimensionsState.values.get(props.dimension.id);
         return val ? val as number : undefined;
-    });
+    }, [props.dimensionsState]);
 
     const domain = useDatasetDomain({
         dimension: props.dimension
@@ -79,7 +79,7 @@ export const DatasetTimeDimensionSelector = (props: DatasetTimeDimensionSelector
     const value = useSelector(() => {
         let val = props.dimensionsState.values.get(props.dimension.id);
         return val ? val as Date : undefined;
-    });
+    }, [props.dimensionsState]);
 
     useEffect(() => {
         if (domain) {
@@ -119,7 +119,7 @@ export const DatasetCategoricalDimensionSelector = (props: DatasetCategoricalDim
 
     const value = useSelector(() => {
         return props.dimensionsState.values.get(props.dimension.id) as (string | number);
-    });
+    }, [props.dimensionsState]);
 
     const domain = useDatasetDomain({
         dimension: props.dimension
