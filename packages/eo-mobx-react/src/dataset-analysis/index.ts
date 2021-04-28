@@ -12,4 +12,4 @@ export * from './chart-widget';
 export * from './analysis-aoi-filter';
 export * from './analysis-loading-state-message';
 export * from './analysis-series-actions';
-
+export * from './dataset-explorer-tools-dropdown';
