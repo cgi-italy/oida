@@ -94,7 +94,7 @@ export const useDatasetExplorerTools = (props: DatasetExplorerToolsProps) => {
                 const analysis = DatasetViz.create<any>({
                     vizType: type,
                     dataset: defaultTarget.explorerItem.dataset,
-                    parent: defaultTarget.explorerItem,
+                    parent: defaultTarget.explorerItem.mapViz,
                     config: defaultTarget.config
                 });
                 if (analysis instanceof DatasetAnalysis) {

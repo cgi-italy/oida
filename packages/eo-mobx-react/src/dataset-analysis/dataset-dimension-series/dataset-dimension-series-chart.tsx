@@ -28,6 +28,8 @@ type LegendDataItem = {
     id: string,
     name: string,
     type: 'point' | 'area',
+    disabled?: boolean,
+    hovered?: boolean,
     description?: string
 };
 
@@ -50,6 +52,10 @@ export function DatasetDimensionSeriesChart(props: DatasetDimensionSeriesChartPr
         let nextYAxisIndex = 0;
 
         props.series.forEach((series, idx) => {
+
+            if (series.loadingState.value === LoadingState.Init) {
+                return;
+            }
 
             let variable = series.seriesVariable;
             if (!variable) {
@@ -116,12 +122,36 @@ export function DatasetDimensionSeriesChart(props: DatasetDimensionSeriesChartPr
                 loadingState = LoadingState.Error;
             }
 
+            let description = `
+                <div>
+                    <div><span>Dataset:</span><span> ${series.dataset.config.name}</span>
+                    <div><span>Variable:</span><span> ${variableConfig.name}</span>
+            `;
+            series.dimensions.values.forEach((value, key) => {
+                const dimensionConfig = series.config.dimensions.find((d) => d.id === key);
+                if (dimensionConfig) {
+                    let stringValue = value.toString();
+                    if (value instanceof Date) {
+                        stringValue = moment(value).format('YYYY-MM-DD HH:mm');
+                    }
+                    description += `<div><span>${dimensionConfig.name}:</span><span> ${stringValue}</span></div>`;
+                }
+            });
+
+            if (series.geometry?.type === 'Point') {
+                description += `<div><span>Location:</span><span> Lat: ${series.geometry.coordinates[0].toFixed(3)}, Lon: ${series.geometry.coordinates[1].toFixed(3)}`;
+            }
+            description += '</div>';
+
             if (isStatsDimensionSeriesData(series.data)) {
 
                 legendData[idx] = {
                     id: `${idx}`,
                     type: 'area',
-                    name: `${series.dataset.config.name}: ${variableConfig.name} stats`
+                    name: `${series.dataset.config.name}: ${variableConfig.name} stats`,
+                    disabled: !series.visible.value,
+                    hovered: series.hovered.value,
+                    description: description
                 };
 
                 const chartMinData: Array<number[]> = [];
@@ -202,7 +232,10 @@ export function DatasetDimensionSeriesChart(props: DatasetDimensionSeriesChartPr
                 legendData[idx] = {
                     id: `${idx}`,
                     type: 'point',
-                    name: `${series.dataset.config.name}: ${variableConfig.name}`
+                    name: `${series.dataset.config.name}: ${variableConfig.name}`,
+                    disabled: !series.visible.value,
+                    hovered: series.hovered.value,
+                    description: description
                 };
 
                 const chartData: Array<number[]> = [];
@@ -270,6 +303,8 @@ export function DatasetDimensionSeriesChart(props: DatasetDimensionSeriesChartPr
         };
     });
 
+    const highlightedSeries = legendData.findIndex(item => item.hovered);
+
     return (
         <div className='series-chart'>
             <ChartWidget
@@ -283,22 +318,31 @@ export function DatasetDimensionSeriesChart(props: DatasetDimensionSeriesChartPr
                         },
                         tooltip: {
                             show: true,
-                            formatter: (data) => {
-                                return legendData[(data as EChartOption.Tooltip.Format).name!].description || '';
+                            formatter: (data: EChartOption.Tooltip.Format) => {
+                                return legendData[data.name!].description || '';
                             }
-                        }
+                        },
+                        selected: legendData.reduce((selected, item) => {
+                            return {
+                                ...selected,
+                                [item.id]: !item.disabled
+                            };
+                        }, {})
                     },
                     dataZoom: [{
                         xAxisIndex: xAxes.map((axis, idx) =>  idx),
-                        type: 'inside'
+                        type: 'inside',
+                        id: '0'
                     }, {
                         xAxisIndex: xAxes.map((axis, idx) =>  idx),
                         type: 'slider',
                         dataBackground: {
                             lineStyle: {
-                                opacity: 1
+                                opacity: 1,
+                                color: 'white'
                             }
-                        }
+                        },
+                        id: '1'
                     }],
                     tooltip: {
                         trigger: 'axis',
@@ -395,6 +439,20 @@ export function DatasetDimensionSeriesChart(props: DatasetDimensionSeriesChartPr
                     useUTC: true,
                     backgroundColor: 'transparent'
                 } as EChartOption}
+                onHighlight={(evt, highlighted) => {
+                    if (evt.seriesName) {
+                        const series = props.series[parseInt(evt.seriesName)];
+                        if (series) {
+                            series.hovered.setValue(highlighted || false);
+                        }
+                    }
+                }}
+                onLegendItemSelection={(evt) => {
+                    for (let idx in evt.selected) {
+                        props.series[parseInt(idx)].visible.setValue(evt.selected[idx]);
+                    }
+                }}
+                highlightedSeries={highlightedSeries !== -1 ? highlightedSeries : undefined}
                 isLoading={loadingState === LoadingState.Loading}
             />
         </div>

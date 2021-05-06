@@ -20,13 +20,16 @@ export type ChartWidgetProps = {
         dataIndex?: number,
         name?: string,
     },
+    highlightedSeries?: number;
     brushMode?: 'none' | 'rect' | 'polygon' | 'lineX' | 'lineY';
     onBrushEnd?: (evt) => void;
     brushArea?: any;
+    onDataZoom?: (evt) => void;
     onMouseEnter?: (evt) => void;
     onMouseLeave?: (evt) => void;
     onItemClick?: (evt) => void;
     onHighlight?: (evt, highlighted?: boolean) => void;
+    onLegendItemSelection?: (evt) => void;
     onSizeChange?: (size: {width: number, height: number}) => void;
 };
 
@@ -77,9 +80,6 @@ export const ChartWidget = (props: ChartWidgetProps) => {
         const chartInstance = chart;
 
         if (chartInstance && onItemClick) {
-            let clickHandler = (evt) => {
-                onItemClick(evt);
-            };
             chartInstance.on('click', onItemClick);
             return () => {
                 chartInstance.off('click', onItemClick);
@@ -89,19 +89,37 @@ export const ChartWidget = (props: ChartWidgetProps) => {
 
     useEffect(() => {
         if (chart) {
-            if (props.options && Array.isArray(props.options.yAxis)) {
-                chart.setOption({
-                    ...props.options,
-                    yAxis: props.options.yAxis.map(axisConfig => {
+            if (props.options) {
+                const currentOptions = chart.getOption();
+                let yAxis = props.options.yAxis;
+                // automatically set the number of split lines (parallel to xAxis) based on the chart height
+                if (Array.isArray(props.options.yAxis)) {
+                    yAxis = props.options.yAxis.map(axisConfig => {
                         return {
                             ...axisConfig,
                             splitNumber: Math.floor(size.height / 80)
                         };
-                    })
+                    });
+                }
+                // keep the data zoom current state
+                let dataZoom = props.options.dataZoom;
+                const currentZoom = currentOptions?.dataZoom;
+                if (dataZoom && currentZoom && dataZoom.length === currentZoom.length) {
+                    dataZoom = dataZoom.map((item, idx) => {
+                        return {
+                            ...item,
+                            start: item.start || currentZoom[idx].start,
+                            end: item.end || currentZoom[idx].end
+                        };
+                    });
+                }
+                chart.setOption({
+                    ...props.options,
+                    yAxis,
+                    dataZoom
                 }, true, false);
-            } else {
-                chart.setOption(props.options, true, false);
             }
+            // reapply brush state
             if (props.brushMode && props.brushMode !== 'none') {
                 chart!.dispatchAction({
                     type: 'takeGlobalCursor',
@@ -173,6 +191,26 @@ export const ChartWidget = (props: ChartWidgetProps) => {
 
     useEffect(() => {
         if (chart) {
+            const highlightedSeries = props.highlightedSeries;
+            if (highlightedSeries !== undefined) {
+                chart.dispatchAction({
+                    type: 'highlight',
+                    seriesIndex: highlightedSeries
+                });
+                return () => {
+                    if (chart) {
+                        chart.dispatchAction({
+                            type: 'downplay',
+                            seriesIndex: highlightedSeries
+                        });
+                    }
+                };
+            }
+        }
+    }, [props.highlightedSeries]);
+
+    useEffect(() => {
+        if (chart) {
             if (props.brushMode && props.brushMode !== 'none') {
                 chart!.dispatchAction({
                     type: 'takeGlobalCursor',
@@ -219,6 +257,33 @@ export const ChartWidget = (props: ChartWidgetProps) => {
             });
         }
     }, [chart, props.brushArea]);
+
+    useEffect(() => {
+
+        const onDataZoom = props.onDataZoom;
+        const chartInstance = chart;
+
+        if (chartInstance && onDataZoom) {
+            chartInstance.on('datazoom', onDataZoom);
+            return () => {
+                chartInstance.off('datazoom', onDataZoom);
+            };
+        }
+    }, [chart, props.onDataZoom]);
+
+    useEffect(() => {
+
+        const onLegendItemSelection = props.onLegendItemSelection;
+        const chartInstance = chart;
+
+        if (chartInstance && onLegendItemSelection) {
+            chartInstance.on('legendselectchanged', onLegendItemSelection);
+            return () => {
+                chartInstance.off('legendselectchanged', onLegendItemSelection);
+            };
+        }
+    }, [chart, props.onLegendItemSelection]);
+
 
     return (
         <React.Fragment>

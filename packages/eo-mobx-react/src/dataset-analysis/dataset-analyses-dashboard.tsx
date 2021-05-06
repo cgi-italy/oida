@@ -43,8 +43,6 @@ export const DatasetAnalysesDashboard = (props: DatasetAnalysesDashboardProps) =
 
     let analysisComponents = useSelector(() => {
 
-        const activeDatasets = props.datasetsExplorer.items.map(datasetView => datasetView.dataset);
-
         const comboAnalyses = Array.from(props.datasetsExplorer.analyses.analyses.values());
 
         let availableCombos = comboAnalyses.reduce((comboMap, analysis) => {
@@ -64,7 +62,7 @@ export const DatasetAnalysesDashboard = (props: DatasetAnalysesDashboardProps) =
 
                 const chartWidget = DatasetAnalysisWidgetFactory.create(analysisType, {
                     combinedAnalysis: analysis,
-                    datasets: activeDatasets,
+                    datasetExplorerItems: props.datasetsExplorer.items,
                     availableCombos: availableCombos
                 });
 

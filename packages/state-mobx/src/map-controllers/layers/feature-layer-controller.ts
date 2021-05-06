@@ -196,8 +196,11 @@ export class FeatureLayerController
         }
 
         featureTracker.disposeStyleObserver = reaction(() => this.styleGetter_(feature), (style) => {
-            featureTracker.ids.forEach((id, idx) => {
-                layerRenderer.updateFeatureStyle(id, style[idx] || style);
+            let idx = 0;
+            featureTracker.ids.forEach((id) => {
+                const geometryId = id.split('-_-')[1];
+                layerRenderer.updateFeatureStyle(id, style[geometryId] || style[idx] || style);
+                idx++;
             });
         });
 
@@ -214,11 +217,11 @@ export class FeatureLayerController
                     const style = this.styleGetter_(feature);
 
                     geometry.geometries.forEach((geometry, idx) => {
-                        const id = `${feature.id}_${geometry.id || uuid()}`;
+                        const id = `${feature.id}-_-${geometry.id || uuid()}`;
                         if (featureTracker.ids.has(id)) {
                             layerRenderer.updateFeatureGeometry(id, geometry);
                         } else {
-                            layerRenderer.addFeature(id, geometry, style[idx] || style, {
+                            layerRenderer.addFeature(id, geometry, style[geometry.id] || style[idx] || style, {
                                 model: feature,
                                 layer: this.mapLayer_
                             });

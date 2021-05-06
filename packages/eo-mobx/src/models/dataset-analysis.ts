@@ -1,7 +1,7 @@
 import { computed, makeObservable, observable, action } from 'mobx';
 import chroma from 'chroma-js';
 
-import { randomColorFactory } from '@oida/core';
+import { IFeatureStyle, randomColorFactory } from '@oida/core';
 import {
     MapLayer,
     HasVisibility, Visible, VisibleProps,
@@ -72,6 +72,10 @@ implements HasVisibility, IsHoverable, IsSelectable {
     @computed
     get geometry() {
         return this.aoi?.geometry.value;
+    }
+
+    get style(): IFeatureStyle | Record<string, IFeatureStyle> | IFeatureStyle[] | undefined {
+        return undefined;
     }
 
     /**

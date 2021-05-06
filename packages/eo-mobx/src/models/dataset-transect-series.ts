@@ -1,13 +1,15 @@
-import { autorun, observable, makeObservable, action, runInAction, computed } from 'mobx';
+import { autorun, observable, makeObservable, action, runInAction, computed, reaction } from 'mobx';
 import nearestPointOnLine from '@turf/nearest-point-on-line';
 import along from '@turf/along';
+import chroma from 'chroma-js';
 
-import { Geometry, IndexableGeometry, LoadingState } from '@oida/core';
+import { Geometry, IFeatureStyle, IndexableGeometry, LoadingState, SubscriptionTracker } from '@oida/core';
 import { AsyncDataFetcher } from '@oida/state-mobx';
 
 import { DatasetDimension, DataDomain, TimeSearchDirection, NumericVariable } from '../types';
 import { DatasetDimensions, HasDatasetDimensions, DatasetDimensionsProps } from './dataset-dimensions';
 import { DatasetAnalysis, DatasetAnalysisProps } from './dataset-analysis';
+import { analysisPlaceHolderIcon } from './dataset-analyses';
 
 
 export const TRANSECT_SERIES_TYPE = 'transect_series';
@@ -27,7 +29,7 @@ export type DatasetTransectSeriesConfig = {
     variables: NumericVariable[];
     maxLineStringLength?: number;
     supportsNumSamples?: boolean;
-    maxNumSamples?: boolean;
+    maxNumSamples?: number;
     provider: DatasetTransectSeriesProvider;
     dimensions: DatasetDimension<DataDomain<TransectDimensionType>>[];
 };
@@ -41,6 +43,7 @@ export type TransectSeriesItem = {
 
 export type DatasetTransectSeriesProps = {
     seriesVariable?: string;
+    numSamples?: number;
     autoUpdate?: boolean;
 } & DatasetAnalysisProps<typeof TRANSECT_SERIES_TYPE, DatasetTransectSeriesConfig> & DatasetDimensionsProps;
 
@@ -50,10 +53,13 @@ export class DatasetTransectSeries extends DatasetAnalysis<undefined> implements
     readonly dimensions: DatasetDimensions;
     @observable.ref seriesVariable: string | undefined;
     @observable.ref data: TransectSeriesItem[];
+    @observable.ref numSamples: number | undefined;
     @observable.ref autoUpdate: boolean;
     @observable.ref highlightedPosition: number | undefined;
 
     protected dataFetcher_: AsyncDataFetcher<TransectSeriesItem[] | undefined, DatasetTransectSeriesRequest>;
+    protected subscriptionTracker_: SubscriptionTracker;
+    protected needsUpdate_: boolean;
 
     constructor(props: Omit<DatasetTransectSeriesProps, 'vizType'>) {
         super({
@@ -64,6 +70,10 @@ export class DatasetTransectSeries extends DatasetAnalysis<undefined> implements
         this.config = props.config;
         this.dimensions = new DatasetDimensions(props);
         this.seriesVariable = props.seriesVariable;
+        this.numSamples = props.numSamples;
+        if (props.config.supportsNumSamples && !this.numSamples) {
+            this.numSamples = props.config.maxNumSamples ? Math.min(props.config.maxNumSamples, 20) : 20;
+        }
         this.data = [];
         this.autoUpdate = props.autoUpdate !== undefined ? props.autoUpdate : true;
 
@@ -91,6 +101,8 @@ export class DatasetTransectSeries extends DatasetAnalysis<undefined> implements
             },
             debounceInterval: this.autoUpdate ? 1000 : 0
         });
+        this.subscriptionTracker_ = new SubscriptionTracker();
+        this.needsUpdate_ = true;
 
         makeObservable(this);
 
@@ -105,6 +117,13 @@ export class DatasetTransectSeries extends DatasetAnalysis<undefined> implements
     @action
     setVariable(variable: string | undefined) {
         this.seriesVariable = variable;
+        this.needsUpdate_ = true;
+    }
+
+    @action
+    setNumSamples(numSamples: number | undefined) {
+        this.numSamples = numSamples;
+        this.needsUpdate_ = true;
     }
 
     @action
@@ -132,10 +151,67 @@ export class DatasetTransectSeries extends DatasetAnalysis<undefined> implements
                 ...this.aoi.geometry.value
             });
         }
+        if (this.data.length) {
+            geometries.push({
+                type: 'MultiPoint',
+                id: 'samples',
+                coordinates: this.data.map((item) => {
+                    return item.coordinates;
+                })
+            });
+        }
         return {
             type: 'GeometryCollectionEx',
             geometries: geometries
         };
+    }
+
+    get style() {
+        let color = chroma(this.color);
+        if (this.selected.value) {
+            color = color.alpha(0.3);
+        } else {
+            color = color.alpha(0.1);
+        }
+
+        let zIndex = 0;
+        if (this.selected.value) {
+            zIndex = 1;
+        }
+        if (this.hovered.value) {
+            zIndex = 2;
+        }
+
+        const styles: Record<string, IFeatureStyle> = {
+            highlightedCoord: {
+                point: {
+                    visible: this.visible.value && !this.needsUpdate_,
+                    url: analysisPlaceHolderIcon,
+                    scale: 0.5,
+                    color: color.alpha(1).gl(),
+                    zIndex: zIndex
+                }
+            },
+            aoi: {
+                line: {
+                    visible: this.visible.value,
+                    color: color.alpha(1).gl(),
+                    width: this.hovered.value ? 3 : 2,
+                    zIndex: zIndex
+                }
+            },
+            samples: {
+                point: {
+                    visible: this.visible.value && !this.needsUpdate_,
+                    radius: this.hovered.value ? 4 : 2,
+                    fillColor: color.alpha(0.9).gl(),
+                    strokeColor: color.alpha(1).gl(),
+                    zIndex: zIndex
+                }
+            }
+        };
+
+        return styles;
     }
 
     onGeometryHover(coordinate: GeoJSON.Position) {
@@ -179,15 +255,19 @@ export class DatasetTransectSeries extends DatasetAnalysis<undefined> implements
 
     retrieveData() {
         if (this.canRunQuery) {
-            this.dataFetcher_.fetchData({
-                geometry: this.aoi?.geometry.value as GeoJSON.LineString,
-                variable: this.seriesVariable!,
-                dimensionValues: new Map(this.dimensions.values)
-            }).then((data) => {
-                this.setData_(data || []);
-            }).catch(() => {
-                this.setData_([]);
-            });
+            if (this.needsUpdate_) {
+                this.dataFetcher_.fetchData({
+                    geometry: this.aoi?.geometry.value as GeoJSON.LineString,
+                    variable: this.seriesVariable!,
+                    dimensionValues: new Map(this.dimensions.values),
+                    numSamples: this.numSamples
+                }).then((data) => {
+                    this.setData_(data || []);
+                    this.needsUpdate_ = false;
+                }).catch(() => {
+                    this.setData_([]);
+                });
+            }
         } else {
             this.loadingState.setValue(LoadingState.Init);
             this.setData_([]);
@@ -198,8 +278,15 @@ export class DatasetTransectSeries extends DatasetAnalysis<undefined> implements
         return this.clone_({
             config: this.config,
             seriesVariable: this.seriesVariable,
-            dimensionValues: this.dimensions.values
+            dimensionValues: this.dimensions.values,
+            autoUpdate: this.autoUpdate,
+            numSamples: this.numSamples
         }) as DatasetTransectSeries;
+    }
+
+    dispose() {
+        super.dispose();
+        this.subscriptionTracker_.unsubscribe();
     }
 
     @action
@@ -243,6 +330,25 @@ export class DatasetTransectSeries extends DatasetAnalysis<undefined> implements
                 this.retrieveData();
             }
         });
+
+        const highlightedCoordDismissDisposer = autorun(() => {
+            if (!this.hovered.value) {
+                this.setHighlightedPosition(undefined);
+            }
+        });
+
+        const updateTrackerDisposer = reaction(() => {
+            return {
+                aoi: this.aoi?.geometry.value,
+                dimensions: new Map(this.dimensions.values)
+            };
+        }, () => {
+            this.needsUpdate_ = true;
+        });
+
+        this.subscriptionTracker_.addSubscription(seriesUpdaterDisposer);
+        this.subscriptionTracker_.addSubscription(highlightedCoordDismissDisposer);
+        this.subscriptionTracker_.addSubscription(updateTrackerDisposer);
     }
 
     protected initMapLayer_() {

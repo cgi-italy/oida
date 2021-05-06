@@ -1,5 +1,5 @@
 import { SelectionMode } from '@oida/core';
-import { useMapModule, useSelector } from '@oida/ui-react-mobx';
+import { useCenterOnMap, useMapModule, useSelector } from '@oida/ui-react-mobx';
 import { DatasetAnalysis } from '@oida/eo-mobx';
 import { Map, SelectionManager } from '@oida/state-mobx';
 
@@ -11,7 +11,11 @@ export type useAnalysisGeometryProps = {
 
 export const useAnalysisGeometry = (props: useAnalysisGeometryProps) => {
 
-    let { mapSelection, map, analysis} = props;
+    const { mapSelection, map, analysis} = props;
+
+    const centerOnMap = useCenterOnMap({
+        map: map
+    });
 
     const onAnalysisHover = (hovered) => {
         if (hovered) {
@@ -23,6 +27,11 @@ export const useAnalysisGeometry = (props: useAnalysisGeometryProps) => {
 
     const onAnalysisSelect = (selected) => {
         mapSelection.selection.modifySelection(analysis, SelectionMode.Replace);
+        if (props.analysis.geometry) {
+            centerOnMap(props.analysis.geometry, {
+                animate: true
+            });
+        }
     };
 
     let aoiProps = useSelector(() => {

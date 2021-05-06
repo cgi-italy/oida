@@ -1,4 +1,4 @@
-import { autorun, observable, makeObservable, action, computed } from 'mobx';
+import { autorun, observable, makeObservable, action, computed, reaction } from 'mobx';
 
 import { BBoxGeometry, LoadingState, SubscriptionTracker } from '@oida/core';
 import { AsyncDataFetcher } from '@oida/state-mobx';
@@ -48,6 +48,7 @@ export class DatasetGridValues extends DatasetAnalysis<undefined> implements Has
 
     protected dataFetcher_: AsyncDataFetcher<DatasetGridValuesData | undefined, DatasetGridValuesRequest>;
     protected subscriptionTracker_: SubscriptionTracker;
+    protected needsUpdate_: boolean;
 
     constructor(props: Omit<DatasetGridValuesProps, 'vizType'>) {
         super({
@@ -68,6 +69,7 @@ export class DatasetGridValues extends DatasetAnalysis<undefined> implements Has
             debounceInterval: this.autoUpdate ? 1000 : 0
         });
         this.subscriptionTracker_ = new SubscriptionTracker();
+        this.needsUpdate_ = true;
 
         makeObservable(this);
 
@@ -80,6 +82,7 @@ export class DatasetGridValues extends DatasetAnalysis<undefined> implements Has
 
     @action
     setVariable(variable: string | undefined) {
+        this.needsUpdate_ = true;
         this.variable = variable;
     }
 
@@ -103,15 +106,18 @@ export class DatasetGridValues extends DatasetAnalysis<undefined> implements Has
 
     retrieveData() {
         if (this.canRunQuery) {
-            this.dataFetcher_.fetchData({
-                bbox: (this.aoi!.geometry.value as BBoxGeometry).bbox,
-                variable: this.variable!,
-                dimensionValues: new Map(this.dimensions.values)
-            }).then((data) => {
-                this.setData_(data);
-            }).catch(() => {
-                this.setData_(undefined);
-            });
+            if (this.needsUpdate_) {
+                this.dataFetcher_.fetchData({
+                    bbox: (this.aoi!.geometry.value as BBoxGeometry).bbox,
+                    variable: this.variable!,
+                    dimensionValues: new Map(this.dimensions.values)
+                }).then((data) => {
+                    this.needsUpdate_ = false;
+                    this.setData_(data);
+                }).catch(() => {
+                    this.setData_(undefined);
+                });
+            }
         } else {
             this.loadingState.setValue(LoadingState.Init);
             this.setData_(undefined);
@@ -122,11 +128,13 @@ export class DatasetGridValues extends DatasetAnalysis<undefined> implements Has
         return this.clone_({
             config: this.config,
             variable: this.variable,
-            dimensionValues: this.dimensions.values
+            dimensionValues: this.dimensions.values,
+            autoUpdate: this.autoUpdate
         }) as DatasetGridValues;
     }
 
     dispose() {
+        super.dispose();
         this.subscriptionTracker_.unsubscribe();
     }
 
@@ -167,7 +175,18 @@ export class DatasetGridValues extends DatasetAnalysis<undefined> implements Has
             }
         });
 
+        const updateTrackerDisposer = reaction(() => {
+            return {
+                aoi: this.geometry,
+                dimensions: new Map(this.dimensions.values)
+            };
+        }, () => {
+            this.needsUpdate_ = true;
+        });
+
+
         this.subscriptionTracker_.addSubscription(dataUpdaterDisposer);
+        this.subscriptionTracker_.addSubscription(updateTrackerDisposer);
     }
 
     @action

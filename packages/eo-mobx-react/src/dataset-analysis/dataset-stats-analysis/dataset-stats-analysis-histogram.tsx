@@ -272,10 +272,11 @@ export const DatasetStatsAnalysisHistogram = (props: DatasetStatsAnalysisProps) 
             : Math.floor(100 / props.analyses.length);
 
         setChartGrids((grids) => {
-            return grids.map((grid) => {
+            return grids.map((grid, idx) => {
                 return {
                     ...grid,
-                    height: chartSize ? gridHeight - margin : `${gridHeight}%`
+                    height: chartSize ? gridHeight - margin : `${gridHeight}%`,
+                    top: chartSize ? margin + gridHeight * idx : `${gridHeight * idx}%`,
                 };
             });
         });

@@ -1,6 +1,6 @@
-import { autorun, observable, makeObservable, action, runInAction, computed } from 'mobx';
+import { autorun, observable, makeObservable, action, computed, reaction } from 'mobx';
 
-import { Geometry, AoiSupportedGeometry, LoadingState } from '@oida/core';
+import { Geometry, AoiSupportedGeometry, LoadingState, SubscriptionTracker } from '@oida/core';
 import { AsyncDataFetcher } from '@oida/state-mobx';
 
 import { DatasetDimension, DataDomain, DomainRange, isValueDomain, NumericVariable } from '../types';
@@ -70,6 +70,8 @@ export class DatasetDimensionSeries extends DatasetAnalysis<undefined> implement
     @observable.ref autoUpdate: boolean;
 
     protected dataFetcher_: AsyncDataFetcher<DatasetDimensionSeriesData | undefined, DatasetDimensionSeriesRequest<SeriesDimensionType>>;
+    protected subscriptionTracker_: SubscriptionTracker;
+    protected needsUpdate_: boolean;
 
     constructor(props: Omit<DatasetDimensionSeriesProps, 'vizType'>) {
         super({
@@ -91,6 +93,8 @@ export class DatasetDimensionSeries extends DatasetAnalysis<undefined> implement
             },
             debounceInterval: this.autoUpdate ? 1000 : 0
         });
+        this.needsUpdate_ = true;
+        this.subscriptionTracker_ = new SubscriptionTracker();
 
         makeObservable(this);
 
@@ -103,6 +107,7 @@ export class DatasetDimensionSeries extends DatasetAnalysis<undefined> implement
 
     @action
     setDimension(dimension: string | undefined) {
+        this.needsUpdate_ = true;
         this.seriesDimension = dimension;
         if (dimension) {
             this.dimensions.unsetValue(dimension);
@@ -134,11 +139,13 @@ export class DatasetDimensionSeries extends DatasetAnalysis<undefined> implement
 
     @action
     setVariable(variable: string | undefined) {
+        this.needsUpdate_ = true;
         this.seriesVariable = variable;
     }
 
     @action
     setRange(range: DomainRange<SeriesDimensionType> | undefined) {
+        this.needsUpdate_ = true;
         this.seriesRange = range;
     }
 
@@ -164,17 +171,20 @@ export class DatasetDimensionSeries extends DatasetAnalysis<undefined> implement
 
     retrieveData() {
         if (this.canRunQuery) {
-            this.dataFetcher_.fetchData({
-                dimension: this.seriesDimension!,
-                geometry: this.geometry!,
-                variable: this.seriesVariable!,
-                range: this.seriesRange,
-                dimensionValues: new Map(this.dimensions.values)
-            }).then((data) => {
-                this.setData_(data || []);
-            }).catch(() => {
-                this.setData_([]);
-            });
+            if (this.needsUpdate_) {
+                this.dataFetcher_.fetchData({
+                    dimension: this.seriesDimension!,
+                    geometry: this.geometry!,
+                    variable: this.seriesVariable!,
+                    range: this.seriesRange,
+                    dimensionValues: new Map(this.dimensions.values)
+                }).then((data) => {
+                    this.needsUpdate_ = false;
+                    this.setData_(data || []);
+                }).catch(() => {
+                    this.setData_([]);
+                });
+            }
         } else {
             this.loadingState.setValue(LoadingState.Init);
             this.setData_([]);
@@ -187,8 +197,14 @@ export class DatasetDimensionSeries extends DatasetAnalysis<undefined> implement
             seriesDimension: this.seriesDimension,
             seriesVariable: this.seriesVariable,
             seriesRange: this.seriesRange,
-            dimensionValues: this.dimensions.values
+            dimensionValues: this.dimensions.values,
+            autoUpdate: this.autoUpdate
         }) as DatasetDimensionSeries;
+    }
+
+    dispose() {
+        super.dispose();
+        this.subscriptionTracker_.unsubscribe();
     }
 
     @action
@@ -210,6 +226,18 @@ export class DatasetDimensionSeries extends DatasetAnalysis<undefined> implement
                 this.retrieveData();
             }
         });
+
+        const updateTrackerDisposer = reaction(() => {
+            return {
+                aoi: this.geometry,
+                dimensions: new Map(this.dimensions.values)
+            };
+        }, () => {
+            this.needsUpdate_ = true;
+        });
+
+        this.subscriptionTracker_.addSubscription(seriesUpdaterDisposer);
+        this.subscriptionTracker_.addSubscription(updateTrackerDisposer);
     }
 
     protected initMapLayer_() {

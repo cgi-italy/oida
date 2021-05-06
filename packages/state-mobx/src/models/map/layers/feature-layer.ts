@@ -10,7 +10,7 @@ export interface FeatureInterface extends IsHoverable, IsSelectable {
 }
 
 export type FeatureGeometryGetter<T extends FeatureInterface> = (entity: T) => Geometry | undefined;
-export type FeatureStyleGetter<T extends FeatureInterface> = (entity: T) => IFeatureStyle | IFeatureStyle[];
+export type FeatureStyleGetter<T extends FeatureInterface> = (entity: T) => IFeatureStyle | IFeatureStyle[] | Record<string, IFeatureStyle>;
 
 export type FeatureLayerConfig<T extends FeatureInterface> = {
     geometryGetter: FeatureGeometryGetter<T>;

@@ -139,7 +139,7 @@ export const DatasetDimensionSeriesFilters = (props: DatasetDimensionSeriesFilte
                     series={props.series}
                 />
             </Form.Item>
-            <Form.Item label='Area'>
+            <Form.Item label='Location'>
                 <AnalysisAoiFilter
                     analysis={props.series}
                     supportedGeometries={props.series.config.supportedGeometries}

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { IObservableArray } from 'mobx';
-import { Form, Collapse } from 'antd';
+import { Form, Button } from 'antd';
+import { LeftOutlined } from '@ant-design/icons';
 
 import { DatasetDimensionSeries, DIMENSION_SERIES_TYPE, DatasetDimensionSeriesConfig } from '@oida/eo-mobx';
 import { useSelector } from '@oida/ui-react-mobx';
@@ -18,17 +19,19 @@ export const DatasetDimensionSeriesAnalysis = (props: DatasetAnalysisWidgetFacto
 
     const series = props.combinedAnalysis.analyses as IObservableArray<DatasetDimensionSeries>;
 
-
     let seriesFilters = useSelector(() => series.map((series, idx) => {
 
-        const datasets = props.datasets.filter(dataset => {
-            return dataset.config.tools?.find(tool => tool.type === DIMENSION_SERIES_TYPE);
+        series.setAutoUpdate(false);
+        series.visible.setValue(true);
+
+        const avaialbleDatasetItems = props.datasetExplorerItems.filter(item => {
+            return item.dataset.config.tools?.find(tool => tool.type === DIMENSION_SERIES_TYPE);
         });
 
         const availableTargets = props.availableCombos[props.combinedAnalysis.type]
             .filter((combo => combo.id !== props.combinedAnalysis.id));
 
-        let selectedDataset = props.datasets.find(dataset => dataset === series.dataset);
+        let selectedDataset = avaialbleDatasetItems.find(item => item.dataset === series.dataset);
         if (!selectedDataset) {
             setImmediate(() => {
                 props.combinedAnalysis.removeAnalysis(series);
@@ -41,20 +44,23 @@ export const DatasetDimensionSeriesAnalysis = (props: DatasetAnalysisWidgetFacto
                     <Form.Item label='Dataset'>
                         <DatasetSelector
                             value={series.dataset.id}
-                            datasets={datasets.map(dataset => dataset.config)}
+                            datasets={avaialbleDatasetItems.map(item => item.dataset.config)}
                             onChange={(value) => {
+                                const aoi = series.aoi;
                                 props.combinedAnalysis.removeAnalysis(series);
                                 if (value) {
-                                    let dataset = props.datasets.find(dataset => dataset.id === value);
+                                    let item = avaialbleDatasetItems.find(item => item.dataset.id === value);
 
-                                    if (dataset) {
+                                    if (item) {
                                         const dimensionSeries = new DatasetDimensionSeries({
-                                            dataset: dataset,
-                                            config: dataset.config!.tools!.find(
+                                            dataset: item.dataset,
+                                            config: item.dataset.config!.tools!.find(
                                                 tool => tool.type === DIMENSION_SERIES_TYPE
-                                            )!.config as DatasetDimensionSeriesConfig
+                                            )!.config as DatasetDimensionSeriesConfig,
+                                            autoUpdate: false,
+                                            aoi: aoi,
+                                            parent: item.mapViz
                                         });
-
 
                                         props.combinedAnalysis.addAnalysis(dimensionSeries, idx);
                                     }
@@ -75,34 +81,50 @@ export const DatasetDimensionSeriesAnalysis = (props: DatasetAnalysisWidgetFacto
                 />
             </div>
         );
-    }), [props.datasets, props.availableCombos]);
+    }), [props.datasetExplorerItems, props.availableCombos]);
+
+    const canRunQuery = useSelector(() => {
+        return series.every((item) => item.canRunQuery);
+    });
 
     return (
         <div className='dataset-chart'>
-            <Collapse
-                className='dataset-chart-filters'
-                accordion={true}
-                activeKey={filtersVisible ? 'filters' : undefined}
-                bordered={false}
-                onChange={(activeKey) => {
-                    if (activeKey === 'filters') {
-                        setFiltersVisible(true);
-                    } else {
-                        setFiltersVisible(false);
-                    }
-                }}
-            >
-                <Collapse.Panel
-                    key='filters'
-                    header={<span className='show-filters-title'>Show series parameters</span>}
-                >
-                    {seriesFilters}
-                </Collapse.Panel>
-            </Collapse>
-
-            <DatasetDimensionSeriesChart
-                series={series}
-            />
+            {filtersVisible &&
+                <div className='dataset-chart-form'>
+                    <div className='dataset-chart-filters'>
+                        {seriesFilters}
+                    </div>
+                    <Button
+                        className='dataset-chart-search-btn'
+                        type='primary'
+                        onClick={() => {
+                            series.forEach((item) => item.retrieveData());
+                            setFiltersVisible(false);
+                        }}
+                        disabled={!canRunQuery}
+                    >
+                        Apply
+                    </Button>
+                </div>
+            }
+            {!filtersVisible &&
+                <div className='dataset-chart-result'>
+                    <Button
+                        className='dataset-chart-modify-params-btn'
+                        type='link'
+                        icon={<LeftOutlined />}
+                        onClick={() => {
+                            series.forEach((item) => item.visible.setValue(true));
+                            setFiltersVisible(true);
+                        }}
+                    >
+                        Modify parameters
+                    </Button>
+                    <DatasetDimensionSeriesChart
+                        series={series}
+                    />
+                </div>
+            }
         </div>
     );
 };

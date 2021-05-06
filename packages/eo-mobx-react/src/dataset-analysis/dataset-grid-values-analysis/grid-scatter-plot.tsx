@@ -168,12 +168,16 @@ export const GridScatterPlot = (props: GridScatterPlotProps) => {
                     }, {
                         xAxisIndex: 0,
                         type: 'slider',
+                        // @ts-ignore (wrong echarts typing)
+                        showDataShadow: false
                     }, {
                         yAxisIndex: 0,
                         type: 'inside'
                     }, {
                         yAxisIndex: 0,
                         type: 'slider',
+                        // @ts-ignore (wrong echarts typing)
+                        showDataShadow: false
                     }],
                     series: chartSeries,
                     backgroundColor: 'transparent'

@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-
+import moment from 'moment';
 import { EChartOption } from 'echarts';
 import 'echarts/lib/chart/line';
 import 'echarts/lib/component/tooltip';
@@ -22,6 +22,8 @@ type LegendDataItem = {
     id: string,
     name: string,
     seriesIdx: number,
+    disabled?: boolean,
+    hovered?: boolean,
     description?: string
 };
 
@@ -42,6 +44,10 @@ export function DatasetTransectSeriesChart(props: DatasetTransectSeriesChartProp
         let nextYAxisIndex = 0;
 
         props.series.forEach((series, idx) => {
+
+            if (series.loadingState.value === LoadingState.Init) {
+                return;
+            }
 
             let variable = series.seriesVariable;
             if (!variable) {
@@ -80,10 +86,32 @@ export function DatasetTransectSeriesChart(props: DatasetTransectSeriesChartProp
             }
 
             colors.push(series.color);
+
+            let description = `
+            <div>
+                <div><span>Dataset:</span><span> ${series.dataset.config.name}</span>
+                <div><span>Variable:</span><span> ${variableConfig.name}</span>
+            `;
+            series.dimensions.values.forEach((value, key) => {
+                const dimensionConfig = series.config.dimensions.find((d) => d.id === key);
+                if (dimensionConfig) {
+                    let stringValue = value.toString();
+                    if (value instanceof Date) {
+                        stringValue = moment(value).format('YYYY-MM-DD HH:mm');
+                    }
+                    description += `<div><span>${dimensionConfig.name}:</span><span> ${stringValue}</span></div>`;
+                }
+            });
+
+            description += '</div>';
+
             legendData[idx] = {
                 id: `${idx}`,
                 seriesIdx: idx,
-                name: `${series.dataset.config.name}: ${variableConfig.name}`
+                name: `${series.dataset.config.name}: ${variableConfig.name}`,
+                description: description,
+                disabled: !series.visible.value,
+                hovered: series.hovered.value,
             };
 
             const chartData: Array<number[]> = [];
@@ -153,6 +181,10 @@ export function DatasetTransectSeriesChart(props: DatasetTransectSeriesChartProp
                     if (trackCoordinate) {
                         transectSeries.setHighlightedPosition(data.dataIndex);
                     }
+                } else {
+                    if (trackCoordinate) {
+                        transectSeries.setHighlightedPosition(data.dataIndex);
+                    }
                 }
 
                 line.content.push( `
@@ -219,6 +251,8 @@ export function DatasetTransectSeriesChart(props: DatasetTransectSeriesChartProp
         );
     }
 
+    const highlightedSeries = legendData.findIndex(item => item.hovered);
+
     return (
         <div className='series-chart'>
             <ChartWidget
@@ -231,7 +265,19 @@ export function DatasetTransectSeriesChart(props: DatasetTransectSeriesChartProp
                         right: '10px',
                         formatter: (name) => {
                             return legendData[name].name;
-                        }
+                        },
+                        tooltip: {
+                            show: true,
+                            formatter: (data: EChartOption.Tooltip.Format) => {
+                                return legendData[data.name!].description || '';
+                            }
+                        },
+                        selected: legendData.reduce((selected, item) => {
+                            return {
+                                ...selected,
+                                [item.id]: !item.disabled
+                            };
+                        }, {})
                     },
                     tooltip: {
                         trigger: 'axis',
@@ -262,6 +308,20 @@ export function DatasetTransectSeriesChart(props: DatasetTransectSeriesChartProp
                     series: chartSeries,
                     backgroundColor: 'transparent'
                 } as EChartOption}
+                onHighlight={(evt, highlighted) => {
+                    if (evt.seriesName) {
+                        const series = props.series[parseInt(evt.seriesName)];
+                        if (series) {
+                            series.hovered.setValue(highlighted || false);
+                        }
+                    }
+                }}
+                onLegendItemSelection={(evt) => {
+                    for (let idx in evt.selected) {
+                        props.series[parseInt(idx)].visible.setValue(evt.selected[idx]);
+                    }
+                }}
+                highlightedSeries={highlightedSeries !== -1 ? highlightedSeries : undefined}
                 isLoading={loadingState === LoadingState.Loading}
                 showTip={!trackCoordinate ? highlightedItems[0] : undefined}
             />

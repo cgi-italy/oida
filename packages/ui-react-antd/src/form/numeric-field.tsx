@@ -25,7 +25,9 @@ export const NumericFieldRenderer = (props: FormFieldRendererBaseProps<NumericFi
     useEffect(() => {
         if (props.changeDelay) {
             let debounceTimeout: number | undefined = window.setTimeout(() => {
-                props.onChange(inputValue);
+                if (inputValue !== props.value) {
+                    props.onChange(inputValue);
+                }
                 debounceTimeout = undefined;
             }, props.changeDelay);
 
@@ -35,7 +37,9 @@ export const NumericFieldRenderer = (props: FormFieldRendererBaseProps<NumericFi
                 }
             };
         } else {
-            props.onChange(inputValue);
+            if (inputValue !== props.value) {
+                props.onChange(inputValue);
+            }
         }
     }, [inputValue]);
 
@@ -44,7 +48,9 @@ export const NumericFieldRenderer = (props: FormFieldRendererBaseProps<NumericFi
     };
 
     const onEnterPress = () => {
-        props.onChange(inputValue || undefined);
+        if (inputValue !== props.value) {
+            props.onChange(inputValue || undefined);
+        }
     };
 
     let { value, onChange, title, required, config, autoFocus, changeDelay, ...renderProps } =  props;

@@ -3,7 +3,7 @@ import { Form } from 'antd';
 
 import { useSelector } from '@oida/ui-react-mobx';
 import { DatasetTransectSeries } from '@oida/eo-mobx';
-import { SelectEnumRenderer } from '@oida/ui-react-antd';
+import { NumericFieldRenderer, SelectEnumRenderer } from '@oida/ui-react-antd';
 
 import { DatasetDimensionValueSelector } from '../../dataset-map-viz/dataset-dimension-value-selector';
 import { AnalysisAoiFilter } from '../analysis-aoi-filter';
@@ -62,6 +62,10 @@ export const DatasetTransectSeriesFilters = (props: DatasetTransectSeriesFilters
         });
     }
 
+    const numSamples = useSelector(() => {
+        return props.series.numSamples;
+    }, [props.series]);
+
     return (
         <React.Fragment>
             {dimensionValueSelectors}
@@ -70,7 +74,7 @@ export const DatasetTransectSeriesFilters = (props: DatasetTransectSeriesFilters
                     series={props.series}
                 />
             </Form.Item>
-            <Form.Item label='Area'>
+            <Form.Item label='Path'>
                 <AnalysisAoiFilter
                     analysis={props.series}
                     supportedGeometries={[{
@@ -81,6 +85,20 @@ export const DatasetTransectSeriesFilters = (props: DatasetTransectSeriesFilters
                     }]}
                 />
             </Form.Item>
+            {props.series.config.supportsNumSamples &&
+                <Form.Item label='Num samples'>
+                    <NumericFieldRenderer
+                        config={{
+                            min: 2,
+                            max: props.series.config.maxNumSamples || 50,
+                            step: 1
+                        }}
+                        changeDelay={0}
+                        value={numSamples}
+                        onChange={(value) => props.series.setNumSamples(value)}
+                    />
+                </Form.Item>
+            }
         </React.Fragment>
     );
 

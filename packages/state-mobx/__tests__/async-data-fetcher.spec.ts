@@ -17,13 +17,13 @@ describe('Async data fetcher', () => {
         const firstThenCallback = jest.fn();
         const secondThenCallback = jest.fn();
 
-        const firstRequest = dataFetcher.fetchData().then((data) => {
+        const firstRequest = dataFetcher.fetchData({}).then((data) => {
             firstThenCallback(data);
         });
 
         let secondRequest;
         setTimeout(() => {
-            secondRequest = dataFetcher.fetchData().then((data) => {
+            secondRequest = dataFetcher.fetchData({}).then((data) => {
                 secondThenCallback(data);
 
                 expect(firstThenCallback).toBeCalledTimes(0);
@@ -50,10 +50,10 @@ describe('Async data fetcher', () => {
         const firstThenCallback = jest.fn();
         const secondThenCallback = jest.fn();
 
-        dataFetcher.fetchData().then(firstThenCallback);
+        dataFetcher.fetchData({}).then(firstThenCallback);
 
         setTimeout(() => {
-            dataFetcher.fetchData().then((data) => {
+            dataFetcher.fetchData({}).then((data) => {
                 secondThenCallback(data);
                 expect(firstThenCallback).toBeCalledTimes(0);
                 expect(secondThenCallback).toBeCalledWith('test');

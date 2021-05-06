@@ -7,107 +7,141 @@
     height: 100%;
     overflow: hidden;
 
-    .dataset-chart-filters.ant-collapse {
-        background: transparent;
+    .dataset-chart-form {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+
+        .dataset-chart-search-btn {
+            align-self: flex-end;
+            margin-top: 15px;
+        }
+
+        .dataset-chart-filters {
+            flex-grow: 1;
+            flex-shrink: 1;
+        }
+    }
+
+    .dataset-chart-result {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        align-items: flex-start;
+        height: 100%;
+
+        .series-chart {
+            flex-grow: 1;
+            flex-shrink: 1;
+            align-self: stretch;
+        }
+    }
+
+    .dataset-chart-filters {
+
+        .analysis-parameters {
+            padding: 0.5rem;
+
+            flex-grow: 0;
+            flex-shrink: 0;
+            display: flex;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: @border-radius-base;
+            margin-bottom: 0.5rem;
+
+            .ant-form {
+                flex-grow: 1;
+                flex-shrink: 1;
+
+                .ant-form-item {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    margin-bottom: 0.5em;
+
+                    .ant-form-item-label {
+                        label {
+                            font-size: 12px;
+                        }
+                    }
+
+                    .dataset-dimension-value-selector {
+                        >span {
+                            display: none;
+                        }
+                    }
+                    .dataset-dimension-selector {
+                        >span {
+                            display: none;
+                        }
+                        .ant-slider {
+                            min-width: 140px;
+                            margin: 0 20px;
+
+                            .ant-slider-mark-text {
+                                min-width: 40px;
+                            }
+
+                        }
+                    }
+
+
+                }
+            }
+
+            .analysis-actions {
+                flex-grow: 0;
+                flex-shrink: 0;
+            }
+        }
+
         flex-grow: 0;
         flex-shrink: 0;
         max-height: 100%;
         overflow-y: auto;
         .scrollbar(8px, @primary-color, @primary-2);
 
-        .ant-collapse-item {
+        &.ant-collapse {
+            background: transparent;
 
-            border-bottom: none;
+            .ant-collapse-item {
 
-            .ant-collapse-header {
-                padding: 0.2em 1.5em;
-                height: 25px;
-                font-size: 13px;
-                color: @primary-color;
-
-                .ant-collapse-arrow {
-                    left: 0px;
-                    padding: 0;
-                    top: 50%;
-                    transform: translateY(-50%)
-                }
-            }
-
-            &.ant-collapse-item-active {
+                border-bottom: none;
 
                 .ant-collapse-header {
-                    pointer-events: none;
+                    padding: 0.2em 1.5em;
+                    height: 25px;
+                    font-size: 13px;
+                    color: @primary-color;
 
                     .ant-collapse-arrow {
-                        pointer-events: all;
-                    }
-
-                    .show-filters-title {
-                        display: none;
-                    }
-                }
-            }
-
-            .ant-collapse-content {
-                margin-top: -25px;
-            }
-
-            .analysis-parameters {
-                padding: 0.5rem;
-
-                flex-grow: 0;
-                flex-shrink: 0;
-                display: flex;
-                background: rgba(255, 255, 255, 0.02);
-                border-radius: @border-radius-base;
-                margin-bottom: 0.5rem;
-
-                .ant-form {
-                    flex-grow: 1;
-                    flex-shrink: 1;
-
-                    .ant-form-item {
-                        flex-direction: column;
-                        align-items: flex-start;
-                        margin-bottom: 0.5em;
-
-                        .ant-form-item-label {
-                            label {
-                                font-size: 12px;
-                            }
-                        }
-
-                        .dataset-dimension-value-selector {
-                            >span {
-                                display: none;
-                            }
-                        }
-                        .dataset-dimension-selector {
-                            >span {
-                                display: none;
-                            }
-                            .ant-slider {
-                                min-width: 140px;
-                                margin: 0 20px;
-
-                                .ant-slider-mark-text {
-                                    min-width: 40px;
-                                }
-
-                            }
-                        }
-
-
+                        left: 0px;
+                        padding: 0;
+                        top: 50%;
+                        transform: translateY(-50%)
                     }
                 }
 
-                .analysis-actions {
-                    flex-grow: 0;
-                    flex-shrink: 0;
+                &.ant-collapse-item-active {
+
+                    .ant-collapse-header {
+                        pointer-events: none;
+
+                        .ant-collapse-arrow {
+                            pointer-events: all;
+                        }
+
+                        .show-filters-title {
+                            display: none;
+                        }
+                    }
                 }
+
+                .ant-collapse-content {
+                    margin-top: -25px;
+                }
+
             }
         }
-
 
     }
 

@@ -98,7 +98,7 @@ export const DatasetTimeDimensionSelector = (props: DatasetTimeDimensionSelector
             <span>{props.dimension.name}: </span>
             <DateFieldRenderer
                 value={value}
-                onChange={(value) => props.dimensionsState.values.set(props.dimension.id, value as Date)}
+                onChange={(value) => props.dimensionsState.setValue(props.dimension.id, value as Date)}
                 required={true}
                 config={{
                     minDate: domain ? domain.min : undefined,

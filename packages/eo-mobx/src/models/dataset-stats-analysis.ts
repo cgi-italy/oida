@@ -1,6 +1,6 @@
-import { autorun, observable, makeObservable, action, runInAction, computed } from 'mobx';
+import { autorun, observable, makeObservable, action, computed, reaction } from 'mobx';
 
-import { BBoxGeometry, LoadingState } from '@oida/core';
+import { BBoxGeometry, LoadingState, SubscriptionTracker } from '@oida/core';
 import { AsyncDataFetcher } from '@oida/state-mobx';
 
 import { DatasetVariable, DatasetDimension, DataDomain, TimeSearchDirection, NumericDomain, CategoricalDomain } from '../types';
@@ -50,6 +50,8 @@ export class DatasetStatsAnalysis extends DatasetAnalysis<undefined> implements 
     @observable.ref autoUpdate: boolean;
 
     protected dataFetcher_: AsyncDataFetcher<DatasetStats | undefined, DatasetStatsRequest>;
+    protected subscriptionTracker_: SubscriptionTracker;
+    protected needsUpdate_: boolean;
 
     constructor(props: Omit<DatasetStatsAnalysisProps, 'vizType'>) {
         super({
@@ -69,6 +71,8 @@ export class DatasetStatsAnalysis extends DatasetAnalysis<undefined> implements 
             },
             debounceInterval: this.autoUpdate ? 1000 : 0
         });
+        this.subscriptionTracker_ = new SubscriptionTracker();
+        this.needsUpdate_ = true;
 
         makeObservable(this);
 
@@ -82,6 +86,7 @@ export class DatasetStatsAnalysis extends DatasetAnalysis<undefined> implements 
 
     @action
     setVariable(variable: string | undefined) {
+        this.needsUpdate_ = true;
         this.variable = variable;
     }
 
@@ -106,15 +111,18 @@ export class DatasetStatsAnalysis extends DatasetAnalysis<undefined> implements 
 
     retrieveData() {
         if (this.canRunQuery) {
-            this.dataFetcher_.fetchData({
-                geometry: this.aoi!.geometry.value as (GeoJSON.Polygon | BBoxGeometry),
-                variable: this.variable!,
-                dimensionValues: new Map(this.dimensions.values)
-            }).then((data) => {
-                this.setData_(data);
-            }).catch(() => {
-                this.setData_(undefined);
-            });
+            if (this.needsUpdate_) {
+                this.dataFetcher_.fetchData({
+                    geometry: this.aoi!.geometry.value as (GeoJSON.Polygon | BBoxGeometry),
+                    variable: this.variable!,
+                    dimensionValues: new Map(this.dimensions.values)
+                }).then((data) => {
+                    this.needsUpdate_ = false;
+                    this.setData_(data);
+                }).catch(() => {
+                    this.setData_(undefined);
+                });
+            }
         } else {
             this.loadingState.setValue(LoadingState.Init);
             this.setData_(undefined);
@@ -125,12 +133,18 @@ export class DatasetStatsAnalysis extends DatasetAnalysis<undefined> implements 
         return this.clone_({
             config: this.config,
             variable: this.variable,
-            dimensionValues: this.dimensions.values
+            dimensionValues: this.dimensions.values,
+            autoUpdate: this.autoUpdate
         }) as DatasetStatsAnalysis;
     }
 
+    dispose() {
+        super.dispose();
+        this.subscriptionTracker_.unsubscribe();
+    }
+
     @action
-    setData_(data: DatasetStats | undefined) {
+    protected setData_(data: DatasetStats | undefined) {
         this.data = data;
     }
 
@@ -170,6 +184,18 @@ export class DatasetStatsAnalysis extends DatasetAnalysis<undefined> implements 
                 this.retrieveData();
             }
         });
+
+        const updateTrackerDisposer = reaction(() => {
+            return {
+                aoi: this.geometry,
+                dimensions: new Map(this.dimensions.values)
+            };
+        }, () => {
+            this.needsUpdate_ = true;
+        });
+
+        this.subscriptionTracker_.addSubscription(statsUpdaterDisposer);
+        this.subscriptionTracker_.addSubscription(updateTrackerDisposer);
     }
 
     protected initMapLayer_() {
