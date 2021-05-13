@@ -176,11 +176,13 @@ export const DatasetStatsAnalysisHistogram = (props: DatasetStatsAnalysisProps) 
 
             let variable = analysis.variable;
             if (!variable) {
+                loadingState = LoadingState.Error;
                 return;
             }
 
             let variableConfig = analysis.config.variables.find((v) => v.id === variable);
             if (!variableConfig) {
+                loadingState = LoadingState.Error;
                 return;
             }
 
@@ -196,6 +198,7 @@ export const DatasetStatsAnalysisHistogram = (props: DatasetStatsAnalysisProps) 
             });
 
             if (!analysis.data || !analysis.data.histogram) {
+                loadingState = LoadingState.Error;
                 return;
             }
 

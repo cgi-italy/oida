@@ -1,5 +1,6 @@
 export * from './dataset-dimension-series';
 export * from './dataset-transect-series';
+export * from './dataset-dimension-raster-sequence';
 export * from './dataset-vertical-profile';
 export * from './dataset-stats-analysis';
 export * from './dataset-raster-point-info';

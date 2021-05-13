@@ -13,7 +13,7 @@ type StatsDimensionType = string | Date | number;
 
 export type DatasetStatsRequest = {
     variable: string;
-    geometry: GeoJSON.Polygon | BBoxGeometry;
+    geometry: GeoJSON.Polygon | GeoJSON.MultiPolygon | BBoxGeometry;
     dimensionValues?: Map<string, StatsDimensionType>;
 };
 

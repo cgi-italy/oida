@@ -50,6 +50,14 @@ export class ColorMapDomain {
     setNoDataValue(noDataValue: number | undefined) {
         this.noDataValue = noDataValue;
     }
+
+    asProps(): ColorMapDomainProps {
+        return {
+            mapRange: this.mapRange,
+            clamp: this.clamp,
+            noDataValue: this.noDataValue
+        };
+    }
 }
 
 export type ColorMapProps = {
@@ -85,5 +93,11 @@ export class ColorMap {
         }
     }
 
-}
+    asProps(): ColorMapProps {
+        return {
+            colorScale: this.colorScale,
+            domain: this.domain?.asProps()
+        };
+    }
 
+}

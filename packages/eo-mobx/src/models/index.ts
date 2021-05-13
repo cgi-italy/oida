@@ -4,6 +4,7 @@ import { VERTICAL_PROFILE_VIZ_TYPE, DatasetVerticalProfileViz, DatasetVerticalPr
 import { VOLUMETRIC_VIZ_TYPE, DatasetVolumetricViz, DatasetVolumetricVizProps } from './volumetric-map-viz';
 import { DIMENSION_SERIES_TYPE, DatasetDimensionSeriesProps, DatasetDimensionSeries } from './dataset-dimension-series';
 import { TRANSECT_SERIES_TYPE, DatasetTransectSeries, DatasetTransectSeriesProps } from './dataset-transect-series';
+import { DIMENSION_RASTER_SEQUENCE_TYPE, DatasetDimensionRasterSequence, DatasetDimensionRasterSequenceProps } from './dataset-dimension-raster-sequence';
 import { STATS_ANALYSIS_TYPE, DatasetStatsAnalysis, DatasetStatsAnalysisProps } from './dataset-stats-analysis';
 import { RASTER_POINT_INFO_TYPE, DatasetRasterPointInfo, DatasetRasterPointInfoProps } from './dataset-raster-point-info';
 import { GRID_VALUES_TYPE, DatasetGridValues, DatasetGridValuesProps } from './dataset-grid-values';
@@ -15,6 +16,7 @@ declare module './dataset-viz' {
         [VOLUMETRIC_VIZ_TYPE]: DatasetVolumetricVizProps;
         [DIMENSION_SERIES_TYPE]: DatasetDimensionSeriesProps;
         [TRANSECT_SERIES_TYPE]: DatasetTransectSeriesProps;
+        [DIMENSION_RASTER_SEQUENCE_TYPE]: DatasetDimensionRasterSequenceProps;
         [STATS_ANALYSIS_TYPE]: DatasetStatsAnalysisProps;
         [RASTER_POINT_INFO_TYPE]: DatasetRasterPointInfoProps;
         [GRID_VALUES_TYPE]: DatasetGridValuesProps;
@@ -26,6 +28,7 @@ declare module './dataset-viz' {
         [VOLUMETRIC_VIZ_TYPE]: DatasetVolumetricViz;
         [DIMENSION_SERIES_TYPE]: DatasetDimensionSeries;
         [TRANSECT_SERIES_TYPE]: DatasetTransectSeries;
+        [DIMENSION_RASTER_SEQUENCE_TYPE]: DatasetDimensionRasterSequence;
         [STATS_ANALYSIS_TYPE]: DatasetStatsAnalysis;
         [RASTER_POINT_INFO_TYPE]: DatasetRasterPointInfo;
         [GRID_VALUES_TYPE]: DatasetGridValues;
@@ -39,6 +42,7 @@ DatasetViz.register(VOLUMETRIC_VIZ_TYPE, DatasetVolumetricViz);
 
 DatasetViz.register(DIMENSION_SERIES_TYPE, DatasetDimensionSeries);
 DatasetViz.register(TRANSECT_SERIES_TYPE, DatasetTransectSeries);
+DatasetViz.register(DIMENSION_RASTER_SEQUENCE_TYPE, DatasetDimensionRasterSequence);
 DatasetViz.register(STATS_ANALYSIS_TYPE, DatasetStatsAnalysis);
 DatasetViz.register(RASTER_POINT_INFO_TYPE, DatasetRasterPointInfo);
 DatasetViz.register(GRID_VALUES_TYPE, DatasetGridValues);
@@ -60,6 +64,7 @@ export * from './combo-analysis';
 export * from './dataset-analyses';
 export * from './dataset-dimension-series';
 export * from './dataset-transect-series';
+export * from './dataset-dimension-raster-sequence';
 export * from './dataset-stats-analysis';
 export * from './dataset-raster-point-info';
 export * from './dataset-grid-values';
