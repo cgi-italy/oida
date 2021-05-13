@@ -149,67 +149,34 @@ export class WmsTimeDistributionProvider implements DatasetTimeDistributionProvi
         return Promise.resolve(distributionItems);
     }
 
-    getNearestItem(dt: Date, direction: TimeSearchDirection) {
+    getNearestItem(dt: Date, direction?: TimeSearchDirection) {
         if (direction === TimeSearchDirection.Forward) {
-            let target = this.timeDistribution_.find((item) => {
-                if (item instanceof Date) {
-                    return item >= dt;
-                } else {
-                    return item.end >= dt;
-                }
-            });
-            if (!target) {
-                return Promise.resolve(undefined);
-            }
-            if (target instanceof Date) {
-                return Promise.resolve({
-                    start: target
-                });
-            } else {
-                let distance = dt.getTime() - target.start.getTime();
-                if (distance <= 0) {
-                    return Promise.resolve({
-                        start: target.start
-                    });
-                } else {
-                    let numSteps = Math.ceil(distance / target.step);
-                    return Promise.resolve({
-                        start: new Date(target.start.getTime() + numSteps * target.step)
-                    });
-                }
-            }
+            return this.getNextItem_(dt);
+        } else if (direction === TimeSearchDirection.Backward) {
+            return this.getPrevItem_(dt);
         } else {
-            let target = this.timeDistribution_.slice().reverse().find((item) => {
-                if (item instanceof Date) {
-                    return item <= dt;
+            return Promise.all([
+                this.getPrevItem_(dt),
+                this.getNextItem_(dt)
+            ]).then(([prev, next]) => {
+                if (!prev) {
+                    return next;
+                } else if (!next) {
+                    return prev;
                 } else {
-                    return item.start <= dt;
+                    const prevDistance = dt.getTime() - prev.start.getTime();
+                    const nextDistance = next.start.getTime() - dt.getTime();
+                    if (prevDistance <= nextDistance) {
+                        return prev;
+                    } else {
+                        return next;
+                    }
                 }
             });
-            if (!target) {
-                return Promise.resolve(undefined);
-            }
-            if (target instanceof Date) {
-                return Promise.resolve({
-                    start: target
-                });
-            } else {
-                let distance = target.end.getTime() - dt.getTime();
-                if (distance <= 0) {
-                    return Promise.resolve({
-                        start: target.end
-                    });
-                } else {
-                    let numSteps = Math.ceil(distance / target.step);
-                    return Promise.resolve({
-                        start: new Date(target.end.getTime() - numSteps * target.step)
-                    });
-                }
-            }
         }
     }
 
-    private parseWmsTimeRange_(timeRange: string) {
+    protected parseWmsTimeRange_(timeRange: string) {
 
         if (timeRange.search(',') !== -1) {
             let values = timeRange.split(',');
@@ -234,6 +201,66 @@ export class WmsTimeDistributionProvider implements DatasetTimeDistributionProvi
             });
         } else {
             this.timeDistribution_.push(moment.utc(timeRange).toDate());
+        }
+    }
+
+    protected getNextItem_(dt: Date) {
+        let target = this.timeDistribution_.find((item) => {
+            if (item instanceof Date) {
+                return item >= dt;
+            } else {
+                return item.end >= dt;
+            }
+        });
+        if (!target) {
+            return Promise.resolve(undefined);
+        }
+        if (target instanceof Date) {
+            return Promise.resolve({
+                start: target
+            });
+        } else {
+            let distance = dt.getTime() - target.start.getTime();
+            if (distance <= 0) {
+                return Promise.resolve({
+                    start: target.start
+                });
+            } else {
+                let numSteps = Math.ceil(distance / target.step);
+                return Promise.resolve({
+                    start: new Date(target.start.getTime() + numSteps * target.step)
+                });
+            }
+        }
+    }
+
+    protected getPrevItem_(dt: Date) {
+        let target = this.timeDistribution_.slice().reverse().find((item) => {
+            if (item instanceof Date) {
+                return item <= dt;
+            } else {
+                return item.start <= dt;
+            }
+        });
+        if (!target) {
+            return Promise.resolve(undefined);
+        }
+        if (target instanceof Date) {
+            return Promise.resolve({
+                start: target
+            });
+        } else {
+            let distance = target.end.getTime() - dt.getTime();
+            if (distance <= 0) {
+                return Promise.resolve({
+                    start: target.end
+                });
+            } else {
+                let numSteps = Math.ceil(distance / target.step);
+                return Promise.resolve({
+                    start: new Date(target.end.getTime() - numSteps * target.step)
+                });
+            }
         }
     }
 }

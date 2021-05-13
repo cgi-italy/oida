@@ -53,32 +53,56 @@ export class VideoTimeDistributionProvider implements DatasetTimeDistributionPro
         }
     }
 
-    getNearestItem(dt: Date, direction: TimeSearchDirection) {
+    getNearestItem(dt: Date, direction?: TimeSearchDirection) {
         let target: Date | undefined;
         if (direction === TimeSearchDirection.Forward) {
-            if (dt > this.timeRange_.end) {
-                target = undefined;
-            } else if (dt < this.timeRange_.start) {
-                target = this.timeRange_.start;
-            } else if (this.frameDuration_) {
-                const distance = dt.getTime() - this.timeRange_.start.getTime();
-                target = new Date(this.timeRange_.start.getTime() + this.frameDuration_ * Math.ceil(distance / this.frameDuration_));
-            } else {
-                target = dt;
-            }
+            target = this.getNextItem_(dt);
+        } else if (direction === TimeSearchDirection.Backward) {
+            target = this.getPrevItem_(dt);
         } else {
-            if (dt < this.timeRange_.start) {
-                target = undefined;
-            } else if (dt > this.timeRange_.end) {
-                target = this.timeRange_.end;
-            } else if (this.frameDuration_) {
-                const distance = dt.getTime() + 1 - this.timeRange_.start.getTime();
-                target = new Date(this.timeRange_.start.getTime() + this.frameDuration_ * Math.floor(distance / this.frameDuration_));
+            const next = this.getNextItem_(dt);
+            const prev = this.getPrevItem_(dt);
+            if (!next) {
+                target = prev;
+            } else if (!prev) {
+                target = next;
             } else {
-                target = dt;
+                const nextDistance = next.getTime() - dt.getTime();
+                const prevDistance = dt.getTime() - prev.getTime();
+                target = nextDistance < prevDistance ? next : prev;
             }
         }
         return Promise.resolve(target ? {start: new Date(target)} : undefined);
+    }
+
+    protected getNextItem_(dt: Date) {
+        let target: Date | undefined;
+        if (dt > this.timeRange_.end) {
+            target = undefined;
+        } else if (dt < this.timeRange_.start) {
+            target = this.timeRange_.start;
+        } else if (this.frameDuration_) {
+            const distance = dt.getTime() - this.timeRange_.start.getTime();
+            target = new Date(this.timeRange_.start.getTime() + this.frameDuration_ * Math.ceil(distance / this.frameDuration_));
+        } else {
+            target = dt;
+        }
+        return target;
+    }
+
+    protected getPrevItem_(dt: Date) {
+        let target: Date | undefined;
+        if (dt < this.timeRange_.start) {
+            target = undefined;
+        } else if (dt > this.timeRange_.end) {
+            target = this.timeRange_.end;
+        } else if (this.frameDuration_) {
+            const distance = dt.getTime() + 1 - this.timeRange_.start.getTime();
+            target = new Date(this.timeRange_.start.getTime() + this.frameDuration_ * Math.floor(distance / this.frameDuration_));
+        } else {
+            target = dt;
+        }
+        return target;
     }
 }
 

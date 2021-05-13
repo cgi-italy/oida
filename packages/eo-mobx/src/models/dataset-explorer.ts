@@ -135,7 +135,7 @@ export class DatasetExplorerItem {
                 this.pendingNearestTimeRequests_ = undefined;
             }
             this.pendingNearestTimeRequests_ = timeDistributionProvider.getNearestItem(
-                filter.value, TimeSearchDirection.Backward
+                filter.value
             ).then((item) => {
                 if (!item || !item.start) {
                     this.dataset.filters.unset(

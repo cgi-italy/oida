@@ -78,6 +78,10 @@ export type DatasetTimeDistributionVizProps = {
 } & Omit<DatasetVizProps, 'vizType'>;
 
 
+/**
+ * A class to manage a dataset time distribution. Automatically created as part of {@link DatasetExplorerItem}
+ * so no need to instantiate it directly except for its use outside of {@link DatasetExplorer}
+ */
 export class DatasetTimeDistributionViz extends DatasetViz<undefined> {
 
     readonly config: DatasetTimeDistributionConfig;

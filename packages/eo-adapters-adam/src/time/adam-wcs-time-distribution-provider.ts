@@ -126,7 +126,7 @@ export class AdamWcsTimeDistributionProvider implements DatasetTimeDistributionP
         });
     }
 
-    getNearestItem(dt: Date, direction: TimeSearchDirection) {
+    getNearestItem(dt: Date, direction?: TimeSearchDirection) {
         return this.getTimeExtent().then((timeExtent) => {
             if (!timeExtent) {
                 return undefined;
@@ -159,11 +159,40 @@ export class AdamWcsTimeDistributionProvider implements DatasetTimeDistributionP
                     };
                 }
             } else {
-                let nearestItem = this.getNearestItemFromCache_(timeExtent, dt, direction);
-                if (!nearestItem) {
-                    nearestItem = this.getNearestItemFromCatalogue_(dt, direction);
+                if (direction) {
+                    let nearestItem = this.getNearestItemFromCache_(timeExtent, dt, direction);
+                    if (!nearestItem) {
+                        nearestItem = this.getNearestItemFromCatalogue_(dt, direction);
+                    }
+                    return nearestItem;
+                } else {
+                    return Promise.all([
+                        this.getNearestItemFromCache_(timeExtent, dt, TimeSearchDirection.Backward).then((item) => {
+                            if (!item) {
+                                return this.getNearestItemFromCatalogue_(dt, TimeSearchDirection.Backward);
+                            }
+                        }),
+                        this.getNearestItemFromCache_(timeExtent, dt, TimeSearchDirection.Forward).then((item) => {
+                            if (!item) {
+                                return this.getNearestItemFromCatalogue_(dt, TimeSearchDirection.Forward);
+                            }
+                        })
+                    ]).then(([prev, next]) => {
+                        if (!prev) {
+                            return next;
+                        } else if (!next) {
+                            return prev;
+                        } else {
+                            const prevDistance = dt.getTime() - prev.start.getTime();
+                            const nextDistance = next.start.getTime() - dt.getTime();
+                            if (prevDistance <= nextDistance) {
+                                return prev;
+                            } else {
+                                return next;
+                            }
+                        }
+                    });
                 }
-                return nearestItem;
             }
 
         });
