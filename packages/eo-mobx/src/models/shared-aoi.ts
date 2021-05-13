@@ -5,16 +5,19 @@ import { computed, action, observable, makeObservable } from 'mobx';
 
 
 export type SharedAoiProps = {
+    name?: string;
 } & GeometryProps;
 
 export class SharedAoi implements HasGeometry {
     geometry: GeometryState;
 
+    @observable protected name_: string | undefined;
     @observable protected referenceCount_: number;
 
     constructor(props: SharedAoiProps) {
         this.referenceCount_ = 0;
         this.geometry = new GeometryState(props);
+        this.name_ = props.name;
 
         makeObservable(this);
     }
@@ -25,7 +28,12 @@ export class SharedAoi implements HasGeometry {
 
     @computed
     get name() {
-        return `${this.geometry.value.type}`;
+        return this.name_ || `${this.geometry.value.type}`;
+    }
+
+    @action
+    setName(name: string | undefined) {
+        this.name_ = name;
     }
 
     @action

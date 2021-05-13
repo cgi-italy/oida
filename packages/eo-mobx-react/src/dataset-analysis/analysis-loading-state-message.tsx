@@ -3,13 +3,15 @@ import React from 'react';
 import { Empty } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
 import { LoadingState } from '@oida/core';
+import { PropTypes } from 'mobx-react';
 
 export type AnalysisLoadingStateMessageProps = {
     loadingState: LoadingState,
     initMessage?: string;
+    errorMessage?: string;
 };
 
-export const AnalysisLoadingStateMessage = ({loadingState, initMessage}: AnalysisLoadingStateMessageProps) => {
+export const AnalysisLoadingStateMessage = ({loadingState, initMessage, errorMessage}: AnalysisLoadingStateMessageProps) => {
 
     return (
         <React.Fragment>
@@ -28,7 +30,7 @@ export const AnalysisLoadingStateMessage = ({loadingState, initMessage}: Analysi
             {(loadingState === LoadingState.Error) &&
                 <Empty
                     image={Empty.PRESENTED_IMAGE_SIMPLE}
-                    description='No data found'
+                    description={errorMessage || 'Error retrieving data'}
                 />
             }
         </React.Fragment>

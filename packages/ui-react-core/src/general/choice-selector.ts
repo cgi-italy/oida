@@ -8,7 +8,7 @@ export type Choice<U> = {
 } & U;
 
 export type ChoiceSelectorProps<U = {}> = {
-    value: string;
+    value: string | undefined;
     items: Choice<U>[];
     onSelect: (value: string) => void;
 };

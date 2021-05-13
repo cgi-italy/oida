@@ -213,7 +213,10 @@ const useMapAoiImporterBase = (props: MapAoiImporterProps) => {
                 loadingState,
                 ...items
             },
-            filters: filtering,
+            filters: {
+                ...filtering,
+                mainFilter: 'name'
+            },
             sorting,
             paging
         };

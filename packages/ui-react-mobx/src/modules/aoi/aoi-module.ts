@@ -57,7 +57,8 @@ export class AoiModule extends AppModule {
                 geometryGetter: (aoi) => aoi.geometry.value,
                 styleGetter: defaultAoiStyleGetter
             },
-            source: this.aois.items
+            source: this.aois.items,
+            zIndex: 10
         });
 
         props.mapModule.map.layers.children.add(this.aoiLayer);

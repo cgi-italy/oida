@@ -9,7 +9,7 @@ import { LinkOutlined, DragOutlined } from '@ant-design/icons';
 import { AoiSupportedGeometry, AoiAction, AoiValue } from '@oida/core';
 import { DatasetAnalysis, SharedAoi } from '@oida/eo-mobx';
 import { AoiFieldRenderer } from '@oida/ui-react-antd';
-import { useMapAoiDrawerFromModule, useAoiAction, useSelector } from '@oida/ui-react-mobx';
+import { useMapAoiDrawerFromModule, useAoiAction, useSelector, useMapAoiImporter } from '@oida/ui-react-mobx';
 
 import { useAnalysisGeometryFromModule } from './use-analysis-geometry';
 
@@ -61,16 +61,19 @@ export const AnalysisAoiFilter = (props: AnalysisAoiFilterProps) => {
     const isLinked = useSelector(() => props.analysis.aoi?.shared || false, [props.analysis]);
 
     let value =  geometryValue ? {
-        geometry: geometryValue
+        geometry: geometryValue,
+        name: aoi?.name
     } : undefined;
 
     const onChange = (value: AoiValue | undefined) => {
         if (value) {
             if (props.analysis.aoi) {
                 props.analysis.aoi.geometry.setValue(value.geometry);
+                props.analysis.aoi.setName(value.props?.name);
             } else {
                 props.analysis.setAoi({
-                    geometry: value.geometry
+                    geometry: value.geometry,
+                    name: value.props?.name
                 });
             }
         } else {
@@ -93,10 +96,17 @@ export const AnalysisAoiFilter = (props: AnalysisAoiFilterProps) => {
         onActiveActionChange
     });
 
+    const importerProps = useMapAoiImporter({
+        value,
+        onChange,
+        onActiveActionChange
+    });
+
     let analysisGeometryState = useAnalysisGeometryFromModule(props.analysis);
 
     let aoiFilterConfig = {
         ...analysisGeometryState,
+        importConfig: importerProps,
         activeAction,
         onActiveActionChange,
         supportedGeometries: props.supportedGeometries,
@@ -122,7 +132,10 @@ export const AnalysisAoiFilter = (props: AnalysisAoiFilterProps) => {
                 <AoiFieldRenderer
                     config={aoiFilterConfig}
                     value={geometryValue ? {
-                        geometry: geometryValue
+                        geometry: geometryValue,
+                        props: {
+                            name: aoi?.name
+                        }
                     } : undefined}
                     onChange={onChange}
                 />
