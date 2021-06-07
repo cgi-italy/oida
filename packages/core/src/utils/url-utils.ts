@@ -21,7 +21,7 @@ export const isAbsoluteUrl = (url: string) => {
  * @param url a relative or absolute url
  * @param fileUrl the file url used as the reference location to resolve relative urls
  */
-export const getFullUrlStartingFromFile = (url, fileUrl) => {
+export const getFullUrlStartingFromFile = (url: string, fileUrl: string) => {
     if (isAbsoluteUrl(url)) {
         return url;
     } else {
@@ -49,7 +49,7 @@ export const urlParamsSerializer = (params: Record<string, string | string[]>, o
             });
         } else {
             if (value !== undefined) {
-                urlParams.push(`${key}=${value}`);
+                urlParams.push(`${key}=${value.replace(/\%/g, '%25')}`);
             }
         }
     }
