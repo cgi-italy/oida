@@ -118,7 +118,7 @@ export const AdvancedSearchFilterer = (props: AdvancedSearchFiltererProps) => {
                 }}
                 prefix={
                     <React.Fragment>
-                        {!!mainFilter && <SearchOutlined/>}
+                        <SearchOutlined/>
                         <QueryFiltersTags filters={tagsFilters}/>
                     </React.Fragment>
                 }
@@ -136,12 +136,11 @@ export const AdvancedSearchFilterer = (props: AdvancedSearchFiltererProps) => {
                             }
                             {!mainFilter &&
                                 <Tooltip title={expandButtonTooltip || 'Filters'}>
-                                    {expandButtonIcon &&
-                                        <div onClick={() => setAdvancedSearchVisible(!advancedSearchVisible)}>{props.expandButtonIcon}</div>
-                                    }
-                                    {!expandButtonIcon &&
-                                        <FilterOutlined onClick={() => setAdvancedSearchVisible(!advancedSearchVisible)}/>
-                                    }
+                                {
+                                    advancedSearchVisible
+                                    ? <UpOutlined onClick={() => setAdvancedSearchVisible(false)}/>
+                                    : <DownOutlined onClick={() => setAdvancedSearchVisible(true)}/>
+                                }
                                 </Tooltip>
                             }
                         </React.Fragment>

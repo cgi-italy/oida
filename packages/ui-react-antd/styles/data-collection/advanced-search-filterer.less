@@ -11,8 +11,64 @@
 }
 
 .advanced-search-filterer {
-    .query-filters-tags {
-        margin-left: 0.5em;
+    display: flex;
+    flex-wrap: wrap;
+    position: relative;
+
+    &::before {
+        height: 0;
+    }
+
+    .ant-input-prefix {
+        flex-basis: 0;
+        flex-grow: 1;
+        align-items: flex-start;
+        margin-left: 15px;
+
+        .anticon-search {
+            position: absolute;
+            top: 8px;
+            left: 10px;
+        }
+
+        .query-filters-tags {
+            margin-left: 0.5em;
+
+            .ant-tag {
+                word-break: break-all;
+                white-space: normal;
+                margin-bottom: 4px;
+            }
+        }
+    }
+
+    .ant-input {
+        flex-basis: calc(100% - 30px);
+        flex-grow: 1;
+    }
+
+    .ant-input-suffix {
+        .ant-input-clear-icon {
+            position: absolute;
+            bottom: 8px;
+            right: 20px;
+        }
+
+        .anticon-down, .anticon-up {
+            position: absolute;
+            top: 8px;
+            right: 6px;
+        }
+    }
+
+    &.ant-input-affix-wrapper-sm {
+        .anticon-search {
+            top: 5px;
+        }
+
+        .anticon-down, .anticon-up {
+            top: 5px;
+        }
     }
 
     &.without-main-filter {
