@@ -9,7 +9,7 @@ import moment from 'moment';
 import { Button, Tooltip } from 'antd';
 import { ColumnWidthOutlined, ClockCircleOutlined, SearchOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 
-import { DateRangeValue } from '@oida/core';
+import { AOI_FIELD_ID, DateRangeValue } from '@oida/core';
 import { ArrayTracker } from '@oida/state-mobx';
 import { DateFieldRenderer, DateRangeFieldRenderer } from '@oida/ui-react-antd';
 import { useSelector } from '@oida/ui-react-mobx';
@@ -157,9 +157,20 @@ export const DatasetTimelineGroupTemplate = (props: DatasetTimelineGroupTemplate
                     size='small'
                     type='link'
                     onClick={() => {
-                        timeProvider.getTimeExtent(Array.from(datasetView.dataset.filters.items.values())).then((range) => {
+
+                        const filters = datasetView.dataset.additionalFilters.asArray();
+                        const aoi = datasetView.dataset.aoi;
+                        if (aoi) {
+                            filters.push({
+                                key: 'aoi',
+                                type: AOI_FIELD_ID,
+                                value: aoi
+                            });
+                        }
+
+                        timeProvider.getTimeExtent(filters).then((range) => {
                             if (range) {
-                                props.explorerState.timeExplorer?.visibleRange.centerRange(
+                                props.explorerState.timeExplorer?.timeRange.centerRange(
                                     new Date(range.start), new Date(range.end), {
                                         margin: 0.1,
                                         animate: true
@@ -228,40 +239,41 @@ export const DatasetDiscoveryTimeline = (props: DatasetExplorerTimelineProps) =>
         if (runningRequest && runningRequest.cancel) {
             runningRequest.cancel();
         }
-        let searchDirection = (selectedDate && date > selectedDate) ? TimeSearchDirection.Forward : TimeSearchDirection.Backward;
+        let searchDirection = (selectedToi instanceof Date && date > selectedToi)
+            ? TimeSearchDirection.Forward
+            : TimeSearchDirection.Backward;
+
         runningRequest = getNearestDatasetProduct(date, searchDirection, props.explorerState.items).then(nearestItem => {
             runningRequest = undefined;
             if (nearestItem) {
-                props.explorerState.setSelectedDate(nearestItem);
+                props.explorerState.setToi(nearestItem);
                 if (timeExplorer) {
                     setVisibleRange({
-                        ...timeExplorer.visibleRange.range
+                        ...timeExplorer.timeRange.value
                     });
                 }
             } else {
-                props.explorerState.setSelectedDate(date);
+                props.explorerState.setToi(date);
             }
         });
     };
 
     const goToTimeSelection = () => {
-        if (timeExplorer) {
-            if (timeSelectionMode === DatasetTimelineTimeSelectionMode.Instant && props.explorerState.selectedDate) {
-                timeExplorer.visibleRange.centerDate(props.explorerState.selectedDate, {
+        const toi = props.explorerState.toi;
+        if (timeExplorer && toi) {
+            if (toi instanceof Date) {
+                timeExplorer.timeRange.centerDate(toi, {
                     animate: true
                 });
-            } else if (timeSelectionMode === DatasetTimelineTimeSelectionMode.Range && props.explorerState.toi) {
-                let queryRange = props.explorerState.toi;
-                if (queryRange) {
-                    timeExplorer.visibleRange.centerRange(
-                        queryRange.start,
-                        queryRange.end,
-                        {
-                            margin: 0.2,
-                            animate: true
-                        }
-                    );
-                }
+            } else {
+                timeExplorer.timeRange.centerRange(
+                    toi.start,
+                    toi.end,
+                    {
+                        margin: 0.2,
+                        animate: true
+                    }
+                );
             }
         }
     };
@@ -280,7 +292,7 @@ export const DatasetDiscoveryTimeline = (props: DatasetExplorerTimelineProps) =>
     const timelineGroups = useRef(new DataSet<DatasetDiscoveryTimelineGroup>());
     const timelineItems = useRef(new DataSet<TimelineItem>());
 
-    const [visibleRange, setVisibleRange] = useState(timeExplorer ? timeExplorer.visibleRange.range : {
+    const [visibleRange, setVisibleRange] = useState(timeExplorer ? timeExplorer.timeRange.value : {
         start: moment.utc().subtract(1, 'month').toDate(),
         end: moment.utc().toDate()
     });
@@ -288,40 +300,56 @@ export const DatasetDiscoveryTimeline = (props: DatasetExplorerTimelineProps) =>
     const [groupLabelsMode, setGroupLabelsMode] = useState(TimelineGroupLabelsMode.Block);
     const [timeSelectionMode, setTimeSelectionMode] = useState(DatasetTimelineTimeSelectionMode.Instant);
 
-    const selectedDate = useSelector(() => props.explorerState.selectedDate);
+    const selectedToi = useSelector(() => props.explorerState.toi);
 
     const onTimelineClick = useCallback((evt: TimelineEventPropertiesResult) => {
         if (timeSelectionMode === DatasetTimelineTimeSelectionMode.Instant) {
             if (evt.what === 'item' && evt.item) {
                 let item = timelineItems.current.get(evt.item);
                 if (item && item.type === 'point') {
-                    props.explorerState.setSelectedDate(moment(item.start).toDate());
+                    const dt = moment(item.start).toDate();
+                    // click on specific product check for the corresponding dataset
+                    if (item.group) {
+                        const explorerItem = props.explorerState.getDataset(item.group.toString());
+                        if (explorerItem) {
+                            // dataset found. set the toi there.
+                            // if time sync is enabled on the dataset it will be propagated to the explorer
+                            explorerItem.dataset.setToi(dt);
+                            return;
+                        }
+                    }
+                    // dataset not found. set the toi globally on the explorer
+                    props.explorerState.setToi(dt);
                     return;
                 }
             }
             if (evt.what === 'custom-time') {
+                // click on the time indicator. do nothing
                 return;
             }
             if (evt.what === 'group-label') {
+                // click inside the product labels area. do nothing
                 return;
             }
             if (evt.group) {
-                let view = props.explorerState.getDataset(evt.group.toString());
-                const provider = view?.timeDistributionViz?.config.provider;
+                // click within a dataset line. find the nearest product for that specific dataset
+                const explorerItem = props.explorerState.getDataset(evt.group.toString());
+                const provider = explorerItem?.timeDistributionViz?.config.provider;
                 if (provider) {
-                    let searchDirection = (selectedDate && evt.time > selectedDate)
+                    let searchDirection = (explorerItem?.dataset.toi instanceof Date && evt.time > explorerItem?.dataset.toi)
                         ? TimeSearchDirection.Forward
                         : TimeSearchDirection.Backward;
                     provider.getNearestItem(evt.time, searchDirection).then(nearestItem => {
                         if (nearestItem) {
-                            props.explorerState.setSelectedDate(nearestItem.start);
+                            explorerItem!.dataset.setToi(nearestItem.start);
                         } else {
+                            // check for out of dataset range click
                             provider.getTimeExtent().then((timeExtent) => {
                                 if (timeExtent) {
                                     if (evt.time > timeExtent.end) {
-                                        props.explorerState.setSelectedDate(timeExtent.end);
+                                        explorerItem!.dataset.setToi(timeExtent.end);
                                     } else {
-                                        props.explorerState.setSelectedDate(timeExtent.start);
+                                        explorerItem!.dataset.setToi(timeExtent.start);
                                     }
                                 }
                             });
@@ -330,10 +358,10 @@ export const DatasetDiscoveryTimeline = (props: DatasetExplorerTimelineProps) =>
                     return;
                 }
             }
-
+            // search for the nearest product for all datasets
             onSelectedDateChange(evt.time);
         }
-    }, [timeSelectionMode, selectedDate]);
+    }, [timeSelectionMode, selectedToi]);
 
     useEffect(() => {
 
@@ -392,11 +420,41 @@ export const DatasetDiscoveryTimeline = (props: DatasetExplorerTimelineProps) =>
                     }
                 });
 
+                //highlight the currently selected granule for the dataset
+                const selectedGranuleId = `${datasetView.dataset.id}_selected_granule`;
+                const selectedGranuleHighlightDisposer = autorun(() => {
+                    const toi = datasetView.dataset.toi;
+                    if (toi instanceof Date) {
+                        if (timelineItems.current.get(selectedGranuleId)) {
+                            timelineItems.current.update({
+                                id: selectedGranuleId,
+                                start: toi,
+                                end: toi
+                            });
+                        } else {
+                            timelineItems.current.add({
+                                id: selectedGranuleId,
+                                content: '',
+                                type: 'point',
+                                className: 'dataset-selected-granule',
+                                group: datasetView.dataset.id,
+                                start: toi,
+                                end: toi,
+                                style: `background-color: ${datasetView.dataset.config.color};`
+                            });
+                        }
+                    } else {
+                        timelineItems.current.remove(selectedGranuleId);
+                    }
+                });
+
                 updateGroupsOrdering();
 
                 return (() => {
                     groupItemsTracker.destroy();
                     timelineGroups.current.remove(groupId);
+                    selectedGranuleHighlightDisposer();
+                    timelineItems.current.remove(selectedGranuleId);
                 });
 
             },
@@ -412,14 +470,9 @@ export const DatasetDiscoveryTimeline = (props: DatasetExplorerTimelineProps) =>
 
         let visibleRangeTrackerDisposer = autorun(() => {
             if (timeExplorer) {
-                setVisibleRange(timeExplorer.visibleRange.range);
+                setVisibleRange(timeExplorer.timeRange.value);
             }
         });
-
-
-        if (!props.explorerState.selectedDate) {
-            props.explorerState.setSelectedDate(new Date());
-        }
 
         return (() => {
             if (timeExplorer) {
@@ -436,7 +489,7 @@ export const DatasetDiscoveryTimeline = (props: DatasetExplorerTimelineProps) =>
             const queryRangeTrackerDisposer = autorun(() => {
                 let queryRange = props.explorerState.toi;
 
-                if (queryRange) {
+                if (queryRange && !(queryRange instanceof Date)) {
                     setEditableRanges([{
                         id: 'query',
                         start: queryRange.start,
@@ -462,12 +515,19 @@ export const DatasetDiscoveryTimeline = (props: DatasetExplorerTimelineProps) =>
             };
         } else {
 
-            let queryRange = props.explorerState.toi;
+            let toi = props.explorerState.toi;
 
-            onSelectedDateChange(queryRange ? queryRange.end : new Date());
+            if (toi) {
+                if (!(toi instanceof Date)) {
+                    // when switching from range mode to instant mode we select the product nearest to the current range end
+                    onSelectedDateChange(toi.end);
+                }
+            } else {
+                onSelectedDateChange(new Date());
+            }
 
             return () => {
-                props.explorerState.setSelectedDate(undefined);
+                props.explorerState.setToi(undefined);
             };
         }
     }, [timeSelectionMode]);
@@ -480,10 +540,7 @@ export const DatasetDiscoveryTimeline = (props: DatasetExplorerTimelineProps) =>
                 onGroupLabelsModeChange={(mode) => setGroupLabelsMode(mode)}
                 timeSelectionMode={timeSelectionMode}
                 onTimeSelectionModeChange={(mode) => setTimeSelectionMode(mode)}
-                selectedTime={timeSelectionMode === DatasetTimelineTimeSelectionMode.Instant
-                    ? props.explorerState.selectedDate
-                    : props.explorerState.toi
-                }
+                selectedTime={selectedToi}
                 onSelectedTimeChange={(value) => {
                     if (timeSelectionMode === DatasetTimelineTimeSelectionMode.Instant) {
                         onSelectedDateChange(value as Date);
@@ -500,7 +557,7 @@ export const DatasetDiscoveryTimeline = (props: DatasetExplorerTimelineProps) =>
                 editableRanges={editableRanges}
                 onRangeChange={(range) => {
                     if (timeExplorer) {
-                        timeExplorer.visibleRange.setRange(range.start!, range.end!);
+                        timeExplorer.timeRange.setValue(range.start!, range.end!);
                     }
                 }}
                 groupLabelsMode={groupLabelsMode}
@@ -525,9 +582,9 @@ export const DatasetDiscoveryTimeline = (props: DatasetExplorerTimelineProps) =>
                     } as unknown as string;
 
                 }}
-                selectedDates={selectedDate ? [{
+                selectedDates={selectedToi instanceof Date ? [{
                     id: 'selected-date',
-                    value: selectedDate,
+                    value: selectedToi,
                     onDateChange: onSelectedDateChange
                 }] : undefined}
                 onSelectedChange={(item) => {

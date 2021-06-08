@@ -1,9 +1,9 @@
-import { autorun, observable, makeObservable, action, runInAction, computed, reaction } from 'mobx';
+import { autorun, observable, makeObservable, action, computed, reaction } from 'mobx';
 import nearestPointOnLine from '@turf/nearest-point-on-line';
 import along from '@turf/along';
 import chroma from 'chroma-js';
 
-import { Geometry, IFeatureStyle, IndexableGeometry, LoadingState, SubscriptionTracker } from '@oida/core';
+import { Geometry, IFeatureStyle, IndexableGeometry, LoadingState, QueryFilter, SubscriptionTracker } from '@oida/core';
 import { AsyncDataFetcher } from '@oida/state-mobx';
 
 import { DatasetDimension, DataDomain, TimeSearchDirection, NumericVariable } from '../types';
@@ -21,6 +21,7 @@ export type DatasetTransectSeriesRequest = {
     geometry: GeoJSON.LineString;
     numSamples?: number;
     dimensionValues?: Map<string, TransectDimensionType>;
+    additionalDatasetFilters?: Map<string, QueryFilter>;
 };
 
 export type DatasetTransectSeriesProvider = (request: DatasetTransectSeriesRequest) => Promise<Array<{x: number, y: number}>>;
@@ -260,7 +261,8 @@ export class DatasetTransectSeries extends DatasetAnalysis<undefined> implements
                     geometry: this.aoi?.geometry.value as GeoJSON.LineString,
                     variable: this.seriesVariable!,
                     dimensionValues: new Map(this.dimensions.values),
-                    numSamples: this.numSamples
+                    numSamples: this.numSamples,
+                    additionalDatasetFilters: new Map(this.dataset.additionalFilters.items)
                 }).then((data) => {
                     this.setData_(data || []);
                     this.needsUpdate_ = false;
@@ -304,7 +306,7 @@ export class DatasetTransectSeries extends DatasetAnalysis<undefined> implements
             // dimension value to the current dataset selected time
             const timeDimension = this.config.dimensions.find((dimension) => dimension.id === 'time');
             if (timeDimension) {
-                const datasetTime = this.dataset.selectedTime;
+                const datasetTime = this.dataset.toi;
                 if (datasetTime) {
                     if (datasetTime instanceof Date) {
                         this.dimensions.setValue('time', datasetTime);

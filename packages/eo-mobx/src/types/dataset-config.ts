@@ -30,13 +30,15 @@ export type DatasetConfig<MAP_VIEW_TYPE extends keyof DatasetVizDefinitions = ke
     color?: string;
     /** An optional dataset icon. Not used anywhere yet */
     icon?: string;
-    /** By default a dataset will have spatial and temporal filters. Provide here any additional filters supported
+    /**
+     * By default a dataset will have spatial and temporal filters. Provide here any additional filters supported
      * by this dataset for product
      */
     filters: IFormFieldDefinition[];
     /** The configuration for dataset time distribution retrieval. If not provided the dataset will be considered timeless */
     timeDistribution?: DatasetTimeDistributionConfig;
-    /** The configuration for product retrieval within the dataset. The filters provided in {@link DatasetConfig.filters}
+    /**
+     * The configuration for product retrieval within the dataset. The filters provided in {@link DatasetConfig.filters}
      * will be available for search. If not provided it will not possible to search for dataset products
     */
     productSearch?: DatasetProductSearchConfig;

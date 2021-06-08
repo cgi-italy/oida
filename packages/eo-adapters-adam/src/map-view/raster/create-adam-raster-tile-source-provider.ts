@@ -72,14 +72,14 @@ export const createAdamRasterTileSourceProvider = (
 
         let subsets: string[] = [];
 
-        let timeSubset = getWcsTimeFilterSubset(rasterView.dataset.selectedTime);
+        let timeSubset = getWcsTimeFilterSubset(rasterView.dataset.toi);
         if (!timeSubset) {
             return Promise.reject(new Error('The layer time span is outside of the selected time range'));
         } else {
             subsets.push(timeSubset);
         }
 
-        const aoiParams = getAoiWcsParams(datasetConfig, rasterView.dataset.aoiFilter);
+        const aoiParams = getAoiWcsParams(datasetConfig, rasterView.dataset.aoi);
         if (!aoiParams) {
             return Promise.reject(new Error('The layer extent does not intersect the selected area of interest'));
         }
@@ -117,7 +117,7 @@ export const createAdamRasterTileSourceProvider = (
         }
 
         return spatialCoverageProvider(rasterView, true).then((coverageExtent) => {
-            const aoiParams = getAoiWcsParams(datasetConfig, rasterView.dataset.aoiFilter, coverageExtent);
+            const aoiParams = getAoiWcsParams(datasetConfig, rasterView.dataset.aoi, coverageExtent);
 
             if (!aoiParams) {
                 return Promise.reject(new Error('The layer extent does not intersect the selected area of interest'));

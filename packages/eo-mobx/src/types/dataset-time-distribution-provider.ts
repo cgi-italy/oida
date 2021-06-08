@@ -19,5 +19,7 @@ export interface DatasetTimeDistributionProvider {
         (TimeDistributionRangeItem | TimeDistributionInstantItem)[]
     >;
     getTimeExtent: (filters?: QueryFilter[]) => Promise<TimeDistributionRangeItem | undefined>;
-    getNearestItem: (dt: Date, direction?: TimeSearchDirection) => Promise<TimeDistributionInstantItem | undefined>;
+    getNearestItem: (
+        dt: Date, direction?: TimeSearchDirection, filters?: QueryFilter[]
+    ) => Promise<TimeDistributionInstantItem | undefined>;
 }

@@ -14,7 +14,7 @@ export const getWmtsDomainSpatialCoverageProvider = (props: WmtsDomainSpatialCov
 
     return (datasetViz: DatasetViz) => {
 
-        const toi = datasetViz.dataset.selectedTime;
+        const toi = datasetViz.dataset.toi;
         let timeRestriction: undefined | string;
         if (toi) {
             if (toi instanceof Date) {

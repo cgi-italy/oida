@@ -7,14 +7,14 @@ export const downloadAdamWcsRaster = (datasetConfig: AdamDatasetConfig, rasterVi
 
     let subsets: string[] = [];
 
-    let timeSubset = getWcsTimeFilterSubset(rasterView.dataset.selectedTime);
+    let timeSubset = getWcsTimeFilterSubset(rasterView.dataset.toi);
     if (!timeSubset) {
         return undefined;
     } else {
         subsets.push(timeSubset);
     }
 
-    const aoiParams = getAoiWcsParams(datasetConfig, rasterView.dataset.aoiFilter);
+    const aoiParams = getAoiWcsParams(datasetConfig, rasterView.dataset.aoi);
     if (!aoiParams) {
         return undefined;
     } else {

@@ -1,8 +1,10 @@
 import { IObservableArray, observable, action, makeObservable } from 'mobx';
 
-import { Active, ActiveProps, IsActivable, IsEntity } from '@oida/state-mobx';
+import { Active, ActiveProps, FeatureStyleGetter, IsActivable, IsEntity } from '@oida/state-mobx';
 import { Geometry, createDynamicFactory } from '@oida/core';
+
 import { DatasetConfig } from '../types/dataset-config';
+import { DatasetExplorerItemInitialState } from './dataset-explorer';
 
 export interface DatasetDiscoveryProviderItem extends IsEntity {
     geometry?: Geometry;
@@ -149,7 +151,8 @@ export abstract class DatasetDiscoveryProvider<
     /**
      * The results datasets array. Its population is responsability of the inherited class
      */
-    protected results_: IObservableArray<T>;
+    @observable.ref protected results_: IObservableArray<T>;
+    @observable.ref protected mapFeatureStyler_: FeatureStyleGetter<DatasetDiscoveryProviderItem> | undefined;
 
     constructor(props: DatasetDiscoveryProviderProps) {
         this.id = props.id;
@@ -161,6 +164,7 @@ export abstract class DatasetDiscoveryProvider<
         this.results_ = observable.array([], {
             deep: false
         });
+        this.mapFeatureStyler_ = undefined;
 
         makeObservable(this);
     }
@@ -168,10 +172,14 @@ export abstract class DatasetDiscoveryProvider<
     /**
      * create the dataset configuration for a specific item
      */
-    abstract createDataset(item: T): Promise<DatasetConfig | undefined>;
+    abstract createDataset(item: T): Promise<(DatasetConfig & {initialState?: DatasetExplorerItemInitialState}) | undefined>;
 
     get results() {
         return this.results_;
+    }
+
+    get mapFeatureStyler() {
+        return this.mapFeatureStyler_;
     }
 
     @action

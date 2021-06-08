@@ -72,12 +72,12 @@ export const getAdamVolumetricMapViewConfig = (
 
             const sourceSubsets: string[] = [];
 
-            const timeSubset = getWcsTimeFilterSubset(volumetricViz.dataset.selectedTime);
+            const timeSubset = getWcsTimeFilterSubset(volumetricViz.dataset.toi);
             if (timeSubset) {
                 sourceSubsets.push(timeSubset);
             }
 
-            let aoiFilter = volumetricViz.dataset.aoiFilter;
+            let aoiFilter = volumetricViz.dataset.aoi;
 
             const aoiParams = getAoiWcsParams(datasetConfig, aoiFilter);
 

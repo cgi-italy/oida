@@ -63,7 +63,7 @@ export class DatasetVideoMapViz extends DatasetViz<GeoImageLayer> {
             mapState: mapState,
             onTimeUpdate: (time) => {
                 const dt = this.getDateFromFrameTime_(time);
-                this.dataset.setSelectedDate(dt);
+                this.dataset.setToi(dt);
             }
         });
         return this.source.mapLayer;
@@ -74,7 +74,7 @@ export class DatasetVideoMapViz extends DatasetViz<GeoImageLayer> {
 
         const timeUpdateDisposer = autorun(() => {
             if (this.source.ready) {
-                const selectedTime = this.dataset.selectedTime;
+                const selectedTime = this.dataset.toi;
                 if (!this.source.isPlaying) {
                     let time = selectedTime instanceof Date ? selectedTime : selectedTime?.end;
                     if (time) {

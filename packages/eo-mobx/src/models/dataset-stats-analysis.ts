@@ -1,6 +1,6 @@
 import { autorun, observable, makeObservable, action, computed, reaction } from 'mobx';
 
-import { BBoxGeometry, LoadingState, SubscriptionTracker } from '@oida/core';
+import { AoiSupportedGeometry, BBoxGeometry, LoadingState, QueryFilter, SubscriptionTracker } from '@oida/core';
 import { AsyncDataFetcher } from '@oida/state-mobx';
 
 import { DatasetVariable, DatasetDimension, DataDomain, TimeSearchDirection, NumericDomain, CategoricalDomain } from '../types';
@@ -15,6 +15,7 @@ export type DatasetStatsRequest = {
     variable: string;
     geometry: GeoJSON.Polygon | GeoJSON.MultiPolygon | BBoxGeometry;
     dimensionValues?: Map<string, StatsDimensionType>;
+    additionalDatasetFilters?: Map<string, QueryFilter>;
 };
 
 export type HistogramBin = [x_center: number, count: number, x_min: number, x_max: number];
@@ -31,6 +32,7 @@ export type DatasetStatsProvider = (request: DatasetStatsRequest) => Promise<Dat
 
 export type DatasetStatsAnalysisConfig = {
     variables: DatasetVariable<NumericDomain | CategoricalDomain<number>>[];
+    supportedGeometries: AoiSupportedGeometry[];
     provider: DatasetStatsProvider;
     dimensions: DatasetDimension<DataDomain<StatsDimensionType>>[];
 };
@@ -115,6 +117,7 @@ export class DatasetStatsAnalysis extends DatasetAnalysis<undefined> implements 
                 this.dataFetcher_.fetchData({
                     geometry: this.aoi!.geometry.value as (GeoJSON.Polygon | BBoxGeometry),
                     variable: this.variable!,
+                    additionalDatasetFilters: new Map(this.dataset.additionalFilters.items),
                     dimensionValues: new Map(this.dimensions.values)
                 }).then((data) => {
                     this.needsUpdate_ = false;
@@ -158,7 +161,7 @@ export class DatasetStatsAnalysis extends DatasetAnalysis<undefined> implements 
             // dimension value to the current dataset selected time
             const timeDimension = this.config.dimensions.find((dimension) => dimension.id === 'time');
             if (timeDimension) {
-                const datasetTime = this.dataset.selectedTime;
+                const datasetTime = this.dataset.toi;
                 if (datasetTime) {
                     if (datasetTime instanceof Date) {
                         this.dimensions.setValue('time', datasetTime);
@@ -166,7 +169,11 @@ export class DatasetStatsAnalysis extends DatasetAnalysis<undefined> implements 
                         //a time range is currently selected. try to find the time nearest to the range end time
                         const timeProvider = this.dataset.config.timeDistribution?.provider;
                         if (timeProvider) {
-                            timeProvider.getNearestItem(datasetTime.end, TimeSearchDirection.Backward).then((dt) => {
+                            timeProvider.getNearestItem(
+                                datasetTime.end,
+                                TimeSearchDirection.Backward,
+                                this.dataset.additionalFilters.asArray()
+                            ).then((dt) => {
                                 if (dt) {
                                     this.dimensions.setValue('time', dt.start);
                                 }

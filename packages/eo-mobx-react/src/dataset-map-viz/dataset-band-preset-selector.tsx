@@ -68,26 +68,33 @@ export const DatasetBandPresetSelector = (props: DatasetBandPresetSelectorProps)
     let selectedPresetConfig = props.presets.find(preset => preset.id === selectedPreset);
 
     return (
-        <Dropdown
-            trigger={['click']}
-            placement='bottomLeft'
-            onVisibleChange={(visible) => setDropDownVisible(visible)}
-            visible={dropDownVisible}
-            overlay={<DatasetBandPresetList
-                presets={props.presets}
-                selectedPreset={selectedPreset}
-                onPresetSelect={(preset) => {
-                    props.state.setPreset(preset);
-                    setDropDownVisible(false);
-                }}
-            />}
-        >
-            <div className='dataset-raster-band-preset'>
-                {selectedPresetConfig && <DatasetBandPresetSelectorItem
-                    preset={selectedPresetConfig}
+        <div className='dataset-raster-band-preset-selector'>
+            <Dropdown
+                trigger={['click']}
+                placement='bottomLeft'
+                onVisibleChange={(visible) => setDropDownVisible(visible)}
+                visible={dropDownVisible}
+                overlay={<DatasetBandPresetList
+                    presets={props.presets}
+                    selectedPreset={selectedPreset}
+                    onPresetSelect={(preset) => {
+                        props.state.setPreset(preset);
+                        setDropDownVisible(false);
+                    }}
                 />}
-                <Button type='link'><DownOutlined/></Button>
-            </div>
-        </Dropdown>
+            >
+                <div className='dataset-raster-band-preset'>
+                    {selectedPresetConfig && <DatasetBandPresetSelectorItem
+                        preset={selectedPresetConfig}
+                    />}
+                    <Button type='link'><DownOutlined/></Button>
+                </div>
+            </Dropdown>
+            {selectedPresetConfig && selectedPresetConfig.legend &&
+                <div className='dataset-raster-band-preset-legend'>
+                    <img src={selectedPresetConfig.legend}/>
+                </div>
+            }
+        </div>
     );
 };

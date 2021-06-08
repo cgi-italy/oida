@@ -35,7 +35,7 @@ export class TimeRange {
     }
 
     @computed
-    get range() {
+    get value() {
         return {
             start: this.start,
             end: this.end
@@ -43,7 +43,7 @@ export class TimeRange {
     }
 
     @action
-    setRange(start: Date, end: Date, animate?: boolean) {
+    setValue(start: Date, end: Date, animate?: boolean) {
 
         if (start.getTime() > end.getTime()) {
             return;
@@ -83,7 +83,7 @@ export class TimeRange {
         }
         let rangeSize = end.getTime() - start.getTime();
         let timeMargin = rangeSize * (options?.margin !== undefined ? options.margin : 0.2);
-        this.setRange(new Date(start.getTime() - timeMargin),  new Date(end.getTime() + timeMargin), options?.animate);
+        this.setValue(new Date(start.getTime() - timeMargin),  new Date(end.getTime() + timeMargin), options?.animate);
     }
 
     @action
@@ -92,7 +92,7 @@ export class TimeRange {
             return;
         }
         let halfRangeSize = (this.end.getTime() - this.start.getTime()) / 2;
-        this.setRange(new Date(dt.getTime() - halfRangeSize), new Date(dt.getTime() + halfRangeSize), options?.animate);
+        this.setValue(new Date(dt.getTime() - halfRangeSize), new Date(dt.getTime() + halfRangeSize), options?.animate);
     }
 
     protected animateRange_(nextStart: Date, nextEnd: Date) {

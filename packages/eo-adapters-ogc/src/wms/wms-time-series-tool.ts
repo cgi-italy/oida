@@ -1,4 +1,4 @@
-import { DatasetDimensionSeriesConfig, DatasetTimeDistributionProvider, DIMENSION_SERIES_TYPE } from '@oida/eo-mobx';
+import { DatasetDimensionSeriesConfig, DatasetTimeDistributionProvider, DatasetToolConfig, DIMENSION_SERIES_TYPE } from '@oida/eo-mobx';
 import { WmsService } from './wms-service';
 
 export type WmsTimeSeriesConfig = {
@@ -43,5 +43,5 @@ export const getWmsTimeSeriesToolConfig = (props: WmsTimeSeriesConfig) => {
         type: DIMENSION_SERIES_TYPE,
         name: 'Series analysis',
         config: timeSeriesToolConfig
-    };
+    } as DatasetToolConfig<typeof DIMENSION_SERIES_TYPE>;
 };

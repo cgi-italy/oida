@@ -190,17 +190,24 @@ export const DatasetStatsAnalysisHistogram = (props: DatasetStatsAnalysisProps) 
                 return;
             }
 
+            if (analysis.loadingState.value === LoadingState.Loading) {
+                loadingState = LoadingState.Loading;
+            } else if (analysis.loadingState.value === LoadingState.Success && loadingState !== LoadingState.Loading) {
+                loadingState = LoadingState.Success;
+            } else if (analysis.loadingState.value === LoadingState.Error && loadingState !== LoadingState.Success) {
+                loadingState = LoadingState.Error;
+            }
+
+            if (!analysis.data || !analysis.data.histogram) {
+                return;
+            }
+
             const variableDomain = variableConfig.domain;
 
             const domainMapper = new NumericDomainMapper({
                 domain: variableDomain && !isDomainProvider(variableDomain) ? variableDomain : undefined,
                 unitsSymbol: variableConfig.units
             });
-
-            if (!analysis.data || !analysis.data.histogram) {
-                loadingState = LoadingState.Error;
-                return;
-            }
 
             domainMappers.push(domainMapper);
 
@@ -230,14 +237,6 @@ export const DatasetStatsAnalysisHistogram = (props: DatasetStatsAnalysisProps) 
                 right: 40,
                 containLabel: true
             });
-
-            if (analysis.loadingState.value === LoadingState.Loading) {
-                loadingState = LoadingState.Loading;
-            } else if (analysis.loadingState.value === LoadingState.Success && loadingState !== LoadingState.Loading) {
-                loadingState = LoadingState.Success;
-            } else if (analysis.loadingState.value === LoadingState.Error && loadingState !== LoadingState.Success) {
-                loadingState = LoadingState.Error;
-            }
 
             chartSeries.push({
                 type: 'bar',
@@ -299,7 +298,7 @@ export const DatasetStatsAnalysisHistogram = (props: DatasetStatsAnalysisProps) 
     return (
         <div className='dataset-stats-analysis'>
             <div className='series-chart'>
-                <DatasetStatsTable analyses={props.analyses}/>
+                {loadingState === LoadingState.Success && <DatasetStatsTable analyses={props.analyses}/>}
                 <ChartWidget
                     onSizeChange={(size) => {
                         setChartSize(size);
@@ -434,7 +433,7 @@ export const DatasetStatsAnalysisHistogram = (props: DatasetStatsAnalysisProps) 
 
                         selectedRange.analysis.dimensions.values.forEach((value, key) => {
                             if (key === 'time') {
-                                selectedRange.analysis.dataset.setSelectedDate(value as Date);
+                                selectedRange.analysis.dataset.setToi(value as Date);
                             } else {
                                 parentViz.dimensions.setValue(key, value);
                             }

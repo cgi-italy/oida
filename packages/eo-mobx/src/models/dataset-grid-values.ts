@@ -1,6 +1,6 @@
 import { autorun, observable, makeObservable, action, computed, reaction } from 'mobx';
 
-import { BBoxGeometry, LoadingState, SubscriptionTracker } from '@oida/core';
+import { BBoxGeometry, LoadingState, QueryFilter, SubscriptionTracker } from '@oida/core';
 import { AsyncDataFetcher } from '@oida/state-mobx';
 
 import { DatasetVariable, DatasetDimension, DataDomain, NumericDomain, CategoricalDomain, TimeSearchDirection } from '../types';
@@ -14,8 +14,9 @@ type DimensionType = string | Date | number;
 
 export type DatasetGridValuesRequest = {
     bbox: number[];
-    dimensionValues?: Map<string, DimensionType>;
     variable: string;
+    dimensionValues?: Map<string, DimensionType>;
+    additionalDatasetFilters?: Map<string, QueryFilter>;
     gridSize?: number[];
 };
 
@@ -110,7 +111,8 @@ export class DatasetGridValues extends DatasetAnalysis<undefined> implements Has
                 this.dataFetcher_.fetchData({
                     bbox: (this.aoi!.geometry.value as BBoxGeometry).bbox,
                     variable: this.variable!,
-                    dimensionValues: new Map(this.dimensions.values)
+                    dimensionValues: new Map(this.dimensions.values),
+                    additionalDatasetFilters: new Map(this.dataset.additionalFilters.items)
                 }).then((data) => {
                     this.needsUpdate_ = false;
                     this.setData_(data);
@@ -148,7 +150,7 @@ export class DatasetGridValues extends DatasetAnalysis<undefined> implements Has
             // dimension value to the current dataset selected time
             const timeDimension = this.config.dimensions.find((dimension) => dimension.id === 'time');
             if (timeDimension) {
-                const datasetTime = this.dataset.selectedTime;
+                const datasetTime = this.dataset.toi;
                 if (datasetTime) {
                     if (datasetTime instanceof Date) {
                         this.dimensions.setValue('time', datasetTime);

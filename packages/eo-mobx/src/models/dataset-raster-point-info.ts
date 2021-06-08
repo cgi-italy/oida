@@ -1,6 +1,6 @@
 import { autorun, observable, makeObservable, action, computed } from 'mobx';
 
-import { LoadingState, SubscriptionTracker } from '@oida/core';
+import { LoadingState, QueryFilter, SubscriptionTracker } from '@oida/core';
 import { AsyncDataFetcher, MapLayer } from '@oida/state-mobx';
 
 import { DatasetDimension, DataDomain, NumericVariable } from '../types';
@@ -16,6 +16,7 @@ type DimensionType = string | Date | number;
 export type DatasetRasterPointInfoRequest = {
     position: GeoJSON.Position;
     dimensionValues?: Map<string, DimensionType>;
+    additionalDatasetFilters?: Map<string, QueryFilter>;
 };
 
 export type DatasetRasterPointData = Record<string, number>;
@@ -103,7 +104,8 @@ export class DatasetRasterPointInfo extends DatasetAnalysis<undefined> implement
         if (this.canRunQuery) {
             this.dataFetcher_.fetchData({
                 position: (this.aoi!.geometry.value as GeoJSON.Point).coordinates,
-                dimensionValues: new Map(this.dimensions.values)
+                dimensionValues: new Map(this.dimensions.values),
+                additionalDatasetFilters: new Map(this.dataset.additionalFilters.items)
             }).then((data) => {
                 this.setData_(data);
             }).catch(() => {
@@ -159,7 +161,7 @@ export class DatasetRasterPointInfo extends DatasetAnalysis<undefined> implement
     protected syncParentDimensions_() {
         const timeDimension = this.config.dimensions.find((dimension) => dimension.id === 'time');
         if (timeDimension) {
-            const datasetTime = this.dataset.selectedTime;
+            const datasetTime = this.dataset.toi;
             if (datasetTime) {
                 if (datasetTime instanceof Date) {
                     this.dimensions.setValue('time', datasetTime);

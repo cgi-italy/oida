@@ -3,12 +3,22 @@ import moment from 'moment';
 import { WmsClient, WmsCapabilities, WmsLayer } from './wms-client';
 import { QueryParams, SortOrder } from '@oida/core';
 
+export type WmsVendor = 'geoserver';
+
 export type WmsServiceConfig = {
+    /** The service URL */
     url: string;
+    /** The service version (default '1.3.0') */
     version?: string;
+    /** The WMS client instance */
     wmsClient?: WmsClient;
+    /** A flag indicating if it is an ncWMS, supporting the GetTimeSeries operation */
     ncWms?: boolean;
-    isGeoserver?: boolean;
+    /**
+     * A flag indicating the wms service vendors (some additional capabilities may be available)
+     * Currently only Geoserver specific behaviours are supported
+     */
+    vendor?: WmsVendor;
 };
 
 export enum WmsLayerPreviewMode {
@@ -58,7 +68,7 @@ export class WmsService {
     }
 
     getVersion() {
-        return this.config_.version;
+        return this.config_.version || '1.3.0';
     }
 
     isNcWms() {
@@ -84,7 +94,7 @@ export class WmsService {
 
     getLayerCapabilities(layerName: string) {
         // Geoserver support WMS capabilities retrieval for a single layer
-        if (this.config_.isGeoserver && !this.globalCapabilities_) {
+        if (this.config_.vendor === 'geoserver' && !this.globalCapabilities_) {
 
             if (!this.cachedCapabilities_[layerName]) {
 

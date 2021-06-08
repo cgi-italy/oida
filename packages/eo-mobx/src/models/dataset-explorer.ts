@@ -1,21 +1,28 @@
-import { autorun, computed, makeObservable, observable, action, observe } from 'mobx';
+import { autorun, computed, makeObservable, observable, action } from 'mobx';
 import moment from 'moment';
 
-import { SubscriptionTracker, AoiValue, DateRangeValue, QueryFilter, DATE_FIELD_ID, DATE_RANGE_FIELD_ID, randomColorFactory } from '@oida/core';
-import { GroupLayer, MapLayer, DataFilters } from '@oida/state-mobx';
+import { SubscriptionTracker, AoiValue, DateRangeValue, randomColorFactory, QueryFilter } from '@oida/core';
+import { GroupLayer, MapLayer, DataFiltersProps } from '@oida/state-mobx';
 
-import { Dataset, DATASET_AOI_FILTER_KEY, DATASET_TIME_RANGE_FILTER_KEY, DATASET_SELECTED_TIME_FILTER_KEY } from './dataset';
+import { Dataset } from './dataset';
 import { DatasetConfig } from '../types/dataset-config';
-import { DatasetViz, DatasetVizConfig } from './dataset-viz';
+import { DatasetViz } from './dataset-viz';
 import { DatasetTimeDistributionViz } from './dataset-time-distribution-viz';
 import { TimeRange } from './time-range';
-import { TimeSearchDirection } from '../types/dataset-time-distribution-provider';
 import { DatasetAnalyses } from './dataset-analyses';
 
+
+export type DatasetExplorerItemInitialState = {
+    disableToiSync?: boolean,
+    aoi?: AoiValue,
+    toi?: Date | DateRangeValue,
+    additionalFilters?: Record<string, QueryFilter>,
+};
 
 export type DatasetExplorerItemProps = {
     datasetConfig: DatasetConfig;
     explorer: DatasetExplorer;
+    initialState?: DatasetExplorerItemInitialState;
 };
 
 /**
@@ -35,6 +42,7 @@ export class DatasetExplorerItem {
     readonly mapViz: DatasetViz<MapLayer | undefined> | undefined;
     readonly timeDistributionViz: DatasetTimeDistributionViz | undefined;
     readonly explorer: DatasetExplorer;
+    @observable.ref toiSyncDisabled: boolean;
 
     protected pendingNearestTimeRequests_: Promise<any> | undefined;
     protected subscriptionTracker_: SubscriptionTracker;
@@ -42,14 +50,20 @@ export class DatasetExplorerItem {
     constructor(props: DatasetExplorerItemProps) {
         this.dataset = new Dataset({
             config: props.datasetConfig,
-            onSelectedDateUpdate: ((dt: Date) => {
-                // sync the dataset selected date with the global explorer selected date
-                props.explorer.setSelectedDate(dt);
-            })
+            additionalFilters: {
+                values: props.initialState?.additionalFilters
+            },
+            aoi: props.initialState?.aoi,
+            toi: props.initialState?.toi,
+            onToiUpdate: (toi) => {
+                if (!this.toiSyncDisabled && toi !== undefined) {
+                    this.explorer.setToi(toi);
+                }
+            },
         });
         this.explorer = props.explorer;
 
-        if (this.explorer.vizExplorer && props.datasetConfig.mapView) {
+        if (this.explorer.mapExplorer && props.datasetConfig.mapView) {
 
             this.mapViz = DatasetViz.create<any>({
                 dataset: this.dataset,
@@ -67,16 +81,21 @@ export class DatasetExplorerItem {
             });
         }
 
+        this.toiSyncDisabled = props.initialState?.disableToiSync || false;
+
         this.subscriptionTracker_ = new SubscriptionTracker();
 
         this.afterInit_();
     }
 
+    @action
+    setToiSyncEnabled(enabled: boolean) {
+        this.cancelPendingTimeRequest_();
+        this.toiSyncDisabled = !enabled;
+    }
+
     dispose() {
-        if (this.pendingNearestTimeRequests_ && this.pendingNearestTimeRequests_.cancel) {
-            this.pendingNearestTimeRequests_.cancel();
-            this.pendingNearestTimeRequests_ = undefined;
-        }
+        this.cancelPendingTimeRequest_();
         if (this.mapViz) {
             this.mapViz.dispose();
         }
@@ -86,20 +105,25 @@ export class DatasetExplorerItem {
 
     protected afterInit_() {
 
-        //propagate the dataset explorer common filters to the dataset filters
-        const filterTrackerDisposer = observe(this.explorer.commonFilters.items, (change) => {
-            if (change.type === 'add' || change.type === 'update') {
-                this.applyFilter_(change.newValue);
-            } else if (change.type === 'delete') {
-                this.dataset.filters.unset(change.oldValue.key);
+        //propagate the explorer aoi to the dataset
+        const aoiSyncDisposer = autorun(() => {
+            this.dataset.setAoi(this.explorer.aoi);
+        });
+
+        //propagate the explorer selected time of interest to the dataset (nearest match)
+        const toiSyncDisposer = autorun(() => {
+            if (!this.toiSyncDisabled) {
+                const toi = this.explorer.toi;
+                if (toi instanceof Date) {
+                    this.setDatasetToiFromDate_(toi);
+                } else {
+                    this.dataset.setToi(toi, true);
+                }
             }
         });
 
-        this.explorer.commonFilters.items.forEach((filter) => {
-            this.applyFilter_(filter);
-        });
-
-        this.subscriptionTracker_.addSubscription(filterTrackerDisposer);
+        this.subscriptionTracker_.addSubscription(aoiSyncDisposer);
+        this.subscriptionTracker_.addSubscription(toiSyncDisposer);
 
         const timeExplorer = this.explorer.timeExplorer;
         const timeDistributionViz = this.timeDistributionViz;
@@ -108,11 +132,11 @@ export class DatasetExplorerItem {
             //time explorer visible range
             const timeDistributionSearchParamsDisposer = autorun(() => {
                 const active = timeExplorer.active;
-                let timeRange = timeExplorer.visibleRange.range;
+                let timeRange = timeExplorer.timeRange.value;
                 if (active) {
                     timeDistributionViz.setSearchParams({
                         ...timeRange,
-                        resolution: timeExplorer.visibleRange.resolution
+                        resolution: timeExplorer.timeRange.resolution
                     });
                 }
             });
@@ -121,61 +145,53 @@ export class DatasetExplorerItem {
         }
     }
 
-    protected applyFilter_(filter: QueryFilter) {
+    protected setDatasetToiFromDate_(dt: Date) {
+
+        this.cancelPendingTimeRequest_();
+
+        //find the nearest match
         const timeDistributionProvider = this.dataset.config.timeDistribution?.provider;
-        if (
-            filter.key === DATASET_SELECTED_TIME_FILTER_KEY
-            && filter.value !== undefined
-            && this.explorer.vizExplorer?.nearestMatch
-            && timeDistributionProvider
-        ) {
-            // find the dataset product nearest to the selected time
-            if (this.pendingNearestTimeRequests_ && this.pendingNearestTimeRequests_.cancel) {
-                this.pendingNearestTimeRequests_.cancel();
-                this.pendingNearestTimeRequests_ = undefined;
-            }
-            this.pendingNearestTimeRequests_ = timeDistributionProvider.getNearestItem(
-                filter.value
-            ).then((item) => {
-                if (!item || !item.start) {
-                    this.dataset.filters.unset(
-                        DATASET_SELECTED_TIME_FILTER_KEY
-                    );
-                } else {
-                    let currentDatasetTime = this.dataset.filters.get(DATASET_SELECTED_TIME_FILTER_KEY)?.value;
-                    let nearestMatch = item.start;
-                    if (!currentDatasetTime || currentDatasetTime.getTime() !== nearestMatch.getTime()) {
-                        this.dataset.filters.set(
-                            DATASET_SELECTED_TIME_FILTER_KEY,
-                            nearestMatch,
-                            filter.type
-                        );
+        if (timeDistributionProvider) {
+            this.pendingNearestTimeRequests_ = timeDistributionProvider.getNearestItem(dt).then((item) => {
+                if (!this.toiSyncDisabled) {
+                    if (!item || !item.start) {
+                        this.dataset.setToi(undefined, true);
+                    } else {
+                        this.dataset.setToi(item.start, true);
                     }
                 }
             }).catch((error) => {
-                this.dataset.filters.unset(
-                    DATASET_SELECTED_TIME_FILTER_KEY
-                );
+                if (!this.toiSyncDisabled) {
+                    this.dataset.setToi(undefined, true);
+                }
             });
         } else {
-            this.dataset.filters.set(filter.key, filter.value, filter.type);
+            this.dataset.setToi(dt, true);
         }
     }
+
+    protected cancelPendingTimeRequest_() {
+        if (this.pendingNearestTimeRequests_ && this.pendingNearestTimeRequests_.cancel) {
+            this.pendingNearestTimeRequests_.cancel();
+            this.pendingNearestTimeRequests_ = undefined;
+        }
+    }
+
 }
 
 /**
- * A class to manage the datasets time exploration state. It is part of the {@link DatasetExplorer} state
+ * A class to manage the datasets time exploration state. It is part of the {@link DatasetExplorer} state.
  * and all datasets added to the explorer will provide their products {@link DatasetTimeDistributionViz | time distribution}
  * in the time range set here.
  */
 export class DatasetTimeExplorer {
     @observable.ref active: boolean;
     /** The explorer visible time range */
-    readonly visibleRange: TimeRange;
+    readonly timeRange: TimeRange;
 
     constructor() {
         this.active = false;
-        this.visibleRange = new TimeRange({
+        this.timeRange = new TimeRange({
             start: moment().subtract(1, 'month').toDate(),
             end: moment().toDate(),
         });
@@ -192,7 +208,7 @@ export class DatasetTimeExplorer {
 /**
  * A class to manage the datasets map visualizations. It is part of the {@link DatasetExplorer} state
  */
-export class DatasetVizExplorer {
+export class DatasetMapExplorer {
     readonly mapLayer: GroupLayer;
     @observable.ref nearestMatch: boolean;
 
@@ -241,14 +257,13 @@ export class DatasetExplorer {
      * The layer group containing all datasets map visualizations (i.e. layers and analyses).
      */
     readonly mapLayer: GroupLayer;
-    /**
-     * A set of filters common to all EO datasets. They usually include an Area of interest and a time filter
-     */
-    readonly commonFilters: DataFilters;
+
+    @observable.ref aoi: AoiValue | undefined;
+    @observable.ref toi: Date | DateRangeValue | undefined;
     /** The dataset time explorer state  */
     readonly timeExplorer: DatasetTimeExplorer | undefined;
     /** The map explorer. It contains all dataset map visualizations */
-    readonly vizExplorer: DatasetVizExplorer | undefined;
+    readonly mapExplorer: DatasetMapExplorer | undefined;
     /** The dataset analyses */
     readonly analyses: DatasetAnalyses;
     /** The datasets array */
@@ -259,13 +274,16 @@ export class DatasetExplorer {
     constructor(props: DatasetsExplorerProps) {
         this.config = props.config || {};
         this.mapLayer = props.mapLayer;
-        this.commonFilters = new DataFilters();
+
+        this.aoi = undefined;
+        this.toi = undefined;
+
         if (!props.config?.disableTimeExplorer) {
             this.timeExplorer = new DatasetTimeExplorer();
         }
         if (!props.config?.disableMapView) {
-            this.vizExplorer = new DatasetVizExplorer();
-            this.mapLayer.children.add(this.vizExplorer.mapLayer);
+            this.mapExplorer = new DatasetMapExplorer();
+            this.mapLayer.children.add(this.mapExplorer.mapLayer);
         }
 
         this.analyses = new DatasetAnalyses({
@@ -275,56 +293,62 @@ export class DatasetExplorer {
 
         this.subscriptionTracker_ = new SubscriptionTracker();
 
-        this.afterInit_();
-
         makeObservable(this);
+
+        this.afterInit_();
     }
 
-    @computed
-    get aoi(): AoiValue | undefined {
-        return this.commonFilters.get(DATASET_AOI_FILTER_KEY)?.value;
+    @action
+    setAoi(aoi: AoiValue | undefined) {
+        this.aoi = aoi;
     }
 
-    @computed
-    get toi(): DateRangeValue | undefined {
-        return this.commonFilters.get(DATASET_TIME_RANGE_FILTER_KEY)?.value;
+    @action
+    setToi(toi: Date | DateRangeValue | undefined) {
+        //avoid update on deep equality
+        if (toi instanceof Date) {
+            if (this.toi instanceof Date && toi.getTime() === this.toi.getTime()) {
+                return;
+            }
+        } else if (toi) {
+            if (this.toi && !(this.toi instanceof Date)) {
+                if (this.toi.start.getTime() === toi.start.getTime() && this.toi.end.getTime() === toi.end.getTime()) {
+                    return;
+                }
+            }
+        }
+        this.toi = toi;
     }
 
-    @computed
-    get selectedDate(): Date | undefined {
-        return this.commonFilters.get(DATASET_SELECTED_TIME_FILTER_KEY)?.value;
-    }
 
     @computed
     get shouldEnableTimeExplorer(): boolean {
         return this.timeExplorer !== undefined && this.items.some(dataset => !!dataset.timeDistributionViz);
     }
 
-    @action
-    setSelectedDate(date: Date | undefined) {
-        this.commonFilters.set(DATASET_SELECTED_TIME_FILTER_KEY, date, DATE_FIELD_ID);
-    }
 
     @action
-    setToi(dateRange: DateRangeValue | undefined) {
-        this.commonFilters.set(DATASET_TIME_RANGE_FILTER_KEY, dateRange, DATE_RANGE_FIELD_ID);
-    }
-
-    @action
-    addDataset(datasetConfig: DatasetConfig) {
+    addDataset(datasetConfig: DatasetConfig, initialState?: {
+        disableToiSync?: boolean,
+        filters?: DataFiltersProps,
+        aoi?: AoiValue,
+        toi?: Date | DateRangeValue
+    }) {
 
         if (!datasetConfig.color) {
             datasetConfig.color = randomColor();
         }
         const item = new DatasetExplorerItem({
             datasetConfig: datasetConfig,
-            explorer: this
+            explorer: this,
+            initialState: initialState
         });
 
         this.items.push(item);
-        if (this.vizExplorer && item.mapViz?.mapLayer) {
-            this.vizExplorer.mapLayer.children.add(item.mapViz.mapLayer, 0);
+        if (this.mapExplorer && item.mapViz?.mapLayer) {
+            this.mapExplorer.mapLayer.children.add(item.mapViz.mapLayer, 0);
         }
+        return item;
     }
 
     @action
@@ -334,8 +358,8 @@ export class DatasetExplorer {
             item.dispose();
             this.items.remove(item);
 
-            if (this.vizExplorer && item.mapViz?.mapLayer) {
-                this.vizExplorer.mapLayer.children.remove(item.mapViz.mapLayer);
+            if (this.mapExplorer && item.mapViz?.mapLayer) {
+                this.mapExplorer.mapLayer.children.remove(item.mapViz.mapLayer);
             }
         }
     }
@@ -347,8 +371,8 @@ export class DatasetExplorer {
             this.items.splice(idx, 1);
             this.items.splice(newIdx, 0, item);
 
-            if (this.vizExplorer && item.mapViz?.mapLayer) {
-                this.vizExplorer.mapLayer.children.move(item.mapViz.mapLayer, this.items.length - newIdx - 1);
+            if (this.mapExplorer && item.mapViz?.mapLayer) {
+                this.mapExplorer.mapLayer.children.move(item.mapViz.mapLayer, this.items.length - newIdx - 1);
             }
         }
     }
@@ -362,8 +386,8 @@ export class DatasetExplorer {
         this.items.forEach(item => item.dispose());
         this.items.clear();
 
-        if (this.vizExplorer) {
-            this.mapLayer.children.remove(this.vizExplorer.mapLayer);
+        if (this.mapExplorer) {
+            this.mapLayer.children.remove(this.mapExplorer.mapLayer);
         }
     }
 
@@ -372,15 +396,17 @@ export class DatasetExplorer {
 
         if (timeExplorer) {
             const autoTimeZoomDisposer = autorun(() => {
-                let selectedDate = this.selectedDate;
                 let toi = this.toi;
-                if (selectedDate) {
-                    timeExplorer.visibleRange.centerDate(selectedDate, {
+                if (!toi) {
+                    return;
+                }
+                if (toi instanceof Date) {
+                    timeExplorer.timeRange.centerDate(toi, {
                         notIfVisible: true,
                         animate: true
                     });
                 } else if (toi) {
-                    timeExplorer.visibleRange.centerRange(toi.start, toi.end, {
+                    timeExplorer.timeRange.centerRange(toi.start, toi.end, {
                         notIfVisible: true,
                         animate: true,
                         margin: 0.2

@@ -1,7 +1,7 @@
 import { observable, makeObservable, action, autorun } from 'mobx';
 import debounce from 'lodash/debounce';
 
-import { QueryFilter } from '@oida/core';
+import { AOI_FIELD_ID, QueryFilter } from '@oida/core';
 
 import { DatasetViz, DatasetVizProps } from './dataset-viz';
 import { DatasetTimeDistributionConfig } from '../types';
@@ -61,7 +61,14 @@ const timeDistributionUpdater = (timeDistributionViz: DatasetTimeDistributionViz
         }
         let searchParams = timeDistributionViz.searchParams ? {...timeDistributionViz.searchParams} : undefined;
         if (searchParams) {
-            let filters = timeDistributionViz.dataset.filters.asArray();
+            const filters = timeDistributionViz.dataset.additionalFilters.asArray();
+            if (timeDistributionViz.dataset.aoi) {
+                filters.push({
+                    key: 'aoi',
+                    value: timeDistributionViz.dataset.aoi,
+                    type: AOI_FIELD_ID
+                });
+            }
             debounceSet(searchParams, filters);
         } else {
             debounceSet.cancel();

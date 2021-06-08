@@ -95,7 +95,7 @@ export const getAdamDatasetSpatialCoverageProvider = (
 
             const subsets: string[] = [];
 
-            let timeSubset = getWcsTimeFilterSubset(mapView.dataset.selectedTime);
+            let timeSubset = getWcsTimeFilterSubset(mapView.dataset.toi);
             if (timeSubset && !datasetConfig.fixedTime) {
                 subsets.push(timeSubset);
             }

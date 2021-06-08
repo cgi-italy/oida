@@ -30,5 +30,26 @@
                 flex-grow: 0;
             }
         }
+
+        .vis-item.vis-point.dataset-selected-granule {
+            height: 10px;
+            width: 10px;
+            border-radius: 5px;
+            margin-left: -5px;
+            margin-top: 1px;
+            z-index: 10;
+            box-shadow: 0px 2px 4px black;
+            border: solid 2px #ffffff50;
+        }
+        .vis-item.vis-point.dataset-selected-granule::before {
+            content: ' ';
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+            border: 2px solid fade(@primary-color, 80%);
+            border-radius: 8px;
+        }
     }
 }
