@@ -23,25 +23,6 @@ export type DatasetDimensionRasterSequenceThumbProps = {
     dimensionConfig: DatasetDimension<DataDomain<number | string | Date>>;
 };
 
-// export const DatasetDimensionRasterSequenceThumb = (props: DatasetDimensionRasterSequenceThumbProps) => {
-//     const parentRef = useRef<HTMLDivElement>(null);
-
-//     useEffect(() => {
-//         if (parentRef.current) {
-//             parentRef.current.innerHTML = '';
-//             parentRef.current.appendChild(props.data.cloneNode(false));
-//         }
-//     }, [parentRef.current, props.data]);
-
-
-//     return (
-//         <div className='raster-sequence-thumb'>
-//             <div ref={parentRef}></div>
-//             <div>{props.dimensionConfig.name} = {props.valueFormatter(props.value)}</div>
-//         </div>
-//     );
-// };
-
 export const DatasetDimensionRasterSequenceThumb = (props: DatasetDimensionRasterSequenceThumbProps) => {
 
     const [dataUri, setDataUri] = useState<string>();

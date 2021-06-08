@@ -85,6 +85,7 @@ export const AnalysisAoiFilter = (props: AnalysisAoiFilterProps) => {
         AoiAction.DrawPoint,
         AoiAction.DrawLine,
         AoiAction.DrawBBox,
+        AoiAction.DrawPolygon,
         AoiAction.Import
     ];
 
@@ -99,6 +100,7 @@ export const AnalysisAoiFilter = (props: AnalysisAoiFilterProps) => {
     const importerProps = useMapAoiImporter({
         value,
         onChange,
+        activeAction,
         onActiveActionChange
     });
 

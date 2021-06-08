@@ -23,6 +23,7 @@ export const DatasetSelector = (props: DatasetSelectorProps) => {
 
     return (
         <SelectEnumRenderer
+            className='dataset-selector'
             config={datasetSelectorConfig}
             value={props.value}
             placeholder='Select dataset'

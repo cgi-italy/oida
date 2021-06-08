@@ -136,41 +136,52 @@ export const DashboardPane = (props: LayoutSectionProps & DashboardPaneProps) =>
     });
 
     const widgets = props.components.map((component) => {
-            return (
-                <div className='dashboard-widget' key={component.id}>
-                    <div className='widget-header'>
+
+        if (!layout[component.id]) {
+            const position = closedWidgetsLayout[component.id] || getInitialLayout(component);
+            setLayout({
+                ...layout,
+                [component.id]: {
+                    i: component.id,
+                    ...position
+                }
+            });
+        }
+        return (
+            <div className='dashboard-widget' key={component.id}>
+                <div className='widget-header'>
+                    <Button
+                        type='link'
+                        className='widget-drag-btn'
+                    >
+                        <DragOutlined/>
+                    </Button>
+                    {component.title}
+                    {component.onClose &&
                         <Button
                             type='link'
-                            className='widget-drag-btn'
-                        >
-                            <DragOutlined/>
-                        </Button>
-                        {component.title}
-                        {component.onClose &&
-                            <Button
-                                type='link'
-                                className='widget-close-btn'
-                                onClick={() => {
-                                    setClosedWidgetsLayout((current) => {
-                                        return {
-                                            ...current,
-                                            [component.id]: layout[component.id]
-                                        };
-                                    });
+                            className='widget-close-btn'
+                            onClick={() => {
+                                setClosedWidgetsLayout((current) => {
+                                    return {
+                                        ...current,
+                                        [component.id]: layout[component.id]
+                                    };
+                                });
 
-                                    component.onClose!();
-                                }}
-                            >
-                                <CloseOutlined/>
-                            </Button>
-                        }
-                    </div>
-                    <div className='widget-content'>
-                        {component.content}
-                    </div>
+                                component.onClose!();
+                            }}
+                        >
+                            <CloseOutlined/>
+                        </Button>
+                    }
                 </div>
-            );
-        });
+                <div className='widget-content'>
+                    {component.content}
+                </div>
+            </div>
+        );
+    });
 
 
     useEffect(() => {

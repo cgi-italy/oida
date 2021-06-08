@@ -69,36 +69,49 @@
     .data-collection-list-item-detailed-content {
         display: flex;
 
-        .data-collection-list-item-detailed-meta {
+        .data-collection-list-item-detailed-data {
             flex-grow: 1;
+            margin-right: @margin-md;
 
-            .ant-descriptions-view {
+            .data-collection-list-item-detailed-description {
+                text-align: justify;
+                hyphens: auto;
 
-                table {
+                .compress-link {
+                    float: right;
+                    margin-left: 5px;
+                }
+            }
 
+            .data-collection-list-item-detailed-meta {
 
-                    .ant-descriptions-row {
+                .ant-descriptions-view {
 
-                        .ant-descriptions-item {
-                            padding-bottom: 2px;
+                    table {
 
-                            .ant-descriptions-item-container {
-                                align-items: center;
+                        .ant-descriptions-row {
 
-                                .ant-descriptions-item-label {
-                                    padding: 2px 4px;
-                                    display: flex;
+                            .ant-descriptions-item {
+                                padding-bottom: 2px;
+
+                                .ant-descriptions-item-container {
                                     align-items: center;
-                                    align-self: flex-start;
 
-                                    &:after {
-                                        margin-left: 4px;
+                                    .ant-descriptions-item-label {
+                                        padding: 2px 4px;
+                                        display: flex;
+                                        align-items: center;
+                                        align-self: flex-start;
+
+                                        &:after {
+                                            margin-left: 4px;
+                                        }
                                     }
-                                }
 
-                                .ant-descriptions-item-content {
-                                    padding: 2px 4px;
-                                    font-size: 13px;
+                                    .ant-descriptions-item-content {
+                                        padding: 2px 4px;
+                                        font-size: 13px;
+                                    }
                                 }
                             }
                         }

@@ -35,12 +35,14 @@ type LegendDataItem = {
 
 export function DatasetDimensionSeriesChart(props: DatasetDimensionSeriesChartProps) {
 
-    const {chartSeries, colors, loadingState, legendData, axes} = useSelector(() => {
+    const {chartSeries, colors, loadingState, errorMessage, legendData, axes} = useSelector(() => {
 
         let chartSeries: EChartOption.SeriesLine[] = [];
         let colors: string[] = [];
 
         let loadingState = LoadingState.Init;
+        let errorMessage: string | undefined;
+
         const legendData: LegendDataItem[] = [];
 
         let axes = {
@@ -120,6 +122,7 @@ export function DatasetDimensionSeriesChart(props: DatasetDimensionSeriesChartPr
                 loadingState = LoadingState.Success;
             } else if (series.loadingState.value === LoadingState.Error && loadingState !== LoadingState.Success) {
                 loadingState = LoadingState.Error;
+                errorMessage = series.loadingState.message;
             }
 
             let description = `
@@ -258,13 +261,14 @@ export function DatasetDimensionSeriesChart(props: DatasetDimensionSeriesChartPr
 
         });
 
-        return {chartSeries, colors, legendData, loadingState, axes};
+        return {chartSeries, colors, legendData, loadingState, errorMessage, axes};
     });
 
     if (loadingState === LoadingState.Init || loadingState === LoadingState.Error) {
         return (
             <AnalysisLoadingStateMessage
                 loadingState={loadingState}
+                errorMessage={errorMessage}
                 initMessage='Fill the series params to retrieve the data'
             />
         );

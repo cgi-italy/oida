@@ -91,7 +91,8 @@ export const DatasetVizListItem = (props: DatasetVizListItemProps) => {
             });
         }
 
-        if (props.datasetViz.dataset.config.tools?.length) {
+        const tools = props.datasetViz.dataset.config.tools ? props.datasetViz.dataset.config.tools.filter((tool) => !tool.hidden) : [];
+        if (tools.length) {
             actions.push({
                 id: 'tools',
                 icon: <BarChartOutlined/>,

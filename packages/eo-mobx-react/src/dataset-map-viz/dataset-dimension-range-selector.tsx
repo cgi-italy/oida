@@ -71,7 +71,7 @@ export const DatasetTimeRangeSelector = (props: DatasetTimeRangeSelectorProps) =
                     max: value.end
                 } : undefined)}
                 config={{
-                    withTime: true,
+                    withTime: false,
                     minDate: domain?.min,
                     maxDate: domain?.max
                 }}

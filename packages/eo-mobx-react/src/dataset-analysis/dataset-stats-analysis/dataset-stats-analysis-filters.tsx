@@ -73,11 +73,7 @@ export const DatasetStatsAnalysisFilters = (props: DatasetStatsAnalysisFiltersPr
             <Form.Item label='Area'>
                 <AnalysisAoiFilter
                     analysis={props.stats}
-                    supportedGeometries={[{
-                        type: 'BBox'
-                    }, {
-                        type: 'Polygon',
-                    }]}
+                    supportedGeometries={props.stats.config.supportedGeometries}
                 />
             </Form.Item>
         </React.Fragment>

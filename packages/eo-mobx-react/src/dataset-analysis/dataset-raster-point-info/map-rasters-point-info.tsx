@@ -26,7 +26,11 @@ const MapRastersPointInfoWidget = observer((props: MapRastersPointInfoWidgetProp
         return (
             <Collapse.Panel
                 key={analysis.id}
-                header={<Badge color={analysis.dataset.config.color} text={analysis.dataset.config.name}/>}
+                header={<Badge
+                    color={analysis.dataset.config.color}
+                    text={analysis.dataset.config.name}
+                    title={analysis.dataset.config.name}
+                />}
             >
                 <DatasetRasterPointInfoTable pointInfo={analysis}/>
             </Collapse.Panel>
