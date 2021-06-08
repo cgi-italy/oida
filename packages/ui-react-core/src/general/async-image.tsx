@@ -2,13 +2,34 @@ import React, { useEffect, useState } from 'react';
 
 import { LoadingState } from '@oida/core';
 
+/**
+ * {@Link AsyncImage} component properties
+ */
 export type AsyncImageProps = {
+    /**
+     * The image src. It could be a string (url or datauri) or a promise returning the image src string
+     */
     imageUrl: string | Promise<string>;
+    /**
+     * Content to be displayed while the image is loading
+     */
     loadingContent?: React.ReactNode;
+    /**
+     * Content to be displayed when the image fails to load
+     */
     errorContent?: React.ReactNode;
-    onLoad?: (state: LoadingState) => void;
+    /**
+     * By default the image is lazy loaded when it becomes visible on the screen.
+     * Set this to true to force image load immediatly after creation
+     */
+    eager?: boolean;
 };
 
+/**
+ * A React component that wrap a standard html image element and displays a loading placeholder
+ * while the image is loading and an error placeholder when the image loading fails
+ * @param props the component properties
+ */
 export const AsyncImage = (props: AsyncImageProps) => {
 
     const [imageUrl, setImageUrl] = useState<string>();
@@ -17,17 +38,45 @@ export const AsyncImage = (props: AsyncImageProps) => {
     useEffect(() => {
 
         let canUpdateOnPromiseResolve = true;
+        let loadingIndicatorTimeout;
 
-        setLoadingState(LoadingState.Loading);
+        // to prevent flickering avoid showing a loading indicator when image resolve immediatly (e.g cached or datauri)
+        const showLoadingIndicator = () => {
+            clearImmediate(loadingIndicatorTimeout);
+            loadingIndicatorTimeout = setImmediate(() => {
+                if (canUpdateOnPromiseResolve) {
+                    setLoadingState(LoadingState.Loading);
+                }
+            });
+        };
+
+        const cancelLoadingIndicator = () => {
+            clearImmediate(loadingIndicatorTimeout);
+        };
+
         if (typeof(props.imageUrl) === 'string') {
-            setImageUrl(props.imageUrl);
+            if (props.imageUrl !== imageUrl) {
+                showLoadingIndicator();
+                setImageUrl(props.imageUrl);
+            } else {
+                cancelLoadingIndicator();
+                setLoadingState(LoadingState.Success);
+            }
         } else {
+            showLoadingIndicator();
             props.imageUrl.then((url) => {
                 if (canUpdateOnPromiseResolve) {
-                    setImageUrl(url);
+                    if (url !== imageUrl) {
+                        showLoadingIndicator();
+                        setImageUrl(url);
+                    } else {
+                        cancelLoadingIndicator();
+                        setLoadingState(LoadingState.Success);
+                    }
                 }
             }).catch(() => {
                 if (canUpdateOnPromiseResolve) {
+                    cancelLoadingIndicator();
                     setLoadingState(LoadingState.Error);
                 }
             });
@@ -42,8 +91,10 @@ export const AsyncImage = (props: AsyncImageProps) => {
         <React.Fragment>
             {imageUrl &&
                 <img
+                    loading={props.eager ? 'eager' : 'lazy'}
                     src={imageUrl}
-                    style={{display: loadingState !== LoadingState.Success ? 'none' : ''}}
+                    // in order for lazy loading to work the image cannot be hidden. We set its size to 0 instead
+                    style={loadingState !== LoadingState.Success ? {height: 0, width: 0} : undefined}
                     onLoad={() => setLoadingState(LoadingState.Success)}
                     onError={() => setLoadingState(LoadingState.Error)}
                 />
