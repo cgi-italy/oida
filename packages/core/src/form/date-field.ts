@@ -5,10 +5,18 @@ import { setFormFieldSerializer } from './form-field-serialization';
 
 export const DATE_FIELD_ID = 'date';
 
+export type SelectableDates = Set<string> | ((range: {
+    start: Date,
+    end: Date,
+    resolution: 'year' | 'month' | 'day'
+}) => Promise<Set<string>>);
+
 export type DateFieldConfig = {
     minDate?: Date,
     maxDate?: Date,
+    selectableDates?: SelectableDates;
     withTime?: boolean;
+    selectableTimes?: (day: Date) => Promise<string[]>;
 };
 
 export type DateField = FormField<typeof DATE_FIELD_ID, Date, DateFieldConfig>;
