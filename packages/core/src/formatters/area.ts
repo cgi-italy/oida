@@ -1,11 +1,11 @@
 import { FormatterQuantity } from './formatter';
+import { formatNumber, NumberFormatOptions } from './utils';
 
 export type AreaFormatterOptions = {
     inputUnits: AreaUnit,
     outputUnits: AreaUnit,
-    precision?: number,
     appendUnits?: boolean
-};
+} & NumberFormatOptions;
 
 export const AreaQuantity: FormatterQuantity<number, AreaFormatterOptions> = {
     id: 'area'
@@ -39,9 +39,7 @@ export const formatArea = (
         formattedArea = 'N/A';
     } else {
         formattedArea = area * options.inputUnits.toSquareMeters / options.outputUnits.toSquareMeters;
-        if (options.precision) {
-            formattedArea = parseFloat(formattedArea.toFixed(options.precision));
-        }
+        formattedArea = formatNumber(formattedArea, options);
         if (options.appendUnits) {
             formattedArea = `${formattedArea} ${options.outputUnits.symbol}`;
         }

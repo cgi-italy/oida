@@ -1,4 +1,5 @@
 import { FormatterQuantity } from './formatter';
+import { formatNumber, NumberFormatOptions } from './utils';
 
 export class LengthUnit {
 
@@ -20,9 +21,8 @@ export class LengthUnit {
 export type LengthFormatterOptions = {
     inputUnits: LengthUnit,
     outputUnits: LengthUnit,
-    precision?: number,
     appendUnits?: boolean
-};
+} & NumberFormatOptions;
 
 
 export const LengthQuantity: FormatterQuantity<number, LengthFormatterOptions> = {
@@ -41,9 +41,7 @@ export const formatLength = (
         formattedLength = 'N/A';
     } else {
         formattedLength = length * options.inputUnits.toMeters / options.outputUnits.toMeters;
-        if (options.precision) {
-            formattedLength = parseFloat(formattedLength.toFixed(options.precision));
-        }
+        formattedLength = formatNumber(formattedLength, options);
         if (options.appendUnits) {
             formattedLength = `${formattedLength} ${options.outputUnits.symbol}`;
         }

@@ -1,11 +1,11 @@
 import { FormatterQuantity } from './formatter';
+import { formatNumber, NumberFormatOptions } from './utils';
 
 export type FilesizeFormatterOptions = {
     inputUnits: FilesizeUnit,
     outputUnits?: FilesizeUnit,
-    precision?: number,
     appendUnits?: boolean
-};
+} & NumberFormatOptions;
 
 export const FilesizeQuantity: FormatterQuantity<number, FilesizeFormatterOptions> = {
     id: 'filesize'
@@ -57,10 +57,7 @@ export const formatFilesize = (
         }
 
         formattedSize = filesize * options.inputUnits.toBytes / outputUnits.toBytes;
-
-        if (options.precision !== undefined) {
-            formattedSize = parseFloat(formattedSize.toFixed(options.precision));
-        }
+        formattedSize = formatNumber(formattedSize, options);
         if (options.appendUnits) {
             formattedSize = `${formattedSize} ${outputUnits.symbol}`;
         }

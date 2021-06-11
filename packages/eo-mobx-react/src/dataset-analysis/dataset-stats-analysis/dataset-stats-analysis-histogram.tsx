@@ -8,7 +8,7 @@ import 'echarts/lib/component/legend';
 import 'echarts/lib/component/axisPointer';
 import 'echarts/lib/component/brush';
 
-import { LoadingState } from '@oida/core';
+import { formatNumber, LoadingState, NumberFormatOptions } from '@oida/core';
 import {
     DatasetStatsAnalysis, RasterMapViz, RasterBandModeType,
     isDomainProvider, NumericDomainMapper
@@ -21,6 +21,7 @@ import { ChartWidget } from '../chart-widget';
 
 export type DatasetStatsAnalysisProps = {
     analyses: DatasetStatsAnalysis[];
+    numberFormatOptions?: NumberFormatOptions;
 };
 
 export const DatasetStatsTable = (props: DatasetStatsAnalysisProps) => {
@@ -53,13 +54,18 @@ export const DatasetStatsTable = (props: DatasetStatsAnalysisProps) => {
                 if (dimensionConfig) {
                     let stringValue = value.toString();
                     if (value instanceof Date) {
-                        stringValue = moment(value).format('YYYY-MM-DD HH:mm');
+                        stringValue = moment.utc(value).format('YYYY-MM-DD HH:mm');
                     }
                     dimensionsInfo.push(
                         <Descriptions.Item key={dimensionConfig.id} label={dimensionConfig.name}>{stringValue}</Descriptions.Item>
                     );
                 }
             });
+
+            const numberFormatOptions = props.numberFormatOptions || {
+                maxLength: 10,
+                precision: 3
+            };
 
             return (
                 <Collapse.Panel
@@ -88,40 +94,38 @@ export const DatasetStatsTable = (props: DatasetStatsAnalysisProps) => {
                         }
                         {analysis.data.min !== undefined &&
                             <Descriptions.Item label='Min'>
-                                {domainMapper.formatValue(analysis.data.min, {
-                                    precision: 3
-                                })}
+                                {domainMapper.formatValue(analysis.data.min, numberFormatOptions)}
                             </Descriptions.Item>
                         }
                         {analysis.data.max !== undefined &&
                             <Descriptions.Item label='Max'>
-                                {domainMapper.formatValue(analysis.data.max, {
-                                    precision: 3
-                                })}
+                                {domainMapper.formatValue(analysis.data.max, numberFormatOptions)}
                             </Descriptions.Item>
                         }
                         {analysis.data.mean !== undefined &&
                             <Descriptions.Item label='Mean'>
-                                {domainMapper.formatValue(analysis.data.mean, {
-                                    precision: 3
-                                })}
+                                {domainMapper.formatValue(analysis.data.mean, numberFormatOptions)}
                             </Descriptions.Item>
                         }
                         {analysis.data.variance !== undefined &&
                             <React.Fragment>
                                 <Descriptions.Item label='Variance'>
-                                    {(analysis.data.variance * Math.pow(domainMapper.domainScalingFactor, 2)).toFixed(3)}
+                                    {formatNumber(
+                                        analysis.data.variance * Math.pow(domainMapper.domainScalingFactor, 2),
+                                        numberFormatOptions
+                                    )}
                                 </Descriptions.Item>
                                 <Descriptions.Item label='Standard deviation'>
-                                    {(Math.sqrt(analysis.data.variance) * domainMapper.domainScalingFactor).toFixed(3)}
+                                    {formatNumber(
+                                        Math.sqrt(analysis.data.variance) * domainMapper.domainScalingFactor,
+                                        numberFormatOptions
+                                    )}
                                 </Descriptions.Item>
                             </React.Fragment>
                         }
                         {analysis.data.median !== undefined &&
                             <Descriptions.Item label='Median'>
-                                {domainMapper.formatValue(analysis.data.median, {
-                                    precision: 3
-                                })}
+                                {domainMapper.formatValue(analysis.data.median, numberFormatOptions)}
                             </Descriptions.Item>
                         }
                     </Descriptions>

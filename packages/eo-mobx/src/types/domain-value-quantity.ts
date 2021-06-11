@@ -1,4 +1,4 @@
-import { FormatterQuantity } from '@oida/core';
+import { formatNumber, FormatterQuantity, NumberFormatOptions } from '@oida/core';
 import { isValueDomain, NumericalValueDomain, NumericDomain } from './dataset-variable';
 
 export type NumericDomainMapperConfig = {
@@ -77,9 +77,10 @@ export class NumericDomainMapper {
         } else {
             let formattedValue: string | number | undefined = this.normalizeValue(value);
             if (formattedValue !== undefined) {
-                if (options?.precision) {
-                    formattedValue = formattedValue.toFixed(options.precision);
-                }
+                formattedValue = formatNumber(formattedValue, {
+                    precision: options?.precision,
+                    maxLength: options?.maxLength
+                });
                 if (this.unitsSymbol && options?.appendUnits) {
                     formattedValue = `${formattedValue} ${this.unitsSymbol}`;
                 }
@@ -94,9 +95,8 @@ export class NumericDomainMapper {
 
 export type NumericDomainValueFormatterOptions = {
     domain: NumericDomainMapper,
-    precision?: number,
     appendUnits?: boolean
-};
+} & NumberFormatOptions;
 
 
 export const NumericDomainValueQuantity: FormatterQuantity<number, NumericDomainValueFormatterOptions> = {

@@ -10,3 +10,4 @@ export * from './area';
 export * from './length';
 export * from './date';
 export * from './file-size';
+export * from './utils';

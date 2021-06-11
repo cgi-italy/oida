@@ -1,6 +1,7 @@
 import dms from 'geodesy/dms';
 
 import { FormatterQuantity } from './formatter';
+import { formatNumber } from './utils';
 
 export const formatLat = (lat: number, config: {format?: string, precision?: number} = {}) => {
     return dms.toLat(lat, config.format, config.precision);
@@ -39,6 +40,8 @@ export const formatMapCoord = (
             });
         }
     } else if (format === 'dec') {
-        return coord.toFixed(formatOptions.precision);
+        return formatNumber(coord, {
+            precision: formatOptions.precision
+        });
     }
 };

@@ -32,18 +32,34 @@ export const DatasetRasterPointInfoTable = observer((props: DatasetRasterPointIn
             });
 
             const bandValues = Object.entries(props.pointInfo.data).map(([bandId, value]) => {
-                const bandDetails = props.pointInfo.config.variables.find((band) => band.id === bandId);
 
-                const domainMapper = new NumericDomainMapper({
-                    domain: bandDetails?.domain && !isDomainProvider(bandDetails?.domain) ? bandDetails?.domain : undefined,
-                    unitsSymbol: bandDetails?.units
-                });
+                let content: React.ReactNode;
+                let label: string;
+                if (typeof(value) === 'number') {
+                    const bandDetails = props.pointInfo.config.variables.find((band) => band.id === bandId);
+
+                    const domainMapper = new NumericDomainMapper({
+                        domain: bandDetails?.domain && !isDomainProvider(bandDetails?.domain) ? bandDetails?.domain : undefined,
+                        unitsSymbol: bandDetails?.units
+                    });
+
+                    label = bandDetails?.name || bandId;
+                    content = domainMapper.formatValue(value, {
+                        precision: 3,
+                        maxLength: 10,
+                        appendUnits: true
+                    });
+                } else {
+                    label = bandId;
+                    content = (
+                        <div dangerouslySetInnerHTML={{
+                            __html: value
+                        }}/>
+                    );
+                }
                 return (
-                    <Descriptions.Item key={bandId} label={bandDetails?.name || bandId}>
-                        {domainMapper.formatValue(value, {
-                            precision: 3,
-                            appendUnits: true
-                        })}
+                    <Descriptions.Item key={bandId} label={label}>
+                        {content}
                     </Descriptions.Item>
                 );
             });
