@@ -13,4 +13,4 @@ export type DataSorterProps = {
     onSortClear: () => void;
 };
 
-export type DataSorterRenderer = (props: DataSorterProps) => React.ReactNode;
+export type DataSorterRenderer = React.ComponentType<DataSorterProps>;

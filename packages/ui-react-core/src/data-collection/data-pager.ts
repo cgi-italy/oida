@@ -6,4 +6,4 @@ export type DataPagerProps = {
     onPageSizeChange: (pageSize: number) => void;
 };
 
-export type DataPagerRenderer = (props: DataPagerProps) => React.ReactNode;
+export type DataPagerRenderer = React.ComponentType<DataPagerProps>;

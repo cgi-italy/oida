@@ -11,4 +11,4 @@ export type DataCollectionProps<T> = {
     filters?: DataFiltererProps
 };
 
-export type DataCollectionRenderer<T> = (props: DataCollectionProps<T>) => React.ReactNode;
+export type DataCollectionRenderer<T> = React.ComponentType<DataCollectionProps<T>>;

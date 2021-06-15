@@ -15,37 +15,34 @@ export type DataCollectionListProps<T> = {
     className?: string;
 } & DataCollectionProps<T> & DataCollectionItemsListProps<T>;
 
-export class DataCollectionList<T> extends React.Component<DataCollectionListProps<T>> {
+export const DataCollectionList = <T extends Object>(props: DataCollectionListProps<T>) => {
+    const {items, paging, sorting, filters, pagerRender, sortRender, filtererRender, className, ...listProps} = props;
 
-    static defaultProps = {
-        pagerRender: (props) => (
-            <div className='ant-list-pagination'>
-                <DataPager {...props}></DataPager>
+    const DataPager = pagerRender!;
+    const DataFilterer = filtererRender!;
+    const DataSorter = sortRender!;
+
+    return  (
+        <div className={classnames('data-collection-list', className)}>
+            <div className='filter-section'>
+                {filters && <DataFilterer {...filters}/>}
+                {sorting && <DataSorter {...sorting}/>}
             </div>
-        ),
-        sortRender: (props) => (
-            <DataSortCombo {...props}></DataSortCombo>
-        ),
-        filtererRender: (props) => (
-            <AdvancedSearchFilterer {...props}></AdvancedSearchFilterer>
-        )
-    };
+            <DataCollectionItemsList<T>
+                {...items}
+                {...listProps}
+            ></DataCollectionItemsList>
+            {paging && <DataPager {...paging}/>}
+        </div>
+    );
+};
 
-    render() {
-        let {items, paging, sorting, filters, pagerRender, sortRender, filtererRender, className, ...listProps} = this.props;
-        return  (
-            <div className={classnames('data-collection-list', className)}>
-                <div className='filter-section'>
-                    {filters && filtererRender!(filters)}
-                    {sorting && sortRender!(sorting)}
-                </div>
-                <DataCollectionItemsList<T>
-                    {...items}
-                    {...listProps}
-                ></DataCollectionItemsList>
-                {paging && pagerRender!(paging)}
-            </div>
-        );
-    }
-}
-
+DataCollectionList.defaultProps = {
+    pagerRender: (props) => (
+        <div className='ant-list-pagination'>
+            <DataPager {...props}></DataPager>
+        </div>
+    ),
+    sortRender: DataSortCombo,
+    filtererRender: AdvancedSearchFilterer
+};

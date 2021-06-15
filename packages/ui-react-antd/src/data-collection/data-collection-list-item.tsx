@@ -27,7 +27,7 @@ const ExpandableDescription = (props: ExpandableDescriptionProps) => {
                     type='secondary'
                     ellipsis={{
                         expandable: true,
-                        rows: props.maxRows || 2,
+                        rows: props.maxRows || 4,
                         symbol: 'more',
                         onExpand: () => setDescriptionExpanded(true)
                     }}
@@ -81,19 +81,35 @@ export function DataCollectionDetailedListItem(props: DatasetCollectionListItemP
             >
                 {props.title}
             </div>
-            {props.description && <ExpandableDescription
-                description={props.description}
-                maxRows={props.maxDescriptionRows}
-                className='data-collection-list-item-detailed-description'
-            />}
             <div className='data-collection-list-item-detailed-content'>
-                <Descriptions
-                    className={'data-collection-list-item-detailed-meta'}
-                    column={1}
-                    size={'small'}
-                >
-                    {metadata}
-                </Descriptions>
+                <div className='data-collection-list-item-detailed-data'>
+                    {props.description &&
+                        <React.Fragment>
+                            {!!props.maxDescriptionRows &&
+                                <ExpandableDescription
+                                    description={props.description}
+                                    maxRows={props.maxDescriptionRows}
+                                    className='data-collection-list-item-detailed-description'
+                                />
+                            }
+                            {!props.maxDescriptionRows &&
+                                <Typography.Paragraph
+                                    className='data-collection-list-item-detailed-description'
+                                    type='secondary'
+                                >
+                                    {props.description}
+                                </Typography.Paragraph>
+                            }
+                        </React.Fragment>
+                    }
+                    <Descriptions
+                        className={'data-collection-list-item-detailed-meta'}
+                        column={1}
+                        size={'small'}
+                    >
+                        {metadata}
+                    </Descriptions>
+                </div>
                 {props.icon && !props.preview &&
                     <div className='data-collection-list-item-detailed-icon'>{props.icon}</div>
                 }
@@ -140,11 +156,20 @@ export function DataCollectionCompactListItem(props: DatasetCollectionListItemPr
                 <div className='data-collection-compact-list-item-title'>
                     {props.title}
                 </div>
-                {props.description && <ExpandableDescription
-                    description={props.description}
-                    maxRows={props.maxDescriptionRows}
-                    className='data-collection-compact-list-item-description'
-                />}
+                {props.description &&
+                    <React.Fragment>
+                        {!!props.maxDescriptionRows &&
+                            <ExpandableDescription
+                                description={props.description}
+                                maxRows={props.maxDescriptionRows}
+                                className='data-collection-compact-list-item-description'
+                            />
+                        }
+                        {!props.maxDescriptionRows &&
+                            props.description
+                        }
+                    </React.Fragment>
+                }
                 {metadata}
             </div>
         </div>

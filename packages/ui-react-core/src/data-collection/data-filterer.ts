@@ -4,4 +4,4 @@ export type DataFiltererProps = FormRendererProps & {
     mainFilter?: string;
 };
 
-export type DataFiltererRenderer = (props: DataFiltererProps) => React.ReactNode;
+export type DataFiltererRenderer = React.ComponentType<DataFiltererProps>;

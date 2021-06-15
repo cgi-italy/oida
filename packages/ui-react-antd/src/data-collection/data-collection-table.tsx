@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import classnames from 'classnames';
 
 import { Table, Menu, Dropdown, Empty, ConfigProvider } from 'antd';
@@ -9,7 +9,7 @@ import { useDrop } from 'react-dnd';
 import { NativeTypes } from 'react-dnd-html5-backend';
 
 
-import { DataCollectionProps, DataPagerRenderer, DataFiltererRenderer } from '@oida/ui-react-core';
+import { DataCollectionProps, DataPagerRenderer, DataFiltererRenderer, useScrollIntoView } from '@oida/ui-react-core';
 
 import { LoadingState, SortOrder, SelectionMode } from '@oida/core';
 
@@ -96,8 +96,16 @@ export function DataCollectionTable<T extends object>(props: DataCollectionTable
 
     const RowRenderer = (props) => {
         if (props.children.length) {
+
             const record = props.children[0].props.record;
             const { selected, hovered } = itemSelector(record);
+
+            const [itemRef, setItemRef] = useState<Element | null>(null);
+
+            useScrollIntoView({
+                element: itemRef,
+                scrollToElement: selected
+            });
 
             // WARN: hooks should not be used in conditionals but we're assuming
             // that fileDropProps will not change during component lifetime
@@ -117,7 +125,10 @@ export function DataCollectionTable<T extends object>(props: DataCollectionTable
                 return (
                     <tr
                         {...props}
-                        ref={drop}
+                        ref={(element) => {
+                            setItemRef(element);
+                            drop(element);
+                        }}
                         key={props['data-row-key']}
                         className={classnames(props.className, {
                             'hovered': hovered,
@@ -131,6 +142,9 @@ export function DataCollectionTable<T extends object>(props: DataCollectionTable
                 return (
                     <tr
                         {...props}
+                        ref={(element) => {
+                            setItemRef(element);
+                        }}
                         key={props['data-row-key']}
                         className={classnames(props.className, {
                             'hovered': hovered,
@@ -179,12 +193,15 @@ export function DataCollectionTable<T extends object>(props: DataCollectionTable
         );
     }
 
+    const DataPager = pagerRender!;
+    const DataFilterer = filtererRender!;
+
     return  (
         <ConfigProvider
                 renderEmpty={emptyRenderer}
         >
             <div className={classnames('data-collection-table', props.className, {'full-height': props.fullHeight})}>
-                {filters && filtererRender!(filters)}
+                {filters && <DataFilterer {...filters}/>}
                 <div className='data-collection-table-container'>
                     {props.fullHeight && resizeListener}
                     <Table<T>
@@ -261,7 +278,7 @@ export function DataCollectionTable<T extends object>(props: DataCollectionTable
                         } : undefined}
                     ></Table>
                 </div>
-                {paging && pagerRender!(paging)}
+                {paging && <DataPager {...paging}/>}
             </div>
         </ConfigProvider>
     );
@@ -274,7 +291,5 @@ DataCollectionTable.defaultProps = {
             <DataPager {...props}></DataPager>
         </div>
     ),
-    filtererRender: (props) => (
-        <AdvancedSearchFilterer {...props}></AdvancedSearchFilterer>
-    )
+    filtererRender: AdvancedSearchFilterer
 };
