@@ -1,9 +1,9 @@
 import React from 'react';
 import { Form } from 'antd';
 
-import { useSelector } from '@oida/ui-react-mobx';
+import { useFormData, useSelector } from '@oida/ui-react-mobx';
 import { DatasetDimensionRasterSequence } from '@oida/eo-mobx';
-import { SelectEnumRenderer } from '@oida/ui-react-antd';
+import { DataFormItems, SelectEnumRenderer } from '@oida/ui-react-antd';
 
 import { DatasetDimensionValueSelector } from '../../dataset-map-viz/dataset-dimension-value-selector';
 import { DatasetDimensionRangeSelector } from '../../dataset-map-viz/dataset-dimension-range-selector';
@@ -106,6 +106,7 @@ export const DatasetDimensionRasterSequenceFilters = (props: DatasetDimensionRas
                     <DatasetDimensionValueSelector
                         dimensionsState={props.sequence.dimensions}
                         dimension={dimension}
+                        timeDistributionProvider={props.sequence.dataset.config.timeDistribution?.provider}
                     />
                 </Form.Item>
             );
@@ -124,6 +125,11 @@ export const DatasetDimensionRasterSequenceFilters = (props: DatasetDimensionRas
             />
         );
     }
+
+    const additionalFilters = useFormData({
+        fields: props.sequence.config.additionalParameters || [],
+        fieldValues: props.sequence.additionalParameters
+    });
 
     return (
         <React.Fragment>
@@ -145,6 +151,11 @@ export const DatasetDimensionRasterSequenceFilters = (props: DatasetDimensionRas
                     supportedGeometries={props.sequence.config.supportedGeometries}
                 />
             </Form.Item>
+            {additionalFilters &&
+                <DataFormItems
+                    {...additionalFilters}
+                />
+            }
         </React.Fragment>
     );
 

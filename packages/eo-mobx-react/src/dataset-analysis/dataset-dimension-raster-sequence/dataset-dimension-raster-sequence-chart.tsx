@@ -101,7 +101,7 @@ export const DatasetDimensionRasterSequenceChart = (props: DatasetDimensionRaste
                 loadingState={loadingState}
                 errorMessage={props.sequence.loadingState.message}
             />
-            {data.length &&
+            {!!data.length &&
                 <React.Fragment>
                     <div className='dataset-raster-sequence-selectors'>
                         {colorMap && variableConfig.colorScales &&
@@ -172,7 +172,7 @@ export const DatasetDimensionRasterSequenceChart = (props: DatasetDimensionRaste
                                     isLoading={loadingState === LoadingState.Loading}
                                 />
                             </div>
-                            {data.length && !data[0].stats &&
+                            {!!data.length && !data[0].stats &&
                                 <div className='dataset-raster-sequence-player-slider'>
                                     <Slider
                                         value={activeThumb}
@@ -188,7 +188,7 @@ export const DatasetDimensionRasterSequenceChart = (props: DatasetDimensionRaste
                                     />
                                 </div>
                             }
-                            {data.length && data[0].stats !== undefined &&
+                            {!!data.length && data[0].stats !== undefined &&
                                 <div className='dataset-raster-sequence-player-slider-stats'>
                                     <DatasetRasterSequenceStatsSlider
                                         data={data}

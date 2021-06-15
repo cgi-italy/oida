@@ -1,7 +1,7 @@
 import { autorun, observable, makeObservable, action, computed, reaction } from 'mobx';
 
-import { Geometry, AoiSupportedGeometry, LoadingState, SubscriptionTracker } from '@oida/core';
-import { AsyncDataFetcher } from '@oida/state-mobx';
+import { Geometry, AoiSupportedGeometry, LoadingState, SubscriptionTracker, IFormFieldDefinition, QueryFilter, QueryParams } from '@oida/core';
+import { AsyncDataFetcher, DataFilters } from '@oida/state-mobx';
 
 import { DatasetDimension, DataDomain, DomainRange, isValueDomain } from '../types';
 import { DatasetDimensions, HasDatasetDimensions, DatasetDimensionsProps } from './dataset-dimensions';
@@ -25,6 +25,7 @@ export type DatasetRasterSequenceRequest<D = SequenceDimensionType> = {
     colorMap?: ColorMapProps;
     variable: string;
     geometry: Geometry;
+    additionalParameters?: QueryFilter[];
 };
 
 export type DatasetRasterSequenceItem<D = SequenceDimensionType, T extends SequenceDataType = SequenceDataType> = {
@@ -42,6 +43,7 @@ export type DatasetDimensionRasterSequenceConfig<D = SequenceDimensionType, T ex
     variables: RasterBandConfig[];
     supportedGeometries: AoiSupportedGeometry[],
     dimensions: DatasetDimension<DataDomain<D>>[];
+    additionalParameters?: IFormFieldDefinition[]
 };
 
 export type DatasetDimensionRasterSequenceProps<D = SequenceDimensionType, T extends SequenceDataType = SequenceDataType> = {
@@ -63,6 +65,7 @@ export class DatasetDimensionRasterSequence<
     @observable.ref colorMap: ColorMap | undefined;
     @observable.ref data: DatasetRasterSequenceItem<D, T>[];
     @observable.ref autoUpdate: boolean;
+    additionalParameters: DataFilters;
 
     protected dataFetcher_: AsyncDataFetcher<
         DatasetRasterSequenceItem<D, T>[] | undefined, DatasetRasterSequenceRequest<D>
@@ -85,6 +88,7 @@ export class DatasetDimensionRasterSequence<
         this.autoUpdate = props.autoUpdate !== undefined ? props.autoUpdate : true;
         this.colorMap = undefined;
         this.setVariable(props.sequenceVariable);
+        this.additionalParameters = new DataFilters();
 
         this.dataFetcher_ = new AsyncDataFetcher({
             dataFetcher: (params) => {
@@ -192,18 +196,23 @@ export class DatasetDimensionRasterSequence<
         && !!this.sequenceVariable
         && this.config.dimensions.every((dim) => {
             return (dim.id === this.sequenceDimension) || this.dimensions.values.has(dim.id);
-        });
+        })
+        && (!this.config.additionalParameters || this.config.additionalParameters.every((field) => {
+            return !field.required || this.additionalParameters.get(field.name);
+        }));
     }
 
     retrieveData() {
         if (this.canRunQuery) {
             if (this.needsUpdate_) {
+                this.setData_([]);
                 this.dataFetcher_.fetchData({
                     dimension: this.sequenceDimension!,
                     geometry: this.geometry!,
                     variable: this.sequenceVariable!,
                     range: this.sequenceRange,
                     dimensionValues: new Map(this.dimensions.values),
+                    additionalParameters: this.additionalParameters.asArray(),
                     colorMap: this.colorMap?.asProps()
                 }).then((data) => {
                     this.setData_(data || []);
@@ -258,7 +267,8 @@ export class DatasetDimensionRasterSequence<
             return {
                 aoi: this.geometry,
                 dimensions: new Map(this.dimensions.values),
-                colorMap: this.colorMap?.asProps()
+                colorMap: this.colorMap?.asProps(),
+                additionalParameters: this.additionalParameters.asArray()
             };
         }, () => {
             this.needsUpdate_ = true;
