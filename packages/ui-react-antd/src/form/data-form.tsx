@@ -25,9 +25,9 @@ export const FieldWrapper = (props) => {
 
 export type DataFormProps = FormRendererProps & Omit<FormProps, 'form' | 'initialValues' | 'fields' | 'onFieldsChange' | 'onValuesChange' | 'validateTrigger'>;
 
-export const DataForm = (props: DataFormProps) => {
+export const DataFormItems = (props: Pick<DataFormProps, 'onFieldChange' | 'values' | 'fields'>) => {
 
-    const { onFieldChange, values, fields, className, ...formRenderProps } = props;
+    const { onFieldChange, values, fields } = props;
 
     const fieldsConfig = useFormFieldRenderers({
         fields: fields,
@@ -51,13 +51,28 @@ export const DataForm = (props: DataFormProps) => {
     });
 
     return (
+        <React.Fragment>
+            {formFields}
+        </React.Fragment>
+    );
+};
+
+export const DataForm = (props: DataFormProps) => {
+
+    const { onFieldChange, values, fields, className, ...formRenderProps } = props;
+
+    return (
         <Form
             className={classnames('antd-form-renderer', className)}
             layout='vertical'
             size='small'
             {...formRenderProps}
         >
-            {formFields}
+           <DataFormItems
+                fields={fields}
+                values={values}
+                onFieldChange={onFieldChange}
+            />
         </Form>
     );
 };
