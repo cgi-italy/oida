@@ -106,6 +106,7 @@ export const DatasetDimensionSeriesFilters = (props: DatasetDimensionSeriesFilte
                     <DatasetDimensionValueSelector
                         dimensionsState={props.series.dimensions}
                         dimension={dimension}
+                        timeDistributionProvider={props.series.dataset.config.timeDistribution?.provider}
                     />
                 </Form.Item>
             );

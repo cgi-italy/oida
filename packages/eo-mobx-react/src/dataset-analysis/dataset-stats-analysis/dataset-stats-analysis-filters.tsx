@@ -56,6 +56,7 @@ export const DatasetStatsAnalysisFilters = (props: DatasetStatsAnalysisFiltersPr
                     <DatasetDimensionValueSelector
                         dimensionsState={props.stats.dimensions}
                         dimension={dimension}
+                        timeDistributionProvider={props.stats.dataset.config.timeDistribution?.provider}
                     />
                 </Form.Item>
             );

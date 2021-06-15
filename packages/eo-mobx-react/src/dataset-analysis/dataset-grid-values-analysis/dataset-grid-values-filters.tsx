@@ -57,6 +57,7 @@ export const DatasetGridValuesFilters = (props: DatasetGridValuesFiltersProps) =
                     <DatasetDimensionValueSelector
                         dimensionsState={props.analysis.dimensions}
                         dimension={dimension}
+                        timeDistributionProvider={props.analysis.dataset.config.timeDistribution?.provider}
                     />
                 </Form.Item>
             );
