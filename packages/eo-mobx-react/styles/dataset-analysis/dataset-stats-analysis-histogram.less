@@ -22,9 +22,20 @@
                 padding: 4px 16px;
 
                 .ant-badge {
-                    max-width: 100%;
-                    text-overflow: ellipsis;
+                    display: flex;
+                    align-items: center;
                     overflow: hidden;
+                    margin-right: 20px;
+
+                    .ant-badge-status-dot {
+                        flex-shrink: 0;
+                    }
+
+                    .ant-badge-status-text {
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                    }
+
                 }
 
                 .ant-collapse-arrow {

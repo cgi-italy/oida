@@ -29,6 +29,7 @@ export const WmsDiscoveryProviderLayerItem = (props: WmsDiscoveryProviderLayerIt
     return (
         <DataCollectionDetailedListItem
             description={props.wmsDiscoveryItem.layer.Abstract}
+            maxDescriptionRows={4}
             preview={layerPreview}
             title={props.wmsDiscoveryItem.layer.Title || props.wmsDiscoveryItem.layer.Name}
         />
