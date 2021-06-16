@@ -1,6 +1,6 @@
 import { observable, makeObservable, computed, action } from 'mobx';
 import { AOI_FIELD_ID, setAoiFieldFactory, FormFieldState, AoiValue } from '@oida/core';
-import { IndexedCollection, FeatureLayer, setReactionForFilterType } from '@oida/state-mobx';
+import { IndexedCollection, FeatureLayer, setReactionForFilterType, FeatureStyleGetter } from '@oida/state-mobx';
 
 import { AppModule } from '../app-module';
 import { MapModule } from '../map';
@@ -10,34 +10,60 @@ import { useMapAoiFieldFromModule } from './hooks/use-map-aoi-field';
 
 export const DEFAULT_AOI_MODULE_ID = 'aoi';
 
+/** A function that extract a list of aois from the file */
 export type AoiParser = (input: string | File) => Promise<AoiProps[]>;
+/** AOI format type */
 export type AoiFormat = {
+    /** format id */
     id: string;
+    /** format name */
     name: string;
+    /** list of supported file extensions */
     supportedFileTypes: string[];
+    /** the file parser */
     parser: AoiParser
 };
 
 export type AoiModuleConfig = {
-    aoiFormats?: AoiFormat[]
+    /** the supported aoi import formats */
+    aoiFormats?: AoiFormat[];
 };
 
-
+/**
+ * The {@Link AoiModule} initialization object
+*/
 export type AoiModuleProps = {
     mapModule: MapModule;
+    /** The map feature styler */
+    aoiStyleGetter?: FeatureStyleGetter<Aoi>
     config: AoiModuleConfig;
     id?: string
 };
 
+/**
+ * An application module to handle areas of interest
+ */
 export class AoiModule extends AppModule {
 
+    /** the area of interest collection */
     readonly aois: IndexedCollection<Aoi>;
+    /** map module reference */
     readonly mapModule: MapModule;
+    /** AOI sources collection. Usually used to allow aoi selection */
     readonly aoiSources: IndexedCollection<AoiSource>;
+    /**
+     * The AOI map layer. It is automatically added to the map on module initialization.
+     * By default it will display the aois within the {@Link AoiModule.aois} collection.
+     * If an {@Link AoiModule.activeSource active source} is defined, aois within the source will be
+     * displayed instead
+     *
+     */
     readonly aoiLayer: FeatureLayer<Aoi>;
     readonly config: AoiModuleConfig;
 
     @observable.ref protected activeSourceId_: string | undefined;
+
+    protected lastActiveSourceId_: string | undefined;
 
     constructor(props: AoiModuleProps) {
         super({
@@ -55,7 +81,7 @@ export class AoiModule extends AppModule {
             id: 'aoiLayer',
             config: {
                 geometryGetter: (aoi) => aoi.geometry.value,
-                styleGetter: defaultAoiStyleGetter
+                styleGetter: props.aoiStyleGetter || defaultAoiStyleGetter
             },
             source: this.aois.items,
             zIndex: 10
@@ -67,7 +93,9 @@ export class AoiModule extends AppModule {
         this.config = props.config;
 
         this.activeSourceId_ = undefined;
+        this.lastActiveSourceId_ = undefined;
 
+        // every time an aoi filter is set, a corresponding aoi instance is drawn on the map
         setReactionForFilterType(AOI_FIELD_ID, (filters, key) => {
             const filterMapBindingDisposer = bindAoiValueToMap({
                 aois: this.aois,
@@ -105,6 +133,7 @@ export class AoiModule extends AppModule {
         makeObservable(this);
     }
 
+    /** The active aoi source */
     @computed
     get activeSource() {
         if (this.activeSourceId_) {
@@ -114,6 +143,13 @@ export class AoiModule extends AppModule {
         }
     }
 
+    /**
+     * Set the active AOI source. The aois within the source will be displayed on map.
+     * When no active source is defined the {@Link AoiModule.aois} will be visible on map
+     *
+     * @param activeSource The active source id or reference
+     * @memberof AoiModule
+     */
     @action
     setActiveSource(activeSource: string | AoiSource | undefined) {
         let id: string | undefined;
@@ -131,9 +167,15 @@ export class AoiModule extends AppModule {
             }
             this.activeSourceId_ = id;
             this.aoiLayer.setSource(source.aois.items);
+            this.lastActiveSourceId_ = id;
         } else {
             this.activeSourceId_ = undefined;
             this.aoiLayer.setSource(this.aois.items);
         }
+    }
+
+    @action
+    loadLastActiveSource() {
+        this.setActiveSource(this.lastActiveSourceId_);
     }
 }

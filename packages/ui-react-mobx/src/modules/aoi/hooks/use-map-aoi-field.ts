@@ -24,7 +24,7 @@ export type MapAoiFieldProps =
 Omit<MapAoiDrawerProps, 'activeAction' | 'onActiveActionChange'>
 & MapAoiInstanceProps
 & Omit<MapAoiViewportProps, 'activeAction' | 'onActiveActionChange'>
-& Omit<MapAoiImporterProps, 'onActiveActionChange'>;
+& Omit<MapAoiImporterProps, 'activeAction' | 'onActiveActionChange'>;
 
 export const useMapAoiField = (props: MapAoiFieldProps) => {
 
@@ -48,6 +48,7 @@ export const useMapAoiField = (props: MapAoiFieldProps) => {
 
     let importerProps = useMapAoiImporter({
         ...props,
+        activeAction,
         onActiveActionChange
     });
 
@@ -83,6 +84,7 @@ export const useMapAoiFieldFromModule =
 
     let importerProps = useMapAoiImporter({
         ...props,
+        activeAction,
         onActiveActionChange
     });
 

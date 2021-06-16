@@ -4,7 +4,7 @@ import { createInMemoryAoiProvider } from './create-in-memory-aoi-provider';
 
 export const GeoJsonAoiParser = (input: File | string, nameProp?: string) => {
 
-    let axios = createAxiosInstance();
+    const axios = createAxiosInstance();
 
     const parseGeoJsonData = (data: GeoJSON.GeoJSON, inputName) => {
         if (data.type === 'FeatureCollection') {

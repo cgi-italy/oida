@@ -5,7 +5,7 @@ import { SelectOutlined, UploadOutlined } from '@ant-design/icons';
 
 import { AoiImportConfig } from '@oida/ui-react-core';
 
-import { DataCollectionList } from '../data-collection';
+import { DataCollectionCompactListItem, DataCollectionList } from '../data-collection';
 import { FocusIcon } from '../icons/focus';
 
 export const AoiImportRenderer = (props: AoiImportConfig) => {
@@ -94,7 +94,7 @@ export const AoiImportRenderer = (props: AoiImportConfig) => {
             {groupAoisProps && <DataCollectionList<any>
                 autoScrollOnSelection={true}
                 content={(item) => {
-                    return <List.Item.Meta
+                    return <DataCollectionCompactListItem
                         title={item.name}
                     />;
                 }}

@@ -13,16 +13,20 @@ import { AoiModule, AoiFormat } from '../aoi-module';
 
 export type MapAoiImporterProps = {
     aoiModule: AoiModule,
+    activeAction: AoiAction,
     onActiveActionChange: (action: AoiAction) => void
 } & FormFieldState<AoiValue>;
 
 const useMapAoiImporterBase = (props: MapAoiImporterProps) => {
 
     useEffect(() => {
-        return () => {
-            props.aoiModule.setActiveSource(undefined);
-        };
-    }, []);
+        if (props.activeAction === AoiAction.Import) {
+            props.aoiModule.loadLastActiveSource();
+            return () => {
+                props.aoiModule.setActiveSource(undefined);
+            };
+        }
+    }, [props.activeAction]);
 
     let sourceGroups = useSelector(() => {
         return props.aoiModule.aoiSources.items.map((aoiSource) => {
@@ -99,15 +103,17 @@ const useMapAoiImporterBase = (props: MapAoiImporterProps) => {
                         format.parser(file).then((data) => {
                             let aoiSourceProvider = createInMemoryAoiProvider(data);
 
-                            let propertiesSchema: Record<string, any> = {};
+                            let propertiesSchema: IFormFieldDefinition[] | undefined;
                             if (data.length) {
                                 let properties = data[0].properties || {};
-                                propertiesSchema = Object.keys(properties).reduce((schema, key) => {
+                                propertiesSchema = Object.keys(properties).map((key, idx) => {
                                     return {
-                                        [key]: {},
-                                        ...schema
+                                        name: key,
+                                        title: key,
+                                        type: 'string',
+                                        config: {}
                                     };
-                                }, propertiesSchema);
+                                });
                             }
                             props.aoiModule.aoiSources.add(new AoiSource({
                                 id: file.name,
@@ -165,19 +171,12 @@ const useMapAoiImporterBase = (props: MapAoiImporterProps) => {
 
     let sortableFields;
     if (selectedSourceGroup && selectedSourceGroup.propertiesSchema) {
-        filters.unshift(...Object.keys(selectedSourceGroup.propertiesSchema).map((key) => {
-            return {
-                name: key,
-                title: key.toLowerCase(),
-                type: 'string',
-                config: {}
-            } as IFormFieldDefinition;
-        }));
+        filters.unshift(...selectedSourceGroup.propertiesSchema);
 
-        sortableFields = Object.keys(selectedSourceGroup.propertiesSchema).map((key) => {
+        sortableFields = selectedSourceGroup.propertiesSchema.map((field) => {
             return {
-                key: key,
-                name: key.toLowerCase()
+                key: field.name,
+                name: field.title
             };
         });
 
@@ -205,7 +204,7 @@ const useMapAoiImporterBase = (props: MapAoiImporterProps) => {
 
     let loadingState = useSelector(() => {
         return selectedSourceGroup ? selectedSourceGroup.loadingStatus.value : LoadingState.Init;
-    });
+    }, [selectedSourceGroup]);
 
     if (items) {
         selectedSourceGroupItems = {
@@ -214,8 +213,7 @@ const useMapAoiImporterBase = (props: MapAoiImporterProps) => {
                 ...items
             },
             filters: {
-                ...filtering,
-                mainFilter: 'name'
+                ...filtering
             },
             sorting,
             paging

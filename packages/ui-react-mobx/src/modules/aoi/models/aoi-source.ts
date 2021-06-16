@@ -1,6 +1,6 @@
 import { action, reaction, computed } from 'mobx';
 
-import { QueryParams, LoadingState } from '@oida/core';
+import { QueryParams, LoadingState, IFormFieldDefinition } from '@oida/core';
 import { AsyncDataFetcher, QueryParams as QueryParamsState, QueryParamsProps, IndexedCollection } from '@oida/state-mobx';
 
 import { AoiProps, Aoi } from './aoi';
@@ -19,7 +19,7 @@ export type AoiSourceProps = {
     name: string;
     queryParams?: QueryParamsProps;
     provider: AoiSourceProvider;
-    propertiesSchema?: Record<string, any>
+    propertiesSchema?: IFormFieldDefinition[]
     lazy?: boolean;
 };
 
@@ -27,7 +27,7 @@ export class AoiSource {
     readonly id: string;
     readonly name: string;
     readonly queryParams: QueryParamsState;
-    readonly propertiesSchema: Record<string, any> | undefined;
+    readonly propertiesSchema: IFormFieldDefinition[] | undefined;
 
     protected readonly dataFetcher: AsyncDataFetcher<AoiSourceProviderResponse, QueryParams>;
     protected readonly aois_: IndexedCollection<Aoi>;
