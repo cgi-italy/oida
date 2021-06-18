@@ -1,6 +1,6 @@
 {
   "name": "@oida/state-mobx",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "oida mobx state management library",
   "module": "es/index.js",
   "main": "lib/index.js",

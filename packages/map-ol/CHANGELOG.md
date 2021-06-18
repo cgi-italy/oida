@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.4.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/map-ol@1.3.0...@oida/map-ol@1.4.0) (2021-06-18)
+
+
+### Bug Fixes
+
+* check for extent size on ol map renderer fitExtent ([fe2f266](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/fe2f2667d5678266cb10eb10cb14a74b2e56f735))
+* fix source in init in ol geo-image layer ([cec638f](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/cec638f4948f1bb68e20d3ba39f3a54a012ff726))
+
+
+### Features
+
+* add geo-image layer ([33c0d4d](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/33c0d4dfd72c27c26a4e02a061c74c4a40c58bf8))
+* add last click tracking in mouse coord interaction ([674aae6](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/674aae6cce3a842e7b7e6272212fe1addd0b778e))
+* add min/max zoom support in tile layer ([159df4f](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/159df4f729d81c3326a2b5e30c92e233701eddfc))
+* improve feature picking ([5ba3494](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/5ba3494454f8708d5a6ac14f201cfdcc0a820313))
+* improve support for layer feature hovering and selecting ([d794e65](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/d794e65b8eb6adea2b5badbb5400cc62882f4b27))
+
+
+
+
+
 # [1.3.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/map-ol@1.2.0...@oida/map-ol@1.3.0) (2020-09-11)
 
 

@@ -3,6 +3,39 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.1.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/core@2.0.0...@oida/core@2.1.0) (2021-06-18)
+
+
+### Bug Fixes
+
+* add missing return statement in fliGeometryCoords function ([7582d93](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/7582d932d743699531849486c1522fcd6ae63788))
+* add missing TileSource definition ([002bf8f](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/002bf8fcec21764c092f0f52a70728357440e541))
+* minor fixes and improvements ([bd78b2c](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/bd78b2c1b783283753e957d5abcfe722bb2916fd))
+* typing issues ([8db52dd](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/8db52dd222a065614d81cf9feec976448fe2bebe))
+
+
+### Features
+
+* add aoi field factory ([6bf45be](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/6bf45beedd40001d930c69090b8b2ed18aec0d00))
+* add color utils in core ([0219ce7](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/0219ce75aefe67ff1b534eba192bc821da7321da))
+* add common number formatting utility ([afda2ab](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/afda2ab139d1855704662375fe26013b5f52e2d5))
+* add geo-image layer ([33c0d4d](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/33c0d4dfd72c27c26a4e02a061c74c4a40c58bf8))
+* add getGeometryCenter util ([54e8ec7](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/54e8ec7d5d9aa4ce7a2b1ddc6e183561665f79a8))
+* add last click tracking in mouse coord interaction ([674aae6](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/674aae6cce3a842e7b7e6272212fe1addd0b778e))
+* add map aoi field component ([aacdecf](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/aacdecff3248b8e1e513dafe77bab2decda35f08))
+* add min/max zoom support in tile layer ([159df4f](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/159df4f729d81c3326a2b5e30c92e233701eddfc))
+* add some basic url utilities ([bb0a839](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/bb0a839c33d24d2f081b0d2d0cf22bb546447417))
+* add some basic xml parsing utils ([fd67ad6](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/fd67ad6bcbe008f1a67a9d6f2425691883c214e0))
+* add support for async data in enum field ([70c8d54](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/70c8d5448387e3fb2ea6cf5f6d4d0299554e4a48))
+* add support for limiting date/time selection in date picker ([d95a006](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/d95a006fc52ad598bbbc12efa36de57d2c56a69f))
+* add utility class to retrieve srs defs from spatialreference.org ([573f267](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/573f267f5e44e37949aefaf9b8f230d7ea010f7a))
+* add utility to check extent validity ([a0afa8b](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/a0afa8be43b54c8f85b0fa4f682ee7d1df4189f8))
+* improve support for layer feature hovering and selecting ([d794e65](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/d794e65b8eb6adea2b5badbb5400cc62882f4b27))
+
+
+
+
+
 # [2.0.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/core@1.2.0...@oida/core@2.0.0) (2020-09-11)
 
 

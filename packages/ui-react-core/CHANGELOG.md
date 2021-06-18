@@ -3,6 +3,43 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.0.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/ui-react-core@2.1.1...@oida/ui-react-core@3.0.0) (2021-06-18)
+
+
+### Bug Fixes
+
+* minor fixes ([5bf1c5d](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/5bf1c5d8e62fef3c7eb7c0cf9a268e014e572031))
+* minor fixes and improvements ([bd78b2c](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/bd78b2c1b783283753e957d5abcfe722bb2916fd))
+* minor layout updates ([adb97cd](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/adb97cdf2d89bd426ea83544253b146fa37719b8))
+
+
+### Code Refactoring
+
+* improve data collection components ([6b54259](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/6b542593300a06cc6fff16a0c0100a99ab786b31))
+
+
+### Features
+
+* add map aoi field component ([aacdecf](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/aacdecff3248b8e1e513dafe77bab2decda35f08))
+* add new data filtering widget ([52bc638](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/52bc638c2ed7129624be61c5cfab91f316aab4df))
+* add support for custom breadcrumb item render content ([f938507](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/f9385079309786a577249eaf4bfcc95d19440602))
+* allow aoi import in dataset analyses ([9ffd9aa](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/9ffd9aa8f9572876be74c348026c4e6a46fb4189))
+* asyncImage improvements ([ffd1f49](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/ffd1f494b3bc90d0f011a5fcc535a027601599fc))
+* breadcrumb improvements ([e697429](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/e697429c074d0df585a3178b5061e4d39d4f20ff))
+* collection list improvements ([21ac452](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/21ac452483fd8318c9a2bc86a7acfc574e8862df))
+* improve analysis dashboard widget positioning ([f56db5d](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/f56db5d87fad5c10b7a68dbe5b019ce3113aeed2))
+* minor component updates ([4b5b23c](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/4b5b23cc05173f59b46f5d456868ecca56aec28d))
+
+
+### BREAKING CHANGES
+
+* Removed icon from collection item props: icons should be added in table column or
+list item content
+
+
+
+
+
 ## [2.1.1](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/ui-react-core@2.1.0...@oida/ui-react-core@2.1.1) (2020-09-11)
 
 **Note:** Version bump only for package @oida/ui-react-core

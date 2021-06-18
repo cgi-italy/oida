@@ -3,6 +3,53 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.0.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/ui-react-antd@2.2.0...@oida/ui-react-antd@3.0.0) (2021-06-18)
+
+
+### Bug Fixes
+
+* allow css coloring of draw-line icon ([2bbd138](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/2bbd13866c930a63263edddda15484c72de0e4a4))
+* minor adjustments ([beac7f5](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/beac7f5995ca070536cdadf83fbfd6ce829fc64a))
+* minor data collection components improvements ([dbad63c](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/dbad63c06d76b98a17f3f3b8e29768d231c8520f))
+* minor fixes and improvements ([bd78b2c](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/bd78b2c1b783283753e957d5abcfe722bb2916fd))
+* minor layout updates ([adb97cd](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/adb97cdf2d89bd426ea83544253b146fa37719b8))
+* minor ui fixes and improvements ([99c5a0f](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/99c5a0ff6e5e54da182429198501f94c663965ba))
+* use multiline break on filter input overflow ([aae71e3](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/aae71e3d28357e2c9f54ff69ba3a9c0e37c795a8))
+
+
+### Code Refactoring
+
+* improve data collection components ([6b54259](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/6b542593300a06cc6fff16a0c0100a99ab786b31))
+
+
+### Features
+
+* add empty message to data collection list ([9c104c5](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/9c104c5b371123fd084954e7af37cffa2be606ee))
+* add generic list item component ([342636c](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/342636cab8b555e17a652ad5819c25836da10b84))
+* add map aoi field component ([aacdecf](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/aacdecff3248b8e1e513dafe77bab2decda35f08))
+* add new data filtering widget ([52bc638](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/52bc638c2ed7129624be61c5cfab91f316aab4df))
+* add support for async data in enum field ([70c8d54](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/70c8d5448387e3fb2ea6cf5f6d4d0299554e4a48))
+* add support for custom breadcrumb item render content ([f938507](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/f9385079309786a577249eaf4bfcc95d19440602))
+* add support for limiting date/time selection in date picker ([d95a006](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/d95a006fc52ad598bbbc12efa36de57d2c56a69f))
+* add support for list item description ([d7d9938](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/d7d993865bb1037eb4a0fafe2eecc0cd3abe3825))
+* breadcrumb improvements ([e697429](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/e697429c074d0df585a3178b5061e4d39d4f20ff))
+* collection list improvements ([21ac452](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/21ac452483fd8318c9a2bc86a7acfc574e8862df))
+* improve analysis ux ([8c2f075](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/8c2f075570f1e7c0f04c849ec3daf32d6fc35fbe))
+* improve aoi import management ([907c9df](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/907c9df0c119821803d74b225a19909d1f605ad1))
+* minor component updates ([4b5b23c](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/4b5b23cc05173f59b46f5d456868ecca56aec28d))
+* minor improvements to search filter control ([ee9fdd4](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/ee9fdd4f8b1a08dc2ec07702d838ccce38ae4bd0))
+* use search filterer as default list filter renderer ([9b27b67](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/9b27b67295e77bcbbacd3ab8654af08b50c56799))
+
+
+### BREAKING CHANGES
+
+* Removed icon from collection item props: icons should be added in table column or
+list item content
+
+
+
+
+
 # [2.2.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/ui-react-antd@2.1.0...@oida/ui-react-antd@2.2.0) (2020-09-11)
 
 

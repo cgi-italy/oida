@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.4.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/map-cesium@1.3.0...@oida/map-cesium@1.4.0) (2021-06-18)
+
+
+### Bug Fixes
+
+* add check for scene first render in cesium updateDataSource ([ec8f0d4](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/ec8f0d4883be8c9fe27f07ce8d98cff7ccfdbe83))
+* add CRS:84 to the list of geographic projections in cesium renderer ([7916dba](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/7916dba6cc74c9e4cf3af030f1e930601aec3afd))
+* catch errors on feature creation in cesium feature layer ([0247c69](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/0247c696d5d2554e716d783fda43900102dd3a02))
+* check for image readyness before creating colormap texture ([607070d](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/607070dadd7e516d2907f4ac9067cadcd2518e70))
+* disable default browser recommended resolution in cesium renderer ([641c4a6](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/641c4a610034db842a15e4ed155664feaa7d9517))
+* fix issue when primitive style is updated before first rendering ([125432a](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/125432ab1f769b48196323188c62a3d2f687843f))
+* handle NaN values in cesium volume layer ([75e68a2](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/75e68a2fbefe7e2bd9541595ea7b7ffd80e0548e))
+* solve issue in cesium tile scheme initialization ([9b95242](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/9b95242c7b50defd4173212f9e46e6a74b22be31))
+* update cesium WMS source default parameters ([8d798d8](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/8d798d81ee99a799223634dea5d3dda3af22ddda))
+
+
+### Features
+
+* add last click tracking in mouse coord interaction ([674aae6](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/674aae6cce3a842e7b7e6272212fe1addd0b778e))
+* add min/max zoom support in tile layer ([159df4f](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/159df4f729d81c3326a2b5e30c92e233701eddfc))
+* improve feature picking ([5ba3494](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/5ba3494454f8708d5a6ac14f201cfdcc0a820313))
+* improve support for layer feature hovering and selecting ([d794e65](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/d794e65b8eb6adea2b5badbb5400cc62882f4b27))
+
+
+
+
+
 # [1.3.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/map-cesium@1.2.0...@oida/map-cesium@1.3.0) (2020-09-11)
 
 
