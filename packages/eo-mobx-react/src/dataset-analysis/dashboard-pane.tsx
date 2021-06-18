@@ -64,7 +64,7 @@ export const DashboardPane = (props: LayoutSectionProps & DashboardPaneProps) =>
         const height = props.containerHeight || size.height;
         if (preferredLayout && size.width && height) {
             const w = Math.floor(Math.min(preferredLayout.width / size.width, 1.0) * props.numCols);
-            const h = Math.floor(preferredLayout.height / rowSnapHeight);
+            const h = Math.floor(Math.min(height, preferredLayout.height) / rowSnapHeight);
             let x = 0;
             let y = 0;
             if (!preferredLayout.position || preferredLayout.position === 'tr') {

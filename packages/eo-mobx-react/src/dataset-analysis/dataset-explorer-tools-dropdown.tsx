@@ -36,13 +36,13 @@ export const DatasetExplorerToolsDropDown = (props: DatasetExplorerToolsDropdown
 
     if (!props.datasetExplorer.items.length) {
         menuItems = [(
-            <Menu.Item disabled={true} className='empty-dropdown-message'>
+            <Menu.Item disabled={true} className='empty-dropdown-message' key='empty-map'>
                 {props.noDatasetsMessage || 'No datasets currently on the map. Add some dataset to enable analysis tools.'}
             </Menu.Item>
         )];
     } else if (!menuItems.length) {
         menuItems = [(
-            <Menu.Item disabled={true} className='empty-dropdown-message'>
+            <Menu.Item disabled={true} className='empty-dropdown-message' key='empty-tools'>
                 {props.noToolsMessage || 'No tools available for the current map datasets.'}
             </Menu.Item>
         )];
