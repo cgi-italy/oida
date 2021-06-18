@@ -5,13 +5,13 @@ import { Descriptions } from 'antd';
 import { DataDomain, DatasetDimension, DatasetRasterSequenceItem, isDomainProvider, NumericDomainMapper, RasterBandConfig } from '@oida/eo-mobx';
 
 
-export type DatasetSequenceItemStatsTable = {
+export type DatasetSequenceItemStatsTableProps = {
     item: DatasetRasterSequenceItem;
     variableConfig: RasterBandConfig;
     dimensionConfig: DatasetDimension<DataDomain<number | Date | string>>;
 };
 
-export const DatasetSequenceItemsStatsTable = (props: DatasetSequenceItemStatsTable) => {
+export const DatasetSequenceItemStatsTable = (props: DatasetSequenceItemStatsTableProps) => {
 
     const stats = props.item.stats;
 

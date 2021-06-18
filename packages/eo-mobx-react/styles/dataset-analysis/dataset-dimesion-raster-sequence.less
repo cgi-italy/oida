@@ -24,66 +24,80 @@
                     padding: 10px 20px;
                     flex-grow: 1;
                 }
+
+                .dataset-raster-sequence-settings {
+                    display: flex;
+                    flex-direction: column;
+                    padding-left: 20px;
+                    border-left: solid 1px #4d4d4d;
+                    margin-left: 10px;
+                    margin-right: 20px;
+
+                    .dataset-raster-sequence-stats-mode-controls {
+                        margin-top: 10px;
+                    }
+
+                }
+            }
+
+            .dataset-raster-sequence-item {
+
+                display: flex;
+                align-items: stretch;
+
+                .raster-sequence-thumb {
+                    margin: 10px;
+                    border: solid 1px @border-color-base;
+                    width: 250px;
+                    flex-grow: 1;
+
+                    img {
+                        width: 100%;
+                        object-fit: contain;
+                        image-rendering: pixelated;
+                    }
+
+                    .raster-sequence-thumb-caption {
+                        margin-top: 5px;
+                        text-align: center;
+                    }
+                }
+
+                .dataset-sequence-item-histogram {
+                    width: 250px;
+
+                    .chart {
+                        height: 250px;
+                        position: relative;
+                    }
+                    .chart-ops {
+                        display: none;
+                    }
+                }
+
+                .dataset-sequence-item-stats-table {
+                    width: 200px;
+                    margin: 10px;
+                    overflow: auto;
+
+                    .ant-descriptions-item {
+                        padding-bottom: 0;
+
+                        .ant-descriptions-item-label {
+                            font-size: 13px;
+                        }
+
+                        .ant-descriptions-item-content {
+                            font-size: 13px;
+                        }
+                    }
+                }
             }
 
             .dataset-raster-sequence-grid {
                 display: flex;
                 flex-wrap: wrap;
                 overflow: auto;
-
-                .dataset-raster-sequence-grid-item {
-
-                    display: flex;
-                    align-items: stretch;
-
-                    .raster-sequence-thumb {
-                        margin: 10px;
-                        border: solid 1px @border-color-base;
-                        width: 250px;
-                        flex-grow: 1;
-
-                        img {
-                            width: 100%;
-                            object-fit: contain;
-                        }
-
-                        .raster-sequence-thumb-caption {
-                            margin-top: 5px;
-                            text-align: center;
-                        }
-                    }
-
-                    .dataset-sequence-item-histogram {
-                        display: none;
-                        width: 250px;
-
-                        .chart {
-                            height: 100%;
-                            position: relative;
-                        }
-                        .chart-ops {
-                            display: none;
-                        }
-                    }
-
-                    .dataset-sequence-item-stats-table {
-                        display: none;
-                        width: 200px;
-                        margin: 10px;
-
-                        .ant-descriptions-item {
-                            padding-bottom: 0;
-
-                            .ant-descriptions-item-label {
-                                font-size: 13px;
-                            }
-
-                            .ant-descriptions-item-content {
-                                font-size: 13px;
-                            }
-                        }
-                    }
-                }
 
                 &.is-detailed {
 
@@ -98,31 +112,38 @@
                         display: block;
                     }
                 }
+
+                &:not(.is-detailed) {
+                    .dataset-sequence-item-histogram {
+                        display: none;
+                    }
+
+                    .dataset-sequence-item-stats-table {
+                        display: none;
+                    }
+                }
             }
+
 
             .dataset-raster-sequence-player {
                 padding: 0 20px;
                 flex-grow: 1;
                 display: flex;
                 flex-direction: column;
-                overflow: auto;
+                overflow: hidden;
 
-                .dataset-raster-sequence-player-item {
-                    display: flex;
-                    flex-grow: 1;
+                .dataset-raster-sequence-item {
                     overflow: hidden;
-                    min-height: 150px;
 
                     .raster-sequence-thumb {
-                        height: 100%;
                         overflow: hidden;
 
                         img {
-                            object-fit: contain;
-                            flex-grow: 1;
-                            max-width: 100%;
-                            height: 100%;
-                            image-rendering: pixelated;
+                            max-height: 100%;
+                        }
+
+                        .raster-sequence-thumb-caption {
+                            display: none;
                         }
                     }
 
@@ -150,7 +171,7 @@
 
                     padding-top: 10px;
 
-                    height: 200px;
+                    height: 300px;
                     position: relative;
                     flex-shrink: 0;
                     display: flex;

@@ -3,17 +3,19 @@ import { reaction } from 'mobx';
 import moment from 'moment';
 import classnames from 'classnames';
 import debounce from 'lodash/debounce';
-import { Radio, Slider, Space, Tooltip } from 'antd';
-import { TableOutlined, UnorderedListOutlined, PlaySquareOutlined } from '@ant-design/icons';
+import { Radio, Slider, Space } from 'antd';
 
+import { LoadingState } from '@oida/core';
 import { DataDomain, DatasetDimension, DatasetDimensionRasterSequence } from '@oida/eo-mobx';
 import { useSelector } from '@oida/ui-react-mobx';
+
 import { DatasetColorMapSelector } from '../../dataset-map-viz/dataset-colormap-selector';
 import { AnalysisLoadingStateMessage } from '../analysis-loading-state-message';
 import { DatasetRasterSequenceItemHistogram } from './dataset-sequence-item-histogram';
-import { LoadingState } from '@oida/core';
 import { DatasetRasterSequenceStatsSlider } from './dataset-sequence-stats-slider';
-import { DatasetSequenceItemsStatsTable } from './dataset-sequence-stats-table';
+import { DatasetSequenceItemStatsTable } from './dataset-sequence-item-stats-table';
+import { DatasetRasterSequencePercentilesSlider } from './dataset-sequence-percentiles-slider';
+import { DatasetSequenceItemPercentilesTable } from './dataset-sequence-item-pecentiles-table';
 
 
 export type DatasetDimensionRasterSequenceThumbProps = {
@@ -95,6 +97,12 @@ export const DatasetDimensionRasterSequenceChart = (props: DatasetDimensionRaste
         }
     };
 
+    // the assumption here is that the set of available statistics are the same for all the items
+    const hasPercentilesData = data.length && data[0].stats?.percentiles !== undefined;
+    const hasHistogramData = data.length && data[0].stats?.histogram !== undefined;
+
+    const [statsMode, setStatsMode] = useState<'basic' | 'percentiles' | 'histogram'>('basic');
+
     return (
         <div className='dataset-dimension-raster-sequence-chart'>
             <AnalysisLoadingStateMessage
@@ -111,46 +119,75 @@ export const DatasetDimensionRasterSequenceChart = (props: DatasetDimensionRaste
                                 variable={variableConfig}
                             />
                         }
-                            <Radio.Group
-                                onChange={(evt) => setMode(evt.target.value)}
-                                value={mode}
-                                buttonStyle='solid'
-                            >
-                                <Space direction='vertical' size={0}>
-                                    <Tooltip title='Thumb view'>
-                                        <Radio.Button value='grid'><TableOutlined/></Radio.Button>
-                                    </Tooltip>
-                                    <Tooltip title='Detailed view'>
-                                        <Radio.Button value='list'><UnorderedListOutlined/></Radio.Button>
-                                    </Tooltip>
-                                    <Tooltip title='Slide view'>
-                                        <Radio.Button value='slide'><PlaySquareOutlined/></Radio.Button>
-                                    </Tooltip>
+                        <div className='dataset-raster-sequence-settings'>
+                            <Space direction='vertical' className='dataset-raster-sequence-display-mode-controls'>
+                                <span>Display mode: </span>
+                                <Radio.Group
+                                    onChange={(evt) => setMode(evt.target.value)}
+                                    value={mode}
+                                    buttonStyle='solid'
+                                    size='small'
+                                >
+                                    <Space size={0}>
+                                        <Radio.Button value='grid'>Grid</Radio.Button>
+                                        <Radio.Button value='list'>List</Radio.Button>
+                                        <Radio.Button value='slide'>Slider</Radio.Button>
+                                    </Space>
+                                </Radio.Group>
+                            </Space>
+                            {(hasPercentilesData || hasHistogramData) && mode !== 'grid' &&
+                                <Space direction='vertical' className='dataset-raster-sequence-stats-mode-controls'>
+                                    <span>Statistics mode: </span>
+                                    <Radio.Group
+                                        onChange={(evt) => setStatsMode(evt.target.value)}
+                                        value={statsMode}
+                                        buttonStyle='solid'
+                                        size='small'
+                                        className='stats-mode-selector'
+                                    >
+                                        <Space size={0}>
+                                            <Radio.Button value='basic'>Basic</Radio.Button>
+                                            {hasPercentilesData && <Radio.Button value='percentiles'>Percentiles</Radio.Button>}
+                                            {hasHistogramData && <Radio.Button value='histogram'>Histogram</Radio.Button>}
+                                        </Space>
+                                    </Radio.Group>
                                 </Space>
-                            </Radio.Group>
+                            }
+                        </div>
                     </div>
                     {mode !== 'slide' &&
                         <div className={classnames('dataset-raster-sequence-grid', {'is-detailed': mode === 'list'})}>
                             {data.map((item) => {
                                 return (
-                                    <div className='dataset-raster-sequence-grid-item'>
+                                    <div className='dataset-raster-sequence-item' key={item.x.toString()}>
                                         <DatasetDimensionRasterSequenceThumb
                                             value={item.x}
                                             dimensionConfig={dimensionConfig}
                                             data={item.data}
                                             valueFormatter={valueFormatter}
                                         />
-                                        <DatasetRasterSequenceItemHistogram
-                                            item={item}
-                                            variableConfig={variableConfig}
-                                            color={props.sequence.color}
-                                            isLoading={loadingState === LoadingState.Loading}
-                                        />
-                                        <DatasetSequenceItemsStatsTable
-                                            dimensionConfig={dimensionConfig}
-                                            variableConfig={variableConfig}
-                                            item={item}
-                                        />
+                                        {statsMode === 'basic' &&
+                                            <DatasetSequenceItemStatsTable
+                                                dimensionConfig={dimensionConfig}
+                                                variableConfig={variableConfig}
+                                                item={item}
+                                            />
+                                        }
+                                        {statsMode === 'percentiles' &&
+                                            <DatasetSequenceItemPercentilesTable
+                                                dimensionConfig={dimensionConfig}
+                                                variableConfig={variableConfig}
+                                                item={data[activeThumb]}
+                                            />
+                                        }
+                                        {statsMode === 'histogram' &&
+                                            <DatasetRasterSequenceItemHistogram
+                                                item={item}
+                                                variableConfig={variableConfig}
+                                                color={props.sequence.color}
+                                                isLoading={loadingState === LoadingState.Loading}
+                                            />
+                                        }
                                     </div>
                                 );
                             })}
@@ -158,19 +195,35 @@ export const DatasetDimensionRasterSequenceChart = (props: DatasetDimensionRaste
                     }
                     {mode === 'slide' && data[activeThumb] &&
                         <div className='dataset-raster-sequence-player'>
-                            <div className='dataset-raster-sequence-player-item'>
+                            <div className='dataset-raster-sequence-item'>
                                 <DatasetDimensionRasterSequenceThumb
                                     value={data[activeThumb].x}
                                     dimensionConfig={dimensionConfig}
                                     data={data[activeThumb].data}
                                     valueFormatter={valueFormatter}
                                 />
-                                <DatasetRasterSequenceItemHistogram
-                                    item={data[activeThumb]}
-                                    variableConfig={variableConfig}
-                                    color={props.sequence.color}
-                                    isLoading={loadingState === LoadingState.Loading}
-                                />
+                                {statsMode === 'basic' &&
+                                    <DatasetSequenceItemStatsTable
+                                        dimensionConfig={dimensionConfig}
+                                        variableConfig={variableConfig}
+                                        item={data[activeThumb]}
+                                    />
+                                }
+                                {statsMode === 'percentiles' &&
+                                    <DatasetSequenceItemPercentilesTable
+                                        dimensionConfig={dimensionConfig}
+                                        variableConfig={variableConfig}
+                                        item={data[activeThumb]}
+                                    />
+                                }
+                                {statsMode === 'histogram' &&
+                                    <DatasetRasterSequenceItemHistogram
+                                        item={data[activeThumb]}
+                                        variableConfig={variableConfig}
+                                        color={props.sequence.color}
+                                        isLoading={loadingState === LoadingState.Loading}
+                                    />
+                                }
                             </div>
                             {!!data.length && !data[0].stats &&
                                 <div className='dataset-raster-sequence-player-slider'>
@@ -190,20 +243,28 @@ export const DatasetDimensionRasterSequenceChart = (props: DatasetDimensionRaste
                             }
                             {!!data.length && data[0].stats !== undefined &&
                                 <div className='dataset-raster-sequence-player-slider-stats'>
-                                    <DatasetRasterSequenceStatsSlider
-                                        data={data}
-                                        dimensionConfig={dimensionConfig}
-                                        variableConfig={variableConfig}
-                                        color={props.sequence.color}
-                                        activeItem={activeThumb}
-                                        onActiveItemChange={(active) => setActiveThumb(active)}
-                                        isLoading={loadingState === LoadingState.Loading}
-                                    />
-                                    <DatasetSequenceItemsStatsTable
-                                        dimensionConfig={dimensionConfig}
-                                        variableConfig={variableConfig}
-                                        item={data[activeThumb]}
-                                    />
+                                    {statsMode !== 'percentiles' &&
+                                        <DatasetRasterSequenceStatsSlider
+                                            data={data}
+                                            dimensionConfig={dimensionConfig}
+                                            variableConfig={variableConfig}
+                                            color={props.sequence.color}
+                                            activeItem={activeThumb}
+                                            onActiveItemChange={(active) => setActiveThumb(active)}
+                                            isLoading={loadingState === LoadingState.Loading}
+                                        />
+                                    }
+                                    {statsMode === 'percentiles' &&
+                                        <DatasetRasterSequencePercentilesSlider
+                                            data={data}
+                                            dimensionConfig={dimensionConfig}
+                                            variableConfig={variableConfig}
+                                            color={props.sequence.color}
+                                            activeItem={activeThumb}
+                                            onActiveItemChange={(active) => setActiveThumb(active)}
+                                            isLoading={loadingState === LoadingState.Loading}
+                                        />
+                                    }
                                 </div>
                             }
                         </div>

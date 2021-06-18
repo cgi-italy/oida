@@ -25,7 +25,8 @@ export type DatasetStats = {
     mean?: number;
     median?: number;
     variance?: number;
-    histogram?: HistogramBin[]
+    histogram?: HistogramBin[];
+    percentiles?: Array<[number, number]>;
 };
 
 export type DatasetStatsProvider = (request: DatasetStatsRequest) => Promise<DatasetStats>;
