@@ -235,7 +235,10 @@ export class DatasetMapExplorer {
 }
 
 export type DatasetsExplorerConfig = {
-    disableTimeExplorer?: boolean;
+    timeExplorer?: {
+        disabled?: boolean;
+        rangeModeDisabled?: boolean;
+    };
     disableProductSearch?: boolean;
     disableMapView?: boolean;
 };
@@ -278,7 +281,7 @@ export class DatasetExplorer {
         this.aoi = undefined;
         this.toi = undefined;
 
-        if (!props.config?.disableTimeExplorer) {
+        if (!props.config?.timeExplorer?.disabled) {
             this.timeExplorer = new DatasetTimeExplorer();
         }
         if (!props.config?.disableMapView) {

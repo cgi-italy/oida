@@ -7,120 +7,21 @@ import { DataSet } from 'vis-data/peer';
 import moment from 'moment';
 
 import { Button, Tooltip } from 'antd';
-import { ColumnWidthOutlined, ClockCircleOutlined, SearchOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
+import { SearchOutlined } from '@ant-design/icons';
 
 import { AOI_FIELD_ID, DateRangeValue } from '@oida/core';
 import { ArrayTracker } from '@oida/state-mobx';
-import { DateFieldRenderer, DateRangeFieldRenderer } from '@oida/ui-react-antd';
 import { useSelector } from '@oida/ui-react-mobx';
 import { DatasetExplorer, DatasetExplorerItem, TimeSearchDirection, getNearestDatasetProduct } from '@oida/eo-mobx';
 
 import { Timeline, TimelineGroupLabelsMode } from './timeline';
+import { DatasetExplorerTimelineToolbar } from './dataset-explorer-timeline-toolbar';
 
 
 export enum DatasetTimelineTimeSelectionMode {
     Instant = 'instant',
     Range = 'range'
 }
-
-export type DatasetDiscoveryTimelineToolbarProps = {
-    onDrawRange: () => void;
-    timeSelectionMode: DatasetTimelineTimeSelectionMode;
-    onTimeSelectionModeChange: (selectionMode: DatasetTimelineTimeSelectionMode) => void;
-    groupLabelsMode: TimelineGroupLabelsMode
-    onGroupLabelsModeChange: (mode: TimelineGroupLabelsMode) => void;
-    selectedTime: Date | DateRangeValue | undefined
-    onSelectedTimeChange: (value: Date | DateRangeValue | undefined) => void;
-    onGoToTimeSelection: () => void;
-};
-
-export const DatasetExplorerTimelineToolbar = (props: DatasetDiscoveryTimelineToolbarProps) => {
-
-    const layerNamesVisible = props.groupLabelsMode === TimelineGroupLabelsMode.Block;
-    const isRangeMode = props.timeSelectionMode === DatasetTimelineTimeSelectionMode.Range;
-
-    let timeField: JSX.Element;
-
-    if (!isRangeMode) {
-        timeField = (
-            <DateFieldRenderer
-                config={{
-                    withTime: true
-                }}
-                size='small'
-                bordered={false}
-                suffixIcon={null}
-                required={true}
-                value={props.selectedTime as Date}
-                onChange={props.onSelectedTimeChange}
-            />
-        );
-
-    } else {
-
-        timeField = (
-            <DateRangeFieldRenderer
-                config={{
-                    withTime: true
-                }}
-                size='small'
-                bordered={false}
-                suffixIcon={null}
-                required={false}
-                value={props.selectedTime as DateRangeValue}
-                onChange={props.onSelectedTimeChange}
-            />
-        );
-
-    }
-
-
-    return (
-        <div className='dataset-timeline-toolbar'>
-            <Tooltip
-                title={layerNamesVisible ? 'Hide layer names' : 'Show layer names'}
-            >
-                <Button
-                    type={layerNamesVisible ? 'link' : 'link'}
-                    size='small'
-                    onClick={() => {
-                        props.onGroupLabelsModeChange(layerNamesVisible ? TimelineGroupLabelsMode.Hidden : TimelineGroupLabelsMode.Block);
-                    }}
-                >
-                    {layerNamesVisible ? <MenuFoldOutlined/> : <MenuUnfoldOutlined/>}
-                </Button>
-            </Tooltip>
-            <Tooltip
-                title='Go to selected time'
-            >
-                <Button
-                    type='link'
-                    size='small'
-                    onClick={props.onGoToTimeSelection}
-                >
-                    <ClockCircleOutlined/>
-                </Button>
-            </Tooltip>
-            <Tooltip
-                title={isRangeMode ? 'Disable range mode' : 'Enable range mode' }
-            >
-                <Button
-                    type={isRangeMode ? 'primary' : 'link'}
-                    size='small'
-                    onClick={() => {
-                        props.onTimeSelectionModeChange(isRangeMode
-                            ? DatasetTimelineTimeSelectionMode.Instant
-                            : DatasetTimelineTimeSelectionMode.Range
-                        );
-                    }}
-                >
-                    <ColumnWidthOutlined/>
-                </Button>
-            </Tooltip>
-            {timeField}
-        </div>
-    );
-};
 
 export type DatasetExplorerTimelineProps = {
     explorerState: DatasetExplorer;
@@ -299,11 +200,15 @@ export const DatasetDiscoveryTimeline = (props: DatasetExplorerTimelineProps) =>
     const [editableRanges, setEditableRanges] = useState<any>([]);
     const [groupLabelsMode, setGroupLabelsMode] = useState(TimelineGroupLabelsMode.Block);
     const [timeSelectionMode, setTimeSelectionMode] = useState(DatasetTimelineTimeSelectionMode.Instant);
+    const [isCompressed, setIsCompressed] = useState(false);
 
     const selectedToi = useSelector(() => props.explorerState.toi);
 
     const onTimelineClick = useCallback((evt: TimelineEventPropertiesResult) => {
         if (timeSelectionMode === DatasetTimelineTimeSelectionMode.Instant) {
+            if (!evt.what) {
+                return;
+            }
             if (evt.what === 'item' && evt.item) {
                 let item = timelineItems.current.get(evt.item);
                 if (item && item.type === 'point') {
@@ -548,9 +453,23 @@ export const DatasetDiscoveryTimeline = (props: DatasetExplorerTimelineProps) =>
                         props.explorerState.setToi(value as DateRangeValue);
                     }
                 }}
+                onGoToPrevItem={() => {
+                    if (selectedToi instanceof Date) {
+                        onSelectedDateChange(new Date(selectedToi.getTime() - 1000));
+                    }
+                }}
+                onGoToNextItem={() => {
+                    if (selectedToi instanceof Date) {
+                        onSelectedDateChange(new Date(selectedToi.getTime() + 1000));
+                    }
+                }}
                 onGoToTimeSelection={goToTimeSelection}
+                isCompressed={isCompressed}
+                onCompressToggle={() => setIsCompressed((compressed) => !compressed)}
+                rangeModeDisabled={props.explorerState.config.timeExplorer?.rangeModeDisabled}
             />
-            <Timeline
+            {<Timeline
+                className={classnames({'is-compressed': isCompressed})}
                 range={visibleRange}
                 timelineGroups={timelineGroups.current}
                 timelineItems={timelineItems.current}
@@ -595,6 +514,7 @@ export const DatasetDiscoveryTimeline = (props: DatasetExplorerTimelineProps) =>
                 }}
                 onClick={onTimelineClick}
             />
+            }
             <TimelineGroupTemplates groups={timelineGroups.current} explorerState={props.explorerState}/>
         </div>
     );
