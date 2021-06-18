@@ -68,6 +68,9 @@ export class WmsTimeDistributionProvider implements DatasetTimeDistributionProvi
 
         let item = this.timeDistribution_[currIndex];
         if (item instanceof Date) {
+            if (item > timeRange.end) {
+                return Promise.resolve([]);
+            }
             prevItem = {
                 start: item
             };
