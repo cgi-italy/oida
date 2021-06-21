@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.1](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/eo-adapters-ogc@0.2.0...@oida/eo-adapters-ogc@0.2.1) (2021-06-21)
+
+
+### Bug Fixes
+
+* handle non geographic SRSs in WMTS spatial coverage provider ([71c3e14](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/71c3e140f2f151c74c023daa0920e54abec81279))
+
+
+
+
+
 # 0.2.0 (2021-06-18)
 
 

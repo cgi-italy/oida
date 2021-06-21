@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.0.1](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/eo-mobx-react@1.0.0...@oida/eo-mobx-react@1.0.1) (2021-06-21)
+
+
+### Bug Fixes
+
+* use a smaller offset in timeline step navigation ([fd82e46](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/fd82e461e7efc50725d9a15088736f7f002efa70))
+
+
+
+
+
 # 1.0.0 (2021-06-18)
 
 
