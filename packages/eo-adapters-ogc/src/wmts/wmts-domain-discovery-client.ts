@@ -4,6 +4,11 @@ export type WmtsDomainDiscoveryClientConfig = {
     axiosInstance?: AxiosInstanceWithCancellation;
 };
 
+/**
+ * A client for the WMTS multidimensional domain discovery extension
+ * https://docs.geoserver.org/stable/en/user/community/wmts-multidimensional/index.html
+ *
+ */
 export class WmtsDomainDiscoveryClient {
 
     private domParser = new DOMParser();
@@ -35,7 +40,7 @@ export class WmtsDomainDiscoveryClient {
             version: parameters.version || '1.0.0',
             request: 'DescribeDomains',
             layer: parameters.layer,
-            tileMatrixSet: parameters.tileMatrix
+            TileMatrixSet: parameters.tileMatrix
         };
 
         if (parameters.bbox) {
@@ -166,6 +171,7 @@ export class WmtsDomainDiscoveryClient {
 
                 if (bboxTag) {
                     output.bbox = {
+                        crs: bboxTag.getAttribute('CRS') || 'EPSG:4326',
                         minx: parseFloat(bboxTag.getAttribute('minx') || 'NaN'),
                         maxx: parseFloat(bboxTag.getAttribute('maxx') || 'NaN'),
                         miny: parseFloat(bboxTag.getAttribute('miny') || 'NaN'),

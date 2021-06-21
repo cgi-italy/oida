@@ -73,6 +73,20 @@ export const getWmsDatasetConfig = (config: WmsDatasetConfig) => {
             }));
         }
 
+        // wrap the provided spatial coverage provider (if any), and fallback to WMS layer
+        // extent in case it fails to provide the geographic extent
+        const spatialCoverageProvider: DatasetSpatialCoverageProvider = (datasetViz) => {
+            if (config.spatialCoverageProvider) {
+                return config.spatialCoverageProvider(datasetViz).then((geographicExtent) => {
+                    return geographicExtent || layer.EX_GeographicBoundingBox;
+                }).catch(() => {
+                    return layer.EX_GeographicBoundingBox;
+                });
+            } else {
+                return Promise.resolve(layer.EX_GeographicBoundingBox);
+            }
+        };
+
         return {
             id: uuid(),
             name: layer.Title || layer.Name,
@@ -85,13 +99,13 @@ export const getWmsDatasetConfig = (config: WmsDatasetConfig) => {
                 },
                 wmsServiceUrl: config.service.getServiceUrl(),
                 wmsVersion: config.service.getVersion(),
-                spatialCoverageProvider: config.spatialCoverageProvider,
+                spatialCoverageProvider: spatialCoverageProvider,
                 getPresetFromStyle: config.getPresetFromStyle,
                 additionalFiltersSerializer: config.additionalFiltersSerializer,
                 tileGridOptions: config.tileGridOptions
 
             }),
-            spatialCoverageProvider: config.spatialCoverageProvider || (() => Promise.resolve(layer.EX_GeographicBoundingBox)),
+            spatialCoverageProvider: spatialCoverageProvider,
             timeDistribution: timeDistributionProvider ? {
                 provider: timeDistributionProvider
             } : undefined,
