@@ -455,12 +455,12 @@ export const DatasetDiscoveryTimeline = (props: DatasetExplorerTimelineProps) =>
                 }}
                 onGoToPrevItem={() => {
                     if (selectedToi instanceof Date) {
-                        onSelectedDateChange(new Date(selectedToi.getTime() - 1000));
+                        onSelectedDateChange(new Date(selectedToi.getTime() - 1));
                     }
                 }}
                 onGoToNextItem={() => {
                     if (selectedToi instanceof Date) {
-                        onSelectedDateChange(new Date(selectedToi.getTime() + 1000));
+                        onSelectedDateChange(new Date(selectedToi.getTime() + 1));
                     }
                 }}
                 onGoToTimeSelection={goToTimeSelection}
