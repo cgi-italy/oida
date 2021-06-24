@@ -116,8 +116,10 @@ export const DatasetColorMapRangeSelector = (props: DatasetColorMapRangeSelector
         variable: props.variable
     });
 
-    let mapRange = useSelector(() => props.colorMap.domain?.mapRange);
-    let clamp = useSelector(() => props.colorMap.domain?.clamp);
+    const mapRange = useSelector(() => props.colorMap.domain?.mapRange);
+    const clamp = useSelector(() => props.colorMap.domain?.clamp);
+
+    const sliderRef = useRef<any>();
 
     if (!mapRange) {
         return null;
@@ -150,6 +152,7 @@ export const DatasetColorMapRangeSelector = (props: DatasetColorMapRangeSelector
         };
 
         domainSlider = <Slider
+            ref={sliderRef}
             value={[domainMapper.normalizeValue(mapRange.min)!, domainMapper.normalizeValue(mapRange.max)!]}
             min={variableDomain.min}
             max={variableDomain.max}
@@ -158,10 +161,21 @@ export const DatasetColorMapRangeSelector = (props: DatasetColorMapRangeSelector
             marks={marks}
             tooltipVisible={false}
             onChange={(value) => {
-                props.colorMap.domain?.setRange({
+                const range = {
                     min: domainMapper.denormalizeValue(value[0]),
                     max: domainMapper.denormalizeValue(value[1])
-                });
+                };
+                if (sliderRef.current) {
+                    // retrieve from the slider state which handle was moved and update only the corresponding range endpoint
+                    // (to avoid rounding-off the untouched range endpoint)
+                    const movedHandle: number | undefined = sliderRef.current.prevMovedHandleIndex;
+                    if (movedHandle === 0) {
+                        range.max = mapRange.max;
+                    } else if (movedHandle === 1) {
+                        range.min = mapRange.min;
+                    }
+                }
+                props.colorMap.domain?.setRange(range);
             }}
         />;
     }
