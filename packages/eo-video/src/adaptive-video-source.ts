@@ -115,7 +115,7 @@ export class AdaptiveVideoLayer {
     get extent() {
         return getGeometryExtent({
             type: 'Polygon',
-            coordinates: [this.getFootprintForTime_(this.mediaElement_.currentTime)]
+            coordinates: [this.mediaElement_ ? this.getFootprintForTime_(this.mediaElement_.currentTime) : this.footprints_[0]]
         });
     }
 
