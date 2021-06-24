@@ -3,16 +3,14 @@ import React from 'react';
 import { SearchOutlined, PlusOutlined } from '@ant-design/icons';
 import { STRING_FIELD_ID, IFormFieldDefinition } from '@oida/core';
 
-import { useEntityCollectionList, useDataPaging, useDataSorting, useFormData, useSelector } from '@oida/ui-react-mobx';
+import { useEntityCollection } from '@oida/ui-react-mobx';
 import { DataCollectionList } from '@oida/ui-react-antd';
 import { DatasetExplorer } from '@oida/eo-mobx';
-
-
 import {
     WmsDatasetDiscoveryProvider, WmsDatasetDiscoveryProviderItem,
  } from '@oida/eo-adapters-ogc';
-
 import { useQueryCriteriaUrlBinding, useQueryFiltersBreadcrumbBindingFromModule } from '@oida/ui-react-mobx';
+
 import { WmsDiscoveryProviderLayerItem } from './wms-discovery-provider-layer-item';
 
 export type WmsDiscoveryProviderResultsProps = {
@@ -41,14 +39,11 @@ export const WmsDiscoveryProviderResults = (props: WmsDiscoveryProviderResultsPr
             content: 'Add to map',
             icon: (<PlusOutlined/>),
             callback: (item: WmsDatasetDiscoveryProviderItem) => {
-                props.provider.createDataset(item).then((datasetConfig) => {
+                return props.provider.createDataset(item).then((datasetConfig) => {
                     if (datasetConfig) {
                         props.datasetExplorer.addDataset(datasetConfig);
                     }
                 });
-            },
-            condition: (entity) => {
-                return true;
             }
         }
     ];
@@ -63,26 +58,19 @@ export const WmsDiscoveryProviderResults = (props: WmsDiscoveryProviderResultsPr
     //     filteringState: props.provider.criteria.filters
     // });
 
-    const loadingState = useSelector(() => props.provider.loadingState.value);
-
-    let pagingProps = useDataPaging(props.provider.criteria.paging);
-
-    let filteringProps = useFormData({
-        fieldValues: props.provider.criteria.filters,
-        fields: searchFilters
-    });
-
-    let sortingProps = useDataSorting({
-        sortableFields: [{key: 'Title', name: 'Name'}],
-        sortingState: props.provider.criteria.sorting
-    });
-
-    let items = useEntityCollectionList<WmsDatasetDiscoveryProviderItem>({
+    const collectionListProps = useEntityCollection({
         items: props.provider.results,
-        actions: actions
+        actions: actions,
+        loadingState: props.provider.loadingState,
+        queryParams: props.provider.criteria,
+        filtering: {
+            filters: searchFilters,
+            mainFilter: 'search'
+        },
+        sortableFields: [{key: 'Title', name: 'Name'}],
     });
 
-    if (!items) {
+    if (!collectionListProps) {
         return null;
     }
 
@@ -91,21 +79,10 @@ export const WmsDiscoveryProviderResults = (props: WmsDiscoveryProviderResultsPr
             <DataCollectionList<WmsDatasetDiscoveryProviderItem>
                 className='dataset-discovery-results wms-discovery-layer-list'
                 content={(item) => <WmsDiscoveryProviderLayerItem wmsDiscoveryItem={item}/>}
-                items={{
-                    ...items,
-                    loadingState: loadingState
-                }}
+                size='default'
                 itemLayout='vertical'
-                paging={pagingProps}
-                sorting={sortingProps}
-                filters={filteringProps
-                    ? {
-                        ...filteringProps,
-                        mainFilter: 'search'
-                    }
-                    : undefined
-                }
                 autoScrollOnSelection={false}
+                {...collectionListProps}
             />
         </div>
     );

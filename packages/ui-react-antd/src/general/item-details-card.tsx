@@ -1,15 +1,16 @@
 import React from 'react';
-
-import { Button, Descriptions } from 'antd';
+import useResizeAware from 'react-resize-aware';
+import { Descriptions } from 'antd';
 import {
     LoadingOutlined, PictureFilled
 } from '@ant-design/icons';
-import useResizeAware from 'react-resize-aware';
 
-import { AsyncImage } from '@oida/ui-react-core';
+import { AsyncImage, DataCollectionItemAction } from '@oida/ui-react-core';
+
+import { DataCollectionItemActionButton } from '../data-collection/data-collection-item-action-button';
 
 
-export type ItemMetadata = {
+export type ItemDetailsCardMetadata = {
     label: React.ReactNode,
     value: React.ReactNode
 };
@@ -19,8 +20,8 @@ export type ItemDetailsCardProps = {
     videoPreview?: string;
     imagePreview?: string;
     icon?: React.ReactNode;
-    metadata?: ItemMetadata[];
-    actions?: {name?: React.ReactNode, icon?: React.ReactNode, callback: () => void}[];
+    metadata?: ItemDetailsCardMetadata[];
+    actions?: DataCollectionItemAction[];
     className?: string;
     maxColumnWidth?: number
 };
@@ -59,9 +60,12 @@ export const ItemDetailsCard = (props: ItemDetailsCardProps) => {
     const actionItems = (props.actions || [])
         .map((action, idx) => {
             return (
-                <Button key={idx} onClick={() => action.callback()}>
-                    <span className='action-icon'>{action.icon}</span><span className='action-name'>{action.name}</span>
-                </Button>
+                <DataCollectionItemActionButton
+                    key={idx}
+                    action={action}
+                    type='default'
+                    size='middle'
+                />
             );
         });
 

@@ -1,5 +1,9 @@
 .aoi-import {
     min-width: 320px;
+    overflow: hidden;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
 
     .aoi-source-selector {
         display: flex;
@@ -10,12 +14,7 @@
     }
 
     .data-collection-list {
-        border: solid 1px @border-color-base;
-        padding: 0.5rem;
         margin-top: 0.5rem;
-
-        .ant-list {
-            max-height: 300px;
-        }
+        flex-grow: 1;
     }
 }

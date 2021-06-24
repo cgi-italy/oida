@@ -1,3 +1,4 @@
+/** {@Link DataPagerRenderer} props */
 export type DataPagerProps = {
     pageSize: number;
     page: number;
@@ -6,4 +7,5 @@ export type DataPagerProps = {
     onPageSizeChange: (pageSize: number) => void;
 };
 
+/** A data pager component */
 export type DataPagerRenderer = React.ComponentType<DataPagerProps>;

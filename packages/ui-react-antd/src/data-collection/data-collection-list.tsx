@@ -32,7 +32,7 @@ export const DataCollectionList = <T extends Object>(props: DataCollectionListPr
                 {...items}
                 {...listProps}
             ></DataCollectionItemsList>
-            {paging && <DataPager {...paging}/>}
+            {paging && paging.total > paging.pageSize && <DataPager {...paging}/>}
         </div>
     );
 };

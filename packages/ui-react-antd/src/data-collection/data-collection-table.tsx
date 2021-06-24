@@ -1,20 +1,18 @@
 import React, { useState } from 'react';
 import classnames from 'classnames';
-
+import { useDrop } from 'react-dnd';
+import { NativeTypes } from 'react-dnd-html5-backend';
+import useResizeAware from 'react-resize-aware';
 import { Table, Menu, Dropdown, Empty, ConfigProvider } from 'antd';
 import { ColumnType } from 'antd/lib/table/interface';
 import { EllipsisOutlined, CloseCircleOutlined } from '@ant-design/icons';
-import useResizeAware from 'react-resize-aware';
-import { useDrop } from 'react-dnd';
-import { NativeTypes } from 'react-dnd-html5-backend';
-
-
-import { DataCollectionProps, DataPagerRenderer, DataFiltererRenderer, useScrollIntoView } from '@oida/ui-react-core';
 
 import { LoadingState, SortOrder, SelectionMode } from '@oida/core';
+import { DataCollectionProps, DataPagerRenderer, DataFiltererRenderer, useScrollIntoView } from '@oida/ui-react-core';
 
 import { DataPager } from './data-pager';
 import { AdvancedSearchFilterer } from './advanced-search-filterer';
+import { DataCollectionItemActionButton } from './data-collection-item-action-button';
 
 export type DataCollectionTableColumn<T> = ColumnType<T> & {
     minTableWidth?: number
@@ -33,6 +31,8 @@ export function DataCollectionTable<T extends object>(props: DataCollectionTable
     const [resizeListener, size] = useResizeAware();
 
     const {items, paging, sorting, filters, filtererRender, pagerRender, columns} = props;
+
+    const { itemState, itemActions } = items;
 
     const tableColumns = columns.filter((column) => {
         if (column.minTableWidth && size.width < column.minTableWidth) {
@@ -63,24 +63,32 @@ export function DataCollectionTable<T extends object>(props: DataCollectionTable
     tableColumns.push({
         key: 'actions',
         render: (item, record) => {
-            const {actions} = itemSelector(record);
+            const actions = itemActions ? itemActions(record) : undefined;
             if (!actions) {
                 return null;
             } else {
-                const actionItems = actions.map((action) => {
+                const actionItems = actions.map((action, idx) => {
                     return (
-                        <Menu.Item key={action.name}>
-                            <a onClick={() => action.callback(record)}
-                            >
-                                {action.icon} {action.name}
-                            </a>
+                        <Menu.Item key={idx}>
+                            <DataCollectionItemActionButton
+                                action={action}
+                                type='text'
+                            />
                         </Menu.Item>
                     );
                 });
 
                 return (
-                    <Dropdown overlay={<Menu>{actionItems}</Menu>} placement='bottomRight'>
-                        <a className='ant-dropdown-link' onClick={e => e.preventDefault()}>
+                    <Dropdown
+                        overlay={<Menu>{actionItems}</Menu>}
+                        placement='bottomRight'
+                        mouseEnterDelay={0.05}
+                        mouseLeaveDelay={0.05}
+                    >
+                        <a
+                            className='ant-dropdown-link'
+                            onClick={e => e.preventDefault()}
+                        >
                             <EllipsisOutlined/>
                         </a>
                     </Dropdown>
@@ -92,13 +100,11 @@ export function DataCollectionTable<T extends object>(props: DataCollectionTable
         sortOrder: null
     });
 
-    const itemSelector = items.itemSelector;
-
     const RowRenderer = (props) => {
         if (props.children.length) {
 
             const record = props.children[0].props.record;
-            const { selected, hovered } = itemSelector(record);
+            const { selected, hovered } = itemState(record);
 
             const [itemRef, setItemRef] = useState<Element | null>(null);
 
@@ -278,7 +284,7 @@ export function DataCollectionTable<T extends object>(props: DataCollectionTable
                         } : undefined}
                     ></Table>
                 </div>
-                {paging && <DataPager {...paging}/>}
+                {paging && paging.total > paging.pageSize && <DataPager {...paging}/>}
             </div>
         </ConfigProvider>
     );

@@ -24,32 +24,27 @@ export const AoiImportRenderer = (props: AoiImportConfig) => {
     let groupAoisProps = props.selectedSourceGroupItems;
     if (groupAoisProps) {
 
-        let aoiActions = [{
-            name: 'Use this area',
-            callback: (aoi) => {
-                props.onAoiImportAction(aoi);
-            },
-            icon: (<SelectOutlined/>)
-        }];
-
-        const onAoiCenterOnMapAction = props.onAoiCenterOnMapAction;
-        if (onAoiCenterOnMapAction) {
-            aoiActions.unshift({
-                name: 'Center on map',
-                callback: (aoi) => {
-                    onAoiCenterOnMapAction(aoi);
+        groupAoisProps.items.itemActions = (item) => {
+            let aoiActions = [{
+                content: 'Use this area',
+                callback: () => {
+                    props.onAoiImportAction(item);
                 },
-                icon: (<FocusIcon/>)
-            });
-        }
+                icon: (<SelectOutlined/>)
+            }];
 
-        let itemSelector = groupAoisProps.items.itemSelector;
+            const onAoiCenterOnMapAction = props.onAoiCenterOnMapAction;
+            if (onAoiCenterOnMapAction) {
+                aoiActions.unshift({
+                    content: 'Center on map',
+                    callback: () => {
+                        onAoiCenterOnMapAction(item);
+                    },
+                    icon: (<FocusIcon/>)
+                });
+            }
 
-        groupAoisProps.items.itemSelector = (item) => {
-            return {
-                ...itemSelector(item),
-                actions: aoiActions
-            };
+            return aoiActions;
         };
     }
 

@@ -1,18 +1,19 @@
-import React, { useState, useEffect } from 'react';
-
+import React, { useState } from 'react';
 import classnames from 'classnames';
-
-import { List, Tooltip, Empty } from 'antd';
-import { CloseCircleOutlined } from '@ant-design/icons';
 import { useDrop } from 'react-dnd';
 import { NativeTypes } from 'react-dnd-html5-backend';
+import { List, Empty } from 'antd';
+import { CloseCircleOutlined } from '@ant-design/icons';
 
 import { LoadingState, SelectionMode } from '@oida/core';
-import { DataCollectionItemsProps, DataCollectionItemProps, useScrollIntoView } from '@oida/ui-react-core';
+import { DataCollectionItemsProps, DataCollectionItemState, DataCollectionItemAction, useScrollIntoView } from '@oida/ui-react-core';
+
+import { DataCollectionItemActionButton } from './data-collection-item-action-button';
 
 type ListItemProps<T> = {
     item: T;
-    itemSelector: (item: T) => DataCollectionItemProps<T>;
+    itemState: (item: T) => DataCollectionItemState;
+    itemActions?: (item: T) => DataCollectionItemAction[];
     content: (item: T) => React.ReactNode;
     onMouseEnter?: (evt: React.MouseEvent) => void;
     onMouseLeave?: (evt: React.MouseEvent) => void;
@@ -27,22 +28,16 @@ type ListItemProps<T> = {
 
 function ListItem<T>(props: ListItemProps<T>) {
 
-    const {hovered, selected, actions: actions} =  props.itemSelector(props.item);
+    const {hovered, selected} =  props.itemState(props.item);
+    const actions = props.itemActions ? props.itemActions(props.item) : [];
 
-    const itemActions = actions ? actions.map((action) => {
+    const itemActions = actions.map((action) => {
         return (
-            <Tooltip title={action.name}>
-                <a onClick={
-                    () => {
-                        action.callback(props.item);
-                }
-                }>
-                    {action.icon}
-                    <span className='action-content'>{action.content}</span>
-                </a>
-            </Tooltip>
+            <DataCollectionItemActionButton
+                action={action}
+            />
         );
-    }) : undefined;
+    });
 
     const [{ canDrop, isDropHover }, drop] = useDrop({
         accept: [NativeTypes.FILE],
@@ -97,10 +92,11 @@ export function DataCollectionItemsList<T>(props: DataCollectionItemsListProps<T
     const {
         autoScrollOnSelection,
         content,
-        itemSelector,
+        itemState,
         onHoverAction,
         onSelectAction,
         onDefaultAction,
+        itemActions,
         fileDropProps,
         multiSelect,
         keyGetter,
@@ -115,7 +111,8 @@ export function DataCollectionItemsList<T>(props: DataCollectionItemsListProps<T
             <ListItem<T>
                 key={keyGetter(item)}
                 item={item}
-                itemSelector={itemSelector}
+                itemState={itemState}
+                itemActions={itemActions}
                 content={content}
                 onMouseEnter={() => onHoverAction(item, true)}
                 onMouseLeave={() => {

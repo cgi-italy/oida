@@ -1,7 +1,7 @@
 
 import React from 'react';
 
-import { FormField, FormFieldConfig, FormFieldDefinition, FormFieldState } from '@oida/core';
+import { FormField, FormFieldConfig, FormFieldDefinition } from '@oida/core';
 
 type ExtractType<IT extends FormField<any, any, any>> = IT extends FormField<infer TYPE, any, any> ? TYPE : never;
 type ExtractValue<IT extends FormField<any, any, any>> = IT extends FormField<any, infer T, any> ? T : never;
@@ -20,9 +20,19 @@ export type FormFieldRendererWrapper<T extends FormField<any, any, any>> = (
 ) => JSX.Element | null;
 
 
+/** Create a new form field renderer factory */
 export const formFieldRendererFactory = () => {
     const REGISTERED_RENDERERS = new Map<string, Map<string, FormFieldRenderer<any>>>();
 
+    /**
+     * Register a new renderer for a form field type. More than one renderer can be registered for
+     * form field type.
+     *
+     * @param fieldId The field type
+     * @param rendererId A unique identifier for the renderer
+     * @param renderer The form field renderer component
+     *
+    */
     const register = <T extends FormField<any, any, any>>(fieldId: ExtractType<T>, rendererId: string, renderer: FormFieldRenderer<T>) => {
         if (!REGISTERED_RENDERERS.has(fieldId)) {
             REGISTERED_RENDERERS.set(fieldId, new Map());
@@ -33,6 +43,12 @@ export const formFieldRendererFactory = () => {
 
     };
 
+    /**
+     * Get the renderer from a form field definition. If multiple renderers are available the {@Link FormFieldCommon definition}
+     * renderConfig id can be used to select a specific one.
+     * @param definition The form field definition
+     * @returns the renderer id and the registered renderer React component
+     **/
     const getRenderer = <T extends FormField<any, any, any>>
     (definition: FormFieldDefinition<ExtractType<T>, ExtractValue<T>, ExtractConfig<T>>) => {
         let renderers = REGISTERED_RENDERERS.get(definition.type);
@@ -86,6 +102,7 @@ export const formFieldRendererFactory = () => {
     };
 };
 
+/** A form field renderer factory. It provides React components to renderer a form field from a configuration object */
 export type FormFieldRendererFactory = ReturnType<typeof formFieldRendererFactory>;
 
 let defaultFormFieldRendererFactory: FormFieldRendererFactory;

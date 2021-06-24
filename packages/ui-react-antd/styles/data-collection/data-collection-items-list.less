@@ -1,6 +1,13 @@
 
 @import '~@oida/ui-react-core/styles/utils/scrollbar';
 
+@data-collection-list-item-bg: lighten(@component-background, 3%);
+@data-collection-list-item-border-color: lighten(@component-background, 10%);
+@data-collection-list-item-hover-bg: @table-row-hover-bg;
+@data-collection-list-item-selected-bg: @table-selected-row-bg;
+@data-collection-list-item-margin-bottom-md: 10px;
+@data-collection-list-item-margin-bottom-sm: 5px;
+
 .data-collection-list-items.ant-list {
 
     .scrollbar(8px, @primary-color, @primary-2);
@@ -25,20 +32,23 @@
 
         cursor: pointer;
         user-select: none;
-        border: solid 1px transparent;
+        border: solid 1px @data-collection-list-item-border-color;
+
+        background: @data-collection-list-item-bg;
+        margin-bottom: @data-collection-list-item-margin-bottom-md;
 
         &.hovered {
-            background-color: @table-row-hover-bg;
+            background-color: @data-collection-list-item-hover-bg;
         }
 
         &.selected {
 
             &:not(.hovered) {
-                background-color: @table-selected-row-bg;
+                background-color: @data-collection-list-item-selected-bg;
             }
 
             &.hovered {
-                background-color: lighten(@table-selected-row-bg, 10%);
+                background-color: lighten(@data-collection-list-item-selected-bg, 10%);
             }
         }
 
@@ -57,14 +67,35 @@
             font-size: @font-size-sm;
         }
 
+        .ant-avatar {
+            font-size: 20px;
+        }
+
         .ant-list-item-action {
-            .anticon {
-                margin-right: 4px;
+
+            margin-left: 16px;
+
+            .ant-btn {
+                padding: 0;
+                .anticon {
+                    margin-right: 4px;
+
+                    svg {
+                        shape-rendering: auto;
+                    }
+                }
             }
+
         }
 
         .action-content {
             display: none;
+        }
+    }
+
+    &.ant-list-sm {
+        .ant-list-item {
+            margin-bottom: @data-collection-list-item-margin-bottom-sm;
         }
     }
 
@@ -74,8 +105,13 @@
             justify-content: flex-end;
             flex-wrap: wrap;
 
-            .action-content {
-                display: inline-block;
+            li {
+                padding: 0 12px;
+
+                .action-content {
+                    margin-left: 2px;
+                    display: inline-block;
+                }
             }
         }
     }

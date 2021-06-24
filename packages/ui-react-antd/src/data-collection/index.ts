@@ -1,3 +1,4 @@
+export * from './data-collection-item-action-button';
 export * from './data-collection-items-list';
 export * from './data-collection-list';
 export * from './data-collection-table';

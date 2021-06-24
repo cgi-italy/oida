@@ -1,12 +1,11 @@
 import { useEffect } from 'react';
 
-import { LoadingState, AoiValue, AoiAction, FormFieldState, IFormFieldDefinition } from '@oida/core';
-
+import { AoiValue, AoiAction, FormFieldState, IFormFieldDefinition } from '@oida/core';
 import { AoiImportConfig } from '@oida/ui-react-core';
 
-import { useEntityCollectionList, useFormData, useDataPaging, useDataSorting, useSelector } from '../../../core/hooks';
+import { useSelector, useEntityCollection } from '../../../core/hooks';
 import { useCenterOnMap } from '../../map';
-import { Aoi, AoiSource } from '../models';
+import { AoiSource } from '../models';
 import { createInMemoryAoiProvider } from '../utils';
 import { useAoiModule } from './use-aoi-module';
 import { AoiModule, AoiFormat } from '../aoi-module';
@@ -143,15 +142,6 @@ const useMapAoiImporterBase = (props: MapAoiImporterProps) => {
         });
     } : undefined;
 
-    let selectedSourceGroupItems;
-
-    let items = useEntityCollectionList<Aoi>({
-        items: selectedSourceGroup ? selectedSourceGroup.aois.items : undefined,
-        selectionManager: props.aoiModule.mapModule.selectionManager,
-    });
-
-    let paging = useDataPaging(selectedSourceGroup ? selectedSourceGroup.queryParams.paging : undefined);
-
     let filters: IFormFieldDefinition[] = [{
         name: 'geometryType',
         title: 'Geometry',
@@ -192,33 +182,18 @@ const useMapAoiImporterBase = (props: MapAoiImporterProps) => {
             {key: 'name', name: 'Name'}
         ];
     }
-    let filtering = useFormData({
-        fields: filters,
-        fieldValues: selectedSourceGroup ? selectedSourceGroup.queryParams.filters : undefined
-    });
 
-    let sorting = useDataSorting({
+    const selectedSourceGroupItems = useEntityCollection({
+        items: selectedSourceGroup ? selectedSourceGroup.aois.items : undefined,
+        selectionManager: props.aoiModule.mapModule.selectionManager,
+        loadingState: selectedSourceGroup?.loadingStatus,
+        filtering: {
+            filters: filters
+        },
         sortableFields: sortableFields,
-        sortingState: selectedSourceGroup ? selectedSourceGroup.queryParams.sorting : undefined
+        queryParams: selectedSourceGroup?.queryParams
     });
 
-    let loadingState = useSelector(() => {
-        return selectedSourceGroup ? selectedSourceGroup.loadingStatus.value : LoadingState.Init;
-    }, [selectedSourceGroup]);
-
-    if (items) {
-        selectedSourceGroupItems = {
-            items: {
-                loadingState,
-                ...items
-            },
-            filters: {
-                ...filtering
-            },
-            sorting,
-            paging
-        };
-    }
 
     let supportedFileTypes = aoiFormats && aoiFormats.reduce((fileTypes, parser) => {
         return [...fileTypes, ...parser.supportedFileTypes];

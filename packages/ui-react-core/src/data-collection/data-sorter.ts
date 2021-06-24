@@ -5,6 +5,7 @@ export type DataSortField = {
     name: string;
 };
 
+/** {@Link DataSorterRenderer} props */
 export type DataSorterProps = {
     sortableFields: Array<DataSortField>;
     sortKey: string;
@@ -13,4 +14,5 @@ export type DataSorterProps = {
     onSortClear: () => void;
 };
 
+/** A data sorting component */
 export type DataSorterRenderer = React.ComponentType<DataSorterProps>;
