@@ -32,10 +32,10 @@
     "@oida/core": "file:../core",
     "@oida/eo-mobx": "file:../eo-mobx",
     "@oida/state-mobx": "file:../state-mobx",
-    "geotiff": "^1.0.0-beta.14",
+    "geotiff": "^1.0.4",
     "lru-cache": "6.0.0",
     "lzw-tiff-decoder": "^0.1.1",
-    "plotty": "^0.4.3",
+    "plotty": "^0.4.7",
     "tslib": "^2.2.0",
     "uuid": "^8.0.0"
   }

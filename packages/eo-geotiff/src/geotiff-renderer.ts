@@ -1,12 +1,11 @@
 import LruCache from 'lru-cache';
 import { plot } from 'plotty';
-import { fromArrayBuffer } from 'geotiff';
+import { fromArrayBuffer, Pool } from 'geotiff';
 import proj4 from 'proj4';
 import axios, { AxiosRequestConfig } from 'axios';
 
 import { AxiosInstanceWithCancellation, EpsgIoDefinitionProvider } from '@oida/core';
 import { PlottyRenderer } from './plotty-renderer';
-
 
 export type GeotiffRendererConfig = {
     cache?: LruCache;
@@ -42,6 +41,7 @@ export class GeotiffRenderer {
 
     protected static srsDefProvider_ = new EpsgIoDefinitionProvider();
     protected static defaultCacheInstance_: LruCache | undefined;
+    protected static decoder_ = new Pool();  //undefined; // getGeotiffDecoder(); //new Pool();
 
     /**
      *Canvas used for post rendering transformations (e.g. extent scaling)
@@ -192,7 +192,7 @@ export class GeotiffRenderer {
     > {
         return fromArrayBuffer(params.data).then((tiff) => {
             return tiff.getImage().then((image) => {
-                return image.readRasters().then((data) => {
+                return image.readRasters({pool: GeotiffRenderer.decoder_}).then((data) => {
                     let noData: number | undefined;
                     const gdalNoData = image.getFileDirectory().GDAL_NODATA;
                     if (gdalNoData) {
@@ -282,7 +282,7 @@ export class GeotiffRenderer {
     }
 
     protected getImageSrs_(image) {
-        const imageSrs: number = image.geoKeys.ProjectedCSTypeGeoKey || image.geoKeys.GeographicTypeGeoKey;
+        const imageSrs: number = image.geoKeys?.ProjectedCSTypeGeoKey || image.geoKeys?.GeographicTypeGeoKey;
         if (imageSrs) {
             if (imageSrs < 32767) {
                 return  `EPSG:${imageSrs}`;
