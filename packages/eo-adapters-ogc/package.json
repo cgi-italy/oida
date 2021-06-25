@@ -25,7 +25,9 @@
   },
   "dependencies": {
     "@oida/core": "file:../core",
+    "@oida/eo-geotiff": "file:../eo-geotiff",
     "@oida/eo-mobx": "file:../eo-mobx",
+    "echarts-stat": "^1.2.0",
     "tslib": "^2.2.0"
   }
 }
