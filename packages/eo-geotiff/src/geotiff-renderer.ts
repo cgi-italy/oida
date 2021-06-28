@@ -34,7 +34,8 @@ type GeotiffRendererData = {
     height: number,
     noData?: number,
     imageExtent: number[],
-    outputExtent?: number[]
+    outputExtent?: number[],
+    flipY?: boolean
 };
 
 export class GeotiffRenderer {
@@ -199,6 +200,9 @@ export class GeotiffRenderer {
                         noData = parseFloat(gdalNoData);
                     }
 
+                    // when y pixel size is positivie (very uncommon) we need to flip vertically the rendered image
+                    const resolution = image.getResolution() || [];
+
                     return this.getImageExtent_(image, params.outputSrs).then((imageExtentData) => {
                         const renderData: GeotiffRendererData = {
                             values: data[0],
@@ -206,7 +210,8 @@ export class GeotiffRenderer {
                             height: image.getHeight(),
                             noData: noData,
                             outputExtent: params.outputExtent,
-                            imageExtent: imageExtentData.extent
+                            imageExtent: imageExtentData.extent,
+                            flipY: resolution[1] > 0
                         };
 
                         const canvas = this.renderTiffImage_(renderData);
@@ -225,6 +230,7 @@ export class GeotiffRenderer {
     protected renderTiffImage_(data: GeotiffRendererData) {
 
         this.plotty_.setNoDataValue(data.noData);
+        this.plotty_.setFlipY(data.flipY || false);
         let outputCanvas = this.plotty_.render(data.values, data.width, data.height);
         if (data.outputExtent) {
             outputCanvas = this.wrapImage_(outputCanvas, data.imageExtent, data.outputExtent);
