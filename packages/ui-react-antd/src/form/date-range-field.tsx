@@ -50,7 +50,8 @@ export const DateRangeFieldRenderer = (
     let disabledDates;
     if (config.minDate || config.maxDate) {
         disabledDates = (current: moment.Moment) => {
-            return (config.minDate && current.isBefore(config.minDate)) || (config.maxDate && current.isAfter(config.maxDate));
+            return (config.minDate && current.isBefore(config.minDate, 'date'))
+                || (config.maxDate && current.isAfter(config.maxDate, 'date'));
         };
     }
 
