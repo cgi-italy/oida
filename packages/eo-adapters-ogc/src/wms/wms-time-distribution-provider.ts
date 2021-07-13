@@ -229,10 +229,16 @@ export class WmsTimeDistributionProvider implements DatasetTimeDistributionProvi
                     start: target.start
                 });
             } else {
-                let numSteps = Math.ceil(distance / target.step);
-                return Promise.resolve({
-                    start: new Date(target.start.getTime() + numSteps * target.step)
-                });
+                if (target.step <= 0) {
+                    return Promise.resolve({
+                        start: dt
+                    });
+                } else {
+                    let numSteps = Math.ceil(distance / target.step);
+                    return Promise.resolve({
+                        start: new Date(target.start.getTime() + numSteps * target.step)
+                    });
+                }
             }
         }
     }
@@ -259,10 +265,16 @@ export class WmsTimeDistributionProvider implements DatasetTimeDistributionProvi
                     start: target.end
                 });
             } else {
-                let numSteps = Math.ceil(distance / target.step);
-                return Promise.resolve({
-                    start: new Date(target.end.getTime() - numSteps * target.step)
-                });
+                if (target.step <= 0) {
+                    return Promise.resolve({
+                        start: dt
+                    });
+                } else {
+                    let numSteps = Math.ceil(distance / target.step);
+                    return Promise.resolve({
+                        start: new Date(target.end.getTime() - numSteps * target.step)
+                    });
+                }
             }
         }
     }
