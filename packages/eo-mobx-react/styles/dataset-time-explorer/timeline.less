@@ -1,4 +1,5 @@
 @group-labels-width: 250px;
+@range-item-min-width: 10px;
 
 .timeline {
     background: @component-background;
@@ -81,7 +82,10 @@
             .vis-item {
                 &.vis-range {
 
-                    min-width: 10px;
+                    // ensure a min pixel width
+                    padding-right: @range-item-min-width;
+                    left: -@range-item-min-width / 2;
+                    box-sizing: content-box;
 
                     .vis-item-overflow {
                         height: 6px;
