@@ -18,7 +18,13 @@ export const useSelector = <T>(selector: () => T, deps?: React.DependencyList) =
 
     useEffect(() => {
         const reactionDisposer = reaction(selector, (data) => {
-            setData(data);
+            if (typeof(data) === 'function') {
+                // if the selector returns a callback we have to wrap the setData
+                // within a function
+                setData(() => data);
+            } else {
+                setData(data);
+            }
         }, {
             fireImmediately: true
         });
