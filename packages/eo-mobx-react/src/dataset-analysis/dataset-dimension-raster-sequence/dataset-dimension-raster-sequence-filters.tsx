@@ -24,6 +24,11 @@ const DatasetDimensionSelector = (props: DatasetDimensionSelectorProps) => {
 
     if (!dimensions.length) {
         return null;
+    } else if (dimensions.length === 1) {
+        if (!value) {
+            props.sequence.setDimension(dimensions[0].id);
+        }
+        return null;
     }
 
     const dimensionChoices = dimensions.map((dimension) => {
@@ -34,17 +39,19 @@ const DatasetDimensionSelector = (props: DatasetDimensionSelectorProps) => {
     });
 
     return (
-        <SelectEnumRenderer
-            config={{
-                choices: dimensionChoices
-            }}
-            value={value}
-            placeholder='Select dimension'
-            required={true}
-            onChange={(value) => {
-                props.sequence.setDimension(value as string);
-            }}
-        />
+        <Form.Item label='Dimension'>
+            <SelectEnumRenderer
+                config={{
+                    choices: dimensionChoices
+                }}
+                value={value}
+                placeholder='Select dimension'
+                required={true}
+                onChange={(value) => {
+                    props.sequence.setDimension(value as string);
+                }}
+            />
+        </Form.Item>
     );
 };
 
@@ -64,16 +71,27 @@ const DatasetVariableSeletor = (props: DatasetVariableSelectorProps) => {
         })
     };
 
+    if (!variableFieldConfig.choices.length) {
+        return null;
+    } else if (variableFieldConfig.choices.length === 1) {
+        if (!variableValue) {
+            props.sequence.setVariable(variableFieldConfig.choices[0].value);
+        }
+        return null;
+    }
+
     return (
-        <SelectEnumRenderer
-            config={variableFieldConfig}
-            value={variableValue}
-            placeholder='Select variable'
-            required={true}
-            onChange={(value) => {
-                props.sequence.setVariable(value as string);
-            }}
-        />
+        <Form.Item label='Variable'>
+            <SelectEnumRenderer
+                config={variableFieldConfig}
+                value={variableValue}
+                placeholder='Select variable'
+                required={true}
+                onChange={(value) => {
+                    props.sequence.setVariable(value as string);
+                }}
+            />
+        </Form.Item>
     );
 };
 
@@ -133,18 +151,14 @@ export const DatasetDimensionRasterSequenceFilters = (props: DatasetDimensionRas
 
     return (
         <React.Fragment>
-            <Form.Item label='Dimension'>
-                <DatasetDimensionSelector
-                    sequence={props.sequence}
-                />
-            </Form.Item>
+            <DatasetDimensionSelector
+                sequence={props.sequence}
+            />
             {dimensionRangeField}
             {dimensionValueSelectors}
-            <Form.Item label='Variable'>
-                <DatasetVariableSeletor
-                    sequence={props.sequence}
-                />
-            </Form.Item>
+            <DatasetVariableSeletor
+                sequence={props.sequence}
+            />
             <Form.Item label='Location'>
                 <AnalysisAoiFilter
                     analysis={props.sequence}
