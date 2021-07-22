@@ -55,7 +55,7 @@ export type DatasetDimensionRasterSequenceChartProps = {
 
 export const DatasetDimensionRasterSequenceChart = (props: DatasetDimensionRasterSequenceChartProps) => {
 
-    const [mode, setMode] = useState('grid');
+    const [mode, setMode] = useState('slide');
 
     const [activeThumb, setActiveThumb] = useState(0);
 
@@ -129,9 +129,9 @@ export const DatasetDimensionRasterSequenceChart = (props: DatasetDimensionRaste
                                     size='small'
                                 >
                                     <Space size={0}>
+                                        <Radio.Button value='slide'>Slider</Radio.Button>
                                         <Radio.Button value='grid'>Grid</Radio.Button>
                                         <Radio.Button value='list'>List</Radio.Button>
-                                        <Radio.Button value='slide'>Slider</Radio.Button>
                                     </Space>
                                 </Radio.Group>
                             </Space>

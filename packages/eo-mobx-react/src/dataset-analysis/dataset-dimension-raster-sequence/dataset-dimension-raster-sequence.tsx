@@ -53,14 +53,17 @@ export const DatasetDimensionRasterSequenceAnalysis = (props: DatasetAnalysisWid
                                     let item = avaialbleDatasetItems.find(item => item.dataset.id === value);
 
                                     if (item) {
+                                        const tool = item.dataset.config!.tools!.find(
+                                            tool => tool.type === DIMENSION_RASTER_SEQUENCE_TYPE
+                                        );
+
                                         const dimensionSequence = new DatasetDimensionRasterSequence({
                                             dataset: item.dataset,
-                                            config: item.dataset.config!.tools!.find(
-                                                tool => tool.type === DIMENSION_RASTER_SEQUENCE_TYPE
-                                            )!.config as DatasetDimensionRasterSequenceConfig,
+                                            config: tool!.config as DatasetDimensionRasterSequenceConfig,
                                             autoUpdate: false,
                                             aoi: aoi,
-                                            parent: item.mapViz
+                                            parent: item.mapViz,
+                                            ...tool?.defaultParams
                                         });
 
                                         props.combinedAnalysis.addAnalysis(dimensionSequence);

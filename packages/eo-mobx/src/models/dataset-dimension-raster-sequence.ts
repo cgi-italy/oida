@@ -51,6 +51,7 @@ export type DatasetDimensionRasterSequenceProps<D = SequenceDimensionType, T ext
     sequenceVariable?: string;
     sequenceRange?: DomainRange<D>;
     autoUpdate?: boolean;
+    additionalParameters?: Record<string, any>;
 } & DatasetAnalysisProps<typeof DIMENSION_RASTER_SEQUENCE_TYPE, DatasetDimensionRasterSequenceConfig<D, T>> & DatasetDimensionsProps;
 
 export class DatasetDimensionRasterSequence<
@@ -65,7 +66,7 @@ export class DatasetDimensionRasterSequence<
     @observable.ref colorMap: ColorMap | undefined;
     @observable.ref data: DatasetRasterSequenceItem<D, T>[];
     @observable.ref autoUpdate: boolean;
-    additionalParameters: DataFilters;
+    readonly additionalParameters: DataFilters;
 
     protected dataFetcher_: AsyncDataFetcher<
         DatasetRasterSequenceItem<D, T>[] | undefined, DatasetRasterSequenceRequest<D>
@@ -88,7 +89,9 @@ export class DatasetDimensionRasterSequence<
         this.autoUpdate = props.autoUpdate !== undefined ? props.autoUpdate : true;
         this.colorMap = undefined;
         this.setVariable(props.sequenceVariable);
-        this.additionalParameters = new DataFilters();
+        this.additionalParameters = new DataFilters({
+            values: props.additionalParameters
+        });
 
         this.dataFetcher_ = new AsyncDataFetcher({
             dataFetcher: (params) => {
@@ -110,7 +113,14 @@ export class DatasetDimensionRasterSequence<
     }
 
     @action
-    setDimension(dimension: string | undefined) {
+    setDimension(dimension: string | undefined, range?: DomainRange<D>) {
+        if (dimension === this.sequenceDimension) {
+            if (range) {
+                this.setRange(range);
+            }
+            return;
+        }
+
         this.needsUpdate_ = true;
         this.sequenceDimension = dimension;
         if (dimension) {
@@ -121,23 +131,40 @@ export class DatasetDimensionRasterSequence<
             if (dimensionConfig) {
                 getDatasetVariableDomain(dimensionConfig).then((domain) => {
                     if (domain && isValueDomain(domain) && domain.min !== undefined && domain.max !== undefined) {
-                        this.setRange({
-                            min: domain.min,
-                            max: domain.max
-                        });
+                        // if no range is defined or the current range is outside of the domain extent set the range to the domain extent
+                        if (!range || (range.min >= domain.max || range.max <= domain.min)) {
+                            this.setRange({
+                                min: domain.min,
+                                max: domain.max
+                            });
+                        } else {
+                            // clamp the range to the domain extent
+                            let min = range.min;
+                            let max = range.max;
+                            if (min < domain.min) {
+                                min = domain.min;
+                            }
+                            if (max > domain.max) {
+                                max = domain.max;
+                            }
+                            this.setRange({
+                                min: min,
+                                max: max
+                            });
+                        }
                     } else {
-                        this.setRange(undefined);
+                        this.setRange(range);
                     }
                 }).catch(() => {
-                    this.setRange(undefined);
+                    this.setRange(range);
                 });
 
             } else {
-                this.setRange(undefined);
+                this.setRange(range);
             }
 
         } else {
-            this.setRange(undefined);
+            this.setRange(range);
         }
     }
 
@@ -175,6 +202,10 @@ export class DatasetDimensionRasterSequence<
 
     @action
     setRange(range: DomainRange<D> | undefined) {
+        // deep equality check
+        if (range && this.sequenceRange && this.sequenceRange.min === range.min && this.sequenceRange.max === range.max) {
+            return;
+        }
         this.needsUpdate_ = true;
         this.sequenceRange = range;
     }
