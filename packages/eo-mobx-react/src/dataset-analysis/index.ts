@@ -11,6 +11,7 @@ export * from './dataset-analysis-widget-factory';
 export * from './use-analysis-geometry';
 export * from './chart-widget';
 export * from './analysis-aoi-filter';
+export * from './dataset-selector';
 export * from './analysis-loading-state-message';
 export * from './analysis-series-actions';
 export * from './dataset-explorer-tools-dropdown';
