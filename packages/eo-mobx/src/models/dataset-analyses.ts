@@ -124,11 +124,11 @@ export class DatasetAnalyses {
     }
 
     @action
-    removeAnalysis(analysis: DatasetAnalysis<any>, parent?: ComboAnalysis) {
+    removeAnalysis(analysis: DatasetAnalysis<any>, parent?: ComboAnalysis, noDisposeOnEmpty?: boolean) {
         this.items_.remove(analysis);
         if (parent) {
             parent.analyses.remove(analysis);
-            if (!parent.analyses.length) {
+            if (!noDisposeOnEmpty && !parent.analyses.length) {
                 this.analyses.delete(parent.id);
                 parent.dispose();
             }

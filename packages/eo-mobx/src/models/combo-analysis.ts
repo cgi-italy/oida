@@ -36,10 +36,13 @@ export class ComboAnalysis<T extends DatasetAnalysis<any> = DatasetAnalysis<any>
         this.name = props.name;
         this.destroyOnClose = typeof(props.destroyOnClose) === 'boolean' ? props.destroyOnClose : true;
         this.visible = new Visible(props);
-        this.analyses = observable.array(props.analyses || [], {
+        this.analyses = observable.array([], {
             deep: false
         });
         this.parent_ = props.parent;
+        props.analyses?.forEach((analysis) => {
+            this.addAnalysis(analysis);
+        });
 
         makeObservable(this);
     }
@@ -50,8 +53,8 @@ export class ComboAnalysis<T extends DatasetAnalysis<any> = DatasetAnalysis<any>
     }
 
     @action
-    removeAnalysis(analysis: DatasetAnalysis<any>) {
-        this.parent_.removeAnalysis(analysis, this);
+    removeAnalysis(analysis: DatasetAnalysis<any>, noDisposeOnEmpty?: boolean) {
+        this.parent_.removeAnalysis(analysis, this, noDisposeOnEmpty);
     }
 
     @action
