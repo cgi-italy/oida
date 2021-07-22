@@ -51,7 +51,8 @@ export const useDatasetExplorerTools = (props: DatasetExplorerToolsProps) => {
         const tools: Record<string, {
             targets: Array<{
                 explorerItem: DatasetExplorerItem;
-                config: any
+                config: any,
+                defaultParams: any
             }>
             name: string;
             hidden?: boolean;
@@ -63,13 +64,15 @@ export const useDatasetExplorerTools = (props: DatasetExplorerToolsProps) => {
                 if (tools[tool.type]) {
                     tools[tool.type].targets.push({
                         explorerItem: item,
-                        config: tool.config
+                        config: tool.config,
+                        defaultParams: tool.defaultParams
                     });
                 } else {
                     tools[tool.type] = {
                         targets: [{
                             explorerItem: item,
-                            config: tool.config
+                            config: tool.config,
+                            defaultParams: tool.defaultParams
                         }],
                         name: tool.name,
                         icon: tool.icon,
@@ -95,7 +98,8 @@ export const useDatasetExplorerTools = (props: DatasetExplorerToolsProps) => {
                     vizType: type,
                     dataset: defaultTarget.explorerItem.dataset,
                     parent: defaultTarget.explorerItem.mapViz,
-                    config: defaultTarget.config
+                    config: defaultTarget.config,
+                    ...defaultTarget.defaultParams
                 });
                 if (analysis instanceof DatasetAnalysis) {
                     props.datasetExplorer.analyses.addAnalysis(analysis, new ComboAnalysis({

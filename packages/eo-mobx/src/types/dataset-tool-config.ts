@@ -1,4 +1,4 @@
-import { DatasetVizConfig, DatasetVizDefinitions } from '../models/dataset-viz';
+import { DatasetVizConfig, DatasetVizDefinition, DatasetVizDefinitions, DatasetVizProps } from '../models/dataset-viz';
 
 export type DatasetToolConfig<TOOL_TYPE extends keyof DatasetVizDefinitions = keyof DatasetVizDefinitions> = {
     type: TOOL_TYPE,
@@ -6,4 +6,5 @@ export type DatasetToolConfig<TOOL_TYPE extends keyof DatasetVizDefinitions = ke
     config: DatasetVizConfig<TOOL_TYPE>;
     hidden?: boolean;
     icon?: any
+    defaultParams?: Omit<DatasetVizDefinition<TOOL_TYPE>, keyof DatasetVizProps>
 };

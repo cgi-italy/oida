@@ -22,7 +22,8 @@ export const DatasetToolsMenu = (props: DatasetToolsMenuProps) => {
                 vizType: tool.type,
                 dataset: props.datasetViz.dataset,
                 parent: props.datasetViz,
-                config: tool.config
+                config: tool.config,
+                ...tool.defaultParams
             });
             if (analysis instanceof DatasetAnalysis) {
                 props.datasetExplorer.analyses.addAnalysis(analysis, new ComboAnalysis({
