@@ -225,12 +225,12 @@ export const DatasetColorMapRangeSelector = (props: DatasetColorMapRangeSelector
             </div>
             {domainSlider}
             <Checkbox
-                checked={clamp}
+                checked={!clamp}
                 onChange={(evt) => {
-                    props.colorMap.domain?.setClamp(evt.target.checked);
+                    props.colorMap.domain?.setClamp(!evt.target.checked);
                 }}
             >
-                Clamp to min/max
+                Filter to data range
             </Checkbox>
         </div>
     );
