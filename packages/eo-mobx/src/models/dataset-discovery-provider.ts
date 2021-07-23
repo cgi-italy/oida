@@ -152,6 +152,10 @@ export abstract class DatasetDiscoveryProvider<
      * The results datasets array. Its population is responsability of the inherited class
      */
     @observable.ref protected results_: IObservableArray<T>;
+    /**
+     * A default feature style is used to draw the discovery items geometries on the map
+     * Define this in the derived class to customize items representation on the map
+     */
     @observable.ref protected mapFeatureStyler_: FeatureStyleGetter<DatasetDiscoveryProviderItem> | undefined;
 
     constructor(props: DatasetDiscoveryProviderProps) {
