@@ -1,4 +1,4 @@
-import { DatasetStatsAnalysisConfig, DatasetTimeDistributionProvider, DatasetToolConfig, NumericVariable, STATS_ANALYSIS_TYPE } from '@oida/eo-mobx';
+import { DatasetAreaValuesConfig, DatasetTimeDistributionProvider, DatasetToolConfig, NumericVariable, DATASET_AREA_VALUES_PROCESSING } from '@oida/eo-mobx';
 import { createWcsStatsProvider, WcsStatsProviderConfig } from './wcs-stats-provider';
 
 /**
@@ -28,8 +28,13 @@ export const getWcsStatsToolConfig = (props: WcsStatsAnalysisConfig) => {
         bands: props.bands
     });
 
-    let statsToolConfig: DatasetStatsAnalysisConfig = {
+    let statsToolConfig: DatasetAreaValuesConfig = {
         variables: props.bands,
+        supportedData: {
+            stats: true,
+            image: false,
+            gridValues: true
+        },
         supportedGeometries: [{
             type: 'BBox'
         }],
@@ -49,8 +54,8 @@ export const getWcsStatsToolConfig = (props: WcsStatsAnalysisConfig) => {
     };
 
     return {
-        type: STATS_ANALYSIS_TYPE,
+        type: DATASET_AREA_VALUES_PROCESSING,
         name: 'Area statistics',
         config: statsToolConfig
-    } as DatasetToolConfig<typeof STATS_ANALYSIS_TYPE>;
+    } as DatasetToolConfig<typeof DATASET_AREA_VALUES_PROCESSING>;
 };

@@ -4,7 +4,7 @@ import ecStats from 'echarts-stat';
 import getBBox from '@turf/bbox';
 
 import { AxiosInstanceWithCancellation, NUMERIC_FIELD_ID, STRING_FIELD_ID, urlParamsSerializer } from '@oida/core';
-import { DatasetStatsProvider, isDomainProvider, isValueDomain, NumericDomain, NumericVariable } from '@oida/eo-mobx';
+import { DatasetAreaValuesProvider, isDomainProvider, isValueDomain, NumericDomain, NumericVariable } from '@oida/eo-mobx';
 
 import { WcsService } from './wcs-service';
 
@@ -80,7 +80,10 @@ export const extractStatisticsFromTiffData = (data: ArrayBuffer, options?: {band
                         histogram: ecStats.histogram(values, 'sturges').data
                     };
 
-                    return stats;
+                    return {
+                        stats: stats,
+                        gridValues: Array.from(data[bandIndex])
+                    };
                 });
             });
         });
@@ -95,7 +98,7 @@ export const extractStatisticsFromTiffData = (data: ArrayBuffer, options?: {band
  */
 export const createWcsStatsProvider = (config: WcsStatsProviderConfig) => {
 
-    const provider: DatasetStatsProvider = (request) => {
+    const provider: DatasetAreaValuesProvider = (request) => {
 
         const geometry = request.geometry;
         let bbox: number[] | undefined;
@@ -144,10 +147,15 @@ export const createWcsStatsProvider = (config: WcsStatsProviderConfig) => {
             params: params,
             paramsSerializer: urlParamsSerializer
         }).then((response) => {
-            return extractStatisticsFromTiffData(response.data, {
+            const coverageData = extractStatisticsFromTiffData(response.data, {
                 bandId: request.variable,
                 bands: config.bands
             });
+
+            return {
+                stats: request.dataMask.stats ? coverageData.stats : undefined,
+                gridValues: request.dataMask.gridValues ? coverageData.gridValues : undefined,
+            };
         });
     };
 

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 import { LoadingState, MapCoordQuantity } from '@oida/core';
-import { MapRastersPointInfo, MAP_RASTERS_POINT_INFO } from '@oida/eo-mobx';
+import { MapRastersPointInfo, MAP_RASTERS_POINT_INFO_ANALYSIS } from '@oida/eo-mobx';
 import { useFormatter, useSelector } from '@oida/ui-react-mobx';
 
 import { DatasetAnalysisWidgetFactory, DatasetAnalysisWidgetFactoryConfig } from '../dataset-analysis-widget-factory';
@@ -20,8 +20,8 @@ const MapRastersPointInfoWidget = observer((props: MapRastersPointInfoWidgetProp
 
     const coordFormatter = useFormatter(MapCoordQuantity);
 
-    const rastersData = props.combinedAnalysis.analyses.filter((analysis) => {
-        return analysis.loadingState.value === LoadingState.Loading || analysis.data !== undefined;
+    const rastersData = props.combinedAnalysis.processings.filter((processing) => {
+        return processing.loadingState.value === LoadingState.Loading || processing.data !== undefined;
     }).map((analysis) => {
         return (
             <Collapse.Panel
@@ -38,9 +38,9 @@ const MapRastersPointInfoWidget = observer((props: MapRastersPointInfoWidgetProp
     });
     const location = props.combinedAnalysis.location;
 
-    const activePanes = props.combinedAnalysis.analyses
-        .filter((analysis) => !collapsedDatasets[analysis.id])
-        .map((analysis) => analysis.id);
+    const activePanes = props.combinedAnalysis.processings
+        .filter((processing) => !collapsedDatasets[processing.id])
+        .map((processing) => processing.id);
 
     return (
         <div className='map-raster-point-info'>
@@ -58,11 +58,11 @@ const MapRastersPointInfoWidget = observer((props: MapRastersPointInfoWidgetProp
                 activeKey={activePanes}
                 expandIconPosition='right'
                 onChange={(expandedKeys) => {
-                const collpasedUpdated = props.combinedAnalysis.analyses.reduce((collapsed, analysis) => {
-                    if (expandedKeys.indexOf(analysis.id) === -1) {
+                const collpasedUpdated = props.combinedAnalysis.processings.reduce((collapsed, processing) => {
+                    if (expandedKeys.indexOf(processing.id) === -1) {
                         return {
                             ...collapsed,
-                            [analysis.id]: true
+                            [processing.id]: true
                         };
                     } else {
                         return collapsed;
@@ -77,7 +77,7 @@ const MapRastersPointInfoWidget = observer((props: MapRastersPointInfoWidgetProp
     );
 });
 
-DatasetAnalysisWidgetFactory.register(MAP_RASTERS_POINT_INFO, (config: DatasetAnalysisWidgetFactoryConfig) => {
+DatasetAnalysisWidgetFactory.register(MAP_RASTERS_POINT_INFO_ANALYSIS, (config: DatasetAnalysisWidgetFactoryConfig) => {
 
     const {combinedAnalysis, ...other} = config;
     return (

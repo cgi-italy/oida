@@ -1,6 +1,6 @@
 import {
-    ComboAnalysis, ComboAnalysisProps, DatasetAnalysis,
-    DatasetExplorer, DatasetExplorerItem, DatasetViz, generateComboAnalysisName } from '@oida/eo-mobx';
+    DatasetAnalysis, DatasetAnalysisProps, DatasetProcessing,
+    DatasetExplorer, DatasetExplorerItem, DatasetViz, generateAnalysisName, Dataset } from '@oida/eo-mobx';
 import { useSelector } from '@oida/ui-react-mobx';
 
 /** A combo analysis tool configuration */
@@ -9,15 +9,9 @@ export type ComboToolConfig = {
     type: string;
     /** The tool name */
     name: string;
-    /** The tool type that a dataset should support to be listed as a potential input of this analyis */
-    datasetRequiredTool: string;
     /** The factory function that will create the combo analysis instance */
-    analysisFactory: (props: ComboAnalysisProps & {
-        targets:  Array<{
-            explorerItem: DatasetExplorerItem;
-            config: any
-        }>
-    }) => ComboAnalysis;
+    analysisFactory: (dataset?: Dataset) => DatasetAnalysis;
+    condition?: (dataset: Dataset) => boolean;
     /** An optional icon */
     icon?: React.ReactNode;
 };
@@ -36,7 +30,8 @@ export type DatasetExplorerTool = {
 
 export type DatasetExplorerToolsProps = {
     datasetExplorer: DatasetExplorer;
-    combinedAnalysisTools?: ComboToolConfig[];
+    combinedAnalysisTools: ComboToolConfig[];
+    dataset?: Dataset
 };
 
 /**
@@ -46,90 +41,33 @@ export type DatasetExplorerToolsProps = {
  */
 export const useDatasetExplorerTools = (props: DatasetExplorerToolsProps) => {
 
-    const availableTools = useSelector(() => {
+    const explorerItems = useSelector(() => props.datasetExplorer.items.slice());
 
-        const tools: Record<string, {
-            targets: Array<{
-                explorerItem: DatasetExplorerItem;
-                config: any,
-                defaultParams: any
-            }>
-            name: string;
-            hidden?: boolean;
-            icon?: React.ReactNode;
-        }> = {};
-
-        props.datasetExplorer.items.forEach((item) => {
-            item.dataset.config.tools?.forEach((tool) => {
-                if (tools[tool.type]) {
-                    tools[tool.type].targets.push({
-                        explorerItem: item,
-                        config: tool.config,
-                        defaultParams: tool.defaultParams
-                    });
-                } else {
-                    tools[tool.type] = {
-                        targets: [{
-                            explorerItem: item,
-                            config: tool.config,
-                            defaultParams: tool.defaultParams
-                        }],
-                        name: tool.name,
-                        icon: tool.icon,
-                        hidden: tool.hidden
-                    };
-                }
-            });
-        });
-
-        return tools;
-    });
-
-    const tools: DatasetExplorerTool[] = Object.entries(availableTools).filter(([type, tool]) => {
-        return !tool.hidden;
-    }).map(([type, tool]) => {
-        return {
-            id: type,
-            name: tool.name,
-            icon: tool.icon,
-            callback: () => {
-                const defaultTarget = tool.targets[0];
-                const analysis = DatasetViz.create<any>({
-                    vizType: type,
-                    dataset: defaultTarget.explorerItem.dataset,
-                    parent: defaultTarget.explorerItem.mapViz,
-                    config: defaultTarget.config,
-                    ...defaultTarget.defaultParams
+    const tools: DatasetExplorerTool[] = props.combinedAnalysisTools.filter((tool) => {
+        if (!tool.condition) {
+            return true;
+        } else {
+            if (props.dataset) {
+                return tool.condition(props.dataset);
+            } else {
+                // check that there is at least one explorer item supporting the analysis
+                return explorerItems.some((item) => {
+                    return tool.condition!(item.dataset);
                 });
-                if (analysis instanceof DatasetAnalysis) {
-                    props.datasetExplorer.analyses.addAnalysis(analysis, new ComboAnalysis({
-                        name: generateComboAnalysisName(tool.name),
-                        type: type,
-                        parent: props.datasetExplorer.analyses
-                    }));
-                }
             }
-        };
-    }).concat((props.combinedAnalysisTools || []).filter((tool) => {
-        return !!availableTools[tool.datasetRequiredTool];
+        }
     }).map((tool) => {
-
-        const targets = availableTools[tool.datasetRequiredTool].targets;
         return {
             id: tool.type,
-            name: tool.name,
             icon: tool.icon,
+            name: tool.name,
             callback: () => {
-                const comboAnalysis = tool.analysisFactory({
-                    name: generateComboAnalysisName(tool.name),
-                    parent: props.datasetExplorer.analyses,
-                    type: tool.type,
-                    targets: targets
-                });
-                props.datasetExplorer.analyses.addComboAnalysis(comboAnalysis);
+                const analysis = tool.analysisFactory(props.dataset);
+                props.datasetExplorer.analytics.addAnalysis(analysis);
             }
         };
-    }));
+    });
 
     return tools;
+
 };

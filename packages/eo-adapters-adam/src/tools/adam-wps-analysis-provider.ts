@@ -5,7 +5,7 @@ import {
     AxiosInstanceWithCancellation, createAxiosInstance
 } from '@oida/core';
 
-import { DatasetDimensionSeriesRequest, DatasetDimensionSeriesStatsItem, DatasetTransectSeriesRequest } from '@oida/eo-mobx';
+import { DatasetAreaSeriesRequest, DatasetAreaSeriesDataItem, DatasetTransectValuesRequest } from '@oida/eo-mobx';
 
 import { AdamServiceParamsSerializer } from '../utils';
 import { AdamDatasetSingleBandCoverage } from '../adam-dataset-config';
@@ -32,7 +32,7 @@ export class AdamWpsAnalysisProvider  {
         this.config_ = config;
     }
 
-    getBBoxTimeSeries(request: DatasetDimensionSeriesRequest<Date>) {
+    getBBoxTimeSeries(request: DatasetAreaSeriesRequest) {
 
         const wpsParams = {
             service: 'WPS',
@@ -41,7 +41,7 @@ export class AdamWpsAnalysisProvider  {
             identifier: 'stat_values'
         };
 
-        if (request.geometry.type === 'BBox' && request.range) {
+        if (request.geometry.type === 'BBox' && request.range && request.dimension === 'time') {
 
             const bbox = request.geometry.bbox;
 
@@ -54,8 +54,8 @@ export class AdamWpsAnalysisProvider  {
                 max_lat: bbox[3],
                 collection: variable?.wcsCoverage,
                 timeaggre: 'hour',
-                start_time: request.range.min.toISOString(),
-                end_time: request.range.max.toISOString()
+                start_time: (request.range.min as Date).toISOString(),
+                end_time: (request.range.max as Date).toISOString()
             };
 
             return this.axiosInstance_.cancelableRequest({
@@ -71,7 +71,7 @@ export class AdamWpsAnalysisProvider  {
                 if (data) {
                     const noData = variable?.domain?.noData;
                     if (noData !== undefined) {
-                        return data.filter(item => item.mean !== noData);
+                        return data.filter(item => item.data.stats?.mean !== noData);
                     } else {
                         return data;
                     }
@@ -84,7 +84,7 @@ export class AdamWpsAnalysisProvider  {
         }
     }
 
-    getTransectSeries(request: DatasetTransectSeriesRequest) {
+    getTransectSeries(request: DatasetTransectValuesRequest) {
         const wpsParams = {
             service: 'WPS',
             request: 'execute',
@@ -169,11 +169,15 @@ export class AdamWpsAnalysisProvider  {
             return outs['time_array'].map((ts, idx) => {
                 return {
                     x: new Date(`${ts}Z`),
-                    min: outs['min_values'][idx],
-                    max: outs['max_values'][idx],
-                    mean: outs['mean_values'][idx]
+                    data: {
+                        stats: {
+                            min: outs['min_values'][idx],
+                            max: outs['max_values'][idx],
+                            mean: outs['mean_values'][idx],
+                        }
+                    }
                 };
-            }) as DatasetDimensionSeriesStatsItem<Date>[];
+            }) as DatasetAreaSeriesDataItem[];
 
         } catch (e) {
             return undefined;

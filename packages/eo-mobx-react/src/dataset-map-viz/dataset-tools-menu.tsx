@@ -1,43 +1,31 @@
 import React from 'react';
 import { Button, Dropdown, Menu } from 'antd';
 
-import { DatasetExplorer, DatasetViz, generateComboAnalysisName, ComboAnalysis, DatasetAnalyses, DatasetAnalysis } from '@oida/eo-mobx';
+import { DatasetExplorer, DatasetViz } from '@oida/eo-mobx';
+import { ComboToolConfig, useDatasetExplorerTools } from '../hooks';
 
 export type DatasetToolsMenuProps = {
     datasetExplorer: DatasetExplorer,
+    analyticsTools: ComboToolConfig[],
     datasetViz: DatasetViz<any>,
-    icon: React.ReactNode,
+    icon: React.ReactNode
 };
 
 export const DatasetToolsMenu = (props: DatasetToolsMenuProps) => {
 
-    let tools = props.datasetViz.dataset.config.tools ? props.datasetViz.dataset.config.tools.filter((tool) => !tool.hidden) : [];
+    const tools = useDatasetExplorerTools({
+        datasetExplorer: props.datasetExplorer,
+        dataset: props.datasetViz.dataset,
+        combinedAnalysisTools: props.analyticsTools
+    });
 
-    const onToolClick = (type: string) => {
+    if (!tools.length) {
+        return null;
+    }
 
-        let tool = tools.find(tool => tool.type === type);
-
-        if (tool) {
-            const analysis = DatasetViz.create<any>({
-                vizType: tool.type,
-                dataset: props.datasetViz.dataset,
-                parent: props.datasetViz,
-                config: tool.config,
-                ...tool.defaultParams
-            });
-            if (analysis instanceof DatasetAnalysis) {
-                props.datasetExplorer.analyses.addAnalysis(analysis, new ComboAnalysis({
-                    name: generateComboAnalysisName(tool.name),
-                    type: tool.type,
-                    parent: props.datasetExplorer.analyses
-                }));
-            }
-        }
-    };
-
-    let toolsMenuItems = tools.map((tool) => {
+    const toolsMenuItems = tools.map((tool) => {
         return (
-            <Menu.Item key={tool.type} icon={tool.icon}>
+            <Menu.Item key={tool.id} icon={tool.icon} onClick={() => tool.callback()}>
                 {tool.name}
             </Menu.Item>
         );
@@ -46,7 +34,7 @@ export const DatasetToolsMenu = (props: DatasetToolsMenuProps) => {
     return (
         <Dropdown
             overlay={
-                <Menu onClick={(evt) => onToolClick(evt.key as string)}>
+                <Menu>
                     {toolsMenuItems}
                 </Menu>
             }

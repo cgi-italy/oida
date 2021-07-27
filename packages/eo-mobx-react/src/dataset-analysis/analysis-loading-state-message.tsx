@@ -3,7 +3,6 @@ import React from 'react';
 import { Empty } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
 import { LoadingState } from '@oida/core';
-import { PropTypes } from 'mobx-react';
 
 export type AnalysisLoadingStateMessageProps = {
     loadingState: LoadingState,

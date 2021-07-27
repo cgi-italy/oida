@@ -8,19 +8,22 @@ import {
 } from '@ant-design/icons';
 import { SortableHandle } from 'react-sortable-hoc';
 
+import { LoadingState } from '@oida/core';
+import { MapLayer } from '@oida/state-mobx';
 import { useSelector, useCenterOnMapFromModule } from '@oida/ui-react-mobx';
 import { DatasetViz, DatasetExplorer } from '@oida/eo-mobx';
 
+import { ComboToolConfig } from '../hooks';
 import { DatasetVizProgressControl } from './dataset-viz-progress-control';
 import { DatasetVizSettingsFactory } from './dataset-viz-settings-factory';
-import { MapLayer } from '@oida/state-mobx';
 import { DatasetVizDownloadModal } from './dataset-viz-download';
 import { DatasetToolsMenu } from './dataset-tools-menu';
-import { LoadingState } from '@oida/core';
+
 
 export type DatasetVizListItemProps = {
     datasetExplorer: DatasetExplorer;
     datasetViz: DatasetViz<MapLayer>;
+    analyticsTools?: ComboToolConfig[];
     onRemove?: () => void;
 };
 
@@ -91,20 +94,17 @@ export const DatasetVizListItem = (props: DatasetVizListItemProps) => {
             });
         }
 
-        const tools = props.datasetViz.dataset.config.tools ? props.datasetViz.dataset.config.tools.filter((tool) => !tool.hidden) : [];
-        if (tools.length) {
-            actions.push({
-                id: 'tools',
-                icon: <BarChartOutlined/>,
-                title: 'Toggle dataset tools',
-                menu: <DatasetToolsMenu
-                    datasetViz={props.datasetViz}
-                    datasetExplorer={props.datasetExplorer}
-                    icon={<BarChartOutlined/>}
-                    key='tools'
-                />
-            });
-        }
+        actions.push({
+            id: 'tools',
+            title: 'Toggle dataset tools',
+            menu: <DatasetToolsMenu
+                datasetViz={props.datasetViz}
+                analyticsTools={props.analyticsTools || []}
+                datasetExplorer={props.datasetExplorer}
+                icon={<BarChartOutlined/>}
+                key='tools'
+            />
+        });
 
         if (props.datasetViz.dataset.config.download) {
             actions.push(        {

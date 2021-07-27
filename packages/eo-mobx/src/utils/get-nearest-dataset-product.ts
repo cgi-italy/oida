@@ -1,5 +1,5 @@
-import { DatasetExplorerItem } from '../models/dataset-explorer';
-import { TimeSearchDirection } from '../types/dataset-time-distribution-provider';
+import { DatasetExplorerItem } from '../dataset-explorer';
+import { TimeSearchDirection } from '../common';
 
 
 export const getNearestDatasetProduct = function(

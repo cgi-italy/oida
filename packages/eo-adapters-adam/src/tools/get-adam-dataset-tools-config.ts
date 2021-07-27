@@ -1,17 +1,13 @@
-import { AoiSupportedGeometry, AxiosInstanceWithCancellation } from '@oida/core';
+import { AxiosInstanceWithCancellation } from '@oida/core';
 import {
-    DIMENSION_SERIES_TYPE, DatasetDimensionSeriesConfig, DatasetTimeDistributionProvider, DatasetToolConfig, DatasetDimensionSeriesRequest,
-    // DIMENSION_RASTER_SEQUENCE_TYPE, DatasetRasterSequenceConfig,
-    TRANSECT_SERIES_TYPE, DatasetTransectSeriesConfig
+    POINT_SERIES_PROCESSING, DatasetPointSeriesConfig, DatasetTimeDistributionProvider, DatasetToolConfig,
+    TRANSECT_VALUES_PROCESSING, DatasetTransectValuesConfig
 } from '@oida/eo-mobx';
 
-import { AdamDatasetConfig, AdamDatasetCoverageBand, AdamDatasetSingleBandCoverage, isMultiBandCoverage, AdamDatasetDimension } from '../adam-dataset-config';
+import { AdamDatasetConfig, AdamDatasetSingleBandCoverage, isMultiBandCoverage, AdamDatasetDimension } from '../adam-dataset-config';
 import { AdamDatasetFactoryConfig } from '../get-adam-dataset-factory';
-// import { getAdamDatasetColorMapConfig } from '../get-adam-dataset-colormap-config';
 import { AdamWcsSeriesProvider } from './adam-wcs-series-provider';
 import { AdamWpsAnalysisProvider } from './adam-wps-analysis-provider';
-// import { AdamWcsRasterVolumeProvider } from './adam-wcs-raster-volume-provider';
-// import { getPlottyColormaps } from '../../utils';
 
 export const getAdamDatasetToolsConfig = (
     axiosInstance: AxiosInstanceWithCancellation,
@@ -114,37 +110,24 @@ export const getAdamDatasetToolsConfig = (
             dimensions: dimensions
         });
 
-        const supportedGeometries: AoiSupportedGeometry[] = [{
-            type: 'Point'
-        }];
 
-        if (wpsAnalysisProvider) {
-            supportedGeometries.push({
-                type: 'BBox'
-            });
-        }
-        let dimensionSeriesToolConfig: DatasetDimensionSeriesConfig = {
-            supportedGeometries: supportedGeometries,
+        let dimensionSeriesToolConfig: DatasetPointSeriesConfig = {
             variables: variables,
             dimensions: dimensions,
             provider: (request) => {
-                if (wpsAnalysisProvider && request.dimension === 'time' && request.geometry.type === 'BBox') {
-                    return wpsAnalysisProvider.getBBoxTimeSeries(request as DatasetDimensionSeriesRequest<Date>);
-                } else {
-                    return wcsSeriesProvider.getSeries(request);
-                }
+                 return wcsSeriesProvider.getSeries(request);
             }
         };
 
         tools.push({
-            type: DIMENSION_SERIES_TYPE,
+            type: POINT_SERIES_PROCESSING,
             name: 'Series analysis',
             config: dimensionSeriesToolConfig
         });
     }
 
     if (wpsAnalysisProvider && variables.length) {
-        const transectSeriesConfig: DatasetTransectSeriesConfig = {
+        const transectSeriesConfig: DatasetTransectValuesConfig = {
             variables: variables,
             dimensions: dimensions,
             provider: (request) => {
@@ -160,7 +143,7 @@ export const getAdamDatasetToolsConfig = (
         };
 
         tools.push({
-            type: TRANSECT_SERIES_TYPE,
+            type: TRANSECT_VALUES_PROCESSING,
             name: 'Values along transect',
             config: transectSeriesConfig
         });

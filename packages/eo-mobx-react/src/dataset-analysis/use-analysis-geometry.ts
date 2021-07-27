@@ -1,10 +1,10 @@
 import { SelectionMode } from '@oida/core';
 import { useCenterOnMap, useMapModule, useSelector } from '@oida/ui-react-mobx';
-import { DatasetAnalysis } from '@oida/eo-mobx';
+import { DatasetProcessing } from '@oida/eo-mobx';
 import { Map, SelectionManager } from '@oida/state-mobx';
 
 export type useAnalysisGeometryProps = {
-    analysis: DatasetAnalysis<any>;
+    analysis: DatasetProcessing<any>;
     map: Map;
     mapSelection: SelectionManager;
 };
@@ -50,7 +50,7 @@ export const useAnalysisGeometry = (props: useAnalysisGeometryProps) => {
 };
 
 
-export const useAnalysisGeometryFromModule = (analysis: DatasetAnalysis<any>, mapModuleId?: string) => {
+export const useAnalysisGeometryFromModule = (analysis: DatasetProcessing<any>, mapModuleId?: string) => {
     let moduleState = useMapModule(mapModuleId);
 
     return useAnalysisGeometry({

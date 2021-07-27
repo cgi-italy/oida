@@ -1,4 +1,4 @@
-import { DatasetDimensionSeriesConfig, DatasetTimeDistributionProvider, DatasetToolConfig, DIMENSION_SERIES_TYPE } from '@oida/eo-mobx';
+import { DatasetPointSeriesConfig, DatasetTimeDistributionProvider, DatasetToolConfig, POINT_SERIES_PROCESSING } from '@oida/eo-mobx';
 import { WmsService } from './wms-service';
 
 export type WmsTimeSeriesConfig = {
@@ -9,10 +9,7 @@ export type WmsTimeSeriesConfig = {
 
 export const getWmsTimeSeriesToolConfig = (props: WmsTimeSeriesConfig) => {
 
-    let timeSeriesToolConfig: DatasetDimensionSeriesConfig = {
-        supportedGeometries: [{
-            type: 'Point'
-        }],
+    let timeSeriesToolConfig: DatasetPointSeriesConfig = {
         variables: [{
             id: `${props.layerName}`,
             name: 'Value',
@@ -34,14 +31,14 @@ export const getWmsTimeSeriesToolConfig = (props: WmsTimeSeriesConfig) => {
                 start: request.range!.min as Date,
                 end: request.range!.max as Date,
                 layer: props.layerName,
-                position: (request.geometry as GeoJSON.Point).coordinates,
+                position: request.location.coordinates,
             });
         }
     };
 
     return {
-        type: DIMENSION_SERIES_TYPE,
+        type: POINT_SERIES_PROCESSING,
         name: 'Series analysis',
         config: timeSeriesToolConfig
-    } as DatasetToolConfig<typeof DIMENSION_SERIES_TYPE>;
+    } as DatasetToolConfig<typeof POINT_SERIES_PROCESSING>;
 };

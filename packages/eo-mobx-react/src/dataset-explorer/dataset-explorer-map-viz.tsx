@@ -1,18 +1,20 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef } from 'react';
 
 import { List } from 'antd';
 
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 
-import { DatasetExplorer, DatasetViz } from '@oida/eo-mobx';
-
-
-import { DatasetVizListItem } from '../dataset-map-viz';
 import { useSelector } from '@oida/ui-react-mobx';
 import { MapLayer } from '@oida/state-mobx';
+import { DatasetExplorer, DatasetViz } from '@oida/eo-mobx';
+
+import { ComboToolConfig } from '../hooks/use-dataset-explorer-tools';
+import { DatasetVizListItem } from '../dataset-map-viz';
+
 
 export type DatasetExplorerMapVizProps = {
     explorerState: DatasetExplorer;
+    analyticsTools?: ComboToolConfig[]
 };
 
 let SortableItem = SortableElement(DatasetVizListItem);
@@ -35,6 +37,7 @@ export const DatasetExplorerMapViz = (props: DatasetExplorerMapVizProps) => {
                 key={view.id}
                 index={idx}
                 datasetExplorer={props.explorerState}
+                analyticsTools={props.analyticsTools}
                 datasetViz={view.mapViz as DatasetViz<MapLayer>}
                 onRemove={() => props.explorerState.removeDataset(view.id)}
             />

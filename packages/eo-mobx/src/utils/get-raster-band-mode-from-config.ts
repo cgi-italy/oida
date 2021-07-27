@@ -2,8 +2,8 @@ import {
     RasterBandModeConfig, RasterBandModeType, RasterBandConfig,
     RasterBandModeSingleProps, RasterBandModePresetProps, RasterBandPreset, RasterBandModeCombinationProps,
     RasterBandModeChoice, RasterBandModeCombinationConfig, BandScalingMode
-} from '../models/raster-band-mode';
-import { isValueDomain } from '../types';
+} from '../dataset-map-viz';
+import { isValueDomain } from '../common';
 
 import { getDatasetVariableDomain } from './get-dataset-variable-domain';
 

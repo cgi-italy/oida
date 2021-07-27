@@ -1,4 +1,4 @@
-import { isDomainProvider, DataDomain, DatasetVariable } from '../types/dataset-variable';
+import { isDomainProvider, DataDomain, DatasetVariable } from '../common';
 
 export const getDatasetVariableDomain = <D extends DataDomain<unknown>>(variable: DatasetVariable<D>): Promise<D | undefined> => {
     if (variable.domain) {

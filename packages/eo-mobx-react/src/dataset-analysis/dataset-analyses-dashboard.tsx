@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 
-import { DatasetExplorer, ComboAnalysis } from '@oida/eo-mobx';
+import { DatasetExplorer, DatasetAnalysis } from '@oida/eo-mobx';
 import { LayoutSectionItem } from '@oida/ui-react-core';
 
 import { DashboardPane, DashboardPaneProps } from './dashboard-pane';
@@ -35,15 +35,15 @@ export type DatasetAnalysesDashboardProps = DashboardPaneProps & {
 export const DatasetAnalysesDashboard = (props: DatasetAnalysesDashboardProps) => {
 
     useEffect(() => {
-        props.datasetsExplorer.analyses.setActive(true);
+        props.datasetsExplorer.analytics.setActive(true);
         return () => {
-            props.datasetsExplorer.analyses.setActive(false);
+            props.datasetsExplorer.analytics.setActive(false);
         };
     }, []);
 
     let analysisComponents = useSelector(() => {
 
-        const comboAnalyses = Array.from(props.datasetsExplorer.analyses.analyses.values());
+        const comboAnalyses = Array.from(props.datasetsExplorer.analytics.analyses.values());
 
         let availableCombos = comboAnalyses.reduce((comboMap, analysis) => {
             return {
@@ -53,7 +53,7 @@ export const DatasetAnalysesDashboard = (props: DatasetAnalysesDashboardProps) =
                     analysis
                 ]
             };
-        }, {} as Record<string, ComboAnalysis[]>);
+        }, {} as Record<string, DatasetAnalysis[]>);
 
         return comboAnalyses.filter(analysis => analysis.visible.value).map((analysis) => {
 
@@ -73,7 +73,7 @@ export const DatasetAnalysesDashboard = (props: DatasetAnalysesDashboardProps) =
                     preferredLayout: props.preferredLayout ? props.preferredLayout[analysisType] : undefined,
                     onClose: () => {
                         if (analysis.destroyOnClose) {
-                            props.datasetsExplorer.analyses.removeComboAnalysis(analysis);
+                            props.datasetsExplorer.analytics.removeAnalysis(analysis);
                         } else {
                             analysis.visible.setValue(false);
                         }

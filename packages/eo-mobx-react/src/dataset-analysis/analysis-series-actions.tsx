@@ -4,26 +4,27 @@ import { Dropdown, Menu, Button, Space, Tooltip } from 'antd';
 
 import { MinusOutlined, ExportOutlined, PlusOutlined } from '@ant-design/icons';
 
-import { ComboAnalysis, DatasetAnalysis } from '@oida/eo-mobx';
+import { DatasetProcessing, DatasetAnalysis } from '@oida/eo-mobx';
 import { useSelector } from '@oida/ui-react-mobx';
 
 export type AnalysisDatasetActions = {
-    combinedAnalysis: ComboAnalysis;
-    analysis: DatasetAnalysis<any>;
+    combinedAnalysis: DatasetAnalysis;
+    analysis: DatasetProcessing<any>;
     idx: number;
-    availableTargets: Array<ComboAnalysis>;
+    availableTargets: Array<DatasetAnalysis>;
     disableMove?: boolean;
 };
 
 export const AnalysisSeriesActions = (props: AnalysisDatasetActions) => {
 
-    const numAnalyses = useSelector(() => props.combinedAnalysis.analyses.length);
+    const numAnalyses = useSelector(() => props.combinedAnalysis.processings.length);
 
     const exportMenu = (
         <Menu>
             <Menu.ItemGroup title='Move to...'>
                 <Menu.Item key='undock' onClick={() => {
-                    props.combinedAnalysis.moveAnalysis(props.analysis);
+                    //TODO: empty analysis creation
+                    props.combinedAnalysis.removeProcessing(props.analysis, false);
                 }}>
                         New widget
                 </Menu.Item>
@@ -31,7 +32,8 @@ export const AnalysisSeriesActions = (props: AnalysisDatasetActions) => {
                 {
                     props.availableTargets.map((target) => {
                         return <Menu.Item key={target.id} onClick={() => {
-                            props.combinedAnalysis.moveAnalysis(props.analysis, target);
+                            props.combinedAnalysis.removeProcessing(props.analysis, true);
+                            target.addProcessing(props.analysis);
                         }}>
                             {target.name}
                         </Menu.Item>;
@@ -49,7 +51,7 @@ export const AnalysisSeriesActions = (props: AnalysisDatasetActions) => {
                     shape='circle'
                     size='small'
                     onClick={() => {
-                        props.combinedAnalysis.addAnalysis(props.analysis.clone(), props.idx + 1);
+                        props.combinedAnalysis.addProcessing(props.analysis.clone(), props.idx + 1);
                     }}
                 >
                     <PlusOutlined />
@@ -62,7 +64,7 @@ export const AnalysisSeriesActions = (props: AnalysisDatasetActions) => {
                         shape='circle'
                         size='small'
                         onClick={() => {
-                            props.combinedAnalysis.removeAnalysis(props.analysis);
+                            props.combinedAnalysis.removeProcessing(props.analysis);
                         }}
                     >
                         <MinusOutlined />

@@ -4,7 +4,7 @@ import { DatasetVizOpacityControl } from './dataset-viz-opacity-control';
 import { DatasetDimensionValueSelector } from './dataset-dimension-value-selector';
 import { DatasetVizSettingsFactory } from './dataset-viz-settings-factory';
 
-import { RasterMapViz } from '@oida/eo-mobx';
+import { RasterMapViz, RASTER_VIZ_TYPE } from '@oida/eo-mobx';
 import { DatasetBandModeControls } from './dataset-band-mode-controls';
 
 export type DatasetRasterVizSettingsProps = {
@@ -42,6 +42,6 @@ export const DatasetRasterVizSettings = (props: DatasetRasterVizSettingsProps) =
     );
 };
 
-DatasetVizSettingsFactory.register('raster', (config) => {
+DatasetVizSettingsFactory.register(RASTER_VIZ_TYPE, (config) => {
     return <DatasetRasterVizSettings {...config}/>;
 });
