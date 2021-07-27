@@ -237,7 +237,7 @@ export class DatasetDimensionRasterSequence<
         if (this.canRunQuery) {
             if (this.needsUpdate_) {
                 this.setData_([]);
-                this.dataFetcher_.fetchData({
+                return this.dataFetcher_.fetchData({
                     dimension: this.sequenceDimension!,
                     geometry: this.geometry!,
                     variable: this.sequenceVariable!,
@@ -251,10 +251,13 @@ export class DatasetDimensionRasterSequence<
                 }).catch(() => {
                     this.setData_([]);
                 });
+            } else {
+                return Promise.resolve();
             }
         } else {
             this.loadingState.setValue(LoadingState.Init);
             this.setData_([]);
+            return Promise.resolve();
         }
     }
 

@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import { Form, Button } from 'antd';
 import { LeftOutlined } from '@ant-design/icons';
 
-import { DatasetDimensionRasterSequence, DIMENSION_RASTER_SEQUENCE_TYPE, DatasetDimensionRasterSequenceConfig } from '@oida/eo-mobx';
+import { DatasetDimensionRasterSequence, DIMENSION_RASTER_SEQUENCE_TYPE, DatasetDimensionRasterSequenceConfig, DomainRange } from '@oida/eo-mobx';
 import { useSelector } from '@oida/ui-react-mobx';
 
 import { DatasetSelector } from '../dataset-selector';
 import { DatasetAnalysisWidgetFactory, DatasetAnalysisWidgetFactoryConfig } from '../dataset-analysis-widget-factory';
 import { DatasetDimensionRasterSequenceFilters } from './dataset-dimension-raster-sequence-filters';
 import { DatasetDimensionRasterSequenceChart } from './dataset-dimension-raster-sequence-chart';
+import { formatNumber } from '@oida/core';
 
 
 export const DatasetDimensionRasterSequenceAnalysis = (props: DatasetAnalysisWidgetFactoryConfig) => {
@@ -86,6 +87,8 @@ export const DatasetDimensionRasterSequenceAnalysis = (props: DatasetAnalysisWid
         return sequence?.canRunQuery;
     });
 
+    const [dataRange, setDataRange] = useState<DomainRange<number>>();
+
     return (
         <div className='dataset-dimension-raster-sequence dataset-chart'>
             {filtersVisible &&
@@ -98,7 +101,29 @@ export const DatasetDimensionRasterSequenceAnalysis = (props: DatasetAnalysisWid
                         type='primary'
                         onClick={() => {
                             const sequence = getSequence();
-                            sequence?.retrieveData();
+                            sequence?.retrieveData().then(() => {
+                                if (sequence.data.length) {
+                                    const minmax = sequence.data.reduce((minmax, item) => {
+                                        const min = typeof(item.stats?.min) === 'number' ? item.stats.min : Number.MAX_VALUE;
+                                        const max = typeof(item.stats?.max) === 'number' ? item.stats.max : -Number.MAX_VALUE;
+                                        return [
+                                            Math.min(min, minmax[0]),
+                                            Math.max(max, minmax[1])
+                                        ];
+                                    }, [Number.MAX_VALUE, -Number.MAX_VALUE]);
+
+                                    const dataRange = {
+                                        min: parseFloat(formatNumber(minmax[0], {
+                                            precision: 3
+                                        })),
+                                        max: parseFloat(formatNumber(minmax[1], {
+                                            precision: 3
+                                        }))
+                                    };
+                                    setDataRange(dataRange);
+                                    sequence.colorMap?.domain?.setRange(dataRange);
+                                }
+                            });
                             setFiltersVisible(false);
                         }}
                         disabled={!canRunQuery}
@@ -125,6 +150,7 @@ export const DatasetDimensionRasterSequenceAnalysis = (props: DatasetAnalysisWid
                     {sequence &&
                         <DatasetDimensionRasterSequenceChart
                             sequence={sequence}
+                            dataRange={dataRange}
                         />
                     }
                 </div>

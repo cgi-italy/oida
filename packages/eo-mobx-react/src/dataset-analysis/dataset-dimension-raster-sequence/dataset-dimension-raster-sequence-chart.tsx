@@ -6,7 +6,7 @@ import debounce from 'lodash/debounce';
 import { Radio, Slider, Space } from 'antd';
 
 import { LoadingState } from '@oida/core';
-import { DataDomain, DatasetDimension, DatasetDimensionRasterSequence } from '@oida/eo-mobx';
+import { DataDomain, DatasetDimension, DatasetDimensionRasterSequence, DomainRange } from '@oida/eo-mobx';
 import { useSelector } from '@oida/ui-react-mobx';
 
 import { DatasetColorMapSelector } from '../../dataset-map-viz/dataset-colormap-selector';
@@ -51,6 +51,7 @@ export const DatasetDimensionRasterSequenceThumb = (props: DatasetDimensionRaste
 
 export type DatasetDimensionRasterSequenceChartProps = {
     sequence: DatasetDimensionRasterSequence;
+    dataRange?: DomainRange<number>;
 };
 
 export const DatasetDimensionRasterSequenceChart = (props: DatasetDimensionRasterSequenceChartProps) => {
@@ -116,7 +117,10 @@ export const DatasetDimensionRasterSequenceChart = (props: DatasetDimensionRaste
                             <DatasetColorMapSelector
                                 colorMap={colorMap}
                                 colorScales={variableConfig.colorScales}
-                                variable={variableConfig}
+                                variable={{
+                                    ...variableConfig,
+                                    domain: props.dataRange ? props.dataRange : variableConfig.domain
+                                }}
                             />
                         }
                         <div className='dataset-raster-sequence-settings'>
