@@ -11,11 +11,13 @@ import { antdFormFieldRendererFactory } from '../form/antd-form-field-renderer-f
 
 export const FieldWrapper = (props) => {
 
-    let { name, title, children, type, required, rendererId } = props;
+    let { name, title, description, children, type, required, rendererId } = props;
     return (
         <Form.Item
+
             label={title}
             rules={[{required: required}]}
+            tooltip={description}
             className={classnames(`${type.toLowerCase()}-field`, `${rendererId}-renderer`, {'is-required': required})}
         >
             {children}

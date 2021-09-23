@@ -1,3 +1,29 @@
+@form-item-small-label-font-size: @font-size-sm;
+@form-item-small-margin-bottom: @margin-sm;
+@form-vertical-item-margin: 0 0 0 @margin-xss;
+
+.ant-form-vertical {
+    .ant-form-item {
+        .ant-form-item-control {
+            margin: @form-vertical-item-margin;
+        }
+    }
+}
+
+&.ant-form-small {
+    .ant-form-item {
+        .ant-form-item-label {
+            label {
+                font-size: @form-item-small-label-font-size;
+                height: auto;
+            }
+        }
+
+        margin-bottom: @form-item-small-margin-bottom;
+    }
+
+}
+
 .antd-form-renderer {
     .ant-form-item {
 
@@ -11,34 +37,18 @@
 
         &.is-required {
             label {
-                &::after {
-                    display: inline;
-                    content: '*'
+                &::before {
+                    display: inline-block;
+                    margin-right: 4px;
+                    color: @highlight-color;
+                    font-size: @form-item-label-font-size;
+                    font-family: SimSun, sans-serif;
+                    line-height: 1;
+                    content: '*';
                 }
-            }
-        }
-    }
-
-    &.ant-form-small {
-        .ant-form-item {
-            .ant-form-item-label {
-                label {
-                    font-size: @font-size-sm;
-                    height: auto;
-                }
-            }
-
-            margin-bottom: @margin-sm;
-        }
-
-    }
-
-    &.ant-form-vertical {
-        .ant-form-item {
-            .ant-form-item-control {
-                margin-left: @margin-xss;
             }
         }
     }
 
 }
+

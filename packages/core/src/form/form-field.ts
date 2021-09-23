@@ -30,6 +30,10 @@ export type FormFieldCommon<TYPE extends string> = {
      */
     title?: string;
     /**
+     * Form field description
+     */
+    description?: string;
+    /**
      * Flag indicating if this field is required
      */
     required?: boolean;
