@@ -71,7 +71,10 @@ export function DataCollectionTable<T extends object>(props: DataCollectionTable
                     return (
                         <Menu.Item key={idx}>
                             <DataCollectionItemActionButton
-                                action={action}
+                                action={{
+                                    ...action,
+                                    primary: false
+                                }}
                                 type='text'
                             />
                         </Menu.Item>

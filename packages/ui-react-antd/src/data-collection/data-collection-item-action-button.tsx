@@ -20,7 +20,6 @@ export const DataCollectionItemActionButton = (props: DataCollectionItemActionBu
             className='data-collection-item-action-btn'
         >
             <Button
-                type='link'
                 size='small'
                 onClick={() => {
                     const callbackReturn = action.callback();
@@ -34,6 +33,7 @@ export const DataCollectionItemActionButton = (props: DataCollectionItemActionBu
                 icon={action.icon}
                 loading={loading}
                 {...buttonProps}
+                type={props.action.primary ? 'primary' : (props.type || 'link')}
             >
                 <span className='action-content'>{action.content}</span>
             </Button>

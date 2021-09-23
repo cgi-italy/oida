@@ -13,6 +13,8 @@ export type DataCollectionItemAction = {
     icon?: React.ReactNode;
     /** The action title. Usually displayed as a tooltip */
     title?: string;
+    /** A flag indicating if this is a primary action */
+    primary?: boolean;
 };
 
 /** Data collection item selection state */
