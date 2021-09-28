@@ -1,2 +1,2 @@
-export * from './map-nav-controls';
+export * from './map-nav-tools';
 export * from './map-mouse-coords';

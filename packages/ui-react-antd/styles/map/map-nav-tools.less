@@ -1,7 +1,16 @@
-.map-nav-controls {
+.map-nav-tools {
     display: inline-flex;
     flex-direction: column;
     align-items: flex-start;
+
+    .zoom-ctrls {
+        display: inline-flex;
+        flex-direction: column;
+
+        &:not(:first-child) {
+            margin-top: 2px;
+        }
+    }
 
     button.ant-btn.ant-btn-icon-only.zoom-ctrl {
         padding: 0 5px;
