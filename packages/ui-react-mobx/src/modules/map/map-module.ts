@@ -1,5 +1,5 @@
 import { IMapProjection } from '@oida/core';
-import { SelectionManager, Map, MapProps, TileLayer } from '@oida/state-mobx';
+import { SelectionManager, Map, MapProps, TileLayer, MapViewportProps } from '@oida/state-mobx';
 
 import { AppModule } from '../app-module';
 
@@ -29,6 +29,7 @@ export type MapModuleConfig = {
         baseLayer?: string;
         renderer?: string;
         projection?: string;
+        viewport?: MapViewportProps
     }
 };
 
@@ -58,7 +59,7 @@ export class MapModule extends AppModule {
 
     protected initFromConfig_(config: MapModuleConfig) {
         if (config.initialOptions) {
-            let baseLayerId = config.initialOptions.baseLayer;
+            const baseLayerId = config.initialOptions.baseLayer;
             if (baseLayerId) {
                 let baseLayers = config.baseLayers || [];
                 let baseLayer = baseLayers.find((layer) => {
@@ -74,7 +75,7 @@ export class MapModule extends AppModule {
                     );
                 }
             }
-            let projectionCode = config.initialOptions.projection;
+            const projectionCode = config.initialOptions.projection;
             if (projectionCode) {
                 let projections = config.projections || [];
                 let projection = projections.find((projection) => {
@@ -84,7 +85,7 @@ export class MapModule extends AppModule {
                     this.map.view.setProjection(projection);
                 }
             }
-            let rendererId = config.initialOptions.renderer;
+            const rendererId = config.initialOptions.renderer;
             if (rendererId) {
                 let renderers = config.renderers || [];
                 let renderer = renderers.find((renderer) => {
@@ -93,6 +94,10 @@ export class MapModule extends AppModule {
                 if (renderer) {
                     this.map.setRenderer(renderer);
                 }
+            }
+            const viewport = config.initialOptions.viewport;
+            if (viewport) {
+                this.map.view.setViewport(viewport);
             }
         }
     }

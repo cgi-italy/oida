@@ -138,7 +138,7 @@ export class MapRendererController {
                     return;
                 }
                 if (this.mapRenderer_) {
-                    this.mapRenderer_.setViewport(viewport, this.mapState_.view.config.value.animateOnChange);
+                    this.mapRenderer_.setViewport(viewport, this.mapState_.view.config.value?.animateOnChange);
                 }
             })
         );
