@@ -3,7 +3,7 @@ import chroma from 'chroma-js';
 export type RandomColorFactoryProps = {
     startIdx?: number;
     saturationRange: number[];
-    luminanceRange: number;
+    luminanceRange: number[];
 };
 
 export const randomColorFactory = (props?: RandomColorFactoryProps) => {
