@@ -9,8 +9,10 @@ export type FormDataProps = {
     fieldValues?: DataFilters;
     /** The form fields definitions */
     fields: IFormFieldDefinition[];
-    /** A flag indicating if the hooks should be re-executed when the fields array change.
-     * Set it to true for dynamic forms
+    /**
+     * A flag indicating if the hooks should be re-executed when the fields array change.
+     * Set it to true for dynamic forms. Be sure to memoize the input fields array when setting this
+     * flga to true.
      */
     trackFieldsDefinitions?: boolean;
 };

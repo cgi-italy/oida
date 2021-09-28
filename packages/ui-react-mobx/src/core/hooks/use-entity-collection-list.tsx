@@ -19,13 +19,21 @@ export type DataCollectionAction<T> = Omit<DataCollectionItemAction, 'callback'>
 export type UseDataCollectionActionsProps<T> = {
     entity: T;
     actions: DataCollectionAction<T>[];
+    /**
+     * A flag indicating if the hooks should be re-executed when the actions array change.
+     * When setting this flag Be sure to memoize the input actions array.
+     */
+    trackActionsDefinitions?: boolean;
 };
 
 /**
  * A React hook that given an entity and a set of collection actions will return the list of action binded to the specific entity
  * The actions condition will be re evaluated if relevant entity properties are updated
  */
-export const useDataCollectionActions = <T extends Object>(props: UseDataCollectionActionsProps<T>) => {
+export const useDataCollectionActions = <T extends unknown>(props: UseDataCollectionActionsProps<T>) => {
+
+    const hooksDeps: React.DependencyList = props.trackActionsDefinitions ? [props.entity, props.actions] : [props.entity];
+
     return useSelector(() => {
         return props.actions.filter((action) => {
             return action.condition ? action.condition(props.entity) : true;
@@ -37,7 +45,7 @@ export const useDataCollectionActions = <T extends Object>(props: UseDataCollect
                 }
             } as DataCollectionItemAction;
         });
-    }, [props.entity]);
+    }, hooksDeps);
 };
 
 /**
@@ -53,6 +61,12 @@ export type UseEntityCollectionListProps<T extends IsEntity> = {
      * Otherwise the state will be managed internally
      */
     selectionManager?: SelectionManager;
+    /**
+     * By default the actions array is assumed to be static. Set this flag to true
+     * if the hooks should be re-executed when the actions array change.
+     * When setting this flag Be sure to memoize the input actions array.
+     */
+    trackActionsDefinitions?: boolean;
 };
 
 /**
@@ -66,6 +80,8 @@ export type UseEntityCollectionListProps<T extends IsEntity> = {
 export const useEntityCollectionList = <T extends IsEntity>(props: UseEntityCollectionListProps<T>) => {
 
     const { items, actions } = props;
+
+    const hooksDeps: React.DependencyList = props.trackActionsDefinitions ? [items, actions] : [items];
 
     const selectionManager = props.selectionManager || new SelectionManager();
 
@@ -87,7 +103,8 @@ export const useEntityCollectionList = <T extends IsEntity>(props: UseEntityColl
             itemActions: (entity: T) => {
                 return useDataCollectionActions({
                     entity: entity,
-                    actions: actions || []
+                    actions: actions || [],
+                    trackActionsDefinitions: props.trackActionsDefinitions
                 });
             },
             onHoverAction: (item: T, hovered: boolean) => {
@@ -97,7 +114,7 @@ export const useEntityCollectionList = <T extends IsEntity>(props: UseEntityColl
                 selectionManager!.selection.modifySelection(item, mode);
             }
         };
-    }, [items]);
+    }, hooksDeps);
 
     return itemProps;
 };
