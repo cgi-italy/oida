@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.0.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/ui-react-core@3.0.0...@oida/ui-react-core@4.0.0) (2021-09-28)
+
+
+### Features
+
+* add goToHome action in map nav controls ([a541a3f](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/a541a3f33900843e999d325e7358e7349f06ebdc))
+* add support for primary actions in data collection ([fd50491](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/fd50491e6c51da3b36c9f87054f692132b959145))
+
+
+### BREAKING CHANGES
+
+* MapNavControls component renamed to MapNavTools
+
+
+
+
+
 # [3.0.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/ui-react-core@2.1.1...@oida/ui-react-core@3.0.0) (2021-06-18)
 
 

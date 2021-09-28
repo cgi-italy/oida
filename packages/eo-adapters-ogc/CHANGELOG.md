@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.3.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/eo-adapters-ogc@0.2.1...@oida/eo-adapters-ogc@0.3.0) (2021-09-28)
+
+
+### Bug Fixes
+
+* disable time parameter for timeless wms layers ([5b33534](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/5b3353400b116f4b3edd71767e10866941b679e5))
+* handle the no step case in WmsTimeDistributionProvider ([8f3ea89](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/8f3ea89613924dbd10f00bb2bd0f320a27de7926))
+
+
+### Features
+
+* add wcs area statistics tool ([d4cbddb](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/d4cbddb66d6e80e1cc12ab8f752c9aae69fef414))
+
+
+
+
+
 ## [0.2.1](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/eo-adapters-ogc@0.2.0...@oida/eo-adapters-ogc@0.2.1) (2021-06-21)
 
 

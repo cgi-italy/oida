@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.2.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/core@2.1.0...@oida/core@2.2.0) (2021-09-28)
+
+
+### Features
+
+* add description in form field definition ([dc5ff4b](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/dc5ff4bfebb71e6ae406076819643223ab452973))
+* add getTextColorForBackground util ([8c70311](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/8c70311681e3fc847fb835cf5241dbb52fe0e565))
+
+
+
+
+
 # [2.1.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/core@2.0.0...@oida/core@2.1.0) (2021-06-18)
 
 

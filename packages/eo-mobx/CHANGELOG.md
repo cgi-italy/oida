@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.3.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/eo-mobx@0.2.0...@oida/eo-mobx@0.3.0) (2021-09-28)
+
+
+### Bug Fixes
+
+* allow disabling auto parent disposal on analysis removal ([bc52304](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/bc523048a9d2489d757c656823eda82250145bd2))
+* improve coloring in dataset analyses charts ([094c508](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/094c5082c0ca3199f8470657831853b8d0112e1f))
+* init raster sequence colormap range from data ([13c65eb](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/13c65eb3bc84510301c005b787a083ce93043975))
+
+
+### Features
+
+* add support for additional parameters in raster sequence analysis ([57f5180](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/57f5180eeeaae42426064854ca12756801a3e47e))
+* allow specification of default dataset tools parameters in config ([83984d7](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/83984d7b1a9b051321c641029c058ec28c8c61c7))
+
+
+
+
+
 # 0.2.0 (2021-06-18)
 
 

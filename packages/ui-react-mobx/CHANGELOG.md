@@ -3,6 +3,29 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.0.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/ui-react-mobx@1.0.0...@oida/ui-react-mobx@2.0.0) (2021-09-28)
+
+
+### Bug Fixes
+
+* add support for selector returning a function in useSelector hook ([9fef225](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/9fef22532323fb329cd900c8c66ce0845673fa42))
+
+
+### Features
+
+* add goToHome action in map nav controls ([a541a3f](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/a541a3f33900843e999d325e7358e7349f06ebdc))
+* add initial viewport in map module config ([ad94b5f](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/ad94b5fc6f74c4e1fd8854300cada210105730c2))
+* allow dynamic actions in entity collection list ([c56a693](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/c56a69383cddd9bd1691227bf914f3c9360f0add))
+
+
+### BREAKING CHANGES
+
+* MapNavControls component renamed to MapNavTools
+
+
+
+
+
 # 1.0.0 (2021-06-18)
 
 

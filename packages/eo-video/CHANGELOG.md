@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.1](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/eo-video@0.2.0...@oida/eo-video@0.2.1) (2021-09-28)
+
+
+### Bug Fixes
+
+* video source extent on non initialized media element ([b9659ee](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/b9659eee72bbd9f48b48f9a81d2bb8151a73607a))
+
+
+
+
+
 # 0.2.0 (2021-06-18)
 
 

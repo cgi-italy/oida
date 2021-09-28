@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.0.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/ui-react-antd@3.0.0...@oida/ui-react-antd@4.0.0) (2021-09-28)
+
+
+### Bug Fixes
+
+* ignore time in date range field min/max limits enforcement ([d9ccf2a](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/d9ccf2a948e9f26464ee835a70e865709290a15f))
+
+
+### Features
+
+* add description in form field definition ([dc5ff4b](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/dc5ff4bfebb71e6ae406076819643223ab452973))
+* add goToHome action in map nav controls ([a541a3f](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/a541a3f33900843e999d325e7358e7349f06ebdc))
+* add layer group icon ([e6117e8](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/e6117e8f060e0d9b79e454171f5ee6e6de4a533f))
+* add support for primary actions in data collection ([fd50491](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/fd50491e6c51da3b36c9f87054f692132b959145))
+
+
+### BREAKING CHANGES
+
+* MapNavControls component renamed to MapNavTools
+
+
+
+
+
 # [3.0.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/ui-react-antd@2.2.0...@oida/ui-react-antd@3.0.0) (2021-06-18)
 
 

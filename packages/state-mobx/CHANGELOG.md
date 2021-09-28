@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.3.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/state-mobx@0.2.0...@oida/state-mobx@0.3.0) (2021-09-28)
+
+
+### Features
+
+* add initial viewport in map module config ([ad94b5f](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/ad94b5fc6f74c4e1fd8854300cada210105730c2))
+
+
+
+
+
 # 0.2.0 (2021-06-18)
 
 
