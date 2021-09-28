@@ -25,6 +25,7 @@ export enum DatasetTimelineTimeSelectionMode {
 
 export type DatasetExplorerTimelineProps = {
     explorerState: DatasetExplorer;
+    title?: string;
 };
 
 export type DatasetDiscoveryTimelineGroup = TimelineGroup & {
@@ -467,6 +468,7 @@ export const DatasetDiscoveryTimeline = (props: DatasetExplorerTimelineProps) =>
                 isCompressed={isCompressed}
                 onCompressToggle={() => setIsCompressed((compressed) => !compressed)}
                 rangeModeDisabled={props.explorerState.config.timeExplorer?.rangeModeDisabled}
+                title={props.title}
             />
             {<Timeline
                 className={classnames({'is-compressed': isCompressed})}
