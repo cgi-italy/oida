@@ -38,6 +38,8 @@ export type WmsRasterSourceProviderConfig = {
 
 export const createWmsRasterSourceProvider = (config: WmsRasterSourceProviderConfig) => {
 
+    const isTimeless = !config.layer.Dimension?.find((dimension) => dimension.name === 'time');
+
     return (rasterView: RasterMapViz) => {
 
         let params: Record<string, string> = {
@@ -50,12 +52,14 @@ export const createWmsRasterSourceProvider = (config: WmsRasterSourceProviderCon
             return Promise.resolve(undefined);
         }
 
-        let timeFilter = rasterView.dataset.toi;
-        if (timeFilter) {
-            if (timeFilter instanceof Date) {
-                params.time = timeFilter.toISOString().replace(/\.[^Z]*Z$/, 'Z');
-            } else {
-                params.time = `${timeFilter.start.toISOString()}/${timeFilter.end.toISOString()}`;
+        if (!isTimeless) {
+            let timeFilter = rasterView.dataset.toi;
+            if (timeFilter) {
+                if (timeFilter instanceof Date) {
+                    params.time = timeFilter.toISOString().replace(/\.[^Z]*Z$/, 'Z');
+                } else {
+                    params.time = `${timeFilter.start.toISOString()}/${timeFilter.end.toISOString()}`;
+                }
             }
         }
 
