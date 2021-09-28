@@ -176,7 +176,7 @@ release:
   }
 
   function nexus_login() {
-     echo //$NEXUS_REPO/:_authToken=$NEXUS_AUTH_TOKEN > ~/.npmrc
+     echo //$NEXUS_REPO/:_auth=$NEXUS_AUTH_TOKEN > ~/.npmrc
   }
 
   function try_release() {
