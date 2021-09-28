@@ -13,7 +13,10 @@ import { DatasetViz, DatasetVizProps } from './dataset-viz';
 import { SharedAoi, SharedAoiProps } from './shared-aoi';
 
 
-const randomColorGenerator = randomColorFactory();
+const randomColorGenerator = randomColorFactory({
+    saturationRange: [0.4, 0.9],
+    luminanceRange: [0.6, 0.9]
+});
 
 export type DatasetAnalysisProps<TYPE extends string = string, CONFIG extends Record<string, any> = Record<string, any>> = {
     color?: string;

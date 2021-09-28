@@ -8,12 +8,12 @@ import 'echarts/lib/component/axisPointer';
 import 'echarts/lib/component/brush';
 import chroma from 'chroma-js';
 
+import { formatNumber, getTextColorForBackground } from '@oida/core';
 import {
     isDomainProvider, NumericDomainMapper, DatasetRasterSequenceItem, RasterBandConfig, DatasetDimension, DataDomain, isValueDomain
 } from '@oida/eo-mobx';
 
 import { ChartWidget } from '../chart-widget';
-import { formatNumber } from '@oida/core';
 
 
 export type DatasetRasterSequencePercentilesSliderProps = {
@@ -98,6 +98,8 @@ export const DatasetRasterSequencePercentilesSlider = (props: DatasetRasterSeque
         return moment.utc(value).format('YYYY-MM-DD');
     } : undefined;
 
+    const handleTextColor = props.color ? getTextColorForBackground(props.color) : 'white';
+
     return (
         <div className='dataset-sequence-stats-slider'>
             <ChartWidget
@@ -145,7 +147,8 @@ export const DatasetRasterSequencePercentilesSlider = (props: DatasetRasterSeque
                                 show: true,
                                 formatter: axisFormatter ? (item) => axisFormatter(item.value) : undefined,
                                 backgroundColor: props.color,
-                                margin: 35
+                                margin: 35,
+                                color: handleTextColor
                             }
                         }
                     }],

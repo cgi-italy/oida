@@ -7,6 +7,7 @@ import 'echarts/lib/component/legend';
 import 'echarts/lib/component/axisPointer';
 import 'echarts/lib/component/brush';
 
+import { getTextColorForBackground } from '@oida/core';
 import {
     isDomainProvider, NumericDomainMapper, DatasetRasterSequenceItem, RasterBandConfig, DatasetDimension, DataDomain, isValueDomain
 } from '@oida/eo-mobx';
@@ -78,6 +79,8 @@ export const DatasetRasterSequenceStatsSlider = (props: DatasetRasterSequenceSta
           : 'category';
     }
 
+    const handleTextColor = props.color ? getTextColorForBackground(props.color) : 'white';
+
     const axisFormatter = props.dimensionConfig.id === 'time' ? (value) => {
         return moment.utc(value).format('YYYY-MM-DD');
     } : undefined;
@@ -129,7 +132,8 @@ export const DatasetRasterSequenceStatsSlider = (props: DatasetRasterSequenceSta
                                 show: true,
                                 formatter: axisFormatter ? (item) => axisFormatter(item.value) : undefined,
                                 backgroundColor: props.color,
-                                margin: 35
+                                margin: 35,
+                                color: handleTextColor
                             }
                         }
                     }],

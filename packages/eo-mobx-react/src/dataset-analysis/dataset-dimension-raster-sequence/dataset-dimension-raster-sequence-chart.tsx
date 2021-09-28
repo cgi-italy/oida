@@ -69,6 +69,7 @@ export const DatasetDimensionRasterSequenceChart = (props: DatasetDimensionRaste
     });
 
     const colorMap = useSelector(() => props.sequence.colorMap);
+    const color = useSelector(() => props.sequence.color);
 
     const data = useSelector(() => props.sequence.data);
     const loadingState = useSelector(() => props.sequence.loadingState.value);
@@ -188,7 +189,7 @@ export const DatasetDimensionRasterSequenceChart = (props: DatasetDimensionRaste
                                             <DatasetRasterSequenceItemHistogram
                                                 item={item}
                                                 variableConfig={variableConfig}
-                                                color={props.sequence.color}
+                                                color={color}
                                                 isLoading={loadingState === LoadingState.Loading}
                                             />
                                         }
@@ -224,7 +225,7 @@ export const DatasetDimensionRasterSequenceChart = (props: DatasetDimensionRaste
                                     <DatasetRasterSequenceItemHistogram
                                         item={data[activeThumb]}
                                         variableConfig={variableConfig}
-                                        color={props.sequence.color}
+                                        color={color}
                                         isLoading={loadingState === LoadingState.Loading}
                                     />
                                 }
@@ -252,7 +253,7 @@ export const DatasetDimensionRasterSequenceChart = (props: DatasetDimensionRaste
                                             data={data}
                                             dimensionConfig={dimensionConfig}
                                             variableConfig={variableConfig}
-                                            color={props.sequence.color}
+                                            color={color}
                                             activeItem={activeThumb}
                                             onActiveItemChange={(active) => setActiveThumb(active)}
                                             isLoading={loadingState === LoadingState.Loading}
@@ -263,7 +264,7 @@ export const DatasetDimensionRasterSequenceChart = (props: DatasetDimensionRaste
                                             data={data}
                                             dimensionConfig={dimensionConfig}
                                             variableConfig={variableConfig}
-                                            color={props.sequence.color}
+                                            color={color}
                                             activeItem={activeThumb}
                                             onActiveItemChange={(active) => setActiveThumb(active)}
                                             isLoading={loadingState === LoadingState.Loading}
