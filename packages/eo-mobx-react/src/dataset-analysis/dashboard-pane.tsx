@@ -98,7 +98,7 @@ export const DashboardPane = (props: LayoutSectionProps & DashboardPaneProps) =>
                 if (updatedLayout[id].y + updatedLayout[id].h > maxY) {
                     updatedLayout[id] = {
                         ...updatedLayout[id],
-                        y: maxY - updatedLayout[id].h,
+                        y: Math.max(0, maxY - updatedLayout[id].h),
                         moved: true
                     };
                 }
