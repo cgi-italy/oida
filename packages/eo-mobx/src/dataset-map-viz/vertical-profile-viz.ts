@@ -3,7 +3,7 @@ import { autorun, IObservableArray, observable, makeObservable, runInAction, act
 import { LoadingState, IVerticalProfile, IVerticalProfileStyle, TileSource, SubscriptionTracker } from '@oida/core';
 import {
     VerticalProfileLayer, Selected, Hovered, SelectedProps, HoveredProps,
-    IsSelectable, IsHoverable, HasVisibility, Visible, VisibleProps
+    IsSelectable, IsHoverable, HasVisibility, Visible, VisibleProps, AsyncDataFetcher
 } from '@oida/state-mobx';
 
 import { DatasetViz, DatasetVizProps } from '../common';
@@ -105,6 +105,7 @@ export class DatasetVerticalProfileViz extends DatasetViz<VerticalProfileLayer<V
     readonly bandMode: RasterBandMode;
 
     protected subscriptionTracker_: SubscriptionTracker;
+    protected profileGetter_: AsyncDataFetcher<VerticalProfileItemProps[], undefined>;
 
     constructor(props: Omit<DatasetVerticalProfileVizProps, 'vizType'>) {
         super({
@@ -128,6 +129,12 @@ export class DatasetVerticalProfileViz extends DatasetViz<VerticalProfileLayer<V
         this.mapLayer.setSource(this.profiles);
 
         this.subscriptionTracker_ = new SubscriptionTracker();
+
+        this.profileGetter_ = new AsyncDataFetcher({
+            dataFetcher: () => {
+                return this.config.dataProvider.getProfiles(this);
+            }
+        });
 
         this.bandMode = new RasterBandMode();
         getRasterBandModeFromConfig({
@@ -180,7 +187,7 @@ export class DatasetVerticalProfileViz extends DatasetViz<VerticalProfileLayer<V
             runInAction(() => {
                 this.profiles.clear();
             });
-            this.config.dataProvider.getProfiles(this).then((profileData) => {
+            this.profileGetter_.fetchData(undefined).then((profileData) => {
                 const profiles = profileData.map((profile) => {
                     return new VerticalProfileItem(profile);
                 });
@@ -189,7 +196,10 @@ export class DatasetVerticalProfileViz extends DatasetViz<VerticalProfileLayer<V
                     this.mapLayer.loadingStatus.setValue(LoadingState.Success);
                 });
             }).catch((error) => {
-                this.mapLayer.loadingStatus.setValue(LoadingState.Error);
+                this.mapLayer.loadingStatus.update({
+                    value: LoadingState.Error,
+                    message: error.message
+                });
             });
         });
 

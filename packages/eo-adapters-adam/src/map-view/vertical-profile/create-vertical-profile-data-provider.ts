@@ -1,6 +1,6 @@
 import debounce from 'lodash/debounce';
 
-import { AxiosInstanceWithCancellation } from '@oida/core';
+import { AxiosInstanceWithCancellation, DateRangeValue } from '@oida/core';
 import { DatasetVerticalProfileViz, VerticalProfileItemProps, RasterBandModeSingle } from  '@oida/eo-mobx';
 
 import { createGeoTiffLoader } from '../../utils';
@@ -71,12 +71,12 @@ export const createVerticalProfileDataProvider = (
     const load = (vProfileViz: DatasetVerticalProfileViz) => {
         const bandMode = vProfileViz.bandMode.value;
         if (bandMode instanceof RasterBandModeSingle) {
-            let timeFilter = vProfileViz.dataset.toi;
+            let timeFilter = !datasetConfig.timeless ?  vProfileViz.dataset.toi : undefined;
             return new Promise<VerticalProfileItemProps[]>((resolve, reject) => {
                 debouncedProfileGetter(bandMode.band, timeFilter, resolve, reject);
             });
         } else {
-            return Promise.reject('Unsupported band mode');
+            return Promise.reject(new Error('Unsupported band mode'));
         }
     };
 

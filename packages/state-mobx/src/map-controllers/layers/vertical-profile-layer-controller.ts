@@ -46,12 +46,12 @@ extends MapLayerController<IVerticalProfileLayerRenderer, VerticalProfileLayer<T
                 hoveredProfile = this.mapLayer_.source?.find(profile => profile.selected.value && profile.id === hovered.profileId);
             }
             if (hoveredProfile) {
-                this.mapLayer_.setSelectedCoordinate({
+                this.mapLayer_.setHighlihgtedCoordinate({
                     profileId: hoveredProfile.id.toString(),
                     geographic: hovered!.coordinate
                 });
             } else {
-                this.mapLayer_.setSelectedCoordinate(undefined);
+                this.mapLayer_.setHighlihgtedCoordinate(undefined);
             }
         };
 

@@ -236,7 +236,7 @@ export class CesiumVerticalProfileLayer extends CesiumMapLayer implements IVerti
         let entity = this.dataSource_.entities.getById('highlighted-point');
         if (!entity) {
 
-            let entity = this.dataSource_.entities.add({
+            entity = this.dataSource_.entities.add({
                 id: 'highlighted-point',
                 billboard: {
                     image: cursor,
@@ -261,7 +261,7 @@ export class CesiumVerticalProfileLayer extends CesiumMapLayer implements IVerti
         let entity = this.dataSource_.entities.getById('selected-point');
         if (!entity) {
 
-            let entity = this.dataSource_.entities.add({
+            entity = this.dataSource_.entities.add({
                 id: 'selected-point',
                 billboard: {
                     image: cursor,
