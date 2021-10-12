@@ -28,7 +28,7 @@
     "@oida/map-ol": "file:../map-ol"
   },
   "peerDependencies": {
-    "cesium": "^1.68.0",
+    "cesium": "^1.86.0",
     "ol": "^6.2.0"
   }
 }

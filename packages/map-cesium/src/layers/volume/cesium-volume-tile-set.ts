@@ -173,7 +173,7 @@ export class CesiumVolumeTileSet {
                 if (!this.colorMap_.texture) {
                     this.colorMap_.texture = this.createColorMapTexture_(this.colorMap_.colorMap, frameState.context);
                 } else {
-                    this.colorMap_.texture.copyFrom(this.colorMap_.colorMap);
+                    this.colorMap_.texture.copyFrom({source: this.colorMap_.colorMap});
                 }
                 this.colorMap_.needsUpdate = false;
             }

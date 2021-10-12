@@ -101,10 +101,18 @@ export class CesiumVolumeTileTexture {
             let tileGrid = this.config_.source.getTileGrid();
             let [tileWidth, tileHeight] = tileGrid.tileSize;
             this.texture_.copyFrom({
-                width: tileWidth, height: tileHeight, arrayBufferView: slice.data
-            }, gridOffset.x, gridOffset.y);
+                source: {
+                    width: tileWidth, height: tileHeight, arrayBufferView: slice.data
+                },
+                xOffset: gridOffset.x,
+                yOffset: gridOffset.y
+            });
         } else {
-            this.texture_.copyFrom(slice.data, gridOffset.x, gridOffset.y);
+            this.texture_.copyFrom({
+                source: slice.data,
+                xOffset: gridOffset.x,
+                yOffset: gridOffset.y
+            });
         }
     }
 
