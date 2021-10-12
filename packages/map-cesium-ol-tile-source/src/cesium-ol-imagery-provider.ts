@@ -25,6 +25,7 @@ export const CesiumOLImageryProvider = function(this: any, olSource, options) {
     this.tileDiscardPolicy_ = options.tileDiscardPolicy;
 
     this.sourceConfig_ = options;
+    this.shouldRequestNextLevel_ = false;
 
     this.ready_ = false;
 
@@ -161,8 +162,9 @@ CesiumOLImageryProvider.prototype.handleSourceChanged_ = function() {
             const {scheme} = getTileGridFromSRS(this.projection_.getCode(), this.sourceConfig_.tileGrid)!;
             this.tilingScheme_ = scheme;
         } else {
-            this.tilingScheme_ = new GeographicTilingScheme();
             this.projection_ = getProj('EPSG:4326'); // reproject
+            this.tilingScheme_ = new GeographicTilingScheme();
+            this.shouldRequestNextLevel_ = true;
         }
 
         this.rectangle_ = this.tilingScheme_.rectangle;
@@ -195,7 +197,7 @@ CesiumOLImageryProvider.prototype.getTileCredits = function(x, y, level) {
 
 CesiumOLImageryProvider.prototype.requestImage = function(x, y, level) {
 
-    const z = level;
+    const z = this.shouldRequestNextLevel_ ? level + 1 : level;
 
     const tilegrid = this.source_.getTileGridForProjection(this.projection_);
     if (z < tilegrid.getMinZoom() || z > tilegrid.getMaxZoom()) {
