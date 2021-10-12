@@ -141,6 +141,7 @@ export class CesiumFeatureDrawInteraction implements IFeatureDrawInteractionImpl
 
                 this.handler_.setInputAction((evt) => {
                     let position = this.viewer_.camera.pickEllipsoid(evt.position);
+                    positions.length = positions.length - 2; //invalidate the effect of the last two click events
                     if (position) {
                         positions[positions.length - 1] = position;
                         this.onDrawEnd_(mode, options);
@@ -250,6 +251,7 @@ export class CesiumFeatureDrawInteraction implements IFeatureDrawInteractionImpl
 
                 this.handler_.setInputAction((evt) => {
                     let position = this.viewer_.camera.pickEllipsoid(evt.position);
+                    positions.length = positions.length - 2; //invalidate the effect of the last two click events
                     if (position) {
                         positions[positions.length - 1] = position;
                         this.onDrawEnd_(mode, options);
