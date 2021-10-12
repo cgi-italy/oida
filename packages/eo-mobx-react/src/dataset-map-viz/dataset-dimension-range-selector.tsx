@@ -121,6 +121,7 @@ export type DatasetDimensionRangeProps = {
     onChange: (value: DomainRange<Date | number> | undefined) => void;
 };
 
+// TODO: This should be updated to support dynamic domains (in a similar way as DatasetDimensionValueSelector)
 export const DatasetDimensionRangeSelector = (props: DatasetDimensionRangeProps) => {
 
     const domain = useDatasetDomain({

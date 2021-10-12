@@ -31,9 +31,7 @@ export const DatasetValueDimensionSelector = (props: DatasetValueDimensionSelect
         return val ? val as number : undefined;
     }, [props.dimensionsState]);
 
-    const domain = useDatasetDomain({
-        dimension: props.dimension
-    });
+    const domain = useSelector(() => props.dimensionsState.getDimensionDomain<ValueDomain<number>>(props.dimension.id));
 
     if (!domain) {
         return null;
@@ -81,9 +79,7 @@ export type DatasetTimeDimensionSelectorProps = {
 
 export const DatasetTimeDimensionSelector = (props: DatasetTimeDimensionSelectorProps) => {
 
-    const domain = useDatasetDomain({
-        dimension: props.dimension
-    });
+    const domain = useSelector(() => props.dimensionsState.getDimensionDomain<ValueDomain<Date>>(props.dimension.id));
 
     const value = useSelector(() => {
         const val = props.dimensionsState.values.get(props.dimension.id);
@@ -223,9 +219,7 @@ export const DatasetCategoricalDimensionSelector = (props: DatasetCategoricalDim
         return props.dimensionsState.values.get(props.dimension.id) as (string | number);
     }, [props.dimensionsState]);
 
-    const domain = useDatasetDomain({
-        dimension: props.dimension
-    });
+    const domain = useSelector(() => props.dimensionsState.getDimensionDomain<CategoricalDomain<string | number>>(props.dimension.id));
 
     if (!domain) {
         return null;
@@ -260,9 +254,7 @@ export type DatasetDimensionSelectorProps = {
 
 export const DatasetDimensionValueSelector = (props: DatasetDimensionSelectorProps) => {
 
-    const domain = useDatasetDomain({
-        dimension: props.dimension
-    });
+    const domain = useSelector(() => props.dimensionsState.getDimensionDomain(props.dimension.id));
 
     const dimension = {
         ...props.dimension,

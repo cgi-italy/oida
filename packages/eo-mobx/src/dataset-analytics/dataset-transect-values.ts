@@ -290,6 +290,7 @@ export class DatasetTransectValues extends DatasetProcessing<undefined> implemen
     dispose() {
         super.dispose();
         this.subscriptionTracker_.unsubscribe();
+        this.dimensions.dispose();
     }
 
     @action

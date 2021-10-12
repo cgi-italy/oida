@@ -176,6 +176,7 @@ export class DatasetAreaValues extends DatasetProcessing<undefined> implements H
     dispose() {
         super.dispose();
         this.subscriptionTracker_.unsubscribe();
+        this.dimensions.dispose();
     }
 
     @action

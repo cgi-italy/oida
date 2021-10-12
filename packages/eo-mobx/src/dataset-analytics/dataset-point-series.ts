@@ -67,12 +67,24 @@ export class DatasetPointSeries extends DatasetProcessing<undefined> implements 
         });
 
         this.config = props.config;
-        this.dimensions = new DatasetDimensions(props);
+
+        const parentDimensions = (props.parent as HasDatasetDimensions | undefined)?.dimensions;
+
         this.seriesDimension = props.seriesDimension;
-        this.seriesVariable = props.seriesVariable;
+        this.seriesVariable = props.seriesVariable || parentDimensions?.variable;
         this.seriesRange = props.seriesRange;
         this.data = [];
         this.autoUpdate = props.autoUpdate !== undefined ? props.autoUpdate : true;
+
+        makeObservable(this);
+
+        this.dimensions = new DatasetDimensions({
+            dimensionValues: props.dimensionValues || parentDimensions?.values,
+            dataset: props.dataset,
+            currentVariable: () => this.seriesVariable,
+            dimensions: props.config.dimensions,
+            initDimensions: true
+        });
 
         this.dataFetcher_ = new AsyncDataFetcher({
             dataFetcher: (params) => {
@@ -83,7 +95,6 @@ export class DatasetPointSeries extends DatasetProcessing<undefined> implements 
         this.needsUpdate_ = true;
         this.subscriptionTracker_ = new SubscriptionTracker();
 
-        makeObservable(this);
 
         this.afterInit_();
     }
@@ -99,10 +110,9 @@ export class DatasetPointSeries extends DatasetProcessing<undefined> implements 
         if (dimension) {
             this.dimensions.unsetValue(dimension);
 
-            let dimensionConfig = this.config.dimensions?.find(dim => dim.id === dimension);
-
-            if (dimensionConfig) {
-                getDatasetVariableDomain(dimensionConfig).then((domain) => {
+            const domainPromise = this.dimensions.domainRequests.get(dimension);
+            if (domainPromise) {
+                domainPromise.then((domain) => {
                     if (domain && isValueDomain(domain) && domain.min !== undefined && domain.max !== undefined) {
                         // if no range is defined or the current range is outside of the domain extent set the range to the domain extent
                         if (!range || (range.min >= domain.max || range.max <= domain.min)) {
@@ -131,11 +141,9 @@ export class DatasetPointSeries extends DatasetProcessing<undefined> implements 
                 }).catch(() => {
                     this.setRange(range);
                 });
-
             } else {
                 this.setRange(range);
             }
-
         } else {
              this.seriesRange = undefined;
         }
@@ -209,6 +217,7 @@ export class DatasetPointSeries extends DatasetProcessing<undefined> implements 
     dispose() {
         super.dispose();
         this.subscriptionTracker_.unsubscribe();
+        this.dimensions.dispose();
     }
 
     @action

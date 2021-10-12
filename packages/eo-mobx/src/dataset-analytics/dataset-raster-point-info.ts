@@ -124,6 +124,7 @@ export class DatasetRasterPointInfo extends DatasetProcessing<undefined> impleme
 
     dispose() {
         this.subscriptionTracker_.unsubscribe();
+        this.dimensions.dispose();
     }
 
     protected afterInit_(trackParentViz?: boolean) {

@@ -7,8 +7,8 @@ import {
     DatasetDimension, DataDomain, isValueDomain,
     DatasetViz, DatasetVizProps, DatasetDimensions, DatasetDimensionsProps, HasDatasetDimensions
 } from '../common';
-import { getDatasetVariableDomain, getRasterBandModeFromConfig } from '../utils';
-import { RasterBandModeConfig, RasterBandMode } from './raster-band-mode';
+import { getRasterBandModeFromConfig } from '../utils';
+import { RasterBandModeConfig, RasterBandMode, RasterBandModeType } from './raster-band-mode';
 
 
 export const RASTER_VIZ_TYPE = 'dataset_raster_viz';
@@ -39,8 +39,17 @@ export class RasterMapViz extends DatasetViz<TileLayer> implements HasDatasetDim
         });
 
         this.config = props.config;
-        this.dimensions = new DatasetDimensions(props);
+
         this.bandMode = new RasterBandMode();
+
+        this.dimensions = new DatasetDimensions({
+            dataset: this.dataset,
+            dimensionValues: props.dimensionValues,
+            dimensions: props.config.dimensions,
+            currentVariable: () => (this.bandMode.value?.type === RasterBandModeType.Single ? this.bandMode.value.band : undefined),
+            initDimensions: true
+        });
+
 
         getRasterBandModeFromConfig({
             config: props.config.bandMode
@@ -50,22 +59,13 @@ export class RasterMapViz extends DatasetViz<TileLayer> implements HasDatasetDim
 
         this.subscriptionTracker_ = new SubscriptionTracker();
 
-        if (this.config.dimensions) {
-            this.config.dimensions.forEach((dimension) => {
-                getDatasetVariableDomain(dimension).then((domain) => {
-                    if (domain) {
-                        this.initDimensionValue_(dimension.id, domain);
-                    }
-                });
-            });
-        }
-
         this.afterInit_();
 
     }
 
     dispose() {
         this.subscriptionTracker_.unsubscribe();
+        this.dimensions.dispose();
     }
 
     protected initMapLayer_() {

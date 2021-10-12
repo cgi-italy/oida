@@ -1,4 +1,4 @@
-import { QueryFilter } from '@oida/core';
+import { AoiValue, DateRangeValue } from '@oida/core';
 
 export type DomainRange<T> = {
     min: T,
@@ -23,7 +23,14 @@ export const isValueDomain = <T, S, C>(domain: ValueDomain<T, S> | CategoricalDo
     return !Array.isArray((domain as  CategoricalDomain<C>).values);
 };
 
-export type DataDomainProvider<D extends DataDomain<unknown>> = (filters?: QueryFilter[]) => Promise<D>;
+export type DataDomainProviderFilters = {
+    aoi?: AoiValue;
+    toi?: Date | DateRangeValue;
+    variable?: string;
+    dimensionValues?: Map<string, any>
+};
+
+export type DataDomainProvider<D extends DataDomain<unknown>> = (filters?: DataDomainProviderFilters) => Promise<D>;
 
 export const isDomainProvider = <D extends DataDomain<unknown>>(domain: D | DataDomainProvider<D>): domain is DataDomainProvider<D> => {
     return (typeof(domain) === 'function');
