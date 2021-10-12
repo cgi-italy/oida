@@ -26,6 +26,7 @@ export const getAdamDatasetDownloadConfig = (
                     request: 'GetCoverage',
                     version: '2.0.0',
                     coverageId: rasterParams.coverageId,
+                    subdataset: rasterParams.subdataset,
                     format: request.format,
                     scale: request.scale
                 };

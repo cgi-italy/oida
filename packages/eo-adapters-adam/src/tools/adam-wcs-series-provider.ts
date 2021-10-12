@@ -1,10 +1,7 @@
 
-import { transform, transformExtent } from 'ol/proj';
+import { transform } from 'ol/proj';
 
-import {
-    AxiosInstanceWithCancellation, createAxiosInstance
-} from '@oida/core';
-
+import { AxiosInstanceWithCancellation, createAxiosInstance } from '@oida/core';
 import { DatasetPointSeriesRequest, isValueDomain, isDomainProvider, DatasetPointSeriesValueItem } from '@oida/eo-mobx';
 
 import { AdamDatasetDimension, AdamDatasetSingleBandCoverage } from '../adam-dataset-config';
@@ -87,6 +84,7 @@ export class AdamWcsSeriesProvider  {
         }
 
         let coverage: string;
+        let subdataset: string | undefined;
         let variableConfig = this.config_.variables!.find((variable) => variable.id === request.variable);
         if (variableConfig) {
             coverage = variableConfig.wcsCoverage;
@@ -98,6 +96,9 @@ export class AdamWcsSeriesProvider  {
                 } else {
                     subsets[variableConfig.wcsSubset.id] = [variableConfig.wcsSubset.value];
                 }
+            }
+            if (variableConfig.subdataset) {
+                subdataset = variableConfig.subdataset;
             }
         } else {
             return Promise.reject(`The requested variable "${request.variable}" doesn't exists`);
@@ -123,12 +124,13 @@ export class AdamWcsSeriesProvider  {
             params: {
                 ...wcsParams,
                 coverageId: coverage,
+                subdataset: subdataset,
                 subset: subset,
             },
             responseType: 'json',
             paramsSerializer: AdamServiceParamsSerializer
         }).then((response) => {
-            return this.parseWcsResponse_(response.data, dimensionConfig!).then((data) => {
+            return this.parseWcsResponse_(response.data, dimensionConfig!, request).then((data) => {
                 const noData = variableConfig?.domain?.noData;
                 if (noData !== undefined) {
                     return data.filter(item => item.y !== noData);
@@ -139,7 +141,9 @@ export class AdamWcsSeriesProvider  {
         });
     }
 
-    protected parseWcsResponse_(response, dimension: AdamDatasetDimension): Promise<DatasetPointSeriesValueItem[]> {
+    protected parseWcsResponse_(
+        response, dimension: AdamDatasetDimension, request: DatasetPointSeriesRequest
+    ): Promise<DatasetPointSeriesValueItem[]> {
         if (dimension.id === 'time') {
             const data = response.data.map((item) => {
                 return {
@@ -150,7 +154,7 @@ export class AdamWcsSeriesProvider  {
 
             return Promise.resolve(data.sort((i1, i2) => i1.x - i2.x));
         } else {
-            return this.getDimensionDomain_(dimension).then((domain) => {
+            return this.getDimensionDomain_(dimension, request).then((domain) => {
                 if (dimension.id === 'band') {
                     return response.data[0].raster.map((item, idx) => {
                         return {
@@ -160,17 +164,20 @@ export class AdamWcsSeriesProvider  {
                     });
                 } else {
                     if (!domain || isValueDomain(domain)) {
-                        if (!dimension.wcsResponseKey) {
+                        const wcsResponseKey = dimension.wcsResponseKey;
+                        if (!wcsResponseKey) {
                             return Promise.reject('Unable to parse WCS response without domain responseKey information');
                         }
                         const data = response.data.map((item) => {
                             return {
-                                x: item[dimension.wcsResponseKey],
+                                x: item[wcsResponseKey],
                                 y: item.raster[0][0][0]
                             };
                         });
                         return data.sort((i1, i2) => i1.x - i2.x);
                     } else {
+                        // TODO: the assumption is that the results array is in the same order of the domain array.
+                        // but this is not the case. Fix it once Sistema provides a solution
                         return response.data.map((item, idx) => {
                             return {
                                 x: domain.values[idx].label || domain.values[idx].value,
@@ -184,9 +191,12 @@ export class AdamWcsSeriesProvider  {
 
     }
 
-    protected getDimensionDomain_(dimension: AdamDatasetDimension) {
+    protected getDimensionDomain_(dimension: AdamDatasetDimension, request: DatasetPointSeriesRequest) {
         if (dimension.domain && isDomainProvider(dimension.domain)) {
-            return dimension.domain();
+            return dimension.domain({
+                dimensionValues: request.dimensionValues,
+                variable: request.variable
+            });
         } else {
             return Promise.resolve(dimension.domain);
         }

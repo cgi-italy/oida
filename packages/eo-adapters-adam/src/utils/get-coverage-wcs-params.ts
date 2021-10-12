@@ -6,6 +6,7 @@ export const getCoverageWcsParams = (datasetConfig: AdamDatasetConfig, dimension
     let coverage: string | undefined;
     let bandSubset: string | undefined;
     let dimensionSubsets: string[] = [];
+    let subdataset: string | undefined;
 
     const dimensionSubsetsMap = {} as Record<string, string[]>;
     if (datasetConfig.dimensions) {
@@ -56,6 +57,9 @@ export const getCoverageWcsParams = (datasetConfig: AdamDatasetConfig, dimension
                         dimensionSubsetsMap[bandConfig.wcsSubset.id] = [bandConfig.wcsSubset.value];
                     }
                 }
+                if (bandConfig.subdataset) {
+                    subdataset = bandConfig.subdataset;
+                }
             }
         }
     }
@@ -71,7 +75,8 @@ export const getCoverageWcsParams = (datasetConfig: AdamDatasetConfig, dimension
         return {
             coverageId: coverage,
             bandSubset,
-            dimensionSubsets
+            dimensionSubsets,
+            subdataset
         };
     }
 };

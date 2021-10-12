@@ -17,6 +17,7 @@ export type AdamWcsTileSource = {
     coverage: string;
     format: string;
     subsets: string[];
+    subdataset?: string;
     tileGrid: TileGridConfig;
     minZoomLevel?: number;
     crossOrigin?: 'anonymous' | 'use-credentials';
@@ -53,6 +54,7 @@ olTileSourcesFactory.register(ADAM_WCS_SOURCE_ID, (config) => {
         format: config.format,
         colorrange: config.colorrange,
         colortable: config.colortable,
+        subdataset: config.subdataset,
         size: `(${tileSize})`
     };
 

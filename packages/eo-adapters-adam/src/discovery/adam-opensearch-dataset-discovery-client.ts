@@ -1,6 +1,6 @@
 import moment from 'moment';
 
-import { AxiosInstanceWithCancellation, createAxiosInstance, QueryParams, randomColorFactory, getGeometryExtent, isValidExtent } from '@oida/core';
+import { AxiosInstanceWithCancellation, createAxiosInstance, QueryParams, getGeometryExtent, isValidExtent } from '@oida/core';
 import { AdamWcsCoverageDescriptionClient, AdamWcsCoverageDescription } from './adam-wcs-coverage-description-client';
 import { AdamDatasetConfig, AdamDatasetDimension, AdamDatasetSingleBandCoverage, AdamDatasetMultiBandCoverage, AdamDatasetRenderMode } from '../adam-dataset-config';
 
@@ -9,8 +9,19 @@ export type AdamDatasetMetadataGridName = {
     label: string;
     values: Array<{
         label: string;
-        value: string;
+        value: string | string[];
     }>;
+};
+
+export type AdamDatasetCustomGridSpec = {
+    SubRegion: Record<string, {
+        value: string,
+        scenes: Array<{
+            scene_type: string,
+            scene_type_values: Array<Record<string, number>>
+        }>
+    }>,
+    Product: Record<string, string>
 };
 
 export type AdamDatasetMetadataSubdataset = {
@@ -23,6 +34,7 @@ export type AdamDatasetMetadataSubdataset = {
     maxDate: string;
     geometry: GeoJSON.Geometry;
     grid?: boolean;
+    gridType?: string;
     gridNames?: AdamDatasetMetadataGridName[];
 };
 
@@ -33,6 +45,8 @@ export type AdamDatasetMetadata = {
     geometry: GeoJSON.Geometry;
     subDataset: AdamDatasetMetadataSubdataset[];
     description: string;
+    dataset_specification: string;
+    defaultViewMode?: string[];
 };
 
 export type AdamDatasetDiscoveryRequest = {
@@ -61,7 +75,6 @@ export class AdamOpensearchDatasetDiscoveryClient {
     protected axiosInstance_: AxiosInstanceWithCancellation;
     protected url_: string;
     protected wcsCoverageDescriptionClient_: AdamWcsCoverageDescriptionClient;
-    protected readonly colorFactory_: () => string;
 
     constructor(config: AdamOpensearchDatasetDiscoveryClientConfig) {
         this.axiosInstance_ = config.axiosInstance || createAxiosInstance();
@@ -70,7 +83,6 @@ export class AdamOpensearchDatasetDiscoveryClient {
             wcsUrl: config.wcsUrl,
             axiosInstance: this.axiosInstance_
         });
-        this.colorFactory_ = randomColorFactory();
     }
 
     searchDatasets(queryParams: QueryParams) {
@@ -86,7 +98,10 @@ export class AdamOpensearchDatasetDiscoveryClient {
 
         return this.axiosInstance_.request<AdamDatasetDiscoveryResponse>({
             url: `${this.url_}/datasets`,
-            params: params
+            params: {
+                ...params,
+                geolocated: true
+            }
         }).then((response) => {
             return response.data;
         });
@@ -104,7 +119,7 @@ export class AdamOpensearchDatasetDiscoveryClient {
 
     protected getConfigFromMetadataAndCoverage_(
         metadata: AdamDatasetMetadata, wcsCoverages: AdamWcsCoverageDescription[]
-    ): AdamDatasetConfig {
+    ): Promise<AdamDatasetConfig> {
 
         try {
 
@@ -148,7 +163,7 @@ export class AdamOpensearchDatasetDiscoveryClient {
                     //no valid extent available in opensearch metadata. use the first available coverage
                     wcsCoverage = wcsCoverages[0];
                     if (!wcsCoverage) {
-                        throw new Error('Invalid dataset');
+                        return Promise.reject(new Error('Invalid dataset'));
                     } else {
                         extent = wcsCoverage.extent;
                         srs = wcsCoverage.srs;
@@ -161,10 +176,9 @@ export class AdamOpensearchDatasetDiscoveryClient {
                 srsDef = wcsCoverage.srsDef;
             }
 
-            const dimensions: AdamDatasetDimension[] = [];
             let coverages: AdamDatasetSingleBandCoverage[] | AdamDatasetMultiBandCoverage;
 
-            if (metadata.subDataset.length > 1) {
+            if ((metadata.defaultViewMode || []).length > 1) {
 
                 //check for true color dataset
                 if (metadata.subDataset.length === 3 && metadata.subDataset.every((subdataset) => {
@@ -212,47 +226,27 @@ export class AdamOpensearchDatasetDiscoveryClient {
                     };
                 }
             } else {
-                const variable = metadata.subDataset[0];
-                const minMax = this.getRoundedMinMax_(variable.minValue, variable.maxValue);
-                coverages = [{
-                    id: `${metadata.datasetId}_${variable.name}`,
-                    name: variable.name,
-                    wcsCoverage: metadata.datasetId,
-                    domain: minMax ? {
-                        min: minMax[0],
-                        max: minMax[1],
-                    } : undefined,
-                    // if data range is not defined set a default range to initialize the colormap object
-                    default: minMax ? undefined : {
-                        range: {
-                            min: 0,
-                            max: 10
-                        }
-                    }
-                }];
-
-                if (variable.grid && variable.gridNames) {
-                    variable.gridNames.forEach((gridName, idx) => {
-                        dimensions.push({
-                            id: gridName.id,
-                            name: gridName.label,
-                            wcsSubset: {
-                                id: 'gfix',
-                                idx: idx
-                            },
-                            wcsResponseKey: 'gfix',
-                            tarFilenameRegex: /^/,
-                            domain: {
-                                values: gridName.values.map((item) => {
-                                    return {
-                                        label: item.label,
-                                        value: item.value
-                                    };
-                                })
+                coverages = metadata.subDataset.map((variable) => {
+                    const minMax = this.getRoundedMinMax_(variable.minValue, variable.maxValue);
+                    return {
+                        id: `${variable.name}`,
+                        name: variable.name,
+                        wcsCoverage: metadata.datasetId,
+                        subdataset: variable.subDatasetId,
+                        domain: minMax ? {
+                            min: minMax[0],
+                            max: minMax[1],
+                        } : undefined,
+                        // if data range is not defined set a default range to initialize the colormap object
+                        default: minMax ? undefined : {
+                            range: {
+                                min: 0,
+                                max: 10
                             }
-                        });
-                    });
-                }
+                        }
+                    };
+                });
+
             }
 
             let minDate: moment.Moment | undefined = moment.utc(metadata.subDataset[0].minDate);
@@ -264,13 +258,13 @@ export class AdamOpensearchDatasetDiscoveryClient {
                 maxDate = wcsCoverages.length === 1 ? moment.utc(wcsCoverages[0].time.end) : undefined;
             }
 
-            let fixedTime: Date | undefined;
+            let timeless = false;
             if (minDate && minDate?.isSame(maxDate)) {
-                fixedTime = moment.utc(minDate).toDate();
+                timeless = true;
             }
 
             if (!isValidExtent(extent)) {
-                throw new Error('Invalid dataset extent');
+                return Promise.reject(new Error('Invalid dataset extent'));
             }
 
             // TODO: fix cesium rectangle intersection error when geographic domain
@@ -290,22 +284,30 @@ export class AdamOpensearchDatasetDiscoveryClient {
                 }
             }
 
-            return {
-                id: metadata.datasetId,
-                color: this.colorFactory_(),
-                type: 'raster',
-                coverageExtent: extent,
-                coverageSrs: srs,
-                srsDef: srsDef,
-                name: metadata.datasetId,
-                fixedTime: fixedTime,
-                renderMode: AdamDatasetRenderMode.ClientSide,
-                coverages: coverages,
-                dimensions: dimensions
-            };
+            return this.getDatasetDimensionsFromSubdatasets_(
+                metadata.subDataset, metadata.dataset_specification
+            ).then((dimensions) => {
+
+                //disable time navigation for mission data
+                if (dimensions.length && dimensions[0].id === 'SceneType') {
+                    timeless = true;
+                }
+
+                return {
+                    type: 'raster',
+                    coverageExtent: extent!,
+                    coverageSrs: srs,
+                    srsDef: srsDef,
+                    name: metadata.datasetId,
+                    timeless: timeless,
+                    renderMode: AdamDatasetRenderMode.ClientSide,
+                    coverages: coverages,
+                    dimensions: dimensions
+                };
+            });
 
         } catch (error) {
-            throw new Error('Invalid dataset');
+            return Promise.reject(new Error('Invalid dataset'));
         }
     }
 
@@ -329,5 +331,130 @@ export class AdamOpensearchDatasetDiscoveryClient {
         }
 
         return [minValue, maxValue];
+    }
+
+    protected getDatasetDimensionsFromSubdatasets_(
+        subdatasets: AdamDatasetMetadataSubdataset[], gridDetailsUrl: string
+    ): Promise<AdamDatasetDimension[]> {
+
+        // the assumption is that all subdatasets have the same grid configuration
+        const gridNames = subdatasets[0].gridNames;
+
+        if (!gridNames?.length) {
+            return Promise.resolve([]);
+        }
+        if (gridNames[0].id === 'SceneType') {
+            return this.axiosInstance_.cancelableRequest<AdamDatasetCustomGridSpec>({
+                url: gridDetailsUrl
+            }).then((response) => {
+                const gridSpec = response.data;
+
+                const sceneValuesMap: Record<string, {
+                    scene: number,
+                    subRegion: number
+                }> = {};
+
+                Object.keys(gridSpec.SubRegion).forEach((key) => {
+                    const subRegionValue = parseInt(gridSpec.SubRegion[key].value);
+                    gridSpec.SubRegion[key].scenes.forEach((scene) => {
+                        scene.scene_type_values.forEach((sceneTypeValue) => {
+                            Object.keys(sceneTypeValue).forEach((key) => {
+                                sceneValuesMap[key] = {
+                                    scene: sceneTypeValue[key],
+                                    subRegion: subRegionValue
+                                };
+                            });
+                        });
+                    });
+                });
+
+                const dimensions: AdamDatasetDimension[] = [];
+                gridNames.forEach((gridItem, idx) => {
+                    const dimensionId = gridItem.id;
+                    if (gridItem.id === 'SceneType') {
+                        dimensions.push({
+                            id: dimensionId,
+                            name: gridItem.label,
+                            wcsSubset: {
+                                id: 'gfix',
+                                idx: idx
+                            },
+                            domain: (filters) => {
+                                const subRegionId: number = filters?.dimensionValues?.get('SubRegion');
+
+                                const subdatasetId = filters?.variable;
+                                const subdataset = subdatasets.find(subdataset => subdataset.subDatasetId === subdatasetId);
+                                const subdatasetGridItem = subdataset?.gridNames?.find(gridItem => gridItem.id === dimensionId) || gridItem;
+
+                                const sceneValues: Array<{label: string, value: number}> = [];
+
+                                subdatasetGridItem.values.forEach((item) => {
+                                    const sceneName = item.label;
+                                    if (Array.isArray(item.value)) {
+                                        item.value.forEach((label) => {
+                                            const value = sceneValuesMap[label];
+                                            if (value !== undefined && (subRegionId === undefined || value.subRegion === subRegionId)) {
+                                                sceneValues.push({
+                                                    label: `${label} (${sceneName})`,
+                                                    value: value.scene
+                                                });
+                                            }
+                                        });
+                                    }
+                                });
+
+                                return Promise.resolve({
+                                    values: sceneValues.sort((item1, item2) => item1.value - item2.value)
+                                });
+                            }
+                        });
+                    } else {
+                        dimensions.push({
+                            id: gridItem.id,
+                            name: gridItem.label,
+                            wcsSubset: {
+                                id: 'gfix',
+                                idx: idx
+                            },
+                            domain: (filters) => {
+                                const subdatasetId = filters?.variable;
+                                const subdataset = subdatasets.find(subdataset => subdataset.subDatasetId === subdatasetId);
+                                const subdatasetGridItem = subdataset?.gridNames?.find(gridItem => gridItem.id === dimensionId) || gridItem;
+                                return Promise.resolve({
+                                    values: subdatasetGridItem.values.map((item) => {
+                                        const value = Array.isArray(item.value) ? item.value[0] : item.value;
+                                        return {
+                                            label: item.label,
+                                            value: parseInt(value)
+                                        };
+                                    })
+                                });
+                            }
+                        });
+                    }
+                });
+                return dimensions;
+            });
+        } else {
+            return Promise.resolve(gridNames.map((gridItem, idx) => {
+                return {
+                    id: gridItem.id,
+                    name: gridItem.label,
+                    wcsSubset: {
+                        id: 'gfix',
+                        idx: idx
+                    },
+                    domain: {
+                        values: gridItem.values.map((item) => {
+                            const value = Array.isArray(item.value) ? item.value[0] : item.value;
+                            return {
+                                label: item.label,
+                                value: parseInt(value)
+                            };
+                        })
+                    }
+                };
+            }));
+        }
     }
 }

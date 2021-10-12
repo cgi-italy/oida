@@ -70,13 +70,15 @@ export const createAdamRasterTileSourceProvider = (
 
     const provider = (rasterView: RasterMapViz) => {
 
-        let subsets: string[] = [];
+        const subsets: string[] = [];
 
-        let timeSubset = getWcsTimeFilterSubset(rasterView.dataset.toi);
-        if (!timeSubset) {
-            return Promise.reject(new Error('The layer time span is outside of the selected time range'));
-        } else {
-            subsets.push(timeSubset);
+        if (!datasetConfig.timeless) {
+            const timeSubset = getWcsTimeFilterSubset(rasterView.dataset.toi);
+            if (!timeSubset) {
+                return Promise.reject(new Error('The layer time span is outside of the selected time range'));
+            } else {
+                subsets.push(timeSubset);
+            }
         }
 
         const aoiParams = getAoiWcsParams(datasetConfig, rasterView.dataset.aoi);
@@ -139,6 +141,7 @@ export const createAdamRasterTileSourceProvider = (
                     minZoomLevel: datasetConfig.minZoomLevel,
                     format: format,
                     subsets: subsets,
+                    subdataset: wcsCoverageParams.subdataset,
                     tileGrid: {
                         extent: aoiParams.extent,
                         forceUniformResolution: true,

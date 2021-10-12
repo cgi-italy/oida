@@ -85,7 +85,7 @@ export const getAdamDatasetToolsConfig = (
         } : undefined
     };
 
-    if (!datasetConfig.fixedTime) {
+    if (!datasetConfig.timeless) {
         dimensions.unshift(timeDimension);
     }
 
@@ -131,12 +131,6 @@ export const getAdamDatasetToolsConfig = (
             variables: variables,
             dimensions: dimensions,
             provider: (request) => {
-                if (datasetConfig.fixedTime && !request.dimensionValues?.get('time')) {
-                    if (!request.dimensionValues) {
-                        request.dimensionValues = new Map();
-                    }
-                    request.dimensionValues.set('time', datasetConfig.fixedTime);
-                }
                 return wpsAnalysisProvider!.getTransectSeries(request);
             },
             maxLineStringLength: 2

@@ -1,9 +1,9 @@
+import { v4 as uuid } from 'uuid';
+
 import { createAxiosInstance } from '@oida/core';
-
-import { AdamDatasetConfig } from './adam-dataset-config';
-
 import { DatasetConfig, ProductSearchRecord } from  '@oida/eo-mobx';
 
+import { AdamDatasetConfig } from './adam-dataset-config';
 import { getAdamDatasetProductSearchConfig } from './product-search';
 import { getAdamDatasetTimeDistributionConfig } from './time';
 import { getAdamDatasetDownloadConfig } from './download';
@@ -32,7 +32,7 @@ export const getAdamDatasetFactory = (factoryConfig: AdamDatasetFactoryConfig) =
         const spatialCoverageProvider = getAdamDatasetSpatialCoverageProvider(axiosInstance, factoryConfig, config);
 
         let datasetConfig: DatasetConfig = {
-            id: config.id,
+            id: config.id || uuid(),
             name: config.name,
             color: config.color,
             filters: [],

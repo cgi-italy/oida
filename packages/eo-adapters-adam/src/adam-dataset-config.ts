@@ -7,13 +7,14 @@ export type AdamDatasetDimension = DatasetDimension<ValueDomain<number | Date> |
         id: string;
         idx?: number;
     };
-    wcsResponseKey: string;
-    tarFilenameRegex: RegExp;
+    wcsResponseKey?: string;
+    tarFilenameRegex?: RegExp;
 };
 
 
 export type AdamDatasetSingleBandCoverage = Omit<RasterBandConfig, 'domain'> & {
     wcsCoverage: string;
+    subdataset?: string;
     wcsSubset?: {
         id: string;
         value: string;
@@ -52,17 +53,17 @@ export enum AdamDatasetRenderMode {
 export type AdamDatasetType = 'raster' | 'volume' | 'vertical_profile';
 
 export type AdamDatasetConfig = {
-    id: string;
+    id?: string;
     type: AdamDatasetType;
     name: string,
-    color: string,
+    color?: string,
     coverages: AdamDatasetSingleBandCoverage[] | AdamDatasetMultiBandCoverage;
     coverageSrs: string;
     srsDef?: string;
     coverageExtent: number[];
     requestExtentOffset?: number[];
     dimensions?: AdamDatasetDimension[];
-    fixedTime?: Date;
+    timeless?: boolean;
     renderMode: AdamDatasetRenderMode;
     cswCollection?: string;
     productSearchRecordContent?: (item: ProductSearchRecord) => any;

@@ -13,6 +13,10 @@ export const getAdamDatasetTimeDistributionConfig = (
     searchProvider?: DatasetProductSearchProvider
 ) => {
 
+    if (datasetConfig.timeless) {
+        return undefined;
+    }
+
     let coverageId: string;
     if (isMultiBandCoverage(datasetConfig.coverages)) {
         coverageId = datasetConfig.coverages.wcsCoverage;
@@ -20,14 +24,12 @@ export const getAdamDatasetTimeDistributionConfig = (
         coverageId = datasetConfig.coverages[0].wcsCoverage;
     }
 
-
-    let timeDistributionConfig: DatasetTimeDistributionConfig = {
+    const timeDistributionConfig: DatasetTimeDistributionConfig = {
         provider: new AdamWcsTimeDistributionProvider({
             serviceUrl: factoryConfig.wcsServiceUrl,
             coverageId: coverageId,
             axiosInstance: axiosInstance,
             searchProvider: searchProvider,
-            fixedTime: datasetConfig.fixedTime
         })
     };
 

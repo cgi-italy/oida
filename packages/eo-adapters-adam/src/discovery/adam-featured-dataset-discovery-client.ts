@@ -1,9 +1,9 @@
-import { QueryParams, SortOrder, randomColorFactory } from '@oida/core';
+import { QueryParams, SortOrder } from '@oida/core';
 import { AdamDatasetConfig, isMultiBandCoverage, AdamDatasetRenderMode } from '../adam-dataset-config';
 import { AdamWcsCoverageDescriptionClient, AdamWcCoverageDescriptionClientConfig } from './adam-wcs-coverage-description-client';
 
-export type AdamFeaturedDataset = Omit<AdamDatasetConfig, 'coverageSrs' | 'srsDef' | 'coverageExtent' | 'renderMode' | 'fixedTime' | 'productSearchRecordContent' | 'color'> & {
-    fixedTime?: string;
+export type AdamFeaturedDataset = Omit<AdamDatasetConfig, 'id' | 'coverageSrs' | 'srsDef' | 'coverageExtent' | 'renderMode' | 'productSearchRecordContent' | 'color'> & {
+    id: string;
     color?: string;
     description?: string;
 };
@@ -22,12 +22,10 @@ export class AdamFeaturedDatasetDiscoveryClient {
 
     protected datasets_: AdamFeaturedDataset[];
     protected wcsCoverageDescriptionClient_: AdamWcsCoverageDescriptionClient;
-    protected readonly colorFactory_: () => string;
 
     constructor(config: AdamFeaturedDatasetClientConfig) {
         this.datasets_ = config.datasets;
         this.wcsCoverageDescriptionClient_ = new AdamWcsCoverageDescriptionClient(config.wcs);
-        this.colorFactory_ = randomColorFactory();
     }
 
     searchDatasets(queryParams: QueryParams): Promise<AdamFeaturedDatasetDiscoveryResponse> {
@@ -81,14 +79,16 @@ export class AdamFeaturedDatasetDiscoveryClient {
                 throw new Error('Invalid dataset');
             } else {
                 const coverage = coverages[0];
+                //omit the id so that it can be added more than once on the map
+                const {id, ...otherProps} = config;
                 return {
-                    ...config,
+                    ...otherProps,
                     coverageExtent: coverage.extent,
                     coverageSrs: coverage.srs,
                     srsDef: coverage.srsDef,
                     renderMode: AdamDatasetRenderMode.ClientSide,
-                    color: config.color || this.colorFactory_(),
-                    fixedTime: coverage.time.start.getTime() === coverage.time.end.getTime() ? coverage.time.start : undefined
+                    color: config.color,
+                    timeless: coverage.time.start.getTime() === coverage.time.end.getTime() ? true : undefined
                 };
             }
         });

@@ -5,13 +5,15 @@ import { AdamDatasetConfig } from '../adam-dataset-config';
 
 export const downloadAdamWcsRaster = (datasetConfig: AdamDatasetConfig, rasterView: RasterMapViz) => {
 
-    let subsets: string[] = [];
+    const subsets: string[] = [];
 
-    let timeSubset = getWcsTimeFilterSubset(rasterView.dataset.toi);
-    if (!timeSubset) {
-        return undefined;
-    } else {
-        subsets.push(timeSubset);
+    if (!datasetConfig.timeless) {
+        const timeSubset = getWcsTimeFilterSubset(rasterView.dataset.toi);
+        if (!timeSubset) {
+            return undefined;
+        } else {
+            subsets.push(timeSubset);
+        }
     }
 
     const aoiParams = getAoiWcsParams(datasetConfig, rasterView.dataset.aoi);

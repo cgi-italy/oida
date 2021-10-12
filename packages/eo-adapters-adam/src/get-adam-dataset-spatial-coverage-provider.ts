@@ -95,9 +95,11 @@ export const getAdamDatasetSpatialCoverageProvider = (
 
             const subsets: string[] = [];
 
-            let timeSubset = getWcsTimeFilterSubset(mapView.dataset.toi);
-            if (timeSubset && !datasetConfig.fixedTime) {
-                subsets.push(timeSubset);
+            if (!datasetConfig.timeless) {
+                let timeSubset = getWcsTimeFilterSubset(mapView.dataset.toi);
+                if (timeSubset) {
+                    subsets.push(timeSubset);
+                }
             }
 
             const wcsCoverage = getCoverageWcsParams(datasetConfig, mapView.dimensions, mapView.bandMode);
@@ -117,6 +119,7 @@ export const getAdamDatasetSpatialCoverageProvider = (
                 params: {
                     ...wcsParams,
                     coverageId: wcsCoverage.coverageId,
+                    subdataset: wcsCoverage.subdataset,
                     subset: subsets
                 },
                 paramsSerializer: AdamServiceParamsSerializer,
