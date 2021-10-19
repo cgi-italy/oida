@@ -79,10 +79,8 @@ export class AdamFeaturedDatasetDiscoveryClient {
                 throw new Error('Invalid dataset');
             } else {
                 const coverage = coverages[0];
-                //omit the id so that it can be added more than once on the map
-                const {id, ...otherProps} = config;
                 return {
-                    ...otherProps,
+                    ...config,
                     coverageExtent: coverage.extent,
                     coverageSrs: coverage.srs,
                     srsDef: coverage.srsDef,

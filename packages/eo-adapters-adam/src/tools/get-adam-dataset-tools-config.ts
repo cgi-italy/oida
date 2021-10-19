@@ -19,7 +19,17 @@ export const getAdamDatasetToolsConfig = (
 
     const variables: AdamDatasetSingleBandCoverage[] = [];
 
-    const dimensions = datasetConfig.dimensions ? datasetConfig.dimensions.slice() : [];
+    const dimensions: AdamDatasetDimension[] = datasetConfig.dimensions ? datasetConfig.dimensions.slice().map((dimension) => {
+        let preventSeries = false;
+
+        if (dimension.id === 'subdataset' || dimension.id === 'SubRegion' || dimension.id === 'Product' || dimension.id === 'SceneType') {
+            preventSeries = true;
+        }
+        return {
+            ...dimension,
+            preventSeries: preventSeries
+        };
+    }) : [];
 
     if (isMultiBandCoverage(datasetConfig.coverages)) {
 
@@ -100,7 +110,7 @@ export const getAdamDatasetToolsConfig = (
 
     let tools: DatasetToolConfig[] = [];
 
-    if (dimensions.length && variables.length) {
+    if (dimensions.filter(dimension => !dimension.preventSeries).length && variables.length) {
         let wcsSeriesProvider = new AdamWcsSeriesProvider({
             axiosInstance: axiosInstance,
             coverageSrs: datasetConfig.coverageSrs,

@@ -39,6 +39,7 @@ export class AdamWcsSeriesProvider  {
         let subsets = {} as Record<string, string[]>;
 
         let dimensionConfig: AdamDatasetDimension | undefined;
+        let subdataset: string | undefined;
 
         this.config_.dimensions.forEach((dimension) => {
             if (dimension.id === request.dimension) {
@@ -61,18 +62,22 @@ export class AdamWcsSeriesProvider  {
                 if (request.dimensionValues) {
                     let value = request.dimensionValues.get(dimension.id);
                     if (value !== undefined) {
-                        let stringValue: string;
-                        if (dimension.id === 'time') {
-                            stringValue = (value as Date).toISOString();
+                        if (dimension.id === 'subdataset') {
+                            subdataset = value as string;
                         } else {
-                            stringValue = value.toString();
-                        }
-                        if (dimension.wcsSubset.idx !== undefined) {
-                            let currentSubset = subsets[dimension.wcsSubset.id] || [];
-                            currentSubset.splice(dimension.wcsSubset.idx, 0, stringValue);
-                            subsets[dimension.wcsSubset.id] = currentSubset;
-                        } else {
-                            subsets[dimension.wcsSubset.id] = [stringValue];
+                            let stringValue: string;
+                            if (dimension.id === 'time') {
+                                stringValue = (value as Date).toISOString();
+                            } else {
+                                stringValue = value.toString();
+                            }
+                            if (dimension.wcsSubset.idx !== undefined) {
+                                let currentSubset = subsets[dimension.wcsSubset.id] || [];
+                                currentSubset.splice(dimension.wcsSubset.idx, 0, stringValue);
+                                subsets[dimension.wcsSubset.id] = currentSubset;
+                            } else {
+                                subsets[dimension.wcsSubset.id] = [stringValue];
+                            }
                         }
                     }
                 }
@@ -80,11 +85,11 @@ export class AdamWcsSeriesProvider  {
         });
 
         if (!dimensionConfig) {
-            return Promise.reject(`The requested dimension "${request.dimension}" doesn't exists`);
+            return Promise.reject(new Error(`The requested dimension "${request.dimension}" doesn't exists`));
         }
 
         let coverage: string;
-        let subdataset: string | undefined;
+
         let variableConfig = this.config_.variables!.find((variable) => variable.id === request.variable);
         if (variableConfig) {
             coverage = variableConfig.wcsCoverage;
@@ -101,7 +106,7 @@ export class AdamWcsSeriesProvider  {
                 subdataset = variableConfig.subdataset;
             }
         } else {
-            return Promise.reject(`The requested variable "${request.variable}" doesn't exists`);
+            return Promise.reject(new Error(`The requested variable "${request.variable}" doesn't exists`));
         }
 
         const subset = Object.keys(subsets).map((subsetId) => {
@@ -158,7 +163,7 @@ export class AdamWcsSeriesProvider  {
                 if (dimension.id === 'band') {
                     return response.data[0].raster.map((item, idx) => {
                         return {
-                            x: domain ? domain[idx].label || domain[idx].value : idx,
+                            x: domain && !isValueDomain(domain) ? domain.values[idx].label || domain.values[idx].value : idx,
                             y: item[0][0]
                         };
                     });

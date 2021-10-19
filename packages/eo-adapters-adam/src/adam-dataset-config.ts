@@ -9,6 +9,7 @@ export type AdamDatasetDimension = DatasetDimension<ValueDomain<number | Date> |
     };
     wcsResponseKey?: string;
     tarFilenameRegex?: RegExp;
+    preventSeries?: boolean;
 };
 
 
@@ -53,7 +54,7 @@ export enum AdamDatasetRenderMode {
 export type AdamDatasetType = 'raster' | 'volume' | 'vertical_profile';
 
 export type AdamDatasetConfig = {
-    id?: string;
+    id: string;
     type: AdamDatasetType;
     name: string,
     color?: string,

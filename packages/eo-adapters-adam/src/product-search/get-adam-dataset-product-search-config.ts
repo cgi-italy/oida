@@ -2,19 +2,18 @@ import { AxiosInstanceWithCancellation } from '@oida/core';
 import { DatasetProductSearchConfig } from  '@oida/eo-mobx';
 
 import { AdamDatasetConfig, isMultiBandCoverage } from '../adam-dataset-config';
+import { AdamOpenSearchClient } from '../common';
 import { AdamDatasetFactoryConfig } from '../get-adam-dataset-factory';
 import { plottyToAdamWcsColormap } from '../utils';
 import { AdamCswProductSearchProvider, AdamWcsPreviewConfig } from './adam-csw-product-search-provider';
+import { AdamOpenSearchProductSearchProvider } from './adam-opensearch-product-search-provider';
 
 export const getAdamDatasetProductSearchConfig = (
     axiosInstance: AxiosInstanceWithCancellation,
     factoryConfig: AdamDatasetFactoryConfig,
-    datasetConfig: AdamDatasetConfig
+    datasetConfig: AdamDatasetConfig,
+    openSearchClient?: AdamOpenSearchClient
 ) => {
-
-    if (!datasetConfig.cswCollection) {
-        return;
-    }
 
     let wcsPreviewConfig: AdamWcsPreviewConfig;
     if (isMultiBandCoverage(datasetConfig.coverages)) {
@@ -45,8 +44,11 @@ export const getAdamDatasetProductSearchConfig = (
     }
 
     let searchConfig: DatasetProductSearchConfig = {
-        searchProvider: new AdamCswProductSearchProvider({
-            collectionId: datasetConfig.cswCollection,
+        searchProvider: openSearchClient ? new AdamOpenSearchProductSearchProvider({
+            datasetId: datasetConfig.id,
+            openSearchClient: openSearchClient
+        }) : new AdamCswProductSearchProvider({
+            collectionId: datasetConfig.id,
             serviceUrl: factoryConfig.cswServiceUrl,
             wcsPreview: wcsPreviewConfig,
             axiosInstance: axiosInstance,

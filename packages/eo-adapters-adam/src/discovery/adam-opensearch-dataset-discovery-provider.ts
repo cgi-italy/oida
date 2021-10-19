@@ -2,18 +2,19 @@ import { QueryParams as QueryCriteria } from '@oida/core';
 import { DatasetDiscoveryProvider, DatasetDiscoveryProviderProps } from '@oida/eo-mobx';
 import { Entity, QueryParams, QueryParamsProps, AsyncDataFetcher } from '@oida/state-mobx';
 import { autorun } from 'mobx';
+import { AdamOpensearchDatasetMetadata, AdamOpensearchDatasetDiscoveryResponse } from '../common';
 import { AdamDatasetFactoryConfig, AdamDatasetFactory, getAdamDatasetFactory } from '../get-adam-dataset-factory';
-import { AdamDatasetMetadata, AdamOpensearchDatasetDiscoveryClient, AdamDatasetDiscoveryResponse } from './adam-opensearch-dataset-discovery-client';
+import { AdamOpensearchDatasetDiscoveryClient } from './adam-opensearch-dataset-discovery-client';
 
 export const ADAM_OPENSEARCH_DATASET_DISCOVERY_ITEM_TYPE = 'adam_opensearch_discovery_item';
 
 export type AdamOpensearchDatasetDiscoveryProviderItemProps = {
-    metadata: AdamDatasetMetadata;
+    metadata: AdamOpensearchDatasetMetadata;
 };
 
 export class AdamOpensearchDatasetDiscoveryProviderItem extends Entity {
 
-    metadata: AdamDatasetMetadata;
+    metadata: AdamOpensearchDatasetMetadata;
 
     constructor(props: AdamOpensearchDatasetDiscoveryProviderItemProps) {
         super({
@@ -42,7 +43,7 @@ export class AdamOpensearchDatasetDiscoveryProvider extends DatasetDiscoveryProv
     readonly criteria: QueryParams;
     readonly searchClient: AdamOpensearchDatasetDiscoveryClient;
     protected datasetFactory_: AdamDatasetFactory;
-    protected readonly asyncDataFetcher_: AsyncDataFetcher<AdamDatasetDiscoveryResponse, QueryCriteria>;
+    protected readonly asyncDataFetcher_: AsyncDataFetcher<AdamOpensearchDatasetDiscoveryResponse, QueryCriteria>;
 
     constructor(props: Omit<AdamOpensearchDatasetDiscoveryProviderProps, 'providerType'>) {
         super({

@@ -1,6 +1,7 @@
 import { autorun } from 'mobx';
 
 import { AxiosInstanceWithCancellation } from '@oida/core';
+import { TileLayer } from '@oida/state-mobx';
 import {
     RasterMapViz,
     RASTER_VIZ_TYPE,
@@ -9,7 +10,6 @@ import {
     RasterBandModeChoice,
     DatasetMapViewConfig
 } from '@oida/eo-mobx';
-
 import { getPlottyColorScales } from '@oida/eo-geotiff';
 
 import { AdamDatasetConfig, AdamDatasetRenderMode, isMultiBandCoverage } from '../../adam-dataset-config';
@@ -18,6 +18,7 @@ import { createAdamRasterTileSourceProvider } from './create-adam-raster-tile-so
 import { AdamSpatialCoverageProvider } from '../../get-adam-dataset-spatial-coverage-provider';
 
 import trueColorPreview from './true-color-preset-preview';
+
 
 export const getAdamRasterMapViewConfig = (
     axiosInstance: AxiosInstanceWithCancellation,
@@ -48,7 +49,9 @@ export const getAdamRasterMapViewConfig = (
                     }
 
 
-                    mapViz.mapLayer.forceRefresh();
+                    mapViz.mapLayer.children.items.forEach((layer) => {
+                        (layer as TileLayer).forceRefresh();
+                    });
                 }
             });
         };
@@ -73,7 +76,8 @@ export const getAdamRasterMapViewConfig = (
                         preview: trueColorPreview
                     }],
                     defaultMode: 0
-                }
+                },
+                dimensions: datasetConfig.dimensions
             };
         } else {
             const supportedModes: RasterBandModeChoice[] = [{
@@ -83,7 +87,9 @@ export const getAdamRasterMapViewConfig = (
                 }
             }];
 
+            let hasPresets = false;
             if (datasetConfig.coverages.presets && datasetConfig.coverages.presets.length) {
+                hasPresets = true;
                 supportedModes.push(                    {
                     type: RasterBandModeType.Preset,
                     default: {
@@ -109,7 +115,7 @@ export const getAdamRasterMapViewConfig = (
                     }),
                     bandGroups: datasetConfig.coverages.bandGroups,
                     presets: datasetConfig.coverages.presets,
-                    defaultMode: 0
+                    defaultMode: hasPresets ? 1 : 0
                 },
                 afterInit: afterInit,
                 dimensions: datasetConfig.dimensions

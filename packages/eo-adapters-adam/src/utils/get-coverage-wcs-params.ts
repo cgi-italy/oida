@@ -13,18 +13,22 @@ export const getCoverageWcsParams = (datasetConfig: AdamDatasetConfig, dimension
 
         datasetConfig.dimensions.forEach((dimension) => {
             let value = dimensions.values.get(dimension.id);
-            if (value !== undefined) {
-                if (dimension.wcsSubset.idx !== undefined) {
+            if (value && dimension.id === 'subdataset') {
+                subdataset = value.toString();
+            } else {
+                if (value !== undefined) {
+                    if (dimension.wcsSubset.idx !== undefined) {
+                        let currentSubset = dimensionSubsetsMap[dimension.wcsSubset.id] || [];
+                        currentSubset.splice(dimension.wcsSubset.idx, 0, value.toString());
+                        dimensionSubsetsMap[dimension.wcsSubset.id] = currentSubset;
+                    } else {
+                        dimensionSubsetsMap[dimension.wcsSubset.id] = [value.toString()];
+                    }
+                } else if (dimension.wcsSubset.idx !== undefined) {
                     let currentSubset = dimensionSubsetsMap[dimension.wcsSubset.id] || [];
-                    currentSubset.splice(dimension.wcsSubset.idx, 0, value.toString());
+                    currentSubset.splice(dimension.wcsSubset.idx, 0, '*');
                     dimensionSubsetsMap[dimension.wcsSubset.id] = currentSubset;
-                } else {
-                    dimensionSubsetsMap[dimension.wcsSubset.id] = [value.toString()];
                 }
-            } else if (dimension.wcsSubset.idx !== undefined) {
-                let currentSubset = dimensionSubsetsMap[dimension.wcsSubset.id] || [];
-                currentSubset.splice(dimension.wcsSubset.idx, 0, '*');
-                dimensionSubsetsMap[dimension.wcsSubset.id] = currentSubset;
             }
         });
     }

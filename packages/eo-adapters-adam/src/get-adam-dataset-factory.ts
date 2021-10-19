@@ -10,11 +10,13 @@ import { getAdamDatasetDownloadConfig } from './download';
 import { getAdamDatasetToolsConfig } from './tools';
 import { getAdamDatasetMapViewConfig } from './map-view';
 import { getAdamDatasetSpatialCoverageProvider } from './get-adam-dataset-spatial-coverage-provider';
+import { AdamOpenSearchClient } from './common';
 
 export type AdamDatasetFactoryConfig = {
     wcsServiceUrl: string;
     cswServiceUrl: string;
     wpsServiceUrl?: string;
+    opensearchUrl?: string;
     productSearchRecordContent?: (item: ProductSearchRecord) => any
 };
 
@@ -22,17 +24,24 @@ export const getAdamDatasetFactory = (factoryConfig: AdamDatasetFactoryConfig) =
 
     const axiosInstance = createAxiosInstance();
 
+    let openSearchClient: AdamOpenSearchClient | undefined;
+    if (factoryConfig.opensearchUrl) {
+        openSearchClient = new AdamOpenSearchClient({
+            axiosInstance: axiosInstance,
+            serviceUrl: factoryConfig.opensearchUrl
+        });
+    }
 
     const datasetFactory = (config: AdamDatasetConfig) => {
 
-        const productSearchConfig = getAdamDatasetProductSearchConfig(axiosInstance, factoryConfig, config);
+        const productSearchConfig = getAdamDatasetProductSearchConfig(axiosInstance, factoryConfig, config, openSearchClient);
         const timeDistributionConfig = getAdamDatasetTimeDistributionConfig(
             axiosInstance, factoryConfig, config, productSearchConfig?.searchProvider
         );
         const spatialCoverageProvider = getAdamDatasetSpatialCoverageProvider(axiosInstance, factoryConfig, config);
 
         let datasetConfig: DatasetConfig = {
-            id: config.id || uuid(),
+            id: uuid(),
             name: config.name,
             color: config.color,
             filters: [],

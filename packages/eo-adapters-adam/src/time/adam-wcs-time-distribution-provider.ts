@@ -1,14 +1,24 @@
 import moment from 'moment';
 
-import { AxiosInstanceWithCancellation, createAxiosInstance, SortOrder, QueryParams, TimeInterval, TimeIntervalSet } from '@oida/core';
-import { DatasetTimeDistributionProvider, TimeSearchDirection, TimeDistributionRangeItem, DatasetProductSearchProvider } from '@oida/eo-mobx';
+import {
+    AxiosInstanceWithCancellation, createAxiosInstance, SortOrder,
+    QueryParams, TimeInterval, TimeIntervalSet, DATE_RANGE_FIELD_ID, STRING_FIELD_ID, QueryFilter
+} from '@oida/core';
+import {
+    DatasetTimeDistributionProvider, TimeSearchDirection, TimeDistributionRangeItem,
+    DatasetProductSearchProvider, ProductSearchRecord, DataDomainProviderFilters
+} from '@oida/eo-mobx';
 
 
 export type AdamWcsTimeDistributionProviderConfig = {
     serviceUrl: string;
     coverageId: string;
     axiosInstance?: AxiosInstanceWithCancellation;
-    searchProvider?: DatasetProductSearchProvider;
+    productCatalogue?: {
+        provider: DatasetProductSearchProvider;
+        timeRangeQueryParam: string;
+        timeSortParam?: string;
+    }
 };
 
 export class AdamWcsTimeDistributionProvider implements DatasetTimeDistributionProvider {
@@ -67,7 +77,7 @@ export class AdamWcsTimeDistributionProvider implements DatasetTimeDistributionP
                     return [];
                 } else {
                     let size = timeExtent.data?.size || 1;
-                    if (size <= 2 || !this.config_.searchProvider) {
+                    if (!this.config_.productCatalogue) {
                         return [timeExtent];
                     } else {
 
@@ -86,7 +96,7 @@ export class AdamWcsTimeDistributionProvider implements DatasetTimeDistributionP
                                 return this.cswCache_.data.filter(item => item.start >= overlapStart && item.start <= overlapEnd);
                             } else {
                                 let requests = missingIntervals.map((interval) => {
-                                    return this.getRecordsForInterval_(interval)
+                                    return this.getRecordsForInterval_(interval, filters)
                                     .then((records) => {
                                         let items = records.map((item) => {
                                             return {
@@ -116,7 +126,7 @@ export class AdamWcsTimeDistributionProvider implements DatasetTimeDistributionP
         });
     }
 
-    getNearestItem(dt: Date, direction?: TimeSearchDirection) {
+    getNearestItem(dt: Date, direction?: TimeSearchDirection, filters?) {
         return this.getTimeExtent().then((timeExtent) => {
             if (!timeExtent) {
                 return undefined;
@@ -255,8 +265,9 @@ export class AdamWcsTimeDistributionProvider implements DatasetTimeDistributionP
 
     protected getNearestItemFromCatalogue_(dt: Date, direction: TimeSearchDirection) {
 
-        const searchProvider = this.config_.searchProvider;
-        if (!searchProvider) {
+        const productCatalogue = this.config_.productCatalogue;
+
+        if (!productCatalogue) {
             return undefined;
         }
 
@@ -270,16 +281,16 @@ export class AdamWcsTimeDistributionProvider implements DatasetTimeDistributionP
                     pageSize: 1
                 },
                 filters: [{
-                    key: 'time',
+                    key: productCatalogue.timeRangeQueryParam,
                     value: {
                         start: dt
                     },
-                    type: 'daterange'
+                    type: DATE_RANGE_FIELD_ID
                 }],
-                sortBy: {
-                    key: 'dc:date',
+                sortBy: productCatalogue.timeSortParam ? {
+                    key: productCatalogue.timeSortParam,
                     order: SortOrder.Ascending
-                }
+                } : undefined
             };
         } else {
             params = {
@@ -289,20 +300,20 @@ export class AdamWcsTimeDistributionProvider implements DatasetTimeDistributionP
                     pageSize: 1
                 },
                 filters: [{
-                    key: 'time',
+                    key: productCatalogue.timeRangeQueryParam,
                     value: {
                         end: moment(dt).add({'seconds': 1}).toDate()
                     },
-                    type: 'daterange'
+                    type: DATE_RANGE_FIELD_ID
                 }],
-                sortBy: {
-                    key: 'dc:date',
+                sortBy: productCatalogue.timeSortParam ? {
+                    key: productCatalogue.timeSortParam,
                     order: SortOrder.Descending
-                }
+                } : undefined
             };
         }
 
-        return searchProvider.searchProducts(params).then((response) => {
+        return productCatalogue.provider.searchProducts(params).then((response) => {
             let item = response.results[0];
             return item ? {
                 start: item.start as Date,
@@ -311,35 +322,62 @@ export class AdamWcsTimeDistributionProvider implements DatasetTimeDistributionP
         });
     }
 
-    protected async getRecordsForInterval_(interval) {
-        const pageSize = 10;
+    protected async getRecordsForInterval_(interval, requestFilters?: DataDomainProviderFilters) {
+
+        const productCatalogue = this.config_.productCatalogue;
+        if (!productCatalogue) {
+            throw new Error('No product catalogue configuration provided');
+        }
+        const pageSize = 200;
         let page = 0;
 
-        const filters = [{
-            key: 'time',
+        const filters: QueryFilter[] = [{
+            key: productCatalogue.timeRangeQueryParam,
             value: {
                 start: interval.start.toDate(),
                 end: interval.end.add({'seconds': 1}).toDate()
             },
-            type: 'daterange'
+            type: DATE_RANGE_FIELD_ID
         }];
 
-        const sortBy = {
-            key: 'dc:date',
-            order: SortOrder.Ascending
-        };
+        requestFilters?.dimensionValues?.forEach((value, key) => {
+            if (key === 'subdataset') {
+                filters.push({
+                    key: 'subDatasetId',
+                    value: value,
+                    type: STRING_FIELD_ID
+                });
+            } else {
+                filters.push({
+                    key: key,
+                    value: value,
+                    type: STRING_FIELD_ID
+                });
+            }
+        });
 
-        const data: any[] = [];
+        if (requestFilters?.variable) {
+            filters.push({
+                key: 'subDatasetId',
+                value: requestFilters.variable,
+                type: STRING_FIELD_ID
+            });
+        }
+
+        const data: ProductSearchRecord[] = [];
 
         const retrievePage = () => {
-            return this.config_.searchProvider!.searchProducts({
+            return productCatalogue.provider.searchProducts({
                 paging: {
                     page: page,
                     offset: page * pageSize,
                     pageSize: pageSize
                 },
                 filters: filters,
-                sortBy: sortBy
+                sortBy: productCatalogue.timeSortParam ? {
+                    key: productCatalogue.timeSortParam,
+                    order: SortOrder.Ascending
+                } : undefined
             }).then((response) => {
                 data.push(...response.results);
                 return response;
@@ -352,7 +390,17 @@ export class AdamWcsTimeDistributionProvider implements DatasetTimeDistributionP
             page++;
         } while (response.total > page * pageSize);
 
-        return data;
+        if (productCatalogue.timeSortParam) {
+            data.sort((p1, p2) => p1.start.getTime() - p2.start.getTime());
+        }
+
+        let lastDate: Date;
+
+        return data.filter((item) => {
+            const keep = item.start.getTime() !== lastDate?.getTime();
+            lastDate = item.start;
+            return keep;
+        });
     }
 }
 

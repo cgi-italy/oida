@@ -17,6 +17,8 @@ export type AdamWcsCoverageDescription = {
     width: number;
     height: number;
     extent: number[];
+    numBands: number;
+    isTrueColor: boolean;
 };
 
 export type AdamWcCoverageDescriptionClientConfig = {
@@ -34,7 +36,9 @@ export class AdamWcsCoverageDescriptionClient {
     protected xmlNamespaces_ = {
         ows: 'http://www.opengis.net/ows/1.1',
         gml: 'http://www.opengis.net/gml/3.2',
-        wcs: 'http://www.opengis.net/wcs/2.0'
+        wcs: 'http://www.opengis.net/wcs/2.0',
+        gmlcov: 'http://www.opengis.net/gmlcov/1.0',
+        swe: 'http://www.opengis.net/swe/2.0'
     };
 
     constructor(config: AdamWcCoverageDescriptionClientConfig) {
@@ -157,6 +161,16 @@ export class AdamWcsCoverageDescriptionClient {
             }
         }
 
+        const fields = coverageDescription.getElementsByTagNameNS(this.xmlNamespaces_.swe, 'field');
+
+        let isTrueColor = false;
+        if (fields.length === 3) {
+            const bandType = fields[0].getElementsByTagNameNS(this.xmlNamespaces_.swe, 'Quantity')[0].getAttribute('definition');
+            if (bandType?.search('unsignedByte') !== -1) {
+                isTrueColor = true;
+            }
+        }
+
         return {
             id: coverageId,
             srs,
@@ -165,6 +179,8 @@ export class AdamWcsCoverageDescriptionClient {
                 end: new Date(upperCorner[timeAxisIdx] * 1000),
                 size: gridSize[timeAxisIdx]
             },
+            numBands: fields.length,
+            isTrueColor: isTrueColor,
             width: gridSize[xAxisIdx],
             height: gridSize[yAxisIdx],
             extent: [lowerCorner[xAxisIdx], lowerCorner[yAxisIdx], upperCorner[xAxisIdx], upperCorner[yAxisIdx]]
