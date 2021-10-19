@@ -205,7 +205,7 @@ export class DatasetAreaValues extends DatasetProcessing<undefined> implements H
                             timeProvider.getNearestItem(
                                 datasetTime.end,
                                 TimeSearchDirection.Backward,
-                                this.dataset.additionalFilters.asArray()
+                                this.dimensions
                             ).then((dt) => {
                                 if (dt) {
                                     this.dimensions.setValue('time', dt.start);

@@ -1,4 +1,4 @@
-import {  QueryFilter } from '@oida/core';
+import { DataDomainProviderFilters } from './dataset-variable';
 
 export type TimeDistributionInstantItem = {
     start: Date,
@@ -15,11 +15,11 @@ export enum TimeSearchDirection {
 }
 export interface DatasetTimeDistributionProvider {
     supportsHistograms: () => boolean;
-    getTimeDistribution: (timeRange: {start: Date, end: Date}, filters: QueryFilter[], resolution?: number) => Promise<
+    getTimeDistribution: (timeRange: {start: Date, end: Date}, filters?: DataDomainProviderFilters, resolution?: number) => Promise<
         (TimeDistributionRangeItem | TimeDistributionInstantItem)[]
     >;
-    getTimeExtent: (filters?: QueryFilter[]) => Promise<TimeDistributionRangeItem | undefined>;
+    getTimeExtent: (filters?: DataDomainProviderFilters) => Promise<TimeDistributionRangeItem | undefined>;
     getNearestItem: (
-        dt: Date, direction?: TimeSearchDirection, filters?: QueryFilter[]
+        dt: Date, direction?: TimeSearchDirection, filters?: DataDomainProviderFilters
     ) => Promise<TimeDistributionInstantItem | undefined>;
 }

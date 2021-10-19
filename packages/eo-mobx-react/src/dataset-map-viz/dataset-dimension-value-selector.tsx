@@ -13,8 +13,6 @@ import {
 import { DateFieldRenderer } from '@oida/ui-react-antd';
 import { useSelector } from '@oida/ui-react-mobx';
 
-import { useDatasetDomain } from './use-dataset-domain';
-
 type TimeDimension = DatasetDimension<ValueDomain<Date>>;
 type ValueDimension = DatasetDimension<ValueDomain<number>>;
 type CategoricalDimension = DatasetDimension<CategoricalDomain<number | string>>;
@@ -123,7 +121,8 @@ export const DatasetTimeDimensionSelector = (props: DatasetTimeDimensionSelector
                         if (value) {
                             timeDistributionProvider.getNearestItem(
                                 moment(value).subtract(1, 'second').toDate(),
-                                TimeSearchDirection.Backward
+                                TimeSearchDirection.Backward,
+                                props.dimensionsState
                             ).then((value) => {
                                 if (value) {
                                     props.dimensionsState.setValue(props.dimension.id, value.start);
@@ -144,7 +143,7 @@ export const DatasetTimeDimensionSelector = (props: DatasetTimeDimensionSelector
                     minDate: domain ? domain.min : undefined,
                     maxDate: domain ? domain.max : undefined,
                     selectableDates: timeDistributionProvider ? (range) => {
-                        return timeDistributionProvider.getTimeDistribution(range, [], 0).then((items) => {
+                        return timeDistributionProvider.getTimeDistribution(range, props.dimensionsState, 0).then((items) => {
                             const selectableDates: Set<string> = new Set();
                             let format: string;
                             if (range.resolution === 'day') {
@@ -174,7 +173,7 @@ export const DatasetTimeDimensionSelector = (props: DatasetTimeDimensionSelector
                         return timeDistributionProvider.getTimeDistribution({
                             start: dateMoment.startOf('day').toDate(),
                             end: dateMoment.endOf('day').toDate()
-                        }, [], 0).then((items) => {
+                        }, props.dimensionsState, 0).then((items) => {
                             return items.map((item) => {
                                 return moment.utc(item.start).format('HH:mm:ss');
                             });
@@ -191,7 +190,8 @@ export const DatasetTimeDimensionSelector = (props: DatasetTimeDimensionSelector
                             if (value) {
                                 timeDistributionProvider.getNearestItem(
                                     moment(value).add(1, 'second').toDate(),
-                                    TimeSearchDirection.Forward
+                                    TimeSearchDirection.Forward,
+                                    props.dimensionsState
                                 ).then((value) => {
                                     if (value) {
                                         props.dimensionsState.setValue(props.dimension.id, value.start);

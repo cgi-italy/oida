@@ -73,6 +73,7 @@ export class DatasetExplorerItem {
         if (this.explorer.timeExplorer && props.datasetConfig.timeDistribution) {
             this.timeDistributionViz = new DatasetTimeDistributionViz({
                 dataset: this.dataset,
+                parent: this.mapViz,
                 config: {
                     provider: props.datasetConfig.timeDistribution.provider
                 }

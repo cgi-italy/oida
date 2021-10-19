@@ -68,6 +68,10 @@ export class DatasetDimensions implements DataDomainProviderFilters {
         return this.values;
     }
 
+    get additionalFilters() {
+        return this.dataset_.additionalFilters.items;
+    }
+
     @action
     setValue(dimension: string, value: DimensionValueType) {
         this.values.set(dimension, value);
@@ -172,3 +176,8 @@ export class DatasetDimensions implements DataDomainProviderFilters {
 export interface HasDatasetDimensions {
     dimensions: DatasetDimensions;
 }
+
+export function hasDatasetDimensions(object: any): object is HasDatasetDimensions {
+    return !!object && object.dimensions instanceof DatasetDimensions;
+}
+

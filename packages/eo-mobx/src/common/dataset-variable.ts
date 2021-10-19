@@ -1,4 +1,4 @@
-import { AoiValue, DateRangeValue } from '@oida/core';
+import { AoiValue, DateRangeValue, QueryFilter } from '@oida/core';
 
 export type DomainRange<T> = {
     min: T,
@@ -27,7 +27,8 @@ export type DataDomainProviderFilters = {
     aoi?: AoiValue;
     toi?: Date | DateRangeValue;
     variable?: string;
-    dimensionValues?: Map<string, any>
+    dimensionValues?: Map<string, any>;
+    additionaFilters?: Map<string, QueryFilter>;
 };
 
 export type DataDomainProvider<D extends DataDomain<unknown>> = (filters?: DataDomainProviderFilters) => Promise<D>;

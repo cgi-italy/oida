@@ -6,12 +6,13 @@ export const getNearestDatasetProduct = function(
     dt: Date, direction: TimeSearchDirection, datasetViews: DatasetExplorerItem[]
 ) : Promise<Date | undefined> {
 
-    let timeRequests = datasetViews.map((view) => {
-        let timeProvider = view.timeDistributionViz?.config.provider;
-        if (timeProvider) {
-            return timeProvider.getNearestItem(
+    const timeRequests = datasetViews.map((view) => {
+        const timeDistribution = view.timeDistributionViz;
+        if (timeDistribution) {
+            return timeDistribution.config.provider.getNearestItem(
                 dt,
-                direction
+                direction,
+                view.timeDistributionViz?.filters
             );
         } else {
             return Promise.resolve(undefined);
@@ -38,9 +39,9 @@ export const getNearestDatasetProduct = function(
             return targetDate;
         } else {
             let timeRequests = datasetViews.map((view) => {
-                let timeProvider = view.timeDistributionViz?.config.provider;
-                if (timeProvider) {
-                    return timeProvider.getTimeExtent();
+                const timeDistribution = view.timeDistributionViz;
+                if (timeDistribution) {
+                    return timeDistribution.config.provider.getTimeExtent(timeDistribution.filters);
                 } else {
                     return Promise.resolve(undefined);
                 }

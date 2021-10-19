@@ -316,7 +316,11 @@ export class DatasetTransectValues extends DatasetProcessing<undefined> implemen
                         //a time range is currently selected. try to find the time nearest to the range end time
                         const timeProvider = this.dataset.config.timeDistribution?.provider;
                         if (timeProvider) {
-                            timeProvider.getNearestItem(datasetTime.end, TimeSearchDirection.Backward).then((dt) => {
+                            timeProvider.getNearestItem(
+                                datasetTime.end,
+                                TimeSearchDirection.Backward,
+                                this.dimensions
+                            ).then((dt) => {
                                 if (dt) {
                                     this.dimensions.setValue('time', dt.start);
                                 }

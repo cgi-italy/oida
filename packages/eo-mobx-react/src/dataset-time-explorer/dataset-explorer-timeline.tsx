@@ -48,8 +48,9 @@ export const DatasetTimelineGroupTemplate = (props: DatasetTimelineGroupTemplate
 
     let centerTimeExtentButton;
 
-    const timeProvider = datasetView.dataset.config.timeDistribution?.provider;
-    if (timeProvider) {
+    const timeDistribution = datasetView.timeDistributionViz;
+
+    if (timeDistribution) {
 
         centerTimeExtentButton = (
             <Tooltip
@@ -70,7 +71,7 @@ export const DatasetTimelineGroupTemplate = (props: DatasetTimelineGroupTemplate
                             });
                         }
 
-                        timeProvider.getTimeExtent(filters).then((range) => {
+                        timeDistribution.config.provider.getTimeExtent(timeDistribution.filters).then((range) => {
                             if (range) {
                                 props.explorerState.timeExplorer?.timeRange.centerRange(
                                     new Date(range.start), new Date(range.end), {
