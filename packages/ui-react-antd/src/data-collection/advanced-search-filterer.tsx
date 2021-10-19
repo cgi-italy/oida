@@ -45,6 +45,7 @@ const QueryFiltersTags = (props: QueryFiltersTagsProps) => {
 
 export type AdvancedSearchFiltererProps = {
     expandButtonTooltip?: string;
+    searchIcon?: React.ReactNode;
     expandButtonIcon?: React.ReactNode;
 } & DataFiltererProps;
 export const AdvancedSearchFilterer = (props: AdvancedSearchFiltererProps) => {
@@ -73,6 +74,8 @@ export const AdvancedSearchFilterer = (props: AdvancedSearchFiltererProps) => {
             formProps.onFieldChange(filter.name, undefined);
         });
     };
+
+    const searchIcon = props.searchIcon || <SearchOutlined/>;
 
     const advancedSearchPanel = (
         <Dropdown
@@ -118,7 +121,7 @@ export const AdvancedSearchFilterer = (props: AdvancedSearchFiltererProps) => {
                 }}
                 prefix={
                     <React.Fragment>
-                        <SearchOutlined/>
+                        <span className='input-prefix-icon'>{searchIcon}</span>
                         <QueryFiltersTags filters={tagsFilters}/>
                     </React.Fragment>
                 }
