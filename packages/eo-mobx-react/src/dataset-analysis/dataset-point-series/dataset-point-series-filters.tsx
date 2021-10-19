@@ -19,7 +19,7 @@ const DatasetDimensionSelector = (props: DatasetDimensionSelectorProps) => {
         return props.series.seriesDimension;
     });
 
-    const dimensions = [...(props.series.config.dimensions || [])];
+    const dimensions = [...(props.series.config.dimensions.filter(dimension => !dimension.preventSeries) || [])];
 
     if (!dimensions.length) {
         return null;

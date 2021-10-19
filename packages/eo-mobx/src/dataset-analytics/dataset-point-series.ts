@@ -36,7 +36,7 @@ export type DatasetPointSeriesProvider<T = SeriesDimensionType> =
 export type DatasetPointSeriesConfig<T = SeriesDimensionType> = {
     provider: DatasetPointSeriesProvider<T>;
     variables: NumericVariable[];
-    dimensions: DatasetDimension<DataDomain<T>>[];
+    dimensions: (DatasetDimension<DataDomain<T>> & {preventSeries?: boolean})[];
 };
 
 export type DatasetPointSeriesProps = {

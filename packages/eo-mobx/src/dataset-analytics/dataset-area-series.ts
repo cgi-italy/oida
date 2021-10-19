@@ -39,7 +39,7 @@ export type DatasetAreaSeriesConfig = {
     variables: RasterBandConfig[];
     supportedGeometries: AoiSupportedGeometry[];
     supportedData: DatasetAreaValuesDataMask;
-    dimensions: DatasetDimension<DataDomain<SequenceDimensionType>>[];
+    dimensions: (DatasetDimension<DataDomain<SequenceDimensionType>> & {preventSeries?: boolean})[];
     additionalParameters?: IFormFieldDefinition[];
 };
 
