@@ -23,6 +23,11 @@ export class AdamOpensearchDatasetDiscoveryProviderItem extends Entity {
         });
 
         this.metadata = props.metadata;
+        // temporary fix
+        // TODO: remove this once the cesium polygon fill issue is resolved
+        if (this.metadata.datasetId === 'ESACCI_Biomass_L4_AGB') {
+            this.visible.setValue(false);
+        }
     }
 
     get geometry() {
