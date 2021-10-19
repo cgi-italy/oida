@@ -1,7 +1,7 @@
 import { autorun } from 'mobx';
 
 import { TileSource, SubscriptionTracker, LoadingState } from '@oida/core';
-import { TileLayer } from '@oida/state-mobx';
+import { GroupLayer, TileLayer } from '@oida/state-mobx';
 
 import {
     DatasetDimension, DataDomain, isValueDomain,
@@ -13,7 +13,14 @@ import { RasterBandModeConfig, RasterBandMode, RasterBandModeType } from './rast
 
 export const RASTER_VIZ_TYPE = 'dataset_raster_viz';
 
-export type RasterSourceProvider = (rasterViz: RasterMapViz) => Promise<({config: TileSource, geographicExtent?: number[]}) | undefined>;
+export type RasterSourceProviderResponseItem = {
+    config: TileSource,
+    geographicExtent?: number[]
+};
+
+export type RasterSourceProvider = (rasterViz: RasterMapViz) => Promise<
+    RasterSourceProviderResponseItem | RasterSourceProviderResponseItem[] | undefined
+>;
 
 export type RasterMapVizConfig = {
     bandMode: RasterBandModeConfig;
@@ -24,7 +31,7 @@ export type RasterMapVizConfig = {
 
 export type RasterMapVizProps = DatasetVizProps<typeof RASTER_VIZ_TYPE, RasterMapVizConfig> & DatasetDimensionsProps;
 
-export class RasterMapViz extends DatasetViz<TileLayer> implements HasDatasetDimensions {
+export class RasterMapViz extends DatasetViz<GroupLayer> implements HasDatasetDimensions {
 
     readonly config: RasterMapVizConfig;
     readonly dimensions: DatasetDimensions;
@@ -69,7 +76,7 @@ export class RasterMapViz extends DatasetViz<TileLayer> implements HasDatasetDim
     }
 
     protected initMapLayer_() {
-        return new TileLayer({
+        return new GroupLayer({
             id: `${this.dataset.id}raster`
         });
     }
@@ -92,13 +99,34 @@ export class RasterMapViz extends DatasetViz<TileLayer> implements HasDatasetDim
                 percentage: 30
             });
             this.config.rasterSourceProvider(this).then((source) => {
-                this.mapLayer.setSource(source?.config);
                 if (source) {
-                    this.mapLayer.setExtent(source.geographicExtent);
+                    const sources = Array.isArray(source) ? source : [source];
+
+                    const toRemove = this.mapLayer.children.items.slice(sources.length);
+                    toRemove.forEach((layer) => {
+                        this.mapLayer.children.remove(layer);
+                    });
+                    sources.forEach((item, idx) => {
+                        let layer = this.mapLayer.children.itemAt(idx) as TileLayer | undefined;
+                        if (!layer) {
+                            layer = new TileLayer({
+                                id: `${item.config.id}_tile`
+                            });
+                            this.mapLayer.children.add(layer);
+                        }
+                        layer.setSource(item.config);
+                        layer.setExtent(item.geographicExtent);
+                    });
+                } else {
+                    this.mapLayer.children.items.forEach((layer) => {
+                        (layer as TileLayer).setSource(undefined);
+                    });
                 }
                 this.mapLayer.loadingStatus.setValue(LoadingState.Init);
             }).catch((error) => {
-                this.mapLayer.setSource(undefined);
+                this.mapLayer.children.items.forEach((layer) => {
+                    (layer as TileLayer).setSource(undefined);
+                });
                 this.mapLayer.loadingStatus.update({
                     value: LoadingState.Error,
                     message: error.message
@@ -108,7 +136,33 @@ export class RasterMapViz extends DatasetViz<TileLayer> implements HasDatasetDim
             delay: 1000
         });
 
+        const loadingStateUpdateDisposer = autorun(() => {
+            let loadingState = LoadingState.Success;
+            let percentage  = 100;
+            let message = '';
+            for (let item of this.mapLayer.children.items) {
+                const itemState = item.loadingStatus.value;
+                if (itemState === LoadingState.Loading) {
+                    loadingState = LoadingState.Loading;
+                    percentage = item.loadingStatus.percentage * percentage / 100;
+                } else if (itemState === LoadingState.Error) {
+                    loadingState = LoadingState.Error;
+                    message = item.loadingStatus.message;
+                    break;
+                }
+            }
+
+            setImmediate(() => {
+                this.mapLayer.loadingStatus.update({
+                    value: loadingState,
+                    percentage: percentage,
+                    message: message
+                });
+            });
+        });
+
         this.subscriptionTracker_.addSubscription(sourceUpdateDisposer);
+        this.subscriptionTracker_.addSubscription(loadingStateUpdateDisposer);
 
         if (this.config.afterInit) {
             this.config.afterInit(this);

@@ -30,12 +30,20 @@
         border: solid 2px @border-color-base;
         flex-grow: 0;
         margin-right: 5px;
+        flex-shrink: 0;
     }
 
     .dataset-raster-band-preset-content {
         display: flex;
         flex-direction: column;
         flex-grow: 1;
+        flex-shrink: 1;
+        overflow: hidden;
+
+        .dataset-raster-band-preset-title {
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
 
         .dataset-raster-band-preset-description {
             font-size: @font-size-sm;

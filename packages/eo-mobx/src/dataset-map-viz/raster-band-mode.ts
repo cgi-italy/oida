@@ -23,7 +23,7 @@ export enum RasterBandModeType {
 export type RasterBandPreset = {
     id: string;
     name: string;
-    preview: string;
+    preview?: string;
     legend?: string;
     description?: string;
 };

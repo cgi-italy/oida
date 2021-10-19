@@ -14,7 +14,7 @@ export type DatasetBandPresetSelectorItemProps = {
 export const DatasetBandPresetSelectorItem = (props: DatasetBandPresetSelectorItemProps) => {
     return (
         <React.Fragment>
-            <Avatar size='large' src={props.preset.preview}/>
+            {props.preset.preview && <Avatar size='large' src={props.preset.preview}/>}
             <div className='dataset-raster-band-preset-content'>
                 <div className='dataset-raster-band-preset-title'>{props.preset.name}</div>
                 <div className='dataset-raster-band-preset-description'>{props.preset.description}</div>
