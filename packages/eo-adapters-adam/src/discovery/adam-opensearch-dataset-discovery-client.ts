@@ -259,8 +259,8 @@ export class AdamOpensearchDatasetDiscoveryClient {
                 metadata.subDataset, metadata.dataset_specification
             ).then((dimensions) => {
 
-                //disable time navigation for mission data
-                if (dimensions.length && dimensions[0].id === 'SceneType') {
+                //disable time navigation for campaign data
+                if (dimensions.length && (dimensions[0].id === 'SceneType' || dimensions[0].id === 'image')) {
                     timeless = true;
                 }
 

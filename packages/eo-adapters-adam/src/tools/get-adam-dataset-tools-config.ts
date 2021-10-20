@@ -22,7 +22,11 @@ export const getAdamDatasetToolsConfig = (
     const dimensions: AdamDatasetDimension[] = datasetConfig.dimensions ? datasetConfig.dimensions.slice().map((dimension) => {
         let preventSeries = false;
 
-        if (dimension.id === 'subdataset' || dimension.id === 'SubRegion' || dimension.id === 'Product' || dimension.id === 'SceneType') {
+        // disable series on campaign data
+        if (dimension.id === 'subdataset' || dimension.id === 'SubRegion'
+            || dimension.id === 'Product' || dimension.id === 'SceneType'
+            || dimension.id === 'image' || dimension.id === 'plan'
+        ) {
             preventSeries = true;
         }
         return {
