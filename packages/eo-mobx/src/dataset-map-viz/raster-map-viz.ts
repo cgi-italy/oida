@@ -15,7 +15,9 @@ export const RASTER_VIZ_TYPE = 'dataset_raster_viz';
 
 export type RasterSourceProviderResponseItem = {
     config: TileSource,
-    geographicExtent?: number[]
+    geographicExtent?: number[],
+    minZoomLevel?: number;
+    maxZoomLevel?: number;
 };
 
 export type RasterSourceProvider = (rasterViz: RasterMapViz) => Promise<
@@ -107,7 +109,10 @@ export class RasterMapViz extends DatasetViz<GroupLayer> implements HasDatasetDi
                         this.mapLayer.children.remove(layer);
                     });
                     sources.forEach((item, idx) => {
-                        let layer = this.mapLayer.children.itemAt(idx) as TileLayer | undefined;
+                        let layer: TileLayer | undefined;
+                        if (idx < this.mapLayer.children.items.length) {
+                            layer = this.mapLayer.children.itemAt(idx) as TileLayer;
+                        }
                         if (!layer) {
                             layer = new TileLayer({
                                 id: `${item.config.id}_tile`
@@ -116,6 +121,8 @@ export class RasterMapViz extends DatasetViz<GroupLayer> implements HasDatasetDi
                         }
                         layer.setSource(item.config);
                         layer.setExtent(item.geographicExtent);
+                        layer.setMinZoomLevel(item.minZoomLevel);
+                        layer.setMaxZoomLevel(item.maxZoomLevel);
                     });
                 } else {
                     this.mapLayer.children.items.forEach((layer) => {
