@@ -8,7 +8,7 @@ export type DataCollectionItemAction = {
      */
     callback: () => (void | Promise<void>);
     /** The action content */
-    content: React.ReactNode;
+    content?: React.ReactNode;
     /** An icon to display */
     icon?: React.ReactNode;
     /** The action title. Usually displayed as a tooltip */

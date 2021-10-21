@@ -35,7 +35,7 @@ export const DataCollectionItemActionButton = (props: DataCollectionItemActionBu
                 {...buttonProps}
                 type={props.action.primary ? 'primary' : (props.type || 'link')}
             >
-                <span className='action-content'>{action.content}</span>
+                {action.content && <span className='action-content'>{action.content}</span>}
             </Button>
         </Tooltip>
     );
