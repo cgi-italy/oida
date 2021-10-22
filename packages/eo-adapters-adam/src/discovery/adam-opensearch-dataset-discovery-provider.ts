@@ -1,7 +1,7 @@
 import { QueryParams as QueryCriteria } from '@oida/core';
 import { DatasetDiscoveryProvider, DatasetDiscoveryProviderProps } from '@oida/eo-mobx';
 import { Entity, QueryParams, QueryParamsProps, AsyncDataFetcher } from '@oida/state-mobx';
-import { autorun } from 'mobx';
+import { autorun, reaction, when } from 'mobx';
 import { AdamOpensearchDatasetMetadata, AdamOpensearchDatasetDiscoveryResponse } from '../common';
 import { AdamDatasetFactoryConfig, AdamDatasetFactory, getAdamDatasetFactory } from '../get-adam-dataset-factory';
 import { AdamOpensearchDatasetDiscoveryClient } from './adam-opensearch-dataset-discovery-client';
@@ -23,11 +23,6 @@ export class AdamOpensearchDatasetDiscoveryProviderItem extends Entity {
         });
 
         this.metadata = props.metadata;
-        // temporary fix
-        // TODO: remove this once the cesium polygon fill issue is resolved
-        if (this.metadata.datasetId === 'ESACCI_Biomass_L4_AGB') {
-            this.visible.setValue(false);
-        }
     }
 
     get geometry() {
@@ -40,6 +35,7 @@ export const ADAM_OPENSEARCH_DATASET_DISCOVERY_PROVIDER_TYPE = 'adam_opensearch'
 export type AdamOpensearchDatasetDiscoveryProviderProps = {
     searchClient: AdamOpensearchDatasetDiscoveryClient;
     factoryConfig: AdamDatasetFactoryConfig;
+    isStatic?: boolean;
     queryParams?: QueryParamsProps;
 } & DatasetDiscoveryProviderProps<typeof ADAM_OPENSEARCH_DATASET_DISCOVERY_PROVIDER_TYPE>;
 
@@ -67,7 +63,7 @@ export class AdamOpensearchDatasetDiscoveryProvider extends DatasetDiscoveryProv
             }
         });
 
-        this.afterInit_();
+        this.afterInit_(props.isStatic);
     }
 
     get loadingState() {
@@ -80,18 +76,44 @@ export class AdamOpensearchDatasetDiscoveryProvider extends DatasetDiscoveryProv
         });
     }
 
-    protected afterInit_() {
-        autorun(() => {
-            if (this.active.value) {
-                this.asyncDataFetcher_.fetchData(this.criteria.data).then((data) => {
-                    const datasets = data.features.map((metadata) => {
-                        return new AdamOpensearchDatasetDiscoveryProviderItem({
-                            metadata: metadata
+    protected retrieveData_() {
+        return this.asyncDataFetcher_.fetchData(this.criteria.data).then((data) => {
+            const datasets = data.features.map((metadata) => {
+                return new AdamOpensearchDatasetDiscoveryProviderItem({
+                    metadata: metadata
+                });
+            });
+            this.setResults_(datasets);
+        });
+    }
+
+    protected afterInit_(isStatic?: boolean) {
+
+        if (isStatic) {
+            const populateResultsOnActivation = () => {
+                when(() => this.active.value, () => {
+                    this.retrieveData_().catch((error) => {
+                        // retry getting results on next activation
+                        when(() => !this.active.value, () => {
+                            populateResultsOnActivation();
                         });
                     });
-                    this.setResults_(datasets);
                 });
-            }
-        });
+            };
+
+            populateResultsOnActivation();
+
+            reaction(() => this.criteria.data, () => {
+                if (this.active.value) {
+                    this.retrieveData_();
+                }
+            });
+        } else {
+            autorun(() => {
+                if (this.active.value) {
+                    this.retrieveData_();
+                }
+            });
+        }
     }
 }
