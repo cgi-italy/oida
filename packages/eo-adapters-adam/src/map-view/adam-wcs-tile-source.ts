@@ -129,12 +129,12 @@ olTileSourcesFactory.register(ADAM_WCS_SOURCE_ID, (config) => {
                             response.blob().then((blob) => {
                                 const dataUri = URL.createObjectURL(blob);
                                 if (!dataUri) {
-                                    tile.handleImageError_();
+                                    onLoadError();
                                 } else {
                                     tile.getImage().src = dataUri;
                                 }
                             }).catch(() => {
-                                tile.handleImageError_();
+                                onLoadError();
                             });
                         }
                     }, () => {

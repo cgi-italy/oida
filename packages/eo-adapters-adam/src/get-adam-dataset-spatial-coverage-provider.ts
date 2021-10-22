@@ -85,6 +85,11 @@ export const getAdamDatasetSpatialCoverageProvider = (
     return ((mapView: DatasetViz<any>, keepDatasetSrs?: boolean) => {
 
         if (mapView instanceof RasterMapViz) {
+
+            if (datasetConfig.minZoomLevel || datasetConfig.aoiRequired) {
+                return Promise.resolve(keepDatasetSrs ? datasetConfig.coverageExtent : geogCoverageExtent);
+            }
+
             let wcsParams: any = {
                 service: 'WCS',
                 request: 'GetCoverage',

@@ -167,14 +167,18 @@ export class AdamWcsTimeDistributionProvider implements DatasetTimeDistributionP
                     return nearestItem;
                 } else {
                     return Promise.all([
-                        this.getNearestItemFromCache_(timeExtent, dt, TimeSearchDirection.Backward).then((item) => {
+                        Promise.resolve(this.getNearestItemFromCache_(timeExtent, dt, TimeSearchDirection.Backward)).then((item) => {
                             if (!item) {
                                 return this.getNearestItemFromCatalogue_(dt, TimeSearchDirection.Backward);
+                            } else {
+                                return  item;
                             }
                         }),
-                        this.getNearestItemFromCache_(timeExtent, dt, TimeSearchDirection.Forward).then((item) => {
+                        Promise.resolve(this.getNearestItemFromCache_(timeExtent, dt, TimeSearchDirection.Forward)).then((item) => {
                             if (!item) {
                                 return this.getNearestItemFromCatalogue_(dt, TimeSearchDirection.Forward);
+                            } else {
+                                return item;
                             }
                         })
                     ]).then(([prev, next]) => {

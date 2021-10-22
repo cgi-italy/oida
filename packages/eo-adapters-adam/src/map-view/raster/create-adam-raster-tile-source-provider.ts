@@ -70,6 +70,10 @@ export const createAdamRasterTileSourceProvider = (
 
     const provider = (rasterView: RasterMapViz) => {
 
+        if (datasetConfig.aoiRequired && !rasterView.dataset.aoi) {
+            return Promise.reject(new Error('Select an area of interest to visualize data from this layer'));
+        }
+
         const subsets: string[] = [];
 
         if (!datasetConfig.timeless) {
@@ -138,7 +142,6 @@ export const createAdamRasterTileSourceProvider = (
                     url: factoryConfig.wcsServiceUrl,
                     srs: datasetConfig.coverageSrs,
                     coverage: wcsCoverageParams.coverageId,
-                    minZoomLevel: datasetConfig.minZoomLevel,
                     format: format,
                     subsets: subsets,
                     subdataset: wcsCoverageParams.subdataset,
@@ -154,7 +157,8 @@ export const createAdamRasterTileSourceProvider = (
                     colorrange: colorRange,
                     requestExtentOffset: datasetConfig.requestExtentOffset
                 } as TileSource,
-                geographicExtent: geographicExtent
+                geographicExtent: geographicExtent,
+                minZoomLevel: datasetConfig.minZoomLevel
             };
         });
     };

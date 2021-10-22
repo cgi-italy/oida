@@ -69,6 +69,7 @@ export type AdamDatasetConfig = {
     cswCollection?: string;
     productSearchRecordContent?: (item: ProductSearchRecord) => any;
     minZoomLevel?: number;
+    aoiRequired?: boolean;
 };
 
 export function isMultiBandCoverage(
