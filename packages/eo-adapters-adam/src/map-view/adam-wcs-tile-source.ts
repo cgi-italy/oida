@@ -187,6 +187,7 @@ cesiumTileSourcesFactory.register(ADAM_WCS_SOURCE_ID, (config) => {
             request: 'GetCoverage',
             version: '2.0.0',
             coverageId: config.coverage,
+            subdataset: config.subdataset,
             format: config.format,
             colorrange: config.colorrange,
             colortable: config.colortable,
