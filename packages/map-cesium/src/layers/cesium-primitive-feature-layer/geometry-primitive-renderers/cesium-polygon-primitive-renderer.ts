@@ -15,7 +15,7 @@ import GroundPrimitive from 'cesium/Source/Scene/GroundPrimitive';
 import Primitive from 'cesium/Source/Scene/Primitive';
 import PerInstanceColorAppearance from 'cesium/Source/Scene/PerInstanceColorAppearance';
 
-import { BBoxGeometry, CircleGeometry, IPolygonStyle } from '@oida/core';
+import { BBoxGeometry, CircleGeometry, getGeometryExtent, IPolygonStyle } from '@oida/core';
 
 import { PICK_INFO_KEY, PickInfo } from '../../../utils/picking';
 import { CesiumPrimitiveFeatureLayer } from '../cesium-primitive-feature-layer';
@@ -77,6 +77,14 @@ export class CesiumPolygonPrimitiveRenderer implements CesiumGeometryPrimitiveRe
             outlineInstances = instance.outline;
         }
 
+        // cesium has a bug in filling large polygons: https://github.com/CesiumGS/cesium/issues/4871
+        // disable fill when the bounding box is bigger than half of the globe (is this a good heuristic for "large"?)
+        // TODO: split polygon in tiles?
+        const bbox = getGeometryExtent(geometry);
+        if (bbox && ((bbox[2] - bbox[0]) * (bbox[3] - bbox[1]) > 32400)) {
+            fillInstances = [];
+        }
+
         let fill;
         if (this.clampToGround_) {
             fill = this.polygons_.add(new GroundPrimitive({
@@ -116,7 +124,7 @@ export class CesiumPolygonPrimitiveRenderer implements CesiumGeometryPrimitiveRe
             renderProps: {
                 fillPrimitive: fill,
                 strokePrimitive: stroke,
-                numGeometries: fillInstances.length
+                numGeometries: outlineInstances.length
             }
         };
 
