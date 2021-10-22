@@ -147,15 +147,15 @@ export const createWcsStatsProvider = (config: WcsStatsProviderConfig) => {
             params: params,
             paramsSerializer: urlParamsSerializer
         }).then((response) => {
-            const coverageData = extractStatisticsFromTiffData(response.data, {
+            return extractStatisticsFromTiffData(response.data, {
                 bandId: request.variable,
                 bands: config.bands
+            }).then((coverageData) => {
+                return {
+                    stats: request.dataMask.stats ? coverageData.stats : undefined,
+                    gridValues: request.dataMask.gridValues ? coverageData.gridValues : undefined,
+                };
             });
-
-            return {
-                stats: request.dataMask.stats ? coverageData.stats : undefined,
-                gridValues: request.dataMask.gridValues ? coverageData.gridValues : undefined,
-            };
         });
     };
 
