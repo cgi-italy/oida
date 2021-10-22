@@ -10,6 +10,7 @@ import { SortableHandle } from 'react-sortable-hoc';
 
 import { LoadingState } from '@oida/core';
 import { MapLayer } from '@oida/state-mobx';
+import { DataCollectionItemActionButton } from '@oida/ui-react-antd';
 import { useSelector, useCenterOnMapFromModule } from '@oida/ui-react-mobx';
 import { DatasetViz, DatasetExplorer } from '@oida/eo-mobx';
 
@@ -64,7 +65,7 @@ export const DatasetVizListItem = (props: DatasetVizListItemProps) => {
                 icon: <AimOutlined/>,
                 title: 'Zoom to dataset area',
                 callback: () => {
-                    spatialCoverageProvider(props.datasetViz).then((extent) => {
+                    return spatialCoverageProvider(props.datasetViz).then((extent) => {
                         centerOnMap({
                             type: 'BBox',
                             bbox: extent as GeoJSON.BBox
@@ -159,15 +160,12 @@ export const DatasetVizListItem = (props: DatasetVizListItemProps) => {
                             return action.menu;
                         } else {
                             return (
-                                <Tooltip title={action.title} key={action.id}>
-                                    <Button
-                                        size='small'
-                                        type={action.id === activeAction ? 'primary' : 'link'}
-                                        onClick={() => action.callback()}
-                                    >
-                                        {action.icon}
-                                    </Button>
-                                </Tooltip>
+                                <DataCollectionItemActionButton key={action.id} action={{
+                                    title: action.title,
+                                    icon: action.icon,
+                                    callback: action.callback,
+                                    primary: (action.id === activeAction)
+                                }}/>
                             );
                         }
                     })
