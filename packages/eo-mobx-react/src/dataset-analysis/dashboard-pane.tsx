@@ -190,6 +190,13 @@ export const DashboardPane = (props: LayoutSectionProps & DashboardPaneProps) =>
             return getLayoutFromComponents(currentLayout);
         });
 
+        setClosedWidgetsLayout((current) => {
+            return {
+                ...current,
+                ...layout
+            };
+        });
+
     }, [props.components]);
 
 
