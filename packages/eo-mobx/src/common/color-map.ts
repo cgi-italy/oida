@@ -13,7 +13,7 @@ export type ColorScale = {
     type: ColorScaleType;
     legend: HTMLImageElement | HTMLCanvasElement;
     colors?: string[];
-    positions?: string[];
+    positions?: number[];
 };
 
 
@@ -74,6 +74,8 @@ export class ColorMap {
         this.colorScale = props.colorScale;
         if (props.domain) {
             this.domain = props.domain instanceof ColorMapDomain ? props.domain : new ColorMapDomain(props.domain);
+        } else {
+            this.domain = undefined;
         }
 
         makeObservable(this);
