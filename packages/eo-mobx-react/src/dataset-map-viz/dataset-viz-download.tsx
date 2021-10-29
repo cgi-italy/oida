@@ -1,28 +1,36 @@
 import React, { useState } from 'react';
-import { Select, Slider, Form, InputNumber, Modal, Typography } from 'antd';
+import { Select, Slider, Form, InputNumber, Modal, Typography, FormInstance, Input } from 'antd';
 import { CloseCircleOutlined } from '@ant-design/icons';
 
 import { DatasetViz } from '@oida/eo-mobx';
+import { useForm } from 'antd/lib/form/Form';
 
-enum FormSubmitState {
+export enum DatasetDownloadFormSubmitState {
     Ready = 'Ready',
     Pending = 'Pending',
+    Invalid = 'Invalid',
     Success = 'Success',
     Error = 'Error'
 }
 
 export type DatasetDownloadProps = {
     datasetViz: DatasetViz<any>
+    onSubmitStateChange: (submitState: DatasetDownloadFormSubmitState) => void
     formId?: string;
-    onSubmitStateChange: (submitState: FormSubmitState) => void
+    formInstance?: FormInstance
 };
 
 export const DatasetVizDownload = (props: DatasetDownloadProps) => {
 
     let downloadConfig = props.datasetViz.dataset.config!.download!;
 
-    let [downloadScale, setDownloadScale] = useState(1);
-    let [downloadFormat, setDownloadFormat] = useState(downloadConfig!.supportedFormats[0].id);
+    const [formInstance] = useForm(props.formInstance);
+
+    formInstance.setFieldsValue({
+        format: downloadConfig!.supportedFormats[0].id,
+        scale: 1
+    });
+
     let [downloadError, setDownloadError] = useState('');
     let formatOptions = downloadConfig!.supportedFormats.map((format) => {
         return (<Select.Option key={format.id} value={format.id}>{format.name || format.id}</Select.Option>);
@@ -32,53 +40,71 @@ export const DatasetVizDownload = (props: DatasetDownloadProps) => {
         <div className='dataset-viz-download'>
             <Form
                 id={props.formId || 'dataset-viz-download-form'}
+                form={formInstance}
                 layout='vertical'
-                onFinish={(evt) => {
+                onValuesChange={(changedValues, values) => {
+                    formInstance.validateFields().then(() => {
+                        props.onSubmitStateChange(DatasetDownloadFormSubmitState.Ready);
+                    }).catch((e) => {
+                        if (e.errorFields.length) {
+                            props.onSubmitStateChange(DatasetDownloadFormSubmitState.Invalid);
+                        } else {
+                            props.onSubmitStateChange(DatasetDownloadFormSubmitState.Ready);
+                        }
+                    });
+                }}
+                onFinish={(values) => {
 
                     setDownloadError('');
-                    props.onSubmitStateChange(FormSubmitState.Pending);
+                    props.onSubmitStateChange(DatasetDownloadFormSubmitState.Pending);
 
                     downloadConfig.downloadProvider({
                         datasetViz: props.datasetViz,
-                        format: downloadFormat,
-                        scale: downloadScale
+                        ...values
                     }).then(() => {
-                        props.onSubmitStateChange(FormSubmitState.Success);
+                        props.onSubmitStateChange(DatasetDownloadFormSubmitState.Success);
                     }).catch((error) => {
                         setDownloadError(`Unable to download data: ${error.message}`);
-                        props.onSubmitStateChange(FormSubmitState.Error);
+                        props.onSubmitStateChange(DatasetDownloadFormSubmitState.Error);
                     });
 
                 }}
             >
-                <Form.Item label='Format'>
+                <Form.Item label='Format' name='format' rules={[{required: true}]}>
                     <Select
                         size='small'
-                        value={downloadFormat}
-                        onChange={(format) => setDownloadFormat(format)}
                     >
                         {formatOptions}
                     </Select>
                 </Form.Item>
-                <Form.Item label='Scale'>
-                    <Slider
-                        value={downloadScale}
-                        onChange={(value) => setDownloadScale(value as number)}
-                        min={0.05}
-                        max={1.0001}
-                        step={0.05}
-                    />
-                    <InputNumber
-                        value={downloadScale}
-                        onChange={(value) => {
-                            if (value) {
-                                setDownloadScale(value as number);
-                            }
-                        }}
-                        min={0.05}
-                        max={1}
-                        step={0.05}
-                    />
+                <Form.Item
+                    name='scale'
+                    label='Scale'
+                    className='download-scale-item'
+                    rules={[{required: true, message: 'Scale should be a number > 0 and <= 1'}]}
+                >
+                    <Form.Item
+                        name='scale'
+                        className='download-scale-slider'
+
+                    >
+                        <Slider
+                            min={0.05}
+                            max={1.0}
+                            step={0.05}
+                        />
+                    </Form.Item>
+                    <Form.Item
+                        name='scale'
+                        className='download-scale-input'
+
+                    >
+                        <InputNumber
+                            min={0.05}
+                            max={1}
+                            step={0.05}
+                        />
+                    </Form.Item>
                 </Form.Item>
             </Form>
             {downloadError &&
@@ -100,11 +126,13 @@ export const DatasetVizDownloadModal = (props: DatasetVizDownloadModalProps) => 
     let formId = 'dataset-viz-download-form';
 
     let [visible, setVisible] = useState(true);
-    let [isPending, setPending] = useState(false);
+    let [formState, setFormState] = useState<DatasetDownloadFormSubmitState>(DatasetDownloadFormSubmitState.Ready);
 
-    const onSubmitStateChange = (submitState: FormSubmitState) => {
-        setPending(submitState === FormSubmitState.Pending);
-        if (submitState === FormSubmitState.Success) {
+    const [formInstance] = useForm(props.formInstance);
+
+    const onSubmitStateChange = (submitState: DatasetDownloadFormSubmitState) => {
+        setFormState(submitState);
+        if (submitState === DatasetDownloadFormSubmitState.Success) {
             setVisible(false);
         }
     };
@@ -115,15 +143,15 @@ export const DatasetVizDownloadModal = (props: DatasetVizDownloadModalProps) => 
             okButtonProps={{
                 htmlType: 'submit',
                 form: formId,
-                loading: isPending
+                loading: formState === DatasetDownloadFormSubmitState.Pending,
+                disabled: formState === DatasetDownloadFormSubmitState.Invalid
             }}
             visible={visible}
-            zIndex={1040}
             onCancel={() => setVisible(false)}
             afterClose={props.onClose}
             destroyOnClose={true}
         >
-            <DatasetVizDownload formId={formId} onSubmitStateChange={onSubmitStateChange} {...props}/>
+            <DatasetVizDownload formId={formId} formInstance={formInstance} onSubmitStateChange={onSubmitStateChange} {...props}/>
         </Modal>
     );
 };

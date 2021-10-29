@@ -17,7 +17,7 @@ import { DatasetViz, DatasetExplorer } from '@oida/eo-mobx';
 import { ComboToolConfig } from '../hooks';
 import { DatasetVizProgressControl } from './dataset-viz-progress-control';
 import { DatasetVizSettingsFactory } from './dataset-viz-settings-factory';
-import { DatasetVizDownloadModal } from './dataset-viz-download';
+import { DatasetVizDownloadModal, DatasetVizDownloadModalProps } from './dataset-viz-download';
 import { DatasetToolsMenu } from './dataset-tools-menu';
 
 
@@ -26,6 +26,7 @@ export type DatasetVizListItemProps = {
     datasetViz: DatasetViz<MapLayer>;
     analyticsTools?: ComboToolConfig[];
     onRemove?: () => void;
+    downloadComponent?: React.ComponentType<DatasetVizDownloadModalProps>;
 };
 
 export const DatasetVizListItem = (props: DatasetVizListItemProps) => {
@@ -124,6 +125,8 @@ export const DatasetVizListItem = (props: DatasetVizListItemProps) => {
 
     const onItemRemove = props.onRemove;
 
+    const DownloadComponent = props.downloadComponent || DatasetVizDownloadModal;
+
     return (
         <List.Item
             className='viz-item'
@@ -193,7 +196,7 @@ export const DatasetVizListItem = (props: DatasetVizListItemProps) => {
                 );
             })}
             {downloadVisible &&
-                <DatasetVizDownloadModal onClose={() => setDownloadVisible(false)} datasetViz={props.datasetViz}></DatasetVizDownloadModal>
+                <DownloadComponent onClose={() => setDownloadVisible(false)} datasetViz={props.datasetViz}/>
             }
         </List.Item>
     );

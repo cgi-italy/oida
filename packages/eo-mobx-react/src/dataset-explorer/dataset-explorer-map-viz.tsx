@@ -9,12 +9,13 @@ import { MapLayer } from '@oida/state-mobx';
 import { DatasetExplorer, DatasetViz } from '@oida/eo-mobx';
 
 import { ComboToolConfig } from '../hooks/use-dataset-explorer-tools';
-import { DatasetVizListItem } from '../dataset-map-viz';
+import { DatasetVizDownloadModalProps, DatasetVizListItem } from '../dataset-map-viz';
 
 
 export type DatasetExplorerMapVizProps = {
     explorerState: DatasetExplorer;
-    analyticsTools?: ComboToolConfig[]
+    analyticsTools?: ComboToolConfig[];
+    datasetDownloadComponent?: React.ComponentType<DatasetVizDownloadModalProps>;
 };
 
 let SortableItem = SortableElement(DatasetVizListItem);
@@ -40,6 +41,7 @@ export const DatasetExplorerMapViz = (props: DatasetExplorerMapVizProps) => {
                 analyticsTools={props.analyticsTools}
                 datasetViz={view.mapViz as DatasetViz<MapLayer>}
                 onRemove={() => props.explorerState.removeDataset(view.id)}
+                downloadComponent={props.datasetDownloadComponent}
             />
         );
     });
