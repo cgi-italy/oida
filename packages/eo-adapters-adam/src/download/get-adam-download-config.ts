@@ -8,18 +8,24 @@ import { AdamDatasetFactoryConfig } from '../get-adam-dataset-factory';
 import { downloadAdamWcsRaster } from './download-adam-wcs-raster';
 import { AdamServiceParamsSerializer, getColormapWcsParams } from '../utils';
 
+export type AdamDatasetDownloadConfig = DatasetDownloadConfig & {
+    downloadUrlProvider: (request: DownloaMapVizRequest) => Promise<{
+        url: string;
+        postData: string | undefined;
+    }>
+};
+
 export const getAdamDatasetDownloadConfig = (
     axiosInstance: AxiosInstanceWithCancellation,
     factoryConfig: AdamDatasetFactoryConfig,
     datasetConfig: AdamDatasetConfig
 ) => {
 
-
-    const downloadProvider = (request: DownloaMapVizRequest) => {
+    const getDownloadRequestConfig = (request: DownloaMapVizRequest) => {
         if (request.datasetViz instanceof RasterMapViz) {
             const rasterParams = downloadAdamWcsRaster(datasetConfig, request.datasetViz);
             if (!rasterParams) {
-                return Promise.reject('No coverage available');
+               throw new Error('No coverage available');
             } else {
                 let wcsParams: any = {
                     service: 'WCS',
@@ -46,27 +52,53 @@ export const getAdamDatasetDownloadConfig = (
                     }
                 }
 
-                return axiosInstance.cancelableRequest({
+                return {
                     url: factoryConfig.wcsServiceUrl,
-                    method: rasterParams.wktFilter ? 'POST' : 'GET',
-                    data: rasterParams.wktFilter,
                     params: {
                         ...wcsParams,
-                        subset: rasterParams.subsets,
+                        subset: rasterParams.subsets
                     },
-                    responseType: 'blob',
-                    paramsSerializer: AdamServiceParamsSerializer
-                }).then((response) => {
-                    download(response.data, wcsParams.coverageId, request.format);
-                });
+                    postData: rasterParams.wktFilter
+                };
             }
         } else {
-            return Promise.reject('Unsupported dataset');
+            throw new Error('Unsupported dataset');
         }
     };
 
-    let downloadConfig: DatasetDownloadConfig = {
+    const downloadUrlProvider = (request: DownloaMapVizRequest) => {
+        try {
+            const requestConfig = getDownloadRequestConfig(request);
+            return Promise.resolve({
+                url: `${factoryConfig.wcsServiceUrl}?${AdamServiceParamsSerializer(requestConfig.params)}`,
+                postData: requestConfig.postData
+            });
+        } catch (e) {
+            return Promise.reject(e);
+        }
+    };
+
+    const downloadProvider = (request: DownloaMapVizRequest) => {
+        try {
+            const requestConfig = getDownloadRequestConfig(request);
+            return axiosInstance.cancelableRequest({
+                url: requestConfig.url,
+                method: requestConfig.postData ? 'POST' : 'GET',
+                data: requestConfig.postData,
+                params: requestConfig.params,
+                responseType: 'blob',
+                paramsSerializer: AdamServiceParamsSerializer
+            }).then((response) => {
+                download(response.data, requestConfig.params.coverageId, request.format);
+            });
+        } catch (e) {
+            return Promise.reject(e);
+        }
+    };
+
+    let downloadConfig: AdamDatasetDownloadConfig = {
         downloadProvider: downloadProvider,
+        downloadUrlProvider: downloadUrlProvider,
         supportedFormats: [
             {id: 'image/tiff', name: 'GeoTiff'},
             {id: 'application/tar', name: 'GeoTiff archive'},
