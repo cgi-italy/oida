@@ -85,7 +85,7 @@ export class CesiumFeatureSelectInteraction implements IFeatureSelectInteraction
 
     protected selectClickedEntity_(selectionMode, movement) {
 
-        const pickedObjects = this.viewer_.scene.drillPick(movement.position);
+        const pickedObjects = this.viewer_.scene.drillPick(movement.position, 20);
 
         const pickInfos: PickInfo[] = pickedObjects
             .map(pickedObject => getPickInfo(pickedObject))

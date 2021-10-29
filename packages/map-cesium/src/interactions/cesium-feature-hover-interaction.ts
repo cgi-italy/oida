@@ -52,7 +52,7 @@ export class CesiumFeatureHoverInteraction implements IFeatureHoverInteractionIm
                 return;
             }
             lastPickTime = now;
-            let pickedObjects = this.viewer_.scene.drillPick(movement.endPosition);
+            let pickedObjects = this.viewer_.scene.drillPick(movement.endPosition, 10);
 
             const pickInfo: PickInfo = pickedObjects
                 .map(pickedObject => getPickInfo(pickedObject))
