@@ -2,7 +2,9 @@ import { colorscales, renderColorScaleToCanvas } from 'plotty';
 import { ColorScale, ColorScaleType } from '@oida/eo-mobx';
 import chroma from 'chroma-js';
 
-let plottyColorScales: ColorScale[];
+let plottyColorScales: (ColorScale & {
+    colors: string[]
+})[];
 
 export const getPlottyColorScales = () => {
 
