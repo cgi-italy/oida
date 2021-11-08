@@ -119,10 +119,12 @@ export class RasterMapViz extends DatasetViz<GroupLayer> implements HasDatasetDi
                             });
                             this.mapLayer.children.add(layer);
                         }
-                        layer.setSource(item.config);
+
+                        layer.setSource(undefined);
                         layer.setExtent(item.geographicExtent);
                         layer.setMinZoomLevel(item.minZoomLevel);
                         layer.setMaxZoomLevel(item.maxZoomLevel);
+                        layer.setSource(item.config);
                     });
                 } else {
                     this.mapLayer.children.items.forEach((layer) => {
