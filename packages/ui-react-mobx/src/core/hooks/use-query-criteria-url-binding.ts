@@ -30,7 +30,7 @@ export const serializeQueryFilters = (filters: QueryFilter[]): string => {
         if (serializer) {
             q.push({
                 k: filter.key,
-                v: filter.value,
+                v: serializer.toJSON(filter.value),
                 t: filter.type
             });
         }
@@ -59,13 +59,8 @@ export const useQueryCriteriaUrlBinding = (props: QueryCriteriaUrlBindingProps) 
             delete urlParams[queryUrlKeys.pageSize];
         }
 
-        if (sortBy) {
-            urlParams[queryUrlKeys.sortKey] = sortBy.key;
-            urlParams[queryUrlKeys.sortOrder] = sortBy.order;
-        } else {
-            delete urlParams[queryUrlKeys.sortKey];
-            delete urlParams[queryUrlKeys.sortOrder];
-        }
+        urlParams[queryUrlKeys.sortKey] = sortBy?.key || '';
+        urlParams[queryUrlKeys.sortOrder] = sortBy?.order || '';
 
         if (filters) {
             urlParams[queryUrlKeys.filters] = serializeQueryFilters(filters);
@@ -79,26 +74,29 @@ export const useQueryCriteriaUrlBinding = (props: QueryCriteriaUrlBindingProps) 
 
     const updateCriteriaFromUrl = (search) => {
         let urlParams = queryString.parse(search);
-        if (urlParams[queryUrlKeys.page]) {
+        if (urlParams[queryUrlKeys.page] !== undefined) {
             props.criteria.paging.setPage(parseInt(urlParams[queryUrlKeys.page] as string));
-        } else {
-            props.criteria.paging.setPage(0);
         }
-        if (urlParams[queryUrlKeys.pageSize]) {
+        if (urlParams[queryUrlKeys.pageSize] !== undefined) {
             props.criteria.paging.setPageSize(parseInt(urlParams[queryUrlKeys.pageSize] as string));
-        } else {
-            props.criteria.paging.setPageSize(20);
         }
 
         const sortKey = urlParams[queryUrlKeys.sortKey] as string;
+        if (sortKey !== undefined) {
+            props.criteria.sorting.sortBy({
+                key: sortKey,
+            });
+        }
+
         const sortOrder = urlParams[queryUrlKeys.sortOrder] as string;
-        props.criteria.sorting.sortBy({
-            key: sortKey,
-            order: sortOrder === 'desc' ? SortOrder.Descending : SortOrder.Ascending
-        });
+        if (sortOrder !== undefined) {
+            props.criteria.sorting.sortBy({
+                order: sortOrder === 'desc' ? SortOrder.Descending : SortOrder.Ascending
+            });
+        }
 
         const urlFilters = urlParams[queryUrlKeys.filters];
-        if (urlFilters && urlFilters !== serializeQueryFilters(props.criteria.data.filters)) {
+        if (urlFilters !== undefined && urlFilters !== serializeQueryFilters(props.criteria.data.filters || [])) {
 
             props.criteria.filters.clear();
             const filterValues = urlFilters ? JSON.parse(lzString.decompressFromEncodedURIComponent(urlFilters)) : [];
