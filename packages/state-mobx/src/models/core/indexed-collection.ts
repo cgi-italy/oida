@@ -8,7 +8,7 @@ export type IndexedCollectionProps<T> = CollectionProps<T> & {
 
 export class IndexedCollection<T> extends Collection<T> {
 
-    protected idMap_: Record<string | number, T> = {};
+    @observable protected idMap_: Record<string | number, T> = {};
     protected idGetter_: (item: T) => string | number;
 
     constructor(props: IndexedCollectionProps<T>) {
@@ -19,10 +19,7 @@ export class IndexedCollection<T> extends Collection<T> {
             this.indexItems_(props.items);
         }
 
-        makeObservable<IndexedCollection<T>, 'idMap_'>(this, {
-            idMap_: observable,
-            removeItemWithId: action
-        });
+        makeObservable(this);
     }
 
     add(items: T | T[], idx = -1) {
@@ -40,6 +37,7 @@ export class IndexedCollection<T> extends Collection<T> {
         this.idMap_ = {};
     }
 
+    @action
     removeItemWithId(id: string) {
         const item = this.idMap_[id];
         if (item) {

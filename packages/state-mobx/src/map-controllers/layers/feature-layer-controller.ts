@@ -1,7 +1,7 @@
 import { reaction, IReactionDisposer, IObservableArray, makeObservable, observable } from 'mobx';
 import { v4 as uuid } from 'uuid';
 
-import { FEATURE_LAYER_ID, IFeatureLayerRenderer, IMapRenderer, IFeatureStyle, Geometry, GeometryCollection, IFeature } from '@oida/core';
+import { FEATURE_LAYER_ID, IFeatureLayerRenderer, IMapRenderer, IFeature } from '@oida/core';
 
 import { ArrayTracker } from '../../utils';
 import { FeatureLayer, FeatureInterface, FeatureStyleGetter, FeatureGeometryGetter } from '../../models/map/layers/feature-layer';
@@ -25,8 +25,8 @@ export class FeatureLayerController
 <T extends FeatureInterface> extends MapLayerController<IFeatureLayerRenderer<FeatureData<T>>, FeatureLayer<T>> {
 
     private sourceTracker_: ArrayTracker<T, FeatureTracker> | undefined;
-    private geometryGetter_: FeatureGeometryGetter<T>;
-    private styleGetter_: FeatureStyleGetter<T>;
+    @observable.ref private geometryGetter_: FeatureGeometryGetter<T>;
+    @observable.ref private styleGetter_: FeatureStyleGetter<T>;
 
     constructor(config) {
         super(config);
@@ -34,10 +34,7 @@ export class FeatureLayerController
         this.geometryGetter_ = this.mapLayer_.config.value.geometryGetter;
         this.styleGetter_ = this.mapLayer_.config.value.styleGetter;
 
-        makeObservable<FeatureLayerController<T>, 'styleGetter_' | 'geometryGetter_'>(this, {
-            styleGetter_: observable.ref,
-            geometryGetter_: observable.ref
-        });
+        makeObservable(this);
     }
 
     protected createLayerRenderer_(mapRenderer: IMapRenderer) {

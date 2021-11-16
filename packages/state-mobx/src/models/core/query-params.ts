@@ -1,6 +1,6 @@
 import { makeObservable, observable, action, computed, reaction, ObservableMap } from 'mobx';
 
-import { SortOrder, QueryFilter } from '@oida/core';
+import { SortOrder, QueryFilter, QueryParams as QueryCriteria } from '@oida/core';
 
 
 export type FilterTypeReaction =  (filters: DataFilters, key: string) => (() => void);
@@ -11,8 +11,9 @@ export const setReactionForFilterType = (type: string, reaction: FilterTypeReact
     filterTypeReactions[type] = reaction;
 };
 
+/** {@Link DataFilters} props */
 export type DataFiltersProps<FILTER extends QueryFilter = any> = {
-    /**the initial filter values */
+    /** The initial filter values */
     values?: Record<string, FILTER>
 };
 
@@ -59,11 +60,7 @@ export class DataFilters<FILTERS extends QueryFilter = any> {
 
         this.reactionsDisposer_ = {};
 
-        makeObservable(this, {
-            set: action,
-            clear: action,
-            unset: action
-        });
+        makeObservable(this);
     }
 
     /**
@@ -75,7 +72,7 @@ export class DataFilters<FILTERS extends QueryFilter = any> {
         return this.items.get(key) as FindByKey<FILTERS, KEY> | undefined;
     }
 
-
+    @action
     set<KEY extends FILTERS['key']>(key: KEY, value: FindByKey<FILTERS, KEY>['value'], type: FindByKey<FILTERS, KEY>['type']) {
         this.items.set(key, {
             key,
@@ -87,12 +84,14 @@ export class DataFilters<FILTERS extends QueryFilter = any> {
         }
     }
 
+    @action
     clear() {
         this.items.clear();
         Object.values(this.reactionsDisposer_).forEach(disposer => disposer());
         this.reactionsDisposer_ = {};
     }
 
+    @action
     unset(key: string) {
         this.items.delete(key);
         if (this.reactionsDisposer_[key]) {
@@ -106,28 +105,26 @@ export class DataFilters<FILTERS extends QueryFilter = any> {
     }
 }
 
+/** {@Linki DataSorting} props */
 export type DataSortingProps = {
     key: string,
     order?: SortOrder
 };
 
+/** A class to manage the sorting state of a collection */
 export class DataSorting {
-    key: string | undefined;
-    order: SortOrder;
+    @observable key: string | undefined;
+    @observable order: SortOrder;
 
     constructor(props?: DataSortingProps) {
 
         this.key = props?.key;
         this.order = props?.order || SortOrder.Ascending;
 
-        makeObservable(this, {
-            key: observable,
-            order: observable,
-            sortBy: action,
-            clear: action
-        });
+        makeObservable(this);
     }
 
+    @action
     sortBy(params: {key?: string, order?: SortOrder}) {
         if (params.key) {
             this.key = params.key;
@@ -137,21 +134,27 @@ export class DataSorting {
         }
     }
 
+    @action
     clear() {
         this.key = undefined;
     }
 }
 
+/** {@Link DataPaging} props */
 export type DataPagingProps = {
     page?: number;
     pageSize?: number;
     total?: number;
 };
 
+/** A class to manage a data pager state */
 export class DataPaging {
-    page: number;
-    pageSize: number;
-    total: number;
+    /** The current page number */
+    @observable page: number;
+    /** The page size  */
+    @observable pageSize: number;
+    /** The total number of records */
+    @observable total: number;
 
     constructor(props?: DataPagingProps) {
 
@@ -159,61 +162,81 @@ export class DataPaging {
         this.pageSize = props?.pageSize || 20;
         this.total = props?.total || 0;
 
-        makeObservable(this, {
-            page: observable,
-            pageSize: observable,
-            total: observable,
-            offset: computed,
-            numPages: computed,
-            isFirstPage: computed,
-            isLastPage: computed,
-            setPage: action,
-            setPageSize: action,
-            setTotal: action,
-            reset: action
-        });
+        makeObservable(this);
     }
 
+    /** The current start index */
+    @computed
     get offset() {
         return this.pageSize * this.page;
     }
 
+    /** Total number of pages */
+    @computed
     get numPages() {
         return Math.ceil(this.total / this.pageSize);
     }
 
+    @computed
     get isFirstPage() {
         return this.page === 0;
     }
 
+    @computed
     get isLastPage() {
         return this.page === this.numPages - 1;
     }
 
+    /**
+     * Set the page number
+     *
+     * @param page Page number
+     */
+    @action
     setPage(page: number) {
         this.page = page;
     }
 
+    /**
+     * Set the paging size
+     *
+     * @param pageSize Page size
+     */
+    @action
     setPageSize(pageSize: number) {
         this.pageSize = pageSize;
     }
 
+    /**
+     * Set the total number of records
+     *
+     * @param total Sumber of records
+     */
+    @action
     setTotal(total: number) {
         this.total = total;
     }
 
+    /**
+     * Reset the page number
+     */
+    @action
     reset() {
         this.page = 0;
     }
 }
 
-
+/** {@Link QueryParam} props */
 export type QueryParamsProps<FILTERS extends QueryFilter = any> = {
     filters?: DataFilters<FILTERS> | DataFiltersProps<FILTERS>,
     paging?: DataPaging | DataPagingProps,
     sorting?: DataSorting | DataSortingProps,
 };
 
+/**
+ * A class to manage a collection query state.
+ * It combines {@Link DataFilters}, {@Link DataPaging} and {@Link DataSorting}
+ */
 export class QueryParams<FILTERS extends QueryFilter = any> {
     filters: DataFilters<FILTERS>;
     paging: DataPaging;
@@ -237,15 +260,14 @@ export class QueryParams<FILTERS extends QueryFilter = any> {
             this.sorting = new DataSorting(props?.sorting);
         }
 
-        makeObservable(this, {
-            data: computed,
-            reset: action
-        });
+        makeObservable(this);
 
         this.afterInit_();
     }
 
-    get data() {
+    /** The current query criteria */
+    @computed
+    get data(): QueryCriteria<FILTERS> {
         return {
             paging: {
                 page: this.paging.page,
@@ -260,6 +282,8 @@ export class QueryParams<FILTERS extends QueryFilter = any> {
         };
     }
 
+    /** Reset the query state */
+    @action
     reset() {
         this.filters.clear();
         this.paging.setTotal(0);

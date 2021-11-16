@@ -3,16 +3,21 @@ import { makeObservable, observable, action, IObservableArray } from 'mobx';
 import { SelectionMode } from  '@oida/core';
 
 export class DataSelection<T> {
-    readonly items = observable<T>([]);
+    readonly items: IObservableArray<T>;
 
     constructor() {
-        makeObservable(this, {
-            modifySelection: action
+        this.items = observable.array([], {
+            deep: false
         });
+
+        makeObservable(this);
     }
+
     isSelected(item: T) {
         return this.items.indexOf(item) !== -1;
     }
+
+    @action
     modifySelection(item?: T, mode: SelectionMode = SelectionMode.Replace) {
         if (mode === SelectionMode.Replace) {
             this.items.clear();

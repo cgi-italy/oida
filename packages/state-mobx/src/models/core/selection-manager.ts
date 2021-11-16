@@ -12,13 +12,12 @@ export class SelectionManager<T extends SelectableItem = SelectableItem> {
     constructor() {
         this.selection = new DataSelection();
 
-        makeObservable(this, {
-            setHovered: action
-        });
+        makeObservable(this);
 
         this.afterInit_();
     }
 
+    @action
     setHovered(items: T | T[] | undefined) {
         if (this.hovered.length === 1 && items === this.hovered[0]) {
             return;

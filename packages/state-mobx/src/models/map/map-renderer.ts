@@ -11,21 +11,18 @@ export type MapRendererProps = {
 
 export class MapRenderer {
     id: string;
-    options: MapRendererOptions;
-    implementation: IMapRenderer | undefined;
+    @observable.ref options: MapRendererOptions;
+    @observable.ref implementation: IMapRenderer | undefined;
 
     constructor(props: MapRendererProps) {
         this.id = props.id;
         this.options = props.options || {};
         this.implementation = undefined;
 
-        makeObservable(this, {
-            options: observable.ref,
-            implementation: observable.ref,
-            setImplementation: action
-        });
+        makeObservable(this);
     }
 
+    @action
     setOptions(options: Partial<MapRendererOptions>) {
         this.options = {
             ...this.options,
@@ -33,6 +30,7 @@ export class MapRenderer {
         };
     }
 
+    @action
     setImplementation(implementation: IMapRenderer | undefined) {
         this.implementation = implementation;
     }

@@ -17,8 +17,8 @@ export class Map {
 
     readonly layers: GroupLayer;
     readonly interactions: IndexedCollection<MapInteraction>;
-    view: MapView;
-    renderer: MapRenderer;
+    @observable.ref view: MapView;
+    @observable.ref renderer: MapRenderer;
 
     constructor(props: MapProps) {
         this.view = props.view instanceof MapView ? props.view : new MapView(props.view);
@@ -36,17 +36,15 @@ export class Map {
             items: (props.interactions || []).map(item => item instanceof MapInteraction ? item : MapInteraction.create(item))
         });
 
-        makeObservable(this, {
-            view: observable.ref,
-            renderer: observable.ref,
-            setRenderer: action
-        });
+        makeObservable(this);
     }
 
+    @action
     setView(view: MapViewProps) {
         this.view = new MapView(view);
     }
 
+    @action
     setRenderer(renderer: MapRendererProps) {
         this.renderer = new MapRenderer(renderer);
     }
