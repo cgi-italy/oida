@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { IObservableArray } from 'mobx';
-import { Form, Button } from 'antd';
+import { Form, Button, Checkbox } from 'antd';
 import { LeftOutlined } from '@ant-design/icons';
 
 import { DatasetPointSeries, POINT_SERIES_PROCESSING, DatasetPointSeriesConfig } from '@oida/eo-mobx';
@@ -87,6 +87,8 @@ export const DatasetPointSeriesAnalysis = (props: DatasetAnalysisWidgetFactoryCo
         return series.every((item) => item.canRunQuery);
     });
 
+    const [smooth, setSmooth] = useState(false);
+
     return (
         <div className='dataset-chart'>
             {filtersVisible &&
@@ -109,19 +111,23 @@ export const DatasetPointSeriesAnalysis = (props: DatasetAnalysisWidgetFactoryCo
             }
             {!filtersVisible &&
                 <div className='dataset-chart-result'>
-                    <Button
-                        className='dataset-chart-modify-params-btn'
-                        type='link'
-                        icon={<LeftOutlined />}
-                        onClick={() => {
-                            series.forEach((item) => item.visible.setValue(true));
-                            setFiltersVisible(true);
-                        }}
-                    >
-                        Modify parameters
-                    </Button>
+                    <div className='dataset-chart-actions'>
+                        <Button
+                            className='dataset-chart-modify-params-btn'
+                            type='link'
+                            icon={<LeftOutlined />}
+                            onClick={() => {
+                                series.forEach((item) => item.visible.setValue(true));
+                                setFiltersVisible(true);
+                            }}
+                        >
+                            Modify parameters
+                        </Button>
+                        <Checkbox checked={smooth} onChange={(evt) => setSmooth(evt.target.checked)}>Smoothing</Checkbox>
+                    </div>
                     <DatasetPointSeriesChart
                         series={series}
+                        smooth={smooth}
                     />
                 </div>
             }

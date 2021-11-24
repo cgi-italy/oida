@@ -20,6 +20,7 @@ import { ChartWidget } from '../chart-widget';
 
 export type DatasetPointSeriesChartProps = {
     series: DatasetPointSeries[];
+    smooth?: boolean;
 };
 
 type LegendDataItem = {
@@ -167,7 +168,6 @@ export function DatasetPointSeriesChart(props: DatasetPointSeriesChartProps) {
                 name: `${idx}`,
                 xAxisIndex: axes.x[dimensionConfig.id].idx,
                 yAxisIndex: axes.y[yAxisUnits].idx,
-                smooth: true,
                 data: chartData
             });
 
@@ -325,7 +325,12 @@ export function DatasetPointSeriesChart(props: DatasetPointSeriesChartProps) {
                         top: 60,
                         containLabel: true
                     },
-                    series: chartSeries,
+                    series: chartSeries.map((series) => {
+                        return {
+                            ...series,
+                            smooth: props.smooth
+                        };
+                    }),
                     useUTC: true,
                     backgroundColor: 'transparent'
                 } as EChartOption}
