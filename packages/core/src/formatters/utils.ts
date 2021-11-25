@@ -11,7 +11,14 @@ export type NumberFormatOptions = {
     precision?: number;
 };
 
-export const formatNumber = (value: number, options?: NumberFormatOptions) => {
+export const formatNumber = (value: number | string, options?: NumberFormatOptions) => {
+    if (typeof(value) === 'string') {
+        try {
+            value = parseFloat(value);
+        } catch (e) {
+            return value as string;
+        }
+    }
     let formattedValue = value.toString();
     if (typeof(options?.maxLength) === 'number') {
         if (formattedValue.length > options.maxLength) {
