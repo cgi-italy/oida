@@ -123,7 +123,7 @@ export class WmsService {
     }
 
     getFeatureInfo(params: WmsFeatureInfoParams) {
-        const buffer = params.buffer || [0.1, 0.2];
+        const buffer = params.buffer || [0.01, 0.02];
         return this.wmsClient_.getFeatureInfo({
             url: this.config_.url,
             layers: params.layer,
@@ -135,10 +135,10 @@ export class WmsService {
                 params.position[1] + buffer[1],
                 params.position[0] + buffer[0]
             ],
-            width: 64,
-            height: 64,
-            i: 32,
-            j: 32,
+            width: 2,
+            height: 2,
+            i: 1,
+            j: 1,
             format: params.format,
             vendorParams: params.additionalParams
         });
