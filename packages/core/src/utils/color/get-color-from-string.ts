@@ -1,12 +1,19 @@
 import chroma from 'chroma-js';
 
+
+// taken from https://github.com/darkskyapp/string-hash/blob/master/index.js
 const getHashCode = (str) => {
-    let hash = 0;
-    for (let i = 0; i < str.length; i++) {
-      hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    let hash = 5381, i = str.length;
+    while (i) {
+        hash = (hash * 33) ^ str.charCodeAt(--i);
     }
-    return hash;
+
+    /* JavaScript does bitwise operations (like XOR, above) on 32-bit signed
+     * integers. Since we want the results to be always positive, convert the
+     * signed int to an unsigned by doing an unsigned bitshift. */
+    return hash >>> 0;
 };
+
 
 export const getColorFromString = (str: string, saturation: number, lightness: number) => {
     return chroma.hsl(
