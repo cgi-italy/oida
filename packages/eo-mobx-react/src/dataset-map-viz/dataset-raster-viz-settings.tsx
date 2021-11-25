@@ -1,14 +1,17 @@
 import React from 'react';
 
+import { Map } from '@oida/state-mobx';
+import { RasterMapViz, RASTER_VIZ_TYPE } from '@oida/eo-mobx';
+
 import { DatasetVizOpacityControl } from './dataset-viz-opacity-control';
 import { DatasetDimensionValueSelector } from './dataset-dimension-value-selector';
 import { DatasetVizSettingsFactory } from './dataset-viz-settings-factory';
-
-import { RasterMapViz, RASTER_VIZ_TYPE } from '@oida/eo-mobx';
 import { DatasetBandModeControls } from './dataset-band-mode-controls';
 
+
 export type DatasetRasterVizSettingsProps = {
-    datasetViz: RasterMapViz
+    datasetViz: RasterMapViz;
+    mapState?: Map;
 };
 
 export const DatasetRasterVizSettings = (props: DatasetRasterVizSettingsProps) => {
@@ -37,6 +40,8 @@ export const DatasetRasterVizSettings = (props: DatasetRasterVizSettingsProps) =
             <DatasetBandModeControls
                 bandModeConfig={props.datasetViz.config.bandMode}
                 bandMode={props.datasetViz.bandMode}
+                dimensionsState={props.datasetViz.dimensions}
+                mapState={props.mapState}
             />
         </div>
     );

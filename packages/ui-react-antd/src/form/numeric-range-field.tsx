@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { InputNumber, Slider } from 'antd';
 import { InputNumberProps } from 'antd/lib/input-number';
 import { SliderRangeProps } from 'antd/lib/slider';
@@ -13,10 +13,16 @@ import { antdFormFieldRendererFactory } from './antd-form-field-renderer-factory
 
 export type NumericRangeFieldRendererProps = FormFieldRendererBaseProps<NumericRangeField> & {
     sliderProps?: Partial<SliderRangeProps>,
-    numericInputProps?: Partial<InputNumberProps>
+    numericInputProps?: Partial<InputNumberProps>,
+    /** Extra content to be displayed between the two range inputs */
+    inputInfraContent?: React.ReactNode,
+    /** Extra content to be displayed on the right of the range selection slider */
+    sliderExtraContent?: React.ReactNode
 };
 
 export const NumericRangeFieldRenderer = (props: NumericRangeFieldRendererProps) => {
+
+    const sliderRef = useRef<any>();
 
     const {value, onChange, title, required, config, autoFocus, sliderProps, numericInputProps} = props;
 
@@ -43,15 +49,28 @@ export const NumericRangeFieldRenderer = (props: NumericRangeFieldRendererProps)
 
         domainSlider = (
             <Slider
+                ref={sliderRef}
                 style={{minWidth: '140px'}}
                 value={value ? [value.from, value.to] : undefined}
                 defaultValue={value ? [value.from, value.to] : [config.min!, config.max!]}
-                onChange={onRangeChange}
+                onChange={(range) => {
+                    if (sliderRef.current) {
+                        // retrieve from the slider state which handle was moved and update only the corresponding range endpoint
+                        // (to avoid rounding-off the untouched range endpoint)
+                        const movedHandle: number | undefined = sliderRef.current.prevMovedHandleIndex;
+                        if (movedHandle === 0) {
+                            range[1] = value?.to || range[1];
+                        } else if (movedHandle === 1) {
+                            range[0] = value?.from || range[0];
+                        }
+                    }
+                    onRangeChange(range);
+                }}
                 min={config.min}
                 max={config.max}
                 marks={marks}
                 tooltipVisible={false}
-                step={config.step || ((config.max! - config.min!) / 100)}
+                step={config.step || parseFloat(((config.max! - config.min!) / 100).toPrecision(4))}
                 range={true}
                 {...sliderProps}
             />
@@ -75,6 +94,7 @@ export const NumericRangeFieldRenderer = (props: NumericRangeFieldRendererProps)
                     }}
                     {...numericInputProps}
                 />
+                {props.inputInfraContent}
                 <InputNumber
                     value={value ? value.to : undefined}
                     min={config.min}
@@ -90,7 +110,10 @@ export const NumericRangeFieldRenderer = (props: NumericRangeFieldRendererProps)
                     {...numericInputProps}
                 />
             </div>
-            {domainSlider}
+            <div className='numeric-range-slider'>
+                {domainSlider}
+                {props.sliderExtraContent}
+            </div>
         </div>
     );
 

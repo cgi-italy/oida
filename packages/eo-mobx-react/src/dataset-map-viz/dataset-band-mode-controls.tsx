@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-
 import { Select } from 'antd';
 
+import { Map } from '@oida/state-mobx';
 import { useSelector } from '@oida/ui-react-mobx';
 import {
     RasterBandModeType, RasterBandMode, RasterBandModeConfig, getRasterBandModeFromConfig,
-    RasterBandModeSingle, RasterBandModePreset, RasterBandModeCombination
+    RasterBandModeSingle, RasterBandModePreset, RasterBandModeCombination, DatasetDimensions
 } from '@oida/eo-mobx';
 
 import { DatasetBandSingleSelector } from './dataset-band-single-selector';
@@ -69,7 +69,9 @@ export const DatasetBandModeSelector = (props: DatasetBandModeSelectorProps) => 
 
 export type DatasetBandModeControlsProps = {
     bandMode: RasterBandMode,
-    bandModeConfig: RasterBandModeConfig
+    bandModeConfig: RasterBandModeConfig,
+    dimensionsState?: DatasetDimensions,
+    mapState?: Map
 };
 
 export const DatasetBandModeControls = (props: DatasetBandModeControlsProps) => {
@@ -96,6 +98,8 @@ export const DatasetBandModeControls = (props: DatasetBandModeControlsProps) => 
                     rasterBands={props.bandModeConfig.bands!}
                     state={selectedMode}
                     bandSelectorLabel={bandModeSelector ? 'Band' : 'Variable'}
+                    dimensionsState={props.dimensionsState}
+                    mapState={props.mapState}
                 />
             }
             {selectedMode instanceof RasterBandModePreset &&
@@ -109,6 +113,8 @@ export const DatasetBandModeControls = (props: DatasetBandModeControlsProps) => 
                     bandCombo={selectedMode}
                     bands={props.bandModeConfig.bands!}
                     bandGroups={props.bandModeConfig.bandGroups}
+                    dimensionsState={props.dimensionsState}
+                    mapState={props.mapState}
                 />
             }
         </div>

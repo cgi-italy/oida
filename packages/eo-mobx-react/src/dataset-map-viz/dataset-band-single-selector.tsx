@@ -1,11 +1,11 @@
 import React from 'react';
-
 import { Select } from 'antd';
 
-import { RasterBandModeSingle, RasterBandConfig, getDatasetVariableDomain, getRasterBandModeFromConfig, getRasterBandSingleConfig } from '@oida/eo-mobx';
+import { Map } from '@oida/state-mobx';
+import { useSelector } from '@oida/ui-react-mobx';
+import { RasterBandModeSingle, RasterBandConfig, getRasterBandSingleConfig, DatasetDimensions } from '@oida/eo-mobx';
 
 import { DatasetColorMapSelector } from './dataset-colormap-selector';
-import { useSelector } from '@oida/ui-react-mobx';
 import { DatasetInfoTooltip } from './dataset-info-tooltip';
 
 
@@ -58,7 +58,9 @@ export const DatasetBandSelector = (props: DatasetBandSelectorProps) => {
 export type DatasetBandSingleSelectorProps = {
     state: RasterBandModeSingle;
     rasterBands: RasterBandConfig | RasterBandConfig[];
-    bandSelectorLabel?: string
+    dimensionsState?: DatasetDimensions;
+    mapState?: Map;
+    bandSelectorLabel?: string;
 };
 
 export const DatasetBandSingleSelector = (props: DatasetBandSingleSelectorProps) => {
@@ -103,6 +105,8 @@ export const DatasetBandSingleSelector = (props: DatasetBandSingleSelectorProps)
                 colorMap={props.state.colorMap}
                 colorScales={colorScales}
                 variable={selectedBandConfig}
+                dimensionsState={props.dimensionsState}
+                mapState={props.mapState}
             />
         );
     }

@@ -9,7 +9,7 @@ import {
 import { SortableHandle } from 'react-sortable-hoc';
 
 import { LoadingState } from '@oida/core';
-import { MapLayer } from '@oida/state-mobx';
+import { Map, MapLayer } from '@oida/state-mobx';
 import { DataCollectionItemActionButton } from '@oida/ui-react-antd';
 import { useSelector, useCenterOnMapFromModule } from '@oida/ui-react-mobx';
 import { DatasetViz, DatasetExplorer } from '@oida/eo-mobx';
@@ -25,6 +25,7 @@ export type DatasetVizListItemProps = {
     datasetExplorer: DatasetExplorer;
     datasetViz: DatasetViz<MapLayer>;
     analyticsTools?: ComboToolConfig[];
+    mapState?: Map;
     onRemove?: () => void;
     downloadComponent?: React.ComponentType<DatasetVizDownloadModalProps>;
 };
@@ -77,7 +78,8 @@ export const DatasetVizListItem = (props: DatasetVizListItemProps) => {
         }
 
         const settingsContent = DatasetVizSettingsFactory.create(props.datasetViz.vizType, {
-            datasetViz: props.datasetViz
+            datasetViz: props.datasetViz,
+            mapState: props.mapState
         });
 
         if (settingsContent) {

@@ -1,3 +1,4 @@
+export * from './adjust-solid'
 export * from './draw-bbox'
 export * from './draw-line'
 export * from './draw-polygon'

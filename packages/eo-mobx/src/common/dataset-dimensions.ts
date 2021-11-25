@@ -100,7 +100,6 @@ export class DatasetDimensions implements DataDomainProviderFilters {
                         currentRequest.cancel();
                     }
                     this.domainRequests.set(dimension.id, domainRequest.then((domain) => {
-                        //this.domains.set(dimension.id, domain);
                         this.setDomain_(dimension.id, domain);
                         this.checkDimensionValue_(dimension.id, initDimensions);
                         return domain;

@@ -53,8 +53,13 @@
 
         }
 
-        .ant-slider {
-            margin: 10px 20px 30px 20px;
+        .dataset-colormap-range-slider {
+            display: flex;
+
+            .ant-slider {
+                flex-grow: 1;
+                margin: 10px 20px 30px 20px;
+            }
         }
     }
 }
@@ -92,6 +97,8 @@
 
 
 .ant-dropdown.dataset-colormap-preset-dropdown {
+
+    max-width: 300px;
 
     .dataset-colormap-presets {
         max-height: 300px;

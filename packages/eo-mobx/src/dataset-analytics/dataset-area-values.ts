@@ -5,7 +5,7 @@ import { AsyncDataFetcher } from '@oida/state-mobx';
 
 import {
     DatasetVariable, DatasetDimension, DataDomain, TimeSearchDirection, NumericDomain, CategoricalDomain,
-    DatasetDimensions, HasDatasetDimensions, DatasetDimensionsProps, ColorMapProps
+    DatasetDimensions, HasDatasetDimensions, DatasetDimensionsProps, ColorMapProps, DistributionHistogramBin, DistributionPercentile
 } from '../common';
 import { DatasetProcessing, DatasetProcessingProps } from './dataset-processing';
 
@@ -30,15 +30,14 @@ export type DatasetAreaValuesRequest = {
     additionalDatasetFilters?: Map<string, QueryFilter>;
 };
 
-export type DatasetHistogramBin = [x_center: number, count: number, x_min: number, x_max: number];
 export type DatasetAreaStatistics = {
     min?: number;
     max?: number;
     mean?: number;
     median?: number;
     variance?: number;
-    histogram?: DatasetHistogramBin[];
-    percentiles?: Array<[number, number]>;
+    histogram?: DistributionHistogramBin[];
+    percentiles?: DistributionPercentile[];
 };
 
 export type DatasetAreaValuesData = {

@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { DataDomain, DatasetVariable, isDomainProvider } from '@oida/eo-mobx';
+import { DataDomain, DatasetDimensions, DatasetVariable, isDomainProvider } from '@oida/eo-mobx';
+import { autorun } from 'mobx';
 
 export type UseDatasetVariableDomainProps<D extends DataDomain<unknown>> = {
     variable: DatasetVariable<D>;
-    onDomainReady?: (domain: D | undefined) => void;
+    dimensionsState?: DatasetDimensions;
 };
 
 export const useDatasetVariableDomain = <D extends DataDomain<unknown> = DataDomain<unknown>>(props: UseDatasetVariableDomainProps<D>) => {
@@ -11,22 +12,25 @@ export const useDatasetVariableDomain = <D extends DataDomain<unknown> = DataDom
 
     useEffect(() => {
         setDomain(undefined);
-        if (props.variable.domain) {
-            if (isDomainProvider(props.variable.domain)) {
-                props.variable.domain().then((domain) => {
-                    setDomain(domain);
+        const domainConfig = props.variable.domain;
+        let domainUpdateDisposer;
+        if (domainConfig) {
+            if (isDomainProvider(domainConfig)) {
+                domainUpdateDisposer = autorun(() => {
+                    domainConfig(props.dimensionsState).then((domain) => {
+                        setDomain(domain);
+                    });
                 });
             } else {
-                setDomain(props.variable.domain);
+                setDomain(domainConfig);
             }
         }
-    }, [props.variable]);
-
-    useEffect(() => {
-        if (props.onDomainReady) {
-            props.onDomainReady(domain);
-        }
-    }, [domain]);
+        return () => {
+            if (domainUpdateDisposer) {
+                domainUpdateDisposer();
+            }
+        };
+    }, [props.variable, props.dimensionsState]);
 
     return domain;
 };

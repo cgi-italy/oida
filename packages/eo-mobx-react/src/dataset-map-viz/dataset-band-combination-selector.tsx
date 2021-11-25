@@ -6,9 +6,16 @@ import { useDrag, useDrop } from 'react-dnd';
 import { Avatar, Tooltip, Button } from 'antd';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 
-import { RasterBandModeCombination, RasterBandConfig, RasterBandGroup } from '@oida/eo-mobx';
+import { AoiValue, formatNumber, getColorFromString } from '@oida/core';
+import { Map } from '@oida/state-mobx';
+import {
+    RasterBandModeCombination, RasterBandConfig, RasterBandGroup, BandScalingMode,
+    DomainRange, isValueDomain, DatasetDimensions, isDomainProvider, NumericalValueDomain, computeRasterDatasetOptimalBandRange
+} from '@oida/eo-mobx';
+import { AdjustSolidIcon, AsyncButton, NumericRangeFieldRenderer } from '@oida/ui-react-antd';
 import { useSelector } from '@oida/ui-react-mobx';
-import { getColorFromString } from '@oida/core';
+
+import { useDatasetVariableDomain } from '../hooks';
 
 
 const DatasetBandDnDType = 'DATASET_BAND';
@@ -34,7 +41,7 @@ const DatasetBandItem = (props: DatasetBandItemProps) => {
     const {id, name, color} = props.band;
 
     let label = name.length <= 5 ? name : `B${id.substr(0, 4)}`;
-    let backgroundColor = color || getColorFromString(name, 0.7, 0.7);
+    let backgroundColor = color || getColorFromString(name, 0.7, 0.4);
 
     return (
         <div
@@ -77,7 +84,7 @@ const DatasetChannelItem = (props: DatasetChannelItemProps) => {
     const {id, name, color} = props.band;
 
     let label = name.length <= 5 ? name : `B${id.substr(0, 4)}`;
-    let backgroundColor = color || getColorFromString(name, 0.7, 0.7);
+    let backgroundColor = color || getColorFromString(name, 0.7, 0.4);
 
     return (
         <div className={classnames('dataset-channel-item', {
@@ -98,17 +105,175 @@ const DatasetChannelItem = (props: DatasetChannelItemProps) => {
 
 };
 
+export type DatasetBandScalingSelectorProps = {
+    bandCombo: RasterBandModeCombination;
+    redBand: RasterBandConfig;
+    greenBand: RasterBandConfig;
+    blueBand: RasterBandConfig;
+    dimensionsState?: DatasetDimensions,
+    mapState?: Map
+};
+
+export const DatasetBandScalingSelector = (props: DatasetBandScalingSelectorProps) => {
+
+    const bandScaling = useSelector(() => {
+        return {
+            mode: props.bandCombo.bandScalingMode,
+            dataRange: props.bandCombo.dataRange,
+            redRange: props.bandCombo.redRange,
+            greenRange: props.bandCombo.greenRange,
+            blueRange: props.bandCombo.blueRange
+        };
+    });
+    if (props.bandCombo.config.supportBandScalingMode === BandScalingMode.None) {
+        return null;
+    }
+
+    if (props.bandCombo.config.supportBandScalingMode === BandScalingMode.Channel) {
+    }
+
+    let redRange: DomainRange<number> | undefined;
+    let greenRange: DomainRange<number> | undefined;
+    let blueRange: DomainRange<number> | undefined;
+    let dataRange: DomainRange<number> | undefined;
+
+    const redDomain = useDatasetVariableDomain({
+        variable: props.redBand
+    });
+    const greenDomain = useDatasetVariableDomain({
+        variable: props.greenBand
+    });
+    const blueDomain = useDatasetVariableDomain({
+        variable: props.blueBand
+    });
+
+    if (
+        redDomain && isValueDomain(redDomain)
+        && redDomain.min !== undefined && redDomain.max !== undefined
+    ) {
+        redRange = {
+            min: redDomain.min,
+            max: redDomain.max
+        };
+        dataRange = redRange;
+    }
+
+    if (
+        greenDomain && isValueDomain(greenDomain)
+        && greenDomain.min !== undefined && greenDomain.max !== undefined
+    ) {
+        greenRange = {
+            min: greenDomain.min,
+            max: greenDomain.max
+        };
+
+        dataRange = dataRange ? {
+            min: Math.min(dataRange.min, greenRange.min),
+            max: Math.max(dataRange.max, greenRange.max)
+        } : greenRange;
+    }
+
+    if (
+        blueDomain && isValueDomain(blueDomain)
+        && blueDomain.min !== undefined && blueDomain.max !== undefined
+    ) {
+        blueRange = {
+            min: blueDomain.min,
+            max: blueDomain.max
+        };
+
+        dataRange = dataRange ? {
+            min: Math.min(dataRange.min, blueRange.min),
+            max: Math.max(dataRange.max, blueRange.max)
+        } : blueRange;
+    }
+
+    const redDomainProvider = props.redBand.domain && isDomainProvider(props.redBand.domain) ? props.redBand.domain : undefined;
+    const greenDomainProvider = props.greenBand.domain && isDomainProvider(props.greenBand.domain) ? props.greenBand.domain : undefined;
+    const blueDomainProvider = props.blueBand.domain && isDomainProvider(props.blueBand.domain) ? props.blueBand.domain : undefined;
+
+    let autoAdjustRangeBtn: JSX.Element | undefined;
+    if (dataRange && redDomainProvider && greenDomainProvider && blueDomainProvider && props.dimensionsState) {
+        autoAdjustRangeBtn = (
+            <AsyncButton
+                className='dataset-range-adjust-btn'
+                tooltip='Adjust range based on current visible data domain'
+                onClick={() => {
+
+                    const mapViewport = props.mapState?.renderer.implementation?.getViewportExtent();
+                    const aoi: AoiValue | undefined = mapViewport ? {
+                        geometry: {
+                            type: 'BBox',
+                            bbox: mapViewport
+                        }
+                    } : undefined;
+
+                    return computeRasterDatasetOptimalBandRange({
+                        filters: {
+                            aoi: mapViewport ? {
+                                geometry: {
+                                    type: 'BBox',
+                                    bbox: mapViewport
+                                }
+                            } : undefined,
+                            additionaFilters: props.dimensionsState?.additionalFilters,
+                            dimensionValues: props.dimensionsState?.dimensionValues,
+                            toi: props.dimensionsState?.toi
+                        },
+                        bandDomainProviders: [redDomainProvider, greenDomainProvider, blueDomainProvider]
+                    }).then((range) => {
+                        if (range) {
+                            props.bandCombo.setDataRange({
+                                min: parseFloat(formatNumber(range.min, {
+                                    precision: 3
+                                })),
+                                max: parseFloat(formatNumber(range.max, {
+                                    precision: 3
+                                }))
+                            });
+                        }
+                    });
+                }}
+                type='link'
+                icon={<AdjustSolidIcon/>}
+            />
+        );
+    }
+    return (
+        <div className='dataset-band-scaling-selector' style={{padding: '10px'}}>
+            <span>Data range:</span>
+            <NumericRangeFieldRenderer
+                config={dataRange ? {min: dataRange.min, max: dataRange.max} : {}}
+                value={bandScaling.dataRange ? {
+                    from: bandScaling.dataRange.min,
+                    to: bandScaling.dataRange.max
+                } : undefined}
+                onChange={(value) => {
+                    props.bandCombo.setDataRange(value ? {
+                        min: value.from,
+                        max: value.to
+                    } : undefined);
+                }}
+                sliderExtraContent={autoAdjustRangeBtn}
+            />
+        </div>
+    );
+
+};
+
 export type DatasetBandCombinationSelectorProps = {
     bands: RasterBandConfig[];
     bandGroups?: RasterBandGroup[];
     bandCombo: RasterBandModeCombination;
+    dimensionsState?: DatasetDimensions,
+    mapState?: Map
 };
 
 type BandConfigMap = Record<string, RasterBandConfig>;
 
 export const DatasetBandCombinationSelector = (props: DatasetBandCombinationSelectorProps) => {
 
-    let selectedBands = useSelector(() => {
+    const selectedBands = useSelector(() => {
         return {
             red: props.bandCombo.red,
             green: props.bandCombo.green,
@@ -199,6 +364,14 @@ export const DatasetBandCombinationSelector = (props: DatasetBandCombinationSele
                 </div>
                 {bandGroupItems}
             </div>
+            <DatasetBandScalingSelector
+                bandCombo={props.bandCombo}
+                redBand={bandConfigMap[selectedBands.red]}
+                greenBand={bandConfigMap[selectedBands.green]}
+                blueBand={bandConfigMap[selectedBands.blue]}
+                mapState={props.mapState}
+                dimensionsState={props.dimensionsState}
+            />
         </div>
     );
 };

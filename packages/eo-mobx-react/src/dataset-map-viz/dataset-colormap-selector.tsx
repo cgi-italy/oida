@@ -1,14 +1,19 @@
 import React, { useState, useRef, useEffect } from 'react';
 import classnames from 'classnames';
-
-
-import { Button, Dropdown, InputNumber, Slider, Checkbox } from 'antd';
+import { Button, Dropdown, InputNumber, Slider, Checkbox, Tooltip } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
 
-import { ColorMap, ColorScale, NumericVariable, ColorScaleType, isValueDomain, NumericDomainMapper } from '@oida/eo-mobx';
-
+import { formatNumber } from '@oida/core';
+import { Map } from '@oida/state-mobx';
+import {
+    ColorMap, ColorScale, NumericVariable, ColorScaleType,
+    isValueDomain, NumericDomainMapper, DatasetDimensions, isDomainProvider, computeRasterDatasetOptimalBandRange
+} from '@oida/eo-mobx';
+import { AdjustSolidIcon, AsyncButton } from '@oida/ui-react-antd';
 import { useSelector } from '@oida/ui-react-mobx';
+
 import { useDatasetVariableDomain } from '../hooks';
+
 
 export type DatasetColorScaleSelectorItemProps = {
     colorScale: ColorScale;
@@ -108,6 +113,8 @@ export const DatasetColorScaleSelector = (props: DatasetColorScaleSelectorProps)
 export type DatasetColorMapRangeSelectorProps = {
     colorMap: ColorMap;
     variable: NumericVariable;
+    dimensionsState?: DatasetDimensions;
+    mapState?: Map;
 };
 
 export const DatasetColorMapRangeSelector = (props: DatasetColorMapRangeSelectorProps) => {
@@ -131,15 +138,25 @@ export const DatasetColorMapRangeSelector = (props: DatasetColorMapRangeSelector
         domain: domain,
         unitsSymbol: props.variable.units
     });
+
+    const normalizedRange = {
+        min: domainMapper.normalizeValue(mapRange.min),
+        max: domainMapper.normalizeValue(mapRange.max)
+    };
+
     let variableDomain: {min: number, max: number, step: number} | undefined;
     if (domain && isValueDomain(domain) && domain.min !== undefined && domain.max !== undefined) {
         const min = domainMapper.normalizeValue(domain.min);
         const max = domainMapper.normalizeValue(domain.max);
         if (min !== undefined && max !== undefined) {
             variableDomain = {
-                min: min,
-                max: max,
-                step: domain.step ? domain.step * (domain.scale || 1) : (max - min) / 100
+                min: parseFloat(formatNumber(min, {
+                    maxLength: 6
+                })),
+                max: parseFloat(formatNumber(max, {
+                    maxLength: 6
+                })),
+                step: domain.step ? domain.step * (domain.scale || 1) : parseFloat(((max - min) / 100).toPrecision(4))
             };
         }
     }
@@ -153,7 +170,7 @@ export const DatasetColorMapRangeSelector = (props: DatasetColorMapRangeSelector
 
         domainSlider = <Slider
             ref={sliderRef}
-            value={[domainMapper.normalizeValue(mapRange.min)!, domainMapper.normalizeValue(mapRange.max)!]}
+            value={[normalizedRange.min!, normalizedRange.max!]}
             min={variableDomain.min}
             max={variableDomain.max}
             step={variableDomain.step}
@@ -180,11 +197,13 @@ export const DatasetColorMapRangeSelector = (props: DatasetColorMapRangeSelector
         />;
     }
 
+    const domainProvider = props.variable.domain && isDomainProvider(props.variable.domain) ? props.variable.domain : undefined;
+
     return (
         <div className='dataset-colormap-range'>
             <div className='dataset-colormap-range-inputs'>
                 <InputNumber
-                    value={domainMapper.normalizeValue(mapRange.min)}
+                    value={normalizedRange.min}
                     min={variableDomain?.min}
                     max={variableDomain?.max}
                     step={variableDomain?.step}
@@ -204,7 +223,7 @@ export const DatasetColorMapRangeSelector = (props: DatasetColorMapRangeSelector
                 />
                 {props.variable.units && <span className='dataset-colormap-units'>{props.variable.units}</span>}
                 <InputNumber
-                    value={domainMapper.normalizeValue(mapRange.max)}
+                    value={normalizedRange.max}
                     min={variableDomain?.min}
                     max={variableDomain?.max}
                     step={variableDomain?.step}
@@ -223,7 +242,44 @@ export const DatasetColorMapRangeSelector = (props: DatasetColorMapRangeSelector
                     formatter={value => `${clamp ? '≥ ' : ''}${value}`}
                 />
             </div>
-            {domainSlider}
+            <div className='dataset-colormap-range-slider'>
+                {domainSlider}
+                {variableDomain && domainProvider && props.dimensionsState &&
+                    <AsyncButton
+                        tooltip='Adjust range based on current visible data domain'
+                        onClick={() => {
+                            const mapViewport = props.mapState?.renderer.implementation?.getViewportExtent();
+                            return computeRasterDatasetOptimalBandRange({
+                                filters: {
+                                    aoi: mapViewport ? {
+                                        geometry: {
+                                            type: 'BBox',
+                                            bbox: mapViewport
+                                        }
+                                    } : undefined,
+                                    additionaFilters: props.dimensionsState?.additionalFilters,
+                                    dimensionValues: props.dimensionsState?.dimensionValues,
+                                    toi: props.dimensionsState?.toi
+                                },
+                                bandDomainProviders: [domainProvider]
+                            }).then((range) => {
+                                if (range) {
+                                    props.colorMap.domain?.setRange({
+                                        min: parseFloat(formatNumber(range.min, {
+                                            precision: 3
+                                        })),
+                                        max: parseFloat(formatNumber(range.max, {
+                                            precision: 3
+                                        }))
+                                    });
+                                }
+                            });
+                        }}
+                        type='link'
+                        icon={<AdjustSolidIcon/>}
+                    />
+                }
+            </div>
             <Checkbox
                 checked={!clamp}
                 onChange={(evt) => {
@@ -241,6 +297,8 @@ export type DatasetColorMapSelectorProps = {
     colorScales: ColorScale[];
     colorMap: ColorMap;
     variable?: NumericVariable;
+    dimensionsState?: DatasetDimensions;
+    mapState?: Map;
 };
 
 export const DatasetColorMapSelector = (props: DatasetColorMapSelectorProps) => {
@@ -256,6 +314,8 @@ export const DatasetColorMapSelector = (props: DatasetColorMapSelectorProps) => 
         colormapRangeSelector = <DatasetColorMapRangeSelector
             colorMap={props.colorMap}
             variable={props.variable}
+            dimensionsState={props.dimensionsState}
+            mapState={props.mapState}
         />;
     }
 
