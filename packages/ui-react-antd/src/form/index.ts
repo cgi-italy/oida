@@ -1,5 +1,6 @@
 export * from './antd-form-field-renderer-factory';
 export * from './select-field';
+export * from './dropdown-enum-renderer';
 export * from './input-field';
 export * from './aoi-field';
 export * from './aoi-import';

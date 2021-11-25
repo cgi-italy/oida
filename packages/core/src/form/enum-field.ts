@@ -7,7 +7,8 @@ export const ENUM_FIELD_ID = 'enum';
 export type EnumChoice = {
     name: string,
     value: string,
-    description?: string
+    description?: string,
+    icon?: string
 };
 
 export type EnumFieldConfig = {

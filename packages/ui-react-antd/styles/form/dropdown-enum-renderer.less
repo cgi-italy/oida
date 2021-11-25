@@ -1,0 +1,93 @@
+.dropdown-enum-options {
+    border: solid 1px @border-color-base;
+    overflow: hidden;
+}
+
+.dropdown-enum-option {
+
+    display: flex;
+    align-items: center;
+
+    cursor: pointer;
+    padding-left: 10px;
+    padding: @input-padding-horizontal-sm;
+    border-bottom: solid 1px @border-color-base;
+
+    .ant-avatar {
+        border: solid 2px @border-color-base;
+        flex-grow: 0;
+        margin-right: 5px;
+        flex-shrink: 0;
+    }
+
+    .dropdown-enum-choice-content {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        flex-shrink: 1;
+        overflow: hidden;
+
+        .dropdown-enum-choice-title {
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .dropdown-enum-choice-description {
+            font-size: @font-size-sm;
+            color: @text-color-secondary;
+            margin-top: -2px;
+        }
+    }
+
+    &.selected {
+        .ant-avatar {
+            border-color: @primary-color;
+        }
+        background: @item-active-bg;
+    }
+
+    &:hover {
+        background: @item-hover-bg
+    }
+}
+
+
+
+.ant-dropdown-trigger.dropdown-enum-option {
+
+    border: solid 1px @border-color-base;
+    border-radius: @border-radius-base;
+    transition: all 0.3s @ease-in-out;
+    justify-content: flex-end;
+
+    &.ant-dropdown-open {
+        border-color: @input-hover-border-color;
+    }
+
+    .anticon-down {
+        color: @disabled-color;
+        font-size: @font-size-sm;
+        margin-right: 2px;
+    }
+
+    &:hover {
+        border-color: @input-hover-border-color;
+        background: transparent;
+    }
+
+}
+
+
+.ant-dropdown {
+
+    .dropdown-enum-options {
+        background: @component-background;
+        box-shadow: @shadow-1-down;
+        border: none;
+
+        .dropdown-enum-option {
+            border-bottom: none;
+        }
+    }
+
+}
