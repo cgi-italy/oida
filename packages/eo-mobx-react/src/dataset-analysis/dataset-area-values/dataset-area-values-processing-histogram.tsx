@@ -11,7 +11,7 @@ import 'echarts/lib/component/brush';
 import { formatNumber, LoadingState, NumberFormatOptions } from '@oida/core';
 import {
     DatasetAreaValues, RasterMapViz, RasterBandModeType,
-    isDomainProvider, NumericDomainMapper
+    isDomainProvider, NumericDomainMapper, ColorScaleType
 } from '@oida/eo-mobx';
 import { useSelector } from '@oida/ui-react-mobx';
 
@@ -299,6 +299,21 @@ export const DatasetAreaValuesProcessingHistogram = (props: DatasetAreaValuesPro
         );
     }
 
+    let enableHistogramRange = false;
+
+    if (selectedRange !== undefined && parentViz instanceof RasterMapViz && parentViz.config.bandMode.supportedModes.find((mode) => {
+        return mode.type === RasterBandModeType.Single;
+    })) {
+        const bandConfig = parentViz.config.bandMode.bands?.find(
+            (band) => band.id === selectedRange.processing.variable!
+        );
+
+        if (bandConfig && bandConfig.colorScales?.find(scale => scale.type === ColorScaleType.Parametric)) {
+            enableHistogramRange = true;
+        }
+    }
+
+
     return (
         <div className='dataset-stats-analysis'>
             <div className='series-chart'>
@@ -371,7 +386,7 @@ export const DatasetAreaValuesProcessingHistogram = (props: DatasetAreaValuesPro
                     isLoading={loadingState === LoadingState.Loading}
                 />
             </div>
-            {selectedRange && parentViz instanceof RasterMapViz && selectedRangeDomainMapper &&
+            {selectedRange && enableHistogramRange && selectedRangeDomainMapper &&
                 <div className='dataset-stats-analysis-ops'>
                     <Space>
                         <span>Selected data range: </span>
@@ -385,7 +400,9 @@ export const DatasetAreaValuesProcessingHistogram = (props: DatasetAreaValuesPro
                     </Space>
                     <Button onClick={() => {
 
-                        const bandMode = parentViz.bandMode.value;
+                        const rasterViz = parentViz as RasterMapViz;
+
+                        const bandMode = rasterViz.bandMode.value;
 
                         if (bandMode?.type === RasterBandModeType.Single) {
                             bandMode.setBand(selectedRange.processing.variable!);
@@ -407,31 +424,25 @@ export const DatasetAreaValuesProcessingHistogram = (props: DatasetAreaValuesPro
                             }
                         } else {
 
-                            const singleBandConfig = parentViz.config.bandMode.supportedModes.find((mode) => {
-                                return mode.type === RasterBandModeType.Single;
-                            });
+                            const bandConfig = rasterViz.config.bandMode.bands?.find(
+                                (band) => band.id === selectedRange.processing.variable!
+                            );
 
-                            if (singleBandConfig) {
-                                const bandConfig = parentViz.config.bandMode.bands?.find(
-                                    (band) => band.id === selectedRange.processing.variable!
-                                );
+                            if (bandConfig && bandConfig.colorScales) {
 
-                                if (bandConfig && bandConfig.colorScales) {
-
-                                    parentViz.bandMode.setValue({
-                                        type: RasterBandModeType.Single,
-                                        band: selectedRange.processing.variable!,
-                                        colorMap: {
-                                            colorScale: bandConfig.default?.colorScale || bandConfig.colorScales[0].id,
-                                            domain: {
-                                                mapRange: {
-                                                    min: selectedRange.min,
-                                                    max: selectedRange.max
-                                                }
+                                rasterViz.bandMode.setValue({
+                                    type: RasterBandModeType.Single,
+                                    band: selectedRange.processing.variable!,
+                                    colorMap: {
+                                        colorScale: bandConfig.default?.colorScale || bandConfig.colorScales[0].id,
+                                        domain: {
+                                            mapRange: {
+                                                min: selectedRange.min,
+                                                max: selectedRange.max
                                             }
                                         }
-                                    });
-                                }
+                                    }
+                                });
                             }
                         }
 
@@ -439,7 +450,7 @@ export const DatasetAreaValuesProcessingHistogram = (props: DatasetAreaValuesPro
                             if (key === 'time') {
                                 selectedRange.processing.dataset.setToi(value as Date);
                             } else {
-                                parentViz.dimensions.setValue(key, value);
+                                rasterViz.dimensions.setValue(key, value);
                             }
                         });
                     }}>
