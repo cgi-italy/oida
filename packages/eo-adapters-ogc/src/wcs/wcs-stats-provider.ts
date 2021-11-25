@@ -4,7 +4,7 @@ import ecStats from 'echarts-stat';
 import getBBox from '@turf/bbox';
 
 import { AxiosInstanceWithCancellation, NUMERIC_FIELD_ID, STRING_FIELD_ID, urlParamsSerializer } from '@oida/core';
-import { DatasetAreaValuesProvider, isDomainProvider, isValueDomain, NumericDomain, NumericVariable } from '@oida/eo-mobx';
+import { DatasetAreaValuesData, DatasetAreaValuesProvider, isDomainProvider, isValueDomain, NumericDomain, NumericVariable } from '@oida/eo-mobx';
 
 import { WcsService } from './wcs-service';
 
@@ -25,11 +25,18 @@ export type WcsStatsProviderConfig = {
  *
  * @param data The raw geotiff data as an ArrayBuffer
  * @param options optional configuration
- * @param options.bands additional bands information (e.g. used for reserved value filtering or domain rescaling)
- * @param options.bandId the id of the band from which the statistics will be computed (first band by default)
+ * @param options.bandConfig additional band information (e.g. used for reserved value filtering or domain rescaling)
+ * @param options.bandIndex the index of the band from which the statistics will be computed (first band by default)
+ * @param options.disableHistogram disable histogram computation
+ * @param options.disablePecentiles disable percentiles computation
  * @return the geotiff band statistics
 */
-export const extractStatisticsFromTiffData = (data: ArrayBuffer, options?: {bandId: string, bands: NumericVariable[]}) => {
+export const extractStatisticsFromTiffData = (data: ArrayBuffer, options?: {
+    bandIndex?: number,
+    bandConfig?: NumericVariable,
+    disableHistogram?: boolean,
+    disablePercentiles?: boolean
+}): Promise<DatasetAreaValuesData> => {
     return fromArrayBuffer(data).then((tiff) => {
         return tiff.getImage().then((image) => {
             return image.readRasters().then((data) => {
@@ -39,14 +46,14 @@ export const extractStatisticsFromTiffData = (data: ArrayBuffer, options?: {band
                     noData = parseFloat(gdalNoData);
                 }
 
-                const bandIndex = options ? options.bands.findIndex((band) => band.id === options.bandId) : 0;
-                if (bandIndex === -1 || bandIndex >= data.length) {
+                const bandIndex = options?.bandIndex || 0;
+                if (bandIndex >= data.length) {
                     return undefined;
                 }
 
                 let domainPromise: Promise<NumericDomain | undefined>;
 
-                const bandDomain = options ? options.bands[bandIndex].domain : undefined;
+                const bandDomain = options?.bandConfig?.domain;
                 if (bandDomain) {
                     if (isDomainProvider(bandDomain)) {
                         domainPromise = bandDomain();
@@ -65,7 +72,7 @@ export const extractStatisticsFromTiffData = (data: ArrayBuffer, options?: {band
                     }
                     const values = Array.from(data[bandIndex] as ArrayLike<number>).filter((value: number) => {
                         return value !== noData && reservedValues[value] === undefined &&  Number.isFinite(value);
-                    }).sort();
+                    }).sort((a, b) => a - b);
 
                     if (!values.length) {
                         return undefined;
@@ -77,7 +84,30 @@ export const extractStatisticsFromTiffData = (data: ArrayBuffer, options?: {band
                         mean: ecStats.statistics.mean(values),
                         median: ecStats.statistics.median(values),
                         variance: ecStats.statistics.sampleVariance(values),
-                        histogram: ecStats.histogram(values, 'sturges').data
+                        histogram: options?.disableHistogram ? undefined : ecStats.histogram(values, 'sturges').data,
+                        percentiles: options?.disablePercentiles ? undefined : [
+                            [1, ecStats.statistics.quantile(values, 0.01)],
+                            [5, ecStats.statistics.quantile(values, 0.05)],
+                            [10, ecStats.statistics.quantile(values, 0.1)],
+                            [15, ecStats.statistics.quantile(values, 0.15)],
+                            [20, ecStats.statistics.quantile(values, 0.2)],
+                            [25, ecStats.statistics.quantile(values, 0.25)],
+                            [30, ecStats.statistics.quantile(values, 0.30)],
+                            [35, ecStats.statistics.quantile(values, 0.35)],
+                            [40, ecStats.statistics.quantile(values, 0.4)],
+                            [45, ecStats.statistics.quantile(values, 0.45)],
+                            [50, ecStats.statistics.quantile(values, 0.5)],
+                            [55, ecStats.statistics.quantile(values, 0.55)],
+                            [60, ecStats.statistics.quantile(values, 0.60)],
+                            [65, ecStats.statistics.quantile(values, 0.65)],
+                            [70, ecStats.statistics.quantile(values, 0.70)],
+                            [75, ecStats.statistics.quantile(values, 0.75)],
+                            [80, ecStats.statistics.quantile(values, 0.8)],
+                            [85, ecStats.statistics.quantile(values, 0.85)],
+                            [90, ecStats.statistics.quantile(values, 0.9)],
+                            [95, ecStats.statistics.quantile(values, 0.95)],
+                            [99, ecStats.statistics.quantile(values, 0.99)],
+                        ]
                     };
 
                     return {
@@ -129,6 +159,14 @@ export const createWcsStatsProvider = (config: WcsStatsProviderConfig) => {
             ...additionalParameters
         };
 
+        if (config.bands.length > 1) {
+            params.rangesubset = request.variable;
+        }
+
+        if (request.gridSize) {
+            params.scalesize = `i(${request.gridSize[0]}),j(${request.gridSize[1]})`;
+        }
+
         const subset = [
             `Long(${bbox[0]},${bbox[2]})`,
             `Lat(${bbox[1]},${bbox[3]})`
@@ -147,9 +185,10 @@ export const createWcsStatsProvider = (config: WcsStatsProviderConfig) => {
             params: params,
             paramsSerializer: urlParamsSerializer
         }).then((response) => {
+
+            const bandConfig = config.bands.find((band) => band.id === request.variable);
             return extractStatisticsFromTiffData(response.data, {
-                bandId: request.variable,
-                bands: config.bands
+                bandConfig: bandConfig
             }).then((coverageData) => {
                 return {
                     stats: request.dataMask.stats ? coverageData.stats : undefined,
