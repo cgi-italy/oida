@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
-import { Button, ButtonProps, Tooltip } from 'antd';
+import React from 'react';
+import { ButtonProps, Tooltip } from 'antd';
 
 import { DataCollectionItemAction } from '@oida/ui-react-core';
+
+import { AsyncButton } from '../general';
 
 
 export type DataCollectionItemActionButtonProps = {
@@ -10,33 +12,22 @@ export type DataCollectionItemActionButtonProps = {
 
 export const DataCollectionItemActionButton = (props: DataCollectionItemActionButtonProps) => {
 
-    const [loading, setLoading] = useState(false);
-
     const { action, ...buttonProps } = props;
 
     return (
-        <Tooltip
-            title={props.action.title || props.action.content}
+        <AsyncButton
+            size='small'
             className='data-collection-item-action-btn'
+            tooltip={props.action.title || props.action.content}
+            onClick={(evt) => {
+                evt.stopPropagation();
+                return action.callback();
+            }}
+            icon={action.icon}
+            {...buttonProps}
+            type={props.action.primary ? 'primary' : (props.type || 'link')}
         >
-            <Button
-                size='small'
-                onClick={() => {
-                    const callbackReturn = action.callback();
-                    if (callbackReturn) {
-                        setLoading(true);
-                        callbackReturn.finally(() => {
-                            setLoading(false);
-                        });
-                    }
-                }}
-                icon={action.icon}
-                loading={loading}
-                {...buttonProps}
-                type={props.action.primary ? 'primary' : (props.type || 'link')}
-            >
-                {action.content && <span className='action-content'>{action.content}</span>}
-            </Button>
-        </Tooltip>
+            {action.content && <span className='action-content'>{action.content}</span>}
+        </AsyncButton>
     );
 };
