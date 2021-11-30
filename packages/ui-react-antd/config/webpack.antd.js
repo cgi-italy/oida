@@ -2,12 +2,6 @@ const tsImportPluginFactory = require('ts-import-plugin');
 
 const config = (config = {}) => {
 
-    let tsLoaderOptions = config.tsLoaderOptions || {};
-
-    let {getCustomTransformers, ...otherTsLoaderOptions} = tsLoaderOptions;
-
-    getCustomTransformers = getCustomTransformers || {};
-
     let styleLoader = config.styleLoader || 'style-loader';
 
     let cssLoaderOptions = config.cssLoaderOptions || {
@@ -21,30 +15,6 @@ const config = (config = {}) => {
     return {
         module: {
             rules: [
-                {
-                    test: /\.tsx?$/,
-                    use: [
-                        {
-                            loader: 'ts-loader',
-                            options: {
-                                getCustomTransformers: () => ({
-                                    before: [
-                                        tsImportPluginFactory({
-                                            libraryName: 'antd',
-                                            libraryDirectory: 'lib',
-                                            style: false
-                                        }),
-                                        ...getCustomTransformers.before || []
-                                    ],
-                                    after: [
-                                        ...getCustomTransformers.after || []
-                                    ]
-                                }),
-                                ...otherTsLoaderOptions
-                            }
-                        }
-                    ],
-                },
                 {
                     test: /\.less$/,
                     use: [

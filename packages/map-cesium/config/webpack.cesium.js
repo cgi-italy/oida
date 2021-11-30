@@ -20,11 +20,11 @@ const config = (config = {}) => {
         output: {
             sourcePrefix: ''
         },
-        node: {
-            fs: 'empty',
-        },
-        module: {
-            unknownContextCritical: false,
+        resolve: {
+            alias: {
+                // to address this issue: https://github.com/CesiumGS/cesium/issues/9212
+                cesium: '/node_modules/cesium/'
+            }
         },
         plugins: [
             new webpack.DefinePlugin({
