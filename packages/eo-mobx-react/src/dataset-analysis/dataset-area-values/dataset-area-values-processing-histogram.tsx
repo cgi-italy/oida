@@ -73,6 +73,7 @@ export const DatasetAreaValuesProcessingTable = (props: DatasetAreaValuesProcess
                     key={processing.id}
                     header={(
                         <div
+                            className='dataset-stats-header'
                             onMouseEnter={() => processing.hovered.setValue(true)}
                             onMouseLeave={() => processing.hovered.setValue(false)}
                         >

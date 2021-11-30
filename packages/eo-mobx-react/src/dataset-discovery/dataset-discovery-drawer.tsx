@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 import { Tooltip, Drawer, PageHeader } from 'antd';
 import { DrawerProps } from 'antd/lib/drawer';
-import { LeftOutlined } from '@ant-design/icons';
+import { CloseOutlined } from '@ant-design/icons';
 
 import { DatasetDiscovery, DatasetExplorer } from '@oida/eo-mobx';
 
@@ -40,7 +40,7 @@ export const DatasetDiscoveryDrawer = (props: DatasetDiscoveryDrawerProps) => {
                 <PageHeader
                     title={props.title || 'Data discovery'}
                     onBack={() => setVisible(false)}
-                    backIcon={props.backIcon || <Tooltip title='Back to map'><LeftOutlined/></Tooltip>}
+                    backIcon={props.backIcon || <Tooltip title='Back to map'><CloseOutlined/></Tooltip>}
                     footer={
                         <DatasetDiscoveryProviderTabsNavigation
                             datasetDiscovery={datasetDiscovery}
@@ -50,7 +50,7 @@ export const DatasetDiscoveryDrawer = (props: DatasetDiscoveryDrawerProps) => {
                 </PageHeader>
             }
             placement='right'
-            closable={true}
+            closable={false}
             mask={false}
             {...drawerProps}
             visible={visible}
