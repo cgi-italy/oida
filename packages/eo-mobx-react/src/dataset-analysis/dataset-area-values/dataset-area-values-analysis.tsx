@@ -32,9 +32,9 @@ export const DatasetAreaValuesAnalysisWidget = (props: DatasetAnalysisWidgetFact
 
         let selectedDataset = avaialbleDatasetItems.find(item => item.dataset === processing.dataset);
         if (!selectedDataset) {
-            setImmediate(() => {
+            setTimeout(() => {
                 props.combinedAnalysis.removeProcessing(processing);
-            });
+            }, 0);
         }
 
         return (

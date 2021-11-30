@@ -15,6 +15,7 @@ export type DatasetDiscoveryProviderProps<TYPE extends string = string> = {
     providerType: TYPE;
     name: string;
     description?: string;
+    disabled?: boolean;
 } & ActiveProps;
 
 export interface DatasetDiscoveryProviderDefinitions {
@@ -148,6 +149,9 @@ export abstract class DatasetDiscoveryProvider<
      **/
     readonly active: Active;
 
+    /** The disabled state of the provider. When disabled a provider will not be visible or selectable*/
+    @observable disabled: boolean;
+
     /**
      * The results datasets array. Its population is responsability of the inherited class
      */
@@ -165,6 +169,8 @@ export abstract class DatasetDiscoveryProvider<
         this.description = props.description;
 
         this.active = new Active(props);
+        this.disabled = props.disabled || false;
+
         this.results_ = observable.array([], {
             deep: false
         });
@@ -177,6 +183,12 @@ export abstract class DatasetDiscoveryProvider<
      * create the dataset configuration for a specific item
      */
     abstract createDataset(item: T): Promise<(DatasetConfig & {initialState?: DatasetExplorerItemInitialState}) | undefined>;
+
+
+    @action
+    setDisabled(disabled: boolean) {
+        this.disabled = disabled;
+    }
 
     get results() {
         return this.results_;

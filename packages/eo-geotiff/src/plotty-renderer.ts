@@ -12,7 +12,7 @@ export class PlottyRenderer {
      */
     protected static defaultPlottyInstance_: plot | undefined;
     /**
-     * When the flipY option is true this canvas is used to flip the image vertically
+     * When the flipY option is true this canvas is used to flip the rendered image vertically
      */
     protected static flipCanvas_: [HTMLCanvasElement, CanvasRenderingContext2D] | undefined;
 

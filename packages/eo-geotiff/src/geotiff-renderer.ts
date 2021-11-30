@@ -42,10 +42,10 @@ export class GeotiffRenderer {
 
     protected static srsDefProvider_ = new EpsgIoDefinitionProvider();
     protected static defaultCacheInstance_: LruCache | undefined;
-    protected static decoder_ = new Pool();  //undefined; // getGeotiffDecoder(); //new Pool();
+    protected static decoder_ = new Pool();
 
     /**
-     *Canvas used for post rendering transformations (e.g. extent scaling)
+     * Canvas used for post rendering transformations (e.g. extent scaling)
      *
      * @protected
      * @static
@@ -121,13 +121,13 @@ export class GeotiffRenderer {
                     return Promise.resolve(undefined);
                 } else {
                     return new Promise((resolve, reject) => {
-                        setImmediate(() => {
+                        setTimeout(() => {
                             const canvas = this.renderTiffImage_(cachedData);
                             resolve({
                                 canvas,
                                 newSrsDefinition: false
                             });
-                        });
+                        }, 0);
                     });
                 }
                 // return Promise.resolve({

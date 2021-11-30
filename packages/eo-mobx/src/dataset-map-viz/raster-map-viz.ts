@@ -161,13 +161,13 @@ export class RasterMapViz extends DatasetViz<GroupLayer> implements HasDatasetDi
                 }
             }
 
-            setImmediate(() => {
+            setTimeout(() => {
                 this.mapLayer.loadingStatus.update({
                     value: loadingState,
                     percentage: percentage,
                     message: message
                 });
-            });
+            }, 0);
         });
 
         this.subscriptionTracker_.addSubscription(sourceUpdateDisposer);

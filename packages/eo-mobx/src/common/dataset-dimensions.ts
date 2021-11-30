@@ -128,20 +128,20 @@ export class DatasetDimensions implements DataDomainProviderFilters {
             if (domain) {
                 if (isValueDomain(domain)) {
                     if (domain.min !== undefined && currentValue < domain.min) {
-                        setImmediate(() => this.setValue(dimension, domain.min!));
+                        setTimeout(() => this.setValue(dimension, domain.min!), 0);
                     }
                     if (domain.max !== undefined && currentValue > domain.max) {
-                        setImmediate(() => this.setValue(dimension, domain.max!));
+                        setTimeout(() => this.setValue(dimension, domain.max!), 0);
                     }
                 } else {
                     if (!domain.values.find((item) => item.value === currentValue)) {
-                        setImmediate(() => {
+                        setTimeout(() => {
                             if (domain.values.length) {
                                 this.setValue(dimension, domain.values[0].value);
                             } else {
                                 this.unsetValue(dimension);
                             }
-                        });
+                        }, 0);
                     }
                 }
             }

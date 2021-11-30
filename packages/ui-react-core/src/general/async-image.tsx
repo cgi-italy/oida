@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import { LoadingState } from '@oida/core';
 
@@ -35,23 +35,24 @@ export const AsyncImage = (props: AsyncImageProps) => {
     const [imageUrl, setImageUrl] = useState<string>();
     const [loadingState, setLoadingState] = useState<LoadingState>(LoadingState.Init);
 
+    const loadingIndicatorTimeout = useRef<any>();
+
+    const cancelLoadingIndicator = () => {
+        clearTimeout(loadingIndicatorTimeout.current);
+    };
+
     useEffect(() => {
 
         let canUpdateOnPromiseResolve = true;
-        let loadingIndicatorTimeout;
 
         // to prevent flickering avoid showing a loading indicator when image resolve immediatly (e.g cached or datauri)
         const showLoadingIndicator = () => {
-            clearImmediate(loadingIndicatorTimeout);
-            loadingIndicatorTimeout = setImmediate(() => {
+            clearTimeout(loadingIndicatorTimeout.current);
+            loadingIndicatorTimeout.current = setTimeout(() => {
                 if (canUpdateOnPromiseResolve) {
                     setLoadingState(LoadingState.Loading);
                 }
-            });
-        };
-
-        const cancelLoadingIndicator = () => {
-            clearImmediate(loadingIndicatorTimeout);
+            }, 0);
         };
 
         if (typeof(props.imageUrl) === 'string') {
@@ -95,7 +96,10 @@ export const AsyncImage = (props: AsyncImageProps) => {
                     src={imageUrl}
                     // in order for lazy loading to work the image cannot be hidden. We set its size to 0 instead
                     style={loadingState !== LoadingState.Success ? {height: 0, width: 0} : undefined}
-                    onLoad={() => setLoadingState(LoadingState.Success)}
+                    onLoad={() => {
+                        cancelLoadingIndicator();
+                        setLoadingState(LoadingState.Success);
+                    }}
                     onError={() => setLoadingState(LoadingState.Error)}
                 />
             }

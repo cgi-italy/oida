@@ -33,9 +33,9 @@ export const DatasetPointSeriesAnalysis = (props: DatasetAnalysisWidgetFactoryCo
 
         let selectedDataset = avaialbleDatasetItems.find(item => item.dataset === series.dataset);
         if (!selectedDataset) {
-            setImmediate(() => {
+            setTimeout(() => {
                 props.combinedAnalysis.removeProcessing(series);
-            });
+            }, 0);
         }
 
         return (

@@ -214,11 +214,11 @@ export const DateFieldRenderer = (props: FormFieldRendererBaseProps<DateField> &
                 if (/[0-9]{4}-[0-9]{2}-[0-9]{2}/.test(stringValue)) {
                     const value = moment.utc(stringValue);
                     if (value.isValid()) {
-                        setImmediate(() => {
+                        setTimeout(() => {
                             if (mode === 'date' || mode === 'month') {
                                 updateSelectableDates(value, mode);
                             }
-                        });
+                        }, 0);
                     }
                 }
             };

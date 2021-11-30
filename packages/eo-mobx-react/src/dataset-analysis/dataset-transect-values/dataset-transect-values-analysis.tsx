@@ -33,9 +33,9 @@ export const DatasetTransectValuesAnalysisWidget = (props: DatasetAnalysisWidget
 
         let selectedDataset = props.datasetExplorerItems.find(item => item.dataset === series.dataset);
         if (!selectedDataset) {
-            setImmediate(() => {
+            setTimeout(() => {
                 props.combinedAnalysis.removeProcessing(series);
-            });
+            }, 0);
         }
 
         return (

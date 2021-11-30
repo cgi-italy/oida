@@ -309,7 +309,7 @@ export class AdaptiveVideoLayer {
     protected forceFrameReload_() {
         const currentTime = this.mediaElement_.currentTime;
         this.mediaElement_.currentTime = Number.MAX_VALUE;
-        setImmediate(() => {
+        setTimeout(() => {
             this.mediaElement_.currentTime = currentTime;
             if (!this.ready) {
 
@@ -321,7 +321,7 @@ export class AdaptiveVideoLayer {
 
                 this.mediaElement_.addEventListener('seeked', onFirstSeek);
             }
-        });
+        }, 0);
     }
 
     protected onFrameSeeked_() {
