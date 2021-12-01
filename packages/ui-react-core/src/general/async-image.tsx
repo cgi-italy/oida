@@ -100,7 +100,10 @@ export const AsyncImage = (props: AsyncImageProps) => {
                         cancelLoadingIndicator();
                         setLoadingState(LoadingState.Success);
                     }}
-                    onError={() => setLoadingState(LoadingState.Error)}
+                    onError={() => {
+                        cancelLoadingIndicator();
+                        setLoadingState(LoadingState.Error);
+                    }}
                 />
             }
             {loadingState === LoadingState.Loading && props.loadingContent}
