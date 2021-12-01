@@ -84,7 +84,7 @@ export const DatasetDiscoveryProviderRouter = (props: DatasetDiscoveryProviderRo
 
 export const DatasetDiscoveryProviderTabsNavigation = (props: {datasetDiscovery: DatasetDiscovery}) => {
 
-    const providers = useSelector(() => props.datasetDiscovery.providers.slice());
+    const providers = useSelector(() => props.datasetDiscovery.providers.filter(provider => !provider.disabled));
 
     const history = useHistory();
     const { path } = useRouteMatch();
