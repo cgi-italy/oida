@@ -54,6 +54,7 @@ export const InputFieldRenderer = (props: FormFieldRendererBaseProps<StringField
             value={inputValue}
             onPressEnter={onEnterPress}
             onChange={onInputChange}
+            onBlur={() => props.onChange(inputValue || undefined)}
             autoFocus={props.autoFocus}
             {...renderProps}
         >
