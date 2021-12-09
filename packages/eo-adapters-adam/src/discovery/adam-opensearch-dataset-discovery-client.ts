@@ -12,10 +12,16 @@ import {
 } from '../common';
 
 
+export enum AdamOpensearchMetadataModelVersion {
+    V1 = 'v1',
+    V2 = 'v2'
+}
+
 export type AdamOpensearchDatasetDiscoveryClientConfig = {
     serviceUrl: string;
     wcsUrl: string;
     additionalDatasetConfig?: Record<string, Partial<AdamDatasetConfig>>;
+    metadataModelVersion?: AdamOpensearchMetadataModelVersion;
     axiosInstance?: AxiosInstanceWithCancellation;
 };
 
@@ -25,6 +31,7 @@ export class AdamOpensearchDatasetDiscoveryClient {
     protected openSearchClient_: AdamOpenSearchClient;
     protected wcsCoverageDescriptionClient_: AdamWcsCoverageDescriptionClient;
     protected additionalDatasetConfig_: Record<string, Partial<AdamDatasetConfig>>;
+    protected metadataModelVersion_: AdamOpensearchMetadataModelVersion;
 
     constructor(config: AdamOpensearchDatasetDiscoveryClientConfig) {
         this.axiosInstance_ = config.axiosInstance || createAxiosInstance();
@@ -37,17 +44,24 @@ export class AdamOpensearchDatasetDiscoveryClient {
             axiosInstance: this.axiosInstance_
         });
         this.additionalDatasetConfig_ = config.additionalDatasetConfig || {};
+        this.metadataModelVersion_ = config.metadataModelVersion || AdamOpensearchMetadataModelVersion.V2;
     }
 
     searchDatasets(queryParams: QueryParams) {
 
-        return this.openSearchClient_.getDatasets({
-            ...queryParams,
-            filters: [...(queryParams.filters || []), {
+        const filters = queryParams.filters?.slice() || [];
+
+        if (this.metadataModelVersion_ === AdamOpensearchMetadataModelVersion.V2) {
+            filters.push({
                 key: 'geolocated',
                 type: BOOLEAN_FIELD_ID,
                 value: true
-            }]
+            });
+        }
+
+        return this.openSearchClient_.getDatasets({
+            ...queryParams,
+            filters: filters
         });
     }
 
@@ -122,8 +136,17 @@ export class AdamOpensearchDatasetDiscoveryClient {
 
             let coverages: AdamDatasetSingleBandCoverage[] | AdamDatasetMultiBandCoverage;
 
+            let subdatasets = metadata.subDataset;
+            if (!Array.isArray(subdatasets)) {
+                subdatasets = Object.entries(metadata.subDataset).map(([name, subdataset]) => {
+                    return {
+                        ...subdataset,
+                        name: name
+                    };
+                });
+            }
             let subsetDimension: AdamDatasetDimension | undefined;
-            const defaultViewMode = metadata.subDataset[0].defaultViewMode || [];
+            const defaultViewMode = subdatasets[0].defaultViewMode || [];
             if (defaultViewMode.length > 1) {
 
                 subsetDimension = {
@@ -133,7 +156,7 @@ export class AdamOpensearchDatasetDiscoveryClient {
                         id: 'subdataset'
                     },
                     domain: {
-                        values: metadata.subDataset.map((subdataset) => {
+                        values: subdatasets.map((subdataset) => {
                             return {
                                 value: subdataset.subDatasetId,
                                 name: subdataset.name
@@ -158,7 +181,7 @@ export class AdamOpensearchDatasetDiscoveryClient {
 
                     let minValue = Number.MAX_VALUE;
                     let maxValue = -Number.MAX_VALUE;
-                    metadata.subDataset.forEach((subdataset) => {
+                    subdatasets.forEach((subdataset) => {
                         minValue = Math.min(subdataset.minValue, minValue);
                         maxValue = Math.max(subdataset.maxValue, maxValue);
                     });
@@ -200,10 +223,10 @@ export class AdamOpensearchDatasetDiscoveryClient {
                     };
                 // }
             } else {
-                coverages = metadata.subDataset.map((variable) => {
+                coverages = subdatasets.map((variable) => {
                     const minMax = this.getRoundedMinMax_(variable.minValue, variable.maxValue);
                     return {
-                        id: `${variable.name}`,
+                        id: variable.name,
                         name: variable.name,
                         wcsCoverage: metadata.datasetId,
                         subdataset: variable.subDatasetId,
@@ -223,11 +246,11 @@ export class AdamOpensearchDatasetDiscoveryClient {
 
             }
 
-            let minDate: moment.Moment | undefined = moment.utc(metadata.subDataset[0].minDate);
+            let minDate: moment.Moment | undefined = moment.utc(subdatasets[0].minDate);
             if (!minDate.isValid()) {
                 minDate = wcsCoverages.length === 1 ? moment.utc(wcsCoverages[0].time.start) : undefined;
             }
-            let maxDate: moment.Moment | undefined = moment.utc(metadata.subDataset[0].maxDate);
+            let maxDate: moment.Moment | undefined = moment.utc(subdatasets[0].maxDate);
             if (!maxDate.isValid()) {
                 maxDate = wcsCoverages.length === 1 ? moment.utc(wcsCoverages[0].time.end) : undefined;
             }
@@ -259,7 +282,7 @@ export class AdamOpensearchDatasetDiscoveryClient {
             }
 
             return this.getDatasetDimensionsFromSubdatasets_(
-                metadata.subDataset, metadata.dataset_specification
+                subdatasets, metadata.dataset_specification
             ).then((dimensions) => {
 
                 //disable time navigation for campaign data
