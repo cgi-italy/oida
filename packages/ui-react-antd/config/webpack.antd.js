@@ -1,5 +1,3 @@
-const tsImportPluginFactory = require('ts-import-plugin');
-
 const config = (config = {}) => {
 
     let styleLoader = config.styleLoader || 'style-loader';
