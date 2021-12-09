@@ -1,6 +1,6 @@
 import LruCache from 'lru-cache';
 import { plot } from 'plotty';
-import { fromArrayBuffer, Pool } from 'geotiff';
+import { fromArrayBuffer } from 'geotiff';
 import proj4 from 'proj4';
 import axios, { AxiosRequestConfig } from 'axios';
 
@@ -40,9 +40,19 @@ type GeotiffRendererData = {
 
 export class GeotiffRenderer {
 
+
+    /**
+     * Set a decoder (pool) to use for geotiff deconding.
+     * See {@link https://github.com/geotiffjs/geotiff.js/#using-decoder-pools-to-improve-parsing-performance | geotiffjs documentation}
+     * @param decoder
+     */
+    static setDecoder(decoder) {
+        this.decoder_ = decoder;
+    }
+
     protected static srsDefProvider_ = new EpsgIoDefinitionProvider();
     protected static defaultCacheInstance_: LruCache | undefined;
-    protected static decoder_ = new Pool();
+    protected static decoder_ = undefined;
 
     /**
      * Canvas used for post rendering transformations (e.g. extent scaling)
