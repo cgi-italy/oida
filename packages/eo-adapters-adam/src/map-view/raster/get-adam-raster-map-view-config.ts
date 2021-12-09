@@ -53,6 +53,8 @@ export const getAdamRasterMapViewConfig = (
                         (layer as TileLayer).forceRefresh();
                     });
                 }
+            }, {
+                delay: 1000
             });
         };
     }
