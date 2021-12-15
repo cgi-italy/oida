@@ -150,6 +150,8 @@ deploy_docs:
 
 release:
   stage: release
+  variables:
+    GIT_STRATEGY: clone
   script:
     - try_release
   dependencies:
