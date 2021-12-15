@@ -1,6 +1,6 @@
 {
   "name": "@oidajs/ui-react-antd",
-  "version": "4.0.0",
+  "version": "5.0.0",
   "description": "antd components",
   "module": "es/index.js",
   "main": "lib/index.js",

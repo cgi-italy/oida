@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.0.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/core@2.2.0...@oidajs/core@3.0.0) (2021-12-15)
+
+
+### Build System
+
+* change packages name scope ([a8d721d](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/a8d721db395a8a9f9c52808c5318c392096cc2a3))
+
+
+### Features
+
+* accept string as formatNumber input value ([ed8a18a](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/ed8a18a0a8f68e77bda65e6a3ca835b740a5480f))
+* add additional enum field renderer using dropdown ([52489b2](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/52489b239ebc7dad786855d6f53c6ceb38861462))
+
+
+### BREAKING CHANGES
+
+* all import to @oida/\* packages shall be updated with @oidajs/\*
+
+
+
+
+
 # [2.2.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/core@2.1.0...@oida/core@2.2.0) (2021-09-28)
 
 

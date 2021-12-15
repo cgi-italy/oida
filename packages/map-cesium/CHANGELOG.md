@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.0.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/map-cesium@1.4.1...@oidajs/map-cesium@2.0.0) (2021-12-15)
+
+
+### Bug Fixes
+
+* disable fill for large polygons in cesium renderer ([1af6ddb](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/1af6ddb4446e3cc141988eb8dab812543b41c7a4))
+* limit maximum pickable objects in cesium feature interactions ([18efde0](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/18efde028048a042dc84529828a78b96e1b6cca2))
+* prevent coordinates duplication in cesium feature draw ([620b2c8](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/620b2c8743917e542ced6468e25676412c95ebb0))
+* solve some vertical profile layer issues ([1c4255c](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/1c4255c92636a2d3d9ad817b7f017f64a24ac088))
+
+
+### Build System
+
+* change packages name scope ([a8d721d](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/a8d721db395a8a9f9c52808c5318c392096cc2a3))
+
+
+### BREAKING CHANGES
+
+* all import to @oida/\* packages shall be updated with @oidajs/\*
+
+
+
+
+
 ## [1.4.1](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/map-cesium@1.4.0...@oida/map-cesium@1.4.1) (2021-09-28)
 
 **Note:** Version bump only for package @oida/map-cesium

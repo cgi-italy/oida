@@ -3,6 +3,43 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.0.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/eo-mobx-react@1.0.1...@oidajs/eo-mobx-react@2.0.0) (2021-12-15)
+
+
+### Bug Fixes
+
+* filter out disabled discovery providers from tabs navigation ([e5a2346](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/e5a2346b1dbae903494a1d84705bf58b3ec70edc))
+* improve checks for histogram range application to map viz ([a0f5293](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/a0f529373598f08c48cf15aee91cd7a0a4f78033))
+* minor ui improvements ([a2fbb7f](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/a2fbb7f42ca7fa6600003864c5bd31ffc46fcb8f))
+* replace all setImmediate (non standard) calls with setTimeout ([e991548](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/e9915486859236b2bfa37760ef4508d0f467dc77))
+* solve minor issues in analysis dashboard widget layout ([7bb6db3](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/7bb6db335f254b370c6a2bfdf18358dc196a5430))
+
+
+### Build System
+
+* change packages name scope ([a8d721d](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/a8d721db395a8a9f9c52808c5318c392096cc2a3))
+
+
+### Features
+
+* add control to perform auto histogram stretch in raster viz ([a441f8f](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/a441f8f1471c4876417862d9e6b784d79487135c))
+* add preliminary support for vectorial datasets visualization ([8ed1e64](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/8ed1e64bf2e370281b87a6451a4f7998e0d7fac8))
+* add smoothing control to point series chart ([f395b84](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/f395b84b27664ea803dafb08f667a5db3f9d2ead))
+* add support for dynamic domains in DatasetDimensions ([4e28c27](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/4e28c278f73ba7057c35c5af0fcfa381a9fc571b))
+* add support for multiple tile layers in RasterMapViz ([389470a](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/389470a34cd848652ba9bd145d1de3e141279775))
+* allow a dimension to be excluded from series selection ([f577579](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/f57757971fcc460c8b023cc389c61a014f649558))
+* allow customization of dataset download component ([b847fc9](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/b847fc98fc9d99360e368ba603e4e389c8d69ee5))
+
+
+### BREAKING CHANGES
+
+* all import to @oida/\* packages shall be updated with @oidajs/\*
+* RasterMapViz map layer is now a GroupLayer instead of a TileLayer
+
+
+
+
+
 # [1.1.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/eo-mobx-react@1.0.1...@oida/eo-mobx-react@1.1.0) (2021-09-28)
 
 

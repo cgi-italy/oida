@@ -3,6 +3,37 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.0.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/eo-adapters-ogc@0.3.0...@oidajs/eo-adapters-ogc@1.0.0) (2021-12-15)
+
+
+### Bug Fixes
+
+* wrong async code invocation in createWcsStatsProvider ([5bc9994](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/5bc9994f81ae82e5c559682c4a958b7870651e7b))
+
+
+### Build System
+
+* change packages name scope ([a8d721d](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/a8d721db395a8a9f9c52808c5318c392096cc2a3))
+
+
+### Features
+
+* add percentiles and band subsetting support in wcs stats provider ([cc8063c](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/cc8063cdc300a7d30511029e5f9da07cbf00b52a))
+
+
+### Performance Improvements
+
+* reduce image size in WMS GetFeatureInfo request ([4b53546](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/4b53546db11c71351b326a5e19742c53e8afe761))
+
+
+### BREAKING CHANGES
+
+* all import to @oida/\* packages shall be updated with @oidajs/\*
+
+
+
+
+
 # [0.3.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/eo-adapters-ogc@0.2.1...@oida/eo-adapters-ogc@0.3.0) (2021-09-28)
 
 

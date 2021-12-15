@@ -3,6 +3,40 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.0.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/eo-mobx@0.3.0...@oidajs/eo-mobx@1.0.0) (2021-12-15)
+
+
+### Bug Fixes
+
+* replace all setImmediate (non standard) calls with setTimeout ([e991548](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/e9915486859236b2bfa37760ef4508d0f467dc77))
+* solve some vertical profile layer issues ([1c4255c](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/1c4255c92636a2d3d9ad817b7f017f64a24ac088))
+* update layer extent before setting the new source ([5bd8c02](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/5bd8c02c517e0b05f0b7c7e279d33fde265c3d1d))
+
+
+### Build System
+
+* change packages name scope ([a8d721d](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/a8d721db395a8a9f9c52808c5318c392096cc2a3))
+
+
+### Features
+
+* add control to perform auto histogram stretch in raster viz ([a441f8f](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/a441f8f1471c4876417862d9e6b784d79487135c))
+* add preliminary support for vectorial datasets visualization ([8ed1e64](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/8ed1e64bf2e370281b87a6451a4f7998e0d7fac8))
+* add support for dynamic domains in DatasetDimensions ([4e28c27](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/4e28c278f73ba7057c35c5af0fcfa381a9fc571b))
+* add support for layer min/max zoom level in raster source provider ([39aeca0](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/39aeca02faaec0101a2109b3c8476db6cf6f5bda))
+* add support for multiple tile layers in RasterMapViz ([389470a](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/389470a34cd848652ba9bd145d1de3e141279775))
+* allow a dimension to be excluded from series selection ([f577579](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/f57757971fcc460c8b023cc389c61a014f649558))
+
+
+### BREAKING CHANGES
+
+* all import to @oida/\* packages shall be updated with @oidajs/\*
+* RasterMapViz map layer is now a GroupLayer instead of a TileLayer
+
+
+
+
+
 # [0.3.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/eo-mobx@0.2.0...@oida/eo-mobx@0.3.0) (2021-09-28)
 
 

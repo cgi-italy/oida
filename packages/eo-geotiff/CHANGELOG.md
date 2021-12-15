@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.0.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/eo-geotiff@0.2.1...@oidajs/eo-geotiff@1.0.0) (2021-12-15)
+
+
+### Bug Fixes
+
+* imrpove typing of plotty color scale ([d7c72b5](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/d7c72b59cb57b975b097b4f39638d2ae5d2783c1))
+* replace all setImmediate (non standard) calls with setTimeout ([e991548](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/e9915486859236b2bfa37760ef4508d0f467dc77))
+
+
+### Build System
+
+* change packages name scope ([a8d721d](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/a8d721db395a8a9f9c52808c5318c392096cc2a3))
+
+
+### Features
+
+* add method to specify a geotiff decoder in GeotiffRenderer ([e9caac4](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/e9caac419c366accb0f18049a4b655873899a368))
+
+
+### BREAKING CHANGES
+
+* all import to @oida/\* packages shall be updated with @oidajs/\*
+
+
+
+
+
 ## [0.2.1](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/eo-geotiff@0.2.0...@oida/eo-geotiff@0.2.1) (2021-09-28)
 
 

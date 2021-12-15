@@ -3,6 +3,40 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.0.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/eo-adapters-adam@0.2.1...@oidajs/eo-adapters-adam@1.0.0) (2021-12-15)
+
+
+### Bug Fixes
+
+* add missing subdataset in cesium tile source ([bcf1eb0](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/bcf1eb01d926780146523f7ee60453db35be9e7d))
+* check for timeless flag in adam volume source provider ([db2fc0b](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/db2fc0b9dc33aede65e4c58bbfb2c9b67abd1f07))
+* delay tile source refresh on ColorScale update in adam raster view ([42c2987](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/42c2987758035a3f0c920a2562b615d2ed628da2))
+* disable footprint for esa cci dataset (temporary fix) ([984c525](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/984c5254aada42de31737e0a867adf0fd9f4a340))
+* disable series and time navigation for all campaign data ([a668c85](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/a668c85270502547630281f9e63b057cd47861d5))
+* solve some vertical profile layer issues ([1c4255c](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/1c4255c92636a2d3d9ad817b7f017f64a24ac088))
+
+
+### Build System
+
+* change packages name scope ([a8d721d](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/a8d721db395a8a9f9c52808c5318c392096cc2a3))
+
+
+### Features
+
+* add download url provider in adam dataset download conifg ([566177c](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/566177c25ae9ac8241625f493f038e0207155b00))
+* add option for static adam opensearch catalogues ([9be792a](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/9be792a27935fad0dd7e5e11b5bfd403cac79704))
+* general improvements in adam adapters ([2790490](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/27904909e4a40aac0121d140a22c3bb8bd0152c0))
+* update adam adapters to new opensearch metadata model ([13b12a0](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/13b12a0635e46e6fb8fec9724e5eb568cece938d))
+
+
+### BREAKING CHANGES
+
+* all import to @oida/\* packages shall be updated with @oidajs/\*
+
+
+
+
+
 ## [0.2.1](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/eo-adapters-adam@0.2.0...@oida/eo-adapters-adam@0.2.1) (2021-09-28)
 
 **Note:** Version bump only for package @oida/eo-adapters-adam

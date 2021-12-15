@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.0.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/map-cesium-ol-tile-source@0.1.3...@oidajs/map-cesium-ol-tile-source@1.0.0) (2021-12-15)
+
+
+### Bug Fixes
+
+* solve issue in tiling scheme initialization for reprojected layers ([b382369](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/b38236926507f252a6b0525b691bc90371399772))
+
+
+### Build System
+
+* change packages name scope ([a8d721d](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/a8d721db395a8a9f9c52808c5318c392096cc2a3))
+
+
+### BREAKING CHANGES
+
+* all import to @oida/\* packages shall be updated with @oidajs/\*
+
+
+
+
+
 ## [0.1.3](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/map-cesium-ol-tile-source@0.1.2...@oida/map-cesium-ol-tile-source@0.1.3) (2021-09-28)
 
 **Note:** Version bump only for package @oida/map-cesium-ol-tile-source

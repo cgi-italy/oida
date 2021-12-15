@@ -3,6 +3,40 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.0.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/ui-react-antd@4.0.0...@oidajs/ui-react-antd@5.0.0) (2021-12-15)
+
+
+### Bug Fixes
+
+* minor layout updates ([b33062c](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/b33062c6a6ea207cdcdde39b4f805beb04aa0429))
+* minor ui improvements ([a2fbb7f](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/a2fbb7f42ca7fa6600003864c5bd31ffc46fcb8f))
+* replace all setImmediate (non standard) calls with setTimeout ([e991548](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/e9915486859236b2bfa37760ef4508d0f467dc77))
+* solve custom search icon layout issue on AdvancedSearchFilterer ([fd1bc77](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/fd1bc777119f4860b01c027d338a946602770d96))
+* trigger onChange on input blur ([e9152cf](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/e9152cf696f5047459b12de287c04be86cd69214))
+
+
+### Build System
+
+* change packages name scope ([a8d721d](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/a8d721db395a8a9f9c52808c5318c392096cc2a3))
+
+
+### Features
+
+* add a generic AsyncButton component ([44878c3](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/44878c38201f2dbd909f67fba86fbfbc947c40ae))
+* add additional enum field renderer using dropdown ([52489b2](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/52489b239ebc7dad786855d6f53c6ceb38861462))
+* add control to perform auto histogram stretch in raster viz ([a441f8f](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/a441f8f1471c4876417862d9e6b784d79487135c))
+* allow search icon customization in AdvancedSearchFilterer ([b125b4a](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/b125b4af35387a50d23025d806ae40c77efc3854))
+* make item action content optional ([8d94652](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/8d94652544ce858c5fffff3078f5823c27e8c7d2))
+
+
+### BREAKING CHANGES
+
+* all import to @oida/\* packages shall be updated with @oidajs/\*
+
+
+
+
+
 # [4.0.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/ui-react-antd@3.0.0...@oida/ui-react-antd@4.0.0) (2021-09-28)
 
 

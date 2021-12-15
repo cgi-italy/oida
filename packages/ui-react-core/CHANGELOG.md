@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.0.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/ui-react-core@4.0.0...@oidajs/ui-react-core@5.0.0) (2021-12-15)
+
+
+### Bug Fixes
+
+* cancel loading indicator before setting error state in AsyncImage ([22151b9](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/22151b9293e2a507d847f6d2f4beb91233d5bf52))
+* replace all setImmediate (non standard) calls with setTimeout ([e991548](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/e9915486859236b2bfa37760ef4508d0f467dc77))
+
+
+### Build System
+
+* change packages name scope ([a8d721d](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/a8d721db395a8a9f9c52808c5318c392096cc2a3))
+
+
+### Features
+
+* make item action content optional ([8d94652](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/8d94652544ce858c5fffff3078f5823c27e8c7d2))
+
+
+### BREAKING CHANGES
+
+* all import to @oida/\* packages shall be updated with @oidajs/\*
+
+
+
+
+
 # [4.0.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/ui-react-core@3.0.0...@oida/ui-react-core@4.0.0) (2021-09-28)
 
 

@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.0.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/ui-react-mobx@1.0.0...@oida/ui-react-mobx@2.0.0) (2021-12-15)
+
+
+### Bug Fixes
+
+* use form serializer for filter serialization to url ([ac05a91](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/ac05a915fc08546679386a6efdf1c6b5d4ed60b1))
+
+
+### Build System
+
+* change packages name scope ([a8d721d](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/a8d721db395a8a9f9c52808c5318c392096cc2a3))
+
+
+### BREAKING CHANGES
+
+* all import to @oida/\* packages shall be updated with @oidajs/\*
+
+
+
+
+
 # [2.0.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/ui-react-mobx@1.0.0...@oida/ui-react-mobx@2.0.0) (2021-09-28)
 
 
