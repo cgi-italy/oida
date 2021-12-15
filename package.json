@@ -4,14 +4,12 @@
   "scripts": {
     "build:es": "lerna run --stream build:es",
     "build:umd": "lerna run --stream build:umd",
-    "build:docs": "lerna run --stream build:docs",
     "clean": "lerna run --parallel clean",
     "cz": "git-cz",
     "lint": "lerna run --parallel lint",
     "check-staged": "lint-staged",
     "watch": "lerna run --parallel watch",
-    "test": "lerna run --parallel test",
-    "typedoc": "typedoc --tsconfig ./tsconfig.typedoc.json"
+    "test": "lerna run --parallel test"
   },
   "husky": {
     "hooks": {

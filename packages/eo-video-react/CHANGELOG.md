@@ -3,12 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [1.0.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/eo-video-react@0.2.2...@oidajs/eo-video-react@1.0.0) (2021-12-15)
+# [1.0.0](https://github.com/cgi-italy/oida/compare/@oida/eo-video-react@0.2.2...@oidajs/eo-video-react@1.0.0) (2021-12-15)
 
 
 ### Build System
 
-* change packages name scope ([a8d721d](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/a8d721db395a8a9f9c52808c5318c392096cc2a3))
+* change packages name scope ([a8d721d](https://github.com/cgi-italy/oida/commit/a8d721db395a8a9f9c52808c5318c392096cc2a3))
 
 
 ### BREAKING CHANGES
@@ -19,7 +19,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 
 
-## [0.2.2](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/eo-video-react@0.2.1...@oida/eo-video-react@0.2.2) (2021-09-28)
+## [0.2.2](https://github.com/cgi-italy/oida/compare/@oida/eo-video-react@0.2.1...@oida/eo-video-react@0.2.2) (2021-09-28)
 
 **Note:** Version bump only for package @oida/eo-video-react
 
@@ -27,7 +27,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 
 
-## [0.2.1](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oida/eo-video-react@0.2.0...@oida/eo-video-react@0.2.1) (2021-06-21)
+## [0.2.1](https://github.com/cgi-italy/oida/compare/@oida/eo-video-react@0.2.0...@oida/eo-video-react@0.2.1) (2021-06-21)
 
 **Note:** Version bump only for package @oida/eo-video-react
 
@@ -40,4 +40,4 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### Features
 
-* add eo video ui controls ([bf73759](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/bf73759716b156b152e3b09aa97fedfe1effe082))
+* add eo video ui controls ([bf73759](https://github.com/cgi-italy/oida/commit/bf73759716b156b152e3b09aa97fedfe1effe082))
