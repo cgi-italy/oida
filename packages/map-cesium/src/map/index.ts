@@ -1,7 +1,7 @@
-import { mapRendererFactory } from '@oida/core';
+import { mapRendererFactory } from '@oidajs/core';
 import { CESIUM_RENDERER_ID, CesiumMapRenderer, CesiumMapRendererProps } from './cesium-map-renderer';
 
-declare module '@oida/core' {
+declare module '@oidajs/core' {
     interface IMapRendererPropsDefinitions {
         [CESIUM_RENDERER_ID]:  CesiumMapRendererProps;
     }

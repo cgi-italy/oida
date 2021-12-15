@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid';
 
-import { createDynamicFactory } from '@oida/core';
+import { createDynamicFactory } from '@oidajs/core';
 
 import { IsActivable, Active, ActiveProps } from '../../mixins';
 

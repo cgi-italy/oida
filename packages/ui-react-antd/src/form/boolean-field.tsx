@@ -3,8 +3,8 @@ import { Checkbox, Switch } from 'antd';
 import { SwitchProps } from 'antd/lib/switch';
 import { CheckboxProps } from 'antd/lib/checkbox';
 
-import { BooleanField, BOOLEAN_FIELD_ID } from '@oida/core';
-import { FormFieldRendererBaseProps } from '@oida/ui-react-core';
+import { BooleanField, BOOLEAN_FIELD_ID } from '@oidajs/core';
+import { FormFieldRendererBaseProps } from '@oidajs/ui-react-core';
 
 import { antdFormFieldRendererFactory } from './antd-form-field-renderer-factory';
 

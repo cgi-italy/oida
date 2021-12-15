@@ -1,10 +1,10 @@
 import React from 'react';
 
-import { MapCoordQuantity } from '@oida/core';
+import { MapCoordQuantity } from '@oidajs/core';
 
-import { MapMouseCoords } from '@oida/ui-react-antd';
+import { MapMouseCoords } from '@oidajs/ui-react-antd';
 
-import { useMapMouseCoordsFromModule, useFormatter } from '@oida/ui-react-mobx';
+import { useMapMouseCoordsFromModule, useFormatter } from '@oidajs/ui-react-mobx';
 
 
 export const MouseCoords = () => {

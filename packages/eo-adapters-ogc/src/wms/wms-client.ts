@@ -1,4 +1,4 @@
-import { AxiosInstanceWithCancellation, createAxiosInstance } from '@oida/core';
+import { AxiosInstanceWithCancellation, createAxiosInstance } from '@oidajs/core';
 import WmsCapabilitiesParser from 'ol/format/WMSCapabilities';
 import WmsFeatureInfoParser from 'ol/format/WMSGetFeatureInfo';
 import GeoJsonParser from 'ol/format/GeoJSON';

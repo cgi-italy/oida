@@ -3,7 +3,7 @@ import React from 'react';
 import { Select, Upload, Button, Tooltip, List } from 'antd';
 import { SelectOutlined, UploadOutlined } from '@ant-design/icons';
 
-import { AoiImportConfig } from '@oida/ui-react-core';
+import { AoiImportConfig } from '@oidajs/ui-react-core';
 
 import { DataCollectionCompactListItem, DataCollectionList } from '../data-collection';
 import { FocusIcon } from '../icons/focus';

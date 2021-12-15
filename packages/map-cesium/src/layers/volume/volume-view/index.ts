@@ -1,4 +1,4 @@
-import { STACK_VOLUME_VIEW_ID, SLICE_VOLUME_VIEW_ID } from '@oida/core';
+import { STACK_VOLUME_VIEW_ID, SLICE_VOLUME_VIEW_ID } from '@oidajs/core';
 
 import { cesiumVolumeViewFactory } from './cesium-volume-view-factory';
 import { CesiumStackVolumeView } from './cesium-stack-volume-view';

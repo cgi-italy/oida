@@ -1,5 +1,5 @@
-import { IMapProjection } from '@oida/core';
-import { SelectionManager, Map, MapProps, TileLayer, MapViewportProps } from '@oida/state-mobx';
+import { IMapProjection } from '@oidajs/core';
+import { SelectionManager, Map, MapProps, TileLayer, MapViewportProps } from '@oidajs/state-mobx';
 
 import { AppModule } from '../app-module';
 

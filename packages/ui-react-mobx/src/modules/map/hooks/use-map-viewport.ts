@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react';
 import { autorun } from 'mobx';
 import debounce from 'lodash/debounce';
 
-import { BBox } from '@oida/core';
-import { Map } from '@oida/state-mobx';
+import { BBox } from '@oidajs/core';
+import { Map } from '@oidajs/state-mobx';
 import { useMapModule } from './use-map-module';
 
 export type MapViewportProps = {

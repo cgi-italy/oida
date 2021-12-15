@@ -1,7 +1,7 @@
 import { autorun, observable, makeObservable, action, computed, reaction } from 'mobx';
 
-import { LoadingState, SubscriptionTracker } from '@oida/core';
-import { AsyncDataFetcher } from '@oida/state-mobx';
+import { LoadingState, SubscriptionTracker } from '@oidajs/core';
+import { AsyncDataFetcher } from '@oidajs/state-mobx';
 
 import {
     DatasetDimension, DataDomain, DomainRange, isValueDomain, NumericVariable ,

@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { createDynamicFactory } from '@oida/core';
-import { DatasetDiscoveryProvider, DatasetExplorer } from '@oida/eo-mobx';
+import { createDynamicFactory } from '@oidajs/core';
+import { DatasetDiscoveryProvider, DatasetExplorer } from '@oidajs/eo-mobx';
 
 /**
  * Input props provided to the {@Link DatasetDiscoveryProviderFactory} create method

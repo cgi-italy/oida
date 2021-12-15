@@ -1,6 +1,6 @@
 import { observable, makeObservable, action } from 'mobx';
 
-import { FEATURE_DRAW_INTERACTION_ID, FeatureDrawMode, FeatureDrawOptions } from '@oida/core';
+import { FEATURE_DRAW_INTERACTION_ID, FeatureDrawMode, FeatureDrawOptions } from '@oidajs/core';
 
 import { MapInteraction, MapInteractionProps } from './map-interaction';
 

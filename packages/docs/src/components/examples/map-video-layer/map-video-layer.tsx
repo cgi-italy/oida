@@ -3,13 +3,13 @@ import { observer } from 'mobx-react';
 import { Button } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
 
-import { LoadingState } from '@oida/core';
-import { Map, TileLayer } from '@oida/state-mobx';
-import { AdaptiveVideoLayer } from '@oida/eo-video';
+import { LoadingState } from '@oidajs/core';
+import { Map, TileLayer } from '@oidajs/state-mobx';
+import { AdaptiveVideoLayer } from '@oidajs/eo-video';
 
-import { MapComponent } from '@oida/ui-react-mobx';
+import { MapComponent } from '@oidajs/ui-react-mobx';
 
-import '@oida/map-ol';
+import '@oidajs/map-ol';
 import '../antd.less';
 
 const mapState = new Map({

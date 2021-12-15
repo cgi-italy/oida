@@ -1,4 +1,4 @@
-import { ColorMap, RasterBandMode, RasterBandModeSingle } from '@oida/eo-mobx';
+import { ColorMap, RasterBandMode, RasterBandModeSingle } from '@oidajs/eo-mobx';
 import { plottyToAdamWcsColormap } from '../utils';
 
 export const getColormapWcsParams = (bandMode: RasterBandMode) => {

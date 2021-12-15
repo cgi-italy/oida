@@ -1,6 +1,6 @@
 import { autorun } from 'mobx';
 
-import { SliceVolumeView } from '@oida/core';
+import { SliceVolumeView } from '@oidajs/core';
 
 import { SliceVolumeViewMode } from '../../../models/map/layers/volume-layer';
 

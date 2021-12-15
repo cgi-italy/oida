@@ -1,6 +1,6 @@
 
 import { autorun } from 'mobx';
-import { SubscriptionTracker, IMapInteractionImplementation, IMapRenderer } from '@oida/core';
+import { SubscriptionTracker, IMapInteractionImplementation, IMapRenderer } from '@oidajs/core';
 
 import { MapInteraction } from '../../models/map/interactions/map-interaction';
 

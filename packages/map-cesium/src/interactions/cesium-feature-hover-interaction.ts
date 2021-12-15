@@ -3,7 +3,10 @@ import ScreenSpaceEventType from 'cesium/Source/Core/ScreenSpaceEventType';
 import KeyboardEventModifier from 'cesium/Source/Core/KeyboardEventModifier';
 import Cartesian3 from 'cesium/Source/Core/Cartesian3';
 
-import { IFeatureHoverInteractionImplementation, IFeatureHoverInteractionProps, FEATURE_HOVER_INTERACTION_ID, IFeature } from '@oida/core';
+import {
+    IFeatureHoverInteractionImplementation, IFeatureHoverInteractionProps,
+    FEATURE_HOVER_INTERACTION_ID, IFeature
+} from '@oidajs/core';
 
 import { cesiumInteractionsFactory } from './cesium-interactions-factory';
 import { CesiumMapRenderer } from '../map/cesium-map-renderer';

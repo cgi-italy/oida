@@ -1,7 +1,7 @@
 
 import React from 'react';
 
-import { FormField, FormFieldConfig, FormFieldDefinition } from '@oida/core';
+import { FormField, FormFieldConfig, FormFieldDefinition } from '@oidajs/core';
 
 type ExtractType<IT extends FormField<any, any, any>> = IT extends FormField<infer TYPE, any, any> ? TYPE : never;
 type ExtractValue<IT extends FormField<any, any, any>> = IT extends FormField<any, infer T, any> ? T : never;

@@ -1,8 +1,8 @@
-import { IMapRendererProps, mapRendererFactory } from '@oida/core';
+import { IMapRendererProps, mapRendererFactory } from '@oidajs/core';
 
 import { OLMapRenderer, OL_RENDERER_ID } from './ol-map-renderer';
 
-declare module '@oida/core' {
+declare module '@oidajs/core' {
     interface IMapRendererPropsDefinitions {
         [OL_RENDERER_ID]:  IMapRendererProps;
     }

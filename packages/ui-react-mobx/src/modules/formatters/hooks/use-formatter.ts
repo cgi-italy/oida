@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { reaction } from 'mobx';
 
-import { FormatterQuantity } from '@oida/core';
+import { FormatterQuantity } from '@oidajs/core';
 
 import { FormattersModule } from '../formatters-module';
 import { useFormattersModule } from './use-formatters-module';

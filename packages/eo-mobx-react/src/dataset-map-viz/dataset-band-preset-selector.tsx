@@ -4,8 +4,8 @@ import classnames from 'classnames';
 import { Avatar, Button, Dropdown } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
 
-import { RasterBandModePreset, RasterBandPreset } from '@oida/eo-mobx';
-import { useSelector } from '@oida/ui-react-mobx';
+import { RasterBandModePreset, RasterBandPreset } from '@oidajs/eo-mobx';
+import { useSelector } from '@oidajs/ui-react-mobx';
 
 export type DatasetBandPresetSelectorItemProps = {
     preset: RasterBandPreset;

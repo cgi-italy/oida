@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 
 import classNames from 'classnames';
-import { DateRange } from '@oida/core';
+import { DateRange } from '@oidajs/core';
 
 import moment from 'moment';
 

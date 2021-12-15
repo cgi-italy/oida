@@ -3,8 +3,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Input } from 'antd';
 import { InputProps } from 'antd/lib/input/Input';
 
-import { StringField, STRING_FIELD_ID } from '@oida/core';
-import { FormFieldRendererBaseProps } from '@oida/ui-react-core';
+import { StringField, STRING_FIELD_ID } from '@oidajs/core';
+import { FormFieldRendererBaseProps } from '@oidajs/ui-react-core';
 
 import { antdFormFieldRendererFactory } from './antd-form-field-renderer-factory';
 

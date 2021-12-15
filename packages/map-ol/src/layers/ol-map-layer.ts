@@ -2,7 +2,7 @@
 import LayerBase from 'ol/layer/Base';
 import { transformExtent } from 'ol/proj';
 
-import { IFeature, IMapLayerRenderer, MapLayerRendererConfig } from '@oida/core';
+import { IFeature, IMapLayerRenderer, MapLayerRendererConfig } from '@oidajs/core';
 
 import { OLMapRenderer } from '../map/ol-map-renderer';
 

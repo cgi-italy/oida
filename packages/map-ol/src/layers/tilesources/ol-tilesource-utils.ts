@@ -3,7 +3,7 @@ import { get as getProjection } from 'ol/proj.js';
 import WMTSTileGrid from 'ol/tilegrid/WMTS';
 import TileGrid from 'ol/tilegrid/TileGrid';
 
-import { TileGridConfig, computeTileGridParams } from '@oida/core';
+import { TileGridConfig, computeTileGridParams } from '@oidajs/core';
 
 export const getTileGridFromConfig = (srs, tileGridConfig?: TileGridConfig) => {
 

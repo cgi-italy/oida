@@ -3,7 +3,7 @@ import ScreenSpaceEventType from 'cesium/Source/Core/ScreenSpaceEventType';
 import Cartographic from 'cesium/Source/Core/Cartographic';
 import CesiumMath from 'cesium/Source/Core/Math';
 
-import { IMouseCoordsInteraction, IMouseCoordsInteractionProps, MouseCoords, MOUSE_COORDS_INTERACTION_ID } from '@oida/core';
+import { IMouseCoordsInteraction, IMouseCoordsInteractionProps, MouseCoords, MOUSE_COORDS_INTERACTION_ID } from '@oidajs/core';
 
 import { cesiumInteractionsFactory } from './cesium-interactions-factory';
 import { CesiumMapRenderer } from '../map/cesium-map-renderer';

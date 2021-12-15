@@ -1,5 +1,5 @@
 import { IObservableArray, observable, action, makeObservable, IReactionDisposer, reaction } from 'mobx';
-import { FeatureLayer, FeatureStyleGetter } from '@oida/state-mobx';
+import { FeatureLayer, FeatureStyleGetter } from '@oidajs/state-mobx';
 
 import { DatasetDiscoveryProvider, DatasetDiscoveryProviderDefinition,
     DatasetDiscoveryProviderDefinitions, DatasetDiscoveryProviderItem

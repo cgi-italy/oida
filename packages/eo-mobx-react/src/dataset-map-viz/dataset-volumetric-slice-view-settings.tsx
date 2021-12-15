@@ -3,9 +3,9 @@ import React, { useState } from 'react';
 import { Slider, Checkbox } from 'antd';
 import proj4 from 'proj4';
 
-import { SLICE_VOLUME_VIEW_ID, VolumeTileGrid } from '@oida/core';
-import { SliceVolumeViewMode } from '@oida/state-mobx';
-import { useSelector } from '@oida/ui-react-mobx';
+import { SLICE_VOLUME_VIEW_ID, VolumeTileGrid } from '@oidajs/core';
+import { SliceVolumeViewMode } from '@oidajs/state-mobx';
+import { useSelector } from '@oidajs/ui-react-mobx';
 
 import { DatasetVolumetricViewModeSettingsFactory } from './dataset-volumetric-view-mode-settings-factory';
 

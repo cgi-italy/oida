@@ -1,7 +1,7 @@
 import { AoiValue, AOI_FIELD_ID, AxiosInstanceWithCancellation,
     BOOLEAN_FIELD_ID, createAxiosInstance, DateRangeValue, DATE_FIELD_ID,
     DATE_RANGE_FIELD_ID, ENUM_FIELD_ID, QueryParams, STRING_FIELD_ID
-} from '@oida/core';
+} from '@oidajs/core';
 
 export type AdamOpensearchDatasetMetadataGridName = {
     id: string;

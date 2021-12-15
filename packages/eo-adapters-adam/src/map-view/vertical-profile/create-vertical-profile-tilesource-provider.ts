@@ -1,7 +1,7 @@
 
-import { AxiosInstanceWithCancellation, TileSource } from '@oida/core';
+import { AxiosInstanceWithCancellation, TileSource } from '@oidajs/core';
 
-import { DatasetVerticalProfileViz, RasterBandModeSingle } from '@oida/eo-mobx';
+import { DatasetVerticalProfileViz, RasterBandModeSingle } from '@oidajs/eo-mobx';
 
 
 import { createGeoTiffLoader } from '../../utils';

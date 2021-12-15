@@ -1,10 +1,10 @@
 import React from 'react';
 import { Button, Tooltip } from 'antd';
 import { FastBackwardOutlined, StepBackwardOutlined, CaretRightOutlined, PauseOutlined, StepForwardOutlined, FastForwardOutlined } from '@ant-design/icons';
-import { DatasetVizOpacityControl, DatasetVizSettingsFactory } from '@oida/eo-mobx-react';
+import { DatasetVizOpacityControl, DatasetVizSettingsFactory } from '@oidajs/eo-mobx-react';
 
-import { DatasetVideoMapViz, VIDEO_VIZ_TYPE } from '@oida/eo-video';
-import { useSelector } from '@oida/ui-react-mobx';
+import { DatasetVideoMapViz, VIDEO_VIZ_TYPE } from '@oidajs/eo-video';
+import { useSelector } from '@oidajs/ui-react-mobx';
 
 
 export type DatasetVideoVizSettingsProps = {

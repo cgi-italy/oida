@@ -1,9 +1,9 @@
 import React from 'react';
 import { Form } from 'antd';
 
-import { useSelector } from '@oida/ui-react-mobx';
-import { DatasetAreaValues } from '@oida/eo-mobx';
-import { SelectEnumRenderer } from '@oida/ui-react-antd';
+import { useSelector } from '@oidajs/ui-react-mobx';
+import { DatasetAreaValues } from '@oidajs/eo-mobx';
+import { SelectEnumRenderer } from '@oidajs/ui-react-antd';
 
 import { DatasetDimensionValueSelector } from '../../dataset-map-viz/dataset-dimension-value-selector';
 import { AnalysisAoiFilter } from '../analysis-aoi-filter';

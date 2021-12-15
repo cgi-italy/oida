@@ -1,4 +1,4 @@
-import { GroupLayer, TileLayer } from '@oida/state-mobx';
+import { GroupLayer, TileLayer } from '@oidajs/state-mobx';
 
 import { useSelector } from '../../../core';
 import { MapBaseLayerConfig } from '../map-module';

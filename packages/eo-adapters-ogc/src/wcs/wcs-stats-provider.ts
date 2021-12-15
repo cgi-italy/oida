@@ -3,8 +3,8 @@ import { fromArrayBuffer } from 'geotiff';
 import ecStats from 'echarts-stat';
 import getBBox from '@turf/bbox';
 
-import { AxiosInstanceWithCancellation, NUMERIC_FIELD_ID, STRING_FIELD_ID, urlParamsSerializer } from '@oida/core';
-import { DatasetAreaValuesData, DatasetAreaValuesProvider, isDomainProvider, isValueDomain, NumericDomain, NumericVariable } from '@oida/eo-mobx';
+import { AxiosInstanceWithCancellation, NUMERIC_FIELD_ID, STRING_FIELD_ID, urlParamsSerializer } from '@oidajs/core';
+import { DatasetAreaValuesData, DatasetAreaValuesProvider, isDomainProvider, isValueDomain, NumericDomain, NumericVariable } from '@oidajs/eo-mobx';
 
 import { WcsService } from './wcs-service';
 

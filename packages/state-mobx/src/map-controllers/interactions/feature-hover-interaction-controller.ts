@@ -2,7 +2,7 @@ import { reaction } from 'mobx';
 
 import { MapInteractionController } from './map-interaction-controller';
 
-import { IFeatureHoverInteractionImplementation, FEATURE_HOVER_INTERACTION_ID, IFeature } from '@oida/core';
+import { IFeatureHoverInteractionImplementation, FEATURE_HOVER_INTERACTION_ID, IFeature } from '@oidajs/core';
 
 import { interactionControllersFactory } from './interaction-controllers-factory';
 

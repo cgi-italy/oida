@@ -3,7 +3,7 @@ import { v4 as uuid } from 'uuid';
 import {
     DatasetConfig, RASTER_VIZ_TYPE, RasterBandPreset, DatasetToolConfig,
     DatasetSpatialCoverageProvider, DatasetTimeDistributionProvider
-} from '@oida/eo-mobx';
+} from '@oidajs/eo-mobx';
 
 import { WmsService } from './wms-service';
 import { WmsTimeDistributionProvider } from './wms-time-distribution-provider';

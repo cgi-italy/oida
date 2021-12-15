@@ -9,9 +9,9 @@ import {
     DatasetTimeDistributionProvider,
     TimeDistributionRangeItem,
     TimeSearchDirection
-} from '@oida/eo-mobx';
-import { DateFieldRenderer } from '@oida/ui-react-antd';
-import { useSelector } from '@oida/ui-react-mobx';
+} from '@oidajs/eo-mobx';
+import { DateFieldRenderer } from '@oidajs/ui-react-antd';
+import { useSelector } from '@oidajs/ui-react-mobx';
 
 type TimeDimension = DatasetDimension<ValueDomain<Date>>;
 type ValueDimension = DatasetDimension<ValueDomain<number>>;

@@ -4,7 +4,7 @@ import classnames from 'classnames';
 import { Form } from 'antd';
 import { FormProps } from 'antd/lib/form';
 
-import { FormRendererProps, useFormFieldRenderers } from '@oida/ui-react-core';
+import { FormRendererProps, useFormFieldRenderers } from '@oidajs/ui-react-core';
 
 import { antdFormFieldRendererFactory } from '../form/antd-form-field-renderer-factory';
 

@@ -7,10 +7,10 @@ import 'echarts/lib/component/legend';
 import 'echarts/lib/component/axisPointer';
 import 'echarts/lib/component/brush';
 
-import { getTextColorForBackground } from '@oida/core';
+import { getTextColorForBackground } from '@oidajs/core';
 import {
     isDomainProvider, NumericDomainMapper, DatasetAreaSeriesDataItem, RasterBandConfig, DatasetDimension, DataDomain, isValueDomain
-} from '@oida/eo-mobx';
+} from '@oidajs/eo-mobx';
 
 import { ChartWidget } from '../chart-widget';
 

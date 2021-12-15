@@ -1,8 +1,8 @@
 import { autorun, computed, makeObservable, observable, action } from 'mobx';
 import moment from 'moment';
 
-import { SubscriptionTracker, AoiValue, DateRangeValue, randomColorFactory, QueryFilter } from '@oida/core';
-import { GroupLayer, MapLayer, DataFiltersProps } from '@oida/state-mobx';
+import { SubscriptionTracker, AoiValue, DateRangeValue, randomColorFactory, QueryFilter } from '@oidajs/core';
+import { GroupLayer, MapLayer, DataFiltersProps } from '@oidajs/state-mobx';
 
 import { Dataset, DatasetConfig, DatasetViz } from '../common';
 import { DatasetTimeDistributionViz } from '../dataset-time-distrbution';

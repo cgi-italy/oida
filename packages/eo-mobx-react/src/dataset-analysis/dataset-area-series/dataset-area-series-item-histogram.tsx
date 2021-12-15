@@ -9,7 +9,7 @@ import 'echarts/lib/component/brush';
 
 import {
     isDomainProvider, NumericDomainMapper, DatasetAreaSeriesDataItem, RasterBandConfig
-} from '@oida/eo-mobx';
+} from '@oidajs/eo-mobx';
 
 import { ChartWidget } from '../chart-widget';
 

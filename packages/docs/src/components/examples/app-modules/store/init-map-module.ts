@@ -1,4 +1,4 @@
-import { MapModule } from '@oida/ui-react-mobx';
+import { MapModule } from '@oidajs/ui-react-mobx';
 
 export const initMapModule = () => {
     const mapProjections = [

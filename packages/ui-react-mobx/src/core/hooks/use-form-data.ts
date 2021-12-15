@@ -1,6 +1,6 @@
-import { IFormFieldDefinition } from '@oida/core';
-import { DataFilters } from '@oida/state-mobx';
-import { FormRendererProps } from '@oida/ui-react-core';
+import { IFormFieldDefinition } from '@oidajs/core';
+import { DataFilters } from '@oidajs/state-mobx';
+import { FormRendererProps } from '@oidajs/ui-react-core';
 
 import { useSelector } from './use-selector';
 

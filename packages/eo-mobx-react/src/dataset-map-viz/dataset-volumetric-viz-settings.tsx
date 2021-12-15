@@ -2,15 +2,15 @@ import React, { useState } from 'react';
 
 import { Select } from 'antd';
 
-import { DatasetVolumetricViz, VOLUMETRIC_VIZ_TYPE } from '@oida/eo-mobx';
+import { DatasetVolumetricViz, VOLUMETRIC_VIZ_TYPE } from '@oidajs/eo-mobx';
 
 import { DatasetVizOpacityControl } from './dataset-viz-opacity-control';
 import { DatasetVizSettingsFactory } from './dataset-viz-settings-factory';
 import { DatasetBandSingleSelector } from './dataset-band-single-selector';
 import { DatasetVerticalScaleSelector } from './dataset-vertical-scale-selector';
 import { DatasetVolumetricViewModeSettingsFactory } from './dataset-volumetric-view-mode-settings-factory';
-import { useSelector } from '@oida/ui-react-mobx';
-import { StackVolumeViewMode, SliceVolumeViewMode } from '@oida/state-mobx';
+import { useSelector } from '@oidajs/ui-react-mobx';
+import { StackVolumeViewMode, SliceVolumeViewMode } from '@oidajs/state-mobx';
 
 export type DatasetVolumetricVizSettingsProps = {
     datasetViz: DatasetVolumetricViz

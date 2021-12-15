@@ -6,7 +6,7 @@ import DeveloperError from 'cesium/Source/Core/DeveloperError';
 import { get as getProj } from 'ol/proj';
 import TileState from 'ol/TileState';
 
-import { getTileGridFromSRS } from '@oida/map-cesium';
+import { getTileGridFromSRS } from '@oidajs/map-cesium';
 
 /*
 *    adapted from:

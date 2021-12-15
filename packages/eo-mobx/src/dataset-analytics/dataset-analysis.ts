@@ -1,7 +1,7 @@
 import { IObservableArray, observable, action, makeObservable } from 'mobx';
 import { v4 as uuid } from 'uuid';
 
-import { Visible, VisibleProps } from '@oida/state-mobx';
+import { Visible, VisibleProps } from '@oidajs/state-mobx';
 
 import { DatasetProcessing } from './dataset-processing';
 

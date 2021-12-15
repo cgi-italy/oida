@@ -1,4 +1,4 @@
-import { IPointStyle, ILineStyle, IPolygonStyle, FeatureGeometry } from '@oida/core';
+import { IPointStyle, ILineStyle, IPolygonStyle, FeatureGeometry } from '@oidajs/core';
 
 export type GeometryStyle = IPointStyle | ILineStyle | IPolygonStyle;
 

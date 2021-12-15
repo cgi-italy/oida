@@ -1,6 +1,6 @@
 import chroma from 'chroma-js';
 
-import { IFeatureStyle } from '@oida/core';
+import { IFeatureStyle } from '@oidajs/core';
 
 import { Aoi } from '../models';
 

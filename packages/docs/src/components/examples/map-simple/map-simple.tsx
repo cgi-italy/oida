@@ -1,8 +1,8 @@
 import React from 'react';
-import { Map, TileLayer, MapLayer } from '@oida/state-mobx';
+import { Map, TileLayer, MapLayer } from '@oidajs/state-mobx';
 
-import { MapComponent } from '@oida/ui-react-mobx';
-import '@oida/map-ol';
+import { MapComponent } from '@oidajs/ui-react-mobx';
+import '@oidajs/map-ol';
 
 
 const mapState = new Map({

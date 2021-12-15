@@ -1,7 +1,7 @@
 import { observable, makeObservable, autorun, action, reaction } from 'mobx';
 
-import { LoadingState, GeoImageLayerFootprint, getGeometryExtent } from '@oida/core';
-import { Map, GeoImageLayer } from '@oida/state-mobx';
+import { LoadingState, GeoImageLayerFootprint, getGeometryExtent } from '@oidajs/core';
+import { Map, GeoImageLayer } from '@oidajs/state-mobx';
 
 import { createAdaptiveVideo } from './adaptive-video';
 import { VideoAdapter, DashVideoAdapter, HlsVideoAdapter, HtmlVideoAdapter, VideoStream } from './video-adapters';

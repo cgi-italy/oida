@@ -1,7 +1,7 @@
 import { autorun, observable, makeObservable, action, computed } from 'mobx';
 
-import { LoadingState, QueryFilter, SubscriptionTracker } from '@oida/core';
-import { AsyncDataFetcher, MapLayer } from '@oida/state-mobx';
+import { LoadingState, QueryFilter, SubscriptionTracker } from '@oidajs/core';
+import { AsyncDataFetcher, MapLayer } from '@oidajs/state-mobx';
 
 import { DatasetViz, DatasetDimension, DataDomain, NumericVariable, DatasetDimensions, HasDatasetDimensions, DatasetDimensionsProps } from '../common';
 import { DatasetProcessing, DatasetProcessingProps } from './dataset-processing';

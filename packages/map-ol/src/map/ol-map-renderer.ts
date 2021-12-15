@@ -6,7 +6,7 @@ import { register } from 'ol/proj/proj4';
 import proj4 from 'proj4';
 import { getCenter as getExtentCenter } from 'ol/extent';
 
-import { IMapRenderer, IMapRendererProps, IMapViewport, IMapProjection } from '@oida/core';
+import { IMapRenderer, IMapRendererProps, IMapViewport, IMapProjection } from '@oidajs/core';
 
 import { olLayersFactory } from '../layers/ol-layers-factory';
 import { olInteractionsFactory } from '../interactions/ol-interactions-factory';

@@ -1,8 +1,8 @@
-import { AxiosInstanceWithCancellation } from '@oida/core';
+import { AxiosInstanceWithCancellation } from '@oidajs/core';
 import {
     POINT_SERIES_PROCESSING, DatasetPointSeriesConfig, DatasetTimeDistributionProvider, DatasetToolConfig,
     TRANSECT_VALUES_PROCESSING, DatasetTransectValuesConfig
-} from '@oida/eo-mobx';
+} from '@oidajs/eo-mobx';
 
 import { AdamDatasetConfig, AdamDatasetSingleBandCoverage, isMultiBandCoverage, AdamDatasetDimension } from '../adam-dataset-config';
 import { AdamDatasetFactoryConfig } from '../get-adam-dataset-factory';

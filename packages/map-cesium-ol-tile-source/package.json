@@ -1,5 +1,5 @@
 {
-  "name": "@oida/map-cesium-ol-tile-source",
+  "name": "@oidajs/map-cesium-ol-tile-source",
   "version": "0.1.3",
   "description": "Cesium map renderer wrapper library",
   "module": "es/index.js",
@@ -24,8 +24,8 @@
     "registry": "https://nexus.dev.eoss-cloud.it/repository/npm-cgi-eo/"
   },
   "dependencies": {
-    "@oida/map-cesium": "file:../map-cesium",
-    "@oida/map-ol": "file:../map-ol"
+    "@oidajs/map-cesium": "file:../map-cesium",
+    "@oidajs/map-ol": "file:../map-ol"
   },
   "peerDependencies": {
     "cesium": "^1.86.0",

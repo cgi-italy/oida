@@ -3,8 +3,8 @@ import classnames from 'classnames';
 import { Dropdown, Avatar } from 'antd';
 import { LoadingOutlined, DownOutlined } from '@ant-design/icons';
 
-import { EnumField, ENUM_FIELD_ID, EnumChoice, LoadingState } from '@oida/core';
-import { FormFieldRendererBaseProps } from '@oida/ui-react-core';
+import { EnumField, ENUM_FIELD_ID, EnumChoice, LoadingState } from '@oidajs/core';
+import { FormFieldRendererBaseProps } from '@oidajs/ui-react-core';
 
 import { antdFormFieldRendererFactory } from './antd-form-field-renderer-factory';
 

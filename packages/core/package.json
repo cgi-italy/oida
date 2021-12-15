@@ -1,5 +1,5 @@
 {
-  "name": "@oida/core",
+  "name": "@oidajs/core",
   "version": "2.2.0",
   "description": "core utils and definitions",
   "module": "es/index.js",

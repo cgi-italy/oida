@@ -1,4 +1,4 @@
-import { FormFieldValues, IFormFieldDefinition } from '@oida/core';
+import { FormFieldValues, IFormFieldDefinition } from '@oidajs/core';
 
 /** {@Link FormRenderer} props */
 export type FormRendererProps = {

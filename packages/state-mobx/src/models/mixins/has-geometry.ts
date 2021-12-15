@@ -1,6 +1,6 @@
 import { makeObservable, observable, computed, action } from 'mobx';
 
-import { Geometry, getGeometryExtent } from '@oida/core';
+import { Geometry, getGeometryExtent } from '@oidajs/core';
 
 type GeometryType = Geometry | (Geometry | undefined);
 

@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
-import { DataFilters } from '@oida/state-mobx';
-import { useFormData } from '@oida/ui-react-mobx';
-import { QueryFilter, IFormFieldDefinition, getFormFieldSerializer, IFormFieldType } from '@oida/core';
-import { DataForm } from '@oida/ui-react-antd';
+import { DataFilters } from '@oidajs/state-mobx';
+import { useFormData } from '@oidajs/ui-react-mobx';
+import { QueryFilter, IFormFieldDefinition, getFormFieldSerializer, IFormFieldType } from '@oidajs/core';
+import { DataForm } from '@oidajs/ui-react-antd';
 import { observer } from 'mobx-react';
 
 import './query-form.less';

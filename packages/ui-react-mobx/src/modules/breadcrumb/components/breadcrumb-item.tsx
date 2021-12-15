@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
-import { IndexedCollection } from '@oida/state-mobx';
-import { BreadcrumbItemProps } from '@oida/ui-react-core';
+import { IndexedCollection } from '@oidajs/state-mobx';
+import { BreadcrumbItemProps } from '@oidajs/ui-react-core';
 
 import { useBreadcrumbModule } from '../hooks/use-breadcrumb-module';
 

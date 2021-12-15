@@ -7,7 +7,7 @@ import PointPrimitiveCollection  from 'cesium/Source/Scene/PointPrimitiveCollect
 import Billboard from 'cesium/Source/Scene/Billboard';
 import PointPrimitive from 'cesium/Source/Scene/PointPrimitive';
 
-import { IPointStyle, IIconStyle, ICircleStyle, isIcon } from '@oida/core';
+import { IPointStyle, IIconStyle, ICircleStyle, isIcon } from '@oidajs/core';
 
 import { PICK_INFO_KEY, PickInfo } from '../../../utils/picking';
 import { CesiumGeometryPrimitiveFeature, CesiumGeometryPrimitiveRenderer } from './cesium-geometry-primitive-renderer';

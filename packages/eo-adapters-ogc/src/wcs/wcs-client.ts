@@ -1,5 +1,5 @@
-import { AxiosInstanceWithCancellation, createAxiosInstance, getXmlDateNodeValue, getXmlFloatNodeValue, getXmlStringNodeValue } from '@oida/core';
-import { NumericVariable, ValueDomain } from '@oida/eo-mobx';
+import { AxiosInstanceWithCancellation, createAxiosInstance, getXmlDateNodeValue, getXmlFloatNodeValue, getXmlStringNodeValue } from '@oidajs/core';
+import { NumericVariable, ValueDomain } from '@oidajs/eo-mobx';
 
 export type WcsVendor = 'geoserver';
 

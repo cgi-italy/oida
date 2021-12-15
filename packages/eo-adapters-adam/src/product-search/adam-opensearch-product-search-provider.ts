@@ -1,5 +1,5 @@
-import { QueryParams, STRING_FIELD_ID } from '@oida/core';
-import { DatasetProductSearchProvider } from '@oida/eo-mobx';
+import { QueryParams, STRING_FIELD_ID } from '@oidajs/core';
+import { DatasetProductSearchProvider } from '@oidajs/eo-mobx';
 import { AdamOpenSearchClient } from '../common';
 
 export type AdamOpenSearchProductSearchProviderConfig = {

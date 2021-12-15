@@ -2,7 +2,7 @@ import { autorun } from 'mobx';
 
 import { MapInteractionController } from './map-interaction-controller';
 
-import { IFeatureSelectInteractionImplementation, FEATURE_SELECT_INTERACTION_ID, SelectionMode, IFeature } from '@oida/core';
+import { IFeatureSelectInteractionImplementation, FEATURE_SELECT_INTERACTION_ID, SelectionMode, IFeature } from '@oidajs/core';
 
 import { interactionControllersFactory } from './interaction-controllers-factory';
 

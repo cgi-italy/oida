@@ -1,7 +1,7 @@
 import React from 'react';
 import classnames from 'classnames';
 
-import { formatLat, formatLon } from '@oida/core';
+import { formatLat, formatLon } from '@oidajs/core';
 
 export type MapMouseCoordsProps = {
     coords?: {

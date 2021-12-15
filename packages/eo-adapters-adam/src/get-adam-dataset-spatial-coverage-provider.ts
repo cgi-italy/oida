@@ -4,8 +4,8 @@ import { transformExtent } from 'ol/proj';
 import { getIntersection } from 'ol/extent';
 import { fromArrayBuffer } from 'geotiff';
 
-import { AxiosInstanceWithCancellation, EpsgIoDefinitionProvider } from '@oida/core';
-import { RasterMapViz, DatasetViz } from '@oida/eo-mobx';
+import { AxiosInstanceWithCancellation, EpsgIoDefinitionProvider } from '@oidajs/core';
+import { RasterMapViz, DatasetViz } from '@oidajs/eo-mobx';
 
 import { AdamDatasetConfig } from './adam-dataset-config';
 import { AdamDatasetFactoryConfig } from './get-adam-dataset-factory';

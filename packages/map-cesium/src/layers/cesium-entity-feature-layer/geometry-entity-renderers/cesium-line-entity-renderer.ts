@@ -3,7 +3,7 @@ import Color from 'cesium/Source/Core/Color';
 import Entity from 'cesium/Source/DataSources/Entity';
 import PolylineGraphics from 'cesium/Source/DataSources/PolylineGraphics';
 
-import { IFeatureStyle } from '@oida/core';
+import { IFeatureStyle } from '@oidajs/core';
 
 import { CesiumGeometryEntityRenderer } from './cesium-geometry-entity-renderer-factory';
 

@@ -1,4 +1,4 @@
-import { IGroupLayerRenderer, MapLayerRendererConfig } from '@oida/core';
+import { IGroupLayerRenderer, MapLayerRendererConfig } from '@oidajs/core';
 
 import { CesiumMapLayer } from './cesium-map-layer';
 

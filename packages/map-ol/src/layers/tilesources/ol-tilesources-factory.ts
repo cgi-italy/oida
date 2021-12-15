@@ -1,6 +1,6 @@
 import TileImage from 'ol/source/TileImage';
 
-import { createDynamicFactory, IDynamicFactory, ITileSourceDefinitions } from '@oida/core';
+import { createDynamicFactory, IDynamicFactory, ITileSourceDefinitions } from '@oidajs/core';
 
 let factory = createDynamicFactory<TileImage, ITileSourceDefinitions, {wrapX?: boolean}>('ol-tile-sources');
 

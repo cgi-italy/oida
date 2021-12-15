@@ -1,6 +1,6 @@
 import { observable, action, makeObservable } from 'mobx';
 
-import { FormatterQuantity, Formatter } from '@oida/core';
+import { FormatterQuantity, Formatter } from '@oidajs/core';
 
 import { AppModule } from '../app-module';
 

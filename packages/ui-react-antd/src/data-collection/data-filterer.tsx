@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { DataFiltererProps } from '@oida/ui-react-core';
+import { DataFiltererProps } from '@oidajs/ui-react-core';
 
 import { DataForm } from '../form';
 

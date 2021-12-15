@@ -3,8 +3,8 @@ import React, { useState, useMemo } from 'react';
 import { Tag, Button, Tooltip, Drawer, Popover } from 'antd';
 
 import { EnvironmentOutlined, LinkOutlined, EditOutlined, ImportOutlined } from '@ant-design/icons';
-import { AoiField, AoiAction, AOI_FIELD_ID } from '@oida/core';
-import { AoiImportConfig, FormFieldRendererBaseProps } from '@oida/ui-react-core';
+import { AoiField, AoiAction, AOI_FIELD_ID } from '@oidajs/core';
+import { AoiImportConfig, FormFieldRendererBaseProps } from '@oidajs/ui-react-core';
 
 import { DrawLineIcon } from '../icons/draw-line';
 import { DrawBboxIcon } from '../icons/draw-bbox';

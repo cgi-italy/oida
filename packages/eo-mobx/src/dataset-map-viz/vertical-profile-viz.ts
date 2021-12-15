@@ -1,10 +1,10 @@
 import { autorun, IObservableArray, observable, makeObservable, runInAction, action } from 'mobx';
 
-import { LoadingState, IVerticalProfile, IVerticalProfileStyle, TileSource, SubscriptionTracker } from '@oida/core';
+import { LoadingState, IVerticalProfile, IVerticalProfileStyle, TileSource, SubscriptionTracker } from '@oidajs/core';
 import {
     VerticalProfileLayer, Selected, Hovered, SelectedProps, HoveredProps,
     IsSelectable, IsHoverable, HasVisibility, Visible, VisibleProps, AsyncDataFetcher
-} from '@oida/state-mobx';
+} from '@oidajs/state-mobx';
 
 import { DatasetViz, DatasetVizProps } from '../common';
 import { DatasetPointSeriesValueItem } from '../dataset-analytics';

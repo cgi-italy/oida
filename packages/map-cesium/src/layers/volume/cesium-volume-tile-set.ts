@@ -3,7 +3,7 @@ import Texture from 'cesium/Source/Renderer/Texture';
 
 import destroyObject from 'cesium/Source/Core/destroyObject';
 
-import { VolumeSourceConfig, VolumeTileKey } from '@oida/core';
+import { VolumeSourceConfig, VolumeTileKey } from '@oidajs/core';
 
 import { CesiumVolumeSource } from './cesium-volume-source';
 import { CesiumVolumeTile } from './cesium-volume-tile';

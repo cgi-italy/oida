@@ -14,7 +14,7 @@ import {
     IFeatureDrawInteractionImplementation,
     FeatureDrawMode,
     FeatureDrawOptions
-} from '@oida/core';
+} from '@oidajs/core';
 
 import { CesiumMapRenderer } from '../map/cesium-map-renderer';
 import { cesiumInteractionsFactory } from './cesium-interactions-factory';

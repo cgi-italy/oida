@@ -1,4 +1,4 @@
-import { QueryParams, Geometry } from '@oida/core';
+import { QueryParams, Geometry } from '@oidajs/core';
 
 export type ProductSearchRecord = {
     start: Date,

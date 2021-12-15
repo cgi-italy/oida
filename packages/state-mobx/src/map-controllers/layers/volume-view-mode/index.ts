@@ -1,4 +1,4 @@
-import { SLICE_VOLUME_VIEW_ID, STACK_VOLUME_VIEW_ID } from '@oida/core';
+import { SLICE_VOLUME_VIEW_ID, STACK_VOLUME_VIEW_ID } from '@oidajs/core';
 
 import { volumeViewModeControllerFactory } from './volume-view-mode-controller-factory';
 

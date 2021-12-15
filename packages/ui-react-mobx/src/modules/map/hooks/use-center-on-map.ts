@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 
-import { Geometry, centerOnMap, CenterOnMapOptions, IMapRenderer } from '@oida/core';
-import { Map } from '@oida/state-mobx';
+import { Geometry, centerOnMap, CenterOnMapOptions, IMapRenderer } from '@oidajs/core';
+import { Map } from '@oidajs/state-mobx';
 
 import { useSelector } from '../../../core';
 import { useMapModule } from './use-map-module';

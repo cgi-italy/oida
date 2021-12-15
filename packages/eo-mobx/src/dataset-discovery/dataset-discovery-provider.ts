@@ -1,7 +1,7 @@
 import { IObservableArray, observable, action, makeObservable } from 'mobx';
 
-import { Active, ActiveProps, FeatureStyleGetter, IsActivable, IsEntity } from '@oida/state-mobx';
-import { Geometry, createDynamicFactory } from '@oida/core';
+import { Active, ActiveProps, FeatureStyleGetter, IsActivable, IsEntity } from '@oidajs/state-mobx';
+import { Geometry, createDynamicFactory } from '@oidajs/core';
 
 import { DatasetConfig } from '../common';
 import { DatasetExplorerItemInitialState } from '../dataset-explorer';
@@ -72,7 +72,7 @@ const discoveryProviderFactory = createDynamicFactory<
  * // from a configuration object the following steps should be implemented
  *
  * // declaration merging to register the provider configuration and type (this is required for typings)
- * declare module '@oida/eo-mobx' {
+ * declare module '@oidajs/eo-mobx' {
  *     interface DatasetDiscoveryProviderDefinitions {
  *         [MY_DISCOVERY_PROVIDER_TYPE]: MyDiscoveryProviderProps;
  *     }

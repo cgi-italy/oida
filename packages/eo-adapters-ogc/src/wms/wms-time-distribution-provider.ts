@@ -3,7 +3,7 @@ import moment from 'moment';
 import {
     DatasetTimeDistributionProvider, TimeDistributionRangeItem,
     TimeDistributionInstantItem, TimeSearchDirection
-} from '@oida/eo-mobx';
+} from '@oidajs/eo-mobx';
 
 
 export type WmsTimeDistributionItem = Date | {

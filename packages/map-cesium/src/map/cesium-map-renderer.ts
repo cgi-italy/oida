@@ -20,7 +20,7 @@ import DataSourceDisplay from 'cesium/Source/DataSources/DataSourceDisplay';
 
 import 'cesium/Source/Widgets/CesiumWidget/CesiumWidget.css';
 
-import { IMapRenderer, IMapRendererProps, IMapViewport, BBox, Size } from '@oida/core';
+import { IMapRenderer, IMapRendererProps, IMapViewport, BBox, Size } from '@oidajs/core';
 
 import { cesiumLayersFactory } from '../layers/cesium-layers-factory';
 import { cesiumInteractionsFactory } from '../interactions/cesium-interactions-factory';

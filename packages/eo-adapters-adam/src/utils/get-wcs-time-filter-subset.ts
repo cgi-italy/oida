@@ -1,4 +1,4 @@
-import { DateRangeValue } from '@oida/core';
+import { DateRangeValue } from '@oidajs/core';
 
 export const getWcsTimeFilterSubset = (timeFilter: Date | DateRangeValue | undefined) => {
 

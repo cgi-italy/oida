@@ -1,5 +1,5 @@
-import { MapView, MapViewportProps } from '@oida/state-mobx';
-import { MapNavControlsProps } from '@oida/ui-react-core';
+import { MapView, MapViewportProps } from '@oidajs/state-mobx';
+import { MapNavControlsProps } from '@oidajs/ui-react-core';
 
 import { useMapModule } from './use-map-module';
 

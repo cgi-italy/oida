@@ -1,7 +1,7 @@
 import { autorun, observable, makeObservable, action, computed, reaction } from 'mobx';
 
-import { AoiSupportedGeometry, BBoxGeometry, CircleGeometry, LoadingState, QueryFilter, SubscriptionTracker } from '@oida/core';
-import { AsyncDataFetcher } from '@oida/state-mobx';
+import { AoiSupportedGeometry, BBoxGeometry, CircleGeometry, LoadingState, QueryFilter, SubscriptionTracker } from '@oidajs/core';
+import { AsyncDataFetcher } from '@oidajs/state-mobx';
 
 import {
     DatasetVariable, DatasetDimension, DataDomain, TimeSearchDirection, NumericDomain, CategoricalDomain,

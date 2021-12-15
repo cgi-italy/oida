@@ -3,7 +3,7 @@ import React from 'react';
 import { DatasetVizOpacityControl } from './dataset-viz-opacity-control';
 import { DatasetVizSettingsFactory } from './dataset-viz-settings-factory';
 
-import { VERTICAL_PROFILE_VIZ_TYPE, DatasetVerticalProfileViz } from '@oida/eo-mobx';
+import { VERTICAL_PROFILE_VIZ_TYPE, DatasetVerticalProfileViz } from '@oidajs/eo-mobx';
 import { DatasetBandModeControls } from './dataset-band-mode-controls';
 import { DatasetVerticalScaleSelector } from './dataset-vertical-scale-selector';
 

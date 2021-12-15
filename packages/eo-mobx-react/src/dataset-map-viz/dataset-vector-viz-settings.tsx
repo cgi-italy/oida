@@ -1,8 +1,8 @@
 import React from 'react';
 import { Checkbox, Select } from 'antd';
 
-import { DatasetVectorMapViz, NumericFeaturePropertyDescriptor, NUMERIC_FEATURE_PROPERTY_TYPE, VECTOR_VIZ_TYPE } from '@oida/eo-mobx';
-import { useSelector } from '@oida/ui-react-mobx';
+import { DatasetVectorMapViz, NumericFeaturePropertyDescriptor, NUMERIC_FEATURE_PROPERTY_TYPE, VECTOR_VIZ_TYPE } from '@oidajs/eo-mobx';
+import { useSelector } from '@oidajs/ui-react-mobx';
 
 import { DatasetVizSettingsFactory } from './dataset-viz-settings-factory';
 import { DatasetColorMapSelector } from './dataset-colormap-selector';

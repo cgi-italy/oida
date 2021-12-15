@@ -1,6 +1,6 @@
 import { useSelector } from '../../../core/hooks';
 
-import { MouseCoordsInteraction } from '@oida/state-mobx';
+import { MouseCoordsInteraction } from '@oidajs/state-mobx';
 
 import { useMapModule } from './use-map-module';
 

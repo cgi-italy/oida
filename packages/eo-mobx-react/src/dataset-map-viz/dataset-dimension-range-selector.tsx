@@ -1,8 +1,8 @@
 import React from 'react';
 import { Form } from 'antd';
 
-import { DatasetDimension, DomainRange, ValueDomain, isValueDomain, DataDomain, CategoricalDomain } from '@oida/eo-mobx';
-import { NumericRangeFieldRenderer, DateRangeFieldRenderer, SelectEnumRenderer } from '@oida/ui-react-antd';
+import { DatasetDimension, DomainRange, ValueDomain, isValueDomain, DataDomain, CategoricalDomain } from '@oidajs/eo-mobx';
+import { NumericRangeFieldRenderer, DateRangeFieldRenderer, SelectEnumRenderer } from '@oidajs/ui-react-antd';
 import { useDatasetDomain } from './use-dataset-domain';
 
 type TimeDimension = DatasetDimension<ValueDomain<Date, number>>;

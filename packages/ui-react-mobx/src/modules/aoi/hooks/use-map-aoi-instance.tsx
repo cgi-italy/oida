@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react';
 
-import { SelectionMode, AoiValue, FormFieldState } from '@oida/core';
-import { IndexedCollection, Map, SelectionManager } from '@oida/state-mobx';
+import { SelectionMode, AoiValue, FormFieldState } from '@oidajs/core';
+import { IndexedCollection, Map, SelectionManager } from '@oidajs/state-mobx';
 
 import { useSelector } from '../../../core';
 import { useCenterOnMap } from '../../map';

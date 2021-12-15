@@ -2,10 +2,10 @@ import React from 'react';
 import { Button, Dropdown, Menu, Tooltip } from 'antd';
 import { DeleteOutlined, PlusOutlined, DownOutlined } from '@ant-design/icons';
 
-import { BOOLEAN_FIELD_ID, DATE_RANGE_FIELD_ID, ENUM_FIELD_ID, NUMERIC_RANGE_FIELD_ID, STRING_FIELD_ID } from '@oida/core';
-import { NumericRangeFieldRenderer, SelectEnumRenderer } from '@oida/ui-react-antd';
-import { useSelector } from '@oida/ui-react-mobx';
-import { DatasetVectorMapViz, VectorFeaturePropertyDescriptor } from '@oida/eo-mobx';
+import { BOOLEAN_FIELD_ID, DATE_RANGE_FIELD_ID, ENUM_FIELD_ID, NUMERIC_RANGE_FIELD_ID, STRING_FIELD_ID } from '@oidajs/core';
+import { NumericRangeFieldRenderer, SelectEnumRenderer } from '@oidajs/ui-react-antd';
+import { useSelector } from '@oidajs/ui-react-mobx';
+import { DatasetVectorMapViz, VectorFeaturePropertyDescriptor } from '@oidajs/eo-mobx';
 
 
 export type FeaturePropertySelectorProps = {

@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Tabs, Tooltip } from 'antd';
 
-import { DatasetDiscoveryProvider } from '@oida/eo-mobx';
+import { DatasetDiscoveryProvider } from '@oidajs/eo-mobx';
 
 
 export type DatasetDiscoveryProviderSelectorProps = {

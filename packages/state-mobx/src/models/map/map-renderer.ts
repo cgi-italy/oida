@@ -1,4 +1,4 @@
-import { IMapRenderer } from '@oida/core';
+import { IMapRenderer } from '@oidajs/core';
 import { makeObservable, observable, action } from 'mobx';
 
 export type MapRendererOptions = Record<string, any>;

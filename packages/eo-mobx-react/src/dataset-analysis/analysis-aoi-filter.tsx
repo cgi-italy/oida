@@ -6,10 +6,10 @@ import classnames from 'classnames';
 import { Tooltip } from 'antd';
 import { LinkOutlined, DragOutlined } from '@ant-design/icons';
 
-import { AoiSupportedGeometry, AoiAction, AoiValue } from '@oida/core';
-import { DatasetProcessing, SharedAoi } from '@oida/eo-mobx';
-import { AoiFieldRenderer } from '@oida/ui-react-antd';
-import { useMapAoiDrawerFromModule, useAoiAction, useSelector, useMapAoiImporter } from '@oida/ui-react-mobx';
+import { AoiSupportedGeometry, AoiAction, AoiValue } from '@oidajs/core';
+import { DatasetProcessing, SharedAoi } from '@oidajs/eo-mobx';
+import { AoiFieldRenderer } from '@oidajs/ui-react-antd';
+import { useMapAoiDrawerFromModule, useAoiAction, useSelector, useMapAoiImporter } from '@oidajs/ui-react-mobx';
 
 import { useAnalysisGeometryFromModule } from './use-analysis-geometry';
 

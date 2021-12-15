@@ -1,4 +1,4 @@
-import { RasterMapViz } from '@oida/eo-mobx';
+import { RasterMapViz } from '@oidajs/eo-mobx';
 import { getWcsTimeFilterSubset } from '../utils/get-wcs-time-filter-subset';
 import { getAoiWcsParams, getCoverageWcsParams } from '../utils';
 import { AdamDatasetConfig } from '../adam-dataset-config';

@@ -1,12 +1,12 @@
 import { intersects, getIntersection } from 'ol/extent';
 import { transformExtent } from 'ol/proj';
 
-import { getGeometryExtent, NUMERIC_FIELD_ID, QueryFilter, STRING_FIELD_ID, TileGridConfig, TileSource } from '@oida/core';
+import { getGeometryExtent, NUMERIC_FIELD_ID, QueryFilter, STRING_FIELD_ID, TileGridConfig, TileSource } from '@oidajs/core';
 import {
     RasterMapViz, RasterMapVizConfig, RASTER_VIZ_TYPE, RasterBandModeType, RasterBandPreset, RasterBandModePreset,
     DatasetSpatialCoverageProvider,
     DatasetMapViewConfig
-} from '@oida/eo-mobx';
+} from '@oidajs/eo-mobx';
 
 import { WmsLayer, WmsLayerStyle } from './wms-client';
 

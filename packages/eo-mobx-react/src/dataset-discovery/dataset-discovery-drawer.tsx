@@ -4,7 +4,7 @@ import { Tooltip, Drawer, PageHeader } from 'antd';
 import { DrawerProps } from 'antd/lib/drawer';
 import { CloseOutlined } from '@ant-design/icons';
 
-import { DatasetDiscovery, DatasetExplorer } from '@oida/eo-mobx';
+import { DatasetDiscovery, DatasetExplorer } from '@oidajs/eo-mobx';
 
 import { DatasetDiscoveryProviderTabsNavigation, DatasetDiscoveryProviderRouter } from './dataset-discovery-provider-route';
 

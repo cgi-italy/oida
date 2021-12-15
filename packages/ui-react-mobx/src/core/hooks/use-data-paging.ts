@@ -1,5 +1,5 @@
-import { DataPaging } from '@oida/state-mobx';
-import { DataPagerProps } from '@oida/ui-react-core';
+import { DataPaging } from '@oidajs/state-mobx';
+import { DataPagerProps } from '@oidajs/ui-react-core';
 
 import { useSelector } from './use-selector';
 

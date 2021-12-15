@@ -1,10 +1,10 @@
 import React, { lazy, Suspense } from 'react';
 
-import { MapComponent, MapComponentProps } from '@oida/ui-react-mst';
+import { MapComponent, MapComponentProps } from '@oidajs/ui-react-mst';
 
 export const LazyMapComponent = lazy(() => {
-    const olPromise = import('@oida/map-ol');
-    const cesiumPromise = import('@oida/map-cesium');
+    const olPromise = import('@oidajs/map-ol');
+    const cesiumPromise = import('@oidajs/map-cesium');
 
     return Promise.all([olPromise, cesiumPromise]).then(() => {
         return {

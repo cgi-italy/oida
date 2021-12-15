@@ -1,4 +1,4 @@
-import { ENUM_FIELD_ID, NUMERIC_RANGE_FIELD_ID, QueryFilter, STRING_FIELD_ID } from '@oida/core';
+import { ENUM_FIELD_ID, NUMERIC_RANGE_FIELD_ID, QueryFilter, STRING_FIELD_ID } from '@oidajs/core';
 import {
     DatasetVectorFeatureProps, VectorFeatureDescriptor, FeaturePropertyValueTypes, VectorFeaturePropertyDescriptor,
     ENUM_FEATURE_PROPERTY_TYPE, NUMERIC_FEATURE_PROPERTY_TYPE, STRING_FEATURE_PROPERTY_TYPE

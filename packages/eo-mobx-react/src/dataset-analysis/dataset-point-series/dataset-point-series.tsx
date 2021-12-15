@@ -3,8 +3,8 @@ import { IObservableArray } from 'mobx';
 import { Form, Button, Checkbox } from 'antd';
 import { LeftOutlined } from '@ant-design/icons';
 
-import { DatasetPointSeries, POINT_SERIES_PROCESSING, DatasetPointSeriesConfig } from '@oida/eo-mobx';
-import { useSelector } from '@oida/ui-react-mobx';
+import { DatasetPointSeries, POINT_SERIES_PROCESSING, DatasetPointSeriesConfig } from '@oidajs/eo-mobx';
+import { useSelector } from '@oidajs/ui-react-mobx';
 
 import { DatasetSelector } from '../dataset-selector';
 import { AnalysisSeriesActions } from '../analysis-series-actions';

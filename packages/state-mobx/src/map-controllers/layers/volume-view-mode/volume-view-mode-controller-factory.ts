@@ -1,4 +1,4 @@
-import { createDynamicFactory } from '@oida/core';
+import { createDynamicFactory } from '@oidajs/core';
 
 import { VolumeViewModeController } from './volume-view-mode-controller';
 

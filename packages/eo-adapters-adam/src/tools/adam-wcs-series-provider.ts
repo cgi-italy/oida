@@ -1,8 +1,8 @@
 
 import { transform } from 'ol/proj';
 
-import { AxiosInstanceWithCancellation, createAxiosInstance } from '@oida/core';
-import { DatasetPointSeriesRequest, isValueDomain, isDomainProvider, DatasetPointSeriesValueItem } from '@oida/eo-mobx';
+import { AxiosInstanceWithCancellation, createAxiosInstance } from '@oidajs/core';
+import { DatasetPointSeriesRequest, isValueDomain, isDomainProvider, DatasetPointSeriesValueItem } from '@oidajs/eo-mobx';
 
 import { AdamDatasetDimension, AdamDatasetSingleBandCoverage } from '../adam-dataset-config';
 import { AdamServiceParamsSerializer } from '../utils';

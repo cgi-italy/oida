@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { Map } from '@oida/state-mobx';
-import { RasterMapViz, RASTER_VIZ_TYPE } from '@oida/eo-mobx';
+import { Map } from '@oidajs/state-mobx';
+import { RasterMapViz, RASTER_VIZ_TYPE } from '@oidajs/eo-mobx';
 
 import { DatasetVizOpacityControl } from './dataset-viz-opacity-control';
 import { DatasetDimensionValueSelector } from './dataset-dimension-value-selector';

@@ -1,4 +1,4 @@
-import { FormatterQuantity } from '@oida/core';
+import { FormatterQuantity } from '@oidajs/core';
 
 import { useSelector } from '../../../core';
 import { FormattersModule, FormatterOptionsPreset } from '../formatters-module';

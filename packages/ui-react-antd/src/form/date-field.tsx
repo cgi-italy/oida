@@ -5,8 +5,8 @@ import { DatePickerProps } from 'antd/lib/date-picker';
 import { PanelMode } from 'rc-picker/lib/interface';
 import moment from 'moment';
 
-import { FormFieldRendererBaseProps } from '@oida/ui-react-core';
-import { DateField, DATE_FIELD_ID } from '@oida/core';
+import { FormFieldRendererBaseProps } from '@oidajs/ui-react-core';
+import { DateField, DATE_FIELD_ID } from '@oidajs/core';
 
 import { antdFormFieldRendererFactory } from './antd-form-field-renderer-factory';
 

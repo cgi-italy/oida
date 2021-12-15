@@ -1,5 +1,5 @@
-import { DatasetDiscoveryProvider, DatasetDiscoveryProviderProps } from '@oida/eo-mobx';
-import { Entity, QueryParams, QueryParamsProps } from '@oida/state-mobx';
+import { DatasetDiscoveryProvider, DatasetDiscoveryProviderProps } from '@oidajs/eo-mobx';
+import { Entity, QueryParams, QueryParamsProps } from '@oidajs/state-mobx';
 import { autorun } from 'mobx';
 import { AdamDatasetFactoryConfig, AdamDatasetFactory, getAdamDatasetFactory } from '../get-adam-dataset-factory';
 import { AdamFeaturedDataset, AdamFeaturedDatasetDiscoveryClient } from './adam-featured-dataset-discovery-client';

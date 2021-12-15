@@ -1,4 +1,4 @@
-import { FeatureLayerRendererConfig, MapLayerRendererConfig } from '@oida/core';
+import { FeatureLayerRendererConfig, MapLayerRendererConfig } from '@oidajs/core';
 
 import { CesiumPrimitiveFeatureLayer } from './cesium-primitive-feature-layer';
 import { CesiumEntityFeatureLayer } from './cesium-entity-feature-layer';

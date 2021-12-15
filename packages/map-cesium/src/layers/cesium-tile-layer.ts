@@ -2,7 +2,7 @@ import ImageryLayer from 'cesium/Source/Scene/ImageryLayer';
 import Rectangle from 'cesium/Source/Core/Rectangle';
 import Event from 'cesium/Source/Core/Event';
 
-import { ITileLayerRenderer, TileLayerRendererConfig, TileSource } from '@oida/core';
+import { ITileLayerRenderer, TileLayerRendererConfig, TileSource } from '@oidajs/core';
 
 import { cesiumTileSourcesFactory } from './tilesources/cesium-tilesources-factory';
 import { CesiumMapLayer } from './cesium-map-layer';

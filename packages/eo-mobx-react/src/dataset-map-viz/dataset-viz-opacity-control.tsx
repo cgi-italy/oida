@@ -2,9 +2,9 @@ import React from 'react';
 
 import { Slider } from 'antd';
 
-import { MapLayer } from '@oida/state-mobx';
-import { useSelector } from '@oida/ui-react-mobx';
-import { DatasetViz } from '@oida/eo-mobx';
+import { MapLayer } from '@oidajs/state-mobx';
+import { useSelector } from '@oidajs/ui-react-mobx';
+import { DatasetViz } from '@oidajs/eo-mobx';
 
 
 export type DatasetVizOpacityControlProps = {

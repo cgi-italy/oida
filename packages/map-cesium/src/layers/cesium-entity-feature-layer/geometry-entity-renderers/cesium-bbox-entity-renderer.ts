@@ -4,7 +4,7 @@ import Rectangle from 'cesium/Source/Core/Rectangle';
 import RectangleGraphics from 'cesium/Source/DataSources/RectangleGraphics';
 import HeightReference from 'cesium/Source/Scene/HeightReference';
 
-import { IFeatureStyle, BBoxGeometry } from '@oida/core';
+import { IFeatureStyle, BBoxGeometry } from '@oidajs/core';
 
 import { CesiumGeometryEntityRenderer } from './cesium-geometry-entity-renderer-factory';
 

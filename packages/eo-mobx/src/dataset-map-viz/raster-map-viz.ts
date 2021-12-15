@@ -1,7 +1,7 @@
 import { autorun } from 'mobx';
 
-import { TileSource, SubscriptionTracker, LoadingState } from '@oida/core';
-import { GroupLayer, TileLayer } from '@oida/state-mobx';
+import { TileSource, SubscriptionTracker, LoadingState } from '@oidajs/core';
+import { GroupLayer, TileLayer } from '@oidajs/state-mobx';
 
 import {
     DatasetDimension, DataDomain, isValueDomain,

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { DataDomain, isDomainProvider, DatasetDimension } from '@oida/eo-mobx';
+import { DataDomain, isDomainProvider, DatasetDimension } from '@oidajs/eo-mobx';
 
 type useDatasetDomainProps<T extends DataDomain<unknown, unknown>> = {
     dimension: DatasetDimension<T>;

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from 'react';
 import { useRouteMatch, Route, Redirect, Switch, useParams, useHistory } from 'react-router';
-import { DatasetDiscovery, DatasetExplorer } from '@oida/eo-mobx';
-import { useSelector } from '@oida/ui-react-mobx';
+import { DatasetDiscovery, DatasetExplorer } from '@oidajs/eo-mobx';
+import { useSelector } from '@oidajs/ui-react-mobx';
 import { DatasetDiscoveryProviderFactory } from './dataset-discovery-provider-factory';
 import { DatasetDiscoveryProviderTabsSelector } from './dataset-discovery-provider-tabs-selector';
 

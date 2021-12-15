@@ -1,4 +1,4 @@
-import { SortOrder } from '@oida/core';
+import { SortOrder } from '@oidajs/core';
 
 export type DataSortField = {
     key: string;

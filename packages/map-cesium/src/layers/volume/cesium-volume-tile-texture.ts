@@ -4,7 +4,7 @@ import PixelDataType from 'cesium/Source/Renderer/PixelDatatype';
 import PixelFormat from 'cesium/Source/Core/PixelFormat';
 import ShaderSource from 'cesium/Source/Renderer/ShaderSource';
 
-import { VolumeTileKey } from '@oida/core';
+import { VolumeTileKey } from '@oidajs/core';
 
 import { CesiumVolumeSource, CesiumVolumeSlice } from './cesium-volume-source';
 

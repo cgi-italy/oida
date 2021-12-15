@@ -1,15 +1,15 @@
 import React from 'react';
 
 import { SearchOutlined, PlusOutlined } from '@ant-design/icons';
-import { STRING_FIELD_ID, IFormFieldDefinition } from '@oida/core';
+import { STRING_FIELD_ID, IFormFieldDefinition } from '@oidajs/core';
 
-import { useEntityCollection } from '@oida/ui-react-mobx';
-import { DataCollectionList } from '@oida/ui-react-antd';
-import { DatasetExplorer } from '@oida/eo-mobx';
+import { useEntityCollection } from '@oidajs/ui-react-mobx';
+import { DataCollectionList } from '@oidajs/ui-react-antd';
+import { DatasetExplorer } from '@oidajs/eo-mobx';
 import {
     WmsDatasetDiscoveryProvider, WmsDatasetDiscoveryProviderItem,
- } from '@oida/eo-adapters-ogc';
-import { useQueryCriteriaUrlBinding, useQueryFiltersBreadcrumbBindingFromModule } from '@oida/ui-react-mobx';
+ } from '@oidajs/eo-adapters-ogc';
+import { useQueryCriteriaUrlBinding, useQueryFiltersBreadcrumbBindingFromModule } from '@oidajs/ui-react-mobx';
 
 import { WmsDiscoveryProviderLayerItem } from './wms-discovery-provider-layer-item';
 

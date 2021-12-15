@@ -1,15 +1,15 @@
 import React from 'react';
 
-import { Geometry } from '@oida/core';
+import { Geometry } from '@oidajs/core';
 import { Map, FeatureLayer, TileLayer, IndexedCollection, Entity, GeometryState,  EntityProps,
     FeatureHoverInteraction, FeatureSelectInteraction, MouseCoordsInteraction
-} from '@oida/state-mobx';
+} from '@oidajs/state-mobx';
 
-import { useMapMouseCoords } from '@oida/ui-react-mobx';
+import { useMapMouseCoords } from '@oidajs/ui-react-mobx';
 
-import { MapComponent } from '@oida/ui-react-mobx';
+import { MapComponent } from '@oidajs/ui-react-mobx';
 
-import '@oida/map-cesium';
+import '@oidajs/map-cesium';
 
 type MyFeatureProps = {
     geometry: Geometry

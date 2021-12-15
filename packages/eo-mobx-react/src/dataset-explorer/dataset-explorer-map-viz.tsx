@@ -4,9 +4,9 @@ import { List } from 'antd';
 
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 
-import { useSelector } from '@oida/ui-react-mobx';
-import { Map, MapLayer } from '@oida/state-mobx';
-import { DatasetExplorer, DatasetViz } from '@oida/eo-mobx';
+import { useSelector } from '@oidajs/ui-react-mobx';
+import { Map, MapLayer } from '@oidajs/state-mobx';
+import { DatasetExplorer, DatasetViz } from '@oidajs/eo-mobx';
 
 import { ComboToolConfig } from '../hooks/use-dataset-explorer-tools';
 import { DatasetVizDownloadModalProps, DatasetVizListItem } from '../dataset-map-viz';

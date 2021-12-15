@@ -1,7 +1,7 @@
 import moment from 'moment';
 
 import { WmsClient, WmsCapabilities, WmsLayer } from './wms-client';
-import { QueryParams, SortOrder } from '@oida/core';
+import { QueryParams, SortOrder } from '@oidajs/core';
 
 export type WmsVendor = 'geoserver';
 

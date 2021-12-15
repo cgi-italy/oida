@@ -1,5 +1,5 @@
 {
-  "name": "@oida/ui-react-antd",
+  "name": "@oidajs/ui-react-antd",
   "version": "4.0.0",
   "description": "antd components",
   "module": "es/index.js",
@@ -36,8 +36,8 @@
     "react-dom": "^16.8.6"
   },
   "dependencies": {
-    "@oida/core": "file:../core",
-    "@oida/ui-react-core": "file:../ui-react-core",
+    "@oidajs/core": "file:../core",
+    "@oidajs/ui-react-core": "file:../ui-react-core",
     "lodash": "4.17.15",
     "tslib": "^2.2.0"
   }

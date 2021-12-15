@@ -1,5 +1,5 @@
 {
-  "name": "@oida/eo-geotiff",
+  "name": "@oidajs/eo-geotiff",
   "version": "0.2.1",
   "description": "oida EO geotiff library",
   "module": "es/index.js",
@@ -29,9 +29,9 @@
     "proj4": "^2.x"
   },
   "dependencies": {
-    "@oida/core": "file:../core",
-    "@oida/eo-mobx": "file:../eo-mobx",
-    "@oida/state-mobx": "file:../state-mobx",
+    "@oidajs/core": "file:../core",
+    "@oidajs/eo-mobx": "file:../eo-mobx",
+    "@oidajs/state-mobx": "file:../state-mobx",
     "geotiff": "^1.0.4",
     "lru-cache": "6.0.0",
     "lzw-tiff-decoder": "^0.1.1",

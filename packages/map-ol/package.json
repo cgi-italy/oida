@@ -1,5 +1,5 @@
 {
-  "name": "@oida/map-ol",
+  "name": "@oidajs/map-ol",
   "version": "1.4.1",
   "description": "Openlayers map renderer wrapper library",
   "module": "es/index.js",
@@ -24,7 +24,7 @@
     "registry": "https://nexus.dev.eoss-cloud.it/repository/npm-cgi-eo/"
   },
   "dependencies": {
-    "@oida/core": "file:../core",
+    "@oidajs/core": "file:../core",
     "@turf/bbox-polygon": "^6.0.1",
     "tslib": "^2.2.0"
   },

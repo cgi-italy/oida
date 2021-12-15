@@ -1,5 +1,5 @@
-import { DataSorting } from '@oida/state-mobx';
-import { DataSortField, DataSorterProps } from '@oida/ui-react-core';
+import { DataSorting } from '@oidajs/state-mobx';
+import { DataSortField, DataSorterProps } from '@oidajs/ui-react-core';
 
 import { useSelector } from './use-selector';
 

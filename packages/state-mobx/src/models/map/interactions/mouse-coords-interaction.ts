@@ -1,6 +1,6 @@
 import { observable, makeObservable, action } from 'mobx';
 
-import { MOUSE_COORDS_INTERACTION_ID } from '@oida/core';
+import { MOUSE_COORDS_INTERACTION_ID } from '@oidajs/core';
 
 import { MapInteraction, MapInteractionProps } from './map-interaction';
 

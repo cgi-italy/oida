@@ -1,7 +1,7 @@
 import { action, makeObservable, observable, reaction } from 'mobx';
 
-import { SubscriptionTracker, MouseCoords, FeatureDrawMode } from '@oida/core';
-import { ArrayTracker, FeatureDrawInteraction, MouseCoordsInteraction, SelectionManager } from '@oida/state-mobx';
+import { SubscriptionTracker, MouseCoords, FeatureDrawMode } from '@oidajs/core';
+import { ArrayTracker, FeatureDrawInteraction, MouseCoordsInteraction, SelectionManager } from '@oidajs/state-mobx';
 
 import { DatasetToolConfig } from '../common';
 import { DatasetExplorer, DatasetExplorerItem } from '../dataset-explorer';

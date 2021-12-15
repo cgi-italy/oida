@@ -1,6 +1,6 @@
 import { reaction } from 'mobx';
 
-import { SubscriptionTracker, mapRendererFactory, IMapRenderer, MapCoord } from '@oida/core';
+import { SubscriptionTracker, mapRendererFactory, IMapRenderer, MapCoord } from '@oidajs/core';
 
 import { Map } from '../models/map/map';
 import { MapRenderer } from '../models/map/map-renderer';

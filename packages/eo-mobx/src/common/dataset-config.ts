@@ -1,4 +1,4 @@
-import { IFormFieldDefinition } from '@oida/core';
+import { IFormFieldDefinition } from '@oidajs/core';
 
 import { DatasetVizConfig, DatasetVizDefinitions } from '../common';
 import { DatasetTimeDistributionConfig } from './dataset-time-distribution-config';

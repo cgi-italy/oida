@@ -1,13 +1,13 @@
 import { computed, makeObservable, observable, action } from 'mobx';
 import chroma from 'chroma-js';
 
-import { IFeatureStyle, randomColorFactory } from '@oida/core';
+import { IFeatureStyle, randomColorFactory } from '@oidajs/core';
 import {
     MapLayer,
     HasVisibility, Visible, VisibleProps,
     IsHoverable, Hovered, HoveredProps,
     IsSelectable, Selected, SelectedProps
-} from '@oida/state-mobx';
+} from '@oidajs/state-mobx';
 
 import { DatasetViz, DatasetVizProps, SharedAoi, SharedAoiProps } from '../common';
 

@@ -1,4 +1,4 @@
-import { QueryParams, SortOrder } from '@oida/core';
+import { QueryParams, SortOrder } from '@oidajs/core';
 import { AdamDatasetConfig, isMultiBandCoverage, AdamDatasetRenderMode } from '../adam-dataset-config';
 import { AdamWcsCoverageDescriptionClient, AdamWcCoverageDescriptionClientConfig } from './adam-wcs-coverage-description-client';
 

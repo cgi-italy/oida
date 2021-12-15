@@ -7,7 +7,7 @@ import { transform } from 'ol/proj';
 
 import bboxPolygon from '@turf/bbox-polygon';
 
-import { FeatureLayerRendererConfig, FEATURE_LAYER_ID, IFeature, IFeatureLayerRenderer } from '@oida/core';
+import { FeatureLayerRendererConfig, FEATURE_LAYER_ID, IFeature, IFeatureLayerRenderer } from '@oidajs/core';
 
 import { OLMapLayer } from './ol-map-layer';
 import { olLayersFactory } from './ol-layers-factory';

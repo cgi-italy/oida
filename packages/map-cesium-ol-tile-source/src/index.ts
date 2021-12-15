@@ -1,5 +1,5 @@
-import { cesiumTileSourcesFactory, getProjectionType, ProjectionType } from '@oida/map-cesium';
-import { olTileSourcesFactory } from '@oida/map-ol';
+import { cesiumTileSourcesFactory, getProjectionType, ProjectionType } from '@oidajs/map-cesium';
+import { olTileSourcesFactory } from '@oidajs/map-ol';
 
 import { CesiumOLImageryProvider } from './cesium-ol-imagery-provider';
 

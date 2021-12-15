@@ -5,7 +5,7 @@ import {
     FEATURE_SELECT_INTERACTION_ID,
     IFeatureSelectInteractionImplementation,
     SelectionMode
-} from '@oida/core';
+} from '@oidajs/core';
 
 import { OLSelectInteraction } from '../utils/ol-select-interaction';
 import { click, platformModifierKeyOnly, shiftKeyOnly } from 'ol/events/condition';

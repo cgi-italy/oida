@@ -119,21 +119,21 @@
     "webpack-merge": "^4.2.2"
   },
   "dependencies": {
-    "@oida/core": "file:packages\\core",
-    "@oida/eo-adapters-adam": "file:packages\\eo-adapters-adam",
-    "@oida/eo-adapters-ogc": "file:packages\\eo-adapters-ogc",
-    "@oida/eo-adapters-ogc-react": "file:packages\\eo-adapters-ogc-react",
-    "@oida/eo-geotiff": "file:packages\\eo-geotiff",
-    "@oida/eo-mobx": "file:packages\\eo-mobx",
-    "@oida/eo-mobx-react": "file:packages\\eo-mobx-react",
-    "@oida/eo-video": "file:packages\\eo-video",
-    "@oida/eo-video-react": "file:packages\\eo-video-react",
-    "@oida/map-cesium": "file:packages\\map-cesium",
-    "@oida/map-cesium-ol-tile-source": "file:packages\\map-cesium-ol-tile-source",
-    "@oida/map-ol": "file:packages\\map-ol",
-    "@oida/state-mobx": "file:packages\\state-mobx",
-    "@oida/ui-react-antd": "file:packages\\ui-react-antd",
-    "@oida/ui-react-core": "file:packages\\ui-react-core",
-    "@oida/ui-react-mobx": "file:packages\\ui-react-mobx"
+    "@oidajs/core": "file:packages\\core",
+    "@oidajs/eo-adapters-adam": "file:packages\\eo-adapters-adam",
+    "@oidajs/eo-adapters-ogc": "file:packages\\eo-adapters-ogc",
+    "@oidajs/eo-adapters-ogc-react": "file:packages\\eo-adapters-ogc-react",
+    "@oidajs/eo-geotiff": "file:packages\\eo-geotiff",
+    "@oidajs/eo-mobx": "file:packages\\eo-mobx",
+    "@oidajs/eo-mobx-react": "file:packages\\eo-mobx-react",
+    "@oidajs/eo-video": "file:packages\\eo-video",
+    "@oidajs/eo-video-react": "file:packages\\eo-video-react",
+    "@oidajs/map-cesium": "file:packages\\map-cesium",
+    "@oidajs/map-cesium-ol-tile-source": "file:packages\\map-cesium-ol-tile-source",
+    "@oidajs/map-ol": "file:packages\\map-ol",
+    "@oidajs/state-mobx": "file:packages\\state-mobx",
+    "@oidajs/ui-react-antd": "file:packages\\ui-react-antd",
+    "@oidajs/ui-react-core": "file:packages\\ui-react-core",
+    "@oidajs/ui-react-mobx": "file:packages\\ui-react-mobx"
   }
 }

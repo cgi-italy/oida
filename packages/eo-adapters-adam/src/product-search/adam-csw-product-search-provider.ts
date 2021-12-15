@@ -4,9 +4,9 @@ import {
     QueryParams, SortOrder,
     getGeometryExtent,
     AxiosInstanceWithCancellation, createAxiosInstance, BBoxGeometry, QueryFilter, AOI_FIELD_ID, DATE_RANGE_FIELD_ID
-} from '@oida/core';
+} from '@oidajs/core';
 
-import { DatasetProductSearchProvider } from '@oida/eo-mobx';
+import { DatasetProductSearchProvider } from '@oidajs/eo-mobx';
 
 import { AdamServiceParamsSerializer } from '../utils';
 

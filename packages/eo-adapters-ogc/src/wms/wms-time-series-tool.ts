@@ -1,4 +1,4 @@
-import { DatasetPointSeriesConfig, DatasetTimeDistributionProvider, DatasetToolConfig, POINT_SERIES_PROCESSING } from '@oida/eo-mobx';
+import { DatasetPointSeriesConfig, DatasetTimeDistributionProvider, DatasetToolConfig, POINT_SERIES_PROCESSING } from '@oidajs/eo-mobx';
 import { WmsService } from './wms-service';
 
 export type WmsTimeSeriesConfig = {

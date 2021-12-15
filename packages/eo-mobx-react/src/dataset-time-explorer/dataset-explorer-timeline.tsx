@@ -9,10 +9,10 @@ import moment from 'moment';
 import { Button, Tooltip } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 
-import { AOI_FIELD_ID, DateRangeValue } from '@oida/core';
-import { ArrayTracker } from '@oida/state-mobx';
-import { useSelector } from '@oida/ui-react-mobx';
-import { DatasetExplorer, DatasetExplorerItem, TimeSearchDirection, getNearestDatasetProduct } from '@oida/eo-mobx';
+import { AOI_FIELD_ID, DateRangeValue } from '@oidajs/core';
+import { ArrayTracker } from '@oidajs/state-mobx';
+import { useSelector } from '@oidajs/ui-react-mobx';
+import { DatasetExplorer, DatasetExplorerItem, TimeSearchDirection, getNearestDatasetProduct } from '@oidajs/eo-mobx';
 
 import { Timeline, TimelineGroupLabelsMode } from './timeline';
 import { DatasetExplorerTimelineToolbar } from './dataset-explorer-timeline-toolbar';

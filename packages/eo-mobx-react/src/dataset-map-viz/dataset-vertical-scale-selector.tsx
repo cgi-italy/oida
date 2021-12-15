@@ -1,10 +1,10 @@
 import React from 'react';
 
-import { useSelector } from '@oida/ui-react-mobx';
+import { useSelector } from '@oidajs/ui-react-mobx';
 
 import { Slider } from 'antd';
 
-import { VerticalScale } from '@oida/eo-mobx';
+import { VerticalScale } from '@oidajs/eo-mobx';
 
 export type DatasetVerticalScaleSelectorProps = {
     verticalScale: VerticalScale

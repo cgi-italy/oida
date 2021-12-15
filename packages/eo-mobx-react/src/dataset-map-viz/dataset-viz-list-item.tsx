@@ -8,11 +8,11 @@ import {
 } from '@ant-design/icons';
 import { SortableHandle } from 'react-sortable-hoc';
 
-import { LoadingState } from '@oida/core';
-import { Map, MapLayer } from '@oida/state-mobx';
-import { DataCollectionItemActionButton } from '@oida/ui-react-antd';
-import { useSelector, useCenterOnMapFromModule } from '@oida/ui-react-mobx';
-import { DatasetViz, DatasetExplorer } from '@oida/eo-mobx';
+import { LoadingState } from '@oidajs/core';
+import { Map, MapLayer } from '@oidajs/state-mobx';
+import { DataCollectionItemActionButton } from '@oidajs/ui-react-antd';
+import { useSelector, useCenterOnMapFromModule } from '@oidajs/ui-react-mobx';
+import { DatasetViz, DatasetExplorer } from '@oidajs/eo-mobx';
 
 import { ComboToolConfig } from '../hooks';
 import { DatasetVizProgressControl } from './dataset-viz-progress-control';

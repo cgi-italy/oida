@@ -1,7 +1,7 @@
 import { autorun, observable, action, makeObservable } from 'mobx';
 
-import { VolumeSourceConfig, SubscriptionTracker } from '@oida/core';
-import { VolumeLayer, StackVolumeViewMode, VolumeColorMap } from '@oida/state-mobx';
+import { VolumeSourceConfig, SubscriptionTracker } from '@oidajs/core';
+import { VolumeLayer, StackVolumeViewMode, VolumeColorMap } from '@oidajs/state-mobx';
 
 import { DatasetViz, DatasetVizProps } from '../common';
 import { RasterBandConfig, RasterBandModeSingle, RasterBandModeSingleProps } from './raster-band-mode';

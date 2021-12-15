@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { getAoiFieldFactory, AoiFieldFactoryProps, AoiValue, AoiField } from '@oida/core';
-import { FormFieldRendererFactory, getDefaultFormFieldRendererFactory, AoiImportConfig } from '@oida/ui-react-core';
+import { getAoiFieldFactory, AoiFieldFactoryProps, AoiValue, AoiField } from '@oidajs/core';
+import { FormFieldRendererFactory, getDefaultFormFieldRendererFactory, AoiImportConfig } from '@oidajs/ui-react-core';
 import { useEffect } from 'react';
 import { useAoiModule } from '../hooks';
 import { bindAoiValueToMap } from '../utils/bind-aoi-value-to-map';

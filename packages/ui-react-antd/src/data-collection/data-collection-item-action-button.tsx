@@ -1,7 +1,7 @@
 import React from 'react';
 import { ButtonProps, Tooltip } from 'antd';
 
-import { DataCollectionItemAction } from '@oida/ui-react-core';
+import { DataCollectionItemAction } from '@oidajs/ui-react-core';
 
 import { AsyncButton } from '../general';
 

@@ -1,14 +1,14 @@
 import React, { useEffect } from 'react';
 
-import { DatasetExplorer, DatasetAnalysis } from '@oida/eo-mobx';
-import { LayoutSectionItem } from '@oida/ui-react-core';
+import { DatasetExplorer, DatasetAnalysis } from '@oidajs/eo-mobx';
+import { LayoutSectionItem } from '@oidajs/ui-react-core';
 
 import { DashboardPane, DashboardPaneProps } from './dashboard-pane';
 
 import { DatasetAnalysisWidgetFactory } from './dataset-analysis-widget-factory';
 
 import 'react-grid-layout/css/styles.css';
-import { useSelector } from '@oida/ui-react-mobx';
+import { useSelector } from '@oidajs/ui-react-mobx';
 
 /**
  * {@link DatasetAnalysesDashboard} component properties

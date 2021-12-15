@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 
-import { DataCollectionDetailedListItem } from '@oida/ui-react-antd';
-import { WmsDatasetDiscoveryProviderItem, WmsLayerPreviewMode } from '@oida/eo-adapters-ogc';
+import { DataCollectionDetailedListItem } from '@oidajs/ui-react-antd';
+import { WmsDatasetDiscoveryProviderItem, WmsLayerPreviewMode } from '@oidajs/eo-adapters-ogc';
 
 export type WmsDiscoveryProviderLayerItemProps = {
     wmsDiscoveryItem: WmsDatasetDiscoveryProviderItem

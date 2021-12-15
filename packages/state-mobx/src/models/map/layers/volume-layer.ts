@@ -1,6 +1,6 @@
 import { observable, makeObservable, action } from 'mobx';
 
-import { VOLUME_LAYER_ID, VolumeSourceConfig, SLICE_VOLUME_VIEW_ID, STACK_VOLUME_VIEW_ID } from '@oida/core';
+import { VOLUME_LAYER_ID, VolumeSourceConfig, SLICE_VOLUME_VIEW_ID, STACK_VOLUME_VIEW_ID } from '@oidajs/core';
 
 import { MapLayer, MapLayerProps } from './map-layer';
 

@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { Form, Button } from 'antd';
 import { LeftOutlined } from '@ant-design/icons';
 
-import { formatNumber } from '@oida/core';
-import { DatasetAreaSeries, DATASET_AREA_SERIES_PROCESSING, DatasetAreaSeriesConfig, DomainRange } from '@oida/eo-mobx';
-import { useSelector } from '@oida/ui-react-mobx';
+import { formatNumber } from '@oidajs/core';
+import { DatasetAreaSeries, DATASET_AREA_SERIES_PROCESSING, DatasetAreaSeriesConfig, DomainRange } from '@oidajs/eo-mobx';
+import { useSelector } from '@oidajs/ui-react-mobx';
 
 import { DatasetSelector } from '../dataset-selector';
 import { DatasetAnalysisWidgetFactory, DatasetAnalysisWidgetFactoryConfig } from '../dataset-analysis-widget-factory';

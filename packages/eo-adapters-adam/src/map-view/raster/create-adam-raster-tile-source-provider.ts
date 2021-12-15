@@ -1,9 +1,9 @@
 import { transformExtent } from 'ol/proj';
 
-import { AxiosInstanceWithCancellation, TileSource } from '@oida/core';
+import { AxiosInstanceWithCancellation, TileSource } from '@oidajs/core';
 import {
     RasterMapViz, RasterBandModeSingle, RasterBandModePreset, RasterBandModeCombination, RasterBandMode
-} from '@oida/eo-mobx';
+} from '@oidajs/eo-mobx';
 
 import { ADAM_WCS_SOURCE_ID } from '../adam-wcs-tile-source';
 import { getWcsTimeFilterSubset, getAoiWcsParams, getCoverageWcsParams, getColormapWcsParams, createGeoTiffLoader, GeotiffLoader } from '../../utils';

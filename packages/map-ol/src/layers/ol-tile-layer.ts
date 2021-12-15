@@ -1,6 +1,6 @@
 import TileLayer from 'ol/layer/Tile';
 
-import { TILE_LAYER_ID, ITileLayerRenderer, MapLayerRendererConfig, TileLayerRendererConfig, TileSource } from '@oida/core';
+import { TILE_LAYER_ID, ITileLayerRenderer, MapLayerRendererConfig, TileLayerRendererConfig, TileSource } from '@oidajs/core';
 
 import { olTileSourcesFactory } from './tilesources/ol-tilesources-factory';
 

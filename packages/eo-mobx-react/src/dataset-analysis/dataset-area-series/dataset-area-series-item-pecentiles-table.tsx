@@ -2,7 +2,7 @@ import React from 'react';
 import moment from 'moment';
 import { Descriptions } from 'antd';
 
-import { DataDomain, DatasetDimension, DatasetAreaSeriesDataItem, isDomainProvider, NumericDomainMapper, RasterBandConfig } from '@oida/eo-mobx';
+import { DataDomain, DatasetDimension, DatasetAreaSeriesDataItem, isDomainProvider, NumericDomainMapper, RasterBandConfig } from '@oidajs/eo-mobx';
 
 
 export type DatasetAreaSeriesItemPercentilesTableProps = {

@@ -1,6 +1,6 @@
 import { observable, action, makeObservable } from 'mobx';
 
-import { TILE_LAYER_ID, TileSource } from '@oida/core';
+import { TILE_LAYER_ID, TileSource } from '@oidajs/core';
 
 import { MapLayer, MapLayerProps } from './map-layer';
 

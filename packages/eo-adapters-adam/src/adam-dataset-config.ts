@@ -1,6 +1,6 @@
 import {
     DatasetDimension, ValueDomain, CategoricalDomain, RasterBandConfig, RasterBandPreset, RasterBandGroup, ProductSearchRecord
-} from '@oida/eo-mobx';
+} from '@oidajs/eo-mobx';
 
 export type AdamDatasetDimension = DatasetDimension<ValueDomain<number | Date> | CategoricalDomain<number | string>> & {
     wcsSubset: {

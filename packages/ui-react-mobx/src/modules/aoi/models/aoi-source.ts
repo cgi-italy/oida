@@ -1,7 +1,7 @@
 import { action, reaction, computed } from 'mobx';
 
-import { QueryParams, LoadingState, IFormFieldDefinition } from '@oida/core';
-import { AsyncDataFetcher, QueryParams as QueryParamsState, QueryParamsProps, IndexedCollection } from '@oida/state-mobx';
+import { QueryParams, LoadingState, IFormFieldDefinition } from '@oidajs/core';
+import { AsyncDataFetcher, QueryParams as QueryParamsState, QueryParamsProps, IndexedCollection } from '@oidajs/state-mobx';
 
 import { AoiProps, Aoi } from './aoi';
 

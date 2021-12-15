@@ -1,4 +1,4 @@
-import { DatasetDimensions, RasterBandMode, RasterBandModeSingle, RasterBandModePreset, RasterBandModeCombination } from '@oida/eo-mobx';
+import { DatasetDimensions, RasterBandMode, RasterBandModeSingle, RasterBandModePreset, RasterBandModeCombination } from '@oidajs/eo-mobx';
 import { AdamDatasetConfig, isMultiBandCoverage } from '../adam-dataset-config';
 
 export const getCoverageWcsParams = (datasetConfig: AdamDatasetConfig, dimensions: DatasetDimensions, bandMode: RasterBandMode) => {

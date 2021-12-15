@@ -4,7 +4,7 @@ import { fromArrayBuffer } from 'geotiff';
 import proj4 from 'proj4';
 import axios, { AxiosRequestConfig } from 'axios';
 
-import { AxiosInstanceWithCancellation, EpsgIoDefinitionProvider } from '@oida/core';
+import { AxiosInstanceWithCancellation, EpsgIoDefinitionProvider } from '@oidajs/core';
 import { PlottyRenderer } from './plotty-renderer';
 
 export type GeotiffRendererConfig = {

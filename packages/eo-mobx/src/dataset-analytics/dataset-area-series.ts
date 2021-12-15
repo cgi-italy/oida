@@ -3,8 +3,8 @@ import { autorun, observable, makeObservable, action, computed, reaction } from 
 import {
     AoiSupportedGeometry, LoadingState, SubscriptionTracker, IFormFieldDefinition,
     QueryFilter, CircleGeometry, BBoxGeometry
-} from '@oida/core';
-import { AsyncDataFetcher, DataFilters } from '@oida/state-mobx';
+} from '@oidajs/core';
+import { AsyncDataFetcher, DataFilters } from '@oidajs/state-mobx';
 
 import {
     DatasetDimension, DataDomain, DomainRange, isValueDomain,

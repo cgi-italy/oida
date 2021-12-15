@@ -1,4 +1,4 @@
-import { formatNumber, FormatterQuantity, NumberFormatOptions } from '@oida/core';
+import { formatNumber, FormatterQuantity, NumberFormatOptions } from '@oidajs/core';
 import { isValueDomain, NumericalValueDomain, NumericDomain } from './dataset-variable';
 
 export type NumericDomainMapperConfig = {

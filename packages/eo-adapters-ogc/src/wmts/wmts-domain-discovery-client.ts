@@ -1,4 +1,4 @@
-import { AxiosInstanceWithCancellation, createAxiosInstance } from '@oida/core';
+import { AxiosInstanceWithCancellation, createAxiosInstance } from '@oidajs/core';
 
 export type WmtsDomainDiscoveryClientConfig = {
     axiosInstance?: AxiosInstanceWithCancellation;

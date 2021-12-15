@@ -2,10 +2,10 @@ import React, { useEffect } from 'react';
 
 import { Select } from 'antd';
 
-import { useSelector } from '@oida/ui-react-mobx';
-import { DatasetExplorer } from '@oida/eo-mobx';
+import { useSelector } from '@oidajs/ui-react-mobx';
+import { DatasetExplorer } from '@oidajs/eo-mobx';
 
-import { WmsDatasetDiscoveryProvider } from '@oida/eo-adapters-ogc';
+import { WmsDatasetDiscoveryProvider } from '@oidajs/eo-adapters-ogc';
 
 import { useHistory, useRouteMatch, Redirect, Route, Switch, useParams } from 'react-router';
 import { WmsDiscoveryProviderResults } from './wms-discovery-provider-results';

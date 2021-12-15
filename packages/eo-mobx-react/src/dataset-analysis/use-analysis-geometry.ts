@@ -1,7 +1,7 @@
-import { SelectionMode } from '@oida/core';
-import { useCenterOnMap, useMapModule, useSelector } from '@oida/ui-react-mobx';
-import { DatasetProcessing } from '@oida/eo-mobx';
-import { Map, SelectionManager } from '@oida/state-mobx';
+import { SelectionMode } from '@oidajs/core';
+import { useCenterOnMap, useMapModule, useSelector } from '@oidajs/ui-react-mobx';
+import { DatasetProcessing } from '@oidajs/eo-mobx';
+import { Map, SelectionManager } from '@oidajs/state-mobx';
 
 export type useAnalysisGeometryProps = {
     analysis: DatasetProcessing<any>;

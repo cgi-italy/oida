@@ -1,13 +1,13 @@
 import { action, autorun, computed, IObservableArray, makeObservable, observable, reaction, runInAction } from 'mobx';
 import chroma from 'chroma-js';
 
-import { Geometry, LoadingState, SubscriptionTracker } from '@oida/core';
+import { Geometry, LoadingState, SubscriptionTracker } from '@oidajs/core';
 import {
     DataFilters,
     DataFiltersProps,
     FeatureLayer, FeatureStyleGetter, HasVisibility, Hovered, HoveredProps,
     IsHoverable, IsSelectable, Selected, SelectedProps, Visible, VisibleProps
-} from '@oida/state-mobx';
+} from '@oidajs/state-mobx';
 
 import { ColorMap, ColorScale, DatasetViz, DatasetVizProps } from '../common';
 import { VectorFeatureDescriptor, VectorFeatureProperties } from './vector-feature-descriptor';

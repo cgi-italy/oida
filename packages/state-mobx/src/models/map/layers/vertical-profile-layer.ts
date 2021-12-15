@@ -1,6 +1,6 @@
 import { IObservableArray, observable, makeObservable, action } from 'mobx';
 
-import { VERTICAL_PROFILE_LAYER_ID, IVerticalProfile, IVerticalProfileStyle, VerticalProfileCoordinate } from '@oida/core';
+import { VERTICAL_PROFILE_LAYER_ID, IVerticalProfile, IVerticalProfileStyle, VerticalProfileCoordinate } from '@oidajs/core';
 
 import { HasConfig, ConfigProps, Config } from '../../mixins';
 import { MapLayer, MapLayerProps } from './map-layer';

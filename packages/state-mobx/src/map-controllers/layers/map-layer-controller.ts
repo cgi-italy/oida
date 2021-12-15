@@ -1,6 +1,6 @@
 import { autorun } from 'mobx';
 
-import { SubscriptionTracker, IMapLayerRenderer, IMapRenderer, MapLayerRendererConfig } from '@oida/core';
+import { SubscriptionTracker, IMapLayerRenderer, IMapRenderer, MapLayerRendererConfig } from '@oidajs/core';
 
 import { MapLayer } from '../../models/map/layers/map-layer';
 

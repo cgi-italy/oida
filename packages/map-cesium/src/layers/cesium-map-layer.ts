@@ -6,7 +6,7 @@ import ImageryLayerCollection from 'cesium/Source/Scene/ImageryLayerCollection';
 import ImageryLayer from 'cesium/Source/Scene/ImageryLayer';
 
 
-import { IMapLayerRenderer, MapLayerRendererConfig } from '@oida/core';
+import { IMapLayerRenderer, MapLayerRendererConfig } from '@oidajs/core';
 
 import { CesiumMapRenderer } from '../map/cesium-map-renderer';
 import { updateDataSource } from '../utils/render';

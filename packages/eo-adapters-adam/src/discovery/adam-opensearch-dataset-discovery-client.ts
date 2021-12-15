@@ -1,6 +1,6 @@
 import moment from 'moment';
 
-import { AxiosInstanceWithCancellation, createAxiosInstance, QueryParams, getGeometryExtent, isValidExtent, BOOLEAN_FIELD_ID } from '@oida/core';
+import { AxiosInstanceWithCancellation, createAxiosInstance, QueryParams, getGeometryExtent, isValidExtent, BOOLEAN_FIELD_ID } from '@oidajs/core';
 import { AdamWcsCoverageDescriptionClient, AdamWcsCoverageDescription } from './adam-wcs-coverage-description-client';
 import {
     AdamDatasetConfig, AdamDatasetDimension, AdamDatasetSingleBandCoverage,

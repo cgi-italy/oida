@@ -4,8 +4,8 @@ import {
     ColumnWidthOutlined, AimOutlined, MenuFoldOutlined, MenuUnfoldOutlined,
     StepBackwardOutlined, StepForwardOutlined, ExpandAltOutlined, ShrinkOutlined } from '@ant-design/icons';
 
-import { DateRangeValue } from '@oida/core';
-import { DateFieldRenderer, DateRangeFieldRenderer } from '@oida/ui-react-antd';
+import { DateRangeValue } from '@oidajs/core';
+import { DateFieldRenderer, DateRangeFieldRenderer } from '@oidajs/ui-react-antd';
 
 import { TimelineGroupLabelsMode } from './timeline';
 import { DatasetTimelineTimeSelectionMode } from './dataset-explorer-timeline';

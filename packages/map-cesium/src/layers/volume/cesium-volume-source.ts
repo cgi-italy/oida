@@ -1,6 +1,6 @@
 import Resource from 'cesium/Source/Core/Resource';
 
-import { VolumeSourceConfig, VolumeTileKey, VolumeSliceData } from '@oida/core';
+import { VolumeSourceConfig, VolumeTileKey, VolumeSliceData } from '@oidajs/core';
 
 export type CesiumVolumeSlice = {
     z: number;

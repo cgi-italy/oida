@@ -2,15 +2,15 @@ import { autorun } from 'mobx';
 
 import nearestPointOnLine from '@turf/nearest-point-on-line';
 
-import { AxiosInstanceWithCancellation } from '@oida/core';
-import { VERTICAL_PROFILE_VIZ_TYPE, DatasetVerticalProfileViz, VerticalProfileVizConfig, RasterBandModeType, DatasetMapViewConfig } from  '@oida/eo-mobx';
+import { AxiosInstanceWithCancellation } from '@oidajs/core';
+import { VERTICAL_PROFILE_VIZ_TYPE, DatasetVerticalProfileViz, VerticalProfileVizConfig, RasterBandModeType, DatasetMapViewConfig } from  '@oidajs/eo-mobx';
 
 import { AdamDatasetConfig, isMultiBandCoverage } from '../../adam-dataset-config';
 import { AdamDatasetFactoryConfig } from '../../get-adam-dataset-factory';
 
 import { createVerticalProfileDataProvider } from './create-vertical-profile-data-provider';
 import { createAdamVerticalProfileTileSourceProvider } from './create-vertical-profile-tilesource-provider';
-import { getPlottyColorScales } from '@oida/eo-geotiff';
+import { getPlottyColorScales } from '@oidajs/eo-geotiff';
 
 export const getAdamVerticalProfileViewConfig = (
     axiosInstance: AxiosInstanceWithCancellation,

@@ -1,4 +1,4 @@
-import { HasAppModules, AppModules } from '@oida/ui-react-mobx';
+import { HasAppModules, AppModules } from '@oidajs/ui-react-mobx';
 
 import { initMapModule } from './init-map-module';
 import { initFormattersModule } from './init-formatters-module';

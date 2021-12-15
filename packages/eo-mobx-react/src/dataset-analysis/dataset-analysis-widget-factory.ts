@@ -1,8 +1,8 @@
 import React from 'react';
 
-import { createDynamicFactory } from '@oida/core';
+import { createDynamicFactory } from '@oidajs/core';
 
-import { DatasetExplorerItem, DatasetAnalysis } from '@oida/eo-mobx';
+import { DatasetExplorerItem, DatasetAnalysis } from '@oidajs/eo-mobx';
 
 export const DatasetAnalysisWidgetFactory = createDynamicFactory<React.ReactNode>('dataset-analysis-widget');
 

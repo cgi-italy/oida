@@ -1,7 +1,7 @@
 import { v4 as uuid } from 'uuid';
 
-import { createAxiosInstance } from '@oida/core';
-import { DatasetConfig, ProductSearchRecord } from  '@oida/eo-mobx';
+import { createAxiosInstance } from '@oidajs/core';
+import { DatasetConfig, ProductSearchRecord } from  '@oidajs/eo-mobx';
 
 import { AdamDatasetConfig } from './adam-dataset-config';
 import { getAdamDatasetProductSearchConfig } from './product-search';

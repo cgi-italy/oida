@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import  classNames from 'classnames';
 import useResizeAware from 'react-resize-aware';
 
-import { Map, MapRendererController } from '@oida/state-mobx';
+import { Map, MapRendererController } from '@oidajs/state-mobx';
 import { useMapModule } from '../hooks';
 
 export type MapComponentProps = {

@@ -1,8 +1,8 @@
 import { autorun, reaction } from 'mobx';
 import debounce from 'lodash/debounce';
 
-import { AoiValue, randomColorFactory } from '@oida/core';
-import { Map, IndexedCollection } from '@oida/state-mobx';
+import { AoiValue, randomColorFactory } from '@oidajs/core';
+import { Map, IndexedCollection } from '@oidajs/state-mobx';
 
 import { Aoi } from '../models';
 

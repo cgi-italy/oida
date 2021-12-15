@@ -2,9 +2,9 @@ import React from 'react';
 
 import { Slider } from 'antd';
 
-import { STACK_VOLUME_VIEW_ID } from '@oida/core';
-import { StackVolumeViewMode } from '@oida/state-mobx';
-import { useSelector } from '@oida/ui-react-mobx';
+import { STACK_VOLUME_VIEW_ID } from '@oidajs/core';
+import { StackVolumeViewMode } from '@oidajs/state-mobx';
+import { useSelector } from '@oidajs/ui-react-mobx';
 
 import { DatasetVolumetricViewModeSettingsFactory } from './dataset-volumetric-view-mode-settings-factory';
 

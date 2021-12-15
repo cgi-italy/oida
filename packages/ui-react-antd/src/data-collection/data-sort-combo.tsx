@@ -4,8 +4,8 @@ import { Select, Button, Input } from 'antd';
 import { SelectProps } from 'antd/lib/select';
 import { SortAscendingOutlined, SortDescendingOutlined } from '@ant-design/icons';
 
-import { SortOrder } from '@oida/core';
-import { DataSorterProps } from '@oida/ui-react-core';
+import { SortOrder } from '@oidajs/core';
+import { DataSorterProps } from '@oidajs/ui-react-core';
 
 const Option = Select.Option;
 const InputGroup = Input.Group;

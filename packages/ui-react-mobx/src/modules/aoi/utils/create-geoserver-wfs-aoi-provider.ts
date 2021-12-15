@@ -1,4 +1,4 @@
-import { createAxiosInstance, DATE_FIELD_ID, DATE_RANGE_FIELD_ID, NUMERIC_FIELD_ID, NUMERIC_RANGE_FIELD_ID, QueryParams, SortOrder } from '@oida/core';
+import { createAxiosInstance, DATE_FIELD_ID, DATE_RANGE_FIELD_ID, NUMERIC_FIELD_ID, NUMERIC_RANGE_FIELD_ID, QueryParams, SortOrder } from '@oidajs/core';
 import { AoiSourceProvider } from '../models/aoi-source';
 
 export type GeoserverWfsAoiProviderConfig = {

@@ -4,8 +4,8 @@ import { Dropdown, Menu, Button, Space, Tooltip } from 'antd';
 
 import { MinusOutlined, ExportOutlined, PlusOutlined } from '@ant-design/icons';
 
-import { DatasetProcessing, DatasetAnalysis } from '@oida/eo-mobx';
-import { useSelector } from '@oida/ui-react-mobx';
+import { DatasetProcessing, DatasetAnalysis } from '@oidajs/eo-mobx';
+import { useSelector } from '@oidajs/ui-react-mobx';
 
 export type AnalysisDatasetActions = {
     combinedAnalysis: DatasetAnalysis;

@@ -9,7 +9,7 @@ import {
     FEATURE_SELECT_INTERACTION_ID,
     SelectionMode,
     FeatureSelectCallback
-} from '@oida/core';
+} from '@oidajs/core';
 
 import { cesiumInteractionsFactory } from './cesium-interactions-factory';
 import { CesiumMapRenderer } from '../map/cesium-map-renderer';

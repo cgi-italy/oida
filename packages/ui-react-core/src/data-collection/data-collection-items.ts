@@ -1,4 +1,4 @@
-import { LoadingState, SelectionMode } from '@oida/core';
+import { LoadingState, SelectionMode } from '@oidajs/core';
 
 /** Data collection item action */
 export type DataCollectionItemAction = {

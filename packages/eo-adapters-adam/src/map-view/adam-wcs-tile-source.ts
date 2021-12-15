@@ -2,9 +2,9 @@ import XYZSource from 'ol/source/XYZ';
 
 import UrlTemplateImageryProvider from 'cesium/Source/Scene/UrlTemplateImageryProvider';
 
-import { TileGridConfig } from '@oida/core';
-import { olTileSourcesFactory, getTileGridFromConfig } from '@oida/map-ol';
-import { cesiumTileSourcesFactory, getTileGridFromSRS } from '@oida/map-cesium';
+import { TileGridConfig } from '@oidajs/core';
+import { olTileSourcesFactory, getTileGridFromConfig } from '@oidajs/map-ol';
+import { cesiumTileSourcesFactory, getTileGridFromSRS } from '@oidajs/map-cesium';
 
 import { AdamServiceParamsSerializer } from '../utils';
 
@@ -34,7 +34,7 @@ export type AdamWcsTileSource = {
 };
 
 
-declare module '@oida/core' {
+declare module '@oidajs/core' {
     export interface ITileSourceDefinitions {
         [ADAM_WCS_SOURCE_ID]: AdamWcsTileSource;
     }

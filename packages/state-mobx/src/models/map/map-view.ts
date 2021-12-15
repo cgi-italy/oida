@@ -1,4 +1,4 @@
-import { IMapProjection } from '@oida/core';
+import { IMapProjection } from '@oidajs/core';
 
 import { MapViewport, MapViewportProps } from './map-viewport';
 import { HasConfig, Config, ConfigProps } from '../mixins';

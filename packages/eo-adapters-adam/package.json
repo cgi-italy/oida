@@ -1,5 +1,5 @@
 {
-  "name": "@oida/eo-adapters-adam",
+  "name": "@oidajs/eo-adapters-adam",
   "version": "0.2.1",
   "description": "oida EO adam adapters",
   "module": "es/index.js",
@@ -24,11 +24,11 @@
     "registry": "https://nexus.dev.eoss-cloud.it/repository/npm-cgi-eo/"
   },
   "dependencies": {
-    "@oida/core": "file:../core",
-    "@oida/eo-geotiff": "file:../eo-geotiff",
-    "@oida/eo-mobx": "file:../eo-mobx",
-    "@oida/map-cesium": "file:../map-cesium",
-    "@oida/map-ol": "file:../map-ol",
+    "@oidajs/core": "file:../core",
+    "@oidajs/eo-geotiff": "file:../eo-geotiff",
+    "@oidajs/eo-mobx": "file:../eo-mobx",
+    "@oidajs/map-cesium": "file:../map-cesium",
+    "@oidajs/map-ol": "file:../map-ol",
     "tslib": "^2.2.0"
   }
 }

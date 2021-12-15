@@ -1,5 +1,5 @@
-import { AxiosInstanceWithCancellation } from '@oida/core';
-import { DatasetProductSearchConfig } from  '@oida/eo-mobx';
+import { AxiosInstanceWithCancellation } from '@oidajs/core';
+import { DatasetProductSearchConfig } from  '@oidajs/eo-mobx';
 
 import { AdamDatasetConfig, isMultiBandCoverage } from '../adam-dataset-config';
 import { AdamOpenSearchClient } from '../common';

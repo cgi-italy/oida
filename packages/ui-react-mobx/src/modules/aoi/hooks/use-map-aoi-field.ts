@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { AoiAction } from '@oida/core';
+import { AoiAction } from '@oidajs/core';
 
 import { useMapAoiDrawer, MapAoiDrawerProps, useMapAoiDrawerFromModule } from './use-map-aoi-drawer';
 import { useMapAoiInstance, MapAoiInstanceProps, useMapAoiInstanceFromModule } from './use-map-aoi-instance';

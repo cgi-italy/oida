@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { DataDomain, DatasetDimensions, DatasetVariable, isDomainProvider } from '@oida/eo-mobx';
+import { DataDomain, DatasetDimensions, DatasetVariable, isDomainProvider } from '@oidajs/eo-mobx';
 import { autorun } from 'mobx';
 
 export type UseDatasetVariableDomainProps<D extends DataDomain<unknown>> = {

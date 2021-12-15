@@ -2,18 +2,18 @@ import React from 'react';
 import { Descriptions, Tooltip } from 'antd';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 
-import { formatDate, formatNumber } from '@oida/core';
-import { useSelector } from '@oida/ui-react-mobx';
+import { formatDate, formatNumber } from '@oidajs/core';
+import { useSelector } from '@oidajs/ui-react-mobx';
 import {
     DatasetVectorFeature, DatasetVectorMapViz, FeaturePropertyValueType, VectorFeatureDescriptor,
     VectorFeatureProperties, VectorFeaturePropertyDescriptor, VectorFeaturePropertyFormatter, VECTOR_VIZ_TYPE
-} from '@oida/eo-mobx';
+} from '@oidajs/eo-mobx';
 
 import { DatasetAnalysisWidgetFactory } from '../dataset-analysis';
 
 
 // extend the formatter output types to support jsx
-declare module '@oida/eo-mobx' {
+declare module '@oidajs/eo-mobx' {
     export interface VectorFeaturePropertyFormatterOutputTypes {
         'jsx': JSX.Element;
     }

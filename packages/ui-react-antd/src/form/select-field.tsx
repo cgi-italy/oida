@@ -3,8 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { Select } from 'antd';
 import { SelectProps } from 'antd/lib/select';
 
-import { EnumField, ENUM_FIELD_ID, EnumChoice } from '@oida/core';
-import { FormFieldRendererBaseProps } from '@oida/ui-react-core';
+import { EnumField, ENUM_FIELD_ID, EnumChoice } from '@oidajs/core';
+import { FormFieldRendererBaseProps } from '@oidajs/ui-react-core';
 
 import { antdFormFieldRendererFactory } from './antd-form-field-renderer-factory';
 

@@ -1,6 +1,6 @@
 import { observable, makeObservable, computed, action } from 'mobx';
-import { AOI_FIELD_ID, setAoiFieldFactory, FormFieldState, AoiValue } from '@oida/core';
-import { IndexedCollection, FeatureLayer, setReactionForFilterType, FeatureStyleGetter } from '@oida/state-mobx';
+import { AOI_FIELD_ID, setAoiFieldFactory, FormFieldState, AoiValue } from '@oidajs/core';
+import { IndexedCollection, FeatureLayer, setReactionForFilterType, FeatureStyleGetter } from '@oidajs/state-mobx';
 
 import { AppModule } from '../app-module';
 import { MapModule } from '../map';

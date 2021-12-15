@@ -1,6 +1,6 @@
 import { autorun } from 'mobx';
 
-import { StackVolumeView } from '@oida/core';
+import { StackVolumeView } from '@oidajs/core';
 
 import { StackVolumeViewMode } from '../../../models/map/layers/volume-layer';
 

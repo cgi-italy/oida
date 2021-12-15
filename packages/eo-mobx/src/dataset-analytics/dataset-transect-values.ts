@@ -3,8 +3,8 @@ import nearestPointOnLine from '@turf/nearest-point-on-line';
 import along from '@turf/along';
 import chroma from 'chroma-js';
 
-import { Geometry, IFeatureStyle, IndexableGeometry, LoadingState, QueryFilter, SubscriptionTracker } from '@oida/core';
-import { AsyncDataFetcher } from '@oida/state-mobx';
+import { Geometry, IFeatureStyle, IndexableGeometry, LoadingState, QueryFilter, SubscriptionTracker } from '@oidajs/core';
+import { AsyncDataFetcher } from '@oidajs/state-mobx';
 
 import {
     DatasetDimension, DataDomain, TimeSearchDirection, NumericVariable,

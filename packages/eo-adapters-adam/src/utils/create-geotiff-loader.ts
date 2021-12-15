@@ -2,9 +2,9 @@ import LruCache from 'lru-cache';
 import proj4 from 'proj4';
 import { register } from 'ol/proj/proj4';
 
-import { AxiosInstanceWithCancellation } from '@oida/core';
-import { GeotiffRenderer } from '@oida/eo-geotiff';
-import { PlottyRenderer } from '@oida/eo-geotiff';
+import { AxiosInstanceWithCancellation } from '@oidajs/core';
+import { GeotiffRenderer } from '@oidajs/eo-geotiff';
+import { PlottyRenderer } from '@oidajs/eo-geotiff';
 
 
 export type createGeotiffTileLoaderProps = {

@@ -1,8 +1,8 @@
 import { IObservableArray } from 'mobx';
 
-import { SelectionMode } from '@oida/core';
-import { SelectionManager, IsEntity } from '@oida/state-mobx';
-import { DataCollectionItemAction, DataCollectionItemsProps } from '@oida/ui-react-core';
+import { SelectionMode } from '@oidajs/core';
+import { SelectionManager, IsEntity } from '@oidajs/state-mobx';
+import { DataCollectionItemAction, DataCollectionItemsProps } from '@oidajs/ui-react-core';
 
 import { useSelector } from './use-selector';
 

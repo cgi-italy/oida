@@ -1,4 +1,4 @@
-import { DatasetAreaValuesConfig, DatasetTimeDistributionProvider, DatasetToolConfig, NumericVariable, DATASET_AREA_VALUES_PROCESSING } from '@oida/eo-mobx';
+import { DatasetAreaValuesConfig, DatasetTimeDistributionProvider, DatasetToolConfig, NumericVariable, DATASET_AREA_VALUES_PROCESSING } from '@oidajs/eo-mobx';
 import { createWcsStatsProvider, WcsStatsProviderConfig } from './wcs-stats-provider';
 
 /**

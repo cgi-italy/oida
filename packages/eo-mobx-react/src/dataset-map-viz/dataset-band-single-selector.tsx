@@ -1,9 +1,9 @@
 import React from 'react';
 import { Select } from 'antd';
 
-import { Map } from '@oida/state-mobx';
-import { useSelector } from '@oida/ui-react-mobx';
-import { RasterBandModeSingle, RasterBandConfig, getRasterBandSingleConfig, DatasetDimensions } from '@oida/eo-mobx';
+import { Map } from '@oidajs/state-mobx';
+import { useSelector } from '@oidajs/ui-react-mobx';
+import { RasterBandModeSingle, RasterBandConfig, getRasterBandSingleConfig, DatasetDimensions } from '@oidajs/eo-mobx';
 
 import { DatasetColorMapSelector } from './dataset-colormap-selector';
 import { DatasetInfoTooltip } from './dataset-info-tooltip';

@@ -5,9 +5,9 @@ import classnames from 'classnames';
 import debounce from 'lodash/debounce';
 import { Radio, Slider, Space } from 'antd';
 
-import { LoadingState } from '@oida/core';
-import { DataDomain, DatasetDimension, DatasetAreaSeries, DomainRange } from '@oida/eo-mobx';
-import { useSelector } from '@oida/ui-react-mobx';
+import { LoadingState } from '@oidajs/core';
+import { DataDomain, DatasetDimension, DatasetAreaSeries, DomainRange } from '@oidajs/eo-mobx';
+import { useSelector } from '@oidajs/ui-react-mobx';
 
 import { DatasetColorMapSelector } from '../../dataset-map-viz/dataset-colormap-selector';
 import { AnalysisLoadingStateMessage } from '../analysis-loading-state-message';

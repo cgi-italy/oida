@@ -1,5 +1,5 @@
 import { MapLayer, MapLayerProps } from './map-layer';
-import { GEO_IMAGE_LAYER_ID, GeoImageLayerSource, GeoImageLayerFootprint } from '@oida/core';
+import { GEO_IMAGE_LAYER_ID, GeoImageLayerSource, GeoImageLayerFootprint } from '@oidajs/core';
 import { observable, makeObservable, action } from 'mobx';
 
 

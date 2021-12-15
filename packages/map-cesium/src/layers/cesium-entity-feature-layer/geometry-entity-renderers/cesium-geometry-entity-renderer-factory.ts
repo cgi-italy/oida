@@ -1,4 +1,4 @@
-import { IFeatureStyle, Geometry, createDynamicFactory } from '@oida/core';
+import { IFeatureStyle, Geometry, createDynamicFactory } from '@oidajs/core';
 
 export type CesiumEntity = any;
 

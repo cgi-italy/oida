@@ -7,8 +7,8 @@ import { Table, Menu, Dropdown, Empty, ConfigProvider } from 'antd';
 import { ColumnType } from 'antd/lib/table/interface';
 import { EllipsisOutlined, CloseCircleOutlined } from '@ant-design/icons';
 
-import { LoadingState, SortOrder, SelectionMode } from '@oida/core';
-import { DataCollectionProps, DataPagerRenderer, DataFiltererRenderer, useScrollIntoView } from '@oida/ui-react-core';
+import { LoadingState, SortOrder, SelectionMode } from '@oidajs/core';
+import { DataCollectionProps, DataPagerRenderer, DataFiltererRenderer, useScrollIntoView } from '@oidajs/ui-react-core';
 
 import { DataPager } from './data-pager';
 import { AdvancedSearchFilterer } from './advanced-search-filterer';

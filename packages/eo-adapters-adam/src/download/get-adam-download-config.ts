@@ -1,7 +1,7 @@
 import download from 'downloadjs';
 
-import { AxiosInstanceWithCancellation } from '@oida/core';
-import { DatasetDownloadConfig, DownloaMapVizRequest, RasterMapViz } from  '@oida/eo-mobx';
+import { AxiosInstanceWithCancellation } from '@oidajs/core';
+import { DatasetDownloadConfig, DownloaMapVizRequest, RasterMapViz } from  '@oidajs/eo-mobx';
 
 import { AdamDatasetConfig } from '../adam-dataset-config';
 import { AdamDatasetFactoryConfig } from '../get-adam-dataset-factory';

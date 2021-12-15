@@ -3,8 +3,8 @@ import { Dropdown, Tag, Tooltip, Button, Space } from 'antd';
 import { DownOutlined, UpOutlined, SearchOutlined, FilterOutlined } from '@ant-design/icons';
 import classnames from 'classnames';
 
-import { getFormFieldSerializer, IFormField } from '@oida/core';
-import { DataFiltererProps } from '@oida/ui-react-core';
+import { getFormFieldSerializer, IFormField } from '@oidajs/core';
+import { DataFiltererProps } from '@oidajs/ui-react-core';
 
 import { DataForm, InputFieldRenderer } from '../form';
 

@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Select } from 'antd';
 
-import { ChoiceSelectorProps } from '@oida/ui-react-core';
+import { ChoiceSelectorProps } from '@oidajs/ui-react-core';
 
 const Option = Select.Option;
 

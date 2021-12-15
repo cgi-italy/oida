@@ -1,6 +1,6 @@
 import download from 'downloadjs';
 
-import { Map } from '@oida/state-mobx';
+import { Map } from '@oidajs/state-mobx';
 
 import { useSelector } from '../../../core';
 import { useMapModule } from './use-map-module';

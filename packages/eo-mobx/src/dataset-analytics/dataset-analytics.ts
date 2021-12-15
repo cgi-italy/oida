@@ -1,8 +1,8 @@
 import { IObservableArray, observable, action, makeObservable, ObservableMap } from 'mobx';
 import chroma from 'chroma-js';
 
-import { IFeatureStyle } from '@oida/core';
-import { ArrayTracker, FeatureLayer, FeatureStyleGetter } from '@oida/state-mobx';
+import { IFeatureStyle } from '@oidajs/core';
+import { ArrayTracker, FeatureLayer, FeatureStyleGetter } from '@oidajs/state-mobx';
 
 import { DatasetAnalysis } from './dataset-analysis';
 import { DatasetProcessing } from './dataset-processing';

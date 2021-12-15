@@ -1,4 +1,4 @@
-import { DatasetTimeDistributionProvider, TimeSearchDirection, TimeDistributionInstantItem } from '@oida/eo-mobx';
+import { DatasetTimeDistributionProvider, TimeSearchDirection, TimeDistributionInstantItem } from '@oidajs/eo-mobx';
 
 export type VideoTimeDistributionProviderConfig = {
     timeRange: {

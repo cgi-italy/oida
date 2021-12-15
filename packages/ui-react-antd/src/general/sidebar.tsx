@@ -3,7 +3,7 @@ import classnames from 'classnames';
 
 import { Tabs, Tooltip } from 'antd';
 
-import { LayoutSectionProps } from '@oida/ui-react-core';
+import { LayoutSectionProps } from '@oidajs/ui-react-core';
 
 const TabPane = Tabs.TabPane;
 

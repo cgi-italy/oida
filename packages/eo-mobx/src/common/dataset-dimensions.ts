@@ -1,4 +1,4 @@
-import { SubscriptionTracker } from '@oida/core';
+import { SubscriptionTracker } from '@oidajs/core';
 import { action, autorun, makeObservable, observable, ObservableMap, reaction } from 'mobx';
 
 import { Dataset } from './dataset';

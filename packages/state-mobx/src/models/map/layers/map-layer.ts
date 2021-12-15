@@ -1,6 +1,6 @@
 import { makeObservable, observable, action } from 'mobx';
 
-import { createDynamicFactory, IMapLayerRenderer } from '@oida/core';
+import { createDynamicFactory, IMapLayerRenderer } from '@oidajs/core';
 
 import { Entity, EntityProps } from '../../core';
 import {

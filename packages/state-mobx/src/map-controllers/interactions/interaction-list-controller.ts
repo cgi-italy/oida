@@ -1,4 +1,4 @@
-import { IMapRenderer } from '@oida/core';
+import { IMapRenderer } from '@oidajs/core';
 
 import { MapInteractionController } from './map-interaction-controller';
 import { interactionControllersFactory } from './interaction-controllers-factory';

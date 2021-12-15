@@ -1,10 +1,10 @@
 import { useEffect } from 'react';
 import { values, autorun } from 'mobx';
 
-import { getFormFieldSerializer, IFormFieldDefinition, QueryFilter } from '@oida/core';
-import { DataFilters } from '@oida/state-mobx';
+import { getFormFieldSerializer, IFormFieldDefinition, QueryFilter } from '@oidajs/core';
+import { DataFilters } from '@oidajs/state-mobx';
 
-import { BreadcrumbItemProps } from '@oida/ui-react-core';
+import { BreadcrumbItemProps } from '@oidajs/ui-react-core';
 
 import { serializeQueryFilters } from '../../../core/hooks/use-query-criteria-url-binding';
 import { BreadcrumbModule } from '../breadcrumb-module';

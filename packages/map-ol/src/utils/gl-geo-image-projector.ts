@@ -1,5 +1,5 @@
 
-import { GeoImageLayerSource, GeoImageLayerFootprint } from '@oida/core';
+import { GeoImageLayerSource, GeoImageLayerFootprint } from '@oidajs/core';
 
 export type GLGeoImageProjectorConfig = {
     footprint: GeoImageLayerFootprint;

@@ -1,5 +1,5 @@
 import { colorscales, renderColorScaleToCanvas } from 'plotty';
-import { ColorScale, ColorScaleType } from '@oida/eo-mobx';
+import { ColorScale, ColorScaleType } from '@oidajs/eo-mobx';
 import chroma from 'chroma-js';
 
 let plottyColorScales: (ColorScale & {

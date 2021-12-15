@@ -3,7 +3,7 @@ import React from 'react';
 import { Pagination } from 'antd';
 import { PaginationProps } from 'antd/lib/pagination';
 
-import { DataPagerProps } from '@oida/ui-react-core';
+import { DataPagerProps } from '@oidajs/ui-react-core';
 
 export const DataPager = (props: PaginationProps & DataPagerProps) => {
 

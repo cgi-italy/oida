@@ -5,7 +5,7 @@ import {
     LoadingOutlined, PictureFilled
 } from '@ant-design/icons';
 
-import { AsyncImage, DataCollectionItemAction } from '@oida/ui-react-core';
+import { AsyncImage, DataCollectionItemAction } from '@oidajs/ui-react-core';
 
 import { DataCollectionItemActionButton } from '../data-collection/data-collection-item-action-button';
 

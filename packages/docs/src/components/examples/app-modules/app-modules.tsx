@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { createAppStoreContext, destroyAppStoreContext } from '@oida/ui-react-mobx';
-import { MapComponentFromModule as MapComponent } from '@oida/ui-react-mobx';
-import '@oida/map-cesium';
-import '@oida/map-ol';
+import { createAppStoreContext, destroyAppStoreContext } from '@oidajs/ui-react-mobx';
+import { MapComponentFromModule as MapComponent } from '@oidajs/ui-react-mobx';
+import '@oidajs/map-cesium';
+import '@oidajs/map-ol';
 
 import { createAppStore } from './store';
 import { Settings, MouseCoords } from './components';

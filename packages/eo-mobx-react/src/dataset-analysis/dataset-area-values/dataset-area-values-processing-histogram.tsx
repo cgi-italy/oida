@@ -8,12 +8,12 @@ import 'echarts/lib/component/legend';
 import 'echarts/lib/component/axisPointer';
 import 'echarts/lib/component/brush';
 
-import { formatNumber, LoadingState, NumberFormatOptions } from '@oida/core';
+import { formatNumber, LoadingState, NumberFormatOptions } from '@oidajs/core';
 import {
     DatasetAreaValues, RasterMapViz, RasterBandModeType,
     isDomainProvider, NumericDomainMapper, ColorScaleType
-} from '@oida/eo-mobx';
-import { useSelector } from '@oida/ui-react-mobx';
+} from '@oidajs/eo-mobx';
+import { useSelector } from '@oidajs/ui-react-mobx';
 
 import { AnalysisLoadingStateMessage } from '../analysis-loading-state-message';
 import { ChartWidget } from '../chart-widget';

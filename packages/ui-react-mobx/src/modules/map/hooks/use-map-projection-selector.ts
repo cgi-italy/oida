@@ -1,4 +1,4 @@
-import { MapView } from '@oida/state-mobx';
+import { MapView } from '@oidajs/state-mobx';
 
 import { useSelector } from '../../../core';
 import { MapProjectionConfig } from '../map-module';

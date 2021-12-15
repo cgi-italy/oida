@@ -1,4 +1,4 @@
-import { GROUP_LAYER_ID, IGroupLayerRenderer, IMapRenderer } from '@oida/core';
+import { GROUP_LAYER_ID, IGroupLayerRenderer, IMapRenderer } from '@oidajs/core';
 
 import { MapLayerController } from './map-layer-controller';
 import { layerControllersFactory } from './layer-controllers-factory';

@@ -1,4 +1,4 @@
-import { QueryParams, SortOrder } from '@oida/core';
+import { QueryParams, SortOrder } from '@oidajs/core';
 
 import { AoiSourceProvider, AoiProps } from '../models';
 

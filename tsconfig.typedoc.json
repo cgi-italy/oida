@@ -5,7 +5,7 @@
     "jsx": "react",
     "baseUrl": "./",
     "paths": {
-      "@oida/*": ["packages/*/src"]
+      "@oidajs/*": ["packages/*/src"]
     }
   },
   "include": [

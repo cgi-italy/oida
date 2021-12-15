@@ -3,7 +3,7 @@ import WebMercatorTilingScheme from 'cesium/Source/Core/WebMercatorTilingScheme.
 import Cartesian2 from 'cesium/Source/Core/Cartesian2';
 import Rectangle from 'cesium/Source/Core/Rectangle';
 
-import { TileGridConfig, computeTileGridParams } from '@oida/core';
+import { TileGridConfig, computeTileGridParams } from '@oidajs/core';
 
 import { ProjectionType, getProjectionType } from '../../utils/projection';
 

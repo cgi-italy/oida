@@ -1,7 +1,7 @@
 import {
     DatasetAnalysis, DatasetAnalysisProps, DatasetProcessing,
-    DatasetExplorer, DatasetExplorerItem, DatasetViz, generateAnalysisName, Dataset } from '@oida/eo-mobx';
-import { useSelector } from '@oida/ui-react-mobx';
+    DatasetExplorer, DatasetExplorerItem, DatasetViz, generateAnalysisName, Dataset } from '@oidajs/eo-mobx';
+import { useSelector } from '@oidajs/ui-react-mobx';
 
 /** A combo analysis tool configuration */
 export type ComboToolConfig = {

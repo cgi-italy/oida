@@ -1,4 +1,4 @@
-import { GROUP_LAYER_ID } from '@oida/core';
+import { GROUP_LAYER_ID } from '@oidajs/core';
 
 import { IndexedCollection } from '../../core';
 import { MapLayer, MapLayerDefinition, MapLayerProps } from './map-layer';

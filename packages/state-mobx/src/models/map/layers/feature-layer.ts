@@ -1,6 +1,6 @@
 import { observable, action, makeObservable, IObservableArray } from 'mobx';
 
-import { FEATURE_LAYER_ID, Geometry, IFeatureStyle } from '@oida/core';
+import { FEATURE_LAYER_ID, Geometry, IFeatureStyle } from '@oidajs/core';
 
 import { MapLayer, MapLayerProps } from './map-layer';
 import { IsHoverable, IsSelectable, Config, ConfigProps, HasConfig } from '../../mixins';

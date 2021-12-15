@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { Select } from 'antd';
 
-import { Map } from '@oida/state-mobx';
-import { useSelector } from '@oida/ui-react-mobx';
+import { Map } from '@oidajs/state-mobx';
+import { useSelector } from '@oidajs/ui-react-mobx';
 import {
     RasterBandModeType, RasterBandMode, RasterBandModeConfig, getRasterBandModeFromConfig,
     RasterBandModeSingle, RasterBandModePreset, RasterBandModeCombination, DatasetDimensions
-} from '@oida/eo-mobx';
+} from '@oidajs/eo-mobx';
 
 import { DatasetBandSingleSelector } from './dataset-band-single-selector';
 import { DatasetBandPresetSelector } from './dataset-band-preset-selector';

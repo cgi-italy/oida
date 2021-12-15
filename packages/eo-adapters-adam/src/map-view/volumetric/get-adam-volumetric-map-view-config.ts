@@ -1,15 +1,15 @@
 import { fromArrayBuffer } from 'geotiff';
 
-import { VolumeSliceUrl } from '@oida/core';
+import { VolumeSliceUrl } from '@oidajs/core';
 import {
     DatasetVolumetricViz, VolumetricMapVizConfig, VOLUMETRIC_VIZ_TYPE, isValueDomain, isDomainProvider, DatasetMapViewConfig
-} from '@oida/eo-mobx';
+} from '@oidajs/eo-mobx';
 
 import { AdamDatasetConfig, isMultiBandCoverage } from '../../adam-dataset-config';
 import { AdamDatasetFactoryConfig } from '../../get-adam-dataset-factory';
 
 import { AdamServiceParamsSerializer, getAoiWcsParams, getWcsTimeFilterSubset } from '../../utils';
-import { getPlottyColorScales } from '@oida/eo-geotiff';
+import { getPlottyColorScales } from '@oidajs/eo-geotiff';
 
 export const getAdamVolumetricMapViewConfig = (
     factoryConfig: AdamDatasetFactoryConfig,

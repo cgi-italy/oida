@@ -9,7 +9,7 @@ import GroundPolylinePrimitive from 'cesium/Source/Scene/GroundPolylinePrimitive
 import Primitive from 'cesium/Source/Scene/Primitive';
 import PolylineColorAppearance from 'cesium/Source/Scene/PolylineColorAppearance';
 
-import { ILineStyle } from '@oida/core';
+import { ILineStyle } from '@oidajs/core';
 
 import { PICK_INFO_KEY, PickInfo } from '../../../utils/picking';
 import { CesiumPrimitiveFeatureLayer } from '../cesium-primitive-feature-layer';

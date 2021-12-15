@@ -1,4 +1,4 @@
-import { SliceVolumeView } from '@oida/core';
+import { SliceVolumeView } from '@oidajs/core';
 import { CesiumVolumeView } from './cesium-volume-view';
 import { CesiumVolumeTile } from '../cesium-volume-tile';
 import { CesiumSliceVolumeTilePrimitive } from './cesium-slice-volume-tile-primitive';

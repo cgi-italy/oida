@@ -1,6 +1,6 @@
 import ImageLayer from 'ol/layer/Image';
 
-import { IMAGE_LAYER_ID, IImageLayerRenderer, MapLayerRendererConfig, ImageLayerRendererConfig, ImageSourceConfig } from '@oida/core';
+import { IMAGE_LAYER_ID, IImageLayerRenderer, MapLayerRendererConfig, ImageLayerRendererConfig, ImageSourceConfig } from '@oidajs/core';
 
 import { olImageSourceFactory } from './image-sources/ol-image-source-factory';
 

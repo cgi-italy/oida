@@ -1,7 +1,7 @@
 import proj4 from 'proj4';
 import { register } from 'ol/proj/proj4';
 
-import { AxiosInstanceWithCancellation } from '@oida/core';
+import { AxiosInstanceWithCancellation } from '@oidajs/core';
 
 import { AdamDatasetConfig } from '../adam-dataset-config';
 import { AdamDatasetFactoryConfig } from '../get-adam-dataset-factory';

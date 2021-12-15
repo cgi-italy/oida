@@ -3,9 +3,9 @@ import React from 'react';
 import { EChartOption } from 'echarts';
 import 'echarts/lib/chart/scatter';
 
-import { LoadingState } from '@oida/core';
-import { GridScatterAnalysis, isDomainProvider, NumericDomainMapper } from '@oida/eo-mobx';
-import { useSelector } from '@oida/ui-react-mobx';
+import { LoadingState } from '@oidajs/core';
+import { GridScatterAnalysis, isDomainProvider, NumericDomainMapper } from '@oidajs/eo-mobx';
+import { useSelector } from '@oidajs/ui-react-mobx';
 import { AnalysisLoadingStateMessage } from '../analysis-loading-state-message';
 import { ChartWidget } from '../chart-widget';
 

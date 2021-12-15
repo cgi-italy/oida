@@ -3,7 +3,7 @@ import { Point } from 'ol/geom.js';
 import IconStyle from 'ol/style/Icon';
 import ImageState from 'ol/ImageState';
 
-import { IPointStyle } from '@oida/core';
+import { IPointStyle } from '@oidajs/core';
 
 import { OLStyleParser } from './ol-style-parser';
 

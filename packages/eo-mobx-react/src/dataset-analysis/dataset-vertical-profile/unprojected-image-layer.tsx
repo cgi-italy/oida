@@ -14,7 +14,7 @@ import { getVectorContext } from 'ol/render';
 
 import useResizeAware from 'react-resize-aware';
 
-import { olTileSourcesFactory } from '@oida/map-ol';
+import { olTileSourcesFactory } from '@oidajs/map-ol';
 
 export type UnprojectedImageLayerProps = {
     sourceConfig: any;

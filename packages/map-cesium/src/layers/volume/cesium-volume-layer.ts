@@ -1,6 +1,6 @@
 import Cartesian2 from 'cesium/Source/Core/Cartesian2';
 
-import { IVolumeLayerRenderer, MapLayerRendererConfig, VolumeLayerRendererConfig, VolumeSourceConfig } from '@oida/core';
+import { IVolumeLayerRenderer, MapLayerRendererConfig, VolumeLayerRendererConfig, VolumeSourceConfig } from '@oidajs/core';
 
 import { CesiumMapLayer } from '../cesium-map-layer';
 import { CesiumVolumeSource } from './cesium-volume-source';

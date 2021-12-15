@@ -1,8 +1,8 @@
-import { DatasetDiscoveryProvider } from '@oida/eo-mobx';
+import { DatasetDiscoveryProvider } from '@oidajs/eo-mobx';
 
 import { WMS_DATASET_DISCOVERY_PROVIDER_TYPE, WmsDatasetDiscoveryProvider, WmsDatasetDiscoveryProviderProps } from './wms-discovery-provider';
 
-declare module '@oida/eo-mobx' {
+declare module '@oidajs/eo-mobx' {
     interface DatasetDiscoveryProviderDefinitions {
         [WMS_DATASET_DISCOVERY_PROVIDER_TYPE]: WmsDatasetDiscoveryProviderProps;
     }

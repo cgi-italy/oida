@@ -8,7 +8,7 @@ import HeightReference from 'cesium/Source/Scene/HeightReference';
 
 import { CesiumGeometryEntityRenderer } from './cesium-geometry-entity-renderer-factory';
 
-import { IFeatureStyle } from '@oida/core';
+import { IFeatureStyle } from '@oidajs/core';
 
 
 const getPolygonHierarchy = (coordinates) => {

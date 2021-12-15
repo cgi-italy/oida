@@ -1,5 +1,5 @@
-import { AoiValue, DateRangeValue, QueryFilter } from '@oida/core';
-import { DataFilters, DataFiltersProps } from '@oida/state-mobx';
+import { AoiValue, DateRangeValue, QueryFilter } from '@oidajs/core';
+import { DataFilters, DataFiltersProps } from '@oidajs/state-mobx';
 import { action, makeObservable, observable } from 'mobx';
 
 import { DatasetConfig } from './dataset-config';

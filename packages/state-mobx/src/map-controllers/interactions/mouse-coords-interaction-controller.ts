@@ -1,6 +1,6 @@
 import { MapInteractionController } from './map-interaction-controller';
 
-import { IMapInteractionImplementation, MOUSE_COORDS_INTERACTION_ID } from '@oida/core';
+import { IMapInteractionImplementation, MOUSE_COORDS_INTERACTION_ID } from '@oidajs/core';
 
 import { interactionControllersFactory } from './interaction-controllers-factory';
 

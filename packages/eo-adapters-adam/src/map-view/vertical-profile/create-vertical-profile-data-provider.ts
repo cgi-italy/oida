@@ -1,7 +1,7 @@
 import debounce from 'lodash/debounce';
 
-import { AxiosInstanceWithCancellation, DateRangeValue } from '@oida/core';
-import { DatasetVerticalProfileViz, VerticalProfileItemProps, RasterBandModeSingle } from  '@oida/eo-mobx';
+import { AxiosInstanceWithCancellation, DateRangeValue } from '@oidajs/core';
+import { DatasetVerticalProfileViz, VerticalProfileItemProps, RasterBandModeSingle } from  '@oidajs/eo-mobx';
 
 import { createGeoTiffLoader } from '../../utils';
 import { AdamDatasetConfig, AdamDatasetSingleBandCoverage, isMultiBandCoverage } from '../../adam-dataset-config';

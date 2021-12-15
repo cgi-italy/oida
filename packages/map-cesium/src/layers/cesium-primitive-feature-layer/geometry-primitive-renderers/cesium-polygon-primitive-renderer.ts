@@ -15,7 +15,7 @@ import GroundPrimitive from 'cesium/Source/Scene/GroundPrimitive';
 import Primitive from 'cesium/Source/Scene/Primitive';
 import PerInstanceColorAppearance from 'cesium/Source/Scene/PerInstanceColorAppearance';
 
-import { BBoxGeometry, CircleGeometry, getGeometryExtent, IPolygonStyle } from '@oida/core';
+import { BBoxGeometry, CircleGeometry, getGeometryExtent, IPolygonStyle } from '@oidajs/core';
 
 import { PICK_INFO_KEY, PickInfo } from '../../../utils/picking';
 import { CesiumPrimitiveFeatureLayer } from '../cesium-primitive-feature-layer';

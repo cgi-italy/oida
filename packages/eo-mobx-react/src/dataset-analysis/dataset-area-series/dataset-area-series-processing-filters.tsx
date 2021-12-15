@@ -1,9 +1,9 @@
 import React from 'react';
 import { Form } from 'antd';
 
-import { useFormData, useSelector } from '@oida/ui-react-mobx';
-import { DatasetAreaSeries } from '@oida/eo-mobx';
-import { DataFormItems, SelectEnumRenderer } from '@oida/ui-react-antd';
+import { useFormData, useSelector } from '@oidajs/ui-react-mobx';
+import { DatasetAreaSeries } from '@oidajs/eo-mobx';
+import { DataFormItems, SelectEnumRenderer } from '@oidajs/ui-react-antd';
 
 import { DatasetDimensionValueSelector } from '../../dataset-map-viz/dataset-dimension-value-selector';
 import { DatasetDimensionRangeSelector } from '../../dataset-map-viz/dataset-dimension-range-selector';

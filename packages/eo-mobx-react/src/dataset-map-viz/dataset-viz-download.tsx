@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Select, Slider, Form, InputNumber, Modal, Typography, FormInstance, Input } from 'antd';
 import { CloseCircleOutlined } from '@ant-design/icons';
 
-import { DatasetViz } from '@oida/eo-mobx';
+import { DatasetViz } from '@oidajs/eo-mobx';
 import { useForm } from 'antd/lib/form/Form';
 
 export enum DatasetDownloadFormSubmitState {

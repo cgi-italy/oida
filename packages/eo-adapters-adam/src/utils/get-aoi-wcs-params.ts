@@ -1,8 +1,8 @@
 import { transformExtent } from 'ol/proj';
 import { getIntersection, isEmpty } from 'ol/extent';
 
-import { getGeometryExtent } from '@oida/core';
-import { AoiValue } from '@oida/core';
+import { getGeometryExtent } from '@oidajs/core';
+import { AoiValue } from '@oidajs/core';
 
 import { AdamDatasetConfig } from '../adam-dataset-config';
 

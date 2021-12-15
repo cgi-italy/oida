@@ -1,6 +1,6 @@
 import { action, makeObservable, reaction } from 'mobx';
 
-import { SubscriptionTracker } from '@oida/core';
+import { SubscriptionTracker } from '@oidajs/core';
 
 import { DatasetAnalysis, DatasetAnalysisProps } from './dataset-analysis';
 import { DatasetAreaValues, DatasetAreaValuesProps } from './dataset-area-values';

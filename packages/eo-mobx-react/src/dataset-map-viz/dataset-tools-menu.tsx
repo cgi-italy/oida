@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, Dropdown, Menu } from 'antd';
 
-import { DatasetExplorer, DatasetViz } from '@oida/eo-mobx';
+import { DatasetExplorer, DatasetViz } from '@oidajs/eo-mobx';
 import { ComboToolConfig, useDatasetExplorerTools } from '../hooks';
 
 export type DatasetToolsMenuProps = {

@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { DatasetConfig } from '@oida/eo-mobx';
-import { SelectEnumRenderer } from '@oida/ui-react-antd';
+import { DatasetConfig } from '@oidajs/eo-mobx';
+import { SelectEnumRenderer } from '@oidajs/ui-react-antd';
 
 
 export type DatasetSelectorProps = {

@@ -3,14 +3,14 @@ import classnames from 'classnames';
 import { Button, Dropdown, InputNumber, Slider, Checkbox, Tooltip } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
 
-import { formatNumber } from '@oida/core';
-import { Map } from '@oida/state-mobx';
+import { formatNumber } from '@oidajs/core';
+import { Map } from '@oidajs/state-mobx';
 import {
     ColorMap, ColorScale, NumericVariable, ColorScaleType,
     isValueDomain, NumericDomainMapper, DatasetDimensions, isDomainProvider, computeRasterDatasetOptimalBandRange
-} from '@oida/eo-mobx';
-import { AdjustSolidIcon, AsyncButton } from '@oida/ui-react-antd';
-import { useSelector } from '@oida/ui-react-mobx';
+} from '@oidajs/eo-mobx';
+import { AdjustSolidIcon, AsyncButton } from '@oidajs/ui-react-antd';
+import { useSelector } from '@oidajs/ui-react-mobx';
 
 import { useDatasetVariableDomain } from '../hooks';
 

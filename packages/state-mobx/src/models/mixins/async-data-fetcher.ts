@@ -1,7 +1,7 @@
 import debounce from 'lodash/debounce';
 
 import { LoadingStatus, HasLoadingStatus } from './has-loading-status';
-import { LoadingState, CancelablePromise } from '@oida/core';
+import { LoadingState, CancelablePromise } from '@oidajs/core';
 
 /** Constructor parameters for {@link AsyncDataFetcher} class */
 export type AsyncDataFetcherProps<RESPONSE = any, PARAMS = any> = {

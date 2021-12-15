@@ -1,7 +1,7 @@
 import { autorun } from 'mobx';
 
-import { AxiosInstanceWithCancellation } from '@oida/core';
-import { TileLayer } from '@oida/state-mobx';
+import { AxiosInstanceWithCancellation } from '@oidajs/core';
+import { TileLayer } from '@oidajs/state-mobx';
 import {
     RasterMapViz,
     RASTER_VIZ_TYPE,
@@ -9,8 +9,8 @@ import {
     RasterBandModeType,
     RasterBandModeChoice,
     DatasetMapViewConfig
-} from '@oida/eo-mobx';
-import { getPlottyColorScales } from '@oida/eo-geotiff';
+} from '@oidajs/eo-mobx';
+import { getPlottyColorScales } from '@oidajs/eo-geotiff';
 
 import { AdamDatasetConfig, AdamDatasetRenderMode, isMultiBandCoverage } from '../../adam-dataset-config';
 import { AdamDatasetFactoryConfig } from '../../get-adam-dataset-factory';

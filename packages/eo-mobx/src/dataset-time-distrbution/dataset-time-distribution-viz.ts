@@ -1,13 +1,13 @@
 import { observable, makeObservable, action, autorun } from 'mobx';
 
-import { SubscriptionTracker } from '@oida/core';
+import { SubscriptionTracker } from '@oidajs/core';
 
 import {
     DatasetViz, DatasetVizProps, DatasetTimeDistributionConfig, hasDatasetDimensions,
     DataDomainProviderFilters, TimeDistributionInstantItem, TimeDistributionRangeItem
 } from '../common';
 import { TimeDistribution } from './time-distribution';
-import { AsyncDataFetcher } from '@oida/state-mobx';
+import { AsyncDataFetcher } from '@oidajs/state-mobx';
 
 
 export const TIME_DISTRIBUTION_VIZ_TYPE = 'time_distribution';

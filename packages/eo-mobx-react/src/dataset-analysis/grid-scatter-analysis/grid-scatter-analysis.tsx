@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { Button,  Form } from 'antd';
 import { LeftOutlined } from '@ant-design/icons';
 
-import { useSelector } from '@oida/ui-react-mobx';
+import { useSelector } from '@oidajs/ui-react-mobx';
 import {
     DatasetAreaValues, DatasetAreaValuesConfig, GridScatterAnalysis,
-    GRID_SCATTER_ANALYSIS, DATASET_AREA_VALUES_PROCESSING, DatasetToolConfig } from '@oida/eo-mobx';
+    GRID_SCATTER_ANALYSIS, DATASET_AREA_VALUES_PROCESSING, DatasetToolConfig } from '@oidajs/eo-mobx';
 
 import { DatasetAnalysisWidgetFactory, DatasetAnalysisWidgetFactoryConfig } from '../dataset-analysis-widget-factory';
 import { DatasetSelector } from '../dataset-selector';

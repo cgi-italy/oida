@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-import { LoadingState } from '@oida/core';
+import { LoadingState } from '@oidajs/core';
 
 /**
  * {@Link AsyncImage} component properties

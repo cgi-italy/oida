@@ -13,7 +13,7 @@ import Pass from 'cesium/Source/Renderer/Pass';
 
 import proj4 from 'proj4';
 
-import { VolumeTileKey } from '@oida/core';
+import { VolumeTileKey } from '@oidajs/core';
 
 import { CesiumVolumeTileTexture } from './cesium-volume-tile-texture';
 import { CesiumVolumeTileSet } from './cesium-volume-tile-set';

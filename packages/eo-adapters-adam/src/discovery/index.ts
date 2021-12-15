@@ -1,4 +1,4 @@
-import { DatasetDiscoveryProvider } from '@oida/eo-mobx';
+import { DatasetDiscoveryProvider } from '@oidajs/eo-mobx';
 
 import {
     ADAM_OPENSEARCH_DATASET_DISCOVERY_PROVIDER_TYPE, AdamOpensearchDatasetDiscoveryProvider, AdamOpensearchDatasetDiscoveryProviderProps,
@@ -8,7 +8,7 @@ import {
     ADAM_FEATURED_DATASET_DISCOVERY_PROVIDER_TYPE, AdamFeaturedDatasetDiscoveryProvider, AdamFeaturedDatasetDiscoveryProviderProps,
 } from './adam-featured-dataset-discovery-provider';
 
-declare module '@oida/eo-mobx' {
+declare module '@oidajs/eo-mobx' {
     interface DatasetDiscoveryProviderDefinitions {
         [ADAM_OPENSEARCH_DATASET_DISCOVERY_PROVIDER_TYPE]: AdamOpensearchDatasetDiscoveryProviderProps;
         [ADAM_FEATURED_DATASET_DISCOVERY_PROVIDER_TYPE]: AdamFeaturedDatasetDiscoveryProviderProps;

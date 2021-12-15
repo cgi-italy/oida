@@ -6,7 +6,7 @@ import useResizeAware from 'react-resize-aware';
 import { Button } from 'antd';
 import { DragOutlined, CloseOutlined } from '@ant-design/icons';
 
-import { LayoutSectionItem, LayoutSectionProps } from '@oida/ui-react-core';
+import { LayoutSectionItem, LayoutSectionProps } from '@oidajs/ui-react-core';
 
 import 'react-grid-layout/css/styles.css';
 

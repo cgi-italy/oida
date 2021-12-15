@@ -5,7 +5,7 @@ import HeightReference from 'cesium/Source/Scene/HeightReference';
 import BillboardGraphics from 'cesium/Source/DataSources/BillboardGraphics';
 import PointGraphics from 'cesium/Source/DataSources/PointGraphics';
 
-import { IFeatureStyle, IPointStyle, isIcon } from '@oida/core';
+import { IFeatureStyle, IPointStyle, isIcon } from '@oidajs/core';
 
 import { CesiumGeometryEntityRenderer } from './cesium-geometry-entity-renderer-factory';
 

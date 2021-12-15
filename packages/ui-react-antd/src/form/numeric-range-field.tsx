@@ -5,8 +5,8 @@ import { SliderRangeProps } from 'antd/lib/slider';
 
 import classnames from 'classnames';
 
-import { NumericRangeField, NUMERIC_RANGE_FIELD_ID } from '@oida/core';
-import { FormFieldRendererBaseProps } from '@oida/ui-react-core';
+import { NumericRangeField, NUMERIC_RANGE_FIELD_ID } from '@oidajs/core';
+import { FormFieldRendererBaseProps } from '@oidajs/ui-react-core';
 
 import { antdFormFieldRendererFactory } from './antd-form-field-renderer-factory';
 

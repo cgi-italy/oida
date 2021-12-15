@@ -3,11 +3,11 @@ import moment from 'moment';
 import {
     AxiosInstanceWithCancellation, createAxiosInstance, SortOrder,
     QueryParams, TimeInterval, TimeIntervalSet, DATE_RANGE_FIELD_ID, STRING_FIELD_ID, QueryFilter
-} from '@oida/core';
+} from '@oidajs/core';
 import {
     DatasetTimeDistributionProvider, TimeSearchDirection, TimeDistributionRangeItem,
     DatasetProductSearchProvider, ProductSearchRecord, DataDomainProviderFilters
-} from '@oida/eo-mobx';
+} from '@oidajs/eo-mobx';
 
 
 export type AdamWcsTimeDistributionProviderConfig = {

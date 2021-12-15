@@ -1,4 +1,4 @@
-import { AoiValue, DateRangeValue, QueryFilter } from '@oida/core';
+import { AoiValue, DateRangeValue, QueryFilter } from '@oidajs/core';
 
 export type DomainRange<T> = {
     min: T,

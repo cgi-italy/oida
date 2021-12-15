@@ -1,6 +1,6 @@
-import { QueryParams as QueryCriteria } from '@oida/core';
-import { DatasetDiscoveryProvider, DatasetDiscoveryProviderProps } from '@oida/eo-mobx';
-import { Entity, QueryParams, QueryParamsProps, AsyncDataFetcher } from '@oida/state-mobx';
+import { QueryParams as QueryCriteria } from '@oidajs/core';
+import { DatasetDiscoveryProvider, DatasetDiscoveryProviderProps } from '@oidajs/eo-mobx';
+import { Entity, QueryParams, QueryParamsProps, AsyncDataFetcher } from '@oidajs/state-mobx';
 import { autorun, reaction, when } from 'mobx';
 import { AdamOpensearchDatasetMetadata, AdamOpensearchDatasetDiscoveryResponse } from '../common';
 import { AdamDatasetFactoryConfig, AdamDatasetFactory, getAdamDatasetFactory } from '../get-adam-dataset-factory';

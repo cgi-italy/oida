@@ -1,6 +1,6 @@
 import {
     AxiosInstanceWithCancellation, createAxiosInstance, DateRangeValue
-} from '@oida/core';
+} from '@oidajs/core';
 
 import { AdamServiceParamsSerializer, getWcsTimeFilterSubset } from '../../utils';
 

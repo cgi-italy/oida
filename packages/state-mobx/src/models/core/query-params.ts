@@ -1,6 +1,6 @@
 import { makeObservable, observable, action, computed, reaction, ObservableMap } from 'mobx';
 
-import { SortOrder, QueryFilter, QueryParams as QueryCriteria } from '@oida/core';
+import { SortOrder, QueryFilter, QueryParams as QueryCriteria } from '@oidajs/core';
 
 
 export type FilterTypeReaction =  (filters: DataFilters, key: string) => (() => void);

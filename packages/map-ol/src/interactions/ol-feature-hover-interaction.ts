@@ -1,7 +1,7 @@
 import { transform } from 'ol/proj';
 import { pointerMove } from 'ol/events/condition';
 
-import { IFeatureHoverInteractionProps, FEATURE_HOVER_INTERACTION_ID, IFeatureHoverInteractionImplementation } from '@oida/core';
+import { IFeatureHoverInteractionProps, FEATURE_HOVER_INTERACTION_ID, IFeatureHoverInteractionImplementation } from '@oidajs/core';
 
 import { OLSelectInteraction } from '../utils/ol-select-interaction';
 import { OLMapRenderer } from '../map/ol-map-renderer';

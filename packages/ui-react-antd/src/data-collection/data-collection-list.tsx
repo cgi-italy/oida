@@ -1,7 +1,7 @@
 import React from 'react';
 import classnames from 'classnames';
 
-import { DataCollectionProps, DataPagerRenderer, DataSorterRenderer, DataFiltererRenderer } from '@oida/ui-react-core';
+import { DataCollectionProps, DataPagerRenderer, DataSorterRenderer, DataFiltererRenderer } from '@oidajs/ui-react-core';
 
 import { DataCollectionItemsList, DataCollectionItemsListProps } from './data-collection-items-list';
 import { DataPager } from './data-pager';

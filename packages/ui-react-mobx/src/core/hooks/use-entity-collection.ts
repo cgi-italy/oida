@@ -1,6 +1,6 @@
-import { IFormFieldDefinition } from '@oida/core';
-import { IsEntity, QueryParams, LoadingStatus } from '@oida/state-mobx';
-import { DataCollectionItemsProps, DataCollectionProps, DataSortField } from '@oida/ui-react-core';
+import { IFormFieldDefinition } from '@oidajs/core';
+import { IsEntity, QueryParams, LoadingStatus } from '@oidajs/state-mobx';
+import { DataCollectionItemsProps, DataCollectionProps, DataSortField } from '@oidajs/ui-react-core';
 
 import { useSelector } from './use-selector';
 import { useEntityCollectionList, UseEntityCollectionListProps } from './use-entity-collection-list';

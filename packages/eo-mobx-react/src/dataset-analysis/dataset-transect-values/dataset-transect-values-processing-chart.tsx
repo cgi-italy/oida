@@ -6,9 +6,9 @@ import 'echarts/lib/component/tooltip';
 import 'echarts/lib/component/legend';
 import 'echarts/lib/component/axisPointer';
 
-import { LoadingState } from '@oida/core';
-import { DatasetTransectValues, isDomainProvider, NumericDomainMapper } from '@oida/eo-mobx';
-import { useSelector } from '@oida/ui-react-mobx';
+import { LoadingState } from '@oidajs/core';
+import { DatasetTransectValues, isDomainProvider, NumericDomainMapper } from '@oidajs/eo-mobx';
+import { useSelector } from '@oidajs/ui-react-mobx';
 
 import { AnalysisLoadingStateMessage } from '../analysis-loading-state-message';
 import { ChartWidget } from '../chart-widget';

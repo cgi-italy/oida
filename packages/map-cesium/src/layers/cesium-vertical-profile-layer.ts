@@ -13,7 +13,7 @@ import { CesiumMapLayer } from './cesium-map-layer';
 import {
     IVerticalProfileLayerRenderer, VerticalProfileLayerRendererConfig,
     IVerticalProfile, IVerticalProfileStyle, VerticalProfileCoordinate
-} from '@oida/core';
+} from '@oidajs/core';
 
 import { PickInfo, PICK_INFO_KEY, updateDataSource } from '../utils';
 

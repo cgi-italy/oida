@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 
-import { AoiValue, AoiAction, FormFieldState, IFormFieldDefinition } from '@oida/core';
-import { AoiImportConfig } from '@oida/ui-react-core';
+import { AoiValue, AoiAction, FormFieldState, IFormFieldDefinition } from '@oidajs/core';
+import { AoiImportConfig } from '@oidajs/ui-react-core';
 
 import { useSelector, useEntityCollection } from '../../../core/hooks';
 import { useCenterOnMap } from '../../map';

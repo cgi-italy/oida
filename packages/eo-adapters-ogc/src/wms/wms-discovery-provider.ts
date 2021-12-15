@@ -1,13 +1,13 @@
 import { v4 as uuid } from 'uuid';
 
-import { QueryParams as QueryCriteria } from '@oida/core';
-import { DatasetDiscoveryProvider, DatasetDiscoveryProviderProps, DatasetConfig } from '@oida/eo-mobx';
-import { Entity, QueryParams, QueryParamsProps, AsyncDataFetcher } from '@oida/state-mobx';
+import { QueryParams as QueryCriteria } from '@oidajs/core';
+import { DatasetDiscoveryProvider, DatasetDiscoveryProviderProps, DatasetConfig } from '@oidajs/eo-mobx';
+import { Entity, QueryParams, QueryParamsProps, AsyncDataFetcher } from '@oidajs/state-mobx';
 import { IObservableArray, observable, action, makeObservable, autorun } from 'mobx';
 
 import { WmsServiceConfig, WmsService } from './wms-service';
 import { WmsLayer } from './wms-client';
-import { SubscriptionTracker } from '@oida/core';
+import { SubscriptionTracker } from '@oidajs/core';
 import { getWmsDatasetConfig } from './wms-dataset-config';
 
 export const WMS_DATASET_DISCOVERY_ITEM_TYPE = 'wms-discovery-provider-item';

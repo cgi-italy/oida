@@ -1,6 +1,6 @@
 import { makeObservable, observable, action, IObservableArray } from 'mobx';
 
-import { SelectionMode } from  '@oida/core';
+import { SelectionMode } from  '@oidajs/core';
 
 export class DataSelection<T> {
     readonly items: IObservableArray<T>;

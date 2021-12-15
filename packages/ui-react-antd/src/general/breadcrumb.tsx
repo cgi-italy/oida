@@ -1,7 +1,7 @@
 import React from 'react';
 import { Breadcrumb } from 'antd';
 
-import { BreadcrumbProps, BreadcrumbRouterLinkItem } from '@oida/ui-react-core';
+import { BreadcrumbProps, BreadcrumbRouterLinkItem } from '@oidajs/ui-react-core';
 
 /**
  * A breadcrumb renderer

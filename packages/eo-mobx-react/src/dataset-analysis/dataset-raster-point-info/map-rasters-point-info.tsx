@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 
-import { LoadingState, MapCoordQuantity } from '@oida/core';
-import { MapRastersPointInfo, MAP_RASTERS_POINT_INFO_ANALYSIS } from '@oida/eo-mobx';
-import { useFormatter, useSelector } from '@oida/ui-react-mobx';
+import { LoadingState, MapCoordQuantity } from '@oidajs/core';
+import { MapRastersPointInfo, MAP_RASTERS_POINT_INFO_ANALYSIS } from '@oidajs/eo-mobx';
+import { useFormatter, useSelector } from '@oidajs/ui-react-mobx';
 
 import { DatasetAnalysisWidgetFactory, DatasetAnalysisWidgetFactoryConfig } from '../dataset-analysis-widget-factory';
 import { observer } from 'mobx-react';

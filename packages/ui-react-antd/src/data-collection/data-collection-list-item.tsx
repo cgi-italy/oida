@@ -5,7 +5,7 @@ import {
     LoadingOutlined, PictureFilled
 } from '@ant-design/icons';
 
-import { AsyncImage } from '@oida/ui-react-core';
+import { AsyncImage } from '@oidajs/ui-react-core';
 
 
 type ExpandableDescriptionProps = {

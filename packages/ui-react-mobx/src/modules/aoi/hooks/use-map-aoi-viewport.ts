@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 
-import { AoiAction, FormFieldState, AoiValue } from '@oida/core';
-import { Map } from '@oida/state-mobx';
+import { AoiAction, FormFieldState, AoiValue } from '@oidajs/core';
+import { Map } from '@oidajs/state-mobx';
 
 import { useAoiModule } from './use-aoi-module';
 

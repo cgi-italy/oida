@@ -1,4 +1,4 @@
-import { IVolumeViewMode } from '@oida/core';
+import { IVolumeViewMode } from '@oidajs/core';
 import { CesiumVolumeTile } from '../cesium-volume-tile';
 import { CesiumVolumeTilePrimitive } from '../cesium-volume-tile-primitive';
 import { CesiumVolumeTileSet } from '../cesium-volume-tile-set';

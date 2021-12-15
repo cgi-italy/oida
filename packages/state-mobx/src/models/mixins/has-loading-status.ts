@@ -1,6 +1,6 @@
 import { makeObservable, observable, action } from 'mobx';
 
-import { LoadingState } from '@oida/core';
+import { LoadingState } from '@oidajs/core';
 
 export type LoadingStatusValue = {
     value?: LoadingState,

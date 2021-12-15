@@ -5,10 +5,10 @@ import { autorun } from 'mobx';
 
 import { EChartOption } from 'echarts/lib/echarts';
 
-import { VerticalProfileCoordinate } from '@oida/core';
+import { VerticalProfileCoordinate } from '@oidajs/core';
 
-import { DatasetVerticalProfileViz, VerticalProfileItem, VERTICAL_PROFILE_VIZ_TYPE, RasterBandModeSingle, RasterBandConfig } from '@oida/eo-mobx';
-import { useSelector, useCenterOnMapFromModule } from '@oida/ui-react-mobx';
+import { DatasetVerticalProfileViz, VerticalProfileItem, VERTICAL_PROFILE_VIZ_TYPE, RasterBandModeSingle, RasterBandConfig } from '@oidajs/eo-mobx';
+import { useSelector, useCenterOnMapFromModule } from '@oidajs/ui-react-mobx';
 
 import { ChartWidget } from '../chart-widget';
 import { UnprojectedImageLayer } from './unprojected-image-layer';

@@ -3,9 +3,9 @@ import length from '@turf/length';
 
 import {
     AxiosInstanceWithCancellation, createAxiosInstance
-} from '@oida/core';
+} from '@oidajs/core';
 
-import { DatasetAreaSeriesRequest, DatasetAreaSeriesDataItem, DatasetTransectValuesRequest } from '@oida/eo-mobx';
+import { DatasetAreaSeriesRequest, DatasetAreaSeriesDataItem, DatasetTransectValuesRequest } from '@oidajs/eo-mobx';
 
 import { AdamServiceParamsSerializer } from '../utils';
 import { AdamDatasetSingleBandCoverage } from '../adam-dataset-config';

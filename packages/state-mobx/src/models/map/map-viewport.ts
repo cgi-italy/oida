@@ -1,4 +1,4 @@
-import { MapCoord } from '@oida/core';
+import { MapCoord } from '@oidajs/core';
 import { makeAutoObservable, observable } from 'mobx';
 
 export type MapViewportProps = {

@@ -1,6 +1,6 @@
 import { reaction } from 'mobx';
 
-import { TILE_LAYER_ID, ITileLayerRenderer, IMapRenderer, LoadingState } from '@oida/core';
+import { TILE_LAYER_ID, ITileLayerRenderer, IMapRenderer, LoadingState } from '@oidajs/core';
 
 import { MapLayerController } from './map-layer-controller';
 import { layerControllersFactory } from './layer-controllers-factory';

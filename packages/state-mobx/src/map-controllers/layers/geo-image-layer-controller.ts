@@ -1,6 +1,6 @@
 import { reaction } from 'mobx';
 
-import { GEO_IMAGE_LAYER_ID, IGeoImageLayerRenderer, IMapRenderer } from '@oida/core';
+import { GEO_IMAGE_LAYER_ID, IGeoImageLayerRenderer, IMapRenderer } from '@oidajs/core';
 
 import { MapLayerController } from './map-layer-controller';
 import { layerControllersFactory } from './layer-controllers-factory';

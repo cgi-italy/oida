@@ -8,10 +8,10 @@ import 'echarts/lib/component/axisPointer';
 import 'echarts/lib/component/brush';
 import chroma from 'chroma-js';
 
-import { formatNumber, getTextColorForBackground } from '@oida/core';
+import { formatNumber, getTextColorForBackground } from '@oidajs/core';
 import {
     isDomainProvider, NumericDomainMapper, DatasetAreaSeriesDataItem, RasterBandConfig, DatasetDimension, DataDomain, isValueDomain
-} from '@oida/eo-mobx';
+} from '@oidajs/eo-mobx';
 
 import { ChartWidget } from '../chart-widget';
 

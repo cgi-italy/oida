@@ -3,7 +3,7 @@ import React from 'react';
 import { Button, Tooltip } from 'antd';
 import { PlusOutlined, MinusOutlined, ExpandOutlined } from '@ant-design/icons';
 
-import { MapNavControlsProps } from '@oida/ui-react-core';
+import { MapNavControlsProps } from '@oidajs/ui-react-core';
 
 export type MapNavToolsProps = MapNavControlsProps & {
     size?: 'small' | 'middle' | 'large',

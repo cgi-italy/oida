@@ -1,8 +1,8 @@
 import queryString from 'query-string';
 import lzString from 'lz-string';
 
-import { SortOrder, getFormFieldSerializer, QueryFilter } from '@oida/core';
-import { QueryParams as QueryParamsState } from '@oida/state-mobx';
+import { SortOrder, getFormFieldSerializer, QueryFilter } from '@oidajs/core';
+import { QueryParams as QueryParamsState } from '@oidajs/state-mobx';
 
 import { useRouteSearchStateBinding } from './use-route-search-state-binding';
 

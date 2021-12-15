@@ -1,9 +1,9 @@
 import { autorun } from 'mobx';
 
-import { SubscriptionTracker, GeoImageLayerFootprint } from '@oida/core';
-import { GeoImageLayer } from '@oida/state-mobx';
-import { getMapModule } from '@oida/ui-react-mobx';
-import { DatasetViz, DatasetVizProps } from '@oida/eo-mobx';
+import { SubscriptionTracker, GeoImageLayerFootprint } from '@oidajs/core';
+import { GeoImageLayer } from '@oidajs/state-mobx';
+import { getMapModule } from '@oidajs/ui-react-mobx';
+import { DatasetViz, DatasetVizProps } from '@oidajs/eo-mobx';
 
 import { AdaptiveVideoLayer } from './adaptive-video-source';
 

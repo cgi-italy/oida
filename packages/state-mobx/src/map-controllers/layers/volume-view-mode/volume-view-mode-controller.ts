@@ -1,4 +1,4 @@
-import { SubscriptionTracker, IVolumeViewMode } from '@oida/core';
+import { SubscriptionTracker, IVolumeViewMode } from '@oidajs/core';
 
 import { VolumeViewMode } from '../../../models/map/layers/volume-layer';
 

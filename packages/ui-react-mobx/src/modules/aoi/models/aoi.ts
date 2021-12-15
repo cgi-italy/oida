@@ -1,8 +1,8 @@
 import { observable, computed, makeObservable, action } from 'mobx';
 import chroma from 'chroma-js';
 
-import { randomColorFactory } from '@oida/core';
-import { Entity, EntityProps, HasGeometry, GeometryProps, GeometryState } from '@oida/state-mobx';
+import { randomColorFactory } from '@oidajs/core';
+import { Entity, EntityProps, HasGeometry, GeometryProps, GeometryState } from '@oidajs/state-mobx';
 
 
 const generateAoiColor = randomColorFactory();

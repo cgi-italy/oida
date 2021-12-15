@@ -4,7 +4,7 @@ import CanvasSource from 'ol/source/ImageCanvas';
 import {
     GEO_IMAGE_LAYER_ID, IGeoImageLayerRenderer, GeoImageLayerSource, GeoImageLayerFootprint,
     MapLayerRendererConfig, GeoImageLayerRendererConfig
-} from '@oida/core';
+} from '@oidajs/core';
 
 import { GLGeoImageProjector } from '../utils';
 import { olLayersFactory } from './ol-layers-factory';

@@ -1,7 +1,7 @@
 import { computed, action, observable, makeObservable } from 'mobx';
 import {
     HasGeometry, GeometryProps, GeometryState,
-} from '@oida/state-mobx';
+} from '@oidajs/state-mobx';
 
 export type SharedAoiProps = {
     name?: string;

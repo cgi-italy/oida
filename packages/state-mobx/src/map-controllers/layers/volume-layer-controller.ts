@@ -1,6 +1,6 @@
 import { observe, reaction, autorun } from 'mobx';
 
-import { VOLUME_LAYER_ID, IVolumeLayerRenderer, IMapRenderer, LoadingState } from '@oida/core';
+import { VOLUME_LAYER_ID, IVolumeLayerRenderer, IMapRenderer, LoadingState } from '@oidajs/core';
 
 import { VolumeLayer } from '../../models/map/layers/volume-layer';
 

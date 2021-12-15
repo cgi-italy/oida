@@ -5,8 +5,8 @@ import { NativeTypes } from 'react-dnd-html5-backend';
 import { List, Empty } from 'antd';
 import { CloseCircleOutlined } from '@ant-design/icons';
 
-import { LoadingState, SelectionMode } from '@oida/core';
-import { DataCollectionItemsProps, DataCollectionItemState, DataCollectionItemAction, useScrollIntoView } from '@oida/ui-react-core';
+import { LoadingState, SelectionMode } from '@oidajs/core';
+import { DataCollectionItemsProps, DataCollectionItemState, DataCollectionItemAction, useScrollIntoView } from '@oidajs/ui-react-core';
 
 import { DataCollectionItemActionButton } from './data-collection-item-action-button';
 

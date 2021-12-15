@@ -1,7 +1,7 @@
-import { DatasetViz } from '@oida/eo-mobx';
+import { DatasetViz } from '@oidajs/eo-mobx';
 import { VIDEO_VIZ_TYPE, DatasetVideoMapViz, DatasetVideoMapVizProps } from './daraset-video-map-viz';
 
-declare module '@oida/eo-mobx' {
+declare module '@oidajs/eo-mobx' {
     interface DatasetVizDefinitions {
         [VIDEO_VIZ_TYPE]: DatasetVideoMapVizProps;
     }

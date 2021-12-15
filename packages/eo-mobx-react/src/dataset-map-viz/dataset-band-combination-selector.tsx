@@ -6,14 +6,14 @@ import { useDrag, useDrop } from 'react-dnd';
 import { Avatar, Tooltip, Button } from 'antd';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 
-import { AoiValue, formatNumber, getColorFromString } from '@oida/core';
-import { Map } from '@oida/state-mobx';
+import { AoiValue, formatNumber, getColorFromString } from '@oidajs/core';
+import { Map } from '@oidajs/state-mobx';
 import {
     RasterBandModeCombination, RasterBandConfig, RasterBandGroup, BandScalingMode,
     DomainRange, isValueDomain, DatasetDimensions, isDomainProvider, NumericalValueDomain, computeRasterDatasetOptimalBandRange
-} from '@oida/eo-mobx';
-import { AdjustSolidIcon, AsyncButton, NumericRangeFieldRenderer } from '@oida/ui-react-antd';
-import { useSelector } from '@oida/ui-react-mobx';
+} from '@oidajs/eo-mobx';
+import { AdjustSolidIcon, AsyncButton, NumericRangeFieldRenderer } from '@oidajs/ui-react-antd';
+import { useSelector } from '@oidajs/ui-react-mobx';
 
 import { useDatasetVariableDomain } from '../hooks';
 

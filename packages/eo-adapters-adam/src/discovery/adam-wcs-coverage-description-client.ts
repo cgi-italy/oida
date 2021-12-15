@@ -2,7 +2,7 @@ import proj4 from 'proj4';
 
 import { AxiosInstanceWithCancellation, createAxiosInstance,
     getXmlStringNodeValue, EpsgIoDefinitionProvider
-} from '@oida/core';
+} from '@oidajs/core';
 
 
 export type AdamWcsCoverageDescription = {

@@ -3,9 +3,9 @@ import { observer } from 'mobx-react';
 import { Descriptions } from 'antd';
 import { SyncOutlined } from '@ant-design/icons';
 
-import { DateQuantity, LoadingState } from '@oida/core';
-import { DatasetRasterPointInfo, isDomainProvider, NumericDomainMapper } from '@oida/eo-mobx';
-import { useFormatter } from '@oida/ui-react-mobx';
+import { DateQuantity, LoadingState } from '@oidajs/core';
+import { DatasetRasterPointInfo, isDomainProvider, NumericDomainMapper } from '@oidajs/eo-mobx';
+import { useFormatter } from '@oidajs/ui-react-mobx';
 
 
 export type DatasetRasterPointInfoTableProps = {

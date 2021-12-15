@@ -1,7 +1,7 @@
 import { autorun } from 'mobx';
 
-import { IndexedCollection } from '@oida/state-mobx';
-import { BreadcrumbItemProps } from '@oida/ui-react-core';
+import { IndexedCollection } from '@oidajs/state-mobx';
+import { BreadcrumbItemProps } from '@oidajs/ui-react-core';
 
 import { AppModule } from '../app-module';
 

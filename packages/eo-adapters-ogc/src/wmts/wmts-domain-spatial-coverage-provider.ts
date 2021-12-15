@@ -2,8 +2,8 @@ import proj4 from 'proj4';
 import { transformExtent } from 'ol/proj';
 import { register } from 'ol/proj/proj4';
 
-import { EpsgIoDefinitionProvider } from '@oida/core';
-import { DatasetSpatialCoverageProvider, DatasetViz } from '@oida/eo-mobx';
+import { EpsgIoDefinitionProvider } from '@oidajs/core';
+import { DatasetSpatialCoverageProvider, DatasetViz } from '@oidajs/eo-mobx';
 
 import { WmtsDomainDiscoveryClient } from './wmts-domain-discovery-client';
 

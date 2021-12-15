@@ -2,7 +2,7 @@ import Cartesian3 from 'cesium/Source/Core/Cartesian3';
 import Cartographic from 'cesium/Source/Core/Cartographic';
 import CesiumMath from 'cesium/Source/Core/Math';
 
-import { IFeatureLayerRenderer, IFeatureStyle, MapLayerRendererConfig, FeatureLayerRendererConfig, FeatureGeometry, IFeature } from '@oida/core';
+import { IFeatureLayerRenderer, IFeatureStyle, MapLayerRendererConfig, FeatureLayerRendererConfig, FeatureGeometry, IFeature } from '@oidajs/core';
 
 import { CesiumFeatureCoordPickMode, PickInfo } from '../../utils/picking';
 import { CesiumMapLayer } from '../cesium-map-layer';

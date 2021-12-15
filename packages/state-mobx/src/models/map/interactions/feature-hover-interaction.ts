@@ -1,6 +1,6 @@
 import { observable, makeObservable, action } from 'mobx';
 
-import { FEATURE_HOVER_INTERACTION_ID } from '@oida/core';
+import { FEATURE_HOVER_INTERACTION_ID } from '@oidajs/core';
 
 import { MapInteraction, MapInteractionProps } from './map-interaction';
 import { SelectionManager, SelectableItem } from '../../core';

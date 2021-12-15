@@ -1,7 +1,7 @@
 import {
     GROUP_LAYER_ID, TILE_LAYER_ID, FEATURE_LAYER_ID,
     VERTICAL_PROFILE_LAYER_ID, VOLUME_LAYER_ID
-} from '@oida/core';
+} from '@oidajs/core';
 
 import { cesiumLayersFactory } from './cesium-layers-factory';
 import { CesiumGroupLayer } from './cesium-group-layer';

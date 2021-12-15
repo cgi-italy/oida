@@ -1,8 +1,8 @@
 import { useMemo, useEffect } from 'react';
 
-import { GeometryTypes, FeatureDrawMode, FeatureDrawEvent } from '@oida/core';
-import { FeatureDrawInteraction } from '@oida/state-mobx';
-import { AoiAction, AoiValue, AoiSupportedGeometry, FormFieldState } from '@oida/core';
+import { GeometryTypes, FeatureDrawMode, FeatureDrawEvent } from '@oidajs/core';
+import { FeatureDrawInteraction } from '@oidajs/state-mobx';
+import { AoiAction, AoiValue, AoiSupportedGeometry, FormFieldState } from '@oidajs/core';
 
 import { useAoiModule } from './use-aoi-module';
 

@@ -1,7 +1,7 @@
 import { reaction, IReactionDisposer, IObservableArray, makeObservable, observable } from 'mobx';
 import { v4 as uuid } from 'uuid';
 
-import { FEATURE_LAYER_ID, IFeatureLayerRenderer, IMapRenderer, IFeature } from '@oida/core';
+import { FEATURE_LAYER_ID, IFeatureLayerRenderer, IMapRenderer, IFeature } from '@oidajs/core';
 
 import { ArrayTracker } from '../../utils';
 import { FeatureLayer, FeatureInterface, FeatureStyleGetter, FeatureGeometryGetter } from '../../models/map/layers/feature-layer';

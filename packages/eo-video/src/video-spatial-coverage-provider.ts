@@ -1,4 +1,4 @@
-import { DatasetSpatialCoverageProvider, DatasetViz } from '@oida/eo-mobx';
+import { DatasetSpatialCoverageProvider, DatasetViz } from '@oidajs/eo-mobx';
 
 import { DatasetVideoMapViz } from './daraset-video-map-viz';
 

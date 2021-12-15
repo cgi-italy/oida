@@ -14,7 +14,7 @@ import {
     IFeatureDrawInteractionImplementation,
     FeatureDrawMode,
     FeatureDrawOptions
-} from '@oida/core';
+} from '@oidajs/core';
 
 import { OLMapRenderer } from '../map/ol-map-renderer';
 import { olInteractionsFactory } from './ol-interactions-factory';

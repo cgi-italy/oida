@@ -4,8 +4,8 @@ import { DatePicker } from 'antd';
 import { RangePickerProps } from 'antd/lib/date-picker';
 import moment from 'moment';
 
-import { DateRangeField, DATE_RANGE_FIELD_ID } from '@oida/core';
-import { FormFieldRendererBaseProps } from '@oida/ui-react-core';
+import { DateRangeField, DATE_RANGE_FIELD_ID } from '@oidajs/core';
+import { FormFieldRendererBaseProps } from '@oidajs/ui-react-core';
 
 import { antdFormFieldRendererFactory } from './antd-form-field-renderer-factory';
 

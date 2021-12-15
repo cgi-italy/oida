@@ -1,8 +1,8 @@
 import { v4 as uuid } from 'uuid';
 import { observable, makeObservable, action } from 'mobx';
 
-import { createDynamicFactory } from '@oida/core';
-import { MapLayer } from '@oida/state-mobx';
+import { createDynamicFactory } from '@oidajs/core';
+import { MapLayer } from '@oidajs/state-mobx';
 
 import { Dataset } from './dataset';
 

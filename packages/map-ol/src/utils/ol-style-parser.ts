@@ -4,7 +4,7 @@ import Circle from 'ol/style/Circle';
 import Stroke from 'ol/style/Stroke';
 import Fill from 'ol/style/Fill';
 
-import { GeometryTypes, IFeatureStyle, IPointStyle, isIcon, ILineStyle, IPolygonStyle } from '@oida/core';
+import { GeometryTypes, IFeatureStyle, IPointStyle, isIcon, ILineStyle, IPolygonStyle } from '@oidajs/core';
 
 export class OLStyleParser {
 

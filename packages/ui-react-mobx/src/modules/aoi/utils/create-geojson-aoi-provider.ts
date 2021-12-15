@@ -1,4 +1,4 @@
-import { QueryParams, createAxiosInstance } from '@oida/core';
+import { QueryParams, createAxiosInstance } from '@oidajs/core';
 
 import { createInMemoryAoiProvider } from './create-in-memory-aoi-provider';
 

@@ -1,5 +1,5 @@
 {
-  "name": "@oida/state-mobx",
+  "name": "@oidajs/state-mobx",
   "version": "0.3.0",
   "description": "oida mobx state management library",
   "module": "es/index.js",
@@ -28,7 +28,7 @@
     "moment": "^2.x"
   },
   "dependencies": {
-    "@oida/core": "file:../core",
+    "@oidajs/core": "file:../core",
     "tslib": "^2.2.0"
   }
 }

@@ -1,6 +1,6 @@
 import { reaction, IReactionDisposer, IObservableArray } from 'mobx';
 
-import { VERTICAL_PROFILE_LAYER_ID, IVerticalProfileLayerRenderer, IMapRenderer } from '@oida/core';
+import { VERTICAL_PROFILE_LAYER_ID, IVerticalProfileLayerRenderer, IMapRenderer } from '@oidajs/core';
 
 import { MapLayerController } from './map-layer-controller';
 import { layerControllersFactory } from './layer-controllers-factory';
