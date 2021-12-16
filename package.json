@@ -7,6 +7,8 @@
     "build:docs": "lerna run --stream build:docs",
     "clean": "lerna run --parallel clean",
     "cz": "git-cz",
+    "link": "lerna exec --stream --ignore @oidajs/docs -- npm link",
+    "postlink": "rimraf \"packages/!(docs)/node_modules\" \"packages/!(docs)/package-lock.json\"",
     "lint": "lerna run --parallel lint",
     "check-staged": "lint-staged",
     "watch": "lerna run --parallel watch",
