@@ -89,7 +89,7 @@ publish_canary:
   stage: publish
   script:
     - nexus_login
-    - "node_modules/.bin/lerna publish --canary --force-publish --dist-tag $CI_COMMIT_REF_SLUG --preid $CI_COMMIT_REF_SLUG --yes"
+    - "node_modules/.bin/lerna publish --registry https://$NEXUS_REPO/ --canary --force-publish --dist-tag $CI_COMMIT_REF_SLUG --preid $CI_COMMIT_REF_SLUG --yes"
   dependencies:
     - build
   only:
@@ -123,7 +123,7 @@ publish_release:
   stage: publish
   script:
     - nexus_login
-    - node_modules/.bin/lerna publish from-git --yes
+    - node_modules/.bin/lerna publish from-git --registry https://$NEXUS_REPO/ --yes
   dependencies:
     - build
   only:

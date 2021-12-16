@@ -4,7 +4,6 @@
       "hoist": true
     },
     "publish": {
-      "registry": "https://nexus.dev.eoss-cloud.it/repository/npm-cgi-eo/",
       "conventionalCommits": true,
       "verifyAccess": false,
       "message": "chore(release): publish"

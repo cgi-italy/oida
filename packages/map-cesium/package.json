@@ -20,9 +20,9 @@
     "test": "jest --config ./jest.config.js"
   },
   "author": "stefano marra",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "publishConfig": {
-    "registry": "https://nexus.dev.eoss-cloud.it/repository/npm-cgi-eo/"
+    "access": "public"
   },
   "dependencies": {
     "@oidajs/core": "file:../core",
