@@ -45,7 +45,7 @@ export type AdamOpensearchDatasetMetadata = {
     geometry: GeoJSON.Geometry;
     subDataset: AdamOpensearchDatasetMetadataSubdataset[];
     description: string;
-    dataset_specification: string;
+    datasetSpecification: string;
 };
 
 export type AdamOpensearchProductMetadata = {
