@@ -12,6 +12,7 @@ export type bindAoiValueToMapProps = {
     aois: IndexedCollection<Aoi>;
     map: Map;
     viewportChangeDebounce?: number;
+    color?: string;
 };
 
 let nextAoiId = 1;
@@ -26,7 +27,7 @@ export const bindAoiValueToMap = (props: bindAoiValueToMapProps) => {
 
     let aoiInstance: Aoi | undefined;
     let viewportObserverDisposer: (() => void) | undefined;
-    const color = generateAoiColor();
+    const color = props.color || generateAoiColor();
 
     const debouncedAoiUpdate = debounce((aoiValue: AoiValue) => {
         props.setter(aoiValue);
@@ -51,7 +52,7 @@ export const bindAoiValueToMap = (props: bindAoiValueToMapProps) => {
                     name: valueProps.name ? valueProps.name : value.geometry.type,
                     geometry: value.geometry,
                     color: color,
-                    visible: false
+                    visible: true
                 });
 
                 props.aois.add(aoiInstance);

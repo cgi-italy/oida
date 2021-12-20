@@ -34,10 +34,18 @@ export const useAnalysisGeometry = (props: useAnalysisGeometryProps) => {
         }
     };
 
-    let aoiProps = useSelector(() => {
+    const aoiProps = useSelector(() => {
         return {
             color: analysis.color,
             name: analysis.aoi ? analysis.aoi.name : 'None'
+        };
+    }, [props.analysis]);
+
+    const aoiState = useSelector(() => {
+        return {
+            visible: analysis.visible.value,
+            hovered: analysis.hovered.value,
+            selected: analysis.selected.value
         };
     }, [props.analysis]);
 
@@ -45,7 +53,8 @@ export const useAnalysisGeometry = (props: useAnalysisGeometryProps) => {
         onHoverAction: onAnalysisHover,
         onSelectAction: onAnalysisSelect,
         color: aoiProps.color,
-        name: aoiProps.name
+        name: aoiProps.name,
+        state: aoiState
     };
 };
 

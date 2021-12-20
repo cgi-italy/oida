@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 
 import { SelectionMode, AoiValue, FormFieldState } from '@oidajs/core';
 import { IndexedCollection, Map, SelectionManager } from '@oidajs/state-mobx';
@@ -27,22 +27,6 @@ export const useMapAoiInstance = (props: MapAoiInstanceProps) => {
         }
     }, [value]);
 
-
-    useEffect(() => {
-
-        if (aoiInstance) {
-
-            aoiInstance.visible.setValue(true);
-
-            return () => {
-                if (aoiInstance) {
-                    aoiInstance.visible.setValue(false);
-                }
-            };
-
-        }
-    }, [aoiInstance]);
-
     const centerOnMap = useCenterOnMap({
         map: map
     });
@@ -56,7 +40,7 @@ export const useMapAoiInstance = (props: MapAoiInstanceProps) => {
     };
 
     const onAoiSelect = (selected) => {
-        mapSelection.selection.modifySelection(aoiInstance, SelectionMode.Replace);
+        mapSelection.selection.modifySelection(selected ? aoiInstance : undefined, SelectionMode.Replace);
         if (aoiInstance) {
             centerOnMap(aoiInstance.geometry.value, {
                 animate: true
@@ -64,7 +48,21 @@ export const useMapAoiInstance = (props: MapAoiInstanceProps) => {
         }
     };
 
-    let aoiProps = useSelector(() => {
+    const onAoiVisibilityChange = (visible) => {
+        if (aoiInstance) {
+            aoiInstance.visible.setValue(visible);
+        }
+    };
+
+    const onAoiCenterOnMap = () => {
+        if (aoiInstance) {
+            centerOnMap(aoiInstance.geometry.value, {
+                animate: true
+            });
+        }
+    };
+
+    const aoiProps = useSelector(() => {
         if (aoiInstance) {
             return {
                 color: aoiInstance.color,
@@ -73,9 +71,28 @@ export const useMapAoiInstance = (props: MapAoiInstanceProps) => {
         }
     }, [aoiInstance]);
 
+    const aoiState = useSelector(() => {
+        if (aoiInstance) {
+            return {
+                visible: aoiInstance.visible.value,
+                selected: aoiInstance.selected.value,
+                hovered: aoiInstance.hovered.value
+            };
+        } else {
+            return {
+                visible: false,
+                selected: false,
+                hovered: false
+            };
+        }
+    }, [aoiInstance]);
+
     return {
         onHoverAction: onAoiHover,
         onSelectAction: onAoiSelect,
+        onVisibleAction: onAoiVisibilityChange,
+        onCenterAction: onAoiCenterOnMap,
+        state: aoiState,
         ...aoiProps
     };
 };

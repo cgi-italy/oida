@@ -38,8 +38,15 @@ export type AoiFieldConfig<IMPORT_CONFIG = any> = {
     activeAction: AoiAction;
     name: string;
     color?: string;
+    state: {
+        hovered: boolean;
+        visible: boolean;
+        selected: boolean;
+    }
     onHoverAction?: (hovered: boolean) => void;
     onSelectAction?: (selected: boolean) => void;
+    onVisibleAction?: (visible: boolean) => void;
+    onCenterAction?: () => void;
     importConfig?: IMPORT_CONFIG
 };
 
