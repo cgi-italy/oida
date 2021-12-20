@@ -34,7 +34,7 @@ export class AdamOpensearchDatasetDiscoveryClient {
     protected axiosInstance_: AxiosInstanceWithCancellation;
     protected openSearchClient_: AdamOpenSearchClient;
     protected wcsCoverageDescriptionClient_: AdamWcsCoverageDescriptionClient;
-    protected additionalDatasetConfig_: Record<string, Partial<AdamDatasetConfig>>;
+    protected additionalDatasetConfig_: Record<string, Partial<AdamDatasetConfig> & {disabled?: boolean}>;
     protected metadataModelVersion_: AdamOpensearchMetadataModelVersion;
 
     constructor(config: AdamOpensearchDatasetDiscoveryClientConfig) {
@@ -72,6 +72,13 @@ export class AdamOpensearchDatasetDiscoveryClient {
         return this.openSearchClient_.getDatasets({
             ...queryParams,
             filters: filters
+        }).then((response) => {
+            return {
+                ...response,
+                features: response.features.filter((feature) => {
+                    return !(this.additionalDatasetConfig_[feature.datasetId])?.disabled;
+                })
+            };
         });
     }
 
