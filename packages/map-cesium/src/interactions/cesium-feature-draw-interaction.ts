@@ -68,6 +68,10 @@ export class CesiumFeatureDrawInteraction implements IFeatureDrawInteractionImpl
         }
 
         if (mode !== FeatureDrawMode.Off) {
+
+            //prevent a crash on globe zoom in/out while drawing
+            this.viewer_.scene.pickTranslucentDepth = false;
+
             this.handler_ = new ScreenSpaceEventHandler(this.viewer_.scene.canvas);
 
             let cursorPosition = new Cartesian3();
@@ -308,6 +312,10 @@ export class CesiumFeatureDrawInteraction implements IFeatureDrawInteractionImpl
                     }
 
                 }, ScreenSpaceEventType.MOUSE_MOVE);
+            }
+        } else {
+            if (this.viewer_.scene) {
+                this.viewer_.scene.pickTranslucentDepth = true;
             }
         }
 

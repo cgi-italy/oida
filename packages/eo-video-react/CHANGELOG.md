@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# 2.0.0 (2021-12-21)
+
+
+### Build System
+
+* change packages name scope ([a8d721d](https://github.com/cgi-italy/oida/commit/a8d721db395a8a9f9c52808c5318c392096cc2a3))
+
+
+### Features
+
+* add eo video ui controls ([bf73759](https://github.com/cgi-italy/oida/commit/bf73759716b156b152e3b09aa97fedfe1effe082))
+
+
+### BREAKING CHANGES
+
+* all import to @oida/\* packages shall be updated with @oidajs/\*
+
+
+
+
+
 # [1.0.0](https://github.com/cgi-italy/oida/compare/@oida/eo-video-react@0.2.2...@oidajs/eo-video-react@1.0.0) (2021-12-15)
 
 

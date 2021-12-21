@@ -3,6 +3,35 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# 2.0.0 (2021-12-21)
+
+
+### Bug Fixes
+
+* disable query url binding in wms provider ([fcf45b4](https://github.com/cgi-italy/oida/commit/fcf45b4f1507788056e78b1f3f1ffc86a099216f))
+* minor layout updates ([c41e216](https://github.com/cgi-italy/oida/commit/c41e21632f8f5375350d63dfc2cc7234e81a0b1a))
+* set main filter in wms discovery ui ([845c691](https://github.com/cgi-italy/oida/commit/845c6916fb91e926c8e3bb910a8f3c3bbf095202))
+
+
+### Build System
+
+* change packages name scope ([a8d721d](https://github.com/cgi-italy/oida/commit/a8d721db395a8a9f9c52808c5318c392096cc2a3))
+
+
+### Features
+
+* improve wms discovery ux ([5fc4ebb](https://github.com/cgi-italy/oida/commit/5fc4ebb2669ba6c0d84f61d01ecfe507db8193ff))
+* minor ui updates ([128ee4a](https://github.com/cgi-italy/oida/commit/128ee4a611dd0f50ebdda167d5c81129876ca27f))
+
+
+### BREAKING CHANGES
+
+* all import to @oida/\* packages shall be updated with @oidajs/\*
+
+
+
+
+
 # [1.0.0](https://github.com/cgi-italy/oida/compare/@oida/eo-adapters-ogc-react@0.2.2...@oidajs/eo-adapters-ogc-react@1.0.0) (2021-12-15)
 
 

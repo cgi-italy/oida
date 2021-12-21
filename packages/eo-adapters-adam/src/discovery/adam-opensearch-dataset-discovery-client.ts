@@ -1,6 +1,9 @@
 import moment from 'moment';
 
-import { AxiosInstanceWithCancellation, createAxiosInstance, QueryParams, getGeometryExtent, isValidExtent, BOOLEAN_FIELD_ID } from '@oidajs/core';
+import { AxiosInstanceWithCancellation, createAxiosInstance, QueryParams,
+    getGeometryExtent, isValidExtent, BOOLEAN_FIELD_ID, STRING_FIELD_ID
+} from '@oidajs/core';
+
 import { AdamWcsCoverageDescriptionClient, AdamWcsCoverageDescription } from './adam-wcs-coverage-description-client';
 import {
     AdamDatasetConfig, AdamDatasetDimension, AdamDatasetSingleBandCoverage,
@@ -14,7 +17,8 @@ import {
 
 export enum AdamOpensearchMetadataModelVersion {
     V1 = 'v1',
-    V2 = 'v2'
+    V2 = 'v2',
+    V3 = 'v3'
 }
 
 export type AdamOpensearchDatasetDiscoveryClientConfig = {
@@ -30,7 +34,7 @@ export class AdamOpensearchDatasetDiscoveryClient {
     protected axiosInstance_: AxiosInstanceWithCancellation;
     protected openSearchClient_: AdamOpenSearchClient;
     protected wcsCoverageDescriptionClient_: AdamWcsCoverageDescriptionClient;
-    protected additionalDatasetConfig_: Record<string, Partial<AdamDatasetConfig>>;
+    protected additionalDatasetConfig_: Record<string, Partial<AdamDatasetConfig> & {disabled?: boolean}>;
     protected metadataModelVersion_: AdamOpensearchMetadataModelVersion;
 
     constructor(config: AdamOpensearchDatasetDiscoveryClientConfig) {
@@ -44,7 +48,7 @@ export class AdamOpensearchDatasetDiscoveryClient {
             axiosInstance: this.axiosInstance_
         });
         this.additionalDatasetConfig_ = config.additionalDatasetConfig || {};
-        this.metadataModelVersion_ = config.metadataModelVersion || AdamOpensearchMetadataModelVersion.V2;
+        this.metadataModelVersion_ = config.metadataModelVersion || AdamOpensearchMetadataModelVersion.V3;
     }
 
     searchDatasets(queryParams: QueryParams) {
@@ -57,11 +61,24 @@ export class AdamOpensearchDatasetDiscoveryClient {
                 type: BOOLEAN_FIELD_ID,
                 value: true
             });
+        } else if (this.metadataModelVersion_ === AdamOpensearchMetadataModelVersion.V3) {
+            filters.push({
+                key: 'geolocated',
+                type: STRING_FIELD_ID,
+                value: 'True'
+            });
         }
 
         return this.openSearchClient_.getDatasets({
             ...queryParams,
             filters: filters
+        }).then((response) => {
+            return {
+                ...response,
+                features: response.features.filter((feature) => {
+                    return !(this.additionalDatasetConfig_[feature.datasetId])?.disabled;
+                })
+            };
         });
     }
 
@@ -138,10 +155,11 @@ export class AdamOpensearchDatasetDiscoveryClient {
 
             let subdatasets = metadata.subDataset;
             if (!Array.isArray(subdatasets)) {
-                subdatasets = Object.entries(metadata.subDataset).map(([name, subdataset]) => {
+                subdatasets = Object.entries(metadata.subDataset).map(([id, subdataset]) => {
                     return {
                         ...subdataset,
-                        name: name
+                        subDatasetId: id,
+                        name: id
                     };
                 });
             }
@@ -282,7 +300,7 @@ export class AdamOpensearchDatasetDiscoveryClient {
             }
 
             return this.getDatasetDimensionsFromSubdatasets_(
-                subdatasets, metadata.dataset_specification
+                subdatasets, metadata.datasetSpecification
             ).then((dimensions) => {
 
                 //disable time navigation for campaign data
@@ -403,6 +421,14 @@ export class AdamOpensearchDatasetDiscoveryClient {
                                                 });
                                             }
                                         });
+                                    } else {
+                                        const value = sceneValuesMap[item.value];
+                                        if (value !== undefined && (subRegionId === undefined || value.subRegion === subRegionId)) {
+                                            sceneValues.push({
+                                                label: `${item.value} (${sceneName})`,
+                                                value: value.scene
+                                            });
+                                        }
                                     }
                                 });
 

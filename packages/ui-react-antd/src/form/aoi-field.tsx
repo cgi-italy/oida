@@ -1,8 +1,9 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 
 import { Tag, Button, Tooltip, Drawer, Popover } from 'antd';
 
 import { EnvironmentOutlined, LinkOutlined, EditOutlined, ImportOutlined } from '@ant-design/icons';
+
 import { AoiField, AoiAction, AOI_FIELD_ID } from '@oidajs/core';
 import { AoiImportConfig, FormFieldRendererBaseProps } from '@oidajs/ui-react-core';
 
@@ -27,7 +28,8 @@ export const AoiFieldRenderer = (props:  AoiFieldRendererProps) => {
     const {
         supportedActions, supportedGeometries,
         activeAction, color, name, importConfig,
-        onActiveActionChange, onHoverAction, onSelectAction
+        onActiveActionChange, onHoverAction, onSelectAction,
+        onVisibleAction
     } = config;
 
     const aoiControls = useMemo(() => {
@@ -63,6 +65,19 @@ export const AoiFieldRenderer = (props:  AoiFieldRendererProps) => {
         };
 
     }, [supportedGeometries, supportedActions]);
+
+    useEffect(() => {
+
+        if (onVisibleAction) {
+            onVisibleAction(true);
+        }
+
+        return () => {
+            if (onVisibleAction) {
+                onVisibleAction(false);
+            }
+        };
+    }, []);
 
     return (
         <React.Fragment>
