@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.0.1](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-mobx@2.0.0...@oidajs/eo-mobx@2.0.1) (2021-12-21)
+
+**Note:** Version bump only for package @oidajs/eo-mobx
+
+
+
+
+
+
 # 2.0.0 (2021-12-21)
 
 

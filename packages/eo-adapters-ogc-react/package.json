@@ -1,6 +1,6 @@
 {
   "name": "@oidajs/eo-adapters-ogc-react",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "oida EO OGC adapters react components",
   "module": "es/index.js",
   "main": "lib/index.js",
