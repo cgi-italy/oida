@@ -227,10 +227,11 @@ release:
     git_login
     git checkout github/master
     git merge $CI_COMMIT_SHA --no-commit || true
+    git checkout --theirs -- packages/*/CHANGELOG.md
     npx replace-in-file /https://gitlab.dev.eoss-cloud.it/$CI_PROJECT_PATH/g https://$GITHUB_REPO packages/*/CHANGELOG.md --isRegex
     git add packages/*/CHANGELOG.md
     git rm -r deploy || true
-    git rm -r packages/docs || true
+    git rm -r -f packages/docs || true
     git rm typedoc.json || true
     git rm tsconfig.typedoc.json || true
     git rm .gitlab-ci.yml || true
