@@ -246,7 +246,7 @@ release:
 
   function publish_to_npm() {
     npm_login
-    node_modules/.bin/lerna exec --stream --ignore @oidajs/docs -- npm publish
+    node_modules/.bin/lerna publish from-package --registry https://registry.npmjs.org/ --yes
   }
 
   function try_release() {
