@@ -1,6 +1,6 @@
 {
   "name": "@oidajs/ui-react-core",
-  "version": "5.0.0",
+  "version": "6.0.0",
   "description": "ui core components",
   "module": "es/index.js",
   "main": "lib/index.js",
