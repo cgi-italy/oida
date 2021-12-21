@@ -133,6 +133,37 @@ publish_release:
       - $CI_COMMIT_TITLE == $RELEASE_MSG
 
 
+github_push:
+  stage: publish
+  variables:
+    GIT_STRATEGY: clone
+  script:
+    - merge_to_github_branch
+    - push_to_github
+    - publish_to_npm
+  dependencies:
+    - install_dependencies
+  when: manual
+  only:
+    refs:
+      - master
+
+npm_publish:
+  stage: publish
+  variables:
+    GIT_STRATEGY: clone
+  script:
+    - publish_to_npm
+  dependencies:
+    - build
+  when: manual
+  only:
+    refs:
+      - branches
+    variables:
+      - $CI_COMMIT_TITLE == $RELEASE_MSG
+
+
 deploy_docs:
   stage: deploy
   image: dtzar/helm-kubectl
@@ -180,6 +211,42 @@ release:
 
   function nexus_login() {
      echo //$NEXUS_REPO/:_auth=$NEXUS_AUTH_TOKEN > ~/.npmrc
+  }
+
+  function github_setup() {
+    git config --global user.name "$GITHUB_USER"
+    git config --global user.email "$GITHUB_EMAIL"
+    git remote add github "https://$GITHUB_TOKEN@$GITHUB_REPO.git"
+  }
+
+  function npm_login() {
+    echo //registry.npmjs.org/:_authToken=$NPM_AUTH_TOKEN > ~/.npmrc
+  }
+
+  function merge_to_github_branch() {
+    git_login
+    git checkout github/master
+    git merge $CI_COMMIT_SHA --no-commit || true
+    npx replace-in-file /https://gitlab.dev.eoss-cloud.it/$CI_PROJECT_PATH/g https://$GITHUB_REPO packages/*/CHANGELOG.md --isRegex
+    git add packages/*/CHANGELOG.md
+    git rm -r deploy || true
+    git rm -r packages/docs || true
+    git rm typedoc.json || true
+    git rm tsconfig.typedoc.json || true
+    git rm .gitlab-ci.yml || true
+    git checkout --ours -- package.json
+    git commit -m 'chore: merge from upstream repository' --no-verify
+    git push origin
+  }
+
+  function push_to_github() {
+    github_setup
+    git push github github/master:main
+  }
+
+  function publish_to_npm() {
+    npm_login
+    node_modules/.bin/lerna exec --stream --ignore @oidajs/docs -- npm publish
   }
 
   function try_release() {
