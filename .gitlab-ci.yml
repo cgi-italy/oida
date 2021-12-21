@@ -140,7 +140,6 @@ github_push:
   script:
     - merge_to_github_branch
     - push_to_github
-    - publish_to_npm
   dependencies:
     - install_dependencies
   when: manual
