@@ -12,11 +12,10 @@ import './app-modules.less';
 const appState = createAppStore();
 
 const AppModulesSample = () => {
-
-    let [isContextReady, setContextReady] = useState(false);
+    const [isContextReady, setContextReady] = useState(false);
 
     useEffect(() => {
-        let appContext = createAppStoreContext(appState);
+        createAppStoreContext(appState);
         setContextReady(true);
         return () => destroyAppStoreContext();
     }, []);
@@ -27,9 +26,9 @@ const AppModulesSample = () => {
 
     return (
         <div>
-            <Settings/>
-            <MapComponent style={{height: '300px', width: '400px', position: 'relative'}}/>
-            <MouseCoords/>
+            <Settings />
+            <MapComponent style={{ height: '300px', width: '400px', position: 'relative' }} />
+            <MouseCoords />
         </div>
     );
 };

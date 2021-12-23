@@ -1,9 +1,6 @@
 import proj4 from 'proj4';
 
-import { AxiosInstanceWithCancellation, createAxiosInstance,
-    getXmlStringNodeValue, EpsgIoDefinitionProvider
-} from '@oidajs/core';
-
+import { AxiosInstanceWithCancellation, createAxiosInstance, getXmlStringNodeValue, EpsgIoDefinitionProvider } from '@oidajs/core';
 
 export type AdamWcsCoverageDescription = {
     id: string;
@@ -23,11 +20,10 @@ export type AdamWcsCoverageDescription = {
 
 export type AdamWcCoverageDescriptionClientConfig = {
     wcsUrl: string;
-    axiosInstance?: AxiosInstanceWithCancellation,
+    axiosInstance?: AxiosInstanceWithCancellation;
 };
 
 export class AdamWcsCoverageDescriptionClient {
-
     protected readonly axiosInstance_: AxiosInstanceWithCancellation;
     protected readonly wcsUrl_: string;
     protected readonly srsDefProvider_: EpsgIoDefinitionProvider;
@@ -51,35 +47,38 @@ export class AdamWcsCoverageDescriptionClient {
     }
 
     getCoverageDetails(coverageId: string): Promise<AdamWcsCoverageDescription[]> {
-        return this.axiosInstance_.request<XMLDocument>({
-            url: this.wcsUrl_,
-            responseType: 'document',
-            params: {
-                service: 'WCS',
-                request: 'DescribeCoverage',
-                version: '2.0.0',
-                coverageId: coverageId
-            }
-        }).then((response) => {
-            const coverages = this.parseDescribeCoverageResponse_(response.data);
-            return Promise.all(coverages.map((coverage) => {
-                //retrieve missing srs definitions
-                if (!proj4.defs(coverage.srs)) {
-                    return this.srsDefProvider_.getSrsDefinition(coverage.srs).then((srsDef) => {
-                        return {
-                            ...coverage,
-                            srsDef: srsDef
-                        } as AdamWcsCoverageDescription;
-                    });
-                } else {
-                    return Promise.resolve(coverage);
+        return this.axiosInstance_
+            .request<XMLDocument>({
+                url: this.wcsUrl_,
+                responseType: 'document',
+                params: {
+                    service: 'WCS',
+                    request: 'DescribeCoverage',
+                    version: '2.0.0',
+                    coverageId: coverageId
                 }
-            }));
-        });
+            })
+            .then((response) => {
+                const coverages = this.parseDescribeCoverageResponse_(response.data);
+                return Promise.all(
+                    coverages.map((coverage) => {
+                        //retrieve missing srs definitions
+                        if (!proj4.defs(coverage.srs)) {
+                            return this.srsDefProvider_.getSrsDefinition(coverage.srs).then((srsDef) => {
+                                return {
+                                    ...coverage,
+                                    srsDef: srsDef
+                                } as AdamWcsCoverageDescription;
+                            });
+                        } else {
+                            return Promise.resolve(coverage);
+                        }
+                    })
+                );
+            });
     }
 
     protected parseDescribeCoverageResponse_(doc: XMLDocument) {
-
         try {
             const coverageDescriptions = doc.getElementsByTagNameNS(this.xmlNamespaces_.wcs, 'CoverageDescription');
 
@@ -94,11 +93,11 @@ export class AdamWcsCoverageDescriptionClient {
                         parsedCoverages.add(coverage.id);
                     }
                 } catch (error) {
+                    // do nothing
                 }
             });
 
             return coverages;
-
         } catch (error) {
             throw new Error('AdamOpensearchDatasetFactory: unable to parse describeCoverage response');
         }
@@ -118,7 +117,7 @@ export class AdamWcsCoverageDescriptionClient {
         let timeAxisIdx = 2;
 
         if (axesAttr) {
-            const axes = axesAttr.split(' ').forEach((axis, idx) => {
+            axesAttr.split(' ').forEach((axis, idx) => {
                 if (axis === 'E' || axis === 'Long') {
                     xAxisIdx = idx;
                 } else if (axis === 'N' || axis === 'Lat') {
@@ -131,7 +130,7 @@ export class AdamWcsCoverageDescriptionClient {
 
         let srs = 'EPSG:4326';
 
-        let srsAttr = envelope.getAttribute('srsName');
+        const srsAttr = envelope.getAttribute('srsName');
         if (srsAttr) {
             const matches = srsAttr.match(/crs\/EPSG\/0\/([0-9]+)/);
             if (matches) {
@@ -143,21 +142,21 @@ export class AdamWcsCoverageDescriptionClient {
         if (!lowerCornerString) {
             throw new Error();
         }
-        const lowerCorner = lowerCornerString.split(' ').map((value => parseFloat(value)));
+        const lowerCorner = lowerCornerString.split(' ').map((value) => parseFloat(value));
 
         const upperCornerString = getXmlStringNodeValue(envelope.getElementsByTagNameNS(this.xmlNamespaces_.gml, 'upperCorner')[0]);
         if (!upperCornerString) {
             throw new Error();
         }
 
-        const upperCorner = upperCornerString.split(' ').map((value => parseFloat(value)));
+        const upperCorner = upperCornerString.split(' ').map((value) => parseFloat(value));
 
         let gridSize = [0, 0, 1];
         const gridEnvelopeNode = coverageDescription.getElementsByTagNameNS(this.xmlNamespaces_.gml, 'GridEnvelope')[0];
         if (gridEnvelopeNode) {
             const highValue = getXmlStringNodeValue(gridEnvelopeNode.getElementsByTagNameNS(this.xmlNamespaces_.gml, 'high')[0]);
             if (highValue) {
-                gridSize = highValue.split(' ').map(value => parseInt(value));
+                gridSize = highValue.split(' ').map((value) => parseInt(value));
             }
         }
 

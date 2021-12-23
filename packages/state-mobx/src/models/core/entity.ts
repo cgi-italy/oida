@@ -1,14 +1,11 @@
-import {
-    Visible, VisibleProps, HasVisibility,
-    Hovered, HoveredProps, IsHoverable,
-    Selected, SelectedProps, IsSelectable
-} from '../mixins';
-
+import { Visible, VisibleProps, HasVisibility, Hovered, HoveredProps, IsHoverable, Selected, SelectedProps, IsSelectable } from '../mixins';
 
 export type EntityProps = {
     id: string | number;
     entityType: string;
-} & VisibleProps & HoveredProps & SelectedProps;
+} & VisibleProps &
+    HoveredProps &
+    SelectedProps;
 
 export class Entity implements HasVisibility, IsHoverable, IsSelectable {
     readonly id: string | number;
@@ -19,7 +16,7 @@ export class Entity implements HasVisibility, IsHoverable, IsSelectable {
 
     constructor(props: EntityProps) {
         this.id = props.id;
-        this.entityType =  props.entityType;
+        this.entityType = props.entityType;
         this.visible = new Visible(props);
         this.hovered = new Hovered(props);
         this.selected = new Selected(props);

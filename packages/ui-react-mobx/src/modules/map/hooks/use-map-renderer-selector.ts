@@ -4,15 +4,13 @@ import { useSelector } from '../../../core';
 import { MapRendererConfig } from '../map-module';
 import { useMapModule } from './use-map-module';
 
-
 export type MapRendererSelectorProps = {
-    renderers: MapRendererConfig[],
-    map: Map
+    renderers: MapRendererConfig[];
+    map: Map;
 };
 
 export const useMapRendererSelector = (props: MapRendererSelectorProps) => {
-
-    const {map, renderers} = props;
+    const { map, renderers } = props;
 
     return useSelector(() => ({
         items: renderers.map((renderer) => {
@@ -23,7 +21,7 @@ export const useMapRendererSelector = (props: MapRendererSelectorProps) => {
         }),
         value: map.renderer.id,
         onSelect: (id) => {
-            let renderer = renderers.find((renderer) => {
+            const renderer = renderers.find((renderer) => {
                 return renderer.id === id;
             });
 
@@ -35,10 +33,9 @@ export const useMapRendererSelector = (props: MapRendererSelectorProps) => {
 };
 
 export const useMapRendererSelectorFromModule = (mapModuleId?: string) => {
-    let mapModuleState = useMapModule(mapModuleId);
+    const mapModuleState = useMapModule(mapModuleId);
     return useMapRendererSelector({
         map: mapModuleState.map,
         renderers: mapModuleState.config.renderers || []
     });
 };
-

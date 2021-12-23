@@ -15,11 +15,11 @@ import { AdvancedSearchFilterer } from './advanced-search-filterer';
 import { DataCollectionItemActionButton } from './data-collection-item-action-button';
 
 export type DataCollectionTableColumn<T> = ColumnType<T> & {
-    minTableWidth?: number
+    minTableWidth?: number;
 };
 
 export type DataCollectionTableProps<T> = {
-    columns: DataCollectionTableColumn<T>[]
+    columns: DataCollectionTableColumn<T>[];
     pagerRender?: DataPagerRenderer;
     filtererRender?: DataFiltererRenderer;
     fullHeight?: boolean;
@@ -27,38 +27,40 @@ export type DataCollectionTableProps<T> = {
 } & DataCollectionProps<T>;
 
 export function DataCollectionTable<T extends object>(props: DataCollectionTableProps<T>) {
-
     const [resizeListener, size] = useResizeAware();
 
-    const {items, paging, sorting, filters, filtererRender, pagerRender, columns} = props;
+    const { items, paging, sorting, filters, filtererRender, pagerRender, columns } = props;
 
     const { itemState, itemActions } = items;
 
-    const tableColumns = columns.filter((column) => {
-        if (column.minTableWidth && size.width < column.minTableWidth) {
-            return false;
-        } else {
-            return true;
-        }
-    }).map((column) => {
+    const tableColumns = columns
+        .filter((column) => {
+            if (column.minTableWidth && size.width < column.minTableWidth) {
+                return false;
+            } else {
+                return true;
+            }
+        })
+        .map((column) => {
+            const columnKey = column.key || column.dataIndex?.toString();
 
-        let columnKey = column.key || column.dataIndex?.toString();
+            const isSortable =
+                sorting &&
+                !!sorting.sortableFields.find((field) => {
+                    return field.key === columnKey;
+                });
 
-        let isSortable = sorting && !!sorting.sortableFields.find((field) => {
-            return field.key === columnKey;
+            let sortOrder: 'ascend' | 'descend' | null = null;
+            if (sorting && sorting.sortKey === columnKey) {
+                sortOrder = sorting.sortOrder === SortOrder.Ascending ? 'ascend' : 'descend';
+            }
+            return {
+                ...column,
+                sorter: isSortable,
+                sortOrder: sortOrder,
+                key: columnKey
+            };
         });
-
-        let sortOrder: 'ascend' | 'descend' | null = null;
-        if (sorting && sorting.sortKey === columnKey) {
-            sortOrder = sorting.sortOrder === SortOrder.Ascending ? 'ascend' : 'descend';
-        }
-        return {
-            ...column,
-            sorter: isSortable,
-            sortOrder: sortOrder,
-            key:  columnKey
-        };
-    });
 
     tableColumns.push({
         key: 'actions',
@@ -82,17 +84,9 @@ export function DataCollectionTable<T extends object>(props: DataCollectionTable
                 });
 
                 return (
-                    <Dropdown
-                        overlay={<Menu>{actionItems}</Menu>}
-                        placement='bottomRight'
-                        mouseEnterDelay={0.05}
-                        mouseLeaveDelay={0.05}
-                    >
-                        <a
-                            className='ant-dropdown-link'
-                            onClick={e => e.preventDefault()}
-                        >
-                            <EllipsisOutlined/>
+                    <Dropdown overlay={<Menu>{actionItems}</Menu>} placement='bottomRight' mouseEnterDelay={0.05} mouseLeaveDelay={0.05}>
+                        <a className='ant-dropdown-link' onClick={(e) => e.preventDefault()}>
+                            <EllipsisOutlined />
                         </a>
                     </Dropdown>
                 );
@@ -105,7 +99,6 @@ export function DataCollectionTable<T extends object>(props: DataCollectionTable
 
     const RowRenderer = (props) => {
         if (props.children.length) {
-
             const record = props.children[0].props.record;
             const { selected, hovered } = itemState(record);
 
@@ -121,13 +114,13 @@ export function DataCollectionTable<T extends object>(props: DataCollectionTable
             if (items.fileDropProps) {
                 const [{ canDrop, isDropHover }, drop] = useDrop({
                     accept: [NativeTypes.FILE],
-                    drop: (item: {files: File[], items: DataTransferItemList, type: typeof NativeTypes.FILE}, monitor) => {
+                    drop: (item: { files: File[]; items: DataTransferItemList; type: typeof NativeTypes.FILE }, monitor) => {
                         items.fileDropProps?.onDrop(record, item.files);
                     },
-                    canDrop: () => items.fileDropProps ? items.fileDropProps.canDrop(record) : false,
+                    canDrop: () => (items.fileDropProps ? items.fileDropProps.canDrop(record) : false),
                     collect: (monitor) => ({
                         isDropHover: monitor.isOver(),
-                        canDrop: monitor.canDrop(),
+                        canDrop: monitor.canDrop()
                     })
                 });
 
@@ -140,8 +133,8 @@ export function DataCollectionTable<T extends object>(props: DataCollectionTable
                         }}
                         key={props['data-row-key']}
                         className={classnames(props.className, {
-                            'hovered': hovered,
-                            'selected': selected,
+                            hovered: hovered,
+                            selected: selected,
                             'can-drop': canDrop,
                             'is-drop-hover': isDropHover
                         })}
@@ -156,24 +149,20 @@ export function DataCollectionTable<T extends object>(props: DataCollectionTable
                         }}
                         key={props['data-row-key']}
                         className={classnames(props.className, {
-                            'hovered': hovered,
-                            'selected': selected
+                            hovered: hovered,
+                            selected: selected
                         })}
                     />
                 );
             }
         } else {
-            return (
-                <tr
-                    {...props}
-                />
-            );
+            return <tr {...props} />;
         }
     };
 
     const components = {
         body: {
-            row: (props) => (<RowRenderer {...props}/>)
+            row: (props) => <RowRenderer {...props} />
         }
     };
 
@@ -183,34 +172,21 @@ export function DataCollectionTable<T extends object>(props: DataCollectionTable
 
     if (items.loadingState === LoadingState.Error) {
         emptyRenderer = () => (
-            <Empty
-                image={<CloseCircleOutlined/>}
-                description='Error retrieving data'
-                imageStyle={{fontSize: '30px', height: '40px'}}
-            />
+            <Empty image={<CloseCircleOutlined />} description='Error retrieving data' imageStyle={{ fontSize: '30px', height: '40px' }} />
         );
     } else if (items.loadingState === LoadingState.Loading) {
-        emptyRenderer = () => (
-            <Empty
-                description=''
-                imageStyle={{visibility: 'hidden'}}
-            />
-        );
+        emptyRenderer = () => <Empty description='' imageStyle={{ visibility: 'hidden' }} />;
     } else {
-        emptyRenderer = () => (
-            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
-        );
+        emptyRenderer = () => <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />;
     }
 
     const DataPager = pagerRender!;
     const DataFilterer = filtererRender!;
 
-    return  (
-        <ConfigProvider
-                renderEmpty={emptyRenderer}
-        >
-            <div className={classnames('data-collection-table', props.className, {'full-height': props.fullHeight})}>
-                {filters && <DataFilterer {...filters}/>}
+    return (
+        <ConfigProvider renderEmpty={emptyRenderer}>
+            <div className={classnames('data-collection-table', props.className, { 'full-height': props.fullHeight })}>
+                {filters && <DataFilterer {...filters} />}
                 <div className='data-collection-table-container'>
                     {props.fullHeight && resizeListener}
                     <Table<T>
@@ -220,7 +196,6 @@ export function DataCollectionTable<T extends object>(props: DataCollectionTable
                         rowKey={items.keyGetter}
                         size='small'
                         onRow={(record, listIndex) => {
-
                             return {
                                 onMouseEnter: () => {
                                     items.onHoverAction(record, true);
@@ -238,12 +213,9 @@ export function DataCollectionTable<T extends object>(props: DataCollectionTable
                                             if (evt.shiftKey) {
                                                 selectionMode = SelectionMode.Add;
                                                 if (lastClickedRowIndex !== -1) {
-                                                    const startIdx = lastClickedRowIndex < listIndex
-                                                        ? lastClickedRowIndex
-                                                        : listIndex;
-                                                    const endIdx = lastClickedRowIndex < listIndex
-                                                        ? listIndex + 1
-                                                        : lastClickedRowIndex + 1;
+                                                    const startIdx = lastClickedRowIndex < listIndex ? lastClickedRowIndex : listIndex;
+                                                    const endIdx =
+                                                        lastClickedRowIndex < listIndex ? listIndex + 1 : lastClickedRowIndex + 1;
                                                     const data = items.data.slice(startIdx, endIdx);
                                                     data.forEach((item) => {
                                                         items.onSelectAction(item, selectionMode);
@@ -282,16 +254,19 @@ export function DataCollectionTable<T extends object>(props: DataCollectionTable
                                 }
                             }
                         }}
-                        scroll={props.fullHeight ? {
-                            y: size.height - 40
-                        } : undefined}
+                        scroll={
+                            props.fullHeight
+                                ? {
+                                      y: size.height - 40
+                                  }
+                                : undefined
+                        }
                     ></Table>
                 </div>
-                {paging && paging.total > paging.pageSize && <DataPager {...paging}/>}
+                {paging && paging.total > paging.pageSize && <DataPager {...paging} />}
             </div>
         </ConfigProvider>
     );
-
 }
 
 DataCollectionTable.defaultProps = {

@@ -8,7 +8,7 @@
 export interface IDynamicFactory<
     T,
     CONFIG extends Record<string, any> = Record<string, any>,
-    COMMON_CONFIG extends Record<string, any> = {}
+    COMMON_CONFIG extends Record<string, any> = Record<string, any>
 > {
     /**
      * Register a new object type
@@ -23,7 +23,7 @@ export interface IDynamicFactory<
      * @param id The type identifier
      * @param config The configuration object
      */
-    create<R extends string>(id: R, config: COMMON_CONFIG & CONFIG[R]): (T | undefined);
+    create<R extends string>(id: R, config: COMMON_CONFIG & CONFIG[R]): T | undefined;
     /**
      * Check if a type identifier was registered in the factory
      */
@@ -35,14 +35,15 @@ export interface IDynamicFactory<
  * @template T see {@link IDynamicFactory.T}
  * @template CONFIG see {@link IDynamicFactory}
  * @template COMMON_CONFIG see {@link IDynamicFactory}
-*/
+ */
 export const createDynamicFactory = <
     T = any,
     CONFIG extends Record<string, any> = Record<string, any>,
-    COMMON_CONFIG extends Record<string, any> = {}
->
-(factoryId: string): IDynamicFactory<T, CONFIG, COMMON_CONFIG> => {
-    const REGISTERED_TYPES: {[s: string]: (config: any) => T} = {};
+    COMMON_CONFIG extends Record<string, any> = Record<string, any>
+>(
+    factoryId: string
+): IDynamicFactory<T, CONFIG, COMMON_CONFIG> => {
+    const REGISTERED_TYPES: { [s: string]: (config: any) => T } = {};
 
     const getRegisteredType = (id: string) => {
         return REGISTERED_TYPES[id];
@@ -55,8 +56,8 @@ export const createDynamicFactory = <
             }
             REGISTERED_TYPES[id] = objectCreator;
         },
-        create: <R extends string>(id: R, config: COMMON_CONFIG & CONFIG[R]) : T | undefined => {
-            let objectCreator = getRegisteredType(id);
+        create: <R extends string>(id: R, config: COMMON_CONFIG & CONFIG[R]): T | undefined => {
+            const objectCreator = getRegisteredType(id);
             if (objectCreator) {
                 return objectCreator(config);
             }
@@ -66,4 +67,3 @@ export const createDynamicFactory = <
         }
     };
 };
-

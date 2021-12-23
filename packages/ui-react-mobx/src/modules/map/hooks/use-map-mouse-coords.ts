@@ -5,7 +5,7 @@ import { MouseCoordsInteraction } from '@oidajs/state-mobx';
 import { useMapModule } from './use-map-module';
 
 export type MapMouseCoordsProps = {
-    mouseCoordsInteraction: MouseCoordsInteraction
+    mouseCoordsInteraction: MouseCoordsInteraction;
 };
 
 export const useMapMouseCoords = (props: MapMouseCoordsProps) => {
@@ -15,7 +15,7 @@ export const useMapMouseCoords = (props: MapMouseCoordsProps) => {
 };
 
 export const useMapMouseCoordsFromModule = (mapModuleId?: string) => {
-    let moduleState = useMapModule(mapModuleId);
+    const moduleState = useMapModule(mapModuleId);
 
     let mouseCoordsInteraction = moduleState.map.interactions.items.find((interaction) => {
         return interaction instanceof MouseCoordsInteraction;

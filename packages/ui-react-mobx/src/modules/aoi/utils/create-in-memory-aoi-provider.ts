@@ -3,23 +3,20 @@ import { QueryParams, SortOrder } from '@oidajs/core';
 import { AoiSourceProvider, AoiProps } from '../models';
 
 const filterMemoryAoiSource = (data: AoiProps[], queryParams: QueryParams) => {
-
     let outputData = data;
 
     if (queryParams.filters) {
         queryParams.filters.forEach((filter) => {
             outputData = outputData.filter((aoi) => {
                 if (filter.key === 'name') {
-                    let match = aoi.name.toLowerCase().search(filter.value.toLowerCase());
-                    return (match !== -1);
+                    const match = aoi.name.toLowerCase().search(filter.value.toLowerCase());
+                    return match !== -1;
                 } else if (filter.key === 'geometryType') {
                     return filter.value.includes(aoi.geometry.type);
                 } else {
                     if (aoi.properties && aoi.properties[filter.key]) {
-                        let match = String(aoi.properties[filter.key])
-                        .toLowerCase()
-                        .search(filter.value.toLowerCase());
-                        return (match !== -1);
+                        const match = String(aoi.properties[filter.key]).toLowerCase().search(filter.value.toLowerCase());
+                        return match !== -1;
                     } else {
                         return true;
                     }
@@ -28,10 +25,10 @@ const filterMemoryAoiSource = (data: AoiProps[], queryParams: QueryParams) => {
         });
     }
 
-    let total = outputData.length;
+    const total = outputData.length;
 
     if (queryParams.sortBy) {
-        let key = queryParams.sortBy.key;
+        const key = queryParams.sortBy.key;
         outputData = outputData.sort((i1, i2) => {
             if (key === 'name') {
                 return i1.name < i2.name ? -1 : 1;
@@ -60,7 +57,6 @@ const filterMemoryAoiSource = (data: AoiProps[], queryParams: QueryParams) => {
 };
 
 export const createInMemoryAoiProvider = (aoiList: AoiProps[]) => {
-
     return ((queryParams: QueryParams) => {
         return Promise.resolve(filterMemoryAoiSource(aoiList, queryParams));
     }) as AoiSourceProvider;

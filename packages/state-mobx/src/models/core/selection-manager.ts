@@ -38,8 +38,8 @@ export class SelectionManager<T extends SelectableItem = SelectableItem> {
     protected afterInit_() {
         observe(this.selection.items, (change) => {
             if (change.type === 'splice') {
-                change.added.forEach(item => item.selected.setValue(true));
-                change.removed.forEach(item => item.selected.setValue(false));
+                change.added.forEach((item) => item.selected.setValue(true));
+                change.removed.forEach((item) => item.selected.setValue(false));
             } else if (change.type === 'update') {
                 change.oldValue.selected.setValue(false);
                 change.newValue.selected.setValue(true);

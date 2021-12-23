@@ -4,15 +4,13 @@ import { CesiumVolumeTileTexture } from './cesium-volume-tile-texture';
 import { CesiumVolumeTileSet } from './cesium-volume-tile-set';
 import { CesiumVolumeTilePrimitive } from './cesium-volume-tile-primitive';
 
-
 export type CesiumVolumeTileConfig = {
     tileKey: VolumeTileKey;
-    tileSet: CesiumVolumeTileSet
+    tileSet: CesiumVolumeTileSet;
     parent?: CesiumVolumeTile;
 };
 
 export class CesiumVolumeTile {
-
     protected tileKey_: VolumeTileKey;
     protected tileSet_: CesiumVolumeTileSet;
     protected texture_: CesiumVolumeTileTexture | undefined;
@@ -34,7 +32,6 @@ export class CesiumVolumeTile {
         this.textureRevision_ = revision;
 
         this.textureNeedsLoad_ = true;
-
     }
 
     getTexture() {

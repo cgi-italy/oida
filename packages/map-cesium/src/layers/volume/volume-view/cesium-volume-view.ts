@@ -9,7 +9,6 @@ export type CesiumVolumeViewConfig = {
 };
 
 export abstract class CesiumVolumeView implements IVolumeViewMode {
-
     protected tileSet_: CesiumVolumeTileSet;
     protected requestMapRender_: () => void;
     protected revision_ = 0;
@@ -21,7 +20,7 @@ export abstract class CesiumVolumeView implements IVolumeViewMode {
 
     updateTileForRendering(tile: CesiumVolumeTile) {
         if (tile.getPrimitiveRevision() !== this.revision_) {
-            let tilePrimitive = this.createTilePrimitive_(tile);
+            const tilePrimitive = this.createTilePrimitive_(tile);
             tile.setPrimitive(tilePrimitive, this.revision_);
         }
     }

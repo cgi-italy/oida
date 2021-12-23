@@ -28,6 +28,6 @@
     "@oidajs/eo-geotiff": "file:../eo-geotiff",
     "@oidajs/eo-mobx": "file:../eo-mobx",
     "echarts-stat": "^1.2.0",
-    "tslib": "^2.2.0"
+    "tslib": "^2.3.1"
   }
 }

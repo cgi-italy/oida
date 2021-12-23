@@ -10,7 +10,7 @@ import { useSelector } from './use-selector';
 export type DataCollectionAction<T> = Omit<DataCollectionItemAction, 'callback'> & {
     /** When the condition evaluates to false the action will not be available for the item */
     condition?: (item: T) => boolean;
-    callback: (item: T) => (void | Promise<void>);
+    callback: (item: T) => void | Promise<void>;
 };
 
 /**
@@ -30,21 +30,22 @@ export type UseDataCollectionActionsProps<T> = {
  * A React hook that given an entity and a set of collection actions will return the list of action binded to the specific entity
  * The actions condition will be re evaluated if relevant entity properties are updated
  */
-export const useDataCollectionActions = <T extends unknown>(props: UseDataCollectionActionsProps<T>) => {
-
+export const useDataCollectionActions = <T,>(props: UseDataCollectionActionsProps<T>) => {
     const hooksDeps: React.DependencyList = props.trackActionsDefinitions ? [props.entity, props.actions] : [props.entity];
 
     return useSelector(() => {
-        return props.actions.filter((action) => {
-            return action.condition ? action.condition(props.entity) : true;
-        }).map((action) => {
-            return {
-                ...action,
-                callback: () => {
-                    return action.callback(props.entity);
-                }
-            } as DataCollectionItemAction;
-        });
+        return props.actions
+            .filter((action) => {
+                return action.condition ? action.condition(props.entity) : true;
+            })
+            .map((action) => {
+                return {
+                    ...action,
+                    callback: () => {
+                        return action.callback(props.entity);
+                    }
+                } as DataCollectionItemAction;
+            });
     }, hooksDeps);
 };
 
@@ -78,14 +79,13 @@ export type UseEntityCollectionListProps<T extends IsEntity> = {
  * @return properties to be used as input to a {@Link DataCollectionItemsRenderer}
  */
 export const useEntityCollectionList = <T extends IsEntity>(props: UseEntityCollectionListProps<T>) => {
-
     const { items, actions } = props;
 
     const hooksDeps: React.DependencyList = props.trackActionsDefinitions ? [items, actions] : [items];
 
     const selectionManager = props.selectionManager || new SelectionManager();
 
-    const itemProps: (DataCollectionItemsProps<T> | undefined) = useSelector(() => {
+    const itemProps: DataCollectionItemsProps<T> | undefined = useSelector(() => {
         if (!items) {
             return;
         }
@@ -96,7 +96,7 @@ export const useEntityCollectionList = <T extends IsEntity>(props: UseEntityColl
                 return useSelector(() => {
                     return {
                         hovered: entity.hovered.value,
-                        selected: entity.selected.value,
+                        selected: entity.selected.value
                     };
                 }, [entity]);
             },

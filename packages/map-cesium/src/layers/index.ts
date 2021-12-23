@@ -1,7 +1,4 @@
-import {
-    GROUP_LAYER_ID, TILE_LAYER_ID, FEATURE_LAYER_ID,
-    VERTICAL_PROFILE_LAYER_ID, VOLUME_LAYER_ID
-} from '@oidajs/core';
+import { GROUP_LAYER_ID, TILE_LAYER_ID, FEATURE_LAYER_ID, VERTICAL_PROFILE_LAYER_ID, VOLUME_LAYER_ID } from '@oidajs/core';
 
 import { cesiumLayersFactory } from './cesium-layers-factory';
 import { CesiumGroupLayer } from './cesium-group-layer';
@@ -31,12 +28,6 @@ cesiumLayersFactory.register(VOLUME_LAYER_ID, (config) => {
 });
 
 export * from './cesium-map-layer';
-export {
-    cesiumLayersFactory,
-    CesiumGroupLayer,
-    CesiumTileLayer,
-    CesiumEntityFeatureLayer,
-    CesiumPrimitiveFeatureLayer
-};
+export { cesiumLayersFactory, CesiumGroupLayer, CesiumTileLayer, CesiumEntityFeatureLayer, CesiumPrimitiveFeatureLayer };
 export * from './tilesources';
 export * from './volume';

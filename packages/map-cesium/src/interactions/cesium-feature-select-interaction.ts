@@ -14,12 +14,9 @@ import {
 import { cesiumInteractionsFactory } from './cesium-interactions-factory';
 import { CesiumMapRenderer } from '../map/cesium-map-renderer';
 
-import {
-    getPickInfo, PickInfo, setNonPickableFeaturesVisibility, CesiumFeatureCoordPickMode
-} from '../utils';
+import { getPickInfo, PickInfo, setNonPickableFeaturesVisibility, CesiumFeatureCoordPickMode } from '../utils';
 
 export class CesiumFeatureSelectInteraction implements IFeatureSelectInteractionImplementation {
-
     private viewer_;
     private handler_;
     private onFeatureSelect_: FeatureSelectCallback;
@@ -55,17 +52,13 @@ export class CesiumFeatureSelectInteraction implements IFeatureSelectInteraction
     }
 
     protected bindClick_() {
-
         if (this.handler_) {
             this.handler_.destroy();
         }
 
         this.handler_ = new ScreenSpaceEventHandler(this.viewer_.scene.canvas);
 
-        this.handler_.setInputAction(
-            this.selectClickedEntity_.bind(this, SelectionMode.Replace),
-            ScreenSpaceEventType.LEFT_CLICK
-        );
+        this.handler_.setInputAction(this.selectClickedEntity_.bind(this, SelectionMode.Replace), ScreenSpaceEventType.LEFT_CLICK);
 
         if (this.multiple_) {
             this.handler_.setInputAction(
@@ -80,16 +73,14 @@ export class CesiumFeatureSelectInteraction implements IFeatureSelectInteraction
                 KeyboardEventModifier.SHIFT
             );
         }
-
     }
 
     protected selectClickedEntity_(selectionMode, movement) {
-
         const pickedObjects = this.viewer_.scene.drillPick(movement.position, 20);
 
         const pickInfos: PickInfo[] = pickedObjects
-            .map(pickedObject => getPickInfo(pickedObject))
-            .filter(pickInfo => !!pickInfo && pickInfo.pickable);
+            .map((pickedObject) => getPickInfo(pickedObject))
+            .filter((pickInfo) => !!pickInfo && pickInfo.pickable);
 
         if (pickInfos.length) {
             if (selectionMode === SelectionMode.Replace) {
@@ -106,7 +97,6 @@ export class CesiumFeatureSelectInteraction implements IFeatureSelectInteraction
                         this.viewer_.scene.render();
                         coordinate = this.viewer_.scene.pickPosition(movement.position);
                         setNonPickableFeaturesVisibility(pickedObjects, true);
-
                     }
                     layer.onFeatureSelect(coordinate, pickInfo);
                 }
@@ -138,7 +128,6 @@ export class CesiumFeatureSelectInteraction implements IFeatureSelectInteraction
             });
         }
     }
-
 }
 
 cesiumInteractionsFactory.register(FEATURE_SELECT_INTERACTION_ID, (config) => {

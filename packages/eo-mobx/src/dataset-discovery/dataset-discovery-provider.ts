@@ -18,26 +18,19 @@ export type DatasetDiscoveryProviderProps<TYPE extends string = string> = {
     disabled?: boolean;
 } & ActiveProps;
 
-export interface DatasetDiscoveryProviderDefinitions {
-}
-export interface DatasetDiscoveryProviderTypes {
-}
+export interface DatasetDiscoveryProviderDefinitions {}
+export interface DatasetDiscoveryProviderTypes {}
 
 export type DatasetDiscoveryProviderDefinition<TYPE extends string = keyof DatasetDiscoveryProviderDefinitions> =
     TYPE extends keyof DatasetDiscoveryProviderDefinitions
         ? DatasetDiscoveryProviderDefinitions[TYPE]
-        : (DatasetDiscoveryProviderProps<TYPE> & Record<string, any>);
+        : DatasetDiscoveryProviderProps<TYPE> & Record<string, any>;
 
-export type DatasetDiscoveryProviderType<TYPE extends string> =
-    TYPE extends keyof DatasetDiscoveryProviderTypes
-        ? DatasetDiscoveryProviderTypes[TYPE]
-        : DatasetDiscoveryProvider;
+export type DatasetDiscoveryProviderType<TYPE extends string> = TYPE extends keyof DatasetDiscoveryProviderTypes
+    ? DatasetDiscoveryProviderTypes[TYPE]
+    : DatasetDiscoveryProvider;
 
-
-const discoveryProviderFactory = createDynamicFactory<
-    DatasetDiscoveryProvider
->('datasetDiscoveryProviderFactory');
-
+const discoveryProviderFactory = createDynamicFactory<DatasetDiscoveryProvider>('datasetDiscoveryProviderFactory');
 
 /**
  * A class to manage the state of an EO dataset discovery provider.
@@ -94,22 +87,16 @@ const discoveryProviderFactory = createDynamicFactory<
  *
  * @template T the provider dataset record type
  */
-export abstract class DatasetDiscoveryProvider<
-    T extends DatasetDiscoveryProviderItem = DatasetDiscoveryProviderItem
-> implements IsActivable {
-
+export abstract class DatasetDiscoveryProvider<T extends DatasetDiscoveryProviderItem = DatasetDiscoveryProviderItem>
+    implements IsActivable
+{
     /**
      * Create a dataset discovery provider instance given a configuration object
      * @template P The provider specific configuration object type
      * @param props The provider configuration
      * @returns The dataset discovery provider instance or undefined if no provider with the provided type was registered
      */
-    static create<
-        TYPE extends string
-    >(
-        providerType: TYPE, props: Omit<DatasetDiscoveryProviderDefinition<TYPE>, 'providerType'>
-    ) {
-
+    static create<TYPE extends string>(providerType: TYPE, props: Omit<DatasetDiscoveryProviderDefinition<TYPE>, 'providerType'>) {
         const provider = discoveryProviderFactory.create(providerType, props);
         if (!provider) {
             throw new Error(`DatasetDiscoveryProvider.create: Unable to create provider of type ${providerType}`);
@@ -126,11 +113,7 @@ export abstract class DatasetDiscoveryProvider<
         TYPE extends string,
         P extends DatasetDiscoveryProvider,
         PROPS extends Omit<DatasetDiscoveryProviderProps, 'providerType'> = DatasetDiscoveryProviderDefinition<TYPE>
-    >(
-        providerType: TYPE, providerCtor: new(
-            props: PROPS
-        ) => P
-    ) {
+    >(providerType: TYPE, providerCtor: new (props: PROPS) => P) {
         discoveryProviderFactory.register(providerType, (props) => {
             return new providerCtor(props);
         });
@@ -182,8 +165,7 @@ export abstract class DatasetDiscoveryProvider<
     /**
      * create the dataset configuration for a specific item
      */
-    abstract createDataset(item: T): Promise<(DatasetConfig & {initialState?: DatasetExplorerItemInitialState}) | undefined>;
-
+    abstract createDataset(item: T): Promise<(DatasetConfig & { initialState?: DatasetExplorerItemInitialState }) | undefined>;
 
     @action
     setDisabled(disabled: boolean) {

@@ -16,7 +16,6 @@ export type ColorScale = {
     positions?: number[];
 };
 
-
 export type ColorMapDomainProps = {
     mapRange: DomainRange<number>;
     clamp?: boolean;
@@ -66,7 +65,6 @@ export type ColorMapProps = {
 };
 
 export class ColorMap {
-
     @observable.ref colorScale: string;
     @observable.ref domain: ColorMapDomain | undefined;
 
@@ -101,5 +99,4 @@ export class ColorMap {
             domain: this.domain?.asProps()
         };
     }
-
 }

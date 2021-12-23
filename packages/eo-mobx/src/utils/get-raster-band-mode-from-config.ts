@@ -1,7 +1,14 @@
 import {
-    RasterBandModeConfig, RasterBandModeType, RasterBandConfig,
-    RasterBandModeSingleProps, RasterBandModePresetProps, RasterBandPreset, RasterBandModeCombinationProps,
-    RasterBandModeChoice, RasterBandModeCombinationConfig, BandScalingMode
+    RasterBandModeConfig,
+    RasterBandModeType,
+    RasterBandConfig,
+    RasterBandModeSingleProps,
+    RasterBandModePresetProps,
+    RasterBandPreset,
+    RasterBandModeCombinationProps,
+    RasterBandModeChoice,
+    RasterBandModeCombinationConfig,
+    BandScalingMode
 } from '../dataset-map-viz';
 import { isValueDomain } from '../common';
 
@@ -13,17 +20,16 @@ type getRasterBandSingleConfigOptions = {
 };
 
 export const getRasterBandSingleConfig = (options: getRasterBandSingleConfigOptions): Promise<RasterBandModeSingleProps> => {
-
     let defaultBand: RasterBandConfig | undefined;
     if (options.default?.band) {
-        defaultBand = options.bands.find(band => band.id === options.default?.band);
+        defaultBand = options.bands.find((band) => band.id === options.default?.band);
     }
     if (!defaultBand) {
         defaultBand = options.bands[0];
     }
     const colorScales = defaultBand.colorScales!;
 
-    let colorScale = defaultBand.default?.colorScale || colorScales[0].id;
+    const colorScale = defaultBand.default?.colorScale || colorScales[0].id;
     let range = defaultBand.default?.range;
     let clamp = true;
     if (defaultBand.default?.clamp !== undefined) {
@@ -47,11 +53,13 @@ export const getRasterBandSingleConfig = (options: getRasterBandSingleConfigOpti
             band: defaultBand!.id,
             colorMap: {
                 colorScale: colorScale,
-                domain: range ? {
-                    mapRange: range,
-                    clamp: clamp,
-                    noDataValue: noDataValue
-                } : undefined
+                domain: range
+                    ? {
+                          mapRange: range,
+                          clamp: clamp,
+                          noDataValue: noDataValue
+                      }
+                    : undefined
             }
         };
     });
@@ -62,8 +70,7 @@ type getRasterBandPresetConfigOptions = {
     presets: RasterBandPreset[];
 };
 
-
-export const getRasterBandPresetConfig = (options: getRasterBandPresetConfigOptions): Promise<RasterBandModePresetProps>  => {
+export const getRasterBandPresetConfig = (options: getRasterBandPresetConfigOptions): Promise<RasterBandModePresetProps> => {
     if (options.default) {
         return Promise.resolve({
             type: RasterBandModeType.Preset,
@@ -84,7 +91,6 @@ type getRasterBandCombinationConfigOptions = {
     bands: RasterBandConfig[];
 };
 
-
 export const getRasterBandCombinationConfig = (options: getRasterBandCombinationConfigOptions): Promise<RasterBandModeCombinationProps> => {
     if (options.default) {
         return Promise.resolve({
@@ -99,18 +105,20 @@ export const getRasterBandCombinationConfig = (options: getRasterBandCombination
 
         const bandScalingMode = options.config?.supportBandScalingMode || BandScalingMode.None;
 
-        return Promise.all(rgb.map((band) => {
-            return getDatasetVariableDomain(band).then((domain) => {
-                if (domain && isValueDomain(domain) && domain.min !== undefined && domain.max !== undefined) {
-                    return {
-                        min: domain.min,
-                        max: domain.max
-                    };
-                } else {
-                    return undefined;
-                }
-            });
-        })).then((domains) => {
+        return Promise.all(
+            rgb.map((band) => {
+                return getDatasetVariableDomain(band).then((domain) => {
+                    if (domain && isValueDomain(domain) && domain.min !== undefined && domain.max !== undefined) {
+                        return {
+                            min: domain.min,
+                            max: domain.max
+                        };
+                    } else {
+                        return undefined;
+                    }
+                });
+            })
+        ).then((domains) => {
             return {
                 type: RasterBandModeType.Combination,
                 red: rgb[0].id,
@@ -127,18 +135,17 @@ export const getRasterBandCombinationConfig = (options: getRasterBandCombination
     }
 };
 
-
 export type getRasterBandModeConfigOptions = {
     config: RasterBandModeConfig;
     mode?: RasterBandModeType;
 };
 
-export const getRasterBandModeFromConfig = (options: getRasterBandModeConfigOptions):
-    Promise<RasterBandModeSingleProps | RasterBandModePresetProps | RasterBandModeCombinationProps> => {
-
+export const getRasterBandModeFromConfig = (
+    options: getRasterBandModeConfigOptions
+): Promise<RasterBandModeSingleProps | RasterBandModePresetProps | RasterBandModeCombinationProps> => {
     let modeConfig: RasterBandModeChoice | undefined;
     if (options.mode) {
-        modeConfig = options.config.supportedModes.find(mode => mode.type === options.mode);
+        modeConfig = options.config.supportedModes.find((mode) => mode.type === options.mode);
     }
     if (!modeConfig) {
         modeConfig = options.config.supportedModes[options.config.defaultMode || 0];

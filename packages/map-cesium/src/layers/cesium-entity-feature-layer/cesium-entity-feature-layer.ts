@@ -3,7 +3,7 @@ import Cartographic from 'cesium/Source/Core/Cartographic';
 import CesiumMath from 'cesium/Source/Core/Math';
 import CustomDataSource from 'cesium/Source/DataSources/CustomDataSource';
 
-import { IFeatureLayerRenderer, IFeatureStyle, IFeature, FeatureGeometry, MapLayerRendererConfig, FeatureLayerRendererConfig } from '@oidajs/core';
+import { IFeatureLayerRenderer, IFeatureStyle, IFeature, FeatureGeometry, FeatureLayerRendererConfig } from '@oidajs/core';
 
 import { CesiumFeatureCoordPickMode, PickInfo, PICK_INFO_KEY, updateDataSource } from '../../utils';
 import { CesiumMapLayer } from '../cesium-map-layer';
@@ -11,8 +11,7 @@ import { CesiumFeatureLayerProps } from '../cesium-feature-layer';
 import { geometryEntityRendererFactory } from './geometry-entity-renderers';
 
 export class CesiumEntityFeatureLayer extends CesiumMapLayer implements IFeatureLayerRenderer {
-
-    protected clampToGround_: boolean = false;
+    protected clampToGround_: boolean;
     protected onFeatureHover_: ((feature: IFeature<any>, coordinate: GeoJSON.Position) => void) | undefined;
     protected onFeatureSelect_: ((feature: IFeature<any>, coordinate: GeoJSON.Position) => void) | undefined;
     protected coordPickMode_: CesiumFeatureCoordPickMode;
@@ -31,23 +30,21 @@ export class CesiumEntityFeatureLayer extends CesiumMapLayer implements IFeature
     }
 
     addFeature(id: string, geometry: FeatureGeometry, style: IFeatureStyle, data: any) {
-
         if (!geometry) {
             return;
         }
 
-        let geometryRenderer = geometryEntityRendererFactory.create(geometry.type, {});
+        const geometryRenderer = geometryEntityRendererFactory.create(geometry.type, {});
 
         if (geometryRenderer) {
-
             try {
-                let entity = geometryRenderer.create(id, geometry, style, {
+                const entity = geometryRenderer.create(id, geometry, style, {
                     clampToGround: this.clampToGround_
                 });
 
                 if (entity) {
                     this.dataSource_.entities.add(entity);
-                    entity._children.forEach(childEntity => {
+                    entity._children.forEach((childEntity) => {
                         this.dataSource_.entities.add(childEntity);
                     });
                     entity.geometryRenderer = geometryRenderer;
@@ -73,8 +70,7 @@ export class CesiumEntityFeatureLayer extends CesiumMapLayer implements IFeature
     }
 
     updateFeatureGeometry(id: string, geometry: FeatureGeometry) {
-
-        let entity = this.dataSource_.entities.getById(id);
+        const entity = this.dataSource_.entities.getById(id);
         if (entity) {
             if (entity.geometryType === geometry.type) {
                 entity.geometryRenderer.updateGeometry(entity, geometry);
@@ -86,8 +82,7 @@ export class CesiumEntityFeatureLayer extends CesiumMapLayer implements IFeature
     }
 
     updateFeatureStyle(id: string, style: IFeatureStyle) {
-
-        let entity = this.dataSource_.entities.getById(id);
+        const entity = this.dataSource_.entities.getById(id);
         if (entity) {
             entity.geometryRenderer.updateStyle(entity, style);
             entity[PICK_INFO_KEY].pickable = this.isPickable_(entity.geometryType, style);
@@ -96,8 +91,7 @@ export class CesiumEntityFeatureLayer extends CesiumMapLayer implements IFeature
     }
 
     removeFeature(id: string) {
-
-        let entity = this.dataSource_.entities.getById(id);
+        const entity = this.dataSource_.entities.getById(id);
 
         if (entity) {
             entity._children.forEach((childEntity) => {
@@ -106,7 +100,6 @@ export class CesiumEntityFeatureLayer extends CesiumMapLayer implements IFeature
             this.dataSource_.entities.remove(entity);
             this.updateDataSource_();
         }
-
     }
 
     getFeature(id: string) {
@@ -136,27 +129,29 @@ export class CesiumEntityFeatureLayer extends CesiumMapLayer implements IFeature
     }
 
     onFeatureHover(coordinate: Cartesian3, pickInfo: PickInfo) {
-        let cartographic = Cartographic.fromCartesian(coordinate);
-        this.onFeatureHover_!({
-            id: pickInfo.id,
-            data: pickInfo.data
-        }, [
-            CesiumMath.toDegrees(cartographic.longitude),
-            CesiumMath.toDegrees(cartographic.latitude),
-            cartographic.height
-        ]);
+        if (this.onFeatureHover_) {
+            const cartographic = Cartographic.fromCartesian(coordinate);
+            this.onFeatureHover_(
+                {
+                    id: pickInfo.id,
+                    data: pickInfo.data
+                },
+                [CesiumMath.toDegrees(cartographic.longitude), CesiumMath.toDegrees(cartographic.latitude), cartographic.height]
+            );
+        }
     }
 
     onFeatureSelect(coordinate: Cartesian3, pickInfo: PickInfo) {
-        let cartographic = Cartographic.fromCartesian(coordinate);
-        this.onFeatureSelect_!({
-            id: pickInfo.id,
-            data: pickInfo.data
-        }, [
-            CesiumMath.toDegrees(cartographic.longitude),
-            CesiumMath.toDegrees(cartographic.latitude),
-            cartographic.height
-        ]);
+        if (this.onFeatureSelect_) {
+            const cartographic = Cartographic.fromCartesian(coordinate);
+            this.onFeatureSelect_(
+                {
+                    id: pickInfo.id,
+                    data: pickInfo.data
+                },
+                [CesiumMath.toDegrees(cartographic.longitude), CesiumMath.toDegrees(cartographic.latitude), cartographic.height]
+            );
+        }
     }
 
     getFeaturePickMode() {
@@ -178,6 +173,4 @@ export class CesiumEntityFeatureLayer extends CesiumMapLayer implements IFeature
     protected updateDataSource_() {
         updateDataSource(this.dataSource_, this.mapRenderer_.getViewer().scene);
     }
-
 }
-

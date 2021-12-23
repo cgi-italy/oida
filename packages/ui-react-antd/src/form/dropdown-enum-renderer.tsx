@@ -8,7 +8,6 @@ import { FormFieldRendererBaseProps } from '@oidajs/ui-react-core';
 
 import { antdFormFieldRendererFactory } from './antd-form-field-renderer-factory';
 
-
 export type DropdownEnumChoiceProps = {
     choice: EnumChoice;
 };
@@ -16,7 +15,7 @@ export type DropdownEnumChoiceProps = {
 export const DropdownEnumChoice = (props: DropdownEnumChoiceProps) => {
     return (
         <React.Fragment>
-            {props.choice.icon && <Avatar size='large' src={props.choice.icon}/>}
+            {props.choice.icon && <Avatar size='large' src={props.choice.icon} />}
             <div className='dropdown-enum-choice-content'>
                 <div className='dropdown-enum-choice-title'>{props.choice.name}</div>
                 <div className='dropdown-enum-choice-description'>{props.choice.description}</div>
@@ -32,33 +31,25 @@ export type DropdownEnumOptionsProps = {
 };
 
 export const DropdownEnumOptions = (props: DropdownEnumOptionsProps) => {
-
-    let enumItems = props.choices.map((choice) => {
+    const enumItems = props.choices.map((choice) => {
         return (
             <div
-                className={classnames('dropdown-enum-option', {'selected': choice.value === props.selectedChoice})}
+                className={classnames('dropdown-enum-option', { selected: choice.value === props.selectedChoice })}
                 onClick={() => props.onChoiceSelect(choice.value)}
                 key={choice.value}
             >
-                <DropdownEnumChoice choice={choice}/>
+                <DropdownEnumChoice choice={choice} />
             </div>
         );
     });
 
-    return (
-        <div className='dropdown-enum-options'
-        >
-            {enumItems}
-        </div>
-    );
+    return <div className='dropdown-enum-options'>{enumItems}</div>;
 };
-
 
 export type DropdownEnumRendererProps = FormFieldRendererBaseProps<EnumField>;
 
 export const DropdownEnumRenderer = (props: DropdownEnumRendererProps) => {
-
-    let [dropDownVisible, setDropDownVisible] = useState(false);
+    const [dropDownVisible, setDropDownVisible] = useState(false);
 
     const [choices, setChoices] = useState<EnumChoice[]>();
     const [loadingState, setLoadingState] = useState(LoadingState.Init);
@@ -70,16 +61,19 @@ export const DropdownEnumRenderer = (props: DropdownEnumRendererProps) => {
         } else {
             let isComponentMounted = true;
             setLoadingState(LoadingState.Loading);
-            props.config.choices().then((choices) => {
-                if (isComponentMounted) {
-                    setLoadingState(LoadingState.Success);
-                    setChoices(choices);
-                }
-            }).catch((error) => {
-                if (isComponentMounted) {
-                    setLoadingState(LoadingState.Error);
-                }
-            });
+            props.config
+                .choices()
+                .then((choices) => {
+                    if (isComponentMounted) {
+                        setLoadingState(LoadingState.Success);
+                        setChoices(choices);
+                    }
+                })
+                .catch((error) => {
+                    if (isComponentMounted) {
+                        setLoadingState(LoadingState.Error);
+                    }
+                });
 
             return () => {
                 isComponentMounted = false;
@@ -87,7 +81,7 @@ export const DropdownEnumRenderer = (props: DropdownEnumRendererProps) => {
         }
     }, [props.config.choices]);
 
-    const selectedChoice = (choices || []).find(choice => choice.value === props.value);
+    const selectedChoice = (choices || []).find((choice) => choice.value === props.value);
 
     return (
         <Dropdown
@@ -98,10 +92,8 @@ export const DropdownEnumRenderer = (props: DropdownEnumRendererProps) => {
             visible={dropDownVisible}
             overlay={
                 <React.Fragment>
-                    {loadingState === LoadingState.Loading &&
-                        <LoadingOutlined />
-                    }
-                    {loadingState === LoadingState.Success && !!choices &&
+                    {loadingState === LoadingState.Loading && <LoadingOutlined />}
+                    {loadingState === LoadingState.Success && !!choices && (
                         <DropdownEnumOptions
                             choices={choices}
                             selectedChoice={props.value as string}
@@ -110,25 +102,19 @@ export const DropdownEnumRenderer = (props: DropdownEnumRendererProps) => {
                                 setDropDownVisible(false);
                             }}
                         />
-                    }
+                    )}
                 </React.Fragment>
             }
         >
             <div
-                className={classnames('dropdown-enum-option', {'ant-dropdown-open': dropDownVisible})}
+                className={classnames('dropdown-enum-option', { 'ant-dropdown-open': dropDownVisible })}
                 onClick={() => setDropDownVisible(!dropDownVisible)}
             >
-                {selectedChoice && <DropdownEnumChoice
-                    choice={selectedChoice}
-                />}
-                <DownOutlined/>
+                {selectedChoice && <DropdownEnumChoice choice={selectedChoice} />}
+                <DownOutlined />
             </div>
         </Dropdown>
     );
 };
 
-
-antdFormFieldRendererFactory.register<EnumField>(
-    ENUM_FIELD_ID, 'dropdown',
-    DropdownEnumRenderer
-);
+antdFormFieldRendererFactory.register<EnumField>(ENUM_FIELD_ID, 'dropdown', DropdownEnumRenderer);

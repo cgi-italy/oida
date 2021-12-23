@@ -7,7 +7,7 @@ export type Choice<U> = {
     description?: string;
 } & U;
 
-export type ChoiceSelectorProps<U = {}> = {
+export type ChoiceSelectorProps<U = Record<string, never>> = {
     value: string | undefined;
     items: Choice<U>[];
     onSelect: (value: string) => void;

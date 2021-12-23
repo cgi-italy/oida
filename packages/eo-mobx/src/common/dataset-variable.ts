@@ -1,26 +1,26 @@
 import { AoiValue, DateRangeValue, QueryFilter } from '@oidajs/core';
 
 export type DomainRange<T> = {
-    min: T,
-    max: T
+    min: T;
+    max: T;
 };
 
 export type CategoricalDomain<T> = {
     values: Array<{
-        value: T,
-        label?: string
-    }>
+        value: T;
+        label?: string;
+    }>;
 };
 
 export type ValueDomain<T, S = T> = Partial<DomainRange<T>> & {
-    step?: S,
-    noData?: T
+    step?: S;
+    noData?: T;
 };
 
 export type DataDomain<T, S = T> = ValueDomain<T, S> | CategoricalDomain<T>;
 
 export const isValueDomain = <T, S, C>(domain: ValueDomain<T, S> | CategoricalDomain<C>): domain is ValueDomain<T, S> => {
-    return !Array.isArray((domain as  CategoricalDomain<C>).values);
+    return !Array.isArray((domain as CategoricalDomain<C>).values);
 };
 
 export type DataDomainProviderFilters = {
@@ -34,15 +34,15 @@ export type DataDomainProviderFilters = {
 export type DataDomainProvider<D extends DataDomain<unknown>> = (filters?: DataDomainProviderFilters) => Promise<D>;
 
 export const isDomainProvider = <D extends DataDomain<unknown>>(domain: D | DataDomainProvider<D>): domain is DataDomainProvider<D> => {
-    return (typeof(domain) === 'function');
+    return typeof domain === 'function';
 };
 
 export type DatasetVariable<D extends DataDomain<unknown>> = {
-    id: string,
-    name: string,
-    domain?: D | DataDomainProvider<D>,
-    units?: string,
-    description?: string
+    id: string;
+    name: string;
+    domain?: D | DataDomainProvider<D>;
+    units?: string;
+    description?: string;
 };
 
 export type DatasetDimension<D extends DataDomain<unknown>> = DatasetVariable<D>;

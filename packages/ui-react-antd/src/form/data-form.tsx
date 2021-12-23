@@ -8,27 +8,24 @@ import { FormRendererProps, useFormFieldRenderers } from '@oidajs/ui-react-core'
 
 import { antdFormFieldRendererFactory } from '../form/antd-form-field-renderer-factory';
 
-
 export const FieldWrapper = (props) => {
-
-    let { name, title, description, children, type, required, rendererId } = props;
+    const { title, description, children, type, required, rendererId } = props;
     return (
         <Form.Item
-
             label={title}
-            rules={[{required: required}]}
+            rules={[{ required: required }]}
             tooltip={description}
-            className={classnames(`${type.toLowerCase()}-field`, `${rendererId}-renderer`, {'is-required': required})}
+            className={classnames(`${type.toLowerCase()}-field`, `${rendererId}-renderer`, { 'is-required': required })}
         >
             {children}
         </Form.Item>
     );
 };
 
-export type DataFormProps = FormRendererProps & Omit<FormProps, 'form' | 'initialValues' | 'fields' | 'onFieldsChange' | 'onValuesChange' | 'validateTrigger'>;
+export type DataFormProps = FormRendererProps &
+    Omit<FormProps, 'form' | 'initialValues' | 'fields' | 'onFieldsChange' | 'onValuesChange' | 'validateTrigger'>;
 
 export const DataFormItems = (props: Pick<DataFormProps, 'onFieldChange' | 'values' | 'fields'>) => {
-
     const { onFieldChange, values, fields } = props;
 
     const fieldsConfig = useFormFieldRenderers({
@@ -52,29 +49,15 @@ export const DataFormItems = (props: Pick<DataFormProps, 'onFieldChange' | 'valu
         }
     });
 
-    return (
-        <React.Fragment>
-            {formFields}
-        </React.Fragment>
-    );
+    return <React.Fragment>{formFields}</React.Fragment>;
 };
 
 export const DataForm = (props: DataFormProps) => {
-
     const { onFieldChange, values, fields, className, ...formRenderProps } = props;
 
     return (
-        <Form
-            className={classnames('antd-form-renderer', className)}
-            layout='vertical'
-            size='small'
-            {...formRenderProps}
-        >
-           <DataFormItems
-                fields={fields}
-                values={values}
-                onFieldChange={onFieldChange}
-            />
+        <Form className={classnames('antd-form-renderer', className)} layout='vertical' size='small' {...formRenderProps}>
+            <DataFormItems fields={fields} values={values} onFieldChange={onFieldChange} />
         </Form>
     );
 };

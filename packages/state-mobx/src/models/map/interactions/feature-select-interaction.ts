@@ -7,12 +7,13 @@ import { SelectionManager, SelectableItem } from '../../core';
 import { Config, ConfigProps, HasConfig } from '../../mixins';
 
 export type FeatureSelectInteractionConfig = {
-    multiple: boolean
+    multiple: boolean;
 };
 
 export type FeatureSelectInteractionProps = {
-    selectionManager?: SelectionManager<SelectableItem>
-} & Omit<MapInteractionProps, 'interactionType'> & ConfigProps<FeatureSelectInteractionConfig>;
+    selectionManager?: SelectionManager<SelectableItem>;
+} & Omit<MapInteractionProps, 'interactionType'> &
+    ConfigProps<FeatureSelectInteractionConfig>;
 
 export class FeatureSelectInteraction extends MapInteraction implements HasConfig<FeatureSelectInteractionConfig> {
     readonly config: Config<FeatureSelectInteractionConfig>;

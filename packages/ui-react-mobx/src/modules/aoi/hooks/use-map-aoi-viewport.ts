@@ -7,12 +7,11 @@ import { useAoiModule } from './use-aoi-module';
 
 export type MapAoiViewportProps = {
     map: Map;
-    activeAction: AoiAction,
-    onActiveActionChange: (action: AoiAction) => void
+    activeAction: AoiAction;
+    onActiveActionChange: (action: AoiAction) => void;
 } & FormFieldState<AoiValue>;
 
 export const useMapAoiViewport = (props: MapAoiViewportProps) => {
-
     useEffect(() => {
         if (props.value?.props?.fromMapViewport) {
             if (props.activeAction !== AoiAction.LinkToMapViewport) {
@@ -28,7 +27,7 @@ export const useMapAoiViewport = (props: MapAoiViewportProps) => {
     useEffect(() => {
         if (props.activeAction === AoiAction.LinkToMapViewport) {
             if (!props.value?.props?.fromMapViewport) {
-                let bbox = props.map.renderer.implementation?.getViewportExtent();
+                const bbox = props.map.renderer.implementation?.getViewportExtent();
                 if (bbox) {
                     props.onChange({
                         geometry: {
@@ -56,7 +55,7 @@ export const useMapAoiViewport = (props: MapAoiViewportProps) => {
 };
 
 export const useMapAoiViewportFromModule = (props: Omit<MapAoiViewportProps, 'map'>, aoiModuleId?: string) => {
-    let moduleState = useAoiModule(aoiModuleId);
+    const moduleState = useAoiModule(aoiModuleId);
 
     return useMapAoiViewport({
         map: moduleState.mapModule.map,

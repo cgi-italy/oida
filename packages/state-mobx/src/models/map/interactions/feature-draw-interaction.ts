@@ -4,12 +4,9 @@ import { FEATURE_DRAW_INTERACTION_ID, FeatureDrawMode, FeatureDrawOptions } from
 
 import { MapInteraction, MapInteractionProps } from './map-interaction';
 
-
-export type FeatureDrawInteractionProps = {
-} & Omit<MapInteractionProps, 'interactionType'>;
+export type FeatureDrawInteractionProps = Omit<MapInteractionProps, 'interactionType'>;
 
 export class FeatureDrawInteraction extends MapInteraction {
-
     @observable.ref drawMode: FeatureDrawMode;
     drawOptions: FeatureDrawOptions;
 
@@ -30,7 +27,6 @@ export class FeatureDrawInteraction extends MapInteraction {
         this.drawOptions = options;
         this.drawMode = drawMode;
     }
-
 }
 
 MapInteraction.register(FEATURE_DRAW_INTERACTION_ID, FeatureDrawInteraction);

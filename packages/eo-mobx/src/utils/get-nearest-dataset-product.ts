@@ -1,19 +1,15 @@
 import { DatasetExplorerItem } from '../dataset-explorer';
 import { TimeSearchDirection } from '../common';
 
-
-export const getNearestDatasetProduct = function(
-    dt: Date, direction: TimeSearchDirection, datasetViews: DatasetExplorerItem[]
-) : Promise<Date | undefined> {
-
+export const getNearestDatasetProduct = function (
+    dt: Date,
+    direction: TimeSearchDirection,
+    datasetViews: DatasetExplorerItem[]
+): Promise<Date | undefined> {
     const timeRequests = datasetViews.map((view) => {
         const timeDistribution = view.timeDistributionViz;
         if (timeDistribution) {
-            return timeDistribution.config.provider.getNearestItem(
-                dt,
-                direction,
-                view.timeDistributionViz?.filters
-            );
+            return timeDistribution.config.provider.getNearestItem(dt, direction, view.timeDistributionViz?.filters);
         } else {
             return Promise.resolve(undefined);
         }
@@ -22,14 +18,13 @@ export const getNearestDatasetProduct = function(
     return Promise.all(timeRequests).then((items) => {
         let targetDate: Date | undefined;
         if (direction === TimeSearchDirection.Forward) {
-            items.forEach(item => {
+            items.forEach((item) => {
                 if (item && (!targetDate || item.start < targetDate)) {
                     targetDate = item.start as Date;
                 }
             });
-
         } else {
-            items.forEach(item => {
+            items.forEach((item) => {
                 if (item && (!targetDate || item.start > targetDate)) {
                     targetDate = item.start as Date;
                 }
@@ -49,13 +44,13 @@ export const getNearestDatasetProduct = function(
             return Promise.all(timeRequests).then((items) => {
                 timeRequests = [];
                 if (direction === TimeSearchDirection.Forward) {
-                    items.forEach(item => {
+                    items.forEach((item) => {
                         if (item && (!targetDate || item.end > targetDate)) {
                             targetDate = item.end as Date;
                         }
                     });
                 } else {
-                    items.forEach(item => {
+                    items.forEach((item) => {
                         if (item && (!targetDate || item.start < targetDate)) {
                             targetDate = item.start as Date;
                         }

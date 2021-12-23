@@ -13,26 +13,24 @@ export type DataCollectionListProps<T> = {
     sortRender?: DataSorterRenderer;
     filtererRender?: DataFiltererRenderer;
     className?: string;
-} & DataCollectionProps<T> & DataCollectionItemsListProps<T>;
+} & DataCollectionProps<T> &
+    DataCollectionItemsListProps<T>;
 
-export const DataCollectionList = <T extends Object>(props: DataCollectionListProps<T>) => {
-    const {items, paging, sorting, filters, pagerRender, sortRender, filtererRender, className, ...listProps} = props;
+export const DataCollectionList = <T extends object>(props: DataCollectionListProps<T>) => {
+    const { items, paging, sorting, filters, pagerRender, sortRender, filtererRender, className, ...listProps } = props;
 
     const DataPager = pagerRender!;
     const DataFilterer = filtererRender!;
     const DataSorter = sortRender!;
 
-    return  (
+    return (
         <div className={classnames('data-collection-list', className)}>
             <div className='filter-section'>
-                {filters && <DataFilterer {...filters}/>}
-                {sorting && <DataSorter {...sorting}/>}
+                {filters && <DataFilterer {...filters} />}
+                {sorting && <DataSorter {...sorting} />}
             </div>
-            <DataCollectionItemsList<T>
-                {...items}
-                {...listProps}
-            ></DataCollectionItemsList>
-            {paging && paging.total > paging.pageSize && <DataPager {...paging}/>}
+            <DataCollectionItemsList<T> {...items} {...listProps}></DataCollectionItemsList>
+            {paging && paging.total > paging.pageSize && <DataPager {...paging} />}
         </div>
     );
 };

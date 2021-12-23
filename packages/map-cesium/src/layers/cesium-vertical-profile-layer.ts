@@ -11,19 +11,22 @@ import CustomDataSource from 'cesium/Source/DataSources/CustomDataSource';
 import { CesiumMapLayer } from './cesium-map-layer';
 
 import {
-    IVerticalProfileLayerRenderer, VerticalProfileLayerRendererConfig,
-    IVerticalProfile, IVerticalProfileStyle, VerticalProfileCoordinate
+    IVerticalProfileLayerRenderer,
+    VerticalProfileLayerRendererConfig,
+    IVerticalProfile,
+    IVerticalProfileStyle,
+    VerticalProfileCoordinate
 } from '@oidajs/core';
 
 import { PickInfo, PICK_INFO_KEY, updateDataSource } from '../utils';
 
-const cursor = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAADsQAAA7EB9YPtSQAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAF6SURBVDiNnZO9TgJBEMf/7NGcJFMsXCWKxo+EHA8gak8N9xDG5+HjMDwDodWWcOEFIBRiocT2riBhi729tYAjeh4R/HW72d/MzuxOBumcAqiZpnkBAEKINwDPABbJg5nE+oxz/mQYxq3jOEa5XDYBYDabiX6/r5RSnu/7DwDe07LeEVHguq4Kw1AnkVLqTqejiCgAUE3K50QUjMfjX2ISz/P0Jkhpa3POX1zXVX/aG9rttsrn88/bhlmWtUy79i6klLpQKCwBFBmAmuM4hmEYOx7kN9lsFo1GgwGosVwud23btrm3vcG27SPTNK9YtOZQH1prANBMCDGfTqerQwNMJpOVEGIOACeWZS2llP9p4jEDsFBKeb1eb+86ut2uiqJoCOAz3isRUeB53p/ZR6ORJiIf63n5QZWIglarFaaVI6XUzWYz3PzCm1hKDlOJc95ljN3X63VWqVSO4oYNBoMoiqKh7/uPAD52BYgpYj3OlwAghHgF8PK95pgvLpeADirdFxkAAAAASUVORK5CYII=';
+const cursor =
+    'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAADsQAAA7EB9YPtSQAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAF6SURBVDiNnZO9TgJBEMf/7NGcJFMsXCWKxo+EHA8gak8N9xDG5+HjMDwDodWWcOEFIBRiocT2riBhi729tYAjeh4R/HW72d/MzuxOBumcAqiZpnkBAEKINwDPABbJg5nE+oxz/mQYxq3jOEa5XDYBYDabiX6/r5RSnu/7DwDe07LeEVHguq4Kw1AnkVLqTqejiCgAUE3K50QUjMfjX2ISz/P0Jkhpa3POX1zXVX/aG9rttsrn88/bhlmWtUy79i6klLpQKCwBFBmAmuM4hmEYOx7kN9lsFo1GgwGosVwud23btrm3vcG27SPTNK9YtOZQH1prANBMCDGfTqerQwNMJpOVEGIOACeWZS2llP9p4jEDsFBKeb1eb+86ut2uiqJoCOAz3isRUeB53p/ZR6ORJiIf63n5QZWIglarFaaVI6XUzWYz3PzCm1hKDlOJc95ljN3X63VWqVSO4oYNBoMoiqKh7/uPAD52BYgpYj3OlwAghHgF8PK95pgvLpeADirdFxkAAAAASUVORK5CYII=';
 
 export class CesiumVerticalProfileLayer extends CesiumMapLayer implements IVerticalProfileLayerRenderer {
-
     protected dataSource_;
-    protected onCoordinateSelect_: ((selected?: {profileId: string, coordinate: number[]}) => void) | undefined;
-    protected onCoordinateHover_: ((selected?: {profileId: string, coordinate: number[]}) => void) | undefined;
+    protected onCoordinateSelect_: ((selected?: { profileId: string; coordinate: number[] }) => void) | undefined;
+    protected onCoordinateHover_: ((selected?: { profileId: string; coordinate: number[] }) => void) | undefined;
 
     constructor(config: VerticalProfileLayerRendererConfig) {
         super(config);
@@ -36,12 +39,11 @@ export class CesiumVerticalProfileLayer extends CesiumMapLayer implements IVerti
     }
 
     addProfile(id: string, profile: IVerticalProfile, style: IVerticalProfileStyle, data?: any) {
-
         if (!profile) {
             return;
         }
 
-        let maximumHeights = this.expandProfileHeight_(profile.height, profile.bottomCoords.coordinates.length);
+        const maximumHeights = this.expandProfileHeight_(profile.height, profile.bottomCoords.coordinates.length);
         let minimumHeights;
         if (profile.bottomHeight) {
             minimumHeights = this.expandProfileHeight_(profile.bottomHeight, profile.bottomCoords.coordinates.length);
@@ -58,7 +60,7 @@ export class CesiumVerticalProfileLayer extends CesiumMapLayer implements IVerti
             material = new Color(...style.fillColor);
         }
 
-        let entity = new Entity({
+        const entity = new Entity({
             id: id,
             show: style.visible,
             wall: {
@@ -83,10 +85,9 @@ export class CesiumVerticalProfileLayer extends CesiumMapLayer implements IVerti
     }
 
     updateProfile(id: string, profile: IVerticalProfile) {
-
-        let entity = this.dataSource_.entities.getById(id);
+        const entity = this.dataSource_.entities.getById(id);
         if (entity) {
-            let wall = entity.wall;
+            const wall = entity.wall;
 
             wall.positions = Cartesian3.fromDegreesArray(([] as any[]).concat(...profile.bottomCoords.coordinates));
             wall.maximumHeights = this.expandProfileHeight_(profile.height, profile.bottomCoords.coordinates.length);
@@ -101,11 +102,10 @@ export class CesiumVerticalProfileLayer extends CesiumMapLayer implements IVerti
     }
 
     updateProfileStyle(id, style: IVerticalProfileStyle) {
-
-        let entity = this.dataSource_.entities.getById(id);
+        const entity = this.dataSource_.entities.getById(id);
         if (entity) {
             entity.show = style.visible;
-            let wall = entity.wall;
+            const wall = entity.wall;
             if (style.fillImage) {
                 wall.material = new ImageMaterialProperty({
                     image: style.fillImage,
@@ -120,14 +120,12 @@ export class CesiumVerticalProfileLayer extends CesiumMapLayer implements IVerti
     }
 
     removeProfile(id: string) {
-
-        let entity = this.dataSource_.entities.getById(id);
+        const entity = this.dataSource_.entities.getById(id);
 
         if (entity) {
             this.dataSource_.entities.remove(entity);
             this.updateDataSource_();
         }
-
     }
 
     getProfile(id: string) {
@@ -140,7 +138,7 @@ export class CesiumVerticalProfileLayer extends CesiumMapLayer implements IVerti
     }
 
     setHighlightedCoordinate(coord: VerticalProfileCoordinate | undefined) {
-        let pointHighlight = this.getOrCreatePointHighlightEntity_();
+        const pointHighlight = this.getOrCreatePointHighlightEntity_();
         if (!pointHighlight) {
             return;
         }
@@ -155,7 +153,7 @@ export class CesiumVerticalProfileLayer extends CesiumMapLayer implements IVerti
     }
 
     setSelectedCoordinate(coord: VerticalProfileCoordinate | undefined) {
-        let pointSelect = this.getOrCreatePointSelectEntity_();
+        const pointSelect = this.getOrCreatePointSelectEntity_();
         if (!pointSelect) {
             return;
         }
@@ -171,7 +169,7 @@ export class CesiumVerticalProfileLayer extends CesiumMapLayer implements IVerti
     }
 
     setHighlightedRegion(region: GeoJSON.BBox | undefined) {
-
+        return;
     }
 
     shouldReceiveFeatureHoverEvents() {
@@ -185,7 +183,7 @@ export class CesiumVerticalProfileLayer extends CesiumMapLayer implements IVerti
     onFeatureHover(coordinate: Cartesian3, pickInfo: PickInfo) {
         if (this.onCoordinateHover_) {
             if (coordinate) {
-                let cartographic = Cartographic.fromCartesian(coordinate);
+                const cartographic = Cartographic.fromCartesian(coordinate);
                 this.onCoordinateHover_({
                     profileId: pickInfo.id,
                     coordinate: [
@@ -203,7 +201,7 @@ export class CesiumVerticalProfileLayer extends CesiumMapLayer implements IVerti
     onFeatureSelect(coordinate: Cartesian3, pickInfo: PickInfo) {
         if (this.onCoordinateSelect_) {
             if (coordinate) {
-                let cartographic = Cartographic.fromCartesian(coordinate);
+                const cartographic = Cartographic.fromCartesian(coordinate);
                 this.onCoordinateSelect_({
                     profileId: pickInfo.id,
                     coordinate: [
@@ -235,7 +233,6 @@ export class CesiumVerticalProfileLayer extends CesiumMapLayer implements IVerti
     protected getOrCreatePointHighlightEntity_() {
         let entity = this.dataSource_.entities.getById('highlighted-point');
         if (!entity) {
-
             entity = this.dataSource_.entities.add({
                 id: 'highlighted-point',
                 billboard: {
@@ -260,7 +257,6 @@ export class CesiumVerticalProfileLayer extends CesiumMapLayer implements IVerti
     protected getOrCreatePointSelectEntity_() {
         let entity = this.dataSource_.entities.getById('selected-point');
         if (!entity) {
-
             entity = this.dataSource_.entities.add({
                 id: 'selected-point',
                 billboard: {

@@ -1,4 +1,3 @@
-
 import LayerBase from 'ol/layer/Base';
 import { transformExtent } from 'ol/proj';
 
@@ -7,12 +6,11 @@ import { IFeature, IMapLayerRenderer, MapLayerRendererConfig } from '@oidajs/cor
 import { OLMapRenderer } from '../map/ol-map-renderer';
 
 export abstract class OLMapLayer<T extends LayerBase = LayerBase> implements IMapLayerRenderer {
-
     protected mapRenderer_: OLMapRenderer;
     protected olImpl_: T;
 
     constructor(config: MapLayerRendererConfig) {
-        let {mapRenderer, ...other} = config;
+        const { mapRenderer, ...other } = config;
 
         this.mapRenderer_ = mapRenderer as OLMapRenderer;
         this.olImpl_ = this.createOLObject_(other);
@@ -31,9 +29,8 @@ export abstract class OLMapLayer<T extends LayerBase = LayerBase> implements IMa
     }
 
     setExtent(extent: number[] | undefined) {
-
         if (extent) {
-            let projection = this.mapRenderer_.getViewer().getView().getProjection();
+            const projection = this.mapRenderer_.getViewer().getView().getProjection();
 
             if (projection.getCode() !== 'EPSG:4326') {
                 extent = transformExtent(extent, 'EPSG:4326', projection);
@@ -72,7 +69,9 @@ export abstract class OLMapLayer<T extends LayerBase = LayerBase> implements IMa
      * @param coordinate the hovered feature geographic coordinate
      * @param feature the hovered feature
      */
-    onFeatureHover(coordinate: GeoJSON.Position, feature: IFeature) {}
+    onFeatureHover(coordinate: GeoJSON.Position, feature: IFeature) {
+        return;
+    }
 
     /**
      * Override this in inherited classes to enable custom feature select behaviours
@@ -90,10 +89,10 @@ export abstract class OLMapLayer<T extends LayerBase = LayerBase> implements IMa
      * @param coordinate the hovered feature geographic coordinate
      * @param feature the hovered feature
      */
-    onFeatureSelect(coordinate: GeoJSON.Position, feature: IFeature) {}
+    onFeatureSelect(coordinate: GeoJSON.Position, feature: IFeature) {
+        return;
+    }
 
     protected abstract createOLObject_(config);
     protected abstract destroyOLObject_();
-
 }
-

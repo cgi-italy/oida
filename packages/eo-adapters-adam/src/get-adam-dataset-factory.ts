@@ -1,7 +1,7 @@
 import { v4 as uuid } from 'uuid';
 
 import { createAxiosInstance } from '@oidajs/core';
-import { DatasetConfig, ProductSearchRecord } from  '@oidajs/eo-mobx';
+import { DatasetConfig, ProductSearchRecord } from '@oidajs/eo-mobx';
 
 import { AdamDatasetConfig } from './adam-dataset-config';
 import { getAdamDatasetProductSearchConfig } from './product-search';
@@ -17,11 +17,10 @@ export type AdamDatasetFactoryConfig = {
     cswServiceUrl: string;
     wpsServiceUrl?: string;
     opensearchUrl?: string;
-    productSearchRecordContent?: (item: ProductSearchRecord) => any
+    productSearchRecordContent?: (item: ProductSearchRecord) => any;
 };
 
 export const getAdamDatasetFactory = (factoryConfig: AdamDatasetFactoryConfig) => {
-
     const axiosInstance = createAxiosInstance();
 
     let openSearchClient: AdamOpenSearchClient | undefined;
@@ -33,14 +32,16 @@ export const getAdamDatasetFactory = (factoryConfig: AdamDatasetFactoryConfig) =
     }
 
     const datasetFactory = (config: AdamDatasetConfig) => {
-
         const productSearchConfig = getAdamDatasetProductSearchConfig(axiosInstance, factoryConfig, config, openSearchClient);
         const timeDistributionConfig = getAdamDatasetTimeDistributionConfig(
-            axiosInstance, factoryConfig, config, productSearchConfig?.searchProvider
+            axiosInstance,
+            factoryConfig,
+            config,
+            productSearchConfig?.searchProvider
         );
         const spatialCoverageProvider = getAdamDatasetSpatialCoverageProvider(axiosInstance, factoryConfig, config);
 
-        let datasetConfig: DatasetConfig = {
+        const datasetConfig: DatasetConfig = {
             id: uuid(),
             name: config.name,
             color: config.color,

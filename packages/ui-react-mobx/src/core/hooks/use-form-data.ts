@@ -22,9 +22,8 @@ export type FormDataProps = {
  * in a format that can be passed to a component implementing the {@link FormRenderer} interface. Every time the field values object is
  * updated the hook is re-executed
  * @returns properties object that can be passed to the FormRenderer {{@link FormRenderer}} implementation
-*/
+ */
 export const useFormData = (props: FormDataProps) => {
-
     const { fieldValues, fields } = props;
 
     const hooksDeps: React.DependencyList = props.trackFieldsDefinitions ? [fieldValues, fields] : [fieldValues];
@@ -34,7 +33,7 @@ export const useFormData = (props: FormDataProps) => {
             return;
         }
 
-        let values = new Map<string, any>();
+        const values = new Map<string, any>();
         fieldValues.asArray().forEach((item) => {
             values.set(item.key, item.value);
         });
@@ -44,7 +43,7 @@ export const useFormData = (props: FormDataProps) => {
             values: values,
             onFieldChange: (name, value) => {
                 if (value !== undefined) {
-                    let filterConfig = props.fields.find((f) => {
+                    const filterConfig = props.fields.find((f) => {
                         return f.name === name;
                     });
                     if (filterConfig) {

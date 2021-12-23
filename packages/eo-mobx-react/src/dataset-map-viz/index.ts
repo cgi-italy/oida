@@ -13,4 +13,3 @@ export * from './dataset-volumetric-viz-settings';
 export * from './dataset-volumetric-view-mode-settings-factory';
 export * from './dataset-volumetric-stack-view-settings';
 export * from './dataset-volumetric-slice-view-settings';
-

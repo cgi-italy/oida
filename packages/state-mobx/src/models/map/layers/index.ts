@@ -1,6 +1,10 @@
 import {
-    GROUP_LAYER_ID, TILE_LAYER_ID, FEATURE_LAYER_ID,
-    GEO_IMAGE_LAYER_ID, VOLUME_LAYER_ID, VERTICAL_PROFILE_LAYER_ID
+    GROUP_LAYER_ID,
+    TILE_LAYER_ID,
+    FEATURE_LAYER_ID,
+    GEO_IMAGE_LAYER_ID,
+    VOLUME_LAYER_ID,
+    VERTICAL_PROFILE_LAYER_ID
 } from '@oidajs/core';
 
 import { MapLayer } from './map-layer';
@@ -44,4 +48,3 @@ export * from './feature-layer';
 export * from './geo-image-layer';
 export * from './vertical-profile-layer';
 export * from './volume-layer';
-

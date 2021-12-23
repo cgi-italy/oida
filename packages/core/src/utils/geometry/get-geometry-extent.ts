@@ -1,4 +1,3 @@
-
 import bbox from '@turf/bbox';
 import circle from '@turf/circle';
 
@@ -21,8 +20,7 @@ const mergeExtents = (firstExtent: GeoJSON.BBox | undefined, secondExtent: GeoJS
     }
 };
 
-
-export const getGeometryExtent = (geometry: Geometry): (GeoJSON.BBox | undefined) => {
+export const getGeometryExtent = (geometry: Geometry): GeoJSON.BBox | undefined => {
     if (geometry.type === 'GeometryCollectionEx') {
         return geometry.geometries.reduce((extent: GeoJSON.BBox | undefined, geom) => {
             return mergeExtents(extent, getGeometryExtent(geom));

@@ -1,8 +1,13 @@
 import React from 'react';
 import { Button, Tooltip } from 'antd';
 import {
-    ColumnWidthOutlined, AimOutlined, MenuFoldOutlined, MenuUnfoldOutlined,
-    StepBackwardOutlined, StepForwardOutlined, ExpandAltOutlined, ShrinkOutlined } from '@ant-design/icons';
+    ColumnWidthOutlined,
+    AimOutlined,
+    StepBackwardOutlined,
+    StepForwardOutlined,
+    ExpandAltOutlined,
+    ShrinkOutlined
+} from '@ant-design/icons';
 
 import { DateRangeValue } from '@oidajs/core';
 import { DateFieldRenderer, DateRangeFieldRenderer } from '@oidajs/ui-react-antd';
@@ -10,14 +15,13 @@ import { DateFieldRenderer, DateRangeFieldRenderer } from '@oidajs/ui-react-antd
 import { TimelineGroupLabelsMode } from './timeline';
 import { DatasetTimelineTimeSelectionMode } from './dataset-explorer-timeline';
 
-
 export type DatasetDiscoveryTimelineToolbarProps = {
     onDrawRange: () => void;
     timeSelectionMode: DatasetTimelineTimeSelectionMode;
     onTimeSelectionModeChange: (selectionMode: DatasetTimelineTimeSelectionMode) => void;
-    groupLabelsMode: TimelineGroupLabelsMode
+    groupLabelsMode: TimelineGroupLabelsMode;
     onGroupLabelsModeChange: (mode: TimelineGroupLabelsMode) => void;
-    selectedTime: Date | DateRangeValue | undefined
+    selectedTime: Date | DateRangeValue | undefined;
     onSelectedTimeChange: (value: Date | DateRangeValue | undefined) => void;
     isCompressed: boolean;
     onCompressToggle: () => void;
@@ -29,8 +33,6 @@ export type DatasetDiscoveryTimelineToolbarProps = {
 };
 
 export const DatasetExplorerTimelineToolbar = (props: DatasetDiscoveryTimelineToolbarProps) => {
-
-    const layerNamesVisible = props.groupLabelsMode === TimelineGroupLabelsMode.Block;
     const isRangeMode = props.timeSelectionMode === DatasetTimelineTimeSelectionMode.Range;
 
     let timeField: JSX.Element;
@@ -39,10 +41,7 @@ export const DatasetExplorerTimelineToolbar = (props: DatasetDiscoveryTimelineTo
         timeField = (
             <React.Fragment>
                 <Tooltip title='Previous step'>
-                    <Button
-                        size='small'
-                        onClick={props.onGoToPrevItem}
-                    >
+                    <Button size='small' onClick={props.onGoToPrevItem}>
                         <StepBackwardOutlined />
                     </Button>
                 </Tooltip>
@@ -59,10 +58,7 @@ export const DatasetExplorerTimelineToolbar = (props: DatasetDiscoveryTimelineTo
                     onChange={props.onSelectedTimeChange}
                 />
                 <Tooltip title='Next step'>
-                    <Button
-                        size='small'
-                        onClick={props.onGoToNextItem}
-                    >
+                    <Button size='small' onClick={props.onGoToNextItem}>
                         <StepForwardOutlined />
                     </Button>
                 </Tooltip>
@@ -88,45 +84,32 @@ export const DatasetExplorerTimelineToolbar = (props: DatasetDiscoveryTimelineTo
     return (
         <div className='dataset-timeline-toolbar'>
             <div className='dataset-timeline-toolbar-title'>{props.title || 'Time navigation'}</div>
-            <div className='dataset-timeline-time-selector'>
-                {timeField}
-            </div>
+            <div className='dataset-timeline-time-selector'>{timeField}</div>
             <div className='dataset-timeline-selector-controls'>
-                {!props.isCompressed &&
-                    <Tooltip
-                        title='Center on selected time'
-                    >
-                        <Button
-                            type='link'
-                            size='small'
-                            onClick={props.onGoToTimeSelection}
-                        >
-                            <AimOutlined/>
+                {!props.isCompressed && (
+                    <Tooltip title='Center on selected time'>
+                        <Button type='link' size='small' onClick={props.onGoToTimeSelection}>
+                            <AimOutlined />
                         </Button>
                     </Tooltip>
-                }
-                {!props.rangeModeDisabled &&
-                    <Tooltip
-                        title={isRangeMode ? 'Disable range mode' : 'Enable range mode' }
-                    >
+                )}
+                {!props.rangeModeDisabled && (
+                    <Tooltip title={isRangeMode ? 'Disable range mode' : 'Enable range mode'}>
                         <Button
                             type={isRangeMode ? 'primary' : 'link'}
                             size='small'
                             onClick={() => {
-                                props.onTimeSelectionModeChange(isRangeMode
-                                    ? DatasetTimelineTimeSelectionMode.Instant
-                                    : DatasetTimelineTimeSelectionMode.Range
+                                props.onTimeSelectionModeChange(
+                                    isRangeMode ? DatasetTimelineTimeSelectionMode.Instant : DatasetTimelineTimeSelectionMode.Range
                                 );
                             }}
                         >
-                            <ColumnWidthOutlined/>
+                            <ColumnWidthOutlined />
                         </Button>
                     </Tooltip>
-                }
+                )}
             </div>
-            <Tooltip
-                title={props.isCompressed ? 'Expand timeline' : 'Compress timeline'}
-            >
+            <Tooltip title={props.isCompressed ? 'Expand timeline' : 'Compress timeline'}>
                 <Button
                     size='small'
                     type='text'

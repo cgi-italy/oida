@@ -6,7 +6,6 @@ export type SpatialReferenceOrgDefinitionProviderConfig = {
 };
 
 export class SpatialReferenceOrgDefinitionProvider {
-
     protected axiosInstance_: AxiosInstanceWithCancellation;
     protected serviceUrl_: string;
 
@@ -18,11 +17,13 @@ export class SpatialReferenceOrgDefinitionProvider {
     getSrsDefinition(code: string) {
         const defPath = code.toLowerCase().split(':').join('/');
 
-        return this.axiosInstance_.request<string>({
-            url: `${this.serviceUrl_}/ref/${defPath}/proj4/`,
-            responseType: 'text/plain'
-        }).then((response) => {
-            return response.data;
-        });
+        return this.axiosInstance_
+            .request<string>({
+                url: `${this.serviceUrl_}/ref/${defPath}/proj4/`,
+                responseType: 'text/plain'
+            })
+            .then((response) => {
+                return response.data;
+            });
     }
 }

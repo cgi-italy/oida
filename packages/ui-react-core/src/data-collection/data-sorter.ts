@@ -10,7 +10,7 @@ export type DataSorterProps = {
     sortableFields: Array<DataSortField>;
     sortKey: string;
     sortOrder: SortOrder;
-    onSortChange: (sortBy: {key?: string, order?: SortOrder}) => void;
+    onSortChange: (sortBy: { key?: string; order?: SortOrder }) => void;
     onSortClear: () => void;
 };
 

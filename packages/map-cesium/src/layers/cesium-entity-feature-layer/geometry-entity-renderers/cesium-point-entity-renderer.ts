@@ -5,35 +5,17 @@ import HeightReference from 'cesium/Source/Scene/HeightReference';
 import BillboardGraphics from 'cesium/Source/DataSources/BillboardGraphics';
 import PointGraphics from 'cesium/Source/DataSources/PointGraphics';
 
-import { IFeatureStyle, IPointStyle, isIcon } from '@oidajs/core';
+import { IFeatureStyle, isIcon } from '@oidajs/core';
 
 import { CesiumGeometryEntityRenderer } from './cesium-geometry-entity-renderer-factory';
 
-const getPropsFromStyle = (style: IPointStyle) => {
-    if (isIcon(style)) {
-        return {
-            color: style.color ? new Color(...style.color) : undefined,
-            image: style.url,
-            scale: style.scale || 1.0,
-            rotation: style.rotation || 0.0,
-        };
-    } else {
-        return {
-            pixelSize: style.radius || 1,
-            color: style.fillColor ? new Color(...style.fillColor) : undefined,
-            outlineColor: style.strokeColor ? new Color(...style.strokeColor) : undefined
-        };
-    }
-};
-
 export const createPointEntity = (id: string, geometry: GeoJSON.Point, featureStyle: IFeatureStyle, layerOptions?) => {
-
-    let style = featureStyle.point;
+    const style = featureStyle.point;
     if (!style) {
         return;
     }
 
-    let pointEntity = new Entity({
+    const pointEntity = new Entity({
         id: id,
         position: Cartesian3.fromDegrees(...geometry.coordinates),
         show: style.visible
@@ -45,7 +27,7 @@ export const createPointEntity = (id: string, geometry: GeoJSON.Point, featureSt
     }
 
     if (isIcon(style)) {
-        let billboard = new BillboardGraphics({
+        const billboard = new BillboardGraphics({
             color: style.color ? new Color(...style.color) : undefined,
             image: style.url,
             scale: style.scale || 1.0,
@@ -55,7 +37,7 @@ export const createPointEntity = (id: string, geometry: GeoJSON.Point, featureSt
         });
         pointEntity.billboard = billboard;
     } else {
-        let point = new PointGraphics({
+        const point = new PointGraphics({
             pixelSize: style.radius ? style.radius * 2 : 1,
             color: style.fillColor ? new Color(...style.fillColor) : undefined,
             outlineColor: style.strokeColor ? new Color(...style.strokeColor) : undefined
@@ -71,8 +53,7 @@ export const updatePointEntityGeometry = (pointEntity, geometry: GeoJSON.Point) 
 };
 
 export const updatePointEntityStyle = (pointEntity, featureStyle: IFeatureStyle) => {
-
-    let style = featureStyle.point;
+    const style = featureStyle.point;
     if (!style) {
         return;
     }
@@ -96,7 +77,6 @@ export const updatePointEntityStyle = (pointEntity, featureStyle: IFeatureStyle)
         }
 
         billboard.eyeOffset = new Cartesian3(0, 0, -100 * (style.zIndex || 0));
-
     } else {
         pointEntity.billboard = undefined;
         let point = pointEntity.point;
@@ -114,18 +94,16 @@ export const updatePointEntityStyle = (pointEntity, featureStyle: IFeatureStyle)
             point.pixelSize = style.radius * 2;
         }
     }
-
 };
 
 export const createMultiPointEntity = (id, geometry: GeoJSON.MultiPoint, featureStyle: IFeatureStyle, layerOptions) => {
-
-    let pointStyle = featureStyle.point;
+    const pointStyle = featureStyle.point;
 
     if (!pointStyle) {
         return;
     }
 
-    let multiPointEntity = new Entity({
+    const multiPointEntity = new Entity({
         id: id,
         show: pointStyle.visible
     });
@@ -133,13 +111,8 @@ export const createMultiPointEntity = (id, geometry: GeoJSON.MultiPoint, feature
     multiPointEntity.featureStyle = featureStyle;
     multiPointEntity.layerOptions = layerOptions;
 
-    let pointEntities = geometry.coordinates.map((pointCoords, idx) => {
-        let pointEntity = createPointEntity(
-            `${id}_${idx}`,
-            {type: 'Point', coordinates: pointCoords},
-            featureStyle,
-            layerOptions
-        );
+    geometry.coordinates.forEach((pointCoords, idx) => {
+        const pointEntity = createPointEntity(`${id}_${idx}`, { type: 'Point', coordinates: pointCoords }, featureStyle, layerOptions);
         pointEntity.parent = multiPointEntity;
     });
 
@@ -147,20 +120,16 @@ export const createMultiPointEntity = (id, geometry: GeoJSON.MultiPoint, feature
 };
 
 export const updateMultiPointEntityGeometry = (multiPointEntity, geometry: GeoJSON.MultiPoint) => {
-    let pointEntities = multiPointEntity._children;
-    let coordinates = geometry.coordinates;
+    const pointEntities = multiPointEntity._children;
+    const coordinates = geometry.coordinates;
 
     let i = 0;
     for (i = 0; i < coordinates.length; ++i) {
-        if (pointEntities[i])
-            updatePointEntityGeometry(
-                pointEntities[i],
-                {type: 'Point', coordinates: coordinates[i]}
-            );
+        if (pointEntities[i]) updatePointEntityGeometry(pointEntities[i], { type: 'Point', coordinates: coordinates[i] });
         else {
-            let pointEntity = createPointEntity(
+            const pointEntity = createPointEntity(
                 `${multiPointEntity.id}_${i}`,
-                {type: 'Point', coordinates: coordinates[i]},
+                { type: 'Point', coordinates: coordinates[i] },
                 multiPointEntity.featureStyle,
                 multiPointEntity.layerOptions
             );
@@ -168,20 +137,18 @@ export const updateMultiPointEntityGeometry = (multiPointEntity, geometry: GeoJS
         }
     }
 
-    let toRemove = pointEntities.slice(i);
+    const toRemove = pointEntities.slice(i);
     toRemove.forEach((pointEntity) => {
         pointEntity.parent = undefined;
         if (pointEntity.entityCollection) {
             pointEntity.entityCollection.remove(pointEntity);
         }
     });
-
 };
 
 export const updateMultiPointEntityStyle = (multiPointEntity, featureStyle: IFeatureStyle) => {
-
     multiPointEntity.featureStyle = featureStyle;
-    let pointEntities = multiPointEntity._children;
+    const pointEntities = multiPointEntity._children;
     pointEntities.forEach((pointEntity) => {
         updatePointEntityStyle(pointEntity, featureStyle);
     });

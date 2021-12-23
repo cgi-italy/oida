@@ -7,7 +7,6 @@ import { DatasetDownloadConfig } from './dataset-download-config';
 import { DatasetToolConfig } from './dataset-tool-config';
 import { DatasetSpatialCoverageProvider } from './dataset-spatial-coverage-provider';
 
-
 export type DatasetMapViewConfig<MAP_VIEW_TYPE extends keyof DatasetVizDefinitions> = {
     type: MAP_VIEW_TYPE;
     config: DatasetVizConfig<MAP_VIEW_TYPE>;
@@ -42,12 +41,12 @@ export type DatasetConfig<MAP_VIEW_TYPE extends keyof DatasetVizDefinitions = ke
      * The configuration for product retrieval within the dataset. The filters provided in {@link DatasetConfig.filters}
      * will be available for search.
      * If not provided it will not possible to search for dataset products
-    */
+     */
     productSearch?: DatasetProductSearchConfig;
     /** The dataset spatial domain provider. It returns the dataset spatial extent for the current dataset map visualization. */
     spatialCoverageProvider?: DatasetSpatialCoverageProvider;
     /** The map view configuration for the dataset */
-    mapView?: DatasetMapViewConfig<MAP_VIEW_TYPE>
+    mapView?: DatasetMapViewConfig<MAP_VIEW_TYPE>;
     /** The configuration of the analytics tools supported by the dataset */
     tools?: DatasetToolConfig[];
     /** Dataset download configuration */

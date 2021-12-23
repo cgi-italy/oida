@@ -16,7 +16,6 @@ export type DatasetValueRangeSelectorProps = {
 };
 
 export const DatasetValueRangeSelector = (props: DatasetValueRangeSelectorProps) => {
-
     const units = props.dimension.units ? props.dimension.units : '';
 
     const domain = useDatasetDomain({
@@ -26,11 +25,15 @@ export const DatasetValueRangeSelector = (props: DatasetValueRangeSelectorProps)
     return (
         <Form.Item label='Range'>
             <NumericRangeFieldRenderer
-                value={props.value ? {
-                    from: props.value.min,
-                    to: props.value.max
-                } : undefined}
-                onChange={(value) => props.onChange(value ? {min: value.from, max: value.to} : undefined)}
+                value={
+                    props.value
+                        ? {
+                              from: props.value.min,
+                              to: props.value.max
+                          }
+                        : undefined
+                }
+                onChange={(value) => props.onChange(value ? { min: value.from, max: value.to } : undefined)}
                 config={{
                     min: domain?.min,
                     max: domain?.max,
@@ -41,7 +44,6 @@ export const DatasetValueRangeSelector = (props: DatasetValueRangeSelectorProps)
                         return `${value} ${units}`;
                     }
                 }}
-
             />
         </Form.Item>
     );
@@ -54,7 +56,6 @@ export type DatasetTimeRangeSelectorProps = {
 };
 
 export const DatasetTimeRangeSelector = (props: DatasetTimeRangeSelectorProps) => {
-
     const domain = useDatasetDomain({
         dimension: props.dimension
     });
@@ -62,14 +63,24 @@ export const DatasetTimeRangeSelector = (props: DatasetTimeRangeSelectorProps) =
     return (
         <Form.Item label='Range'>
             <DateRangeFieldRenderer
-                value={props.value ? {
-                    start: props.value.min,
-                    end: props.value.max
-                } : undefined}
-                onChange={(value) => props.onChange(value ? {
-                    min: value.start,
-                    max: value.end
-                } : undefined)}
+                value={
+                    props.value
+                        ? {
+                              start: props.value.min,
+                              end: props.value.max
+                          }
+                        : undefined
+                }
+                onChange={(value) =>
+                    props.onChange(
+                        value
+                            ? {
+                                  min: value.start,
+                                  max: value.end
+                              }
+                            : undefined
+                    )
+                }
                 config={{
                     withTime: false,
                     minDate: domain?.min,
@@ -87,7 +98,6 @@ export type DatasetCategoricalRangeSelectorProps = {
 };
 
 export const DatasetCategoricalRangeSelector = (props: DatasetCategoricalRangeSelectorProps) => {
-
     const domain = useDatasetDomain({
         dimension: props.dimension
     });
@@ -102,7 +112,7 @@ export const DatasetCategoricalRangeSelector = (props: DatasetCategoricalRangeSe
                 value={props.value}
                 onChange={(value) => props.onChange(value as string[])}
                 config={{
-                    choices: domain.values.map(domainValue => {
+                    choices: domain.values.map((domainValue) => {
                         return {
                             name: domainValue.label || domainValue.value.toString(),
                             value: domainValue.value.toString()
@@ -123,7 +133,6 @@ export type DatasetDimensionRangeProps = {
 
 // TODO: This should be updated to support dynamic domains (in a similar way as DatasetDimensionValueSelector)
 export const DatasetDimensionRangeSelector = (props: DatasetDimensionRangeProps) => {
-
     const domain = useDatasetDomain({
         dimension: props.dimension
     });
@@ -152,7 +161,6 @@ export const DatasetDimensionRangeSelector = (props: DatasetDimensionRangeProps)
             );
         }
     }
-
 
     if (isValueDomain(domain)) {
         if (domain.min instanceof Date) {

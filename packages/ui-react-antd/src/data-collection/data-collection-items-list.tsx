@@ -27,27 +27,22 @@ type ListItemProps<T> = {
 };
 
 function ListItem<T>(props: ListItemProps<T>) {
-
-    const {hovered, selected} =  props.itemState(props.item);
+    const { hovered, selected } = props.itemState(props.item);
     const actions = props.itemActions ? props.itemActions(props.item) : [];
 
     const itemActions = actions.map((action) => {
-        return (
-            <DataCollectionItemActionButton
-                action={action}
-            />
-        );
+        return <DataCollectionItemActionButton action={action} />;
     });
 
     const [{ canDrop, isDropHover }, drop] = useDrop({
         accept: [NativeTypes.FILE],
-        drop: (dropItem: {files: File[], items: DataTransferItemList, type: typeof NativeTypes.FILE}, monitor) => {
+        drop: (dropItem: { files: File[]; items: DataTransferItemList; type: typeof NativeTypes.FILE }, monitor) => {
             props.fileDropProps?.onDrop(props.item, dropItem.files);
         },
-        canDrop: () => props.fileDropProps ? props.fileDropProps.canDrop(props.item) : false,
+        canDrop: () => (props.fileDropProps ? props.fileDropProps.canDrop(props.item) : false),
         collect: (monitor) => ({
             isDropHover: monitor.isOver(),
-            canDrop: monitor.canDrop(),
+            canDrop: monitor.canDrop()
         })
     });
 
@@ -68,7 +63,7 @@ function ListItem<T>(props: ListItemProps<T>) {
         >
             <List.Item
                 actions={itemActions}
-                className={classnames({'hovered': hovered, 'selected': selected, 'can-drop': canDrop, 'is-drop-hover': isDropHover})}
+                className={classnames({ hovered: hovered, selected: selected, 'can-drop': canDrop, 'is-drop-hover': isDropHover })}
                 onMouseEnter={props.onMouseEnter}
                 onMouseLeave={props.onMouseLeave}
                 onClick={props.onClick}
@@ -78,7 +73,6 @@ function ListItem<T>(props: ListItemProps<T>) {
             </List.Item>
         </div>
     );
-
 }
 
 export type DataCollectionItemsListProps<T> = {
@@ -88,7 +82,6 @@ export type DataCollectionItemsListProps<T> = {
     size?: 'default' | 'small' | 'large';
 };
 export function DataCollectionItemsList<T>(props: DataCollectionItemsListProps<T> & DataCollectionItemsProps<T>) {
-
     const {
         autoScrollOnSelection,
         content,
@@ -106,7 +99,6 @@ export function DataCollectionItemsList<T>(props: DataCollectionItemsListProps<T
     let lastClickedRowIndex = -1;
 
     const listItems = props.data.map((item, listIndex) => {
-
         return (
             <ListItem<T>
                 key={keyGetter(item)}
@@ -151,10 +143,12 @@ export function DataCollectionItemsList<T>(props: DataCollectionItemsListProps<T
         );
     });
 
-    const {data, loadingState, ...listProps} = renderProps;
+    const { data, loadingState, ...listProps } = renderProps;
 
     if (loadingState === LoadingState.Error) {
-        return <Empty image={<CloseCircleOutlined/>} description='Error retrieving data' imageStyle={{fontSize: '30px', height: '40px'}} />;
+        return (
+            <Empty image={<CloseCircleOutlined />} description='Error retrieving data' imageStyle={{ fontSize: '30px', height: '40px' }} />
+        );
     }
     if (loadingState === LoadingState.Success && !data.length) {
         return <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />;

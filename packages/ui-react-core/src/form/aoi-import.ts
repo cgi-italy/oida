@@ -1,6 +1,5 @@
 import { DataCollectionProps } from '../data-collection';
 
-
 export type AoiImportConfig = {
     onFileImportAction?: (files) => Promise<void>;
     onAoiImportAction: (aoi) => void;
@@ -10,5 +9,5 @@ export type AoiImportConfig = {
     selectedSourceGroup: string;
     sourceGroups: any[];
     selectedSourceGroupItems?: DataCollectionProps<any>;
-    supportedFileTypes: string[]
+    supportedFileTypes: string[];
 };

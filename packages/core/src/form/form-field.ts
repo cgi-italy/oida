@@ -5,11 +5,11 @@ export type FormFieldRendererConfig = {
     /**
      * The renderer unique identifier
      */
-    id?: string,
+    id?: string;
     /**
      * The renderer specific properties
      */
-    props?: Record<string, any>
+    props?: Record<string, any>;
 };
 
 /**
@@ -47,7 +47,6 @@ export type FormFieldCommon<TYPE extends string> = {
     rendererConfig?: FormFieldRendererConfig;
 };
 
-
 /**
  * Form field state type
  * @template T The form field value type
@@ -73,23 +72,17 @@ export type FormFieldDefinition<TYPE extends string, T, CONFIG> = FormFieldCommo
 /**
  * Form field type. It combines field configuration and state
  */
-export type FormField<TYPE extends string, T, CONFIG> = FormFieldCommon<TYPE> & {config: CONFIG} & FormFieldState<T>;
-
+export type FormField<TYPE extends string, T, CONFIG> = FormFieldCommon<TYPE> & { config: CONFIG } & FormFieldState<T>;
 
 // use declaration merging to register new form fields
-export interface IFormFieldDefinitions {
+export interface IFormFieldDefinitions {}
 
-}
-
-export interface IFormFieldValueTypes {
-
-}
+export interface IFormFieldValueTypes {}
 
 export type IFormFieldType = keyof IFormFieldDefinitions;
 export type IFormFieldDefinition<TYPE extends IFormFieldType = IFormFieldType> = IFormFieldDefinitions[TYPE];
 export type IFormFieldValueType<TYPE extends IFormFieldType = IFormFieldType> = IFormFieldValueTypes[TYPE];
-export type IFormField<TYPE extends IFormFieldType =
-    IFormFieldType> = IFormFieldDefinition<TYPE> & FormFieldState<IFormFieldValueTypes[TYPE]>;
-
+export type IFormField<TYPE extends IFormFieldType = IFormFieldType> = IFormFieldDefinition<TYPE> &
+    FormFieldState<IFormFieldValueTypes[TYPE]>;
 
 export type FormFieldValues = Map<string, any>;

@@ -2,7 +2,6 @@ import { ColorMap, RasterBandMode, RasterBandModeSingle } from '@oidajs/eo-mobx'
 import { plottyToAdamWcsColormap } from '../utils';
 
 export const getColormapWcsParams = (bandMode: RasterBandMode) => {
-
     let colorRange: string | undefined = undefined;
     let colorTable: string | undefined = undefined;
 
@@ -10,7 +9,7 @@ export const getColormapWcsParams = (bandMode: RasterBandMode) => {
     const bandModeValue = bandMode.value;
     if (bandModeValue instanceof RasterBandModeSingle) {
         colorMap = bandModeValue.colorMap;
-        let mapRange = bandModeValue.colorMap.domain?.mapRange;
+        const mapRange = bandModeValue.colorMap.domain?.mapRange;
         if (mapRange) {
             colorRange = `(${mapRange.min},${mapRange.max})`;
         }
@@ -24,5 +23,4 @@ export const getColormapWcsParams = (bandMode: RasterBandMode) => {
         colorTable,
         colorRange
     };
-
 };

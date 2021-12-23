@@ -8,11 +8,10 @@ import { IObservableArray } from 'mobx';
 import { MapInteraction } from '../../models/map/interactions';
 
 export type InteractionListControllerProps = {
-    interactions: IObservableArray<MapInteraction>
+    interactions: IObservableArray<MapInteraction>;
 };
 
 export class InteractionListController {
-
     private interactions_: IObservableArray<MapInteraction>;
     private mapRenderer_: IMapRenderer | undefined;
 
@@ -42,7 +41,7 @@ export class InteractionListController {
     }
 
     private createInteractionController_(interaction: MapInteraction) {
-        let interactionController = interactionControllersFactory.create(interaction.interactionType, {
+        const interactionController = interactionControllersFactory.create(interaction.interactionType, {
             interaction
         });
 
@@ -58,6 +57,4 @@ export class InteractionListController {
             controller.destroy();
         }
     }
-
 }
-

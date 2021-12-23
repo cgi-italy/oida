@@ -6,7 +6,7 @@ export type DataCollectionItemAction = {
      * The callback invoked when the action is selected.
      * If the callback returns a promise the action will be disabled until the promise completes.
      */
-    callback: () => (void | Promise<void>);
+    callback: () => void | Promise<void>;
     /** The action content */
     content?: React.ReactNode;
     /** An icon to display */
@@ -34,7 +34,7 @@ export type DataCollectionItemsProps<T> = {
     /** Callback invoked when an item of the collection is mouse hovered */
     onHoverAction: (item: T, hovered: boolean) => void;
     /** Callback invoked when an item of the collection is selected (e.g. mouse click) */
-    onSelectAction: (item:  T, mode: SelectionMode) => void;
+    onSelectAction: (item: T, mode: SelectionMode) => void;
     /** Callback invoked when the default action (e.g. double click) is performed on an item */
     onDefaultAction?: (item: T) => void;
     /** A function that given an item return the list of actions available for the item */

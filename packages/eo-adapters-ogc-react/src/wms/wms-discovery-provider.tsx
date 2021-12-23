@@ -10,19 +10,19 @@ import { WmsDatasetDiscoveryProvider } from '@oidajs/eo-adapters-ogc';
 import { useHistory, useRouteMatch, Redirect, Route, Switch, useParams } from 'react-router';
 import { WmsDiscoveryProviderResults } from './wms-discovery-provider-results';
 
-
-const WmsDiscoveryProviderRedirect = (props: {provider: WmsDatasetDiscoveryProvider}) => {
+const WmsDiscoveryProviderRedirect = (props: { provider: WmsDatasetDiscoveryProvider }) => {
     const { url } = useRouteMatch();
 
     const selectedService = useSelector(() => props.provider.selectedService || props.provider.services[0]);
     if (selectedService) {
         return (
-            <Redirect to={{
-                pathname: `${url}/${selectedService.id}`,
-                state: {
-                    updateLocationFromState: true
-                }
-            }}
+            <Redirect
+                to={{
+                    pathname: `${url}/${selectedService.id}`,
+                    state: {
+                        updateLocationFromState: true
+                    }
+                }}
             />
         );
     } else {
@@ -31,19 +31,13 @@ const WmsDiscoveryProviderRedirect = (props: {provider: WmsDatasetDiscoveryProvi
 };
 
 export const WmsDiscoveryProviderRoute = (props: WmsDiscoveryProviderRouterProps) => {
-
-    const { serviceId } = useParams<{serviceId: string}>();
+    const { serviceId } = useParams<{ serviceId: string }>();
 
     useEffect(() => {
         props.provider.selectService(serviceId);
     }, [serviceId]);
 
-    return (
-        <WmsDiscoveryProviderResults
-            provider={props.provider}
-            datasetExplorer={props.datasetExplorer}
-        />
-    );
+    return <WmsDiscoveryProviderResults provider={props.provider} datasetExplorer={props.datasetExplorer} />;
 };
 
 export type WmsDiscoveryProviderRouterProps = {
@@ -52,39 +46,30 @@ export type WmsDiscoveryProviderRouterProps = {
 };
 
 export const WmsDiscoveryProviderRouter = (props: WmsDiscoveryProviderRouterProps) => {
-
     const { path } = useRouteMatch();
 
     return (
         <Switch>
             <Route exact path={path}>
-                <WmsDiscoveryProviderRedirect provider={props.provider}
-                />
+                <WmsDiscoveryProviderRedirect provider={props.provider} />
             </Route>
             <Route path={`${path}/:serviceId`}>
-                <WmsDiscoveryProviderRoute
-                    provider={props.provider}
-                    datasetExplorer={props.datasetExplorer}
-                />
+                <WmsDiscoveryProviderRoute provider={props.provider} datasetExplorer={props.datasetExplorer} />
             </Route>
         </Switch>
     );
 };
 
 export type WmsDiscoveryProviderProps = {
-    provider: WmsDatasetDiscoveryProvider,
-    datasetExplorer: DatasetExplorer
+    provider: WmsDatasetDiscoveryProvider;
+    datasetExplorer: DatasetExplorer;
 };
 
 export const WmsDiscoveryProvider = (props: WmsDiscoveryProviderProps) => {
-
     const serviceOptions = useSelector(() => {
         return props.provider.services.map((service) => {
             return (
-                <Select.Option
-                    key={service.id}
-                    value={service.id}
-                >
+                <Select.Option key={service.id} value={service.id}>
                     {service.name}
                 </Select.Option>
             );
@@ -93,7 +78,7 @@ export const WmsDiscoveryProvider = (props: WmsDiscoveryProviderProps) => {
 
     const history = useHistory();
     const { url, path } = useRouteMatch();
-    const match = useRouteMatch<{serviceId: string}>({
+    const match = useRouteMatch<{ serviceId: string }>({
         path: `${path}/:serviceId`
     });
     const selectedService = match?.params.serviceId;
@@ -102,17 +87,11 @@ export const WmsDiscoveryProvider = (props: WmsDiscoveryProviderProps) => {
         <div className='wms-discovery-provider'>
             <div className='wms-discovery-service-selector'>
                 <label>Service:</label>
-                <Select
-                    value={selectedService}
-                    onChange={(value) => history.push(`${url}/${value}`)}
-                >
+                <Select value={selectedService} onChange={(value) => history.push(`${url}/${value}`)}>
                     {serviceOptions}
                 </Select>
             </div>
-            <WmsDiscoveryProviderRouter
-                datasetExplorer={props.datasetExplorer}
-                provider={props.provider}
-            />
+            <WmsDiscoveryProviderRouter datasetExplorer={props.datasetExplorer} provider={props.provider} />
         </div>
     );
 };

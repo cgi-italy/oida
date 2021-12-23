@@ -1,5 +1,5 @@
 import { AxiosInstanceWithCancellation } from '@oidajs/core';
-import { DatasetTimeDistributionConfig, DatasetProductSearchProvider } from  '@oidajs/eo-mobx';
+import { DatasetTimeDistributionConfig, DatasetProductSearchProvider } from '@oidajs/eo-mobx';
 
 import { AdamDatasetConfig, isMultiBandCoverage } from '../adam-dataset-config';
 import { AdamDatasetFactoryConfig } from '../get-adam-dataset-factory';
@@ -13,7 +13,6 @@ export const getAdamDatasetTimeDistributionConfig = (
     datasetConfig: AdamDatasetConfig,
     searchProvider?: DatasetProductSearchProvider
 ) => {
-
     if (datasetConfig.timeless) {
         return undefined;
     }
@@ -25,11 +24,13 @@ export const getAdamDatasetTimeDistributionConfig = (
         coverageId = datasetConfig.coverages[0].wcsCoverage;
     }
 
-    let productCatalogueConfig: {
-        provider: DatasetProductSearchProvider;
-        timeRangeQueryParam: string;
-        timeSortParam?: string
-    } | undefined;
+    let productCatalogueConfig:
+        | {
+              provider: DatasetProductSearchProvider;
+              timeRangeQueryParam: string;
+              timeSortParam?: string;
+          }
+        | undefined;
 
     if (searchProvider instanceof AdamOpenSearchProductSearchProvider) {
         productCatalogueConfig = {

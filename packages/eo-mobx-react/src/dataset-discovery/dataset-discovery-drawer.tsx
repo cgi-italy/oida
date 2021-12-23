@@ -8,7 +8,6 @@ import { DatasetDiscovery, DatasetExplorer } from '@oidajs/eo-mobx';
 
 import { DatasetDiscoveryProviderTabsNavigation, DatasetDiscoveryProviderRouter } from './dataset-discovery-provider-route';
 
-
 export type DatasetDiscoveryDrawerProps = {
     datasetDiscovery: DatasetDiscovery;
     datasetExplorer: DatasetExplorer;
@@ -18,8 +17,7 @@ export type DatasetDiscoveryDrawerProps = {
 } & Omit<DrawerProps, 'visible' | 'onClose' | 'afterVisibleChange'>;
 
 export const DatasetDiscoveryDrawer = (props: DatasetDiscoveryDrawerProps) => {
-
-    const { datasetDiscovery, datasetExplorer, title, backIcon, onClose, ...drawerProps} = props;
+    const { datasetDiscovery, datasetExplorer, title, backIcon, onClose, ...drawerProps } = props;
 
     const [visible, setVisible] = useState(true);
 
@@ -31,7 +29,6 @@ export const DatasetDiscoveryDrawer = (props: DatasetDiscoveryDrawerProps) => {
         };
     }, []);
 
-
     return (
         <Drawer
             className='dataset-discovery-drawer'
@@ -40,14 +37,15 @@ export const DatasetDiscoveryDrawer = (props: DatasetDiscoveryDrawerProps) => {
                 <PageHeader
                     title={props.title || 'Data discovery'}
                     onBack={() => setVisible(false)}
-                    backIcon={props.backIcon || <Tooltip title='Back to map'><CloseOutlined/></Tooltip>}
-                    footer={
-                        <DatasetDiscoveryProviderTabsNavigation
-                            datasetDiscovery={datasetDiscovery}
-                        />
+                    backIcon={
+                        props.backIcon || (
+                            <Tooltip title='Back to map'>
+                                <CloseOutlined />
+                            </Tooltip>
+                        )
                     }
-                >
-                </PageHeader>
+                    footer={<DatasetDiscoveryProviderTabsNavigation datasetDiscovery={datasetDiscovery} />}
+                ></PageHeader>
             }
             placement='right'
             closable={false}
@@ -63,10 +61,7 @@ export const DatasetDiscoveryDrawer = (props: DatasetDiscoveryDrawerProps) => {
                 }
             }}
         >
-            {visible && <DatasetDiscoveryProviderRouter
-                datasetDiscovery={datasetDiscovery}
-                datasetExplorer={datasetExplorer}
-            />}
+            {visible && <DatasetDiscoveryProviderRouter datasetDiscovery={datasetDiscovery} datasetExplorer={datasetExplorer} />}
         </Drawer>
     );
 };

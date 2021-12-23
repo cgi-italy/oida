@@ -7,35 +7,32 @@ import { DateQuantity, LoadingState } from '@oidajs/core';
 import { DatasetRasterPointInfo, isDomainProvider, NumericDomainMapper } from '@oidajs/eo-mobx';
 import { useFormatter } from '@oidajs/ui-react-mobx';
 
-
 export type DatasetRasterPointInfoTableProps = {
     pointInfo: DatasetRasterPointInfo;
 };
 
 export const DatasetRasterPointInfoTable = observer((props: DatasetRasterPointInfoTableProps) => {
-
     const dateFormatter = useFormatter(DateQuantity);
 
     if (props.pointInfo.loadingState.value === LoadingState.Loading) {
-        return <SyncOutlined spin/>;
+        return <SyncOutlined spin />;
     } else {
         if (props.pointInfo.data) {
             const dimensionValues: JSX.Element[] = [];
 
             props.pointInfo.dimensions.values.forEach((value, id) => {
                 const dimensionConfig = props.pointInfo.config.dimensions.find((dimension) => dimension.id === id);
-                dimensionValues.push((
+                dimensionValues.push(
                     <Descriptions.Item key={id} label={dimensionConfig?.name || id}>
                         {value instanceof Date ? dateFormatter(value, {}) : value} {dimensionConfig?.units}
                     </Descriptions.Item>
-                ));
+                );
             });
 
             const bandValues = Object.entries(props.pointInfo.data).map(([bandId, value]) => {
-
                 let content: React.ReactNode;
                 let label: string;
-                if (typeof(value) === 'number') {
+                if (typeof value === 'number') {
                     const bandDetails = props.pointInfo.config.variables.find((band) => band.id === bandId);
 
                     const domainMapper = new NumericDomainMapper({
@@ -52,9 +49,11 @@ export const DatasetRasterPointInfoTable = observer((props: DatasetRasterPointIn
                 } else {
                     label = bandId;
                     content = (
-                        <div dangerouslySetInnerHTML={{
-                            __html: value
-                        }}/>
+                        <div
+                            dangerouslySetInnerHTML={{
+                                __html: value
+                            }}
+                        />
                     );
                 }
                 return (
@@ -64,10 +63,7 @@ export const DatasetRasterPointInfoTable = observer((props: DatasetRasterPointIn
                 );
             });
             return (
-                <Descriptions
-                    size='small'
-                    column={1}
-                >
+                <Descriptions size='small' column={1}>
                     {dimensionValues}
                     {bandValues}
                 </Descriptions>

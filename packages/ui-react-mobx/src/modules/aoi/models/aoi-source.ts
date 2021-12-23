@@ -1,10 +1,9 @@
-import { action, reaction, computed } from 'mobx';
+import { reaction } from 'mobx';
 
 import { QueryParams, LoadingState, IFormFieldDefinition } from '@oidajs/core';
 import { AsyncDataFetcher, QueryParams as QueryParamsState, QueryParamsProps, IndexedCollection } from '@oidajs/state-mobx';
 
 import { AoiProps, Aoi } from './aoi';
-
 
 export type AoiSourceProviderResponse = {
     total: number;
@@ -13,13 +12,12 @@ export type AoiSourceProviderResponse = {
 
 export type AoiSourceProvider = (params: QueryParams) => Promise<AoiSourceProviderResponse>;
 
-
 export type AoiSourceProps = {
     id: string;
     name: string;
     queryParams?: QueryParamsProps;
     provider: AoiSourceProvider;
-    propertiesSchema?: IFormFieldDefinition[]
+    propertiesSchema?: IFormFieldDefinition[];
     lazy?: boolean;
 };
 
@@ -76,13 +74,18 @@ export class AoiSource {
 
     protected retrieveAois_() {
         this.aois_.clear();
-        this.dataFetcher.fetchData(this.queryParams.data).then((data) => {
-            this.queryParams.paging.setTotal(data.total);
-            this.aois.add(data.results.map((aoiProps) => {
-                return new Aoi(aoiProps);
-            }));
-        }, (error) => {
-            this.queryParams.paging.setTotal(0);
-        });
+        this.dataFetcher.fetchData(this.queryParams.data).then(
+            (data) => {
+                this.queryParams.paging.setTotal(data.total);
+                this.aois.add(
+                    data.results.map((aoiProps) => {
+                        return new Aoi(aoiProps);
+                    })
+                );
+            },
+            (error) => {
+                this.queryParams.paging.setTotal(0);
+            }
+        );
     }
 }

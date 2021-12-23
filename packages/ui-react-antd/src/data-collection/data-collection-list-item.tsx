@@ -1,12 +1,9 @@
 import React, { useState } from 'react';
 import classnames from 'classnames';
 import { Descriptions, Typography } from 'antd';
-import {
-    LoadingOutlined, PictureFilled
-} from '@ant-design/icons';
+import { LoadingOutlined, PictureFilled } from '@ant-design/icons';
 
 import { AsyncImage } from '@oidajs/ui-react-core';
-
 
 type ExpandableDescriptionProps = {
     description: React.ReactNode;
@@ -15,14 +12,13 @@ type ExpandableDescriptionProps = {
 };
 
 const ExpandableDescription = (props: ExpandableDescriptionProps) => {
-
     const [descriptionExpanded, setDescriptionExpanded] = useState(false);
 
     return (
         <React.Fragment>
-            {!descriptionExpanded &&
+            {!descriptionExpanded && (
                 <Typography.Paragraph
-                    title={typeof(props.description) === 'string' ? props.description : undefined}
+                    title={typeof props.description === 'string' ? props.description : undefined}
                     className={classnames('data-collection-list-item-description', props.className)}
                     type='secondary'
                     ellipsis={{
@@ -34,8 +30,8 @@ const ExpandableDescription = (props: ExpandableDescriptionProps) => {
                 >
                     {props.description}
                 </Typography.Paragraph>
-            }
-            {descriptionExpanded &&
+            )}
+            {descriptionExpanded && (
                 <Typography.Paragraph
                     className={classnames('data-collection-list-item-description', props.className)}
                     type='secondary'
@@ -46,14 +42,14 @@ const ExpandableDescription = (props: ExpandableDescriptionProps) => {
                         less
                     </a>
                 </Typography.Paragraph>
-            }
+            )}
         </React.Fragment>
     );
 };
 
 export type DatasetCollectionListItemMeta = {
-    label: React.ReactNode,
-    value: React.ReactNode
+    label: React.ReactNode;
+    value: React.ReactNode;
 };
 
 export type DatasetCollectionListItemProps = {
@@ -62,71 +58,58 @@ export type DatasetCollectionListItemProps = {
     icon?: React.ReactNode;
     metadata?: DatasetCollectionListItemMeta[];
     description?: React.ReactNode;
-    className?: string
+    className?: string;
     maxDescriptionRows?: number;
 };
 
 export function DataCollectionDetailedListItem(props: DatasetCollectionListItemProps) {
-
     const metadata = props.metadata?.map((item, idx) => {
-        return <Descriptions.Item key={idx} label={item.label}>{item.value}</Descriptions.Item>;
+        return (
+            <Descriptions.Item key={idx} label={item.label}>
+                {item.value}
+            </Descriptions.Item>
+        );
     });
 
     return (
-        <div
-            className={classnames('data-collection-list-item-detailed', props.className)}
-        >
-            <div className='data-collection-list-item-detailed-title'
-                title={typeof(props.title) === 'string' ? props.title : ''}
-            >
+        <div className={classnames('data-collection-list-item-detailed', props.className)}>
+            <div className='data-collection-list-item-detailed-title' title={typeof props.title === 'string' ? props.title : ''}>
                 {props.title}
             </div>
             <div className='data-collection-list-item-detailed-content'>
                 <div className='data-collection-list-item-detailed-data'>
-                    {props.description &&
+                    {props.description && (
                         <React.Fragment>
-                            {!!props.maxDescriptionRows &&
+                            {!!props.maxDescriptionRows && (
                                 <ExpandableDescription
                                     description={props.description}
                                     maxRows={props.maxDescriptionRows}
                                     className='data-collection-list-item-detailed-description'
                                 />
-                            }
-                            {!props.maxDescriptionRows &&
-                                <Typography.Paragraph
-                                    className='data-collection-list-item-detailed-description'
-                                    type='secondary'
-                                >
+                            )}
+                            {!props.maxDescriptionRows && (
+                                <Typography.Paragraph className='data-collection-list-item-detailed-description' type='secondary'>
                                     {props.description}
                                 </Typography.Paragraph>
-                            }
+                            )}
                         </React.Fragment>
-                    }
-                    <Descriptions
-                        className={'data-collection-list-item-detailed-meta'}
-                        column={1}
-                        size={'small'}
-                    >
+                    )}
+                    <Descriptions className={'data-collection-list-item-detailed-meta'} column={1} size={'small'}>
                         {metadata}
                     </Descriptions>
                 </div>
-                {props.icon && !props.preview &&
-                    <div className='data-collection-list-item-detailed-icon'>{props.icon}</div>
-                }
-                {props.preview && <div className='data-collection-list-item-detailed-preview'>
-                    <AsyncImage
-                        imageUrl={props.preview}
-                        errorContent={<PictureFilled />}
-                        loadingContent={<LoadingOutlined />}
-                    />
-                </div>}
+                {props.icon && !props.preview && <div className='data-collection-list-item-detailed-icon'>{props.icon}</div>}
+                {props.preview && (
+                    <div className='data-collection-list-item-detailed-preview'>
+                        <AsyncImage imageUrl={props.preview} errorContent={<PictureFilled />} loadingContent={<LoadingOutlined />} />
+                    </div>
+                )}
             </div>
         </div>
     );
 }
 
 export function DataCollectionCompactListItem(props: DatasetCollectionListItemProps) {
-
     const metadata = props.metadata?.map((item, idx) => {
         return (
             <div className='data-collection-compact-list-item-meta' key={idx}>
@@ -137,39 +120,27 @@ export function DataCollectionCompactListItem(props: DatasetCollectionListItemPr
     });
 
     return (
-        <div
-            className={classnames('data-collection-compact-list-item', props.className)}
-        >
-            {props.icon && !props.preview &&
-                <div className='data-collection-compact-list-item-icon'>{props.icon}</div>
-            }
-            {props.preview &&
+        <div className={classnames('data-collection-compact-list-item', props.className)}>
+            {props.icon && !props.preview && <div className='data-collection-compact-list-item-icon'>{props.icon}</div>}
+            {props.preview && (
                 <div className='data-collection-compact-list-item-preview'>
-                    <AsyncImage
-                        imageUrl={props.preview}
-                        errorContent={<PictureFilled />}
-                        loadingContent={<LoadingOutlined />}
-                    />
+                    <AsyncImage imageUrl={props.preview} errorContent={<PictureFilled />} loadingContent={<LoadingOutlined />} />
                 </div>
-            }
+            )}
             <div className='data-collection-compact-list-item-content'>
-                <div className='data-collection-compact-list-item-title'>
-                    {props.title}
-                </div>
-                {props.description &&
+                <div className='data-collection-compact-list-item-title'>{props.title}</div>
+                {props.description && (
                     <React.Fragment>
-                        {!!props.maxDescriptionRows &&
+                        {!!props.maxDescriptionRows && (
                             <ExpandableDescription
                                 description={props.description}
                                 maxRows={props.maxDescriptionRows}
                                 className='data-collection-compact-list-item-description'
                             />
-                        }
-                        {!props.maxDescriptionRows &&
-                            props.description
-                        }
+                        )}
+                        {!props.maxDescriptionRows && props.description}
                     </React.Fragment>
-                }
+                )}
                 {metadata}
             </div>
         </div>

@@ -4,9 +4,8 @@ import { CesiumVolumeTile } from '../cesium-volume-tile';
 import { CesiumSliceVolumeTilePrimitive } from './cesium-slice-volume-tile-primitive';
 
 export class CesiumSliceVolumeView extends CesiumVolumeView implements SliceVolumeView {
-
     protected slicePrimitive_: CesiumSliceVolumeTilePrimitive | undefined;
-    protected slices_: {x?: number, y?: number, z?: number};
+    protected slices_: { x?: number; y?: number; z?: number };
 
     constructor(config) {
         super(config);
@@ -33,7 +32,7 @@ export class CesiumSliceVolumeView extends CesiumVolumeView implements SliceVolu
     }
 
     destroy() {
-
+        return;
     }
 
     protected createTilePrimitive_(tile: CesiumVolumeTile) {
@@ -48,4 +47,3 @@ export class CesiumSliceVolumeView extends CesiumVolumeView implements SliceVolu
         return this.slicePrimitive_;
     }
 }
-

@@ -18,16 +18,14 @@ export type DatasetSearchResultsItemProps = {
 };
 
 export const DatasetSearchResultsItem = (props: DatasetSearchResultsItemProps) => {
+    const { title, metadata, style } = props;
 
-    let { title, metadata, style } = props;
-
-    let items = metadata.map((m, idx) => {
-        return <Descriptions.Item
-            key={idx}
-            label={m.label}
-        >
-            <Tooltip title={m.description}>{m.value as React.ReactElement}</Tooltip>
-        </Descriptions.Item>;
+    const items = metadata.map((m, idx) => {
+        return (
+            <Descriptions.Item key={idx} label={m.label}>
+                <Tooltip title={m.description}>{m.value as React.ReactElement}</Tooltip>
+            </Descriptions.Item>
+        );
     });
 
     return (
@@ -36,4 +34,3 @@ export const DatasetSearchResultsItem = (props: DatasetSearchResultsItemProps) =
         </Descriptions>
     );
 };
-

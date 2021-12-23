@@ -1,9 +1,9 @@
 import chroma from 'chroma-js';
 
-
 // taken from https://github.com/darkskyapp/string-hash/blob/master/index.js
 const getHashCode = (str) => {
-    let hash = 5381, i = str.length;
+    let hash = 5381,
+        i = str.length;
     while (i) {
         hash = (hash * 33) ^ str.charCodeAt(--i);
     }
@@ -14,11 +14,6 @@ const getHashCode = (str) => {
     return hash >>> 0;
 };
 
-
 export const getColorFromString = (str: string, saturation: number, lightness: number) => {
-    return chroma.hsl(
-        getHashCode(str) % 360,
-        saturation,
-        lightness
-    ).css();
+    return chroma.hsl(getHashCode(str) % 360, saturation, lightness).css();
 };

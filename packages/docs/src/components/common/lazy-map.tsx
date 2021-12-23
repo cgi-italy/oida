@@ -13,12 +13,10 @@ export const LazyMapComponent = lazy(() => {
     });
 });
 
-
 export const LazyMap = (props: MapComponentProps) => {
     return (
         <Suspense fallback={<div>Loading...</div>}>
-            <LazyMapComponent {...props}/>
+            <LazyMapComponent {...props} />
         </Suspense>
     );
 };
-

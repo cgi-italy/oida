@@ -6,7 +6,6 @@ import { QueryParams as QueryParamsState } from '@oidajs/state-mobx';
 
 import { useRouteSearchStateBinding } from './use-route-search-state-binding';
 
-
 const defaultQueryKeys = {
     page: 'page',
     pageSize: 'pageSize',
@@ -23,7 +22,7 @@ export type QueryCriteriaUrlBindingProps = {
 };
 
 export const serializeQueryFilters = (filters: QueryFilter[]): string => {
-    const q: Array<{k: string, v: string, t: string}> = [];
+    const q: Array<{ k: string; v: string; t: string }> = [];
 
     filters.forEach((filter) => {
         const serializer = getFormFieldSerializer(filter.type);
@@ -40,16 +39,14 @@ export const serializeQueryFilters = (filters: QueryFilter[]): string => {
 };
 
 export const useQueryCriteriaUrlBinding = (props: QueryCriteriaUrlBindingProps) => {
-
     const queryUrlKeys = props.queryKeys || defaultQueryKeys;
 
     const getUrlFromCriteria = () => {
-
         const criteria = props.criteria.data;
 
-        let {paging, filters, sortBy} = criteria;
+        const { paging, filters, sortBy } = criteria;
 
-        let urlParams = queryString.parse(window.location.search);
+        const urlParams = queryString.parse(window.location.search);
 
         if (paging) {
             urlParams[queryUrlKeys.page] = paging.page.toString();
@@ -68,12 +65,12 @@ export const useQueryCriteriaUrlBinding = (props: QueryCriteriaUrlBindingProps) 
             delete urlParams[queryUrlKeys.filters];
         }
 
-        let updatedQueryString = `${queryString.stringify(urlParams)}`;
+        const updatedQueryString = `${queryString.stringify(urlParams)}`;
         return updatedQueryString;
     };
 
     const updateCriteriaFromUrl = (search) => {
-        let urlParams = queryString.parse(search);
+        const urlParams = queryString.parse(search);
         if (urlParams[queryUrlKeys.page] !== undefined) {
             props.criteria.paging.setPage(parseInt(urlParams[queryUrlKeys.page] as string));
         }
@@ -84,7 +81,7 @@ export const useQueryCriteriaUrlBinding = (props: QueryCriteriaUrlBindingProps) 
         const sortKey = urlParams[queryUrlKeys.sortKey] as string;
         if (sortKey !== undefined) {
             props.criteria.sorting.sortBy({
-                key: sortKey,
+                key: sortKey
             });
         }
 
@@ -97,14 +94,13 @@ export const useQueryCriteriaUrlBinding = (props: QueryCriteriaUrlBindingProps) 
 
         const urlFilters = urlParams[queryUrlKeys.filters];
         if (urlFilters !== undefined && urlFilters !== serializeQueryFilters(props.criteria.data.filters || [])) {
-
             props.criteria.filters.clear();
             const filterValues = urlFilters ? JSON.parse(lzString.decompressFromEncodedURIComponent(urlFilters)) : [];
 
             filterValues.forEach((filter) => {
-                let serializer = getFormFieldSerializer(filter.t);
+                const serializer = getFormFieldSerializer(filter.t);
                 if (serializer) {
-                    let value = serializer.fromJSON(filter.v);
+                    const value = serializer.fromJSON(filter.v);
                     if (value) {
                         props.criteria.filters.set(filter.k, value, filter.t);
                     }
@@ -117,5 +113,4 @@ export const useQueryCriteriaUrlBinding = (props: QueryCriteriaUrlBindingProps) 
         stateQueryStringSelector: getUrlFromCriteria,
         updateState: updateCriteriaFromUrl
     });
-
 };

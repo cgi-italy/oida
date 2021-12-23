@@ -3,11 +3,11 @@ import dms from 'geodesy/dms';
 import { FormatterQuantity } from './formatter';
 import { formatNumber } from './utils';
 
-export const formatLat = (lat: number, config: {format?: string, precision?: number} = {}) => {
+export const formatLat = (lat: number, config: { format?: string; precision?: number } = {}) => {
     return dms.toLat(lat, config.format, config.precision);
 };
 
-export const formatLon = (lon: number, config: {format?: string, precision?: number} = {}) => {
+export const formatLon = (lon: number, config: { format?: string; precision?: number } = {}) => {
     return dms.toLon(lon, config.format, config.precision);
 };
 
@@ -21,12 +21,8 @@ export const MapCoordQuantity: FormatterQuantity<number, MapCoordFormatterOption
     id: 'coord'
 };
 
-export const formatMapCoord = (
-    coord: number,
-    options: MapCoordFormatterOptions
-)  => {
-
-    let { format, coordType, ...formatOptions} = options;
+export const formatMapCoord = (coord: number, options: MapCoordFormatterOptions) => {
+    const { format, coordType, ...formatOptions } = options;
     if (format === 'dms') {
         if (coordType === 'lat') {
             return formatLat(coord, {

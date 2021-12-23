@@ -2,26 +2,31 @@ import React, { useMemo } from 'react';
 import classnames from 'classnames';
 import { useDrag, useDrop } from 'react-dnd';
 
-
 import { Avatar, Tooltip, Button } from 'antd';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 
 import { AoiValue, formatNumber, getColorFromString } from '@oidajs/core';
 import { Map } from '@oidajs/state-mobx';
 import {
-    RasterBandModeCombination, RasterBandConfig, RasterBandGroup, BandScalingMode,
-    DomainRange, isValueDomain, DatasetDimensions, isDomainProvider, NumericalValueDomain, computeRasterDatasetOptimalBandRange
+    RasterBandModeCombination,
+    RasterBandConfig,
+    RasterBandGroup,
+    BandScalingMode,
+    DomainRange,
+    isValueDomain,
+    DatasetDimensions,
+    isDomainProvider,
+    computeRasterDatasetOptimalBandRange
 } from '@oidajs/eo-mobx';
 import { AdjustSolidIcon, AsyncButton, NumericRangeFieldRenderer } from '@oidajs/ui-react-antd';
 import { useSelector } from '@oidajs/ui-react-mobx';
 
 import { useDatasetVariableDomain } from '../hooks';
 
-
 const DatasetBandDnDType = 'DATASET_BAND';
 type DatasetBandDnDItem = {
-    id: string,
-    type: typeof DatasetBandDnDType
+    id: string;
+    type: typeof DatasetBandDnDType;
 };
 
 type DatasetBandItemProps = {
@@ -29,8 +34,8 @@ type DatasetBandItemProps = {
 };
 
 const DatasetBandItem = (props: DatasetBandItemProps) => {
-    const [{isDragging}, drag, preview] = useDrag({
-        item: {type: DatasetBandDnDType, id: props.band.id},
+    const [{ isDragging }, drag] = useDrag({
+        item: { type: DatasetBandDnDType, id: props.band.id },
         collect: (monitor) => {
             return {
                 isDragging: monitor.isDragging()
@@ -38,10 +43,10 @@ const DatasetBandItem = (props: DatasetBandItemProps) => {
         }
     });
 
-    const {id, name, color} = props.band;
+    const { id, name, color } = props.band;
 
-    let label = name.length <= 5 ? name : `B${id.substr(0, 4)}`;
-    let backgroundColor = color || getColorFromString(name, 0.7, 0.4);
+    const label = name.length <= 5 ? name : `B${id.substr(0, 4)}`;
+    const backgroundColor = color || getColorFromString(name, 0.7, 0.4);
 
     return (
         <div
@@ -51,8 +56,7 @@ const DatasetBandItem = (props: DatasetBandItemProps) => {
             ref={drag}
             title={name}
         >
-            <Avatar size='large' style={{backgroundColor: backgroundColor}}
-            >
+            <Avatar size='large' style={{ backgroundColor: backgroundColor }}>
                 {label}
             </Avatar>
         </div>
@@ -65,13 +69,12 @@ type DatasetChannelItemProps = {
     onBandDrop: (band: string) => void;
 };
 
-
 const DatasetChannelItem = (props: DatasetChannelItemProps) => {
     const [{ isHover, canDrop }, drop] = useDrop({
         accept: [DatasetBandDnDType],
         collect: (monitor) => ({
-          isHover: monitor.isOver(),
-          canDrop: monitor.canDrop(),
+            isHover: monitor.isOver(),
+            canDrop: monitor.canDrop()
         }),
         canDrop: (item) => {
             return !!item.id && item.id !== props.band.id;
@@ -81,28 +84,26 @@ const DatasetChannelItem = (props: DatasetChannelItemProps) => {
         }
     });
 
-    const {id, name, color} = props.band;
+    const { id, name, color } = props.band;
 
-    let label = name.length <= 5 ? name : `B${id.substr(0, 4)}`;
-    let backgroundColor = color || getColorFromString(name, 0.7, 0.4);
+    const label = name.length <= 5 ? name : `B${id.substr(0, 4)}`;
+    const backgroundColor = color || getColorFromString(name, 0.7, 0.4);
 
     return (
-        <div className={classnames('dataset-channel-item', {
-            'can-drop': canDrop,
-            'is-hover': isHover
-        })}>
-            <div className='dataset-channel-item-label'>
-                {props.channel}:
-            </div>
+        <div
+            className={classnames('dataset-channel-item', {
+                'can-drop': canDrop,
+                'is-hover': isHover
+            })}
+        >
+            <div className='dataset-channel-item-label'>{props.channel}:</div>
             <div className='dataset-channel-item-target' ref={drop} title={name}>
-                <Avatar size={50} style={{backgroundColor: backgroundColor}}
-                >
+                <Avatar size={50} style={{ backgroundColor: backgroundColor }}>
                     {label}
                 </Avatar>
             </div>
         </div>
     );
-
 };
 
 export type DatasetBandScalingSelectorProps = {
@@ -110,12 +111,11 @@ export type DatasetBandScalingSelectorProps = {
     redBand: RasterBandConfig;
     greenBand: RasterBandConfig;
     blueBand: RasterBandConfig;
-    dimensionsState?: DatasetDimensions,
-    mapState?: Map
+    dimensionsState?: DatasetDimensions;
+    mapState?: Map;
 };
 
 export const DatasetBandScalingSelector = (props: DatasetBandScalingSelectorProps) => {
-
     const bandScaling = useSelector(() => {
         return {
             mode: props.bandCombo.bandScalingMode,
@@ -130,6 +130,7 @@ export const DatasetBandScalingSelector = (props: DatasetBandScalingSelectorProp
     }
 
     if (props.bandCombo.config.supportBandScalingMode === BandScalingMode.Channel) {
+        //TODO: handle channel case
     }
 
     let redRange: DomainRange<number> | undefined;
@@ -147,10 +148,7 @@ export const DatasetBandScalingSelector = (props: DatasetBandScalingSelectorProp
         variable: props.blueBand
     });
 
-    if (
-        redDomain && isValueDomain(redDomain)
-        && redDomain.min !== undefined && redDomain.max !== undefined
-    ) {
+    if (redDomain && isValueDomain(redDomain) && redDomain.min !== undefined && redDomain.max !== undefined) {
         redRange = {
             min: redDomain.min,
             max: redDomain.max
@@ -158,34 +156,32 @@ export const DatasetBandScalingSelector = (props: DatasetBandScalingSelectorProp
         dataRange = redRange;
     }
 
-    if (
-        greenDomain && isValueDomain(greenDomain)
-        && greenDomain.min !== undefined && greenDomain.max !== undefined
-    ) {
+    if (greenDomain && isValueDomain(greenDomain) && greenDomain.min !== undefined && greenDomain.max !== undefined) {
         greenRange = {
             min: greenDomain.min,
             max: greenDomain.max
         };
 
-        dataRange = dataRange ? {
-            min: Math.min(dataRange.min, greenRange.min),
-            max: Math.max(dataRange.max, greenRange.max)
-        } : greenRange;
+        dataRange = dataRange
+            ? {
+                  min: Math.min(dataRange.min, greenRange.min),
+                  max: Math.max(dataRange.max, greenRange.max)
+              }
+            : greenRange;
     }
 
-    if (
-        blueDomain && isValueDomain(blueDomain)
-        && blueDomain.min !== undefined && blueDomain.max !== undefined
-    ) {
+    if (blueDomain && isValueDomain(blueDomain) && blueDomain.min !== undefined && blueDomain.max !== undefined) {
         blueRange = {
             min: blueDomain.min,
             max: blueDomain.max
         };
 
-        dataRange = dataRange ? {
-            min: Math.min(dataRange.min, blueRange.min),
-            max: Math.max(dataRange.max, blueRange.max)
-        } : blueRange;
+        dataRange = dataRange
+            ? {
+                  min: Math.min(dataRange.min, blueRange.min),
+                  max: Math.max(dataRange.max, blueRange.max)
+              }
+            : blueRange;
     }
 
     const redDomainProvider = props.redBand.domain && isDomainProvider(props.redBand.domain) ? props.redBand.domain : undefined;
@@ -199,23 +195,19 @@ export const DatasetBandScalingSelector = (props: DatasetBandScalingSelectorProp
                 className='dataset-range-adjust-btn'
                 tooltip='Adjust range based on current visible data domain'
                 onClick={() => {
-
                     const mapViewport = props.mapState?.renderer.implementation?.getViewportExtent();
-                    const aoi: AoiValue | undefined = mapViewport ? {
-                        geometry: {
-                            type: 'BBox',
-                            bbox: mapViewport
-                        }
-                    } : undefined;
+                    const aoi: AoiValue | undefined = mapViewport
+                        ? {
+                              geometry: {
+                                  type: 'BBox',
+                                  bbox: mapViewport
+                              }
+                          }
+                        : undefined;
 
                     return computeRasterDatasetOptimalBandRange({
                         filters: {
-                            aoi: mapViewport ? {
-                                geometry: {
-                                    type: 'BBox',
-                                    bbox: mapViewport
-                                }
-                            } : undefined,
+                            aoi: aoi,
                             additionaFilters: props.dimensionsState?.additionalFilters,
                             dimensionValues: props.dimensionsState?.dimensionValues,
                             toi: props.dimensionsState?.toi
@@ -224,55 +216,65 @@ export const DatasetBandScalingSelector = (props: DatasetBandScalingSelectorProp
                     }).then((range) => {
                         if (range) {
                             props.bandCombo.setDataRange({
-                                min: parseFloat(formatNumber(range.min, {
-                                    precision: 3
-                                })),
-                                max: parseFloat(formatNumber(range.max, {
-                                    precision: 3
-                                }))
+                                min: parseFloat(
+                                    formatNumber(range.min, {
+                                        precision: 3
+                                    })
+                                ),
+                                max: parseFloat(
+                                    formatNumber(range.max, {
+                                        precision: 3
+                                    })
+                                )
                             });
                         }
                     });
                 }}
                 type='link'
-                icon={<AdjustSolidIcon/>}
+                icon={<AdjustSolidIcon />}
             />
         );
     }
     return (
-        <div className='dataset-band-scaling-selector' style={{padding: '10px'}}>
+        <div className='dataset-band-scaling-selector' style={{ padding: '10px' }}>
             <span>Data range:</span>
             <NumericRangeFieldRenderer
-                config={dataRange ? {min: dataRange.min, max: dataRange.max} : {}}
-                value={bandScaling.dataRange ? {
-                    from: bandScaling.dataRange.min,
-                    to: bandScaling.dataRange.max
-                } : undefined}
+                config={dataRange ? { min: dataRange.min, max: dataRange.max } : {}}
+                value={
+                    bandScaling.dataRange
+                        ? {
+                              from: bandScaling.dataRange.min,
+                              to: bandScaling.dataRange.max
+                          }
+                        : undefined
+                }
                 onChange={(value) => {
-                    props.bandCombo.setDataRange(value ? {
-                        min: value.from,
-                        max: value.to
-                    } : undefined);
+                    props.bandCombo.setDataRange(
+                        value
+                            ? {
+                                  min: value.from,
+                                  max: value.to
+                              }
+                            : undefined
+                    );
                 }}
                 sliderExtraContent={autoAdjustRangeBtn}
             />
         </div>
     );
-
 };
 
 export type DatasetBandCombinationSelectorProps = {
     bands: RasterBandConfig[];
     bandGroups?: RasterBandGroup[];
     bandCombo: RasterBandModeCombination;
-    dimensionsState?: DatasetDimensions,
-    mapState?: Map
+    dimensionsState?: DatasetDimensions;
+    mapState?: Map;
 };
 
 type BandConfigMap = Record<string, RasterBandConfig>;
 
 export const DatasetBandCombinationSelector = (props: DatasetBandCombinationSelectorProps) => {
-
     const selectedBands = useSelector(() => {
         return {
             red: props.bandCombo.red,
@@ -280,7 +282,6 @@ export const DatasetBandCombinationSelector = (props: DatasetBandCombinationSele
             blue: props.bandCombo.blue
         };
     });
-
 
     const bandConfigMap = useMemo(() => {
         return props.bands.reduce((bandMap: BandConfigMap, band) => {
@@ -294,43 +295,29 @@ export const DatasetBandCombinationSelector = (props: DatasetBandCombinationSele
     let bandGroupItems: JSX.Element[];
     if (props.bandGroups) {
         bandGroupItems = props.bandGroups.map((group) => {
-            let bandItems = group.bandIndices.map((idx) => {
-                let band = props.bands[idx];
-                return (
-                    <DatasetBandItem
-                        band={band}
-                        key={band.id}
-                    />
-                );
+            const bandItems = group.bandIndices.map((idx) => {
+                const band = props.bands[idx];
+                return <DatasetBandItem band={band} key={band.id} />;
             });
-
 
             return (
                 <div className='dataset-band-group' key={group.id}>
-                    <div className='dataset-band-items'>
-                        {bandItems}
+                    <div className='dataset-band-items'>{bandItems}</div>
+                    <div className='dataset-band-group-label'>
+                        {group.name}
+                        {group.units ? ` (${group.units})` : ''}
                     </div>
-                    <div className='dataset-band-group-label'>{group.name}{group.units ? ` (${group.units})` : ''}</div>
                 </div>
             );
         });
     } else {
-        let bandItems = props.bands.map((band) => {
-            return (
-                <DatasetBandItem
-                    band={band}
-                    key={band.id}
-                />
-            );
+        const bandItems = props.bands.map((band) => {
+            return <DatasetBandItem band={band} key={band.id} />;
         });
         bandGroupItems = [
-            (
-                <div className='dataset-band-group' key='all-bands'>
-                    <div className='dataset-band-items'>
-                        {bandItems}
-                    </div>
-                </div>
-            )
+            <div className='dataset-band-group' key='all-bands'>
+                <div className='dataset-band-items'>{bandItems}</div>
+            </div>
         ];
     }
 

@@ -10,29 +10,27 @@ import { DateField, DATE_FIELD_ID } from '@oidajs/core';
 
 import { antdFormFieldRendererFactory } from './antd-form-field-renderer-factory';
 
-
 export const DateFieldRenderer = (props: FormFieldRendererBaseProps<DateField> & Omit<DatePickerProps, 'value' | 'onChange'>) => {
-
-    const {value, onChange, title, required, config, autoFocus, ...renderProps} = props;
+    const { value, onChange, title, required, config, autoFocus, ...renderProps } = props;
 
     const [selectableDates, setSelectableDates] = useState<{
-        dates?: Set<string>,
-        resolution: 'day' | 'month',
-        pendingRequest?: Promise<void>
+        dates?: Set<string>;
+        resolution: 'day' | 'month';
+        pendingRequest?: Promise<void>;
     }>({
         resolution: 'day'
     });
 
     const [selectableTimes, setSelectableTimes] = useState<{
-        date: moment.Moment,
-        times: string[],
-        pendingRequest?: Promise<string[]>
+        date: moment.Moment;
+        times: string[];
+        pendingRequest?: Promise<string[]>;
     }>();
 
     const [open, setOpen] = useState(false);
     const [mode, setMode] = useState<PanelMode>('date');
 
-    const pickerValue = useMemo(() => value ? moment.utc(value) : undefined, [value, open]);
+    const pickerValue = useMemo(() => (value ? moment.utc(value) : undefined), [value, open]);
 
     const onDateChange = (value: moment.Moment | null) => {
         if (value) {
@@ -46,7 +44,7 @@ export const DateFieldRenderer = (props: FormFieldRendererBaseProps<DateField> &
                     second: 0
                 });
             }
-            value.set({millisecond: 0});
+            value.set({ millisecond: 0 });
             onChange(value.toDate());
             if (config.selectableTimes) {
                 //retrieve the available times for the selected date and
@@ -110,7 +108,7 @@ export const DateFieldRenderer = (props: FormFieldRendererBaseProps<DateField> &
                 setSelectableTimes({
                     times: [],
                     pendingRequest: pendingRequest,
-                    date: moment(props.value),
+                    date: moment(props.value)
                 });
 
                 return pendingRequest;
@@ -137,7 +135,6 @@ export const DateFieldRenderer = (props: FormFieldRendererBaseProps<DateField> &
                 };
             }
             if (range) {
-
                 if (selectableDates.pendingRequest) {
                     if (selectableDates.pendingRequest.cancel) {
                         selectableDates.pendingRequest.cancel();
@@ -187,9 +184,11 @@ export const DateFieldRenderer = (props: FormFieldRendererBaseProps<DateField> &
     let disabledDates;
     if (config.minDate || config.maxDate || selectableDates) {
         disabledDates = (current: moment.Moment) => {
-            return (config.minDate && current.isBefore(config.minDate, 'date'))
-                || (config.maxDate && current.isAfter(config.maxDate, 'date'))
-                || !isDateSelectable(current);
+            return (
+                (config.minDate && current.isBefore(config.minDate, 'date')) ||
+                (config.maxDate && current.isAfter(config.maxDate, 'date')) ||
+                !isDateSelectable(current)
+            );
         };
     }
 
@@ -264,13 +263,16 @@ export const DateFieldRenderer = (props: FormFieldRendererBaseProps<DateField> &
                     }
                     setMode(mode);
                 }}
-                showTime={config.withTime && !config.selectableTimes ? {
-                    defaultValue: moment.utc('00:00:00', 'HH:mm:ss')
-                } : false}
+                showTime={
+                    config.withTime && !config.selectableTimes
+                        ? {
+                              defaultValue: moment.utc('00:00:00', 'HH:mm:ss')
+                          }
+                        : false
+                }
                 {...renderProps}
-            >
-            </DatePicker>
-            {config.withTime && config.selectableTimes &&
+            ></DatePicker>
+            {config.withTime && config.selectableTimes && (
                 <Select
                     loading={!!selectableTimes?.pendingRequest}
                     disabled={!!selectableTimes?.pendingRequest}
@@ -284,13 +286,9 @@ export const DateFieldRenderer = (props: FormFieldRendererBaseProps<DateField> &
                     value={moment.utc(props.value).format('HH:mm:ss')}
                     onChange={(value) => onTimeChange(value as string)}
                 />
-            }
+            )}
         </div>
     );
-
 };
 
-antdFormFieldRendererFactory.register<DateField>(
-    DATE_FIELD_ID, 'datepicker',
-    DateFieldRenderer
-);
+antdFormFieldRendererFactory.register<DateField>(DATE_FIELD_ID, 'datepicker', DateFieldRenderer);

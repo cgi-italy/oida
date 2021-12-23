@@ -4,8 +4,7 @@ import { getTileGridFromConfig, getUrlFromConfig } from './ol-tilesource-utils';
 
 import { olTileSourcesFactory } from './ol-tilesources-factory';
 
-olTileSourcesFactory.register('wmts', function(config) {
-
+olTileSourcesFactory.register('wmts', function (config) {
     return new WMTSSource({
         ...getUrlFromConfig(config),
         layer: config.layer,

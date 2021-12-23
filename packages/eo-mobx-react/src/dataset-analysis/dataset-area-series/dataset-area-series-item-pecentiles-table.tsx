@@ -2,8 +2,14 @@ import React from 'react';
 import moment from 'moment';
 import { Descriptions } from 'antd';
 
-import { DataDomain, DatasetDimension, DatasetAreaSeriesDataItem, isDomainProvider, NumericDomainMapper, RasterBandConfig } from '@oidajs/eo-mobx';
-
+import {
+    DataDomain,
+    DatasetDimension,
+    DatasetAreaSeriesDataItem,
+    isDomainProvider,
+    NumericDomainMapper,
+    RasterBandConfig
+} from '@oidajs/eo-mobx';
 
 export type DatasetAreaSeriesItemPercentilesTableProps = {
     item: DatasetAreaSeriesDataItem;
@@ -12,7 +18,6 @@ export type DatasetAreaSeriesItemPercentilesTableProps = {
 };
 
 export const DatasetAreaSeriesItemPercentilesTable = (props: DatasetAreaSeriesItemPercentilesTableProps) => {
-
     const stats = props.item.data.stats;
 
     if (!stats || !stats.percentiles) {
@@ -44,18 +49,18 @@ export const DatasetAreaSeriesItemPercentilesTable = (props: DatasetAreaSeriesIt
     });
 
     return (
-        <Descriptions
-            className='dataset-sequence-item-stats-table'
-            size='small'
-            column={2}
-        >
-            <Descriptions.Item label='Variable' span={2}>{props.variableConfig.name}</Descriptions.Item>
-            <Descriptions.Item label={props.dimensionConfig.name} span={2}>{dimensionFormatter(props.item.x) }</Descriptions.Item>
-            {props.variableConfig.units &&
+        <Descriptions className='dataset-sequence-item-stats-table' size='small' column={2}>
+            <Descriptions.Item label='Variable' span={2}>
+                {props.variableConfig.name}
+            </Descriptions.Item>
+            <Descriptions.Item label={props.dimensionConfig.name} span={2}>
+                {dimensionFormatter(props.item.x)}
+            </Descriptions.Item>
+            {props.variableConfig.units && (
                 <Descriptions.Item label='Units' span={2}>
                     {props.variableConfig.units}
                 </Descriptions.Item>
-            }
+            )}
             {percentileItems}
         </Descriptions>
     );

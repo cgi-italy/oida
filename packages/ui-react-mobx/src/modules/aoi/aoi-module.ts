@@ -21,7 +21,7 @@ export type AoiFormat = {
     /** list of supported file extensions */
     supportedFileTypes: string[];
     /** the file parser */
-    parser: AoiParser
+    parser: AoiParser;
 };
 
 export type AoiModuleConfig = {
@@ -31,20 +31,19 @@ export type AoiModuleConfig = {
 
 /**
  * The {@Link AoiModule} initialization object
-*/
+ */
 export type AoiModuleProps = {
     mapModule: MapModule;
     /** The map feature styler */
-    aoiStyleGetter?: FeatureStyleGetter<Aoi>
+    aoiStyleGetter?: FeatureStyleGetter<Aoi>;
     config: AoiModuleConfig;
-    id?: string
+    id?: string;
 };
 
 /**
  * An application module to handle areas of interest
  */
 export class AoiModule extends AppModule {
-
     /** the area of interest collection */
     readonly aois: IndexedCollection<Aoi>;
     /** map module reference */
@@ -74,7 +73,7 @@ export class AoiModule extends AppModule {
             idGetter: (aoi) => aoi.id
         });
         this.aoiSources = new IndexedCollection({
-            idGetter: aoiSource => aoiSource.id
+            idGetter: (aoiSource) => aoiSource.id
         });
 
         this.aoiLayer = new FeatureLayer({
@@ -114,11 +113,13 @@ export class AoiModule extends AppModule {
                 rendererConfig: props.rendererConfig,
                 required: props.required,
                 config: (filterState: FormFieldState<AoiValue>) => {
-
-                    let aoiFieldConfig = useMapAoiFieldFromModule({
-                        ...filterState,
-                        supportedGeometries: props.supportedGeometries
-                    }, this.id);
+                    const aoiFieldConfig = useMapAoiFieldFromModule(
+                        {
+                            ...filterState,
+                            supportedGeometries: props.supportedGeometries
+                        },
+                        this.id
+                    );
 
                     return {
                         supportedGeometries: props.supportedGeometries,
@@ -153,7 +154,7 @@ export class AoiModule extends AppModule {
     @action
     setActiveSource(activeSource: string | AoiSource | undefined) {
         let id: string | undefined;
-        if (typeof(activeSource) === 'string') {
+        if (typeof activeSource === 'string') {
             id = activeSource;
         } else if (activeSource instanceof AoiSource) {
             id = activeSource.id;

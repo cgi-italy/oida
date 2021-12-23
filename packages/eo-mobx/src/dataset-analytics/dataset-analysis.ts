@@ -5,7 +5,6 @@ import { Visible, VisibleProps } from '@oidajs/state-mobx';
 
 import { DatasetProcessing } from './dataset-processing';
 
-
 let nextAnalysisIdx = 1;
 export const generateAnalysisName = (type: string) => {
     return `${type} ${nextAnalysisIdx++}`;
@@ -34,7 +33,7 @@ export class DatasetAnalysis<T extends DatasetProcessing<any> = DatasetProcessin
         this.id = uuid();
         this.type = props.type;
         this.name = props.name || generateAnalysisName(props.type);
-        this.destroyOnClose = typeof(props.destroyOnClose) === 'boolean' ? props.destroyOnClose : true;
+        this.destroyOnClose = typeof props.destroyOnClose === 'boolean' ? props.destroyOnClose : true;
         this.visible = new Visible(props);
         this.processings = observable.array(props.processings || [], {
             deep: false
@@ -45,7 +44,7 @@ export class DatasetAnalysis<T extends DatasetProcessing<any> = DatasetProcessin
 
     @action
     addProcessing(processing: T, idx?: number) {
-        if (typeof(idx) === 'number' && idx < this.processings.length) {
+        if (typeof idx === 'number' && idx < this.processings.length) {
             this.processings.splice(idx, 0, processing);
         } else {
             this.processings.push(processing);
@@ -70,5 +69,4 @@ export class DatasetAnalysis<T extends DatasetProcessing<any> = DatasetProcessin
             processing.dispose();
         });
     }
-
 }

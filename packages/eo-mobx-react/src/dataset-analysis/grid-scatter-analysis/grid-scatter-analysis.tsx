@@ -1,11 +1,16 @@
 import React, { useState } from 'react';
-import { Button,  Form } from 'antd';
+import { Button, Form } from 'antd';
 import { LeftOutlined } from '@ant-design/icons';
 
 import { useSelector } from '@oidajs/ui-react-mobx';
 import {
-    DatasetAreaValues, DatasetAreaValuesConfig, GridScatterAnalysis,
-    GRID_SCATTER_ANALYSIS, DATASET_AREA_VALUES_PROCESSING, DatasetToolConfig } from '@oidajs/eo-mobx';
+    DatasetAreaValues,
+    DatasetAreaValuesConfig,
+    GridScatterAnalysis,
+    GRID_SCATTER_ANALYSIS,
+    DATASET_AREA_VALUES_PROCESSING,
+    DatasetToolConfig
+} from '@oidajs/eo-mobx';
 
 import { DatasetAnalysisWidgetFactory, DatasetAnalysisWidgetFactoryConfig } from '../dataset-analysis-widget-factory';
 import { DatasetSelector } from '../dataset-selector';
@@ -13,17 +18,14 @@ import { AnalysisAoiFilter } from '../analysis-aoi-filter';
 import { DatasetAreaValuesProcessingFilters } from '../dataset-area-values';
 import { GridScatterAnalysisPlot } from './grid-scatter-analysis-plot';
 
-
 export type GridScatterAnalysisWidgetProps = Omit<DatasetAnalysisWidgetFactoryConfig, 'combinedAnalysis'> & {
-    combinedAnalysis: GridScatterAnalysis
+    combinedAnalysis: GridScatterAnalysis;
 };
 
 export const GridScatterAnalysisWidget = (props: GridScatterAnalysisWidgetProps) => {
-
     const [filtersVisible, setFiltersVisible] = useState(true);
 
-    const {x, y, color} = useSelector(() => {
-
+    const { x, y, color } = useSelector(() => {
         props.combinedAnalysis.xAxisAnalysis?.setAutoUpdate(false);
         props.combinedAnalysis.yAxisAnalysis?.setAutoUpdate(false);
         props.combinedAnalysis.colorMapAnalysis?.setAutoUpdate(false);
@@ -35,46 +37,50 @@ export const GridScatterAnalysisWidget = (props: GridScatterAnalysisWidgetProps)
         };
     });
 
-    const avaialbleDatasetItems = useSelector(() => props.datasetExplorerItems.filter(item => {
-        const tool = item.dataset.config.tools?.find(tool => tool.type === DATASET_AREA_VALUES_PROCESSING) as
-            DatasetToolConfig<typeof DATASET_AREA_VALUES_PROCESSING> | undefined;
-        return tool && tool.config.supportedData.gridValues;
-    }), [props.datasetExplorerItems]);
+    const avaialbleDatasetItems = useSelector(
+        () =>
+            props.datasetExplorerItems.filter((item) => {
+                const tool = item.dataset.config.tools?.find((tool) => tool.type === DATASET_AREA_VALUES_PROCESSING) as
+                    | DatasetToolConfig<typeof DATASET_AREA_VALUES_PROCESSING>
+                    | undefined;
+                return tool && tool.config.supportedData.gridValues;
+            }),
+        [props.datasetExplorerItems]
+    );
 
     const canRunQuery = useSelector(() => {
-        return (x && x.canRunQuery) && (y && y.canRunQuery) && (!color || color.canRunQuery);
+        return x && x.canRunQuery && y && y.canRunQuery && (!color || color.canRunQuery);
     }, [x, y, color]);
 
     return (
         <div className='dataset-chart'>
-            {filtersVisible &&
+            {filtersVisible && (
                 <div className='dataset-chart-form'>
                     <div className='dataset-chart-filters'>
-                        {x && <div className='analysis-parameters'>
-                            <Form layout='inline' size='small'>
-                                <Form.Item label='Area'>
-                                    <AnalysisAoiFilter
-                                        analysis={x}
-                                        supportedGeometries={x.config.supportedGeometries}
-                                    />
-                                </Form.Item>
-                            </Form>
-                        </div>}
+                        {x && (
+                            <div className='analysis-parameters'>
+                                <Form layout='inline' size='small'>
+                                    <Form.Item label='Area'>
+                                        <AnalysisAoiFilter analysis={x} supportedGeometries={x.config.supportedGeometries} />
+                                    </Form.Item>
+                                </Form>
+                            </div>
+                        )}
                         <div className='analysis-parameters'>
                             <Form layout='inline' size='small'>
                                 <Form.Item label='X axis'>
                                     <DatasetSelector
                                         value={x?.dataset.id}
-                                        datasets={avaialbleDatasetItems.map(item => item.dataset.config)}
+                                        datasets={avaialbleDatasetItems.map((item) => item.dataset.config)}
                                         onChange={(value) => {
                                             if (value) {
-                                                let item = avaialbleDatasetItems.find(item => item.dataset.id === value);
+                                                const item = avaialbleDatasetItems.find((item) => item.dataset.id === value);
 
                                                 if (item) {
                                                     const gridValues = new DatasetAreaValues({
                                                         dataset: item.dataset,
                                                         config: item.dataset.config!.tools!.find(
-                                                            tool => tool.type === DATASET_AREA_VALUES_PROCESSING
+                                                            (tool) => tool.type === DATASET_AREA_VALUES_PROCESSING
                                                         )!.config as DatasetAreaValuesConfig,
                                                         autoUpdate: false,
                                                         parent: item.mapViz,
@@ -91,10 +97,7 @@ export const GridScatterAnalysisWidget = (props: GridScatterAnalysisWidgetProps)
                                         }}
                                     />
                                 </Form.Item>
-                                {x && <DatasetAreaValuesProcessingFilters
-                                    processing={x}
-                                    disableAoi={true}
-                                />}
+                                {x && <DatasetAreaValuesProcessingFilters processing={x} disableAoi={true} />}
                             </Form>
                         </div>
                         <div className='analysis-parameters'>
@@ -102,16 +105,16 @@ export const GridScatterAnalysisWidget = (props: GridScatterAnalysisWidgetProps)
                                 <Form.Item label='Y axis'>
                                     <DatasetSelector
                                         value={y?.dataset.id}
-                                        datasets={avaialbleDatasetItems.map(item => item.dataset.config)}
+                                        datasets={avaialbleDatasetItems.map((item) => item.dataset.config)}
                                         onChange={(value) => {
                                             if (value) {
-                                                let item = avaialbleDatasetItems.find(item => item.dataset.id === value);
+                                                const item = avaialbleDatasetItems.find((item) => item.dataset.id === value);
 
                                                 if (item) {
                                                     const gridValues = new DatasetAreaValues({
                                                         dataset: item.dataset,
                                                         config: item.dataset.config!.tools!.find(
-                                                            tool => tool.type === DATASET_AREA_VALUES_PROCESSING
+                                                            (tool) => tool.type === DATASET_AREA_VALUES_PROCESSING
                                                         )!.config as DatasetAreaValuesConfig,
                                                         autoUpdate: false,
                                                         parent: item.mapViz,
@@ -128,10 +131,7 @@ export const GridScatterAnalysisWidget = (props: GridScatterAnalysisWidgetProps)
                                         }}
                                     />
                                 </Form.Item>
-                                {y && <DatasetAreaValuesProcessingFilters
-                                    processing={y}
-                                    disableAoi={true}
-                                />}
+                                {y && <DatasetAreaValuesProcessingFilters processing={y} disableAoi={true} />}
                             </Form>
                         </div>
                     </div>
@@ -149,8 +149,8 @@ export const GridScatterAnalysisWidget = (props: GridScatterAnalysisWidgetProps)
                         Apply
                     </Button>
                 </div>
-            }
-            {!filtersVisible &&
+            )}
+            {!filtersVisible && (
                 <div className='dataset-chart-result'>
                     <Button
                         className='dataset-chart-modify-params-btn'
@@ -162,20 +162,14 @@ export const GridScatterAnalysisWidget = (props: GridScatterAnalysisWidgetProps)
                     >
                         Modify parameters
                     </Button>
-                    <GridScatterAnalysisPlot gridScatter={props.combinedAnalysis}/>
+                    <GridScatterAnalysisPlot gridScatter={props.combinedAnalysis} />
                 </div>
-            }
+            )}
         </div>
     );
 };
 
 DatasetAnalysisWidgetFactory.register(GRID_SCATTER_ANALYSIS, (config: DatasetAnalysisWidgetFactoryConfig) => {
-
-    const {combinedAnalysis, ...other} = config;
-    return (
-        <GridScatterAnalysisWidget
-            combinedAnalysis={combinedAnalysis as GridScatterAnalysis}
-            {...other}
-        />
-    );
+    const { combinedAnalysis, ...other } = config;
+    return <GridScatterAnalysisWidget combinedAnalysis={combinedAnalysis as GridScatterAnalysis} {...other} />;
 });

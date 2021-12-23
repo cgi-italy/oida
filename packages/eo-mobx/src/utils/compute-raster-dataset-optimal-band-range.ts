@@ -29,7 +29,6 @@ const getDomainStretchMinMax = (domain: NumericalValueDomain) => {
     } else {
         return undefined;
     }
-
 };
 
 export type RasterDatasetOptimalBandRangeParams = {
@@ -44,20 +43,20 @@ export type RasterDatasetOptimalBandRangeParams = {
  * @returns a promise resolving to the optimal range
  */
 export const computeRasterDatasetOptimalBandRange = (params: RasterDatasetOptimalBandRangeParams) => {
-
     return Promise.all(params.bandDomainProviders.map((provider) => provider(params.filters))).then((domains) => {
+        const numericalDomains: NumericalValueDomain[] = domains.filter((domain) => isValueDomain(domain)) as NumericalValueDomain[];
 
-        let numericalDomains: NumericalValueDomain[] = domains.filter((domain) => isValueDomain(domain)) as NumericalValueDomain[];
-
-        let dataRange: {min: number, max: number} | undefined;
+        let dataRange: { min: number; max: number } | undefined;
 
         numericalDomains.forEach((domain) => {
-            let domainRange = getDomainStretchMinMax(domain);
+            const domainRange = getDomainStretchMinMax(domain);
             if (domainRange) {
-                dataRange = dataRange ? {
-                    min: Math.min(dataRange.min, domainRange.min),
-                    max: Math.max(dataRange.max, domainRange.max)
-                } : domainRange;
+                dataRange = dataRange
+                    ? {
+                          min: Math.min(dataRange.min, domainRange.min),
+                          max: Math.max(dataRange.max, domainRange.max)
+                      }
+                    : domainRange;
             }
         });
 

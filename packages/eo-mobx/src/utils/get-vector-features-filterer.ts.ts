@@ -1,7 +1,12 @@
 import { ENUM_FIELD_ID, NUMERIC_RANGE_FIELD_ID, QueryFilter, STRING_FIELD_ID } from '@oidajs/core';
 import {
-    DatasetVectorFeatureProps, VectorFeatureDescriptor, FeaturePropertyValueTypes, VectorFeaturePropertyDescriptor,
-    ENUM_FEATURE_PROPERTY_TYPE, NUMERIC_FEATURE_PROPERTY_TYPE, STRING_FEATURE_PROPERTY_TYPE
+    DatasetVectorFeatureProps,
+    VectorFeatureDescriptor,
+    FeaturePropertyValueTypes,
+    VectorFeaturePropertyDescriptor,
+    ENUM_FEATURE_PROPERTY_TYPE,
+    NUMERIC_FEATURE_PROPERTY_TYPE,
+    STRING_FEATURE_PROPERTY_TYPE
 } from '../dataset-map-viz';
 
 /**
@@ -12,7 +17,6 @@ import {
  * @returns An in memory filterer of a feature array
  */
 export const getVectorFeaturesFilterer = (featureDescriptor: VectorFeatureDescriptor) => {
-
     const propertiesMap: Record<string, VectorFeaturePropertyDescriptor> = featureDescriptor.properties.reduce((propsMap, property) => {
         return {
             ...propsMap,
@@ -23,7 +27,7 @@ export const getVectorFeaturesFilterer = (featureDescriptor: VectorFeatureDescri
     return (features: DatasetVectorFeatureProps[], filters: QueryFilter[]) => {
         return features.filter((feature) => {
             let filtered = false;
-            for (let filter of filters) {
+            for (const filter of filters) {
                 const featureProperty = propertiesMap[filter.key];
                 if (featureProperty) {
                     if (featureProperty.type === NUMERIC_FEATURE_PROPERTY_TYPE && filter.type === NUMERIC_RANGE_FIELD_ID) {
@@ -35,11 +39,11 @@ export const getVectorFeaturesFilterer = (featureDescriptor: VectorFeatureDescri
                     } else if (featureProperty.type === ENUM_FEATURE_PROPERTY_TYPE && filter.type === ENUM_FIELD_ID) {
                         const value = feature.properties[filter.key] as FeaturePropertyValueTypes[typeof ENUM_FEATURE_PROPERTY_TYPE];
                         if (Array.isArray(filter.value)) {
-                            if (!filter.value.find(v => v === value)) {
+                            if (!filter.value.find((v) => v === value)) {
                                 filtered = true;
                                 break;
                             }
-                        } else  {
+                        } else {
                             if (filter.value !== value) {
                                 filtered = true;
                                 break;
@@ -58,4 +62,3 @@ export const getVectorFeaturesFilterer = (featureDescriptor: VectorFeatureDescri
         });
     };
 };
-

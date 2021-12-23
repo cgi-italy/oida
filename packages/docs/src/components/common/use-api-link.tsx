@@ -2,15 +2,26 @@ import React from 'react';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 
 export type OidaModule =
-    'core' | 'map-ol' | 'map-cesium' | 'state-mobx' | 'ui-react-antd' | 'ui-react-core' | 'ui-react-mobx'
-    | 'eo-mobx' | 'eo-mobx-react' | 'eo-adapters-ogc' | 'eo-adapters-ogc-react' | 'eo-adapters-adam' | 'eo-geotiff'
-    | 'eo-video' | 'eo-video-react';
+    | 'core'
+    | 'map-ol'
+    | 'map-cesium'
+    | 'state-mobx'
+    | 'ui-react-antd'
+    | 'ui-react-core'
+    | 'ui-react-mobx'
+    | 'eo-mobx'
+    | 'eo-mobx-react'
+    | 'eo-adapters-ogc'
+    | 'eo-adapters-ogc-react'
+    | 'eo-adapters-adam'
+    | 'eo-geotiff'
+    | 'eo-video'
+    | 'eo-video-react';
 
 export type TypedocsCategory = 'modules' | 'enums' | 'interfaces' | 'classes';
 
-
 const parseModuleName = (name: string) => {
-    return name.replace(/\-\//g, '_');
+    return name.replace(/-\//g, '_');
 };
 
 const getElementPath = (module: OidaModule, category?: TypedocsCategory, element?: string) => {
@@ -22,15 +33,18 @@ const getElementPath = (module: OidaModule, category?: TypedocsCategory, element
 };
 
 export type ApiLinkProps = {
-    module: OidaModule,
-    category?: TypedocsCategory,
-    element?: string
+    module: OidaModule;
+    category?: TypedocsCategory;
+    element?: string;
 };
-
 
 export const useApiLink = (props: ApiLinkProps) => {
     const context = useDocusaurusContext();
-    const typeDocUrl = `${context.siteConfig.customFields.typedocsLocation as string}/${getElementPath(props.module, props.category, props.element)}`;
+    const typeDocUrl = `${context.siteConfig.customFields.typedocsLocation as string}/${getElementPath(
+        props.module,
+        props.category,
+        props.element
+    )}`;
 
     return typeDocUrl;
 };
@@ -38,5 +52,5 @@ export const useApiLink = (props: ApiLinkProps) => {
 export const ApiLink = (props: ApiLinkProps) => {
     const linkHref = useApiLink(props);
 
-    return <a href={linkHref} target='apidocs'/>;
+    return <a href={linkHref} target='apidocs' />;
 };

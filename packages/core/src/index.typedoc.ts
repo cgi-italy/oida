@@ -12,7 +12,7 @@
  * {@link core/utils | Common utilities}
  * @packageDocumentation
  * @module core
-*/
+ */
 
 /**@ignore */
 export const core = 'CORE';

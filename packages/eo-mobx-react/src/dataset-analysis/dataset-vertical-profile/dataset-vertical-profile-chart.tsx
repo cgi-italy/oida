@@ -5,9 +5,13 @@ import { autorun } from 'mobx';
 
 import { EChartOption } from 'echarts/lib/echarts';
 
-import { VerticalProfileCoordinate } from '@oidajs/core';
-
-import { DatasetVerticalProfileViz, VerticalProfileItem, VERTICAL_PROFILE_VIZ_TYPE, RasterBandModeSingle, RasterBandConfig } from '@oidajs/eo-mobx';
+import {
+    DatasetVerticalProfileViz,
+    VerticalProfileItem,
+    VERTICAL_PROFILE_VIZ_TYPE,
+    RasterBandModeSingle,
+    RasterBandConfig
+} from '@oidajs/eo-mobx';
 import { useSelector, useCenterOnMapFromModule } from '@oidajs/ui-react-mobx';
 
 import { ChartWidget } from '../chart-widget';
@@ -15,34 +19,32 @@ import { UnprojectedImageLayer } from './unprojected-image-layer';
 
 import { DatasetAnalysisWidgetFactory } from '../dataset-analysis-widget-factory';
 
-
 export type VerticalProfileImageProps = {
     verticalProfileViz: DatasetVerticalProfileViz;
     selectedProfile: VerticalProfileItem;
     highlightedCoord?: GeoJSON.Position;
     selectedCoord?: GeoJSON.Position;
     style: {
-        horizontalSeriesColor: string,
-        verticalSeriesColor: string,
-        highlightCoordColor: string,
-        selectedCoordColor: string
-    }
+        horizontalSeriesColor: string;
+        verticalSeriesColor: string;
+        highlightCoordColor: string;
+        selectedCoordColor: string;
+    };
 };
 
 export const VerticalProfileImage = (props: VerticalProfileImageProps) => {
+    const [sourceConfig, setSourceConfig] = useState<any>();
 
-    let [sourceConfig, setSourceConfig] = useState<any>();
-
-    let vProfileViz = props.verticalProfileViz;
+    const vProfileViz = props.verticalProfileViz;
 
     const tileSourceProvider = props.verticalProfileViz.config.tileSourceProvider;
 
     const sourceRevision = useSelector(() => vProfileViz.tileSourceRevision);
 
     useEffect(() => {
-        let sourceUpdateDisposer = autorun(() => {
+        const sourceUpdateDisposer = autorun(() => {
             if (tileSourceProvider) {
-                tileSourceProvider(vProfileViz, props.selectedProfile.id).then(source => {
+                tileSourceProvider(vProfileViz, props.selectedProfile.id).then((source) => {
                     setSourceConfig(source);
                 });
             }
@@ -51,25 +53,20 @@ export const VerticalProfileImage = (props: VerticalProfileImageProps) => {
         return () => {
             sourceUpdateDisposer();
         };
-
     }, []);
 
-
-    let centerOnMap = useCenterOnMapFromModule();
+    const centerOnMap = useCenterOnMapFromModule();
 
     const getGeographicCoord = (coord) => {
-
         if (!coord || !vProfileViz.config.profileCoordTransform) {
             return Promise.resolve(undefined);
         } else {
-            return vProfileViz.config.profileCoordTransform.forward(props.selectedProfile.id, coord).then(
-                (geographicCoord) => {
-                    if (geographicCoord) {
-                        geographicCoord[2] *= vProfileViz.verticalScale.value;
-                    }
-                    return geographicCoord;
+            return vProfileViz.config.profileCoordTransform.forward(props.selectedProfile.id, coord).then((geographicCoord) => {
+                if (geographicCoord) {
+                    geographicCoord[2] *= vProfileViz.verticalScale.value;
                 }
-            );
+                return geographicCoord;
+            });
         }
     };
 
@@ -91,9 +88,12 @@ export const VerticalProfileImage = (props: VerticalProfileImageProps) => {
                 unprojected: coord
             });
             if (geographicCoord) {
-                centerOnMap({type: 'Point', coordinates: geographicCoord}, {
-                    animate: true
-                });
+                centerOnMap(
+                    { type: 'Point', coordinates: geographicCoord },
+                    {
+                        animate: true
+                    }
+                );
             }
         });
     };
@@ -124,29 +124,27 @@ export type VerticalProfileSeriesProps = {
 };
 
 export const VerticalProfileSeries = (props: VerticalProfileSeriesProps) => {
-
     const [series, setSeries] = useState<any>();
     const [isLoading, setIsLoading] = useState(false);
-    const [tipOptions, setTipOptions] = useState();
+    const [tipOptions] = useState();
     const [trackCoordinate, setTrackCoordinate] = useState(false);
 
     const getGeographicCoord = (coord) => {
-
         if (!coord || !props.verticalProfileViz.config.profileCoordTransform) {
             return Promise.resolve(undefined);
         } else {
-            return props.verticalProfileViz.config.profileCoordTransform.forward(props.selectedProfile.id, coord).then(
-                (geographicCoord) => {
+            return props.verticalProfileViz.config.profileCoordTransform
+                .forward(props.selectedProfile.id, coord)
+                .then((geographicCoord) => {
                     if (geographicCoord) {
                         geographicCoord[2] *= props.verticalProfileViz.verticalScale.value;
                     }
                     return geographicCoord;
-                }
-            );
+                });
         }
     };
 
-    let centerOnMap = useCenterOnMapFromModule();
+    const centerOnMap = useCenterOnMapFromModule();
 
     useEffect(() => {
         if (props.coordIndex !== undefined) {
@@ -155,28 +153,29 @@ export const VerticalProfileSeries = (props: VerticalProfileSeriesProps) => {
                 profileId: props.selectedProfile.id,
                 direction: props.direction,
                 coordIndex: props.coordIndex
-            }).then((response) => {
-                setSeries({
-                    chartData: response.data.map((item) => [item.x / 1000, item.y]),
-                    imageData: response.data.map(item => [item.imageCoord.x, item.imageCoord.y]),
-                    subsample: response.subsample
+            })
+                .then((response) => {
+                    setSeries({
+                        chartData: response.data.map((item) => [item.x / 1000, item.y]),
+                        imageData: response.data.map((item) => [item.imageCoord.x, item.imageCoord.y]),
+                        subsample: response.subsample
+                    });
+                })
+                .finally(() => {
+                    setIsLoading(false);
                 });
-            }).finally(() => {
-                setIsLoading(false);
-            });
         } else {
             setIsLoading(false);
             setSeries(undefined);
         }
     }, [props.selectedProfile, props.direction, props.coordIndex]);
 
-    let variableConfig = useMemo(() => {
-
+    const variableConfig = useMemo(() => {
         let variableConfig: RasterBandConfig | undefined;
         const bandMode = props.verticalProfileViz.bandMode.value;
         if (bandMode instanceof RasterBandModeSingle) {
-            let variables = props.verticalProfileViz.config.bandMode.bands;
-            let variableConfig = variables?.find((variable => variable.id === bandMode.band));
+            const variables = props.verticalProfileViz.config.bandMode.bands;
+            variableConfig = variables?.find((variable) => variable.id === bandMode.band);
         }
         return variableConfig;
     }, []);
@@ -211,13 +210,12 @@ export const VerticalProfileSeries = (props: VerticalProfileSeriesProps) => {
     }, [props.highlightedCoord, trackCoordinate]);
     */
 
-    let chartOptions: EChartOption = useMemo(() => {
-
+    const chartOptions: EChartOption = useMemo(() => {
         let selectedDataIdx;
         if (props.selectedCoord && series) {
-            selectedDataIdx = Math.round(props.direction === 'horizontal'
-                ? props.selectedCoord[0] * series.subsample
-                : props.selectedCoord[1] * series.subsample);
+            selectedDataIdx = Math.round(
+                props.direction === 'horizontal' ? props.selectedCoord[0] * series.subsample : props.selectedCoord[1] * series.subsample
+            );
         }
         return {
             title: {
@@ -243,8 +241,7 @@ export const VerticalProfileSeries = (props: VerticalProfileSeriesProps) => {
                         if (trackCoordinate) {
                             //hack: we use the tooltip formatter as a chart point highlight event emitter
                             if (fParams.dataIndex !== undefined) {
-
-                                getGeographicCoord(series.imageData[fParams.dataIndex]).then(geographicCoord => {
+                                getGeographicCoord(series.imageData[fParams.dataIndex]).then((geographicCoord) => {
                                     props.verticalProfileViz.mapLayer?.setHighlihgtedCoordinate({
                                         profileId: props.selectedProfile.id,
                                         unprojected: series.imageData[fParams.dataIndex!],
@@ -256,24 +253,33 @@ export const VerticalProfileSeries = (props: VerticalProfileSeriesProps) => {
                                         if (geographicCoord[0] > 180) {
                                             lon = geographicCoord[0] - 360;
                                         }
-                                        callback(ticket, `
+                                        callback(
+                                            ticket,
+                                            `
                                             <div>
                                                 <span>Lon: </span><span>${lon.toFixed(2)}</span>
                                                 <span>Lat: </span><span>${geographicCoord[1].toFixed(2)}</span>
                                             </div>
                                             <div>
-                                                <span>${variableConfig?.name}${variableConfig?.units ? (' (' + variableConfig.units + ')') : ''}: </span>
+                                                <span>${variableConfig?.name}${
+                                                variableConfig?.units ? ' (' + variableConfig.units + ')' : ''
+                                            }: </span>
                                                 <span>${fParams.value![1].toFixed(2)}</span>
                                             </div>
-                                        `);
+                                        `
+                                        );
                                     }
                                 });
                             }
                         }
 
                         return `
-                            <div><span>${props.direction === 'horizontal' ? 'Distance (km)' : 'Height (m)'}: </span>${fParams.value[0].toFixed(0)}</div>
-                            <div><span>${variableConfig?.name}${variableConfig?.units ? (' (' + variableConfig.units + ')') : ''}: </span><span>${fParams.value[1].toFixed(2)}</span></div>
+                            <div><span>${
+                                props.direction === 'horizontal' ? 'Distance (km)' : 'Height (m)'
+                            }: </span>${fParams.value[0].toFixed(0)}</div>
+                            <div><span>${variableConfig?.name}${
+                            variableConfig?.units ? ' (' + variableConfig.units + ')' : ''
+                        }: </span><span>${fParams.value[1].toFixed(2)}</span></div>
                         `;
                     } else {
                         return '';
@@ -287,19 +293,23 @@ export const VerticalProfileSeries = (props: VerticalProfileSeriesProps) => {
                     }
                 }
             },
-            xAxis: [{
-                type: 'value',
-                name: props.direction === 'horizontal' ? 'Distance (km)' : 'Height (m)',
-                nameLocation: 'middle',
-                nameGap: 30
-            }],
-            yAxis: [{
-                type: 'value',
-                name: variableConfig?.name,
-                nameRotate: 90,
-                nameLocation: 'middle',
-                nameGap: 60
-            }],
+            xAxis: [
+                {
+                    type: 'value',
+                    name: props.direction === 'horizontal' ? 'Distance (km)' : 'Height (m)',
+                    nameLocation: 'middle',
+                    nameGap: 30
+                }
+            ],
+            yAxis: [
+                {
+                    type: 'value',
+                    name: variableConfig?.name,
+                    nameRotate: 90,
+                    nameLocation: 'middle',
+                    nameGap: 60
+                }
+            ],
             grid: {
                 left: 40,
                 right: 20,
@@ -307,86 +317,95 @@ export const VerticalProfileSeries = (props: VerticalProfileSeriesProps) => {
                 top: 20,
                 containLabel: true
             },
-            series: [{
-                type: 'line',
-                name: variableConfig?.name,
-                yAxisIndex: 0,
-                smooth: true,
-                // @ts-ignore
-                data: series ? series.chartData : undefined,
-                emphasis: {
-                    itemStyle: {
-                        color: props.highlightColor
-                    }
-                },
-                markPoint: series ? {
-                    data: [{
-                        coord: series.chartData[selectedDataIdx]
-                    }],
-                    itemStyle: {
-                        color: '#FFFF00',
-                        borderWidth: 1,
-                        borderColor: '#000'
-                    }
-                } : undefined,
-            }],
+            series: [
+                {
+                    type: 'line',
+                    name: variableConfig?.name,
+                    yAxisIndex: 0,
+                    smooth: true,
+                    // @ts-ignore
+                    data: series ? series.chartData : undefined,
+                    emphasis: {
+                        itemStyle: {
+                            color: props.highlightColor
+                        }
+                    },
+                    markPoint: series
+                        ? {
+                              data: [
+                                  {
+                                      coord: series.chartData[selectedDataIdx]
+                                  }
+                              ],
+                              itemStyle: {
+                                  color: '#FFFF00',
+                                  borderWidth: 1,
+                                  borderColor: '#000'
+                              }
+                          }
+                        : undefined
+                }
+            ],
             backgroundColor: 'transparent'
         };
     }, [series, trackCoordinate]);
 
-    return <ChartWidget
-        options={chartOptions}
-        showTip={tipOptions}
-        isLoading={isLoading}
-        onMouseEnter={() => setTrackCoordinate(true)}
-        onMouseLeave={() => setTrackCoordinate(false)}
-        onItemClick={(evt) => {
-            if (evt.dataIndex && props.selectedCoord) {
-                getGeographicCoord(series.imageData[evt.dataIndex]).then(geographicCoord => {
-                    props.verticalProfileViz.mapLayer?.setSelectedCoordinate({
-                        profileId: props.selectedProfile.id,
-                        unprojected: series.imageData[evt.dataIndex],
-                        geographic: geographicCoord
-                    });
-
-                    if (geographicCoord) {
-                        centerOnMap({type: 'Point', coordinates: geographicCoord}, {
-                            animate: true
+    return (
+        <ChartWidget
+            options={chartOptions}
+            showTip={tipOptions}
+            isLoading={isLoading}
+            onMouseEnter={() => setTrackCoordinate(true)}
+            onMouseLeave={() => setTrackCoordinate(false)}
+            onItemClick={(evt) => {
+                if (evt.dataIndex && props.selectedCoord) {
+                    getGeographicCoord(series.imageData[evt.dataIndex]).then((geographicCoord) => {
+                        props.verticalProfileViz.mapLayer?.setSelectedCoordinate({
+                            profileId: props.selectedProfile.id,
+                            unprojected: series.imageData[evt.dataIndex],
+                            geographic: geographicCoord
                         });
-                    }
-                });
-            }
-        }}
-    />;
+
+                        if (geographicCoord) {
+                            centerOnMap(
+                                { type: 'Point', coordinates: geographicCoord },
+                                {
+                                    animate: true
+                                }
+                            );
+                        }
+                    });
+                }
+            }}
+        />
+    );
 };
 
 export type VerticalProfileVizWidgetProps = {
     verticalProfileViz: DatasetVerticalProfileViz;
     style?: {
-        horizontalSeriesColor: string,
-        verticalSeriesColor: string,
-        highlightCoordColor: string,
-        selectedCoordColor: string
-    }
+        horizontalSeriesColor: string;
+        verticalSeriesColor: string;
+        highlightCoordColor: string;
+        selectedCoordColor: string;
+    };
 };
 
 export const VerticalProfileVizWidget = (props: VerticalProfileVizWidgetProps) => {
+    const [highlightedCoord, setHighlightedCoord] = useState<GeoJSON.Position | undefined>();
+    const [selectedCoord, setSelectedCoord] = useState<GeoJSON.Position | undefined>();
 
-    let [highlightedCoord, setHighlightedCoord] = useState<GeoJSON.Position | undefined>();
-    let [selectedCoord, setSelectedCoord] = useState<GeoJSON.Position | undefined>();
+    const selectedProfile = useSelector(() => props.verticalProfileViz.profiles.find((profile) => profile.selected.value));
 
-    const selectedProfile = useSelector(() => props.verticalProfileViz.profiles.find(profile => profile.selected.value));
-
-    let vProfileViz = props.verticalProfileViz;
+    const vProfileViz = props.verticalProfileViz;
     const transform = vProfileViz.config.profileCoordTransform;
-
 
     const getImageCoord = (profileCoord) => {
         if (profileCoord && selectedProfile && selectedProfile.id === profileCoord.profileId) {
             if (profileCoord.unprojected) {
                 return Promise.resolve(profileCoord.unprojected);
             } else if (profileCoord.geographic && transform) {
-                let coord = [...profileCoord.geographic];
+                const coord = [...profileCoord.geographic];
                 coord[2] /= vProfileViz.verticalScale.value;
                 return transform.inverse(selectedProfile.id, coord);
             }
@@ -416,7 +435,6 @@ export const VerticalProfileVizWidget = (props: VerticalProfileVizWidgetProps) =
             hoverCoordDisposer();
             selectCoordDisposer();
         };
-
     }, [selectedProfile]);
 
     if (!selectedProfile) {
@@ -424,7 +442,7 @@ export const VerticalProfileVizWidget = (props: VerticalProfileVizWidgetProps) =
     }
 
     return (
-        <div className={classnames('dataset-vertical-profile-chart', {'is-coord-selected': !!selectedCoord})}>
+        <div className={classnames('dataset-vertical-profile-chart', { 'is-coord-selected': !!selectedCoord })}>
             <VerticalProfileImage
                 verticalProfileViz={props.verticalProfileViz}
                 selectedProfile={selectedProfile}
@@ -460,7 +478,6 @@ export const VerticalProfileVizWidget = (props: VerticalProfileVizWidgetProps) =
     );
 };
 
-
 VerticalProfileVizWidget.defaultProps = {
     style: {
         horizontalSeriesColor: 'red',
@@ -471,8 +488,7 @@ VerticalProfileVizWidget.defaultProps = {
 };
 
 DatasetAnalysisWidgetFactory.register(VERTICAL_PROFILE_VIZ_TYPE, (config) => {
-
-    let verticalProfileViz = config.mapViz as DatasetVerticalProfileViz;
+    const verticalProfileViz = config.mapViz as DatasetVerticalProfileViz;
 
     if (!verticalProfileViz.config.tileSourceProvider) {
         return undefined;
@@ -495,7 +511,5 @@ DatasetAnalysisWidgetFactory.register(VERTICAL_PROFILE_VIZ_TYPE, (config) => {
     //     return null;
     // }
 
-    return <VerticalProfileVizWidget
-        verticalProfileViz={verticalProfileViz}
-    />;
+    return <VerticalProfileVizWidget verticalProfileViz={verticalProfileViz} />;
 });

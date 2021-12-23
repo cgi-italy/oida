@@ -1,4 +1,3 @@
-
 import { transform } from 'ol/proj';
 
 import { AxiosInstanceWithCancellation, createAxiosInstance } from '@oidajs/core';
@@ -12,15 +11,13 @@ export type AdamWCSSeriesProviderConfig = {
     dimensions: AdamDatasetDimension[];
     variables: AdamDatasetSingleBandCoverage[];
     coverageSrs: string;
-    extentOffset?: number[],
-    axiosInstance?: AxiosInstanceWithCancellation
+    extentOffset?: number[];
+    axiosInstance?: AxiosInstanceWithCancellation;
 };
 
-export class AdamWcsSeriesProvider  {
-
+export class AdamWcsSeriesProvider {
     protected axiosInstance_: AxiosInstanceWithCancellation;
     protected config_: AdamWCSSeriesProviderConfig;
-
 
     constructor(config: AdamWCSSeriesProviderConfig) {
         this.axiosInstance_ = config.axiosInstance || createAxiosInstance();
@@ -28,15 +25,14 @@ export class AdamWcsSeriesProvider  {
     }
 
     getSeries(request: DatasetPointSeriesRequest) {
-        let wcsParams = {
+        const wcsParams = {
             service: 'WCS',
             request: 'GetCoverage',
             version: '2.0.0',
-            format: 'application/json',
+            format: 'application/json'
         };
 
-
-        let subsets = {} as Record<string, string[]>;
+        const subsets = {} as Record<string, string[]>;
 
         let dimensionConfig: AdamDatasetDimension | undefined;
         let subdataset: string | undefined;
@@ -45,14 +41,13 @@ export class AdamWcsSeriesProvider  {
             if (dimension.id === request.dimension) {
                 if (request.range) {
                     if (dimension.id === 'time') {
-                        subsets['unix'] =
-                            [`${(request.range.min as Date).toISOString()},${(request.range.max as Date).toISOString()}`];
+                        subsets['unix'] = [`${(request.range.min as Date).toISOString()},${(request.range.max as Date).toISOString()}`];
                     } else {
                         subsets[dimension.wcsSubset.id] = [`${request.range.min},${request.range.max}`];
                     }
                 } else {
                     if (dimension.wcsSubset.idx !== undefined) {
-                        let currentSubset = subsets[dimension.wcsSubset.id] || [];
+                        const currentSubset = subsets[dimension.wcsSubset.id] || [];
                         currentSubset.splice(dimension.wcsSubset.idx, 0, '*');
                         subsets[dimension.wcsSubset.id] = currentSubset;
                     }
@@ -60,7 +55,7 @@ export class AdamWcsSeriesProvider  {
                 dimensionConfig = dimension;
             } else {
                 if (request.dimensionValues) {
-                    let value = request.dimensionValues.get(dimension.id);
+                    const value = request.dimensionValues.get(dimension.id);
                     if (value !== undefined) {
                         if (dimension.id === 'subdataset') {
                             subdataset = value as string;
@@ -72,7 +67,7 @@ export class AdamWcsSeriesProvider  {
                                 stringValue = value.toString();
                             }
                             if (dimension.wcsSubset.idx !== undefined) {
-                                let currentSubset = subsets[dimension.wcsSubset.id] || [];
+                                const currentSubset = subsets[dimension.wcsSubset.id] || [];
                                 currentSubset.splice(dimension.wcsSubset.idx, 0, stringValue);
                                 subsets[dimension.wcsSubset.id] = currentSubset;
                             } else {
@@ -90,12 +85,12 @@ export class AdamWcsSeriesProvider  {
 
         let coverage: string;
 
-        let variableConfig = this.config_.variables!.find((variable) => variable.id === request.variable);
+        const variableConfig = this.config_.variables!.find((variable) => variable.id === request.variable);
         if (variableConfig) {
             coverage = variableConfig.wcsCoverage;
             if (variableConfig.wcsSubset) {
                 if (variableConfig.wcsSubset.idx !== undefined) {
-                    let currentSubset = subsets[variableConfig.wcsSubset.id] || [];
+                    const currentSubset = subsets[variableConfig.wcsSubset.id] || [];
                     currentSubset.splice(variableConfig.wcsSubset.idx, 0, variableConfig.wcsSubset.value);
                     subsets[variableConfig.wcsSubset.id] = currentSubset;
                 } else {
@@ -113,7 +108,7 @@ export class AdamWcsSeriesProvider  {
             return `${subsetId}(${subsets[subsetId].join(',')})`;
         });
 
-        let requestCoord = transform(request.location.coordinates, 'EPSG:4326', this.config_.coverageSrs);
+        const requestCoord = transform(request.location.coordinates, 'EPSG:4326', this.config_.coverageSrs);
 
         const extentOffset = this.config_.extentOffset;
         if (extentOffset) {
@@ -124,30 +119,34 @@ export class AdamWcsSeriesProvider  {
         subset.push(`E(${requestCoord[0]},${requestCoord[0]})`);
         subset.push(`N(${requestCoord[1]},${requestCoord[1]})`);
 
-        return this.axiosInstance_.cancelableRequest({
-            url: this.config_.serviceUrl,
-            params: {
-                ...wcsParams,
-                coverageId: coverage,
-                subdataset: subdataset,
-                subset: subset,
-            },
-            responseType: 'json',
-            paramsSerializer: AdamServiceParamsSerializer
-        }).then((response) => {
-            return this.parseWcsResponse_(response.data, dimensionConfig!, request).then((data) => {
-                const noData = variableConfig?.domain?.noData;
-                if (noData !== undefined) {
-                    return data.filter(item => item.y !== noData);
-                } else {
-                    return data;
-                }
+        return this.axiosInstance_
+            .cancelableRequest({
+                url: this.config_.serviceUrl,
+                params: {
+                    ...wcsParams,
+                    coverageId: coverage,
+                    subdataset: subdataset,
+                    subset: subset
+                },
+                responseType: 'json',
+                paramsSerializer: AdamServiceParamsSerializer
+            })
+            .then((response) => {
+                return this.parseWcsResponse_(response.data, dimensionConfig!, request).then((data) => {
+                    const noData = variableConfig?.domain?.noData;
+                    if (noData !== undefined) {
+                        return data.filter((item) => item.y !== noData);
+                    } else {
+                        return data;
+                    }
+                });
             });
-        });
     }
 
     protected parseWcsResponse_(
-        response, dimension: AdamDatasetDimension, request: DatasetPointSeriesRequest
+        response,
+        dimension: AdamDatasetDimension,
+        request: DatasetPointSeriesRequest
     ): Promise<DatasetPointSeriesValueItem[]> {
         if (dimension.id === 'time') {
             const data = response.data.map((item) => {
@@ -193,7 +192,6 @@ export class AdamWcsSeriesProvider  {
                 }
             });
         }
-
     }
 
     protected getDimensionDomain_(dimension: AdamDatasetDimension, request: DatasetPointSeriesRequest) {

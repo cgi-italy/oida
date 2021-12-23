@@ -1,23 +1,25 @@
 import moment from 'moment';
 
 import {
-    DatasetTimeDistributionProvider, TimeDistributionRangeItem,
-    TimeDistributionInstantItem, TimeSearchDirection
+    DatasetTimeDistributionProvider,
+    TimeDistributionRangeItem,
+    TimeDistributionInstantItem,
+    TimeSearchDirection
 } from '@oidajs/eo-mobx';
 
-
-export type WmsTimeDistributionItem = Date | {
-    start: Date,
-    end: Date,
-    step: number
-};
+export type WmsTimeDistributionItem =
+    | Date
+    | {
+          start: Date;
+          end: Date;
+          step: number;
+      };
 
 export type WmsTimeDistributionProviderConfig = {
     timeDimension: string;
 };
 
 export class WmsTimeDistributionProvider implements DatasetTimeDistributionProvider {
-
     protected timeDistribution_: WmsTimeDistributionItem[];
 
     constructor(config: WmsTimeDistributionProviderConfig) {
@@ -30,8 +32,8 @@ export class WmsTimeDistributionProvider implements DatasetTimeDistributionProvi
     }
 
     getTimeExtent() {
-        let firstItem = this.timeDistribution_[0];
-        let lastItem = this.timeDistribution_[this.timeDistribution_.length - 1];
+        const firstItem = this.timeDistribution_[0];
+        const lastItem = this.timeDistribution_[this.timeDistribution_.length - 1];
 
         let start: Date, end: Date;
         if (firstItem instanceof Date) {
@@ -46,12 +48,12 @@ export class WmsTimeDistributionProvider implements DatasetTimeDistributionProvi
         }
 
         return Promise.resolve({
-            start, end
+            start,
+            end
         });
     }
 
     getTimeDistribution(timeRange, filters, resolution?) {
-
         let currIndex = this.timeDistribution_.findIndex((item) => {
             if (item instanceof Date) {
                 return item >= timeRange.start;
@@ -66,7 +68,7 @@ export class WmsTimeDistributionProvider implements DatasetTimeDistributionProvi
         const distributionItems: (TimeDistributionRangeItem | TimeDistributionInstantItem)[] = [];
         let prevItem: TimeDistributionRangeItem | TimeDistributionInstantItem;
 
-        let item = this.timeDistribution_[currIndex];
+        const item = this.timeDistribution_[currIndex];
         if (item instanceof Date) {
             if (item > timeRange.end) {
                 return Promise.resolve([]);
@@ -81,10 +83,9 @@ export class WmsTimeDistributionProvider implements DatasetTimeDistributionProvi
                     end: item.end
                 };
             } else {
-
                 const start = timeRange.start > item.start ? timeRange.start : item.start;
-                let startIndex = Math.floor((start.getTime() - item.start.getTime()) / item.step);
-                let dt = new Date(item.start.getTime() + startIndex * item.step);
+                const startIndex = Math.floor((start.getTime() - item.start.getTime()) / item.step);
+                const dt = new Date(item.start.getTime() + startIndex * item.step);
                 const end = timeRange.end < item.end ? timeRange.end : item.end;
                 while (dt < end) {
                     distributionItems.push({
@@ -93,7 +94,7 @@ export class WmsTimeDistributionProvider implements DatasetTimeDistributionProvi
                     dt.setTime(dt.getTime() + item.step);
                 }
                 prevItem = {
-                    start: item.end,
+                    start: item.end
                 };
             }
         }
@@ -101,13 +102,13 @@ export class WmsTimeDistributionProvider implements DatasetTimeDistributionProvi
 
         currIndex++;
         while (currIndex < this.timeDistribution_.length) {
-            let item = this.timeDistribution_[currIndex];
-            let lastEnd = (prevItem as TimeDistributionRangeItem).end || prevItem.start;
+            const item = this.timeDistribution_[currIndex];
+            const lastEnd = (prevItem as TimeDistributionRangeItem).end || prevItem.start;
             if (item instanceof Date) {
                 if (item > timeRange.end) {
                     break;
                 }
-                let distance = item.getTime() - lastEnd.getTime();
+                const distance = item.getTime() - lastEnd.getTime();
                 if (distance > resolution) {
                     prevItem = {
                         start: new Date(item)
@@ -121,7 +122,7 @@ export class WmsTimeDistributionProvider implements DatasetTimeDistributionProvi
                     break;
                 }
                 if (item.step < resolution) {
-                    let distance = item.start.getTime() - lastEnd.getTime();
+                    const distance = item.start.getTime() - lastEnd.getTime();
                     if (distance > resolution) {
                         prevItem = {
                             start: new Date(item.start),
@@ -132,7 +133,7 @@ export class WmsTimeDistributionProvider implements DatasetTimeDistributionProvi
                         (prevItem as TimeDistributionRangeItem).end = new Date(item.end);
                     }
                 } else {
-                    let dt = new Date(item.start);
+                    const dt = new Date(item.start);
                     const end = timeRange.end < item.end ? timeRange.end : item.end;
                     while (dt < end) {
                         distributionItems.push({
@@ -141,7 +142,7 @@ export class WmsTimeDistributionProvider implements DatasetTimeDistributionProvi
                         dt.setTime(dt.getTime() + item.step);
                     }
                     prevItem = {
-                        start: item.end,
+                        start: item.end
                     };
                     distributionItems.push(prevItem);
                 }
@@ -158,10 +159,7 @@ export class WmsTimeDistributionProvider implements DatasetTimeDistributionProvi
         } else if (direction === TimeSearchDirection.Backward) {
             return this.getPrevItem_(dt);
         } else {
-            return Promise.all([
-                this.getPrevItem_(dt),
-                this.getNextItem_(dt)
-            ]).then(([prev, next]) => {
+            return Promise.all([this.getPrevItem_(dt), this.getNextItem_(dt)]).then(([prev, next]) => {
                 if (!prev) {
                     return next;
                 } else if (!next) {
@@ -180,12 +178,11 @@ export class WmsTimeDistributionProvider implements DatasetTimeDistributionProvi
     }
 
     protected parseWmsTimeRange_(timeRange: string) {
-
         if (timeRange.search(',') !== -1) {
-            let values = timeRange.split(',');
+            const values = timeRange.split(',');
             values.forEach((value) => {
-                if (value.search('/') !== - 1) {
-                    let startEndStep = timeRange.split('/');
+                if (value.search('/') !== -1) {
+                    const startEndStep = timeRange.split('/');
                     this.timeDistribution_.push({
                         start: moment.utc(startEndStep[0]).toDate(),
                         end: moment.utc(startEndStep[1]).toDate(),
@@ -195,8 +192,8 @@ export class WmsTimeDistributionProvider implements DatasetTimeDistributionProvi
                     this.timeDistribution_.push(moment.utc(value).toDate());
                 }
             });
-        } else if (timeRange.search('/') !== - 1) {
-            let startEndStep = timeRange.split('/');
+        } else if (timeRange.search('/') !== -1) {
+            const startEndStep = timeRange.split('/');
             this.timeDistribution_.push({
                 start: moment.utc(startEndStep[0]).toDate(),
                 end: moment.utc(startEndStep[1]).toDate(),
@@ -208,7 +205,7 @@ export class WmsTimeDistributionProvider implements DatasetTimeDistributionProvi
     }
 
     protected getNextItem_(dt: Date) {
-        let target = this.timeDistribution_.find((item) => {
+        const target = this.timeDistribution_.find((item) => {
             if (item instanceof Date) {
                 return item >= dt;
             } else {
@@ -223,7 +220,7 @@ export class WmsTimeDistributionProvider implements DatasetTimeDistributionProvi
                 start: target
             });
         } else {
-            let distance = dt.getTime() - target.start.getTime();
+            const distance = dt.getTime() - target.start.getTime();
             if (distance <= 0) {
                 return Promise.resolve({
                     start: target.start
@@ -234,7 +231,7 @@ export class WmsTimeDistributionProvider implements DatasetTimeDistributionProvi
                         start: dt
                     });
                 } else {
-                    let numSteps = Math.ceil(distance / target.step);
+                    const numSteps = Math.ceil(distance / target.step);
                     return Promise.resolve({
                         start: new Date(target.start.getTime() + numSteps * target.step)
                     });
@@ -244,13 +241,16 @@ export class WmsTimeDistributionProvider implements DatasetTimeDistributionProvi
     }
 
     protected getPrevItem_(dt: Date) {
-        let target = this.timeDistribution_.slice().reverse().find((item) => {
-            if (item instanceof Date) {
-                return item <= dt;
-            } else {
-                return item.start <= dt;
-            }
-        });
+        const target = this.timeDistribution_
+            .slice()
+            .reverse()
+            .find((item) => {
+                if (item instanceof Date) {
+                    return item <= dt;
+                } else {
+                    return item.start <= dt;
+                }
+            });
         if (!target) {
             return Promise.resolve(undefined);
         }
@@ -259,7 +259,7 @@ export class WmsTimeDistributionProvider implements DatasetTimeDistributionProvi
                 start: target
             });
         } else {
-            let distance = target.end.getTime() - dt.getTime();
+            const distance = target.end.getTime() - dt.getTime();
             if (distance <= 0) {
                 return Promise.resolve({
                     start: target.end
@@ -270,7 +270,7 @@ export class WmsTimeDistributionProvider implements DatasetTimeDistributionProvi
                         start: dt
                     });
                 } else {
-                    let numSteps = Math.ceil(distance / target.step);
+                    const numSteps = Math.ceil(distance / target.step);
                     return Promise.resolve({
                         start: new Date(target.end.getTime() - numSteps * target.step)
                     });

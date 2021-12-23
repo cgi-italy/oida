@@ -4,13 +4,11 @@ import { DataCollectionDetailedListItem } from '@oidajs/ui-react-antd';
 import { WmsDatasetDiscoveryProviderItem, WmsLayerPreviewMode } from '@oidajs/eo-adapters-ogc';
 
 export type WmsDiscoveryProviderLayerItemProps = {
-    wmsDiscoveryItem: WmsDatasetDiscoveryProviderItem
+    wmsDiscoveryItem: WmsDatasetDiscoveryProviderItem;
 };
 
 export const WmsDiscoveryProviderLayerItem = (props: WmsDiscoveryProviderLayerItemProps) => {
-
     const layerPreview = useMemo(() => {
-
         const layer = props.wmsDiscoveryItem.layer;
 
         let preview: Promise<string> | undefined;

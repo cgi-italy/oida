@@ -5,14 +5,13 @@ import { DatasetExplorer, DatasetViz } from '@oidajs/eo-mobx';
 import { ComboToolConfig, useDatasetExplorerTools } from '../hooks';
 
 export type DatasetToolsMenuProps = {
-    datasetExplorer: DatasetExplorer,
-    analyticsTools: ComboToolConfig[],
-    datasetViz: DatasetViz<any>,
-    icon: React.ReactNode
+    datasetExplorer: DatasetExplorer;
+    analyticsTools: ComboToolConfig[];
+    datasetViz: DatasetViz<any>;
+    icon: React.ReactNode;
 };
 
 export const DatasetToolsMenu = (props: DatasetToolsMenuProps) => {
-
     const tools = useDatasetExplorerTools({
         datasetExplorer: props.datasetExplorer,
         dataset: props.datasetViz.dataset,
@@ -32,17 +31,8 @@ export const DatasetToolsMenu = (props: DatasetToolsMenuProps) => {
     });
 
     return (
-        <Dropdown
-            overlay={
-                <Menu>
-                    {toolsMenuItems}
-                </Menu>
-            }
-        >
-            <Button
-                size='small'
-                type='link'
-            >
+        <Dropdown overlay={<Menu>{toolsMenuItems}</Menu>}>
+            <Button size='small' type='link'>
                 {props.icon}
             </Button>
         </Dropdown>

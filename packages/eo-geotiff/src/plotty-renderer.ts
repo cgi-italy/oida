@@ -5,7 +5,6 @@ export type PlottyRendererConfig = {
 };
 
 export class PlottyRenderer {
-
     /**
      * Use the same plotty renderer instance for all loaders. Each plotty instance create a
      * new webGL context and we want to avoid the creation of multiple GL contexts.
@@ -97,5 +96,4 @@ export class PlottyRenderer {
         }
         return this.canvas;
     }
-
 }

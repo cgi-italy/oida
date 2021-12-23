@@ -1,6 +1,14 @@
-import { AoiValue, AOI_FIELD_ID, AxiosInstanceWithCancellation,
-    BOOLEAN_FIELD_ID, createAxiosInstance, DateRangeValue, DATE_FIELD_ID,
-    DATE_RANGE_FIELD_ID, ENUM_FIELD_ID, QueryParams, STRING_FIELD_ID
+import {
+    AOI_FIELD_ID,
+    AxiosInstanceWithCancellation,
+    BOOLEAN_FIELD_ID,
+    createAxiosInstance,
+    DateRangeValue,
+    DATE_FIELD_ID,
+    DATE_RANGE_FIELD_ID,
+    ENUM_FIELD_ID,
+    QueryParams,
+    STRING_FIELD_ID
 } from '@oidajs/core';
 
 export type AdamOpensearchDatasetMetadataGridName = {
@@ -13,14 +21,17 @@ export type AdamOpensearchDatasetMetadataGridName = {
 };
 
 export type AdamOpensearchDatasetCustomGridSpec = {
-    SubRegion: Record<string, {
-        value: string,
-        scenes: Array<{
-            scene_type: string,
-            scene_type_values: Array<Record<string, number>>
-        }>
-    }>,
-    Product: Record<string, string>
+    SubRegion: Record<
+        string,
+        {
+            value: string;
+            scenes: Array<{
+                scene_type: string;
+                scene_type_values: Array<Record<string, number>>;
+            }>;
+        }
+    >;
+    Product: Record<string, string>;
 };
 
 export type AdamOpensearchDatasetMetadataSubdataset = {
@@ -60,7 +71,7 @@ export type AdamOpensearchProductMetadata = {
         minValue: number;
         maxValue: number;
         EPSG: string;
-    }
+    };
 };
 
 export type AdamDatasetDiscoveryRequest = {
@@ -69,22 +80,22 @@ export type AdamDatasetDiscoveryRequest = {
 };
 
 export type AdamOpensearchDatasetDiscoveryResponse = {
-    type: 'FeatureCollection',
+    type: 'FeatureCollection';
     properties: {
         totalResults: number;
         startIndex: number;
         itemPerPage: number;
-    }
+    };
     features: AdamOpensearchDatasetMetadata[];
 };
 
 export type AdamOpensearchProductSearchResponse = {
-    type: 'FeatureCollection',
+    type: 'FeatureCollection';
     properties: {
         totalResults: number;
         startIndex: number;
         itemPerPage: number;
-    }
+    };
     features: AdamOpensearchProductMetadata[];
 };
 
@@ -94,7 +105,6 @@ export type AdamOpenSearchClientConfig = {
 };
 
 export class AdamOpenSearchClient {
-
     protected axiosInstance_: AxiosInstanceWithCancellation;
     protected serviceUrl_: string;
 
@@ -128,16 +138,17 @@ export class AdamOpenSearchClient {
             });
         }
 
-        return this.axiosInstance_.request<AdamOpensearchDatasetDiscoveryResponse>({
-            url: `${this.serviceUrl_}/datasets`,
-            params: params
-        }).then((response) => {
-            return response.data;
-        });
+        return this.axiosInstance_
+            .request<AdamOpensearchDatasetDiscoveryResponse>({
+                url: `${this.serviceUrl_}/datasets`,
+                params: params
+            })
+            .then((response) => {
+                return response.data;
+            });
     }
 
     searchProducts(queryParams: QueryParams) {
-
         const params: AdamDatasetDiscoveryRequest = {};
         if (queryParams.paging) {
             params.maxRecords = queryParams.paging.pageSize;
@@ -162,11 +173,13 @@ export class AdamOpenSearchClient {
             });
         }
 
-        return this.axiosInstance_.request<AdamOpensearchProductSearchResponse>({
-            url: `${this.serviceUrl_}/search`,
-            params: params
-        }).then((response) => {
-            return response.data;
-        });
+        return this.axiosInstance_
+            .request<AdamOpensearchProductSearchResponse>({
+                url: `${this.serviceUrl_}/search`,
+                params: params
+            })
+            .then((response) => {
+                return response.data;
+            });
     }
 }

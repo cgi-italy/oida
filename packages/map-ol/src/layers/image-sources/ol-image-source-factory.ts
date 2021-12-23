@@ -1,6 +1,6 @@
 import { createDynamicFactory } from '@oidajs/core';
 
-let factory = createDynamicFactory('ol-image-source');
+const factory = createDynamicFactory('ol-image-source');
 
 export const olImageSourceFactory = {
     ...factory,

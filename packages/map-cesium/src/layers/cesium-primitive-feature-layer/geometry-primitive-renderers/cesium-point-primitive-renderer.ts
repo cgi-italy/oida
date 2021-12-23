@@ -3,7 +3,7 @@ import Cartesian3 from 'cesium/Source/Core/Cartesian3';
 import Color from 'cesium/Source/Core/Color';
 import HeightReference from 'cesium/Source/Scene/HeightReference';
 import BillboardCollection from 'cesium/Source/Scene/BillboardCollection';
-import PointPrimitiveCollection  from 'cesium/Source/Scene/PointPrimitiveCollection';
+import PointPrimitiveCollection from 'cesium/Source/Scene/PointPrimitiveCollection';
 import Billboard from 'cesium/Source/Scene/Billboard';
 import PointPrimitive from 'cesium/Source/Scene/PointPrimitive';
 
@@ -25,10 +25,9 @@ export class CesiumPointPrimitiveRenderer implements CesiumGeometryPrimitiveRend
     private primitives_: PrimitiveCollection;
 
     private layer_: CesiumPrimitiveFeatureLayer;
-    private clampToGround_: boolean = false;
+    private clampToGround_: boolean;
 
     constructor(config) {
-
         this.clampToGround_ = config.clampToGround || false;
         this.layer_ = config.layer;
 
@@ -36,9 +35,7 @@ export class CesiumPointPrimitiveRenderer implements CesiumGeometryPrimitiveRend
         this.billboards_ = new BillboardCollection({
             scene: config.scene
         });
-        this.points_ = new PointPrimitiveCollection({
-
-        });
+        this.points_ = new PointPrimitiveCollection({});
 
         this.primitives_.add(this.billboards_);
         this.primitives_.add(this.points_);
@@ -49,8 +46,7 @@ export class CesiumPointPrimitiveRenderer implements CesiumGeometryPrimitiveRend
     }
 
     addFeature(id: string, geometry: GeoJSON.Point | GeoJSON.MultiPoint, style: IPointStyle, data: any) {
-
-        let feature: CesiumPointPrimitiveFeature = {
+        const feature: CesiumPointPrimitiveFeature = {
             id: id,
             data: data,
             geometryType: geometry.type,
@@ -79,9 +75,8 @@ export class CesiumPointPrimitiveRenderer implements CesiumGeometryPrimitiveRend
             primitive[PICK_INFO_KEY] = pickInfo;
 
             feature.renderProps.primitives.push(primitive);
-
         } else if (geometry.type === 'MultiPoint') {
-            let points = geometry.coordinates;
+            const points = geometry.coordinates;
             for (let i = 0; i < points.length; ++i) {
                 let primitive;
                 if (isIcon(style)) {
@@ -105,8 +100,7 @@ export class CesiumPointPrimitiveRenderer implements CesiumGeometryPrimitiveRend
 
         let i = 0;
         for (i = 0; i < primitives.length; ++i) {
-            if (coordinates[i])
-                this.updatePrimitivedGeometry_(primitives[i], coordinates[i]);
+            if (coordinates[i]) this.updatePrimitivedGeometry_(primitives[i], coordinates[i]);
             else {
                 this.billboards_.remove(primitives[i]);
                 this.points_.remove(primitives[i]);
@@ -153,7 +147,6 @@ export class CesiumPointPrimitiveRenderer implements CesiumGeometryPrimitiveRend
         });
     }
 
-
     clear() {
         this.billboards_.removeAll();
         this.points_.removeAll();
@@ -164,7 +157,7 @@ export class CesiumPointPrimitiveRenderer implements CesiumGeometryPrimitiveRend
     }
 
     protected createBillboard_(id, coordinates, style) {
-        let billboard = this.billboards_.add({
+        const billboard = this.billboards_.add({
             id: id,
             position: Cartesian3.fromDegrees(...coordinates),
             color: style.color ? new Color(...style.color) : undefined,
@@ -173,10 +166,11 @@ export class CesiumPointPrimitiveRenderer implements CesiumGeometryPrimitiveRend
             scale: style.scale || 1.0,
             rotation: style.rotation || 0.0,
             eyeOffset: style.zIndex ? new Cartesian3(0, 0, -100 * style.zIndex) : Cartesian3.ZERO,
-            heightReference:
-                this.clampToGround_ ? (coordinates.length === 2 ? HeightReference.CLAMP_TO_GROUND
-                                                                : HeightReference.RELATIVE_TO_GROUND)
-                                    : HeightReference.NONE
+            heightReference: this.clampToGround_
+                ? coordinates.length === 2
+                    ? HeightReference.CLAMP_TO_GROUND
+                    : HeightReference.RELATIVE_TO_GROUND
+                : HeightReference.NONE
         });
 
         return billboard;
@@ -217,7 +211,6 @@ export class CesiumPointPrimitiveRenderer implements CesiumGeometryPrimitiveRend
     }
 
     protected updatePointStyle_(point: PointPrimitive, style: ICircleStyle) {
-
         point.show = style.visible;
 
         if (style.fillColor) {
@@ -232,11 +225,9 @@ export class CesiumPointPrimitiveRenderer implements CesiumGeometryPrimitiveRend
         } else {
             point.pixelSize = 1;
         }
-
     }
 
     protected updatePrimitivedGeometry_(primitive: Billboard | PointPrimitive, coordinates: GeoJSON.Position) {
         primitive.position = Cartesian3.fromDegrees(...coordinates);
     }
-
 }

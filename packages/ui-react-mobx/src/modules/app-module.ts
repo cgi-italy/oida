@@ -24,7 +24,7 @@ export class AppModules {
     }
 
     getModule<T extends AppModule>(id: string) {
-        let module = this.items.get(id);
+        const module = this.items.get(id);
         if (module) {
             return module as T;
         }

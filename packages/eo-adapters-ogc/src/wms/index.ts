@@ -1,6 +1,10 @@
 import { DatasetDiscoveryProvider } from '@oidajs/eo-mobx';
 
-import { WMS_DATASET_DISCOVERY_PROVIDER_TYPE, WmsDatasetDiscoveryProvider, WmsDatasetDiscoveryProviderProps } from './wms-discovery-provider';
+import {
+    WMS_DATASET_DISCOVERY_PROVIDER_TYPE,
+    WmsDatasetDiscoveryProvider,
+    WmsDatasetDiscoveryProviderProps
+} from './wms-discovery-provider';
 
 declare module '@oidajs/eo-mobx' {
     interface DatasetDiscoveryProviderDefinitions {
@@ -10,11 +14,9 @@ declare module '@oidajs/eo-mobx' {
     interface DatasetDiscoveryProviderTypes {
         [WMS_DATASET_DISCOVERY_PROVIDER_TYPE]: WmsDatasetDiscoveryProvider;
     }
-
 }
 
 DatasetDiscoveryProvider.register(WMS_DATASET_DISCOVERY_PROVIDER_TYPE, WmsDatasetDiscoveryProvider);
-
 
 export * from './wms-client';
 export * from './wms-service';

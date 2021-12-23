@@ -2,7 +2,7 @@ export const OSM_SOURCE_ID = 'osm';
 
 export type OsmSource = {
     id: typeof OSM_SOURCE_ID;
-    url?: string
+    url?: string;
 };
 
 declare module './tile-source' {

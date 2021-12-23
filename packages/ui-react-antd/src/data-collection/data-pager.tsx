@@ -6,8 +6,7 @@ import { PaginationProps } from 'antd/lib/pagination';
 import { DataPagerProps } from '@oidajs/ui-react-core';
 
 export const DataPager = (props: PaginationProps & DataPagerProps) => {
-
-    let {page, pageSize, total, onPageChange, onPageSizeChange, ...renderProps} = props;
+    const { page, pageSize, total, onPageChange, onPageSizeChange, ...renderProps } = props;
 
     return (
         <Pagination
@@ -24,5 +23,4 @@ export const DataPager = (props: PaginationProps & DataPagerProps) => {
             {...renderProps}
         ></Pagination>
     );
-
 };

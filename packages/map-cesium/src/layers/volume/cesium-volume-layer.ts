@@ -8,7 +8,6 @@ import { cesiumVolumeViewFactory } from './volume-view';
 import { CesiumVolumeTileSet } from './cesium-volume-tile-set';
 
 export class CesiumVolumeLayer extends CesiumMapLayer implements IVolumeLayerRenderer {
-
     protected source_: CesiumVolumeSource | undefined;
     protected sourceConfig_: VolumeSourceConfig | undefined;
     protected volumeTileSet_: CesiumVolumeTileSet;
@@ -21,34 +20,42 @@ export class CesiumVolumeLayer extends CesiumMapLayer implements IVolumeLayerRen
         this.onSliceLoadStart_ = config.onSliceLoadStart;
         this.onSliceLoadEnd_ = config.onSliceLoadEnd;
 
-        let colorMap = config.colorMap;
+        const colorMap = config.colorMap;
 
         this.volumeTileSet_ = new CesiumVolumeTileSet({
-            source: config.source ? new CesiumVolumeSource({
-                ...config.source,
-                onSliceLoadStart: config.onSliceLoadStart,
-                onSliceLoadEnd: config.onSliceLoadEnd
-            }) : undefined,
-            colorMap: colorMap ? {
-                clamp: colorMap.clamp,
-                colorMap: colorMap.image,
-                noDataValue: colorMap.noData || -Number.MAX_VALUE,
-                range: new Cartesian2(colorMap.range.min, colorMap.range.max)
-            } : undefined
+            source: config.source
+                ? new CesiumVolumeSource({
+                      ...config.source,
+                      onSliceLoadStart: config.onSliceLoadStart,
+                      onSliceLoadEnd: config.onSliceLoadEnd
+                  })
+                : undefined,
+            colorMap: colorMap
+                ? {
+                      clamp: colorMap.clamp,
+                      colorMap: colorMap.image,
+                      noDataValue: colorMap.noData || -Number.MAX_VALUE,
+                      range: new Cartesian2(colorMap.range.min, colorMap.range.max)
+                  }
+                : undefined
         });
         this.primitives_.add(this.volumeTileSet_);
     }
 
     updateSource(sourceConfig?: VolumeSourceConfig) {
-        this.volumeTileSet_.setSource(sourceConfig ? new CesiumVolumeSource({
-            ...sourceConfig,
-            onSliceLoadStart: this.onSliceLoadStart_,
-            onSliceLoadEnd: this.onSliceLoadEnd_
-        }) : undefined);
+        this.volumeTileSet_.setSource(
+            sourceConfig
+                ? new CesiumVolumeSource({
+                      ...sourceConfig,
+                      onSliceLoadStart: this.onSliceLoadStart_,
+                      onSliceLoadEnd: this.onSliceLoadEnd_
+                  })
+                : undefined
+        );
     }
 
     forceRefresh() {
-
+        return;
     }
 
     setColorMap(colorMap: HTMLImageElement | HTMLCanvasElement) {
@@ -84,8 +91,7 @@ export class CesiumVolumeLayer extends CesiumMapLayer implements IVolumeLayerRen
     }
 
     setViewMode(mode: string) {
-
-        let volumeView = cesiumVolumeViewFactory.create(mode, {
+        const volumeView = cesiumVolumeViewFactory.create(mode, {
             tileSet: this.volumeTileSet_,
             requestMapRender: this.requestMapUpdate_.bind(this)
         });
@@ -97,5 +103,4 @@ export class CesiumVolumeLayer extends CesiumMapLayer implements IVolumeLayerRen
     protected requestMapUpdate_() {
         this.mapRenderer_.getViewer().scene.requestRender();
     }
-
 }

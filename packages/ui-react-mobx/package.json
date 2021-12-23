@@ -40,6 +40,6 @@
     "lz-string": "^1.4.4",
     "query-string": "^6.13.8",
     "react-resize-aware": "^3.0.0",
-    "tslib": "^2.2.0"
+    "tslib": "^2.3.1"
   }
 }

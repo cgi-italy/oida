@@ -2,20 +2,18 @@ import { MapLayer, MapLayerProps } from './map-layer';
 import { GEO_IMAGE_LAYER_ID, GeoImageLayerSource, GeoImageLayerFootprint } from '@oidajs/core';
 import { observable, makeObservable, action } from 'mobx';
 
-
 export type GeoImageLayerConfig = {
     srs?: string;
     dynamicFootprint?: boolean;
 };
 
 export type GeoImageLayerProps = {
-    source?: GeoImageLayerSource,
-    footprint: GeoImageLayerFootprint,
-    config: GeoImageLayerConfig
+    source?: GeoImageLayerSource;
+    footprint: GeoImageLayerFootprint;
+    config: GeoImageLayerConfig;
 } & MapLayerProps<typeof GEO_IMAGE_LAYER_ID>;
 
 export class GeoImageLayer extends MapLayer {
-
     @observable.ref source: GeoImageLayerSource | undefined;
     @observable.ref sourceRevision: number;
     @observable.ref footprint: GeoImageLayerFootprint;

@@ -8,15 +8,14 @@ import { SelectEnumRenderer } from '@oidajs/ui-react-antd';
 import { DatasetDimensionValueSelector } from '../../dataset-map-viz/dataset-dimension-value-selector';
 import { AnalysisAoiFilter } from '../analysis-aoi-filter';
 
-
 type DatasetVariableSelectorProps = {
     processing: DatasetAreaValues;
 };
 
 const DatasetVariableSeletor = (props: DatasetVariableSelectorProps) => {
-    let variableValue = useSelector(() => props.processing.variable);
+    const variableValue = useSelector(() => props.processing.variable);
 
-    let variableFieldConfig = {
+    const variableFieldConfig = {
         choices: props.processing.config.variables.map((variable) => {
             return {
                 value: variable.id,
@@ -38,20 +37,17 @@ const DatasetVariableSeletor = (props: DatasetVariableSelectorProps) => {
     );
 };
 
-
 export type DatasetAreaValuesProcessingFiltersProps = {
     processing: DatasetAreaValues;
     disableAoi?: boolean;
 };
 
 export const DatasetAreaValuesProcessingFilters = (props: DatasetAreaValuesProcessingFiltersProps) => {
-
     let dimensionValueSelectors: JSX.Element[] | undefined;
 
-    let dimensions = props.processing.config.dimensions;
+    const dimensions = props.processing.config.dimensions;
     if (dimensions.length) {
-        dimensionValueSelectors = dimensions
-        .map((dimension) => {
+        dimensionValueSelectors = dimensions.map((dimension) => {
             return (
                 <Form.Item key={dimension.id} label={dimension.name}>
                     <DatasetDimensionValueSelector
@@ -68,18 +64,13 @@ export const DatasetAreaValuesProcessingFilters = (props: DatasetAreaValuesProce
         <React.Fragment>
             {dimensionValueSelectors}
             <Form.Item label='Variable'>
-                <DatasetVariableSeletor
-                    processing={props.processing}
-                />
+                <DatasetVariableSeletor processing={props.processing} />
             </Form.Item>
-            {!props.disableAoi &&
+            {!props.disableAoi && (
                 <Form.Item label='Area'>
-                    <AnalysisAoiFilter
-                        analysis={props.processing}
-                        supportedGeometries={props.processing.config.supportedGeometries}
-                    />
+                    <AnalysisAoiFilter analysis={props.processing} supportedGeometries={props.processing.config.supportedGeometries} />
                 </Form.Item>
-            }
+            )}
         </React.Fragment>
     );
 };

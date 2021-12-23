@@ -3,7 +3,6 @@ import React from 'react';
 import { DatasetConfig } from '@oidajs/eo-mobx';
 import { SelectEnumRenderer } from '@oidajs/ui-react-antd';
 
-
 export type DatasetSelectorProps = {
     datasets: DatasetConfig[];
     value?: string;
@@ -11,8 +10,7 @@ export type DatasetSelectorProps = {
 };
 
 export const DatasetSelector = (props: DatasetSelectorProps) => {
-
-    let datasetSelectorConfig = {
+    const datasetSelectorConfig = {
         choices: props.datasets.map((dataset) => {
             return {
                 value: dataset.id,

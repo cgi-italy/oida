@@ -1,17 +1,11 @@
-
 import { createDynamicFactory } from '../utils';
 
-import { IFormFieldType, IFormFieldValueType, IFormField, IFormFieldDefinitions } from './form-field';
-
+import { IFormFieldType, IFormFieldValueType, IFormField } from './form-field';
 
 export type FormFieldFromJSON<TYPE extends IFormFieldType> = (value: any) => IFormFieldValueType<TYPE>;
 export type FormFieldToJSON<TYPE extends IFormFieldType> = (value: IFormFieldValueType<TYPE>) => any;
-export type FormFieldToStringOptions = {
-};
-export type FormFieldToString<TYPE extends IFormFieldType> = (
-    formField: IFormField<TYPE>,
-    options?: FormFieldToStringOptions & Record<string, any>
-) => string;
+
+export type FormFieldToString<TYPE extends IFormFieldType> = (formField: IFormField<TYPE>, options?: Record<string, any>) => string;
 
 export type FormFieldSerializer<TYPE extends IFormFieldType> = {
     fromJSON: FormFieldFromJSON<TYPE>;
@@ -31,17 +25,15 @@ const defaultFormFieldToString = (formField) => {
     return `${formField.title}: ${formField.value}`;
 };
 
-let defaultFormFieldSerializer = {
+const defaultFormFieldSerializer = {
     fromJSON: defaultFormFieldFromJSON,
     toJSON: defaultFormFieldToJSON,
     toString: defaultFormFieldToString
 };
 
-
 const formFieldSerializers = createDynamicFactory<FormFieldSerializer<any>>('formFieldsIO');
 
-export type FormFieldSerializerSetter<TYPE extends IFormFieldType> =
- (type: TYPE, serializer: Partial<FormFieldSerializer<TYPE>>) => void;
+export type FormFieldSerializerSetter<TYPE extends IFormFieldType> = (type: TYPE, serializer: Partial<FormFieldSerializer<TYPE>>) => void;
 
 export function setFormFieldSerializer<TYPE extends IFormFieldType>(type: TYPE, serializer: Partial<FormFieldSerializer<TYPE>>) {
     formFieldSerializers.register(type, () => {
@@ -52,10 +44,9 @@ export function setFormFieldSerializer<TYPE extends IFormFieldType>(type: TYPE, 
     });
 }
 
-
 export function getFormFieldSerializer<TYPE extends IFormFieldType>(type: TYPE): FormFieldSerializer<TYPE> {
     if (formFieldSerializers.isRegistered(type)) {
-        return formFieldSerializers.create(type, undefined)!;
+        return formFieldSerializers.create(type, undefined) as FormFieldSerializer<TYPE>;
     } else {
         return defaultFormFieldSerializer;
     }

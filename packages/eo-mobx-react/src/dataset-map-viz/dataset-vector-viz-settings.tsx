@@ -9,15 +9,14 @@ import { DatasetColorMapSelector } from './dataset-colormap-selector';
 import { DatasetVectorVizFilters } from './dataset-vector-viz-filters';
 
 export type DatasetVectorVizSettingsProps = {
-    datasetViz: DatasetVectorMapViz
+    datasetViz: DatasetVectorMapViz;
 };
 
 export const DatasetVectorVizSettings = (props: DatasetVectorVizSettingsProps) => {
-
     const numericProperties = useSelector(() => {
         return props.datasetViz.featureDescriptor?.properties.filter((property) => {
             return property.type === NUMERIC_FEATURE_PROPERTY_TYPE;
-        }) as (NumericFeaturePropertyDescriptor[] | undefined);
+        }) as NumericFeaturePropertyDescriptor[] | undefined;
     });
 
     const colorMap = useSelector(() => props.datasetViz.colorMap);
@@ -31,10 +30,8 @@ export const DatasetVectorVizSettings = (props: DatasetVectorVizSettingsProps) =
 
     return (
         <div className='dataset-vector-viz-settings'>
-            <DatasetVectorVizFilters
-                dataset={props.datasetViz}
-            />
-            {numericProperties?.length && props.datasetViz.config.colorScales?.length &&
+            <DatasetVectorVizFilters dataset={props.datasetViz} />
+            {numericProperties?.length && props.datasetViz.config.colorScales?.length && (
                 <div className='dataset-vector-viz-colormap'>
                     <Checkbox
                         checked={!!colorProperty}
@@ -48,7 +45,7 @@ export const DatasetVectorVizSettings = (props: DatasetVectorVizSettingsProps) =
                     >
                         Dynamic coloring
                     </Checkbox>
-                    {colorProperty &&
+                    {colorProperty && (
                         <div className='dataset-combo-selector'>
                             <span>Property: </span>
                             <Select
@@ -63,20 +60,20 @@ export const DatasetVectorVizSettings = (props: DatasetVectorVizSettingsProps) =
                                 })}
                             />
                         </div>
-                    }
-                    {colorProperty && colorMap &&
+                    )}
+                    {colorProperty && colorMap && (
                         <DatasetColorMapSelector
                             colorMap={colorMap}
                             colorScales={props.datasetViz.config.colorScales}
                             variable={colorProperty}
                         />
-                    }
+                    )}
                 </div>
-            }
+            )}
         </div>
     );
 };
 
 DatasetVizSettingsFactory.register(VECTOR_VIZ_TYPE, (config) => {
-    return <DatasetVectorVizSettings {...config}/>;
+    return <DatasetVectorVizSettings {...config} />;
 });

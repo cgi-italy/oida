@@ -5,7 +5,6 @@ import { SubscriptionTracker, IMapLayerRenderer, IMapRenderer, MapLayerRendererC
 import { MapLayer } from '../../models/map/layers/map-layer';
 
 export abstract class MapLayerController<T extends IMapLayerRenderer = IMapLayerRenderer, U extends MapLayer = MapLayer> {
-
     protected mapLayer_: U;
     protected layerRenderer_: T | undefined;
     protected subscriptionTracker_: SubscriptionTracker = new SubscriptionTracker();
@@ -40,21 +39,26 @@ export abstract class MapLayerController<T extends IMapLayerRenderer = IMapLayer
     protected abstract createLayerRenderer_(mapRenderer: IMapRenderer): T;
 
     protected bindToLayerState_() {
-
         const layerRenderer = this.layerRenderer_!;
 
-        this.subscriptionTracker_.addSubscription(autorun(() => {
-            layerRenderer.setVisible(this.mapLayer_.visible.value);
-            layerRenderer.setOpacity(this.mapLayer_.opacity.value);
-        }));
+        this.subscriptionTracker_.addSubscription(
+            autorun(() => {
+                layerRenderer.setVisible(this.mapLayer_.visible.value);
+                layerRenderer.setOpacity(this.mapLayer_.opacity.value);
+            })
+        );
 
-        this.subscriptionTracker_.addSubscription(autorun(() => {
-            layerRenderer.setZIndex(this.mapLayer_.zIndex || 0);
-        }));
+        this.subscriptionTracker_.addSubscription(
+            autorun(() => {
+                layerRenderer.setZIndex(this.mapLayer_.zIndex || 0);
+            })
+        );
 
-        this.subscriptionTracker_.addSubscription(autorun(() => {
-            layerRenderer.setExtent(this.mapLayer_.extent);
-        }));
+        this.subscriptionTracker_.addSubscription(
+            autorun(() => {
+                layerRenderer.setExtent(this.mapLayer_.extent);
+            })
+        );
     }
 
     protected unbindFromLayerState_() {
@@ -70,5 +74,4 @@ export abstract class MapLayerController<T extends IMapLayerRenderer = IMapLayer
             mapRenderer: mapRenderer
         };
     }
-
 }

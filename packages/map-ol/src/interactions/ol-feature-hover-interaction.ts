@@ -9,8 +9,7 @@ import { OLMapLayer } from '../layers/ol-map-layer';
 import { OLFeatureLayer } from '../layers/ol-feature-layer';
 import { olInteractionsFactory } from './ol-interactions-factory';
 
-export class OLFeatureHoverInteraction  implements IFeatureHoverInteractionImplementation  {
-
+export class OLFeatureHoverInteraction implements IFeatureHoverInteractionImplementation {
     private viewer_;
     private olInteraction_;
 
@@ -40,9 +39,8 @@ export class OLFeatureHoverInteraction  implements IFeatureHoverInteractionImple
         });
 
         this.olInteraction_.on('select', (evt) => {
-            let selected = evt.selected;
+            const selected = evt.selected;
             if (selected) {
-
                 const feature = {
                     id: selected.getId(),
                     data: selected.get(OLFeatureLayer.FEATURE_DATA_KEY)
@@ -55,7 +53,7 @@ export class OLFeatureHoverInteraction  implements IFeatureHoverInteractionImple
                     const layer: OLMapLayer | undefined = selected.get(OLFeatureLayer.FEATURE_LAYER_KEY);
                     if (layer && layer.shouldReceiveFeatureHoverEvents()) {
                         let coordinate = evt.mapBrowserEvent.coordinate;
-                        let proj = this.viewer_.getView().getProjection();
+                        const proj = this.viewer_.getView().getProjection();
                         if (proj.getCode() !== 'EPSG:4326') {
                             coordinate = transform(coordinate, proj, 'EPSG:4326');
                         }

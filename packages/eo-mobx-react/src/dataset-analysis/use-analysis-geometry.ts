@@ -10,8 +10,7 @@ export type useAnalysisGeometryProps = {
 };
 
 export const useAnalysisGeometry = (props: useAnalysisGeometryProps) => {
-
-    const { mapSelection, map, analysis} = props;
+    const { mapSelection, map, analysis } = props;
 
     const centerOnMap = useCenterOnMap({
         map: map
@@ -58,9 +57,8 @@ export const useAnalysisGeometry = (props: useAnalysisGeometryProps) => {
     };
 };
 
-
 export const useAnalysisGeometryFromModule = (analysis: DatasetProcessing<any>, mapModuleId?: string) => {
-    let moduleState = useMapModule(mapModuleId);
+    const moduleState = useMapModule(mapModuleId);
 
     return useAnalysisGeometry({
         mapSelection: moduleState.selectionManager,
@@ -68,4 +66,3 @@ export const useAnalysisGeometryFromModule = (analysis: DatasetProcessing<any>, 
         analysis
     });
 };
-

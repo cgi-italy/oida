@@ -22,7 +22,6 @@ declare module '../common/dataset-viz' {
         [DATASET_AREA_VALUES_PROCESSING]: DatasetAreaValues;
         [DATASET_AREA_SERIES_PROCESSING]: DatasetAreaSeries;
     }
-
 }
 
 DatasetViz.register(POINT_SERIES_PROCESSING, DatasetPointSeries);

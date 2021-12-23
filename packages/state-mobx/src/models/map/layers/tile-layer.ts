@@ -4,7 +4,6 @@ import { TILE_LAYER_ID, TileSource } from '@oidajs/core';
 
 import { MapLayer, MapLayerProps } from './map-layer';
 
-
 export type TileLayerProps = {
     source?: TileSource;
     minZoomLevel?: number;
@@ -12,7 +11,6 @@ export type TileLayerProps = {
 } & MapLayerProps<typeof TILE_LAYER_ID>;
 
 export class TileLayer extends MapLayer {
-
     @observable.ref source: TileSource | undefined;
     @observable sourceRevision: number;
     @observable.ref minZoomLevel: number | undefined;

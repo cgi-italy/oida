@@ -1,7 +1,5 @@
 import { computed, action, observable, makeObservable } from 'mobx';
-import {
-    HasGeometry, GeometryProps, GeometryState,
-} from '@oidajs/state-mobx';
+import { HasGeometry, GeometryProps, GeometryState } from '@oidajs/state-mobx';
 
 export type SharedAoiProps = {
     name?: string;
@@ -44,5 +42,4 @@ export class SharedAoi implements HasGeometry {
     unref() {
         this.referenceCount_--;
     }
-
 }

@@ -1,9 +1,8 @@
-import { FeatureLayerRendererConfig, MapLayerRendererConfig } from '@oidajs/core';
+import { FeatureLayerRendererConfig } from '@oidajs/core';
 
 import { CesiumPrimitiveFeatureLayer } from './cesium-primitive-feature-layer';
 import { CesiumEntityFeatureLayer } from './cesium-entity-feature-layer';
 import { CesiumFeatureCoordPickMode } from '../utils/picking';
-
 
 export type CesiumFeatureLayerProps = {
     clampToGround?: boolean;

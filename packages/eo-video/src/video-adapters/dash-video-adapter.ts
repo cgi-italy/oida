@@ -123,4 +123,3 @@ export class DashVideoAdapter implements VideoAdapter {
         this.videoElement_.addEventListener('pause', events.onPlayEnd);
     }
 }
-

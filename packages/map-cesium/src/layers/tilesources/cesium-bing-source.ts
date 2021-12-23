@@ -3,10 +3,9 @@ import BingMapsStyle from 'cesium/Source/Scene/BingMapsStyle';
 import { cesiumTileSourcesFactory } from './cesium-tilesources-factory';
 
 cesiumTileSourcesFactory.register('bing', (config) => {
-
     let mapStyle = BingMapsStyle.AERIAL;
 
-    for (let key in BingMapsStyle) {
+    for (const key in BingMapsStyle) {
         if (config.imagerySet === BingMapsStyle[key]) {
             mapStyle = key;
             break;

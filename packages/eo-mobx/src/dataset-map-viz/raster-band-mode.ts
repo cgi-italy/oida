@@ -8,10 +8,9 @@ export type RasterBandConfig = NumericVariable & {
         range?: DomainRange<number>;
         colorScale?: string;
         clamp?: boolean;
-    }
+    };
     color?: string;
 };
-
 
 export enum RasterBandModeType {
     Single = 'single',
@@ -36,17 +35,20 @@ export type RasterBandGroup = {
     bandIndices: number[];
 };
 
-export type RasterBandModeChoice = {
-    type: RasterBandModeType.Single,
-    default?: Omit<RasterBandModeSingleProps, 'type' |'colorMap'>
-} | {
-    type: RasterBandModeType.Preset,
-    default?: Omit<RasterBandModePresetProps, 'type'>
-} | {
-    type: RasterBandModeType.Combination,
-    config?: RasterBandModeCombinationConfig,
-    default?: Omit<RasterBandModeCombinationProps, 'type' | 'config'>
-};
+export type RasterBandModeChoice =
+    | {
+          type: RasterBandModeType.Single;
+          default?: Omit<RasterBandModeSingleProps, 'type' | 'colorMap'>;
+      }
+    | {
+          type: RasterBandModeType.Preset;
+          default?: Omit<RasterBandModePresetProps, 'type'>;
+      }
+    | {
+          type: RasterBandModeType.Combination;
+          config?: RasterBandModeCombinationConfig;
+          default?: Omit<RasterBandModeCombinationProps, 'type' | 'config'>;
+      };
 
 export type RasterBandModeConfig = {
     supportedModes: RasterBandModeChoice[];
@@ -85,9 +87,8 @@ export class RasterBandModeSingle {
     }
 }
 
-
 export type RasterBandModePresetProps = {
-    type: RasterBandModeType.Preset,
+    type: RasterBandModeType.Preset;
     preset: string;
 };
 
@@ -114,7 +115,7 @@ export enum BandScalingMode {
 }
 
 export type RasterBandModeCombinationConfig = {
-    supportBandScalingMode?: BandScalingMode
+    supportBandScalingMode?: BandScalingMode;
 };
 
 export type RasterBandModeCombinationProps = {
@@ -144,7 +145,6 @@ export class RasterBandModeCombination {
     @observable.ref blueRange: DomainRange<number> | undefined;
 
     constructor(props: Omit<RasterBandModeCombinationProps, 'type'>) {
-
         this.config = props.config || {
             supportBandScalingMode: BandScalingMode.None
         };
@@ -200,7 +200,7 @@ export class RasterBandModeCombination {
 }
 
 export type RasterBandModeProps = {
-    bandMode?: RasterBandModeSingleProps | RasterBandModePresetProps | RasterBandModeCombinationProps
+    bandMode?: RasterBandModeSingleProps | RasterBandModePresetProps | RasterBandModeCombinationProps;
 };
 
 export class RasterBandMode {

@@ -2,26 +2,28 @@ import Cartesian3 from 'cesium/Source/Core/Cartesian3';
 import Cartographic from 'cesium/Source/Core/Cartographic';
 import CesiumMath from 'cesium/Source/Core/Math';
 
-import { IFeatureLayerRenderer, IFeatureStyle, MapLayerRendererConfig, FeatureLayerRendererConfig, FeatureGeometry, IFeature } from '@oidajs/core';
+import { IFeatureLayerRenderer, IFeatureStyle, FeatureLayerRendererConfig, FeatureGeometry, IFeature } from '@oidajs/core';
 
 import { CesiumFeatureCoordPickMode, PickInfo } from '../../utils/picking';
 import { CesiumMapLayer } from '../cesium-map-layer';
 import { CesiumFeatureLayerProps } from '../cesium-feature-layer';
 import {
-    CesiumPointPrimitiveRenderer, CesiumLinePrimitiveRenderer, CesiumPolygonPrimitiveRenderer,
-    CesiumGeometryPrimitiveRenderer, GeometryStyle, CesiumGeometryPrimitiveFeature
+    CesiumPointPrimitiveRenderer,
+    CesiumLinePrimitiveRenderer,
+    CesiumPolygonPrimitiveRenderer,
+    CesiumGeometryPrimitiveRenderer,
+    GeometryStyle,
+    CesiumGeometryPrimitiveFeature
 } from './geometry-primitive-renderers';
 
-
 export class CesiumPrimitiveFeatureLayer extends CesiumMapLayer implements IFeatureLayerRenderer {
-
     protected featureMap_: Record<string, CesiumGeometryPrimitiveFeature> = {};
 
     protected pointRenderer_: CesiumPointPrimitiveRenderer | undefined;
     protected lineRenderer_: CesiumLinePrimitiveRenderer | undefined;
     protected polygonRenderer_: CesiumPolygonPrimitiveRenderer | undefined;
 
-    protected clampToGround_: boolean = false;
+    protected clampToGround_: boolean;
     protected onFeatureHover_: ((feature: IFeature<any>, coordinate: GeoJSON.Position) => void) | undefined;
     protected onFeatureSelect_: ((feature: IFeature<any>, coordinate: GeoJSON.Position) => void) | undefined;
     protected coordPickMode_: CesiumFeatureCoordPickMode;
@@ -36,7 +38,6 @@ export class CesiumPrimitiveFeatureLayer extends CesiumMapLayer implements IFeat
     }
 
     addFeature(id: string, geometry: FeatureGeometry, style: IFeatureStyle, data: any) {
-
         if (!geometry) {
             return;
         }
@@ -44,7 +45,6 @@ export class CesiumPrimitiveFeatureLayer extends CesiumMapLayer implements IFeat
         const geometryRenderer = this.getOrCreateGeometryRenderer_(geometry.type);
         const geometryStyle = this.getStyleForGeometry_(style, geometry.type);
         if (geometryRenderer && geometryStyle) {
-
             try {
                 const feature: CesiumGeometryPrimitiveFeature = geometryRenderer.addFeature(id, geometry, geometryStyle, data);
                 feature.geometryRenderer = geometryRenderer;
@@ -60,14 +60,12 @@ export class CesiumPrimitiveFeatureLayer extends CesiumMapLayer implements IFeat
                 return undefined;
             }
         }
-
     }
 
     updateFeatureGeometry(id: string, geometry: FeatureGeometry) {
-
-        let feature = this.getFeature(id);
+        const feature = this.getFeature(id);
         if (feature) {
-            let geometryRenderer = this.getOrCreateGeometryRenderer_(geometry.type);
+            const geometryRenderer = this.getOrCreateGeometryRenderer_(geometry.type);
             if (geometryRenderer === feature.geometryRenderer) {
                 geometryRenderer.updateGeometry(feature, geometry);
                 this.mapRenderer_.getViewer().scene.requestRender();
@@ -78,7 +76,6 @@ export class CesiumPrimitiveFeatureLayer extends CesiumMapLayer implements IFeat
     }
 
     updateFeatureStyle(id: string, style: IFeatureStyle) {
-
         const feature = this.getFeature(id);
         if (feature) {
             const geometryStyle = this.getStyleForGeometry_(style, feature.geometryType);
@@ -89,10 +86,8 @@ export class CesiumPrimitiveFeatureLayer extends CesiumMapLayer implements IFeat
         }
     }
 
-
     removeFeature(id: string) {
-
-        let feature = this.getFeature(id);
+        const feature = this.getFeature(id);
 
         if (feature) {
             feature.geometryRenderer.removeFeature(feature);
@@ -140,27 +135,29 @@ export class CesiumPrimitiveFeatureLayer extends CesiumMapLayer implements IFeat
     }
 
     onFeatureHover(coordinate: Cartesian3, pickInfo: PickInfo) {
-        let cartographic = Cartographic.fromCartesian(coordinate);
-        this.onFeatureHover_!({
-            id: pickInfo.id,
-            data: pickInfo.data
-        }, [
-            CesiumMath.toDegrees(cartographic.longitude),
-            CesiumMath.toDegrees(cartographic.latitude),
-            cartographic.height
-        ]);
+        if (this.onFeatureHover_) {
+            const cartographic = Cartographic.fromCartesian(coordinate);
+            this.onFeatureHover_(
+                {
+                    id: pickInfo.id,
+                    data: pickInfo.data
+                },
+                [CesiumMath.toDegrees(cartographic.longitude), CesiumMath.toDegrees(cartographic.latitude), cartographic.height]
+            );
+        }
     }
 
     onFeatureSelect(coordinate: Cartesian3, pickInfo: PickInfo) {
-        let cartographic = Cartographic.fromCartesian(coordinate);
-        this.onFeatureSelect_!({
-            id: pickInfo.id,
-            data: pickInfo.data
-        }, [
-            CesiumMath.toDegrees(cartographic.longitude),
-            CesiumMath.toDegrees(cartographic.latitude),
-            cartographic.height
-        ]);
+        if (this.onFeatureSelect_) {
+            const cartographic = Cartographic.fromCartesian(coordinate);
+            this.onFeatureSelect_(
+                {
+                    id: pickInfo.id,
+                    data: pickInfo.data
+                },
+                [CesiumMath.toDegrees(cartographic.longitude), CesiumMath.toDegrees(cartographic.latitude), cartographic.height]
+            );
+        }
     }
 
     getFeaturePickMode() {
@@ -184,7 +181,6 @@ export class CesiumPrimitiveFeatureLayer extends CesiumMapLayer implements IFeat
     }
 
     protected getStyleForGeometry_(style: IFeatureStyle, geometryType: FeatureGeometry['type']): GeometryStyle | undefined {
-
         let geometryStyle: GeometryStyle | undefined;
 
         switch (geometryType) {
@@ -208,7 +204,6 @@ export class CesiumPrimitiveFeatureLayer extends CesiumMapLayer implements IFeat
     }
 
     protected getOrCreateGeometryRenderer_(geometryType: FeatureGeometry['type']) {
-
         let geometryRenderer: CesiumGeometryPrimitiveRenderer;
 
         switch (geometryType) {
@@ -252,6 +247,4 @@ export class CesiumPrimitiveFeatureLayer extends CesiumMapLayer implements IFeat
 
         return geometryRenderer;
     }
-
-
 }

@@ -5,7 +5,6 @@ import { IFeatureStyle } from '@oidajs/core';
 import { Aoi } from '../models';
 
 export const defaultAoiStyleGetter = (aoiInstance: Aoi): IFeatureStyle => {
-
     let color = chroma(aoiInstance.color);
     if (aoiInstance.selected.value) {
         color = color.alpha(0.3);

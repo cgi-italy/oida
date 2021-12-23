@@ -1,8 +1,17 @@
 import React from 'react';
 
 import { Geometry } from '@oidajs/core';
-import { Map, FeatureLayer, TileLayer, IndexedCollection, Entity, GeometryState,  EntityProps,
-    FeatureHoverInteraction, FeatureSelectInteraction, MouseCoordsInteraction
+import {
+    Map,
+    FeatureLayer,
+    TileLayer,
+    IndexedCollection,
+    Entity,
+    GeometryState,
+    EntityProps,
+    FeatureHoverInteraction,
+    FeatureSelectInteraction,
+    MouseCoordsInteraction
 } from '@oidajs/state-mobx';
 
 import { useMapMouseCoords } from '@oidajs/ui-react-mobx';
@@ -12,7 +21,7 @@ import { MapComponent } from '@oidajs/ui-react-mobx';
 import '@oidajs/map-cesium';
 
 type MyFeatureProps = {
-    geometry: Geometry
+    geometry: Geometry;
 } & EntityProps;
 
 class MyFeature extends Entity {
@@ -25,7 +34,7 @@ class MyFeature extends Entity {
 }
 
 type AppStateProps = {
-    map: Map
+    map: Map;
 };
 
 class AppState {
@@ -38,7 +47,6 @@ class AppState {
             idGetter: (feature) => feature.id
         });
     }
-
 }
 
 const mouseCoordsInteraction = new MouseCoordsInteraction({
@@ -65,40 +73,48 @@ const appState = new AppState({
         },
         layers: {
             id: 'rootLayers',
-            children: [new TileLayer({
-                id: 'base',
-                source: {
-                    id: 'osm'
-                }
-            })]
+            children: [
+                new TileLayer({
+                    id: 'base',
+                    source: {
+                        id: 'osm'
+                    }
+                })
+            ]
         },
-        interactions: [mouseCoordsInteraction, new FeatureHoverInteraction({
-            id: 'featureHoverInteraction'
-        }), new FeatureSelectInteraction({
-            id: 'featureSelect',
-            config: {
-                multiple: true
-            }
-        })]
+        interactions: [
+            mouseCoordsInteraction,
+            new FeatureHoverInteraction({
+                id: 'featureHoverInteraction'
+            }),
+            new FeatureSelectInteraction({
+                id: 'featureSelect',
+                config: {
+                    multiple: true
+                }
+            })
+        ]
     })
 });
 
-appState.map.layers.children.add(new FeatureLayer({
-    id: 'featureLayer',
-    source: appState.features.items,
-    config: {
-        geometryGetter: (feature) => feature.geometry.value,
-        styleGetter: (feature) => {
-            return {
-                polygon: {
-                    visible: feature.visible.value,
-                    strokeColor: feature.selected.value ? [1, 1, 0] : [0, 0, 1],
-                    fillColor: feature.hovered.value ? [0, 0, 1, 0.5] : [0, 0, 1, 0.2]
-                }
-            };
+appState.map.layers.children.add(
+    new FeatureLayer({
+        id: 'featureLayer',
+        source: appState.features.items,
+        config: {
+            geometryGetter: (feature) => feature.geometry.value,
+            styleGetter: (feature) => {
+                return {
+                    polygon: {
+                        visible: feature.visible.value,
+                        strokeColor: feature.selected.value ? [1, 1, 0] : [0, 0, 1],
+                        fillColor: feature.hovered.value ? [0, 0, 1, 0.5] : [0, 0, 1, 0.2]
+                    }
+                };
+            }
         }
-    }
-}));
+    })
+);
 
 appState.features.add([
     new MyFeature({
@@ -107,7 +123,7 @@ appState.features.add([
         geometry: {
             type: 'BBox',
             bbox: [10, 40, 12, 41]
-        },
+        }
     }),
     new MyFeature({
         id: 'testFeature2',
@@ -128,14 +144,18 @@ const MouseCoords = () => {
         return null;
     }
 
-    return <div>{mouseCoords.coords.lat} {mouseCoords.coords.lon}</div>;
+    return (
+        <div>
+            {mouseCoords.coords.lat} {mouseCoords.coords.lon}
+        </div>
+    );
 };
 
 const MapFeatureLayer = () => {
     return (
         <React.Fragment>
-            <MapComponent style={{height: '300px', width: '400px', position: 'relative'}} mapState={appState.map}/>
-            <MouseCoords/>
+            <MapComponent style={{ height: '300px', width: '400px', position: 'relative' }} mapState={appState.map} />
+            <MouseCoords />
         </React.Fragment>
     );
 };

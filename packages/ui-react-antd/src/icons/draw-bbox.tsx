@@ -1,17 +1,8 @@
 import React from 'react';
 import Icon from '@ant-design/icons';
 export const SvgDrawBbox = (props: React.SVGProps<SVGSVGElement>) => (
-    <svg
-        className='draw-bbox_svg__icon'
-        height='1em'
-        viewBox='0 0 1024 1024'
-        width='1em'
-        fill='currentColor'
-        {...props}
-    >
+    <svg className='draw-bbox_svg__icon' height='1em' viewBox='0 0 1024 1024' width='1em' fill='currentColor' {...props}>
         <path d='M915.596 761.961v-504.17c29.349-9.862 50.557-37.611 50.557-70.24 0-40.856-33.238-74.095-74.094-74.095-32.629 0-60.378 21.21-70.24 50.558H202.532c-9.861-29.349-37.61-50.558-70.24-50.558-40.855 0-74.093 33.238-74.093 74.095 0 32.629 21.209 60.378 50.557 70.24v504.17c-29.348 9.862-50.557 37.612-50.557 70.24 0 40.856 33.238 74.094 74.093 74.094 32.629 0 60.379-21.209 70.24-50.557h619.29c9.861 29.35 37.611 50.557 70.24 50.557 40.855 0 74.093-33.238 74.093-74.094-.001-32.628-21.209-60.38-50.558-70.24zm-93.775 46.704H202.53c-7.374-21.95-24.754-39.33-46.703-46.705V257.79c21.948-7.375 39.328-24.755 46.703-46.703h619.29c7.375 21.948 24.755 39.328 46.703 46.703v504.171c-21.95 7.375-39.33 24.755-46.703 46.704z' />
     </svg>
 );
-export const DrawBboxIcon = (props: any) => (
-    <Icon component={SvgDrawBbox} {...props} />
-);
+export const DrawBboxIcon = (props: any) => <Icon component={SvgDrawBbox} {...props} />;

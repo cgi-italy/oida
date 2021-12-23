@@ -4,7 +4,6 @@ import { useSelector } from '../../../core';
 import { MapBaseLayerConfig } from '../map-module';
 import { useMapModule } from './use-map-module';
 
-
 export type TileSourceSelectorProps = {
     sources: MapBaseLayerConfig[];
     group: GroupLayer;
@@ -12,8 +11,7 @@ export type TileSourceSelectorProps = {
 };
 
 export const useTileSourceSelector = (props: TileSourceSelectorProps) => {
-
-    const {sources, group, layerIdx} = props;
+    const { sources, group, layerIdx } = props;
 
     return useSelector(() => ({
         items: sources.map((source) => {
@@ -24,12 +22,12 @@ export const useTileSourceSelector = (props: TileSourceSelectorProps) => {
         }),
         value: group.children.itemAt(layerIdx).name,
         onSelect: (id) => {
-            let source = sources.find((source) => {
+            const source = sources.find((source) => {
                 return source.id === id;
             });
 
             if (source) {
-                let layer = group.children.itemAt(layerIdx);
+                const layer = group.children.itemAt(layerIdx);
                 if (layer instanceof TileLayer) {
                     layer.setSource(source.config);
                     layer.setName(source.name);
@@ -40,11 +38,10 @@ export const useTileSourceSelector = (props: TileSourceSelectorProps) => {
 };
 
 export const useMapBaseLayerSelectorFromModule = (mapModuleId?: string) => {
-    let moduleState = useMapModule(mapModuleId);
+    const moduleState = useMapModule(mapModuleId);
     return useTileSourceSelector({
         group: moduleState.map.layers,
         layerIdx: 0,
         sources: moduleState.config.baseLayers || []
     });
 };
-

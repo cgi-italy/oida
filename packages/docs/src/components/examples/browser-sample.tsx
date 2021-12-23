@@ -10,17 +10,17 @@ type BrowserSampleProps = {
 };
 
 export const BrowserSample = (props: BrowserSampleProps) => {
-
     const docsContext = useDocusaurusContext();
 
     const codeLink = `${docsContext.siteConfig.customFields.gitlabDocsUrl}/src/components/examples/${props.sampleName}`;
 
     return (
         <div>
-            <a href={codeLink} target='_black'>Code link</a>
+            <a href={codeLink} target='_black'>
+                Code link
+            </a>
             <BrowserOnly>
                 {() => {
-
                     buildModuleUrl.setBaseUrl(useBaseUrl('Cesium/'));
 
                     const SampleComponent = lazy(() => {
@@ -34,11 +34,11 @@ export const BrowserSample = (props: BrowserSampleProps) => {
                     return (
                         <Suspense fallback={<div>Loading...</div>}>
                             <div className='oida-sample'>
-                                <SampleComponent/>
+                                <SampleComponent />
                             </div>
                         </Suspense>
                     );
-            }}
+                }}
             </BrowserOnly>
         </div>
     );

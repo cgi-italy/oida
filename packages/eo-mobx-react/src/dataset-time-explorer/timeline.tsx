@@ -12,15 +12,16 @@ import { timeline as timelineExports } from 'vis-timeline/peer';
 
 import {
     Timeline as VisTimeline,
-    TimelineItem, TimelineGroup,
-    TimelineOptions, TimelineOptionsTemplateFunction,
+    TimelineItem,
+    TimelineGroup,
+    TimelineOptions,
+    TimelineOptionsTemplateFunction,
     TimelineEventPropertiesResult
 } from 'vis-timeline/peer';
 
 import 'vis-timeline/dist/vis-timeline-graph2d.css';
 
-
-timelineExports.components.items.BackgroundItem.prototype._createDomElement = function() {
+timelineExports.components.items.BackgroundItem.prototype._createDomElement = function () {
     if (!this.dom) {
         // create DOM
         this.dom = {};
@@ -52,9 +53,9 @@ export enum TimelineItemType {
 }
 
 export type EditableRangeItem = TimelineItem & {
-    itemType: string,
-    onRangeUpdate: (range: DateRange) => void,
-    dragging: boolean
+    itemType: string;
+    onRangeUpdate: (range: DateRange) => void;
+    dragging: boolean;
 };
 
 function isRangeItem(item: EditableRangeItem | TimelineItem): item is EditableRangeItem {
@@ -68,40 +69,38 @@ export enum TimelineGroupLabelsMode {
 }
 
 export type TimelineProps = {
-    className?: string,
-    timelineItems: DataSet<TimelineItem | EditableRangeItem>,
-    timelineGroups: DataSet<TimelineGroup>,
-    itemTemplate?: TimelineOptionsTemplateFunction,
-    groupTemplate?: TimelineOptionsTemplateFunction,
+    className?: string;
+    timelineItems: DataSet<TimelineItem | EditableRangeItem>;
+    timelineGroups: DataSet<TimelineGroup>;
+    itemTemplate?: TimelineOptionsTemplateFunction;
+    groupTemplate?: TimelineOptionsTemplateFunction;
     disableGrouping?: boolean;
-    range: DateRange,
-    groupLabelsMode?: TimelineGroupLabelsMode,
-    editableRanges?: Array<{id: string, step?: string, enableDraw?: boolean, onRangeUpdate: (range) => void} & DateRange>,
-    selectedDates?: Array<{id: string, value: Date, onDateChange: (value: Date) => void}>
-    onRangeChange: (range: DateRange) => void,
-    onClick?: (evt: TimelineEventPropertiesResult) => void,
-    onHoveredChange: (item: TimelineItem, hovered: boolean) => void,
-    onSelectedChange: (item: TimelineItem | null) => void,
-    onGroupHoveredChange?: (group: TimelineGroup, hovered: boolean) => void
+    range: DateRange;
+    groupLabelsMode?: TimelineGroupLabelsMode;
+    editableRanges?: Array<{ id: string; step?: string; enableDraw?: boolean; onRangeUpdate: (range) => void } & DateRange>;
+    selectedDates?: Array<{ id: string; value: Date; onDateChange: (value: Date) => void }>;
+    onRangeChange: (range: DateRange) => void;
+    onClick?: (evt: TimelineEventPropertiesResult) => void;
+    onHoveredChange: (item: TimelineItem, hovered: boolean) => void;
+    onSelectedChange: (item: TimelineItem | null) => void;
+    onGroupHoveredChange?: (group: TimelineGroup, hovered: boolean) => void;
 };
 
 export const Timeline = (props: TimelineProps) => {
-
-    let containerRef = useRef<HTMLDivElement>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
 
     const [timeline, setTimeline] = useState<VisTimeline>();
     const [wasRangeChangedFromTimeline, setWasRangeChangedFromTimeline] = useState(false);
     const [nextClickEventDisabled, setNextClickEventDisabled] = useState(false);
 
     useEffect(() => {
-
         if (containerRef.current) {
-            let timelineOptions: TimelineOptions = {
+            const timelineOptions: TimelineOptions = {
                 moment: moment.utc,
                 showCurrentTime: false,
                 selectable: false,
                 maxHeight: '100%',
-                groupOrder: function(a, b) {
+                groupOrder: function (a, b) {
                     return a.zIndex - b.zIndex;
                 },
                 snap: null,
@@ -126,11 +125,10 @@ export const Timeline = (props: TimelineProps) => {
                 timelineOptions.template = props.itemTemplate;
             }
 
-            let timelineInstance = new VisTimeline(containerRef.current, props.timelineItems, props.timelineGroups, timelineOptions);
+            const timelineInstance = new VisTimeline(containerRef.current, props.timelineItems, props.timelineGroups, timelineOptions);
 
             timelineInstance.on('rangechange', (evt) => {
                 if (evt.byUser) {
-
                     setWasRangeChangedFromTimeline(true);
 
                     props.onRangeChange({
@@ -140,12 +138,11 @@ export const Timeline = (props: TimelineProps) => {
                 }
             });
 
-            timelineInstance.on('timechange', ({id, time}) => {
-
-                let match = id.match(/(.*)\.range\.(start|end)$/);
+            timelineInstance.on('timechange', ({ id, time }) => {
+                const match = id.match(/(.*)\.range\.(start|end)$/);
 
                 if (match) {
-                    let rangeId = match[1];
+                    const rangeId = match[1];
 
                     if (match[2] === 'start') {
                         props.timelineItems.update({
@@ -168,14 +165,12 @@ export const Timeline = (props: TimelineProps) => {
                 setTimeline(undefined);
             };
         }
-
     }, [containerRef]);
 
     useEffect(() => {
         const timelineInstance = timeline;
         const onClick = props.onClick;
         if (timelineInstance && onClick) {
-
             let isClick = !nextClickEventDisabled;
 
             const onTimelineClick = (evt) => {
@@ -228,14 +223,13 @@ export const Timeline = (props: TimelineProps) => {
     useEffect(() => {
         const timelineInstance = timeline;
         if (timelineInstance) {
-
-            let onTimeChanged = ({id, time}) => {
-                let match = id.match(/(.*)\.range\.(start|end)$/);
+            const onTimeChanged = ({ id, time }) => {
+                const match = id.match(/(.*)\.range\.(start|end)$/);
 
                 if (match) {
-                    let rangeId: string = match[1];
+                    const rangeId: string = match[1];
 
-                    let item = props.timelineItems.get(rangeId);
+                    const item = props.timelineItems.get(rangeId);
                     if (item && isRangeItem(item)) {
                         item.onRangeUpdate({
                             start: item.start as Date,
@@ -243,7 +237,7 @@ export const Timeline = (props: TimelineProps) => {
                         });
                     }
                 } else if (props.selectedDates) {
-                    let item = props.selectedDates.find(item => item.id === id);
+                    const item = props.selectedDates.find((item) => item.id === id);
                     if (item) {
                         item.onDateChange(time);
                     }
@@ -259,18 +253,16 @@ export const Timeline = (props: TimelineProps) => {
                 }
             };
         }
-
     }, [timeline, props.timelineItems, props.selectedDates]);
 
     useEffect(() => {
-
         const timelineInstance = timeline;
         if (timelineInstance) {
             timelineInstance.setOptions({
                 onMoving: (item, callback) => {
                     if (isRangeItem(item)) {
-                        let startMarkerId = `${item.id}.range.start`;
-                        let endMarkerId = `${item.id}.range.end`;
+                        const startMarkerId = `${item.id}.range.start`;
+                        const endMarkerId = `${item.id}.range.end`;
 
                         timelineInstance.setCustomTime(item.start, startMarkerId);
                         timelineInstance.setCustomTime(item.end || item.start, endMarkerId);
@@ -281,7 +273,7 @@ export const Timeline = (props: TimelineProps) => {
                             className: item.dragging ? item.className : `${item.className} dragging`
                         } as TimelineItem);
                     }
-                },
+                }
             });
         }
     }, [timeline]);
@@ -311,11 +303,10 @@ export const Timeline = (props: TimelineProps) => {
     }, [timeline, props.range]);
 
     useEffect(() => {
-
         const timelineInstance = timeline;
 
         if (timelineInstance && props.selectedDates) {
-            let ids = props.selectedDates.map((item) => {
+            const ids = props.selectedDates.map((item) => {
                 return timelineInstance.addCustomTime(item.value, item.id);
             });
 
@@ -328,30 +319,26 @@ export const Timeline = (props: TimelineProps) => {
                 }
             };
         }
-
     }, [timeline, props.selectedDates]);
 
     useEffect(() => {
-
-        let rangeIds : Array<string> = [];
+        const rangeIds: Array<string> = [];
         let cancelRangeDraw;
 
         const timelineInstance = timeline;
 
         if (timelineInstance && props.editableRanges && props.timelineItems) {
-
             props.editableRanges.forEach((range) => {
-
                 if (!range.enableDraw && range.start && range.end) {
                     rangeIds.push(range.id);
 
-                    let startMarkerId = `${range.id}.range.start`;
-                    let endMarkerId = `${range.id}.range.end`;
+                    const startMarkerId = `${range.id}.range.start`;
+                    const endMarkerId = `${range.id}.range.end`;
 
                     timelineInstance.addCustomTime(range.start, startMarkerId);
                     timelineInstance.addCustomTime(range.end, endMarkerId);
 
-                    let selectionRange = {
+                    const selectionRange = {
                         id: range.id,
                         content: '',
                         start: range.start,
@@ -368,13 +355,11 @@ export const Timeline = (props: TimelineProps) => {
 
                     timelineInstance.setSelection(range.id);
                 } else {
-
-                    let startMarkerId = `${range.id}.range.start`;
-                    let endMarkerId = `${range.id}.range.end`;
+                    const startMarkerId = `${range.id}.range.start`;
+                    const endMarkerId = `${range.id}.range.end`;
 
                     const onMoveBeforeDrawStart = (evt) => {
-
-                        let evtTime = timelineInstance.getEventProperties(evt).time;
+                        const evtTime = timelineInstance.getEventProperties(evt).time;
 
                         try {
                             timelineInstance.setCustomTime(evtTime, startMarkerId);
@@ -384,18 +369,17 @@ export const Timeline = (props: TimelineProps) => {
                     };
 
                     const onDrawStart = (evt) => {
-
                         timelineInstance.setCustomTime(evt.time, startMarkerId);
                         timelineInstance.addCustomTime(evt.time, endMarkerId);
 
-                        let selectionRange = {
+                        const selectionRange = {
                             id: range.id,
                             content: '',
                             start: evt.time,
                             end: evt.time,
                             type: 'background',
                             className: `editable-range ${range.id}`,
-                            itemType: TimelineItemType.EditableRange,
+                            itemType: TimelineItemType.EditableRange
                         };
 
                         props.timelineItems.add(selectionRange as TimelineItem);
@@ -407,8 +391,7 @@ export const Timeline = (props: TimelineProps) => {
                     };
 
                     const onDrawMove = (evt) => {
-
-                        let evtTime = timelineInstance.getEventProperties(evt).time;
+                        const evtTime = timelineInstance.getEventProperties(evt).time;
 
                         timelineInstance.setCustomTime(evtTime, endMarkerId);
                         props.timelineItems.update({
@@ -418,7 +401,6 @@ export const Timeline = (props: TimelineProps) => {
                     };
 
                     const onDrawEnd = (evt) => {
-
                         timelineInstance.setCustomTime(evt.time, endMarkerId);
 
                         props.timelineItems.update({
@@ -445,7 +427,7 @@ export const Timeline = (props: TimelineProps) => {
                             timelineInstance.removeCustomTime(startMarkerId);
                             timelineInstance.removeCustomTime(endMarkerId);
                         } catch (e) {
-
+                            // do nothing
                         }
                         props.timelineItems.remove(range.id);
                     };
@@ -453,7 +435,6 @@ export const Timeline = (props: TimelineProps) => {
                     containerRef.current!.addEventListener('mousemove', onMoveBeforeDrawStart);
                     timelineInstance.on('click', onDrawStart);
                 }
-
             });
 
             return () => {
@@ -470,18 +451,15 @@ export const Timeline = (props: TimelineProps) => {
                 }
             };
         }
-
     }, [timeline, props.timelineItems, props.editableRanges]);
 
     return (
         <div
             className={classNames('timeline', props.className, {
                 'groups-labels-overlay': props.groupLabelsMode === TimelineGroupLabelsMode.Overlay,
-                'groups-labels-hidden': props.groupLabelsMode === TimelineGroupLabelsMode.Hidden,
+                'groups-labels-hidden': props.groupLabelsMode === TimelineGroupLabelsMode.Hidden
             })}
             ref={containerRef}
-        >
-        </div>
+        ></div>
     );
 };
-

@@ -3,7 +3,7 @@ import React from 'react';
 export type LayoutSectionItem = {
     id: string;
     title: React.ReactNode;
-    icon?:  React.ReactNode;
+    icon?: React.ReactNode;
     content: React.ReactNode;
     onClose?: () => void;
 };
@@ -16,4 +16,4 @@ export type LayoutSectionProps = {
     setExpanded: (expanded: boolean) => void;
 };
 
-export type LayoutSectionRenderer =  (props: LayoutSectionProps) => React.ReactNode;
+export type LayoutSectionRenderer = (props: LayoutSectionProps) => React.ReactNode;

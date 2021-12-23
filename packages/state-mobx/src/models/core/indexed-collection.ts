@@ -7,7 +7,6 @@ export type IndexedCollectionProps<T> = CollectionProps<T> & {
 };
 
 export class IndexedCollection<T> extends Collection<T> {
-
     @observable protected idMap_: Record<string | number, T> = {};
     protected idGetter_: (item: T) => string | number;
 
@@ -59,4 +58,3 @@ export class IndexedCollection<T> extends Collection<T> {
         }
     }
 }
-

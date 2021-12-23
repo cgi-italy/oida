@@ -1,4 +1,3 @@
-
 import Interaction from 'ol/interaction/Interaction';
 import { singleClick, pointerMove } from 'ol/events/condition';
 import Event from 'ol/events/Event';
@@ -6,7 +5,6 @@ import Event from 'ol/events/Event';
 import { OLFeatureLayer } from '../layers/ol-feature-layer';
 
 class SelectEvent extends Event {
-
     public selected;
     public selectionMode;
     public mapBrowserEvent;
@@ -20,7 +18,6 @@ class SelectEvent extends Event {
 }
 
 export class OLSelectInteraction extends Interaction {
-
     private condition_;
     private hitTolerance_: number;
     private drillPick_: boolean;
@@ -42,24 +39,25 @@ export class OLSelectInteraction extends Interaction {
             return true;
         }
 
-        let map = mapBrowserEvent.map;
+        const map = mapBrowserEvent.map;
 
-        let selected: any[] = [];
+        const selected: any[] = [];
 
-        map.forEachFeatureAtPixel(mapBrowserEvent.pixel, (feature, layer) => {
-            if (feature && !feature.get(OLFeatureLayer.FEATURE_PICKING_DISABLED_KEY)) {
-                selected.push(feature);
-                return !this.drillPick_;
+        map.forEachFeatureAtPixel(
+            mapBrowserEvent.pixel,
+            (feature, layer) => {
+                if (feature && !feature.get(OLFeatureLayer.FEATURE_PICKING_DISABLED_KEY)) {
+                    selected.push(feature);
+                    return !this.drillPick_;
+                }
+            },
+            {
+                hitTolerance: this.hitTolerance_
             }
-        }, {
-            hitTolerance: this.hitTolerance_
-        });
-
-        super.dispatchEvent(
-            new SelectEvent('select', this.drillPick_ ? selected : selected[0], mapBrowserEvent)
         );
+
+        super.dispatchEvent(new SelectEvent('select', this.drillPick_ ? selected : selected[0], mapBrowserEvent));
 
         return pointerMove(mapBrowserEvent);
     }
-
 }

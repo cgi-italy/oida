@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { DataFilters } from '@oidajs/state-mobx';
 import { useFormData } from '@oidajs/ui-react-mobx';
 import { QueryFilter, IFormFieldDefinition, getFormFieldSerializer, IFormFieldType } from '@oidajs/core';
@@ -8,20 +8,18 @@ import { observer } from 'mobx-react';
 import './query-form.less';
 
 type StatefulFormProps = {
-    formState: DataFilters,
-    fields: IFormFieldDefinition[]
+    formState: DataFilters;
+    fields: IFormFieldDefinition[];
 };
 
 const StatefulForm = (props: StatefulFormProps) => {
-
     const formProps = useFormData({
         fields: props.fields,
         fieldValues: props.formState
     });
 
-    return <DataForm {...formProps}/>;
+    return <DataForm {...formProps} />;
 };
-
 
 type FormSerializerProps = {
     formState: DataFilters<QueryFilter>;
@@ -29,70 +27,78 @@ type FormSerializerProps = {
 };
 
 const FormSerializer = observer((props: FormSerializerProps) => {
-    const filters = props.fields.filter((filter) => props.formState.items.has(filter.name)).map((filter) => {
-        const f = props.formState.get(filter.name);
-        const serializer = getFormFieldSerializer<IFormFieldType>(f.type);
-        let valueString = serializer.toString({
-            ...filter,
-            value: f.value,
-            onChange: () => {}
+    const filters = props.fields
+        .filter((filter) => props.formState.items.has(filter.name))
+        .map((filter) => {
+            const f = props.formState.get(filter.name);
+            const serializer = getFormFieldSerializer<IFormFieldType>(f.type);
+            const valueString = serializer.toString({
+                ...filter,
+                value: f.value,
+                onChange: () => {
+                    // do nothing
+                }
+            });
+            return <div key={filter.name}>{`${filter.title || filter.name}: ${valueString}`}</div>;
         });
-        return <div key={filter.name}>{`${filter.title || filter.name}: ${valueString}`}</div>;
-    });
-    return (
-        <div>
-            {filters}
-        </div>
-    );
+    return <div>{filters}</div>;
 });
 
 const formState = new DataFilters<QueryFilter>();
-const formFields: IFormFieldDefinition[] = [{
+const formFields: IFormFieldDefinition[] = [
+    {
         name: 'q',
         type: 'string',
         title: 'Filter',
         autoFocus: true,
         config: {}
-    }, {
+    },
+    {
         name: 'time',
         title: 'Time',
         type: 'date',
         config: {
             withTime: true
         }
-    }, {
+    },
+    {
         name: 'timerange',
         title: 'Time range',
         type: 'daterange',
         config: {
             withTime: true
         }
-    }, {
+    },
+    {
         name: 'type',
-        type:  'enum',
+        type: 'enum',
         title: 'Select',
         config: {
-            choices: [{
-                name: 'a',
-                value: 'a'
-            }, {
-                name: 'b',
-                value: 'b'
-            }]
+            choices: [
+                {
+                    name: 'a',
+                    value: 'a'
+                },
+                {
+                    name: 'b',
+                    value: 'b'
+                }
+            ]
         }
-    }, {
+    },
+    {
         name: 'flag',
         type: 'boolean',
         title: 'Boolean flag',
-        config: {
-        },
+        config: {},
         rendererConfig: {
             id: 'switch',
             props: {
                 size: 'small'
             }
         }
-    }, {
+    },
+    {
         name: 'numeric',
         type: 'numeric',
         title: 'Numeric',
@@ -105,21 +111,20 @@ const formFields: IFormFieldDefinition[] = [{
                 precision: 0
             }
         }
-    }, {
+    },
+    {
         name: 'numeric_range',
         type: 'numericrange',
         title: 'Numeric range',
-        config: {
-
-        }
+        config: {}
     }
 ];
 
 const QueryForm = () => {
     return (
         <div>
-            <StatefulForm fields={formFields} formState={formState}/>
-            <FormSerializer fields={formFields} formState={formState}/>
+            <StatefulForm fields={formFields} formState={formState} />
+            <FormSerializer fields={formFields} formState={formState} />
         </div>
     );
 };

@@ -22,17 +22,19 @@ export type AdamWcsTileSource = {
     minZoomLevel?: number;
     crossOrigin?: 'anonymous' | 'use-credentials';
     wktFilter?: string;
-    tileLoadFunction?: (source: {
-        url: string,
-        data?: string,
-        requestExtent?: number[],
-        requestSrs?: string
-    }, flip?: boolean) => Promise<string>;
+    tileLoadFunction?: (
+        source: {
+            url: string;
+            data?: string;
+            requestExtent?: number[];
+            requestSrs?: string;
+        },
+        flip?: boolean
+    ) => Promise<string>;
     colortable?: string;
     colorrange?: string;
     requestExtentOffset?: number[];
 };
-
 
 declare module '@oidajs/core' {
     export interface ITileSourceDefinitions {
@@ -40,13 +42,11 @@ declare module '@oidajs/core' {
     }
 }
 
-
 olTileSourcesFactory.register(ADAM_WCS_SOURCE_ID, (config) => {
+    const tileGrid = getTileGridFromConfig(config.srs, config.tileGrid);
+    const tileSize = tileGrid.getTileSize();
 
-    let tileGrid = getTileGridFromConfig(config.srs, config.tileGrid);
-    let tileSize = tileGrid.getTileSize();
-
-    let wcsParams = {
+    const wcsParams = {
         service: 'WCS',
         request: 'GetCoverage',
         version: '2.0.0',
@@ -60,7 +60,7 @@ olTileSourcesFactory.register(ADAM_WCS_SOURCE_ID, (config) => {
 
     return new XYZSource({
         tileUrlFunction: (tileCoord, ratio, projection) => {
-            let tileExtent = tileGrid.getTileCoordExtent(tileCoord);
+            const tileExtent = tileGrid.getTileCoordExtent(tileCoord);
 
             if (config.requestExtentOffset) {
                 tileExtent[0] += config.requestExtentOffset[0];
@@ -69,7 +69,7 @@ olTileSourcesFactory.register(ADAM_WCS_SOURCE_ID, (config) => {
                 tileExtent[3] += config.requestExtentOffset[1];
             }
 
-            let subsets = (config.subsets || []).slice();
+            const subsets = (config.subsets || []).slice();
 
             if (config.srs === 'unprojected') {
                 subsets.push(`y(${tileExtent[0]},${tileExtent[2]})`);
@@ -90,7 +90,7 @@ olTileSourcesFactory.register(ADAM_WCS_SOURCE_ID, (config) => {
                 data: config.wktFilter
             };
         },
-        tileLoadFunction: ((tile, source) => {
+        tileLoadFunction: (tile, source) => {
             if (config.tileLoadFunction) {
                 const tileLoadParams = source;
                 if (config.srs !== 'unprojected') {
@@ -105,46 +105,50 @@ olTileSourcesFactory.register(ADAM_WCS_SOURCE_ID, (config) => {
                     }
                 });
             } else {
-
                 let retryCount = 3;
 
                 const tryImageLoad = () => {
-
                     const onLoadError = () => {
                         if (retryCount) {
                             retryCount--;
                             // add random timout to avoid rerunning all failing requests together
                             setTimeout(() => {
                                 tryImageLoad();
-                            }, 1000 + Math.round((Math.random() * 2000)));
+                            }, 1000 + Math.round(Math.random() * 2000));
                         } else {
                             tile.handleImageError_();
                         }
                     };
 
-                    fetch(source.url).then((response) => {
-                        if (!response.ok) {
-                            onLoadError();
-                        } else {
-                            response.blob().then((blob) => {
-                                const dataUri = URL.createObjectURL(blob);
-                                if (!dataUri) {
-                                    onLoadError();
-                                } else {
-                                    tile.getImage().src = dataUri;
-                                }
-                            }).catch(() => {
+                    fetch(source.url).then(
+                        (response) => {
+                            if (!response.ok) {
                                 onLoadError();
-                            });
+                            } else {
+                                response
+                                    .blob()
+                                    .then((blob) => {
+                                        const dataUri = URL.createObjectURL(blob);
+                                        if (!dataUri) {
+                                            onLoadError();
+                                        } else {
+                                            tile.getImage().src = dataUri;
+                                        }
+                                    })
+                                    .catch(() => {
+                                        onLoadError();
+                                    });
+                            }
+                        },
+                        () => {
+                            onLoadError();
                         }
-                    }, () => {
-                        onLoadError();
-                    });
+                    );
                 };
 
                 tryImageLoad();
             }
-        }),
+        },
         crossOrigin: config.crossOrigin,
         tileGrid: tileGrid,
         projection: config.srs,
@@ -152,20 +156,18 @@ olTileSourcesFactory.register(ADAM_WCS_SOURCE_ID, (config) => {
     });
 });
 
-
 function cesiumBuildImageResource(imageryProvider, x, y, level, request) {
+    const resource = imageryProvider._resource;
+    const url = resource.getUrlComponent(true);
+    const allTags = imageryProvider._tags;
+    const templateValues = {};
 
-    let resource = imageryProvider._resource;
-    let url = resource.getUrlComponent(true);
-    let allTags = imageryProvider._tags;
-    let templateValues = {};
+    const templateRegex = /{[^}]+}/g;
 
-    let templateRegex = /{[^}]+}/g;
-
-    let match = url.match(templateRegex);
+    const match = url.match(templateRegex);
     if (match !== undefined) {
-        match.forEach(function(tag) {
-            let key = tag.substring(1, tag.length - 1);
+        match.forEach(function (tag) {
+            const key = tag.substring(1, tag.length - 1);
             if (allTags[key] !== undefined) {
                 templateValues[key] = allTags[key](imageryProvider, x, y, level);
             }
@@ -181,8 +183,7 @@ function cesiumBuildImageResource(imageryProvider, x, y, level, request) {
 cesiumTileSourcesFactory.register(ADAM_WCS_SOURCE_ID, (config) => {
     const tileGrid = getTileGridFromSRS(config.srs || 'EPSG:4326', config.tileGrid);
     if (tileGrid) {
-
-        let wcsParams = {
+        const wcsParams = {
             service: 'WCS',
             request: 'GetCoverage',
             version: '2.0.0',
@@ -194,14 +195,14 @@ cesiumTileSourcesFactory.register(ADAM_WCS_SOURCE_ID, (config) => {
             size: `(${tileGrid.config.tileWidth},${tileGrid.config.tileHeight})`
         };
 
-        const tileSource =  new UrlTemplateImageryProvider({
+        const tileSource = new UrlTemplateImageryProvider({
             url: `${config.url}?{wcsParams}`,
             enablePickFeatures: false,
             tilingScheme: tileGrid.scheme,
             customTags: {
                 wcsParams: (provider, x, y, level) => {
-                    let tileExtent = tileGrid.scheme.tileXYToNativeRectangle(x, y, level);
-                    let subsets = (config.subsets || []).slice();
+                    const tileExtent = tileGrid.scheme.tileXYToNativeRectangle(x, y, level);
+                    const subsets = (config.subsets || []).slice();
 
                     if (config.requestExtentOffset) {
                         tileExtent.west += config.requestExtentOffset[0];
@@ -229,28 +230,22 @@ cesiumTileSourcesFactory.register(ADAM_WCS_SOURCE_ID, (config) => {
 
         const tileLoadFunction = config.tileLoadFunction;
         if (tileLoadFunction) {
-            tileSource.requestImage = function(x, y, level, request) {
-                let resource = cesiumBuildImageResource(this, x, y, level, request);
-                let url = resource.getUrlComponent(true);
-                let tileRectangle = tileGrid.scheme.tileXYToNativeRectangle(x, y, level);
+            tileSource.requestImage = function (x, y, level, request) {
+                const resource = cesiumBuildImageResource(this, x, y, level, request);
+                const url = resource.getUrlComponent(true);
+                const tileRectangle = tileGrid.scheme.tileXYToNativeRectangle(x, y, level);
                 return tileLoadFunction({
                     url: url,
-                    requestExtent: [
-                        tileRectangle.west,
-                        tileRectangle.south,
-                        tileRectangle.east,
-                        tileRectangle.north,
-                    ],
+                    requestExtent: [tileRectangle.west, tileRectangle.south, tileRectangle.east, tileRectangle.north],
                     requestSrs: config.srs || 'EPSG:4326',
                     data: config.wktFilter
                 }).then((data) => {
-
                     if (!data) {
                         return Promise.reject();
                     }
 
                     return new Promise((resolve, reject) => {
-                        let img = new Image();
+                        const img = new Image();
                         img.src = data;
 
                         img.onload = () => {
@@ -266,6 +261,5 @@ cesiumTileSourcesFactory.register(ADAM_WCS_SOURCE_ID, (config) => {
         }
 
         return tileSource;
-
     }
 });

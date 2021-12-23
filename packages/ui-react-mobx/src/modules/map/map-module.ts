@@ -6,38 +6,38 @@ import { AppModule } from '../app-module';
 export const DEFAULT_MAP_MODULE_ID = 'map';
 
 export type MapBaseLayerConfig = {
-    id: string,
-    name: string,
-    config: any
+    id: string;
+    name: string;
+    config: any;
 };
 
 export type MapProjectionConfig = IMapProjection & {
-    name: string
+    name: string;
 };
 
 export type MapRendererConfig = {
-    id: string,
-    name: string,
-    options?: any
+    id: string;
+    name: string;
+    options?: any;
 };
 
 export type MapModuleConfig = {
-    baseLayers?: MapBaseLayerConfig[]
-    renderers?: MapRendererConfig[],
-    projections?: MapProjectionConfig[],
+    baseLayers?: MapBaseLayerConfig[];
+    renderers?: MapRendererConfig[];
+    projections?: MapProjectionConfig[];
     initialOptions?: {
         baseLayer?: string;
         renderer?: string;
         projection?: string;
-        viewport?: MapViewportProps
-    }
+        viewport?: MapViewportProps;
+    };
 };
 
 export type MapModuleProps = {
     map: Map | MapProps;
     config: MapModuleConfig;
-    selectionManager?: SelectionManager,
-    id?: string
+    selectionManager?: SelectionManager;
+    id?: string;
 };
 
 export class MapModule extends AppModule {
@@ -61,8 +61,8 @@ export class MapModule extends AppModule {
         if (config.initialOptions) {
             const baseLayerId = config.initialOptions.baseLayer;
             if (baseLayerId) {
-                let baseLayers = config.baseLayers || [];
-                let baseLayer = baseLayers.find((layer) => {
+                const baseLayers = config.baseLayers || [];
+                const baseLayer = baseLayers.find((layer) => {
                     return layer.id === baseLayerId;
                 });
                 if (baseLayer) {
@@ -77,8 +77,8 @@ export class MapModule extends AppModule {
             }
             const projectionCode = config.initialOptions.projection;
             if (projectionCode) {
-                let projections = config.projections || [];
-                let projection = projections.find((projection) => {
+                const projections = config.projections || [];
+                const projection = projections.find((projection) => {
                     return projection.code === projectionCode;
                 });
                 if (projection) {
@@ -87,8 +87,8 @@ export class MapModule extends AppModule {
             }
             const rendererId = config.initialOptions.renderer;
             if (rendererId) {
-                let renderers = config.renderers || [];
-                let renderer = renderers.find((renderer) => {
+                const renderers = config.renderers || [];
+                const renderer = renderers.find((renderer) => {
                     return renderer.id === rendererId;
                 });
                 if (renderer) {

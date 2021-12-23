@@ -7,8 +7,7 @@ import { interactionControllersFactory } from './interaction-controllers-factory
 import { MouseCoordsInteraction } from '../../models/map/interactions/mouse-coords-interaction';
 
 export class MouseCoordsInteractionController extends MapInteractionController<IMapInteractionImplementation, MouseCoordsInteraction> {
-
-    constructor(config)  {
+    constructor(config) {
         super(config);
     }
 

@@ -8,22 +8,19 @@ import { MapRenderer } from '../models/map/map-renderer';
 import { GroupLayerController } from './layers/group-layer-controller';
 import { InteractionListController } from './interactions/interaction-list-controller';
 
-
 export type MapRendererControllerConfig = {
     state: Map;
 };
 
 export class MapRendererController {
-
     private mapState_: Map;
     private mapRenderer_: IMapRenderer | undefined;
     private subscriptionTracker_: SubscriptionTracker = new SubscriptionTracker();
     private layersController_: GroupLayerController;
     private interactionsController_: InteractionListController;
-    private ignoreNextViewportChange_: boolean = false;
+    private ignoreNextViewportChange_ = false;
 
     constructor(config: MapRendererControllerConfig) {
-
         this.mapState_ = config.state;
 
         this.layersController_ = new GroupLayerController({
@@ -35,7 +32,6 @@ export class MapRendererController {
         });
 
         this.bindTMapState_();
-
     }
 
     getMapRenderer() {
@@ -79,68 +75,77 @@ export class MapRendererController {
             this.interactionsController_.setMapRenderer(this.mapRenderer_);
 
             if (this.mapRenderer_) {
-                let groupRenderer = this.layersController_.getLayerRenderer();
+                const groupRenderer = this.layersController_.getLayerRenderer();
                 if (groupRenderer) {
                     this.mapRenderer_.setLayerGroup(groupRenderer);
                 }
             }
 
             this.mapState_.renderer.setImplementation(this.mapRenderer_);
-
         }
-
     }
 
     private bindTMapState_() {
         this.subscriptionTracker_.addSubscription(
-            reaction(() => {
-                return {
-                    projection: this.mapState_.view.projection,
-                    renderer: this.mapState_.renderer
-                };
-            }, (config) => {
-                this.initMapRenderer_(config.renderer);
-            })
+            reaction(
+                () => {
+                    return {
+                        projection: this.mapState_.view.projection,
+                        renderer: this.mapState_.renderer
+                    };
+                },
+                (config) => {
+                    this.initMapRenderer_(config.renderer);
+                }
+            )
         );
 
         this.subscriptionTracker_.addSubscription(
-            reaction(() => this.mapState_.renderer.options, (rendererProps) => {
-                if (this.mapRenderer_) {
-                    this.mapRenderer_.updateRendererProps(rendererProps);
+            reaction(
+                () => this.mapState_.renderer.options,
+                (rendererProps) => {
+                    if (this.mapRenderer_) {
+                        this.mapRenderer_.updateRendererProps(rendererProps);
+                    }
                 }
-            })
+            )
         );
 
         this.subscriptionTracker_.addSubscription(
-            reaction(() => {
-                return this.mapState_.view.target;
-            }, (target) => {
-                if (target && this.mapRenderer_) {
-                    this.mapRenderer_.setTarget(target);
+            reaction(
+                () => {
+                    return this.mapState_.view.target;
+                },
+                (target) => {
+                    if (target && this.mapRenderer_) {
+                        this.mapRenderer_.setTarget(target);
+                    }
                 }
-            })
+            )
         );
 
         this.subscriptionTracker_.addSubscription(
-            reaction(() => {
+            reaction(
+                () => {
+                    const viewport = this.mapState_.view.viewport;
 
-                let viewport = this.mapState_.view.viewport;
-
-                return {
-                    center: <MapCoord>viewport.center.slice(),
-                    resolution: viewport.resolution,
-                    rotation: viewport.rotation,
-                    pitch: viewport.pitch
-                };
-            }, (viewport) => {
-                if (this.ignoreNextViewportChange_) {
-                    this.ignoreNextViewportChange_ = false;
-                    return;
+                    return {
+                        center: <MapCoord>viewport.center.slice(),
+                        resolution: viewport.resolution,
+                        rotation: viewport.rotation,
+                        pitch: viewport.pitch
+                    };
+                },
+                (viewport) => {
+                    if (this.ignoreNextViewportChange_) {
+                        this.ignoreNextViewportChange_ = false;
+                        return;
+                    }
+                    if (this.mapRenderer_) {
+                        this.mapRenderer_.setViewport(viewport, this.mapState_.view.config.value?.animateOnChange);
+                    }
                 }
-                if (this.mapRenderer_) {
-                    this.mapRenderer_.setViewport(viewport, this.mapState_.view.config.value?.animateOnChange);
-                }
-            })
+            )
         );
 
         this.initMapRenderer_(this.mapState_.renderer);
@@ -150,5 +155,4 @@ export class MapRendererController {
         this.ignoreNextViewportChange_ = true;
         this.mapState_.view.setViewport(viewport);
     }
-
 }

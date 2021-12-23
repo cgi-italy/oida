@@ -4,12 +4,17 @@ import { LoadingState, SubscriptionTracker } from '@oidajs/core';
 import { AsyncDataFetcher } from '@oidajs/state-mobx';
 
 import {
-    DatasetDimension, DataDomain, DomainRange, isValueDomain, NumericVariable ,
-    DatasetDimensions, HasDatasetDimensions, DatasetDimensionsProps } from '../common';
-import { getDatasetVariableDomain } from '../utils';
+    DatasetDimension,
+    DataDomain,
+    DomainRange,
+    isValueDomain,
+    NumericVariable,
+    DatasetDimensions,
+    HasDatasetDimensions,
+    DatasetDimensionsProps
+} from '../common';
 import { DatasetProcessing, DatasetProcessingProps } from './dataset-processing';
 import { DatasetAnalysis, DatasetAnalysisProps } from './dataset-analysis';
-
 
 export const POINT_SERIES_PROCESSING = 'point_series_processing';
 
@@ -30,13 +35,14 @@ export type DatasetPointSeriesValueItem<T = SeriesDimensionType> = {
 
 export type DatasetPointSeriesData<T = SeriesDimensionType> = DatasetPointSeriesValueItem<T>[];
 
-export type DatasetPointSeriesProvider<T = SeriesDimensionType> =
-    (request: DatasetPointSeriesRequest<T>) => Promise<DatasetPointSeriesData<T>>;
+export type DatasetPointSeriesProvider<T = SeriesDimensionType> = (
+    request: DatasetPointSeriesRequest<T>
+) => Promise<DatasetPointSeriesData<T>>;
 
 export type DatasetPointSeriesConfig<T = SeriesDimensionType> = {
     provider: DatasetPointSeriesProvider<T>;
     variables: NumericVariable[];
-    dimensions: (DatasetDimension<DataDomain<T>> & {preventSeries?: boolean})[];
+    dimensions: (DatasetDimension<DataDomain<T>> & { preventSeries?: boolean })[];
 };
 
 export type DatasetPointSeriesProps = {
@@ -44,10 +50,10 @@ export type DatasetPointSeriesProps = {
     seriesVariable?: string;
     seriesRange?: DomainRange<SeriesDimensionType>;
     autoUpdate?: boolean;
-} & DatasetProcessingProps<typeof POINT_SERIES_PROCESSING, DatasetPointSeriesConfig> & DatasetDimensionsProps;
+} & DatasetProcessingProps<typeof POINT_SERIES_PROCESSING, DatasetPointSeriesConfig> &
+    DatasetDimensionsProps;
 
 export class DatasetPointSeries extends DatasetProcessing<undefined> implements HasDatasetDimensions {
-
     readonly config: DatasetPointSeriesConfig;
     readonly dimensions: DatasetDimensions;
     @observable.ref seriesDimension: string | undefined;
@@ -95,7 +101,6 @@ export class DatasetPointSeries extends DatasetProcessing<undefined> implements 
         this.needsUpdate_ = true;
         this.subscriptionTracker_ = new SubscriptionTracker();
 
-
         this.afterInit_();
     }
 
@@ -112,40 +117,42 @@ export class DatasetPointSeries extends DatasetProcessing<undefined> implements 
 
             const domainPromise = this.dimensions.domainRequests.get(dimension);
             if (domainPromise) {
-                domainPromise.then((domain) => {
-                    if (domain && isValueDomain(domain) && domain.min !== undefined && domain.max !== undefined) {
-                        // if no range is defined or the current range is outside of the domain extent set the range to the domain extent
-                        if (!range || (range.min >= domain.max || range.max <= domain.min)) {
-                            this.setRange({
-                                min: domain.min,
-                                max: domain.max
-                            });
+                domainPromise
+                    .then((domain) => {
+                        if (domain && isValueDomain(domain) && domain.min !== undefined && domain.max !== undefined) {
+                            // if no range is defined or the current range is outside of the domain extent set the range to the domain extent
+                            if (!range || range.min >= domain.max || range.max <= domain.min) {
+                                this.setRange({
+                                    min: domain.min,
+                                    max: domain.max
+                                });
+                            } else {
+                                // clamp the range to the domain extent
+                                let min = range.min;
+                                let max = range.max;
+                                if (min < domain.min) {
+                                    min = domain.min;
+                                }
+                                if (max > domain.max) {
+                                    max = domain.max;
+                                }
+                                this.setRange({
+                                    min: min,
+                                    max: max
+                                });
+                            }
                         } else {
-                            // clamp the range to the domain extent
-                            let min = range.min;
-                            let max = range.max;
-                            if (min < domain.min) {
-                                min = domain.min;
-                            }
-                            if (max > domain.max) {
-                                max = domain.max;
-                            }
-                            this.setRange({
-                                min: min,
-                                max: max
-                            });
+                            this.setRange(range);
                         }
-                    } else {
+                    })
+                    .catch(() => {
                         this.setRange(range);
-                    }
-                }).catch(() => {
-                    this.setRange(range);
-                });
+                    });
             } else {
                 this.setRange(range);
             }
         } else {
-             this.seriesRange = undefined;
+            this.seriesRange = undefined;
         }
     }
 
@@ -173,29 +180,35 @@ export class DatasetPointSeries extends DatasetProcessing<undefined> implements 
 
     @computed
     get canRunQuery() {
-        return !!this.seriesDimension
-            && this.geometry && this.geometry.type === 'Point'
-            && !!this.seriesVariable
-            && this.config.dimensions.every((dim) => {
-                return (dim.id === this.seriesDimension) || this.dimensions.values.has(dim.id);
-            });
+        return (
+            !!this.seriesDimension &&
+            this.geometry &&
+            this.geometry.type === 'Point' &&
+            !!this.seriesVariable &&
+            this.config.dimensions.every((dim) => {
+                return dim.id === this.seriesDimension || this.dimensions.values.has(dim.id);
+            })
+        );
     }
 
     retrieveData() {
         if (this.canRunQuery) {
             if (this.needsUpdate_) {
-                this.dataFetcher_.fetchData({
-                    dimension: this.seriesDimension!,
-                    location: this.geometry! as GeoJSON.Point,
-                    variable: this.seriesVariable!,
-                    range: this.seriesRange,
-                    dimensionValues: new Map(this.dimensions.values)
-                }).then((data) => {
-                    this.needsUpdate_ = false;
-                    this.setData_(data || []);
-                }).catch(() => {
-                    this.setData_([]);
-                });
+                this.dataFetcher_
+                    .fetchData({
+                        dimension: this.seriesDimension!,
+                        location: this.geometry! as GeoJSON.Point,
+                        variable: this.seriesVariable!,
+                        range: this.seriesRange,
+                        dimensionValues: new Map(this.dimensions.values)
+                    })
+                    .then((data) => {
+                        this.needsUpdate_ = false;
+                        this.setData_(data || []);
+                    })
+                    .catch(() => {
+                        this.setData_([]);
+                    });
             }
         } else {
             this.loadingState.setValue(LoadingState.Init);
@@ -226,7 +239,6 @@ export class DatasetPointSeries extends DatasetProcessing<undefined> implements 
     }
 
     protected afterInit_() {
-
         if (!this.seriesVariable) {
             this.setVariable(this.config.variables[0].id);
         }
@@ -240,14 +252,17 @@ export class DatasetPointSeries extends DatasetProcessing<undefined> implements 
             }
         });
 
-        const updateTrackerDisposer = reaction(() => {
-            return {
-                aoi: this.geometry,
-                dimensions: new Map(this.dimensions.values)
-            };
-        }, () => {
-            this.needsUpdate_ = true;
-        });
+        const updateTrackerDisposer = reaction(
+            () => {
+                return {
+                    aoi: this.geometry,
+                    dimensions: new Map(this.dimensions.values)
+                };
+            },
+            () => {
+                this.needsUpdate_ = true;
+            }
+        );
 
         this.subscriptionTracker_.addSubscription(seriesUpdaterDisposer);
         this.subscriptionTracker_.addSubscription(updateTrackerDisposer);
@@ -259,7 +274,6 @@ export class DatasetPointSeries extends DatasetProcessing<undefined> implements 
 }
 
 export class DatasetPointSeriesAnalysis extends DatasetAnalysis<DatasetPointSeries> {
-
     constructor(props: Omit<DatasetAnalysisProps<DatasetPointSeries>, 'type'>) {
         super({
             type: POINT_SERIES_PROCESSING,

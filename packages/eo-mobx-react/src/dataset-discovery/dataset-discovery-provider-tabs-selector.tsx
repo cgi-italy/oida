@@ -4,7 +4,6 @@ import { Tabs, Tooltip } from 'antd';
 
 import { DatasetDiscoveryProvider } from '@oidajs/eo-mobx';
 
-
 export type DatasetDiscoveryProviderSelectorProps = {
     providers: DatasetDiscoveryProvider[];
     selectedProvider?: string;
@@ -12,17 +11,12 @@ export type DatasetDiscoveryProviderSelectorProps = {
 };
 
 export const DatasetDiscoveryProviderTabsSelector = (props: DatasetDiscoveryProviderSelectorProps) => {
-
     const tabs = props.providers.map((provider) => {
         return (
             <Tabs.TabPane
                 tab={
-                    <Tooltip
-                        title={provider.description}
-                    >
-                        <span>
-                            {provider.name}
-                        </span>
+                    <Tooltip title={provider.description}>
+                        <span>{provider.name}</span>
                     </Tooltip>
                 }
                 key={provider.id}
@@ -31,11 +25,7 @@ export const DatasetDiscoveryProviderTabsSelector = (props: DatasetDiscoveryProv
     });
 
     return (
-        <Tabs
-            activeKey={props.selectedProvider}
-            onChange={props.onProviderSelect}
-            size='small'
-        >
+        <Tabs activeKey={props.selectedProvider} onChange={props.onProviderSelect} size='small'>
             {tabs}
         </Tabs>
     );

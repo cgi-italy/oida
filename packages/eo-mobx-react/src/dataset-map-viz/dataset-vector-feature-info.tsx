@@ -5,17 +5,22 @@ import { QuestionCircleOutlined } from '@ant-design/icons';
 import { formatDate, formatNumber } from '@oidajs/core';
 import { useSelector } from '@oidajs/ui-react-mobx';
 import {
-    DatasetVectorFeature, DatasetVectorMapViz, FeaturePropertyValueType, VectorFeatureDescriptor,
-    VectorFeatureProperties, VectorFeaturePropertyDescriptor, VectorFeaturePropertyFormatter, VECTOR_VIZ_TYPE
+    DatasetVectorFeature,
+    DatasetVectorMapViz,
+    FeaturePropertyValueType,
+    VectorFeatureDescriptor,
+    VectorFeatureProperties,
+    VectorFeaturePropertyDescriptor,
+    VectorFeaturePropertyFormatter,
+    VECTOR_VIZ_TYPE
 } from '@oidajs/eo-mobx';
 
 import { DatasetAnalysisWidgetFactory } from '../dataset-analysis';
 
-
 // extend the formatter output types to support jsx
 declare module '@oidajs/eo-mobx' {
     export interface VectorFeaturePropertyFormatterOutputTypes {
-        'jsx': JSX.Element;
+        jsx: JSX.Element;
     }
 }
 
@@ -40,9 +45,13 @@ const formatVectorFeaturePropertyValue = (property: VectorFeaturePropertyDescrip
     } else if (property.type === 'string' && typeof value === 'string') {
         const key = idx !== undefined ? `${property.id}_${idx}` : undefined;
         if (property.subType === 'url') {
-            return <a href={value} key={key} target='_blank' >{value}</a>;
+            return (
+                <a href={value} key={key} target='_blank'>
+                    {value}
+                </a>
+            );
         } else if (property.subType === 'imageUrl') {
-            return <img src={value} key={key}/>;
+            return <img src={value} key={key} />;
         } else {
             return value as string;
         }
@@ -56,28 +65,28 @@ export type DatasetVectorFeatureInfoProps<T extends VectorFeatureProperties = Ve
     /** The vector feature */
     vectorFeature: DatasetVectorFeature<T>;
     /** The feature schema */
-    featureDescriptor?: VectorFeatureDescriptor
+    featureDescriptor?: VectorFeatureDescriptor;
 };
 
 /**
  * A component that displays information about a {@link DatasetVectorFeature | dataset vector feature}
  */
-export const DatasetVectorFeatureInfo = <T extends VectorFeatureProperties = VectorFeatureProperties>
-(props: DatasetVectorFeatureInfoProps<T>) => {
-
+export const DatasetVectorFeatureInfo = <T extends VectorFeatureProperties = VectorFeatureProperties>(
+    props: DatasetVectorFeatureInfoProps<T>
+) => {
     const items: JSX.Element[] = [];
 
     if (props.featureDescriptor) {
         props.featureDescriptor.properties.forEach((property) => {
             const rawValue = property.valueExtractor
-            ? property.valueExtractor(props.vectorFeature.properties)
-            : props.vectorFeature.properties[property.id];
+                ? property.valueExtractor(props.vectorFeature.properties)
+                : props.vectorFeature.properties[property.id];
 
             if (rawValue !== undefined && rawValue !== '') {
                 const value = property.parser ? property.parser(rawValue) : rawValue;
                 let formattedValue: string | JSX.Element | JSX.Element[] | undefined;
                 const formatter: VectorFeaturePropertyFormatter =
-                    property.formatter as VectorFeaturePropertyFormatter || formatVectorFeaturePropertyValue.bind(undefined, property);
+                    (property.formatter as VectorFeaturePropertyFormatter) || formatVectorFeaturePropertyValue.bind(undefined, property);
 
                 // If the property is an array call the formatter function for each item
                 if (property.isArray && Array.isArray(value)) {
@@ -96,14 +105,13 @@ export const DatasetVectorFeatureInfo = <T extends VectorFeatureProperties = Vec
                 }
 
                 if (formattedValue) {
-
                     let label: React.ReactNode = property.name;
                     if (property.description) {
                         label = (
                             <div className='dataset-vector-feature-property-label'>
                                 <span>{property.name}</span>
                                 <Tooltip title={property.description}>
-                                    <QuestionCircleOutlined/>
+                                    <QuestionCircleOutlined />
                                 </Tooltip>
                             </div>
                         );
@@ -122,7 +130,11 @@ export const DatasetVectorFeatureInfo = <T extends VectorFeatureProperties = Vec
         });
     } else {
         Object.entries(props.vectorFeature.properties).forEach(([key, value]) => {
-            items.push(<Descriptions.Item key={key} label={key}>{value}</Descriptions.Item>);
+            items.push(
+                <Descriptions.Item key={key} label={key}>
+                    {value}
+                </Descriptions.Item>
+            );
         });
     }
 
@@ -139,7 +151,7 @@ export const DatasetVectorFeatureInfo = <T extends VectorFeatureProperties = Vec
 };
 
 export type DatasetVectorMapVizWidgetProps = {
-    vectorMapViz: DatasetVectorMapViz
+    vectorMapViz: DatasetVectorMapViz;
 };
 
 /**
@@ -152,19 +164,11 @@ export const DatasetVectorMapVizWidget = (props: DatasetVectorMapVizWidgetProps)
         return null;
     }
 
-    return (
-        <DatasetVectorFeatureInfo
-            vectorFeature={selectedFeature}
-            featureDescriptor={featureDescriptor}
-        />
-    );
+    return <DatasetVectorFeatureInfo vectorFeature={selectedFeature} featureDescriptor={featureDescriptor} />;
 };
 
 DatasetAnalysisWidgetFactory.register(VECTOR_VIZ_TYPE, (config) => {
+    const vectorViz = config.mapViz as DatasetVectorMapViz;
 
-    let vectorViz = config.mapViz as DatasetVectorMapViz;
-
-    return <DatasetVectorMapVizWidget
-        vectorMapViz={vectorViz}
-    />;
+    return <DatasetVectorMapVizWidget vectorMapViz={vectorViz} />;
 });

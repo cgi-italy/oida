@@ -39,6 +39,6 @@
     "@oidajs/core": "file:../core",
     "@oidajs/ui-react-core": "file:../ui-react-core",
     "lodash": "4.17.15",
-    "tslib": "^2.2.0"
+    "tslib": "^2.3.1"
   }
 }

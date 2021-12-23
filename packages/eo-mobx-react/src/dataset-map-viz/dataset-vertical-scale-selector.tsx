@@ -7,25 +7,24 @@ import { Slider } from 'antd';
 import { VerticalScale } from '@oidajs/eo-mobx';
 
 export type DatasetVerticalScaleSelectorProps = {
-    verticalScale: VerticalScale
+    verticalScale: VerticalScale;
     rangeConfig: {
-        min: number,
-        max: number,
-        step?: number
-    }
+        min: number;
+        max: number;
+        step?: number;
+    };
 };
 
 export const DatasetVerticalScaleSelector = (props: DatasetVerticalScaleSelectorProps) => {
-
-    let verticalScale = useSelector(() => {
+    const verticalScale = useSelector(() => {
         return props.verticalScale.value;
     });
 
-    let range = props.rangeConfig!;
+    const range = props.rangeConfig!;
 
-    let marks = {
+    const marks = {
         [range.min]: `${range.min}x`,
-        [range.max]: `${range.max}x`,
+        [range.max]: `${range.max}x`
     };
 
     return (
@@ -42,7 +41,6 @@ export const DatasetVerticalScaleSelector = (props: DatasetVerticalScaleSelector
             />
         </div>
     );
-
 };
 
 DatasetVerticalScaleSelector.defaultProps = {

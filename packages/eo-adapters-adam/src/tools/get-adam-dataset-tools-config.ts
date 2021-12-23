@@ -1,7 +1,11 @@
 import { AxiosInstanceWithCancellation } from '@oidajs/core';
 import {
-    POINT_SERIES_PROCESSING, DatasetPointSeriesConfig, DatasetTimeDistributionProvider, DatasetToolConfig,
-    TRANSECT_VALUES_PROCESSING, DatasetTransectValuesConfig
+    POINT_SERIES_PROCESSING,
+    DatasetPointSeriesConfig,
+    DatasetTimeDistributionProvider,
+    DatasetToolConfig,
+    TRANSECT_VALUES_PROCESSING,
+    DatasetTransectValuesConfig
 } from '@oidajs/eo-mobx';
 
 import { AdamDatasetConfig, AdamDatasetSingleBandCoverage, isMultiBandCoverage, AdamDatasetDimension } from '../adam-dataset-config';
@@ -15,28 +19,31 @@ export const getAdamDatasetToolsConfig = (
     datasetConfig: AdamDatasetConfig,
     timeDistributionProvider?: DatasetTimeDistributionProvider
 ) => {
-
-
     const variables: AdamDatasetSingleBandCoverage[] = [];
 
-    const dimensions: AdamDatasetDimension[] = datasetConfig.dimensions ? datasetConfig.dimensions.slice().map((dimension) => {
-        let preventSeries = false;
+    const dimensions: AdamDatasetDimension[] = datasetConfig.dimensions
+        ? datasetConfig.dimensions.slice().map((dimension) => {
+              let preventSeries = false;
 
-        // disable series on campaign data
-        if (dimension.id === 'subdataset' || dimension.id === 'SubRegion'
-            || dimension.id === 'Product' || dimension.id === 'SceneType'
-            || dimension.id === 'image' || dimension.id === 'plan'
-        ) {
-            preventSeries = true;
-        }
-        return {
-            ...dimension,
-            preventSeries: preventSeries
-        };
-    }) : [];
+              // disable series on campaign data
+              if (
+                  dimension.id === 'subdataset' ||
+                  dimension.id === 'SubRegion' ||
+                  dimension.id === 'Product' ||
+                  dimension.id === 'SceneType' ||
+                  dimension.id === 'image' ||
+                  dimension.id === 'plan'
+              ) {
+                  preventSeries = true;
+              }
+              return {
+                  ...dimension,
+                  preventSeries: preventSeries
+              };
+          })
+        : [];
 
     if (isMultiBandCoverage(datasetConfig.coverages)) {
-
         if (!datasetConfig.coverages.isTrueColor) {
             const bandDimension: AdamDatasetDimension = {
                 id: 'band',
@@ -45,7 +52,7 @@ export const getAdamDatasetToolsConfig = (
                     id: 'band'
                 },
                 wcsResponseKey: '',
-                tarFilenameRegex: /band\(([^\)]*)\)/,
+                tarFilenameRegex: /band\(([^)]*)\)/,
                 domain: {
                     values: datasetConfig.coverages.bands.map((band) => {
                         return {
@@ -57,7 +64,7 @@ export const getAdamDatasetToolsConfig = (
             };
             dimensions.push(bandDimension);
 
-            let bandsDomain = {
+            const bandsDomain = {
                 min: Number.MAX_VALUE,
                 max: -Number.MAX_VALUE
             };
@@ -76,7 +83,6 @@ export const getAdamDatasetToolsConfig = (
                 domain: bandsDomain[0] < bandsDomain[1] ? bandsDomain : undefined
             });
         }
-
     } else {
         variables.push(...datasetConfig.coverages);
     }
@@ -89,14 +95,16 @@ export const getAdamDatasetToolsConfig = (
         },
         wcsResponseKey: 'time',
         tarFilenameRegex: /([0-9]{4})([0-9]{2})([0-9]{2})\.([0-9]{2})([0-9]{2})([0-9]{2})/,
-        domain: timeDistributionProvider ? () => {
-            return timeDistributionProvider!.getTimeExtent().then((extent) => {
-                return {
-                    min: extent?.start || new Date(0),
-                    max: extent?.end || new Date()
-                };
-            });
-        } : undefined
+        domain: timeDistributionProvider
+            ? () => {
+                  return timeDistributionProvider!.getTimeExtent().then((extent) => {
+                      return {
+                          min: extent?.start || new Date(0),
+                          max: extent?.end || new Date()
+                      };
+                  });
+              }
+            : undefined
     };
 
     if (!datasetConfig.timeless) {
@@ -112,10 +120,10 @@ export const getAdamDatasetToolsConfig = (
         });
     }
 
-    let tools: DatasetToolConfig[] = [];
+    const tools: DatasetToolConfig[] = [];
 
-    if (dimensions.filter(dimension => !dimension.preventSeries).length && variables.length) {
-        let wcsSeriesProvider = new AdamWcsSeriesProvider({
+    if (dimensions.filter((dimension) => !dimension.preventSeries).length && variables.length) {
+        const wcsSeriesProvider = new AdamWcsSeriesProvider({
             axiosInstance: axiosInstance,
             coverageSrs: datasetConfig.coverageSrs,
             serviceUrl: factoryConfig.wcsServiceUrl,
@@ -124,12 +132,11 @@ export const getAdamDatasetToolsConfig = (
             dimensions: dimensions
         });
 
-
-        let dimensionSeriesToolConfig: DatasetPointSeriesConfig = {
+        const dimensionSeriesToolConfig: DatasetPointSeriesConfig = {
             variables: variables,
             dimensions: dimensions,
             provider: (request) => {
-                 return wcsSeriesProvider.getSeries(request);
+                return wcsSeriesProvider.getSeries(request);
             }
         };
 
@@ -158,5 +165,4 @@ export const getAdamDatasetToolsConfig = (
     }
 
     return tools;
-
 };

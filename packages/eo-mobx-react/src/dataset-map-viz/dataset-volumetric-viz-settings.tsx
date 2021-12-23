@@ -13,12 +13,11 @@ import { useSelector } from '@oidajs/ui-react-mobx';
 import { StackVolumeViewMode, SliceVolumeViewMode } from '@oidajs/state-mobx';
 
 export type DatasetVolumetricVizSettingsProps = {
-    datasetViz: DatasetVolumetricViz
+    datasetViz: DatasetVolumetricViz;
 };
 
 export const DatasetVolumetricVizSettings = (props: DatasetVolumetricVizSettingsProps) => {
-
-    let [viewModeSnapshot, setViewModeSnapshot] = useState({
+    const [viewModeSnapshot, setViewModeSnapshot] = useState({
         stackView: new StackVolumeViewMode({
             numSlices: 8
         }),
@@ -33,7 +32,6 @@ export const DatasetVolumetricVizSettings = (props: DatasetVolumetricVizSettings
         return props.datasetViz.mapLayer.viewMode;
     });
 
-
     if (viewMode) {
         viewModeSettings = DatasetVolumetricViewModeSettingsFactory.create(viewMode.mode, {
             viewMode: viewMode,
@@ -41,27 +39,29 @@ export const DatasetVolumetricVizSettings = (props: DatasetVolumetricVizSettings
         });
     }
 
-    let viewModeOptions = [
-        (<Select.Option key='stackView' value='stackView'>Image stack</Select.Option>),
-        (<Select.Option key='sliceView' value='sliceView'>Volume slice</Select.Option>)
+    const viewModeOptions = [
+        <Select.Option key='stackView' value='stackView'>
+            Image stack
+        </Select.Option>,
+        <Select.Option key='sliceView' value='sliceView'>
+            Volume slice
+        </Select.Option>
     ];
 
     return (
         <div className='volumetric-viz-settings'>
-            <DatasetVizOpacityControl
-                datasetViz={props.datasetViz}
-            />
+            <DatasetVizOpacityControl datasetViz={props.datasetViz} />
             <DatasetVerticalScaleSelector
                 verticalScale={props.datasetViz.verticalScale}
                 rangeConfig={props.datasetViz.config.verticalScaleConfig}
             />
-            {props.datasetViz.bandMode &&
+            {props.datasetViz.bandMode && (
                 <DatasetBandSingleSelector
                     rasterBands={props.datasetViz.config.bands}
                     state={props.datasetViz.bandMode}
                     bandSelectorLabel='Variable'
                 />
-            }
+            )}
             <div className='volumetric-view-mode'>
                 <div className='dataset-combo-selector'>
                     <span>View mode: </span>
@@ -69,7 +69,7 @@ export const DatasetVolumetricVizSettings = (props: DatasetVolumetricVizSettings
                         value={viewMode?.mode}
                         onChange={(value) => {
                             if (props.datasetViz.mapLayer) {
-                                let currentViewMode = props.datasetViz.mapLayer.viewMode;
+                                const currentViewMode = props.datasetViz.mapLayer.viewMode;
                                 setViewModeSnapshot({
                                     ...viewModeSnapshot,
                                     [currentViewMode.mode]: currentViewMode
@@ -81,14 +81,12 @@ export const DatasetVolumetricVizSettings = (props: DatasetVolumetricVizSettings
                         {viewModeOptions}
                     </Select>
                 </div>
-                <div className='volumetric-view-mode-settings'>
-                    {viewModeSettings}
-                </div>
+                <div className='volumetric-view-mode-settings'>{viewModeSettings}</div>
             </div>
         </div>
     );
 };
 
 DatasetVizSettingsFactory.register(VOLUMETRIC_VIZ_TYPE, (config) => {
-    return <DatasetVolumetricVizSettings {...config}/>;
+    return <DatasetVolumetricVizSettings {...config} />;
 });

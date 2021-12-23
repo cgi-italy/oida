@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Select, Upload, Button, Tooltip, List } from 'antd';
+import { Select, Upload, Button, Tooltip } from 'antd';
 import { SelectOutlined, UploadOutlined } from '@ant-design/icons';
 
 import { AoiImportConfig } from '@oidajs/ui-react-core';
@@ -9,29 +9,26 @@ import { DataCollectionCompactListItem, DataCollectionList } from '../data-colle
 import { FocusIcon } from '../icons/focus';
 
 export const AoiImportRenderer = (props: AoiImportConfig) => {
-
-    let groupOptions = props.sourceGroups.map((group) => {
+    const groupOptions = props.sourceGroups.map((group) => {
         return (
-            <Select.Option
-                key={group.id}
-                value={group.id}
-            >
+            <Select.Option key={group.id} value={group.id}>
                 {group.name}
             </Select.Option>
         );
     });
 
-    let groupAoisProps = props.selectedSourceGroupItems;
+    const groupAoisProps = props.selectedSourceGroupItems;
     if (groupAoisProps) {
-
         groupAoisProps.items.itemActions = (item) => {
-            let aoiActions = [{
-                content: 'Use this area',
-                callback: () => {
-                    props.onAoiImportAction(item);
-                },
-                icon: (<SelectOutlined/>)
-            }];
+            const aoiActions = [
+                {
+                    content: 'Use this area',
+                    callback: () => {
+                        props.onAoiImportAction(item);
+                    },
+                    icon: <SelectOutlined />
+                }
+            ];
 
             const onAoiCenterOnMapAction = props.onAoiCenterOnMapAction;
             if (onAoiCenterOnMapAction) {
@@ -40,7 +37,7 @@ export const AoiImportRenderer = (props: AoiImportConfig) => {
                     callback: () => {
                         onAoiCenterOnMapAction(item);
                     },
-                    icon: (<FocusIcon/>)
+                    icon: <FocusIcon />
                 });
             }
 
@@ -62,40 +59,37 @@ export const AoiImportRenderer = (props: AoiImportConfig) => {
                 >
                     {groupOptions}
                 </Select>
-                {onFileImportAction &&
+                {onFileImportAction && (
                     <Upload
                         customRequest={(options: any) => {
-                            onFileImportAction(options.file).then(() => {
-                                options.onSuccess({}, options.file);
-                            }).catch((error) => {
-                                options.onError(error);
-                            });
+                            onFileImportAction(options.file)
+                                .then(() => {
+                                    options.onSuccess({}, options.file);
+                                })
+                                .catch((error) => {
+                                    options.onError(error);
+                                });
                         }}
-                        accept={props.supportedFileTypes.map(fileType => `.${fileType}`).join(',')}
+                        accept={props.supportedFileTypes.map((fileType) => `.${fileType}`).join(',')}
                         fileList={[]}
                     >
-                        <Tooltip
-                            title='Upload AOI'
-                        >
-                            <Button
-                                size='small'
-                            >
-                                <UploadOutlined/>
+                        <Tooltip title='Upload AOI'>
+                            <Button size='small'>
+                                <UploadOutlined />
                             </Button>
                         </Tooltip>
                     </Upload>
-                }
+                )}
             </div>
-            {groupAoisProps && <DataCollectionList<any>
-                autoScrollOnSelection={true}
-                content={(item) => {
-                    return <DataCollectionCompactListItem
-                        title={item.name}
-                    />;
-                }}
-                {...groupAoisProps}
-            />}
+            {groupAoisProps && (
+                <DataCollectionList<any>
+                    autoScrollOnSelection={true}
+                    content={(item) => {
+                        return <DataCollectionCompactListItem title={item.name} />;
+                    }}
+                    {...groupAoisProps}
+                />
+            )}
         </div>
     );
 };
-

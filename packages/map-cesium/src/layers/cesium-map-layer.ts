@@ -5,7 +5,6 @@ import CustomDataSource from 'cesium/Source/DataSources/CustomDataSource';
 import ImageryLayerCollection from 'cesium/Source/Scene/ImageryLayerCollection';
 import ImageryLayer from 'cesium/Source/Scene/ImageryLayer';
 
-
 import { IMapLayerRenderer, MapLayerRendererConfig } from '@oidajs/core';
 
 import { CesiumMapRenderer } from '../map/cesium-map-renderer';
@@ -13,17 +12,18 @@ import { updateDataSource } from '../utils/render';
 import { PickInfo, CesiumFeatureCoordPickMode } from '../utils/picking';
 
 export class CesiumMapLayer implements IMapLayerRenderer {
-
     protected mapRenderer_: CesiumMapRenderer;
     protected parent_: CesiumMapLayer | undefined;
-    protected visible_: boolean = true;
-    protected alpha_: number = 1.0;
+    protected visible_: boolean;
+    protected alpha_: number;
     protected imageries_;
     protected primitives_;
     protected dataSources_;
 
     constructor(config: MapLayerRendererConfig) {
         this.mapRenderer_ = config.mapRenderer as unknown as CesiumMapRenderer;
+        this.visible_ = true;
+        this.alpha_ = 1.0;
 
         this.initImageries_();
         this.initPrimitives_();
@@ -64,7 +64,8 @@ export class CesiumMapLayer implements IMapLayerRenderer {
         });
     }
 
-    setExtent(extent) {
+    setExtent(extent: number[] | undefined) {
+        return;
     }
 
     setParent(parent) {
@@ -105,7 +106,6 @@ export class CesiumMapLayer implements IMapLayerRenderer {
         return this.dataSources_;
     }
 
-
     /**
      * Override this in inherited classes to enable custom primitive hovering behaviours
      *
@@ -122,7 +122,9 @@ export class CesiumMapLayer implements IMapLayerRenderer {
      * @param coordinate the hovered primitive coordinate
      * @param pickInfo the pick info extracted from the primitive
      */
-    onFeatureHover(coordinate: Cartesian3, pickInfo: PickInfo) {}
+    onFeatureHover(coordinate: Cartesian3, pickInfo: PickInfo) {
+        return;
+    }
 
     /**
      * Override this in inherited classes to enable custom primitive select behaviours
@@ -140,7 +142,9 @@ export class CesiumMapLayer implements IMapLayerRenderer {
      * @param coordinate the selected primitive coordinate
      * @param pickInfo the pick info extracted from the primitive
      */
-    onFeatureSelect(coordinate: Cartesian3, pickInfo: PickInfo) {}
+    onFeatureSelect(coordinate: Cartesian3, pickInfo: PickInfo) {
+        return;
+    }
 
     getFeaturePickMode() {
         return CesiumFeatureCoordPickMode.Primitive;
@@ -179,7 +183,6 @@ export class CesiumMapLayer implements IMapLayerRenderer {
     }
 
     protected onAddImageries_(imageries, idx) {
-
         if (imageries instanceof ImageryLayer || imageries.length) {
             this.updateImageryVisibility_(imageries, this.parent_ ? this.parent_.isVisible() : true);
             this.updateImageryOpacity_(imageries);
@@ -193,7 +196,6 @@ export class CesiumMapLayer implements IMapLayerRenderer {
     }
 
     protected onRemoveImageries_(imageries, idx) {
-
         if (imageries instanceof ImageryLayer || imageries.length) {
             this.mapRenderer_.refreshImageriesFromEvent({
                 type: 'remove',
@@ -205,8 +207,7 @@ export class CesiumMapLayer implements IMapLayerRenderer {
     }
 
     protected onAddDataSources_(parentCollection, dataSources) {
-
-        let idx = parentCollection.indexOf(dataSources);
+        const idx = parentCollection.indexOf(dataSources);
 
         if (dataSources instanceof CustomDataSource || dataSources.length) {
             this.mapRenderer_.refreshDataSourcesFromEvent({
@@ -219,7 +220,6 @@ export class CesiumMapLayer implements IMapLayerRenderer {
     }
 
     protected onRemoveDataSources_(parentCollection, dataSources) {
-
         if (dataSources instanceof CustomDataSource || dataSources.length) {
             this.mapRenderer_.refreshDataSourcesFromEvent({
                 type: 'remove',
@@ -229,9 +229,7 @@ export class CesiumMapLayer implements IMapLayerRenderer {
         }
     }
 
-
     protected updateImageryVisibility_(imageries, parentVisible) {
-
         imageries = imageries || this.imageries_;
 
         if (imageries instanceof ImageryLayer) {
@@ -241,11 +239,9 @@ export class CesiumMapLayer implements IMapLayerRenderer {
                 this.updateImageryVisibility_(imageries.get(i), this.visible_ && parentVisible);
             }
         }
-
     }
 
     protected updateImageryOpacity_(imageries) {
-
         imageries = imageries || this.imageries_;
 
         if (imageries instanceof ImageryLayer) {

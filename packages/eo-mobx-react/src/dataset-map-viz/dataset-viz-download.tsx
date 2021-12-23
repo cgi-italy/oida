@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Select, Slider, Form, InputNumber, Modal, Typography, FormInstance, Input } from 'antd';
+import { Select, Slider, Form, InputNumber, Modal, Typography, FormInstance } from 'antd';
 import { CloseCircleOutlined } from '@ant-design/icons';
 
 import { DatasetViz } from '@oidajs/eo-mobx';
@@ -14,15 +14,14 @@ export enum DatasetDownloadFormSubmitState {
 }
 
 export type DatasetDownloadProps = {
-    datasetViz: DatasetViz<any>
-    onSubmitStateChange: (submitState: DatasetDownloadFormSubmitState) => void
+    datasetViz: DatasetViz<any>;
+    onSubmitStateChange: (submitState: DatasetDownloadFormSubmitState) => void;
     formId?: string;
-    formInstance?: FormInstance
+    formInstance?: FormInstance;
 };
 
 export const DatasetVizDownload = (props: DatasetDownloadProps) => {
-
-    let downloadConfig = props.datasetViz.dataset.config!.download!;
+    const downloadConfig = props.datasetViz.dataset.config!.download!;
 
     const [formInstance] = useForm(props.formInstance);
 
@@ -31,9 +30,13 @@ export const DatasetVizDownload = (props: DatasetDownloadProps) => {
         scale: 1
     });
 
-    let [downloadError, setDownloadError] = useState('');
-    let formatOptions = downloadConfig!.supportedFormats.map((format) => {
-        return (<Select.Option key={format.id} value={format.id}>{format.name || format.id}</Select.Option>);
+    const [downloadError, setDownloadError] = useState('');
+    const formatOptions = downloadConfig!.supportedFormats.map((format) => {
+        return (
+            <Select.Option key={format.id} value={format.id}>
+                {format.name || format.id}
+            </Select.Option>
+        );
     });
 
     return (
@@ -43,76 +46,60 @@ export const DatasetVizDownload = (props: DatasetDownloadProps) => {
                 form={formInstance}
                 layout='vertical'
                 onValuesChange={(changedValues, values) => {
-                    formInstance.validateFields().then(() => {
-                        props.onSubmitStateChange(DatasetDownloadFormSubmitState.Ready);
-                    }).catch((e) => {
-                        if (e.errorFields.length) {
-                            props.onSubmitStateChange(DatasetDownloadFormSubmitState.Invalid);
-                        } else {
+                    formInstance
+                        .validateFields()
+                        .then(() => {
                             props.onSubmitStateChange(DatasetDownloadFormSubmitState.Ready);
-                        }
-                    });
+                        })
+                        .catch((e) => {
+                            if (e.errorFields.length) {
+                                props.onSubmitStateChange(DatasetDownloadFormSubmitState.Invalid);
+                            } else {
+                                props.onSubmitStateChange(DatasetDownloadFormSubmitState.Ready);
+                            }
+                        });
                 }}
                 onFinish={(values) => {
-
                     setDownloadError('');
                     props.onSubmitStateChange(DatasetDownloadFormSubmitState.Pending);
 
-                    downloadConfig.downloadProvider({
-                        datasetViz: props.datasetViz,
-                        ...values
-                    }).then(() => {
-                        props.onSubmitStateChange(DatasetDownloadFormSubmitState.Success);
-                    }).catch((error) => {
-                        setDownloadError(`Unable to download data: ${error.message}`);
-                        props.onSubmitStateChange(DatasetDownloadFormSubmitState.Error);
-                    });
-
+                    downloadConfig
+                        .downloadProvider({
+                            datasetViz: props.datasetViz,
+                            ...values
+                        })
+                        .then(() => {
+                            props.onSubmitStateChange(DatasetDownloadFormSubmitState.Success);
+                        })
+                        .catch((error) => {
+                            setDownloadError(`Unable to download data: ${error.message}`);
+                            props.onSubmitStateChange(DatasetDownloadFormSubmitState.Error);
+                        });
                 }}
             >
-                <Form.Item label='Format' name='format' rules={[{required: true}]}>
-                    <Select
-                        size='small'
-                    >
-                        {formatOptions}
-                    </Select>
+                <Form.Item label='Format' name='format' rules={[{ required: true }]}>
+                    <Select size='small'>{formatOptions}</Select>
                 </Form.Item>
                 <Form.Item
                     name='scale'
                     label='Scale'
                     className='download-scale-item'
-                    rules={[{required: true, message: 'Scale should be a number > 0 and <= 1'}]}
+                    rules={[{ required: true, message: 'Scale should be a number > 0 and <= 1' }]}
                 >
-                    <Form.Item
-                        name='scale'
-                        className='download-scale-slider'
-
-                    >
-                        <Slider
-                            min={0.05}
-                            max={1.0}
-                            step={0.05}
-                        />
+                    <Form.Item name='scale' className='download-scale-slider'>
+                        <Slider min={0.05} max={1.0} step={0.05} />
                     </Form.Item>
-                    <Form.Item
-                        name='scale'
-                        className='download-scale-input'
-
-                    >
-                        <InputNumber
-                            min={0.05}
-                            max={1}
-                            step={0.05}
-                        />
+                    <Form.Item name='scale' className='download-scale-input'>
+                        <InputNumber min={0.05} max={1} step={0.05} />
                     </Form.Item>
                 </Form.Item>
             </Form>
-            {downloadError &&
+            {downloadError && (
                 <Typography.Paragraph className='error-message'>
-                    <CloseCircleOutlined/>
+                    <CloseCircleOutlined />
                     <span>{downloadError}</span>
                 </Typography.Paragraph>
-            }
+            )}
         </div>
     );
 };
@@ -122,11 +109,10 @@ export type DatasetVizDownloadModalProps = {
 } & Omit<DatasetDownloadProps, 'onSubmitStateChange'>;
 
 export const DatasetVizDownloadModal = (props: DatasetVizDownloadModalProps) => {
+    const formId = 'dataset-viz-download-form';
 
-    let formId = 'dataset-viz-download-form';
-
-    let [visible, setVisible] = useState(true);
-    let [formState, setFormState] = useState<DatasetDownloadFormSubmitState>(DatasetDownloadFormSubmitState.Ready);
+    const [visible, setVisible] = useState(true);
+    const [formState, setFormState] = useState<DatasetDownloadFormSubmitState>(DatasetDownloadFormSubmitState.Ready);
 
     const [formInstance] = useForm(props.formInstance);
 
@@ -151,7 +137,7 @@ export const DatasetVizDownloadModal = (props: DatasetVizDownloadModalProps) => 
             afterClose={props.onClose}
             destroyOnClose={true}
         >
-            <DatasetVizDownload formId={formId} formInstance={formInstance} onSubmitStateChange={onSubmitStateChange} {...props}/>
+            <DatasetVizDownload formId={formId} formInstance={formInstance} onSubmitStateChange={onSubmitStateChange} {...props} />
         </Modal>
     );
 };

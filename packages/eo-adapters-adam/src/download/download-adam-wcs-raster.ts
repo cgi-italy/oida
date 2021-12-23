@@ -4,7 +4,6 @@ import { getAoiWcsParams, getCoverageWcsParams } from '../utils';
 import { AdamDatasetConfig } from '../adam-dataset-config';
 
 export const downloadAdamWcsRaster = (datasetConfig: AdamDatasetConfig, rasterView: RasterMapViz) => {
-
     const subsets: string[] = [];
 
     if (!datasetConfig.timeless) {
@@ -28,7 +27,7 @@ export const downloadAdamWcsRaster = (datasetConfig: AdamDatasetConfig, rasterVi
         return undefined;
     }
 
-    const {dimensionSubsets, ...wcsCoverageProps} = wcsCoverage;
+    const { dimensionSubsets, ...wcsCoverageProps } = wcsCoverage;
 
     subsets.push(...dimensionSubsets);
 

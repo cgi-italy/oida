@@ -7,10 +7,9 @@ import { Select, Button, Input, Form } from 'antd';
 import { Geometry, GeometryTypes } from '@oidajs/core';
 import { AoiValue, FormFieldState } from '@oidajs/core';
 
-
-const parseCoordString = (coordString: string = '') => {
+const parseCoordString = (coordString = '') => {
     try {
-        let coord = coordString.split(',').map((stringValue) => {
+        const coord = coordString.split(',').map((stringValue) => {
             return parseFloat(stringValue);
         });
 
@@ -33,12 +32,11 @@ export type PointEditorProps = {
 };
 
 export const PointEditor = (props: PointEditorProps) => {
-
     const parsePoint = (inputValue) => {
         props.onChange(parseCoordString(inputValue));
     };
 
-    let onInputChange = debounce(parsePoint, 1000);
+    const onInputChange = debounce(parsePoint, 1000);
 
     return (
         <Input
@@ -58,17 +56,15 @@ export type BBoxEditorProps = {
     onChange: (value: number[] | undefined) => void;
 };
 
-export const BBoxEditor =  (props: BBoxEditorProps) => {
+export const BBoxEditor = (props: BBoxEditorProps) => {
+    const defaultLowerLeft = props.value ? [props.value[0], props.value[1]].join(', ') : undefined;
+    const defaultUpperRight = props.value ? [props.value[2], props.value[3]].join(', ') : undefined;
 
-    let defaultLowerLeft = props.value ? [props.value[0], props.value[1]].join(', ') : undefined;
-    let defaultUpperRight = props.value ? [props.value[2], props.value[3]].join(', ') : undefined;
-
-    let [lowerLeft, setLowerLeft] = useState(parseCoordString(defaultLowerLeft));
-    let [upperRight, setUpperRight] = useState(parseCoordString(defaultUpperRight));
+    const [lowerLeft, setLowerLeft] = useState(parseCoordString(defaultLowerLeft));
+    const [upperRight, setUpperRight] = useState(parseCoordString(defaultUpperRight));
 
     useEffect(() => {
         if (lowerLeft && upperRight) {
-
             props.onChange([
                 Math.min(lowerLeft[0], upperRight[0]),
                 Math.min(lowerLeft[1], upperRight[1]),
@@ -84,13 +80,11 @@ export const BBoxEditor =  (props: BBoxEditorProps) => {
         setCorner(parseCoordString(inputValue));
     };
 
-    let onCornerChange = debounce(parseCorner, 1000);
+    const onCornerChange = debounce(parseCorner, 1000);
 
     return (
         <Form>
-            <Form.Item
-                label='First corner'
-            >
+            <Form.Item label='First corner'>
                 <Input
                     size='small'
                     defaultValue={defaultLowerLeft}
@@ -101,9 +95,7 @@ export const BBoxEditor =  (props: BBoxEditorProps) => {
                     placeholder='Longitude, Latidude'
                 />
             </Form.Item>
-            <Form.Item
-                label='Second corner'
-            >
+            <Form.Item label='Second corner'>
                 <Input
                     size='small'
                     defaultValue={defaultUpperRight}
@@ -122,7 +114,7 @@ export const PolygonEditor = (props) => {
     let textValue = '';
 
     if (props.value) {
-        let coords = props.value[0].map((coord) => {
+        const coords = props.value[0].map((coord) => {
             return coord.join(', ');
         });
 
@@ -130,11 +122,7 @@ export const PolygonEditor = (props) => {
     }
 
     return (
-        <Input.TextArea
-            placeholder={`Longitude, Latidude\nLongitude, Latitude\n...`}
-            autoSize={{maxRows: 10}}
-            defaultValue={textValue}
-        />
+        <Input.TextArea placeholder={`Longitude, Latidude\nLongitude, Latitude\n...`} autoSize={{ maxRows: 10 }} defaultValue={textValue} />
     );
 };
 
@@ -144,17 +132,20 @@ export type AoiEditorProps = {
 } & FormFieldState<AoiValue>;
 
 export const AoiEditor = (props: AoiEditorProps) => {
-    const { value, onChange, supportedGeometries } = props;
+    const { value, supportedGeometries } = props;
 
-    let [geometryValue, setGeometryValue ] = useState<Partial<Geometry> | undefined>(value ? value.geometry : undefined);
+    const [geometryValue, setGeometryValue] = useState<Partial<Geometry> | undefined>(value ? value.geometry : undefined);
 
     useEffect(() => {
         setGeometryValue(value ? value.geometry : undefined);
     }, [value]);
 
-
-    let selectOptions = supportedGeometries.map((geometryType) => {
-        return <Select.Option key={geometryType} value={geometryType}>{geometryType}</Select.Option>;
+    const selectOptions = supportedGeometries.map((geometryType) => {
+        return (
+            <Select.Option key={geometryType} value={geometryType}>
+                {geometryType}
+            </Select.Option>
+        );
     });
 
     let editor: React.ReactNode | null = null;
@@ -164,31 +155,47 @@ export const AoiEditor = (props: AoiEditorProps) => {
     if (geometryValue) {
         switch (geometryValue.type) {
             case 'Point':
-                editor = <PointEditor
-                    value={geometryValue.coordinates}
-                    onChange={(value) => setGeometryValue({
-                        type: 'Point',
-                        coordinates: value
-                    })}/>;
+                editor = (
+                    <PointEditor
+                        value={geometryValue.coordinates}
+                        onChange={(value) =>
+                            setGeometryValue({
+                                type: 'Point',
+                                coordinates: value
+                            })
+                        }
+                    />
+                );
                 geometryValid = geometryValue.coordinates !== undefined;
                 break;
             case 'BBox':
-                editor = <BBoxEditor
-                    value={geometryValue.bbox}
-                    onChange={(value) => setGeometryValue({
-                        type: 'BBox',
-                        bbox: value as GeoJSON.BBox | undefined
-                    })}/>;
+                editor = (
+                    <BBoxEditor
+                        value={geometryValue.bbox}
+                        onChange={(value) =>
+                            setGeometryValue({
+                                type: 'BBox',
+                                bbox: value as GeoJSON.BBox | undefined
+                            })
+                        }
+                    />
+                );
                 geometryValid = geometryValue.bbox !== undefined;
                 break;
             case 'Polygon':
-                editor = <PolygonEditor
-                    value={geometryValue.coordinates}
-                    onChange={(value) => setGeometryValue({
-                        type: 'Polygon',
-                        coordinates: value
-                    })}/>;
+                editor = (
+                    <PolygonEditor
+                        value={geometryValue.coordinates}
+                        onChange={(value) =>
+                            setGeometryValue({
+                                type: 'Polygon',
+                                coordinates: value
+                            })
+                        }
+                    />
+                );
                 geometryValid = geometryValue.coordinates !== undefined;
+                break;
             default:
                 break;
         }
@@ -222,12 +229,8 @@ export const AoiEditor = (props: AoiEditorProps) => {
             >
                 {selectOptions}
             </Select>
-            <div>
-                {editor}
-            </div>
-            <Button.Group
-                className='aoi-editor-actions'
-            >
+            <div>{editor}</div>
+            <Button.Group className='aoi-editor-actions'>
                 <Button
                     size='small'
                     type='primary'
@@ -241,7 +244,9 @@ export const AoiEditor = (props: AoiEditorProps) => {
                 >
                     OK
                 </Button>
-                <Button size='small' onClick={() => props.onDone()}>Cancel</Button>
+                <Button size='small' onClick={() => props.onDone()}>
+                    Cancel
+                </Button>
             </Button.Group>
         </div>
     );

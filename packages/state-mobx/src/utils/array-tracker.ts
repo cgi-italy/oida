@@ -8,7 +8,6 @@ export type ArrayTrackerConfig<T, S> = {
 };
 
 export class ArrayTracker<T, S> {
-
     protected stateSubscription_;
     protected trackerConfig_: ArrayTrackerConfig<T, S>;
     protected itemTracker_: Record<string, S> = {};
@@ -16,12 +15,12 @@ export class ArrayTracker<T, S> {
 
     constructor(config: ArrayTrackerConfig<T, S>) {
         this.trackerConfig_ = config;
-        this.idGetter_ = this.trackerConfig_.idGetter || (item => item['id']);
+        this.idGetter_ = this.trackerConfig_.idGetter || ((item) => item['id']);
         this.bindToCollectionState_();
     }
 
     forEachItem(callback: (item: S) => void) {
-        for (let id in this.itemTracker_) {
+        for (const id in this.itemTracker_) {
             callback(this.itemTracker_[id]);
         }
     }
@@ -31,29 +30,31 @@ export class ArrayTracker<T, S> {
     }
 
     protected bindToCollectionState_() {
-        this.stateSubscription_ = observe(this.trackerConfig_.items, (change) => {
-            if (change.type === 'splice') {
-                let idx = change.index;
+        this.stateSubscription_ = observe(
+            this.trackerConfig_.items,
+            (change) => {
+                if (change.type === 'splice') {
+                    let idx = change.index;
 
-                change.removed.forEach((item) => {
-                    this.onItemRemoved_(this.idGetter_(item));
-                });
+                    change.removed.forEach((item) => {
+                        this.onItemRemoved_(this.idGetter_(item));
+                    });
 
-                change.added.forEach((item) => {
-                    this.onItemAdd_(this.idGetter_(item), item, idx++);
-                });
-
-            } else if (change.type === 'update') {
-                let idx = change.index;
-                this.onItemRemoved_(this.idGetter_(change.oldValue));
-                this.onItemAdd_(this.idGetter_(change.newValue), change.newValue, idx);
-            }
-        }, true);
-
+                    change.added.forEach((item) => {
+                        this.onItemAdd_(this.idGetter_(item), item, idx++);
+                    });
+                } else if (change.type === 'update') {
+                    const idx = change.index;
+                    this.onItemRemoved_(this.idGetter_(change.oldValue));
+                    this.onItemAdd_(this.idGetter_(change.newValue), change.newValue, idx);
+                }
+            },
+            true
+        );
     }
 
     protected unbindFromCollectionState_() {
-        for (let id in this.itemTracker_) {
+        for (const id in this.itemTracker_) {
             this.onItemRemoved_(id);
         }
         this.stateSubscription_();
@@ -64,7 +65,7 @@ export class ArrayTracker<T, S> {
     }
 
     protected onItemRemoved_(id) {
-        let itemTracker = this.itemTracker_[id];
+        const itemTracker = this.itemTracker_[id];
         this.trackerConfig_.onItemRemove(itemTracker);
         delete this.itemTracker_[id];
     }

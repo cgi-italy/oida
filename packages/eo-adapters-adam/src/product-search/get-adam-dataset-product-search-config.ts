@@ -1,5 +1,5 @@
 import { AxiosInstanceWithCancellation } from '@oidajs/core';
-import { DatasetProductSearchConfig } from  '@oidajs/eo-mobx';
+import { DatasetProductSearchConfig } from '@oidajs/eo-mobx';
 
 import { AdamDatasetConfig, isMultiBandCoverage } from '../adam-dataset-config';
 import { AdamOpenSearchClient } from '../common';
@@ -14,10 +14,8 @@ export const getAdamDatasetProductSearchConfig = (
     datasetConfig: AdamDatasetConfig,
     openSearchClient?: AdamOpenSearchClient
 ) => {
-
     let wcsPreviewConfig: AdamWcsPreviewConfig;
     if (isMultiBandCoverage(datasetConfig.coverages)) {
-
         wcsPreviewConfig = {
             serviceUrl: factoryConfig.wcsServiceUrl,
             coverageId: datasetConfig.coverages.wcsCoverage,
@@ -43,20 +41,21 @@ export const getAdamDatasetProductSearchConfig = (
         };
     }
 
-    let searchConfig: DatasetProductSearchConfig = {
-        searchProvider: openSearchClient ? new AdamOpenSearchProductSearchProvider({
-            datasetId: datasetConfig.id,
-            openSearchClient: openSearchClient
-        }) : new AdamCswProductSearchProvider({
-            collectionId: datasetConfig.id,
-            serviceUrl: factoryConfig.cswServiceUrl,
-            wcsPreview: wcsPreviewConfig,
-            axiosInstance: axiosInstance,
-            extentOffset: datasetConfig.requestExtentOffset
-        }),
+    const searchConfig: DatasetProductSearchConfig = {
+        searchProvider: openSearchClient
+            ? new AdamOpenSearchProductSearchProvider({
+                  datasetId: datasetConfig.id,
+                  openSearchClient: openSearchClient
+              })
+            : new AdamCswProductSearchProvider({
+                  collectionId: datasetConfig.id,
+                  serviceUrl: factoryConfig.cswServiceUrl,
+                  wcsPreview: wcsPreviewConfig,
+                  axiosInstance: axiosInstance,
+                  extentOffset: datasetConfig.requestExtentOffset
+              }),
         searchItemContent: datasetConfig.productSearchRecordContent || factoryConfig.productSearchRecordContent
     };
 
     return searchConfig;
-
 };

@@ -10,7 +10,6 @@ import { DatasetProcessing } from './dataset-processing';
 import { analysisPlaceHolderIcon } from './analysis-placeholder-icon';
 
 const defaultAnalysisStyleGetter = (processing: DatasetProcessing<any>): IFeatureStyle | IFeatureStyle[] => {
-
     if (processing.style) {
         return processing.style;
     }
@@ -55,12 +54,11 @@ const defaultAnalysisStyleGetter = (processing: DatasetProcessing<any>): IFeatur
 };
 
 export type DatasetAnalyticsProps = {
-    analysisGeometryStyle?: FeatureStyleGetter<DatasetProcessing<any>>
+    analysisGeometryStyle?: FeatureStyleGetter<DatasetProcessing<any>>;
     active?: boolean;
 };
 
 export class DatasetAnalytics {
-
     @observable.ref active: boolean;
     geometryLayer: FeatureLayer<DatasetProcessing<any>>;
     analyses: ObservableMap<string, DatasetAnalysis>;
@@ -72,7 +70,6 @@ export class DatasetAnalytics {
     protected analysisTrackers_: Map<string, ArrayTracker<DatasetProcessing<any>, DatasetProcessing<any>>>;
 
     constructor(props?: DatasetAnalyticsProps) {
-
         this.active = props?.active || false;
 
         this.items_ = observable.array([], {
@@ -87,7 +84,7 @@ export class DatasetAnalytics {
             id: 'analysis-geometry',
             source: this.items_,
             config: {
-                geometryGetter: (processing => processing.geometry),
+                geometryGetter: (processing) => processing.geometry,
                 styleGetter: props?.analysisGeometryStyle || defaultAnalysisStyleGetter,
                 onFeatureHover: (feature, coord) => {
                     feature.onGeometryHover(coord);
@@ -112,7 +109,7 @@ export class DatasetAnalytics {
             // add all associated processing to the items array for geometry map visualization
             const tracker = new ArrayTracker({
                 items: analysis.processings,
-                idGetter: item => item.id,
+                idGetter: (item) => item.id,
                 onItemAdd: (item) => {
                     this.items_.push(item);
                     return item;
@@ -123,7 +120,6 @@ export class DatasetAnalytics {
             });
 
             this.analysisTrackers_.set(analysis.id, tracker);
-
         }
     }
 
@@ -136,5 +132,4 @@ export class DatasetAnalytics {
         this.analyses.delete(analysis.id);
         analysis.dispose();
     }
-
 }

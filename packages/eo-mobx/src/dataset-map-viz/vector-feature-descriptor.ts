@@ -2,8 +2,8 @@
  * The feature property formatter output types. Can be extended through declaration merging (e.g. for jsx output)
  */
 export interface VectorFeaturePropertyFormatterOutputTypes {
-    'string': string;
-    'undefined': undefined;
+    string: string;
+    undefined: undefined;
 }
 
 /**
@@ -12,16 +12,17 @@ export interface VectorFeaturePropertyFormatterOutputTypes {
  * @param idx When the feature property is an array of values, the item index will be passed to the formatter function
  * @return The formatted value (typically as a string). If undefined the property will not be displayed
  */
-export type VectorFeaturePropertyFormatter<TYPE extends keyof FeaturePropertyValueTypes = keyof FeaturePropertyValueTypes> =
-(value: FeaturePropertyValueTypes[TYPE], idx?: number)
-    => VectorFeaturePropertyFormatterOutputTypes[keyof VectorFeaturePropertyFormatterOutputTypes];
+export type VectorFeaturePropertyFormatter<TYPE extends keyof FeaturePropertyValueTypes = keyof FeaturePropertyValueTypes> = (
+    value: FeaturePropertyValueTypes[TYPE],
+    idx?: number
+) => VectorFeaturePropertyFormatterOutputTypes[keyof VectorFeaturePropertyFormatterOutputTypes];
 
 /**
  * The feature property parser type
  */
-export type VectorFeaturePropertyParser<TYPE extends keyof FeaturePropertyValueTypes = keyof FeaturePropertyValueTypes> =
-    (value: any) => FeaturePropertyValueTypes[TYPE];
-
+export type VectorFeaturePropertyParser<TYPE extends keyof FeaturePropertyValueTypes = keyof FeaturePropertyValueTypes> = (
+    value: any
+) => FeaturePropertyValueTypes[TYPE];
 
 /**
  * Base feature property descriptor type
@@ -51,13 +52,13 @@ export type FeaturePropertyDescriptorCommon<TYPE extends keyof FeaturePropertyVa
      * A function used to extract the value from the feature properties object. If not provided the assumption is that
      * the property id can be used to index the value from the feature properties (i.e. value = properties[id])
      */
-    valueExtractor?: (properties: VectorFeatureProperties) => FeaturePropertyValueTypes[TYPE]
+    valueExtractor?: (properties: VectorFeatureProperties) => FeaturePropertyValueTypes[TYPE];
 };
 
 export const STRING_FEATURE_PROPERTY_TYPE = 'string';
 /** A feature property descriptor for a string type */
 export type StringFeaturePropertyDescriptor = FeaturePropertyDescriptorCommon<typeof STRING_FEATURE_PROPERTY_TYPE> & {
-    subType?: 'url' | 'imageUrl'
+    subType?: 'url' | 'imageUrl';
 };
 
 export const BOOLEAN_FEATURE_PROPERTY_TYPE = 'boolean';
@@ -71,7 +72,7 @@ export type NumericFeaturePropertyDescriptor = FeaturePropertyDescriptorCommon<t
     domain?: {
         min: number;
         max: number;
-    }
+    };
 };
 
 export const ENUM_FEATURE_PROPERTY_TYPE = 'enum';
@@ -90,15 +91,15 @@ export const DATE_FEATURE_PROPERTY_TYPE = 'date';
 export type DateFeaturePropertyDescriptor = FeaturePropertyDescriptorCommon<typeof DATE_FEATURE_PROPERTY_TYPE> & {
     /** An optional range of ammissible values */
     domain?: {
-        min: Date,
-        max: Date,
-    }
+        min: Date;
+        max: Date;
+    };
 };
 
 export const COMPOSITE_FEATURE_PROPERTY_TYPE = 'composite';
 /** A feature property descriptor for a composite type (i.e. an object of properties) */
 export type CompositeFeaturePropertyDescriptor = FeaturePropertyDescriptorCommon<typeof COMPOSITE_FEATURE_PROPERTY_TYPE> & {
-    properties: VectorFeaturePropertyDescriptor[]
+    properties: VectorFeaturePropertyDescriptor[];
 };
 
 /** The property value type for each descriptor */
@@ -109,15 +110,20 @@ export interface FeaturePropertyValueTypes {
     [ENUM_FEATURE_PROPERTY_TYPE]: string | number;
     [DATE_FEATURE_PROPERTY_TYPE]: Date;
     [COMPOSITE_FEATURE_PROPERTY_TYPE]: {
-        [key: string]: FeaturePropertyValueTypes[keyof FeaturePropertyValueTypes]
+        [key: string]: FeaturePropertyValueTypes[keyof FeaturePropertyValueTypes];
     };
 }
 
 /**
  * The feature property descriptor type
  */
-export type VectorFeaturePropertyDescriptor = StringFeaturePropertyDescriptor | BooleanFeaturePropertyDescriptor
-    | NumericFeaturePropertyDescriptor | EnumFeaturePropertyDescriptor | DateFeaturePropertyDescriptor | CompositeFeaturePropertyDescriptor;
+export type VectorFeaturePropertyDescriptor =
+    | StringFeaturePropertyDescriptor
+    | BooleanFeaturePropertyDescriptor
+    | NumericFeaturePropertyDescriptor
+    | EnumFeaturePropertyDescriptor
+    | DateFeaturePropertyDescriptor
+    | CompositeFeaturePropertyDescriptor;
 
 /**
  * The feature descriptor type. Defines the schema of a vector feature
@@ -126,7 +132,7 @@ export type VectorFeatureDescriptor = {
     typeName: string;
     title?: string;
     description?: string;
-    properties: VectorFeaturePropertyDescriptor[]
+    properties: VectorFeaturePropertyDescriptor[];
 };
 
 export type FeaturePropertyValueType = FeaturePropertyValueTypes[keyof FeaturePropertyValueTypes];

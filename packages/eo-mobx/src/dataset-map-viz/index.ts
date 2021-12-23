@@ -19,7 +19,6 @@ declare module '../common/dataset-viz' {
         [VOLUMETRIC_VIZ_TYPE]: DatasetVolumetricViz;
         [VECTOR_VIZ_TYPE]: DatasetVectorMapViz;
     }
-
 }
 
 DatasetViz.register(RASTER_VIZ_TYPE, RasterMapViz);

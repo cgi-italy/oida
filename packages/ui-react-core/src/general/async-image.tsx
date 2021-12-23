@@ -31,7 +31,6 @@ export type AsyncImageProps = {
  * @param props the component properties
  */
 export const AsyncImage = (props: AsyncImageProps) => {
-
     const [imageUrl, setImageUrl] = useState<string>();
     const [loadingState, setLoadingState] = useState<LoadingState>(LoadingState.Init);
 
@@ -42,7 +41,6 @@ export const AsyncImage = (props: AsyncImageProps) => {
     };
 
     useEffect(() => {
-
         let canUpdateOnPromiseResolve = true;
 
         // to prevent flickering avoid showing a loading indicator when image resolve immediatly (e.g cached or datauri)
@@ -55,7 +53,7 @@ export const AsyncImage = (props: AsyncImageProps) => {
             }, 0);
         };
 
-        if (typeof(props.imageUrl) === 'string') {
+        if (typeof props.imageUrl === 'string') {
             if (props.imageUrl !== imageUrl) {
                 showLoadingIndicator();
                 setImageUrl(props.imageUrl);
@@ -65,22 +63,24 @@ export const AsyncImage = (props: AsyncImageProps) => {
             }
         } else {
             showLoadingIndicator();
-            props.imageUrl.then((url) => {
-                if (canUpdateOnPromiseResolve) {
-                    if (url !== imageUrl) {
-                        showLoadingIndicator();
-                        setImageUrl(url);
-                    } else {
-                        cancelLoadingIndicator();
-                        setLoadingState(LoadingState.Success);
+            props.imageUrl
+                .then((url) => {
+                    if (canUpdateOnPromiseResolve) {
+                        if (url !== imageUrl) {
+                            showLoadingIndicator();
+                            setImageUrl(url);
+                        } else {
+                            cancelLoadingIndicator();
+                            setLoadingState(LoadingState.Success);
+                        }
                     }
-                }
-            }).catch(() => {
-                if (canUpdateOnPromiseResolve) {
-                    cancelLoadingIndicator();
-                    setLoadingState(LoadingState.Error);
-                }
-            });
+                })
+                .catch(() => {
+                    if (canUpdateOnPromiseResolve) {
+                        cancelLoadingIndicator();
+                        setLoadingState(LoadingState.Error);
+                    }
+                });
         }
 
         return () => {
@@ -90,12 +90,12 @@ export const AsyncImage = (props: AsyncImageProps) => {
 
     return (
         <React.Fragment>
-            {imageUrl &&
+            {imageUrl && (
                 <img
                     loading={props.eager ? 'eager' : 'lazy'}
                     src={imageUrl}
                     // in order for lazy loading to work the image cannot be hidden. We set its size to 0 instead
-                    style={loadingState !== LoadingState.Success ? {height: 0, width: 0} : undefined}
+                    style={loadingState !== LoadingState.Success ? { height: 0, width: 0 } : undefined}
                     onLoad={() => {
                         cancelLoadingIndicator();
                         setLoadingState(LoadingState.Success);
@@ -105,7 +105,7 @@ export const AsyncImage = (props: AsyncImageProps) => {
                         setLoadingState(LoadingState.Error);
                     }}
                 />
-            }
+            )}
             {loadingState === LoadingState.Loading && props.loadingContent}
             {loadingState === LoadingState.Error && props.errorContent}
         </React.Fragment>

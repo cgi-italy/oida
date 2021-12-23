@@ -12,7 +12,7 @@ export type NumberFormatOptions = {
 };
 
 export const formatNumber = (value: number | string, options?: NumberFormatOptions) => {
-    if (typeof(value) === 'string') {
+    if (typeof value === 'string') {
         try {
             value = parseFloat(value);
         } catch (e) {
@@ -20,13 +20,13 @@ export const formatNumber = (value: number | string, options?: NumberFormatOptio
         }
     }
     let formattedValue = value.toString();
-    if (typeof(options?.maxLength) === 'number') {
+    if (typeof options?.maxLength === 'number') {
         if (formattedValue.length > options.maxLength) {
             formattedValue = value.toPrecision(options.maxLength);
         }
     }
-    if (typeof(options?.precision) === 'number') {
-        if (/e[\+\-]?[0-9]+/.test(formattedValue)) {
+    if (typeof options?.precision === 'number') {
+        if (/e[+-]?[0-9]+/.test(formattedValue)) {
             formattedValue = value.toExponential(options.precision);
         } else {
             const fractionalString = formattedValue.split('.')[1];

@@ -8,39 +8,41 @@ import { FormFieldRendererBaseProps } from '@oidajs/ui-react-core';
 
 import { antdFormFieldRendererFactory } from './antd-form-field-renderer-factory';
 
-
 const Option = Select.Option;
 
 export const SelectEnumRenderer = (
     props: FormFieldRendererBaseProps<EnumField> & Omit<SelectProps<string | string[]>, 'onChange' | 'value'>
 ) => {
-
-    const {value, onChange, title, required, config, autoFocus, ...renderProps} = props;
+    const { value, onChange, title, required, config, autoFocus, ...renderProps } = props;
 
     const [options, setOptions] = useState<JSX.Element[]>([]);
     const [isLoading, setIsLoading] = useState(false);
 
     const onSelectChange = (value) => {
         if (value === undefined || (Array.isArray(value) && !value.length)) {
-            props.onChange(undefined);
+            onChange(undefined);
         } else {
-            props.onChange(value);
+            onChange(value);
         }
     };
 
     const getOptions = (choices: EnumChoice[]) => {
         return choices.map((choice) => {
-            return <Option key={choice.value} value={choice.value}>{choice.name}</Option>;
+            return (
+                <Option key={choice.value} value={choice.value}>
+                    {choice.name}
+                </Option>
+            );
         });
     };
 
     useEffect(() => {
-        if (Array.isArray(props.config.choices)) {
-            setOptions(getOptions(props.config.choices));
+        if (Array.isArray(config.choices)) {
+            setOptions(getOptions(config.choices));
         } else {
             let isComponentMounted = true;
             setIsLoading(true);
-            let choicesRequest = props.config.choices().then((choices) => {
+            config.choices().then((choices) => {
                 if (isComponentMounted) {
                     setOptions(getOptions(choices));
                     setIsLoading(false);
@@ -51,17 +53,17 @@ export const SelectEnumRenderer = (
                 isComponentMounted = false;
             };
         }
-    }, [props.config.choices]);
-
+    }, [config.choices]);
 
     return (
         <Select
-            style={{minWidth: '150px', width: '100%'}}
-            value={props.value}
+            style={{ minWidth: '150px', width: '100%' }}
+            value={value}
             onChange={onSelectChange}
-            allowClear={!props.required}
-            mode={props.config.multiple ? 'multiple' : undefined}
+            allowClear={!required}
+            mode={config.multiple ? 'multiple' : undefined}
             loading={isLoading}
+            autoFocus={autoFocus}
             {...renderProps}
         >
             {options}
@@ -69,7 +71,4 @@ export const SelectEnumRenderer = (
     );
 };
 
-antdFormFieldRendererFactory.register<EnumField>(
-    ENUM_FIELD_ID, 'select',
-    SelectEnumRenderer
-);
+antdFormFieldRendererFactory.register<EnumField>(ENUM_FIELD_ID, 'select', SelectEnumRenderer);

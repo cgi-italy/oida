@@ -5,9 +5,8 @@ export type MapRendererOptions = Record<string, any>;
 
 export type MapRendererProps = {
     id: string;
-    options?: MapRendererOptions
+    options?: MapRendererOptions;
 };
-
 
 export class MapRenderer {
     id: string;

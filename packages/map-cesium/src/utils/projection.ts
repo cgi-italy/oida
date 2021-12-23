@@ -8,8 +8,7 @@ export enum ProjectionType {
 }
 
 export const getProjectionType = (srs: string) => {
-
-    let projection : ProjectionType;
+    let projection: ProjectionType;
 
     switch (srs) {
         case 'EPSG:3785':
@@ -32,8 +31,7 @@ export const getProjectionType = (srs: string) => {
 };
 
 export const getProjectionFromSRS = (srs: string, defaultGeographic = false) => {
-
-    let projection = getProjectionType(srs);
+    const projection = getProjectionType(srs);
 
     if (projection === ProjectionType.GlobalGeodetic) {
         return new GeographicProjection();

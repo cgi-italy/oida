@@ -23,7 +23,7 @@ const getGeotiffSrs = (image) => {
     const imageSrs: number = image.geoKeys.ProjectedCSTypeGeoKey || image.geoKeys.GeographicTypeGeoKey;
     if (imageSrs) {
         if (imageSrs < 32767) {
-            return  `EPSG:${imageSrs}`;
+            return `EPSG:${imageSrs}`;
         } else {
             return undefined;
         }
@@ -34,11 +34,14 @@ const getGeotiffSrs = (image) => {
 
 const registerSrs = (code: string) => {
     if (!proj4.defs(code)) {
-        return srsDefProvider.getSrsDefinition(code).then((srsDef) => {
-            proj4.defs(code, srsDef);
-        }).then(() => {
-            return true;
-        });
+        return srsDefProvider
+            .getSrsDefinition(code)
+            .then((srsDef) => {
+                proj4.defs(code, srsDef);
+            })
+            .then(() => {
+                return true;
+            });
     } else {
         return Promise.resolve(false);
     }
@@ -52,7 +55,7 @@ const transformExtent = (extent: number[], sourceSrs: string, destSrs: string): 
 };
 
 const getGeotiffExtent = (image, outputSrs?: string) => {
-    let imageExtent: number[] = image.getBoundingBox();
+    const imageExtent: number[] = image.getBoundingBox();
     if (outputSrs) {
         const imageSrs = getGeotiffSrs(image);
         if (imageSrs && imageSrs !== outputSrs) {
@@ -65,13 +68,11 @@ const getGeotiffExtent = (image, outputSrs?: string) => {
     return Promise.resolve(imageExtent);
 };
 
-
 export const getAdamDatasetSpatialCoverageProvider = (
     axiosInstance: AxiosInstanceWithCancellation,
     factoryConfig: AdamDatasetFactoryConfig,
     datasetConfig: AdamDatasetConfig
 ) => {
-
     if (datasetConfig.srsDef) {
         proj4.defs(datasetConfig.coverageSrs, datasetConfig.srsDef);
         register(proj4);
@@ -83,14 +84,12 @@ export const getAdamDatasetSpatialCoverageProvider = (
     }
 
     return ((mapView: DatasetViz<any>, keepDatasetSrs?: boolean) => {
-
         if (mapView instanceof RasterMapViz) {
-
             if (datasetConfig.minZoomLevel || datasetConfig.aoiRequired) {
                 return Promise.resolve(keepDatasetSrs ? datasetConfig.coverageExtent : geogCoverageExtent);
             }
 
-            let wcsParams: any = {
+            const wcsParams: any = {
                 service: 'WCS',
                 request: 'GetCoverage',
                 version: '2.0.0',
@@ -101,7 +100,7 @@ export const getAdamDatasetSpatialCoverageProvider = (
             const subsets: string[] = [];
 
             if (!datasetConfig.timeless) {
-                let timeSubset = getWcsTimeFilterSubset(mapView.dataset.toi);
+                const timeSubset = getWcsTimeFilterSubset(mapView.dataset.toi);
                 if (timeSubset) {
                     subsets.push(timeSubset);
                 }
@@ -118,48 +117,54 @@ export const getAdamDatasetSpatialCoverageProvider = (
             }
             subsets.push(...wcsCoverage.dimensionSubsets);
 
+            return axiosInstance
+                .cancelableRequest({
+                    url: factoryConfig.wcsServiceUrl,
+                    params: {
+                        ...wcsParams,
+                        coverageId: wcsCoverage.coverageId,
+                        subdataset: wcsCoverage.subdataset,
+                        subset: subsets
+                    },
+                    paramsSerializer: AdamServiceParamsSerializer,
+                    responseType: 'arraybuffer'
+                })
+                .then((response) => {
+                    return fromArrayBuffer(response.data)
+                        .then((tiff) => {
+                            return tiff
+                                .getImage()
+                                .then((image) => {
+                                    return getGeotiffExtent(image, datasetConfig.coverageSrs).then((extent) => {
+                                        if (!keepDatasetSrs && datasetConfig.coverageSrs !== 'EPSG:4326') {
+                                            extent = transformExtent(extent, datasetConfig.coverageSrs, 'EPSG:4326');
+                                            extent = getIntersection(extent, geogCoverageExtent);
+                                        } else {
+                                            extent = getIntersection(extent, datasetConfig.coverageExtent);
+                                        }
 
-            return axiosInstance.cancelableRequest({
-                url: factoryConfig.wcsServiceUrl,
-                params: {
-                    ...wcsParams,
-                    coverageId: wcsCoverage.coverageId,
-                    subdataset: wcsCoverage.subdataset,
-                    subset: subsets
-                },
-                paramsSerializer: AdamServiceParamsSerializer,
-                responseType: 'arraybuffer'
-            }).then((response) => {
-                return fromArrayBuffer(response.data).then((tiff) => {
-                    return tiff.getImage().then((image) => {
-                        return getGeotiffExtent(image, datasetConfig.coverageSrs).then((extent) => {
-                            if (!keepDatasetSrs && datasetConfig.coverageSrs !== 'EPSG:4326') {
-                                extent = transformExtent(extent, datasetConfig.coverageSrs, 'EPSG:4326');
-                                extent = getIntersection(extent, geogCoverageExtent);
-                            } else {
-                                extent = getIntersection(extent, datasetConfig.coverageExtent);
-                            }
-
-                            if (datasetConfig.requestExtentOffset) {
-                                extent[0] -= datasetConfig.requestExtentOffset[0];
-                                extent[2] -= datasetConfig.requestExtentOffset[0];
-                                extent[1] -= datasetConfig.requestExtentOffset[1];
-                                extent[3] -= datasetConfig.requestExtentOffset[1];
-                            }
-                            return extent;
+                                        if (datasetConfig.requestExtentOffset) {
+                                            extent[0] -= datasetConfig.requestExtentOffset[0];
+                                            extent[2] -= datasetConfig.requestExtentOffset[0];
+                                            extent[1] -= datasetConfig.requestExtentOffset[1];
+                                            extent[3] -= datasetConfig.requestExtentOffset[1];
+                                        }
+                                        return extent;
+                                    });
+                                })
+                                .catch((error) => {
+                                    return Promise.resolve(keepDatasetSrs ? datasetConfig.coverageExtent : geogCoverageExtent);
+                                });
+                        })
+                        .catch((error) => {
+                            return Promise.resolve(keepDatasetSrs ? datasetConfig.coverageExtent : geogCoverageExtent);
                         });
-                    }).catch((error) => {
-                        return Promise.resolve(keepDatasetSrs ? datasetConfig.coverageExtent : geogCoverageExtent);
-                    });
-                }).catch((error) => {
+                })
+                .catch(() => {
                     return Promise.resolve(keepDatasetSrs ? datasetConfig.coverageExtent : geogCoverageExtent);
                 });
-            }).catch(() => {
-                return Promise.resolve(keepDatasetSrs ? datasetConfig.coverageExtent : geogCoverageExtent);
-            });
         } else {
             return Promise.resolve(keepDatasetSrs ? datasetConfig.coverageExtent : geogCoverageExtent);
         }
     }) as AdamSpatialCoverageProvider;
-
 };

@@ -25,7 +25,8 @@
   },
   "dependencies": {
     "@oidajs/map-cesium": "file:../map-cesium",
-    "@oidajs/map-ol": "file:../map-ol"
+    "@oidajs/map-ol": "file:../map-ol",
+    "tslib": "^2.3.1"
   },
   "peerDependencies": {
     "cesium": "^1.86.0",

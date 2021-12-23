@@ -3,7 +3,7 @@ import { observable, makeObservable, computed, IObservableArray, action } from '
 export type TimeDistributionItemProps<T> = {
     start: Date;
     end?: Date;
-    data?: T
+    data?: T;
 };
 
 export class TimeDistributionItem<T> {
@@ -20,18 +20,18 @@ export class TimeDistributionItem<T> {
 
     @computed
     get isRange() {
-        return this.end !== undefined && (this.start.getTime() < this.end.getTime());
+        return this.end !== undefined && this.start.getTime() < this.end.getTime();
     }
 
     @computed
     get isoString() {
-        let itemString = `${this.start.toISOString()}`;
+        const itemString = `${this.start.toISOString()}`;
         return this.isRange ? `${itemString}/${this.end!.toISOString()}` : itemString;
     }
 }
 
 export type TimeDistributionProps<T> = {
-    items?: (TimeDistributionItem<T> | TimeDistributionItemProps<T>)[]
+    items?: (TimeDistributionItem<T> | TimeDistributionItemProps<T>)[];
 };
 
 export class TimeDistribution<T> {
@@ -47,12 +47,14 @@ export class TimeDistribution<T> {
 
     @action
     setItems(items: (TimeDistributionItem<T> | TimeDistributionItemProps<T>)[]) {
-        this.items.replace(items.map((item) => {
-            if (item instanceof TimeDistributionItem) {
-                return item;
-            } else {
-                return new TimeDistributionItem(item);
-            }
-        }));
+        this.items.replace(
+            items.map((item) => {
+                if (item instanceof TimeDistributionItem) {
+                    return item;
+                } else {
+                    return new TimeDistributionItem(item);
+                }
+            })
+        );
     }
 }

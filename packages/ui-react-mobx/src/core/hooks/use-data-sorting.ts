@@ -9,11 +9,9 @@ export type DataSortingProps = {
 };
 
 export const useDataSorting = (props: DataSortingProps) => {
-
-    const {sortableFields, sortingState} = props;
+    const { sortableFields, sortingState } = props;
 
     return useSelector(() => {
-
         if (!sortingState) {
             return;
         }

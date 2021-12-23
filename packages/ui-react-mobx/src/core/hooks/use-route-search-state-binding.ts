@@ -3,7 +3,6 @@ import { useHistory, useLocation } from 'react-router';
 
 import { useSelector } from './use-selector';
 
-
 type RouteSearchStateBindingProps = {
     updateState: (queryString: string | undefined) => void;
     stateQueryStringSelector: () => string | undefined;
@@ -11,7 +10,7 @@ type RouteSearchStateBindingProps = {
 
 export const useRouteSearchStateBinding = (props: RouteSearchStateBindingProps) => {
     const history = useHistory();
-    const location = useLocation<{updateLocationFromState: boolean}>();
+    const location = useLocation<{ updateLocationFromState: boolean }>();
 
     const [updateMode, setUpdateMode] = useState<'replaceLocation' | 'pushLocation' | 'updateState' | undefined>(
         location.state?.updateLocationFromState ? 'replaceLocation' : 'updateState'
@@ -26,7 +25,6 @@ export const useRouteSearchStateBinding = (props: RouteSearchStateBindingProps) 
                 props.updateState(window.location.search);
             } else {
                 if (stateQuery !== window.location.search.substr(1)) {
-                    let updatedPath: string;
                     if (updateMode === 'pushLocation') {
                         history.push(`${window.location.pathname}?${stateQuery}`, {
                             updateLocationFromState: true
@@ -53,5 +51,4 @@ export const useRouteSearchStateBinding = (props: RouteSearchStateBindingProps) 
             setUpdateMode('pushLocation');
         }
     }, [stateQuery]);
-
 };

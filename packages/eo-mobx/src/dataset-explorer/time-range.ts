@@ -44,7 +44,6 @@ export class TimeRange {
 
     @action
     setValue(start: Date, end: Date, animate?: boolean) {
-
         if (start.getTime() > end.getTime()) {
             return;
         }
@@ -81,9 +80,9 @@ export class TimeRange {
                 return;
             }
         }
-        let rangeSize = end.getTime() - start.getTime();
-        let timeMargin = rangeSize * (options?.margin !== undefined ? options.margin : 0.2);
-        this.setValue(new Date(start.getTime() - timeMargin),  new Date(end.getTime() + timeMargin), options?.animate);
+        const rangeSize = end.getTime() - start.getTime();
+        const timeMargin = rangeSize * (options?.margin !== undefined ? options.margin : 0.2);
+        this.setValue(new Date(start.getTime() - timeMargin), new Date(end.getTime() + timeMargin), options?.animate);
     }
 
     @action
@@ -91,19 +90,18 @@ export class TimeRange {
         if (options?.notIfVisible && dt >= this.start && dt <= this.end) {
             return;
         }
-        let halfRangeSize = (this.end.getTime() - this.start.getTime()) / 2;
+        const halfRangeSize = (this.end.getTime() - this.start.getTime()) / 2;
         this.setValue(new Date(dt.getTime() - halfRangeSize), new Date(dt.getTime() + halfRangeSize), options?.animate);
     }
 
     protected animateRange_(nextStart: Date, nextEnd: Date) {
-
-        let duration = 1000;
+        const duration = 1000;
         let elapsed = 0;
 
-        let prevStart = this.start.getTime();
-        let startOffset = nextStart.getTime() - prevStart;
-        let prevEnd = this.end.getTime();
-        let endOffset = nextEnd.getTime() - prevEnd;
+        const prevStart = this.start.getTime();
+        const startOffset = nextStart.getTime() - prevStart;
+        const prevEnd = this.end.getTime();
+        const endOffset = nextEnd.getTime() - prevEnd;
 
         let lastFrameTS = performance.now();
 
@@ -113,7 +111,7 @@ export class TimeRange {
 
             if (elapsed < duration) {
                 runInAction(() => {
-                    this.start =  new Date(prevStart + easeOut(elapsed / duration) * startOffset);
+                    this.start = new Date(prevStart + easeOut(elapsed / duration) * startOffset);
                     this.end = new Date(prevEnd + easeOut(elapsed / duration) * endOffset);
                 });
                 this.nextRangeAnimationFrame_ = requestAnimationFrame(updateRange);
@@ -127,6 +125,5 @@ export class TimeRange {
         };
 
         updateRange(lastFrameTS);
-
     }
 }

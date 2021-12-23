@@ -13,7 +13,6 @@ export type AdamOpensearchDatasetDiscoveryProviderItemProps = {
 };
 
 export class AdamOpensearchDatasetDiscoveryProviderItem extends Entity {
-
     metadata: AdamOpensearchDatasetMetadata;
 
     constructor(props: AdamOpensearchDatasetDiscoveryProviderItemProps) {
@@ -40,7 +39,6 @@ export type AdamOpensearchDatasetDiscoveryProviderProps = {
 } & DatasetDiscoveryProviderProps<typeof ADAM_OPENSEARCH_DATASET_DISCOVERY_PROVIDER_TYPE>;
 
 export class AdamOpensearchDatasetDiscoveryProvider extends DatasetDiscoveryProvider<AdamOpensearchDatasetDiscoveryProviderItem> {
-
     readonly criteria: QueryParams;
     readonly searchClient: AdamOpensearchDatasetDiscoveryClient;
     protected datasetFactory_: AdamDatasetFactory;
@@ -88,26 +86,34 @@ export class AdamOpensearchDatasetDiscoveryProvider extends DatasetDiscoveryProv
     }
 
     protected afterInit_(isStatic?: boolean) {
-
         if (isStatic) {
             const populateResultsOnActivation = () => {
-                when(() => this.active.value, () => {
-                    this.retrieveData_().catch((error) => {
-                        // retry getting results on next activation
-                        when(() => !this.active.value, () => {
-                            populateResultsOnActivation();
+                when(
+                    () => this.active.value,
+                    () => {
+                        this.retrieveData_().catch((error) => {
+                            // retry getting results on next activation
+                            when(
+                                () => !this.active.value,
+                                () => {
+                                    populateResultsOnActivation();
+                                }
+                            );
                         });
-                    });
-                });
+                    }
+                );
             };
 
             populateResultsOnActivation();
 
-            reaction(() => this.criteria.data, () => {
-                if (this.active.value) {
-                    this.retrieveData_();
+            reaction(
+                () => this.criteria.data,
+                () => {
+                    if (this.active.value) {
+                        this.retrieveData_();
+                    }
                 }
-            });
+            );
         } else {
             autorun(() => {
                 if (this.active.value) {

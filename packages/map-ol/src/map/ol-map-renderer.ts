@@ -18,7 +18,6 @@ import 'ol/ol.css';
 export const OL_RENDERER_ID = 'ol';
 
 export class OLMapRenderer implements IMapRenderer {
-
     private viewer_: Map;
     private layerGroup_: OLGroupLayer | undefined;
 
@@ -39,11 +38,10 @@ export class OLMapRenderer implements IMapRenderer {
     }
 
     updateRendererProps(props) {
-
+        return;
     }
 
     fitExtent(extent, animate?: boolean) {
-
         const view = this.viewer_.getView();
         const projection = view.getProjection();
 
@@ -57,7 +55,6 @@ export class OLMapRenderer implements IMapRenderer {
                 center: center
             });
         } else {
-
             if (projection.getCode() !== 'EPSG:4326') {
                 extent = transformExtent(extent, 'EPSG:4326', projection);
                 if (isNaN(extent[0]) || isNaN(extent[1]) || isNaN(extent[2]) || isNaN(extent[3])) {
@@ -71,12 +68,11 @@ export class OLMapRenderer implements IMapRenderer {
     }
 
     getViewportExtent() {
+        const view = this.viewer_.getView();
 
-        let view = this.viewer_.getView();
+        let extent = view.calculateExtent(this.getSize());
 
-        let extent =  view.calculateExtent(this.getSize());
-
-        let projection = view.getProjection();
+        const projection = view.getProjection();
         if (projection.getCode() !== 'EPSG:4326') {
             extent = transformExtent(extent, projection, 'EPSG:4326');
             if (isNaN(extent[0]) || isNaN(extent[1]) || isNaN(extent[2]) || isNaN(extent[3])) {
@@ -119,7 +115,6 @@ export class OLMapRenderer implements IMapRenderer {
     }
 
     private initRenderer_(props: IMapRendererProps) {
-
         register(proj4);
 
         this.viewer_ = new Map({
@@ -131,10 +126,9 @@ export class OLMapRenderer implements IMapRenderer {
 
         if (props.onViewUpdating) {
             this.viewer_.on('movestart', () => {
-
                 props.onViewUpdating!();
 
-                let duringMove = (evt) => {
+                const duringMove = (evt) => {
                     props.onViewUpdating!(this.computeCurrentView_());
                 };
 
@@ -143,7 +137,6 @@ export class OLMapRenderer implements IMapRenderer {
                 this.viewer_.once('moveend', () => {
                     this.viewer_.un('postrender', duringMove);
                 });
-
             });
         }
 
@@ -152,14 +145,13 @@ export class OLMapRenderer implements IMapRenderer {
                 props.onViewUpdated!(this.computeCurrentView_());
             });
         }
-
     }
 
-    private computeCurrentView_() : IMapViewport {
-        let view = this.viewer_.getView();
+    private computeCurrentView_(): IMapViewport {
+        const view = this.viewer_.getView();
         let center = view.getCenter();
-        let resolution = view.getResolution() * view.getProjection().getMetersPerUnit();
-        let rotation = view.getRotation();
+        const resolution = view.getResolution() * view.getProjection().getMetersPerUnit();
+        const rotation = view.getRotation();
 
         if (view.getProjection().getCode() !== 'EPSG:4326') {
             center = transform(center, view.getProjection(), 'EPSG:4326');
@@ -174,7 +166,6 @@ export class OLMapRenderer implements IMapRenderer {
     }
 
     private createViewFromProps_(viewProps: IMapViewport, projProps: IMapProjection) {
-
         if (!proj4.defs(projProps.code)) {
             if (projProps.projDef) {
                 proj4.defs(projProps.code, projProps.projDef);
@@ -184,12 +175,12 @@ export class OLMapRenderer implements IMapRenderer {
             }
         }
 
-        let projection = getProj(projProps.code);
-        let extent = projProps.extent || undefined;
+        const projection = getProj(projProps.code);
+        const extent = projProps.extent || undefined;
         if (extent) {
             projection.setExtent(projProps.extent);
         }
-        let view = new View({
+        const view = new View({
             projection,
             extent
         });
@@ -202,10 +193,9 @@ export class OLMapRenderer implements IMapRenderer {
     }
 
     private updateViewFromProps_(view, viewProps, animate?: boolean) {
+        const projection = view.getProjection();
 
-        let projection = view.getProjection();
-
-        let resolution = viewProps.resolution / projection.getMetersPerUnit();
+        const resolution = viewProps.resolution / projection.getMetersPerUnit();
         let center = viewProps.center.slice();
         if (projection.getCode() !== 'EPSG:4326') {
             center = transform(center, 'EPSG:4326', projection);
@@ -224,5 +214,4 @@ export class OLMapRenderer implements IMapRenderer {
             view.setResolution(resolution);
         }
     }
-
 }

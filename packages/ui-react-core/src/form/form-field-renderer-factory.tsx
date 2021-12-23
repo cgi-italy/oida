@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 import { FormField, FormFieldConfig, FormFieldDefinition } from '@oidajs/core';
@@ -7,18 +6,17 @@ type ExtractType<IT extends FormField<any, any, any>> = IT extends FormField<inf
 type ExtractValue<IT extends FormField<any, any, any>> = IT extends FormField<any, infer T, any> ? T : never;
 type ExtractConfig<IT extends FormField<any, any, any>> = IT extends FormField<any, any, infer CONFIG> ? CONFIG : never;
 
-
 export type FormFieldRendererBaseProps<F extends FormField<any, any, any>> = Omit<F, 'type' | 'name' | 'rendererConfig'>;
 export type FormFieldRenderer<T extends FormField<any, any, any>> = (
     props: FormFieldRendererBaseProps<T> & Record<string, any>
 ) => JSX.Element | null;
 
 export type FormFieldRendererWrapper<T extends FormField<any, any, any>> = (
-    props : Omit<FormFieldRendererBaseProps<T>, 'config'>
-        & {config: FormFieldConfig<ExtractConfig<T>, ExtractValue<T>>}
-        & Record<string, any>
+    props: Omit<FormFieldRendererBaseProps<T>, 'config'> & { config: FormFieldConfig<ExtractConfig<T>, ExtractValue<T>> } & Record<
+            string,
+            any
+        >
 ) => JSX.Element | null;
-
 
 /** Create a new form field renderer factory */
 export const formFieldRendererFactory = () => {
@@ -32,15 +30,14 @@ export const formFieldRendererFactory = () => {
      * @param rendererId A unique identifier for the renderer
      * @param renderer The form field renderer component
      *
-    */
+     */
     const register = <T extends FormField<any, any, any>>(fieldId: ExtractType<T>, rendererId: string, renderer: FormFieldRenderer<T>) => {
         if (!REGISTERED_RENDERERS.has(fieldId)) {
             REGISTERED_RENDERERS.set(fieldId, new Map());
         }
 
-        let renderers = REGISTERED_RENDERERS.get(fieldId);
+        const renderers = REGISTERED_RENDERERS.get(fieldId);
         renderers!.set(rendererId, renderer);
-
     };
 
     /**
@@ -49,9 +46,10 @@ export const formFieldRendererFactory = () => {
      * @param definition The form field definition
      * @returns the renderer id and the registered renderer React component
      **/
-    const getRenderer = <T extends FormField<any, any, any>>
-    (definition: FormFieldDefinition<ExtractType<T>, ExtractValue<T>, ExtractConfig<T>>) => {
-        let renderers = REGISTERED_RENDERERS.get(definition.type);
+    const getRenderer = <T extends FormField<any, any, any>>(
+        definition: FormFieldDefinition<ExtractType<T>, ExtractValue<T>, ExtractConfig<T>>
+    ) => {
+        const renderers = REGISTERED_RENDERERS.get(definition.type);
         if (!renderers) {
             return null;
         }
@@ -66,24 +64,21 @@ export const formFieldRendererFactory = () => {
             return null;
         }
 
-        let FormFieldRenderer =  renderers.get(rendererId)!;
+        let FormFieldRenderer = renderers.get(rendererId)!;
 
-        if (typeof(definition.config) === 'function') {
+        if (typeof definition.config === 'function') {
             //wrap the field renderer to extract the config from the state and pass it to over
-            let Renderer = FormFieldRenderer;
+            const Renderer = FormFieldRenderer;
             FormFieldRenderer = (props) => {
+                const { config, ...renderProps } = props;
 
-                let { config, ...renderProps} = props;
-
-                let fieldConfig = config({
+                const fieldConfig = config({
                     onChange: props.onChange,
                     value: props.value
                 });
 
                 if (fieldConfig) {
-                    return (
-                        <Renderer {...renderProps} config={fieldConfig}/>
-                    );
+                    return <Renderer {...renderProps} config={fieldConfig} />;
                 } else {
                     return null;
                 }

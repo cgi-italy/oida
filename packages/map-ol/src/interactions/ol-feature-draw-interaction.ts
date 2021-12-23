@@ -1,7 +1,6 @@
 import DrawInteraction from 'ol/interaction/Draw';
 import Polygon from 'ol/geom/Polygon';
 import LineString from 'ol/geom/LineString';
-import MultiLineString from 'ol/geom/MultiLineString';
 import GeoJSON from 'ol/format/GeoJSON';
 
 import { createBox } from 'ol/interaction/Draw';
@@ -20,7 +19,6 @@ import { OLMapRenderer } from '../map/ol-map-renderer';
 import { olInteractionsFactory } from './ol-interactions-factory';
 
 export class OLFeatureDrawInteraction implements IFeatureDrawInteractionImplementation {
-
     private viewer_;
     private olInteraction_;
     private geoJsonParser_;
@@ -80,7 +78,6 @@ export class OLFeatureDrawInteraction implements IFeatureDrawInteractionImplemen
 
             if (options.onDrawStart || options.onDrawChange) {
                 this.olInteraction_.on('drawstart', (evt) => {
-
                     if (options.onDrawChange) {
                         evt.feature.getGeometry().on('change', (evt) => {
                             options.onDrawChange!(evt);
@@ -94,9 +91,13 @@ export class OLFeatureDrawInteraction implements IFeatureDrawInteractionImplemen
 
             if (options.onDrawEnd) {
                 this.olInteraction_.on('drawend', (evt) => {
-                    setTimeout(() => options.onDrawEnd!({
-                        geometry: this.getGeoJSONGeometry(mode, evt.feature.getGeometry())
-                    }), 0);
+                    setTimeout(
+                        () =>
+                            options.onDrawEnd!({
+                                geometry: this.getGeoJSONGeometry(mode, evt.feature.getGeometry())
+                            }),
+                        0
+                    );
                 });
             }
         }
@@ -110,10 +111,9 @@ export class OLFeatureDrawInteraction implements IFeatureDrawInteractionImplemen
     }
 
     protected getGeoJSONGeometry(mode, geometry) {
-
         if (mode === FeatureDrawMode.BBox) {
             let extent = geometry.getExtent();
-            let projection = this.viewer_.getView().getProjection();
+            const projection = this.viewer_.getView().getProjection();
             if (projection.getCode() !== 'EPSG:4326') {
                 extent = transformExtent(extent, projection, 'EPSG:4326');
                 if (isNaN(extent[0]) || isNaN(extent[1]) || isNaN(extent[2]) || isNaN(extent[3])) {
@@ -126,7 +126,7 @@ export class OLFeatureDrawInteraction implements IFeatureDrawInteractionImplemen
             };
         } else if (mode === FeatureDrawMode.Circle) {
             let center = geometry.getCenter();
-            let projection = this.viewer_.getView().getProjection();
+            const projection = this.viewer_.getView().getProjection();
             if (projection.getCode() !== 'EPSG:4326') {
                 center = transform(center, projection, 'EPSG:4326');
             }
@@ -145,9 +145,7 @@ export class OLFeatureDrawInteraction implements IFeatureDrawInteractionImplemen
             featureProjection: this.viewer_.getView().getProjection()
         });
     }
-
 }
-
 
 olInteractionsFactory.register(FEATURE_DRAW_INTERACTION_ID, (config) => {
     return new OLFeatureDrawInteraction(config);

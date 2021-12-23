@@ -11,7 +11,7 @@ export type AoiValue = {
         id?: string;
         name?: string;
         fromMapViewport?: boolean;
-    }
+    };
 };
 
 export enum AoiAction {
@@ -25,10 +25,10 @@ export enum AoiAction {
 }
 
 export type AoiSupportedGeometry = {
-    type: GeometryTypes,
+    type: GeometryTypes;
     constraints?: {
-        maxCoords?: number
-    }
+        maxCoords?: number;
+    };
 };
 
 export type AoiFieldConfig<IMPORT_CONFIG = any> = {
@@ -42,24 +42,22 @@ export type AoiFieldConfig<IMPORT_CONFIG = any> = {
         hovered: boolean;
         visible: boolean;
         selected: boolean;
-    }
+    };
     onHoverAction?: (hovered: boolean) => void;
     onSelectAction?: (selected: boolean) => void;
     onVisibleAction?: (visible: boolean) => void;
     onCenterAction?: () => void;
-    importConfig?: IMPORT_CONFIG
+    importConfig?: IMPORT_CONFIG;
 };
 
 export type AoiFieldDefinition<IMPORT_CONFIG = any> = FormFieldDefinition<typeof AOI_FIELD_ID, AoiValue, AoiFieldConfig<IMPORT_CONFIG>>;
 export type AoiField<IMPORT_CONFIG = any> = FormField<typeof AOI_FIELD_ID, AoiValue, AoiFieldConfig<IMPORT_CONFIG>>;
 
-
 setFormFieldSerializer(AOI_FIELD_ID, {
-    toString: (formField, options) => {
+    toString: (formField) => {
         return formField.value?.props?.name || formField.value?.geometry.type || 'unspecified';
     }
 });
-
 
 export type AoiFieldFactoryProps = {
     name: string;
@@ -96,9 +94,9 @@ export const getAoiFieldFactory = () => {
 
 declare module './form-field' {
     interface IFormFieldDefinitions {
-        [AOI_FIELD_ID]:  {
-            type: typeof AOI_FIELD_ID
-         } & AoiFieldDefinition;
+        [AOI_FIELD_ID]: {
+            type: typeof AOI_FIELD_ID;
+        } & AoiFieldDefinition;
     }
 
     interface IFormFieldValueTypes {

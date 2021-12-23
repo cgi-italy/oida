@@ -8,9 +8,8 @@ import { useSelector } from '@oidajs/ui-react-mobx';
 
 import { DatasetVolumetricViewModeSettingsFactory } from './dataset-volumetric-view-mode-settings-factory';
 
-
 export type DatasetVolumetricStackViewSettingsProps = {
-    viewMode: StackVolumeViewMode
+    viewMode: StackVolumeViewMode;
 };
 
 export const DatasetVolumetricStackViewSettings = (props: DatasetVolumetricStackViewSettingsProps) => {
@@ -19,19 +18,11 @@ export const DatasetVolumetricStackViewSettings = (props: DatasetVolumetricStack
     return (
         <div className='dataset-volume-slices-selector dataset-slider-selector'>
             <span>Stack size:</span>
-            <Slider
-                min={4}
-                max={50}
-                step={1}
-                value={numSlices}
-                onChange={(value) => props.viewMode.setNumSlices(value as number)}
-            />
+            <Slider min={4} max={50} step={1} value={numSlices} onChange={(value) => props.viewMode.setNumSlices(value as number)} />
         </div>
     );
-
 };
 
-
 DatasetVolumetricViewModeSettingsFactory.register(STACK_VOLUME_VIEW_ID, (config) => {
-    return <DatasetVolumetricStackViewSettings {...config}/>;
+    return <DatasetVolumetricStackViewSettings {...config} />;
 });

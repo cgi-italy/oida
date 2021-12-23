@@ -6,14 +6,13 @@ import { HasConfig, Config, ConfigProps } from '../mixins';
 import { makeObservable, observable, computed, action } from 'mobx';
 
 export type MapViewConfig = {
-    animateOnChange?: boolean
+    animateOnChange?: boolean;
 };
 
 export type MapViewProps = {
     viewport: MapViewport | MapViewportProps;
     projection?: IMapProjection;
 } & ConfigProps<MapViewConfig>;
-
 
 export class MapView implements HasConfig<MapViewConfig> {
     readonly config: Config<MapViewConfig>;
@@ -59,4 +58,3 @@ export class MapView implements HasConfig<MapViewConfig> {
         return this.target ? [this.target.clientWidth, this.target.clientHeight] : null;
     }
 }
-

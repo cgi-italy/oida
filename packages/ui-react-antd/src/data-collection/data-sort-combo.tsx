@@ -11,24 +11,25 @@ const Option = Select.Option;
 const InputGroup = Input.Group;
 
 export const DataSortCombo = (props: SelectProps<string> & DataSorterProps) => {
-
-    let { sortableFields, sortKey, sortOrder, onSortChange, onSortClear, ...selectProps } = props;
+    const { sortableFields, sortKey, sortOrder, onSortChange, onSortClear, ...selectProps } = props;
 
     const onSelectChange = (value) => {
         if (!value) {
             onSortClear();
         } else {
-            onSortChange({key: value});
+            onSortChange({ key: value });
         }
     };
 
     const switchSortOrder = () => {
-        onSortChange({order: sortOrder === SortOrder.Ascending ? SortOrder.Descending : SortOrder.Ascending});
+        onSortChange({ order: sortOrder === SortOrder.Ascending ? SortOrder.Descending : SortOrder.Ascending });
     };
 
-    let options = sortableFields.map((field) => {
+    const options = sortableFields.map((field) => {
         return (
-            <Option key={field.key} value={field.key}>{field.name}</Option>
+            <Option key={field.key} value={field.key}>
+                {field.name}
+            </Option>
         );
     });
 
@@ -48,10 +49,9 @@ export const DataSortCombo = (props: SelectProps<string> & DataSorterProps) => {
             <Button
                 size={selectProps.size}
                 disabled={!sortKey}
-                icon={sortOrder === SortOrder.Ascending ? <SortAscendingOutlined/> : <SortDescendingOutlined/>}
+                icon={sortOrder === SortOrder.Ascending ? <SortAscendingOutlined /> : <SortDescendingOutlined />}
                 onClick={switchSortOrder}
             ></Button>
         </InputGroup>
     );
 };
-

@@ -4,23 +4,24 @@ import { MapCoordQuantity } from '@oidajs/core';
 
 import { ChoiceSelectorCombo } from '@oidajs/ui-react-antd';
 import {
-    useMapProjectionSelectorFromModule, useFormatSelector, useMapBaseLayerSelectorFromModule, useMapRendererSelectorFromModule
+    useMapProjectionSelectorFromModule,
+    useFormatSelector,
+    useMapBaseLayerSelectorFromModule,
+    useMapRendererSelectorFromModule
 } from '@oidajs/ui-react-mobx';
 
 export const Settings = () => {
-
-    let baseLayerSelectorProps = useMapBaseLayerSelectorFromModule();
-    let projSelectorProps = useMapProjectionSelectorFromModule();
-    let rendererSelectorProps = useMapRendererSelectorFromModule();
-    let formatSelectorProps = useFormatSelector(MapCoordQuantity);
+    const baseLayerSelectorProps = useMapBaseLayerSelectorFromModule();
+    const projSelectorProps = useMapProjectionSelectorFromModule();
+    const rendererSelectorProps = useMapRendererSelectorFromModule();
+    const formatSelectorProps = useFormatSelector(MapCoordQuantity);
 
     return (
         <React.Fragment>
-            <ChoiceSelectorCombo {...baseLayerSelectorProps}/>
-            <ChoiceSelectorCombo {...projSelectorProps}/>
-            <ChoiceSelectorCombo {...rendererSelectorProps}/>
-            <ChoiceSelectorCombo {...formatSelectorProps}/>
+            <ChoiceSelectorCombo {...baseLayerSelectorProps} />
+            <ChoiceSelectorCombo {...projSelectorProps} />
+            <ChoiceSelectorCombo {...rendererSelectorProps} />
+            <ChoiceSelectorCombo {...formatSelectorProps} />
         </React.Fragment>
     );
 };
-

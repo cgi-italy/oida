@@ -4,4 +4,3 @@ import { FormattersModule, DEFAULT_FORMATTERS_MODULE_ID } from '../formatters-mo
 export const useFormattersModule = (id?: string) => {
     return useAppModule(id || DEFAULT_FORMATTERS_MODULE_ID, FormattersModule);
 };
-

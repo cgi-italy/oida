@@ -3,11 +3,10 @@ import Texture from 'cesium/Source/Renderer/Texture';
 
 import destroyObject from 'cesium/Source/Core/destroyObject';
 
-import { VolumeSourceConfig, VolumeTileKey } from '@oidajs/core';
+import { VolumeTileKey } from '@oidajs/core';
 
 import { CesiumVolumeSource } from './cesium-volume-source';
 import { CesiumVolumeTile } from './cesium-volume-tile';
-import { CesiumVolumeTilePrimitive } from './cesium-volume-tile-primitive';
 import { CesiumVolumeView } from './volume-view';
 import { CesiumVolumeTileTexture } from './cesium-volume-tile-texture';
 
@@ -15,22 +14,20 @@ export type CesiumColorMapConfig = {
     range: Cartesian2;
     clamp: boolean;
     noDataValue: number;
-    colorMap: HTMLImageElement | HTMLCanvasElement
+    colorMap: HTMLImageElement | HTMLCanvasElement;
 };
 
 export type CesiumVolumeTileSetConfig = {
     source?: CesiumVolumeSource;
     volumeView?: CesiumVolumeView;
     colorMap?: CesiumColorMapConfig;
-    verticalScale?: number
+    verticalScale?: number;
 };
 
 export class CesiumVolumeTileSet {
-
     protected static colormapShaders_ = CesiumVolumeTileSet.createColorMappingShaders_();
 
     protected static createColorMappingShaders_() {
-
         const colorMappingSource = `
             uniform vec2 mapRange;
             uniform bool clampRange;
@@ -63,10 +60,12 @@ export class CesiumVolumeTileSet {
     protected volumeView_: CesiumVolumeView | undefined;
     protected verticalScale_: number;
 
-    protected colorMap_: (CesiumColorMapConfig & {
-        texture: Texture | undefined,
-        needsUpdate: boolean
-    }) | undefined;
+    protected colorMap_:
+        | (CesiumColorMapConfig & {
+              texture: Texture | undefined;
+              needsUpdate: boolean;
+          })
+        | undefined;
 
     protected rootTiles_: CesiumVolumeTile[];
 
@@ -128,7 +127,6 @@ export class CesiumVolumeTileSet {
             if (colorMapConfig.noDataValue !== undefined) {
                 this.colorMap_.noDataValue = colorMapConfig.noDataValue;
             }
-
         } else {
             this.colorMap_ = {
                 texture: undefined,
@@ -154,15 +152,16 @@ export class CesiumVolumeTileSet {
     }
 
     getColorMapUniforms() {
-
         const colorMapConfig = this.colorMap_;
 
-        return colorMapConfig ? {
-            colorMapTexture: () => colorMapConfig.texture,
-            mapRange: () => colorMapConfig.range,
-            noDataValue: () => colorMapConfig.noDataValue,
-            clampRange: () => colorMapConfig.clamp
-        } : {};
+        return colorMapConfig
+            ? {
+                  colorMapTexture: () => colorMapConfig.texture,
+                  mapRange: () => colorMapConfig.range,
+                  noDataValue: () => colorMapConfig.noDataValue,
+                  clampRange: () => colorMapConfig.clamp
+              }
+            : {};
     }
 
     update(frameState) {
@@ -173,12 +172,12 @@ export class CesiumVolumeTileSet {
                 if (!this.colorMap_.texture) {
                     this.colorMap_.texture = this.createColorMapTexture_(this.colorMap_.colorMap, frameState.context);
                 } else {
-                    this.colorMap_.texture.copyFrom({source: this.colorMap_.colorMap});
+                    this.colorMap_.texture.copyFrom({ source: this.colorMap_.colorMap });
                 }
                 this.colorMap_.needsUpdate = false;
             }
         }
-        this.rootTiles_.forEach(tile => tile.traverse(frameState));
+        this.rootTiles_.forEach((tile) => tile.traverse(frameState));
     }
 
     isDestroyed() {
@@ -190,7 +189,6 @@ export class CesiumVolumeTileSet {
     }
 
     getTileExtentForKey(key: VolumeTileKey, normalized?: boolean) {
-
         if (!this.source_) {
             throw new Error('getTileExtentForKey called without a valid source');
         }
@@ -208,8 +206,7 @@ export class CesiumVolumeTileSet {
 
     updateTileForRendering(tile: CesiumVolumeTile) {
         if (tile.getTextureRevision() < this.sourceRevision_) {
-
-            let tileTexture : CesiumVolumeTileTexture | undefined;
+            let tileTexture: CesiumVolumeTileTexture | undefined;
             if (this.source_) {
                 tileTexture = new CesiumVolumeTileTexture({
                     source: this.source_,
@@ -218,25 +215,21 @@ export class CesiumVolumeTileSet {
             }
 
             tile.setTexture(tileTexture, this.sourceRevision_);
-
         }
 
         if (this.volumeView_) {
             this.volumeView_.updateTileForRendering(tile);
         }
-
     }
 
-
     protected createRootTiles_() {
-
         if (!this.source_) {
             return [];
         }
 
-        let tileGrid = this.source_.getTileGrid();
+        const tileGrid = this.source_.getTileGrid();
 
-        let rootTiles: CesiumVolumeTile[] = [];
+        const rootTiles: CesiumVolumeTile[] = [];
         for (let x = 0; x < tileGrid.numRootTiles[0]; ++x) {
             for (let y = 0; y < tileGrid.numRootTiles[1]; ++y) {
                 for (let z = 0; z < (tileGrid.numRootTiles[2] || 1); ++z) {
@@ -261,6 +254,4 @@ export class CesiumVolumeTileSet {
             context: context
         });
     }
-
 }
-

@@ -11,7 +11,6 @@ import { DatasetExplorer, DatasetViz } from '@oidajs/eo-mobx';
 import { ComboToolConfig } from '../hooks/use-dataset-explorer-tools';
 import { DatasetVizDownloadModalProps, DatasetVizListItem } from '../dataset-map-viz';
 
-
 export type DatasetExplorerMapVizProps = {
     explorerState: DatasetExplorer;
     analyticsTools?: ComboToolConfig[];
@@ -19,21 +18,20 @@ export type DatasetExplorerMapVizProps = {
     datasetDownloadComponent?: React.ComponentType<DatasetVizDownloadModalProps>;
 };
 
-let SortableItem = SortableElement(DatasetVizListItem);
-let SortableList = SortableContainer(List);
+const SortableItem = SortableElement(DatasetVizListItem);
+const SortableList = SortableContainer(List);
 
 export const DatasetExplorerMapViz = (props: DatasetExplorerMapVizProps) => {
-
-    let datasetMapViews = useSelector(() => {
+    const datasetMapViews = useSelector(() => {
         return props.explorerState.items.map((datasetView) => {
             return {
                 id: datasetView.dataset.id,
                 mapViz: datasetView.mapViz
             };
         });
-    }).filter(item => item.mapViz?.mapLayer instanceof MapLayer);
+    }).filter((item) => item.mapViz?.mapLayer instanceof MapLayer);
 
-    let items = datasetMapViews.map((view, idx) => {
+    const items = datasetMapViews.map((view, idx) => {
         return (
             <SortableItem
                 key={view.id}
@@ -50,13 +48,10 @@ export const DatasetExplorerMapViz = (props: DatasetExplorerMapVizProps) => {
 
     const componentRef = useRef<HTMLDivElement>(null);
 
-
     return (
         <div className='dataset-explorer-viz' ref={componentRef}>
-            {!items.length &&
-                <div>No dataset selected</div>
-            }
-            {!!items.length &&
+            {!items.length && <div>No dataset selected</div>}
+            {!!items.length && (
                 <SortableList
                     useDragHandle={true}
                     helperContainer={() => {
@@ -72,7 +67,7 @@ export const DatasetExplorerMapViz = (props: DatasetExplorerMapVizProps) => {
                 >
                     {items}
                 </SortableList>
-            }
+            )}
         </div>
     );
 };

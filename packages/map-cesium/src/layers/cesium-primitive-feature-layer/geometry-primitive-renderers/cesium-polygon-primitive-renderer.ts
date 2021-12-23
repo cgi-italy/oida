@@ -21,7 +21,6 @@ import { PICK_INFO_KEY, PickInfo } from '../../../utils/picking';
 import { CesiumPrimitiveFeatureLayer } from '../cesium-primitive-feature-layer';
 import { CesiumGeometryPrimitiveFeature, CesiumGeometryPrimitiveRenderer } from './cesium-geometry-primitive-renderer';
 
-
 type PolygonGeometry = GeoJSON.Polygon | GeoJSON.MultiPolygon | BBoxGeometry | CircleGeometry;
 export type CesiumPolygonPrimitiveRenderProps = {
     fillPrimitive: Primitive | GroundPrimitive;
@@ -32,9 +31,8 @@ export type CesiumPolygonPrimitiveRenderProps = {
 export type CesiumPolygonPrimitiveFeature = CesiumGeometryPrimitiveFeature<CesiumPolygonPrimitiveRenderProps, IPolygonStyle>;
 
 export class CesiumPolygonPrimitiveRenderer implements CesiumGeometryPrimitiveRenderer<CesiumPolygonPrimitiveFeature> {
-
     protected polygons_: PrimitiveCollection;
-    protected clampToGround_: boolean = false;
+    protected clampToGround_: boolean;
     protected layer_: CesiumPrimitiveFeatureLayer;
     protected pickCallbacks_;
 
@@ -55,24 +53,23 @@ export class CesiumPolygonPrimitiveRenderer implements CesiumGeometryPrimitiveRe
         let outlineInstances: any = null;
 
         if (geometry.type === 'Polygon') {
-
-            let instance = this.createPolygonInstance_(id, geometry.coordinates, style);
+            const instance = this.createPolygonInstance_(id, geometry.coordinates, style);
             fillInstances = instance.fill;
             outlineInstances = instance.outline;
         } else if (geometry.type === 'MultiPolygon') {
             fillInstances = [];
             outlineInstances = [];
             for (let i = 0; i < geometry.coordinates.length; ++i) {
-                let instance = this.createPolygonInstance_(`${id}_${i}`, geometry.coordinates[i], style);
+                const instance = this.createPolygonInstance_(`${id}_${i}`, geometry.coordinates[i], style);
                 fillInstances.push(instance.fill);
                 outlineInstances.push(instance.outline);
             }
         } else if (geometry.type === 'BBox') {
-            let instance = this.createRectangleInstance_(id, geometry.bbox, style);
+            const instance = this.createRectangleInstance_(id, geometry.bbox, style);
             fillInstances = instance.fill;
             outlineInstances = instance.outline;
         } else if (geometry.type === 'Circle') {
-            let instance = this.createCircleInstance_(id, geometry.center, geometry.radius, style);
+            const instance = this.createCircleInstance_(id, geometry.center, geometry.radius, style);
             fillInstances = instance.fill;
             outlineInstances = instance.outline;
         }
@@ -81,41 +78,47 @@ export class CesiumPolygonPrimitiveRenderer implements CesiumGeometryPrimitiveRe
         // disable fill when the bounding box is bigger than half of the globe (is this a good heuristic for "large"?)
         // TODO: split polygon in tiles?
         const bbox = getGeometryExtent(geometry);
-        if (bbox && ((bbox[2] - bbox[0]) * (bbox[3] - bbox[1]) > 32400)) {
+        if (bbox && (bbox[2] - bbox[0]) * (bbox[3] - bbox[1]) > 32400) {
             fillInstances = [];
         }
 
         let fill;
         if (this.clampToGround_) {
-            fill = this.polygons_.add(new GroundPrimitive({
-                show: style.visible,
-                geometryInstances: fillInstances,
-                appearance: new PerInstanceColorAppearance({
-                    flat: true
+            fill = this.polygons_.add(
+                new GroundPrimitive({
+                    show: style.visible,
+                    geometryInstances: fillInstances,
+                    appearance: new PerInstanceColorAppearance({
+                        flat: true
+                    })
                 })
-            }));
+            );
         } else {
-            fill = this.polygons_.add(new Primitive({
-                show: style.visible,
-                geometryInstances: fillInstances,
-                appearance: new PerInstanceColorAppearance({
-                    flat: true
+            fill = this.polygons_.add(
+                new Primitive({
+                    show: style.visible,
+                    geometryInstances: fillInstances,
+                    appearance: new PerInstanceColorAppearance({
+                        flat: true
+                    })
                 })
-            }));
+            );
         }
 
-        let stroke = this.polygons_.add(new Primitive({
-            show: style.visible,
-            geometryInstances: outlineInstances,
-            appearance: new PerInstanceColorAppearance({
-                flat : true,
-                renderState : {
-                    lineWidth : 1
-                }
+        const stroke = this.polygons_.add(
+            new Primitive({
+                show: style.visible,
+                geometryInstances: outlineInstances,
+                appearance: new PerInstanceColorAppearance({
+                    flat: true,
+                    renderState: {
+                        lineWidth: 1
+                    }
+                })
             })
-        }));
+        );
 
-        let feature = {
+        const feature = {
             id: id,
             geometryRenderer: this as CesiumPolygonPrimitiveRenderer,
             geometryType: geometry.type,
@@ -144,12 +147,11 @@ export class CesiumPolygonPrimitiveRenderer implements CesiumGeometryPrimitiveRe
     updateGeometry(feature: CesiumPolygonPrimitiveFeature, geometry: PolygonGeometry) {
         this.removeFeature(feature);
 
-        let updatedFeature = this.addFeature(feature.id, geometry, feature.style, feature.data);
+        const updatedFeature = this.addFeature(feature.id, geometry, feature.style, feature.data);
         feature.renderProps = updatedFeature.renderProps;
     }
 
     updateStyle(feature: CesiumPolygonPrimitiveFeature, style: IPolygonStyle) {
-
         this.updatePrimitiveColor_(feature.renderProps.fillPrimitive, style.fillColor);
         this.updatePrimitiveColor_(feature.renderProps.strokePrimitive, style.strokeColor);
 
@@ -159,7 +161,6 @@ export class CesiumPolygonPrimitiveRenderer implements CesiumGeometryPrimitiveRe
         feature.renderProps.strokePrimitive[PICK_INFO_KEY].pickable = !style.pickingDisabled;
 
         feature.style = style;
-
     }
 
     removeFeature(feature: CesiumPolygonPrimitiveFeature) {
@@ -176,7 +177,6 @@ export class CesiumPolygonPrimitiveRenderer implements CesiumGeometryPrimitiveRe
     }
 
     protected createPolygonInstance_(id: string, coordinates, style: IPolygonStyle) {
-
         let polygonInstance: GeometryInstance | undefined;
         let outlineInstance: GeometryInstance | undefined;
 
@@ -184,22 +184,17 @@ export class CesiumPolygonPrimitiveRenderer implements CesiumGeometryPrimitiveRe
         const holes: PolygonHierarchy[] = [];
         for (let i = 1; i < coordinates.length; ++i) {
             if (coordinates[i].length > 2) {
-                holes.push(new PolygonHierarchy(
-                    Cartesian3.fromDegreesArray([].concat(...coordinates[i]))
-                ));
+                holes.push(new PolygonHierarchy(Cartesian3.fromDegreesArray([].concat(...coordinates[i]))));
             }
         }
 
         if (outer.length >= 2) {
-            const polygonHierarchy = new PolygonHierarchy(
-                Cartesian3.fromDegreesArray([].concat(...outer)),
-                holes
-            );
+            const polygonHierarchy = new PolygonHierarchy(Cartesian3.fromDegreesArray([].concat(...outer)), holes);
 
             polygonInstance = new GeometryInstance({
                 geometry: new PolygonGeometry({
                     polygonHierarchy: polygonHierarchy,
-                    vertexFormat : PerInstanceColorAppearance.VERTEX_FORMAT
+                    vertexFormat: PerInstanceColorAppearance.VERTEX_FORMAT
                 }),
                 attributes: {
                     color: new ColorGeometryInstanceAttribute(...style.fillColor!)
@@ -210,14 +205,13 @@ export class CesiumPolygonPrimitiveRenderer implements CesiumGeometryPrimitiveRe
             outlineInstance = new GeometryInstance({
                 geometry: new PolygonOutlineGeometry({
                     polygonHierarchy: polygonHierarchy,
-                    vertexFormat : PerInstanceColorAppearance.VERTEX_FORMAT
+                    vertexFormat: PerInstanceColorAppearance.VERTEX_FORMAT
                 }),
                 attributes: {
                     color: new ColorGeometryInstanceAttribute(...style.strokeColor!)
                 },
                 id: id
             });
-
         }
 
         return {
@@ -227,11 +221,10 @@ export class CesiumPolygonPrimitiveRenderer implements CesiumGeometryPrimitiveRe
     }
 
     protected createRectangleInstance_(id: string, extent, style: IPolygonStyle) {
-
-        let rectangleInstance = new GeometryInstance({
+        const rectangleInstance = new GeometryInstance({
             geometry: new RectangleGeometry({
                 rectangle: Rectangle.fromDegrees(...extent),
-                vertexFormat : PerInstanceColorAppearance.VERTEX_FORMAT
+                vertexFormat: PerInstanceColorAppearance.VERTEX_FORMAT
             }),
             attributes: {
                 color: new ColorGeometryInstanceAttribute(...style.fillColor!)
@@ -239,17 +232,16 @@ export class CesiumPolygonPrimitiveRenderer implements CesiumGeometryPrimitiveRe
             id: id
         });
 
-        let outlineInstance = new GeometryInstance({
+        const outlineInstance = new GeometryInstance({
             geometry: new RectangleOutlineGeometry({
                 rectangle: Rectangle.fromDegrees(...extent),
-                vertexFormat : PerInstanceColorAppearance.VERTEX_FORMAT
+                vertexFormat: PerInstanceColorAppearance.VERTEX_FORMAT
             }),
             attributes: {
                 color: new ColorGeometryInstanceAttribute(...style.strokeColor!)
             },
             id: id
         });
-
 
         return {
             fill: rectangleInstance,
@@ -258,12 +250,11 @@ export class CesiumPolygonPrimitiveRenderer implements CesiumGeometryPrimitiveRe
     }
 
     protected createCircleInstance_(id: string, center: GeoJSON.Position, radius: number, style: IPolygonStyle) {
-
-        let circleInstance = new GeometryInstance({
+        const circleInstance = new GeometryInstance({
             geometry: new CesiumCircleGeometry({
                 center: Cartesian3.fromDegrees(...center),
                 radius: radius,
-                vertexFormat : PerInstanceColorAppearance.VERTEX_FORMAT
+                vertexFormat: PerInstanceColorAppearance.VERTEX_FORMAT
             }),
             attributes: {
                 color: new ColorGeometryInstanceAttribute(...style.fillColor!)
@@ -271,18 +262,17 @@ export class CesiumPolygonPrimitiveRenderer implements CesiumGeometryPrimitiveRe
             id: id
         });
 
-        let outlineInstance = new GeometryInstance({
+        const outlineInstance = new GeometryInstance({
             geometry: new CircleOutlineGeometry({
                 center: Cartesian3.fromDegrees(...center),
                 radius: radius,
-                vertexFormat : PerInstanceColorAppearance.VERTEX_FORMAT
+                vertexFormat: PerInstanceColorAppearance.VERTEX_FORMAT
             }),
             attributes: {
                 color: new ColorGeometryInstanceAttribute(...style.strokeColor!)
             },
             id: id
         });
-
 
         return {
             fill: circleInstance,
@@ -291,7 +281,6 @@ export class CesiumPolygonPrimitiveRenderer implements CesiumGeometryPrimitiveRe
     }
 
     protected updatePrimitiveColor_(primitive: Primitive, color) {
-
         if (primitive.ready) {
             const instanceIds = primitive._instanceIds;
             instanceIds.forEach((id) => {

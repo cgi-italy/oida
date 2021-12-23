@@ -1,8 +1,14 @@
 import React, { useState, useMemo } from 'react';
 import { Tag, Button, Tooltip, Drawer, Menu, Dropdown, Divider } from 'antd';
 import {
-    EnvironmentOutlined, LinkOutlined, ImportOutlined, AimOutlined, EyeOutlined,
-    EyeInvisibleOutlined, CloseOutlined, CaretDownOutlined
+    EnvironmentOutlined,
+    LinkOutlined,
+    ImportOutlined,
+    AimOutlined,
+    EyeOutlined,
+    EyeInvisibleOutlined,
+    CloseOutlined,
+    CaretDownOutlined
 } from '@ant-design/icons';
 
 import { AoiField, AoiAction, AOI_FIELD_ID } from '@oidajs/core';
@@ -13,42 +19,58 @@ import { DrawLineIcon, DrawBboxIcon, DrawPolygonIcon } from '../icons';
 import { antdFormFieldRendererFactory } from './antd-form-field-renderer-factory';
 import { AoiImportRenderer } from './aoi-import';
 
-
 export type AoiDrawToolProps = FormFieldRendererBaseProps<AoiField<AoiImportConfig>> & {
     importDrawerPlacement?: 'left' | 'right';
-    size?: 'small' | 'middle' | 'large'
+    size?: 'small' | 'middle' | 'large';
 };
 
-export const AoiDrawTool = (props:  AoiDrawToolProps) => {
-
-    const { value, onChange, config, ...renderProps } = props;
+export const AoiDrawTool = (props: AoiDrawToolProps) => {
+    const { value, onChange, config } = props;
     const {
-        supportedActions, supportedGeometries,
-        activeAction, color, name, importConfig,
-        onActiveActionChange, onHoverAction, onSelectAction,
-        onCenterAction, onVisibleAction, state
+        supportedActions,
+        supportedGeometries,
+        activeAction,
+        color,
+        name,
+        importConfig,
+        onActiveActionChange,
+        onHoverAction,
+        onSelectAction,
+        onCenterAction,
+        onVisibleAction,
+        state
     } = config;
 
     const aoiControls = useMemo(() => {
-        const point = supportedActions.indexOf(AoiAction.DrawPoint) !== -1 && supportedGeometries.some(geometry => {
-            return geometry.type === 'Point' || geometry.type === 'MultiPoint';
-        });
+        const point =
+            supportedActions.indexOf(AoiAction.DrawPoint) !== -1 &&
+            supportedGeometries.some((geometry) => {
+                return geometry.type === 'Point' || geometry.type === 'MultiPoint';
+            });
 
-        const line = supportedActions.indexOf(AoiAction.DrawLine) !== -1 && supportedGeometries.some(geometry => {
-            return geometry.type === 'LineString' || geometry.type === 'MultiLineString';
-        });
+        const line =
+            supportedActions.indexOf(AoiAction.DrawLine) !== -1 &&
+            supportedGeometries.some((geometry) => {
+                return geometry.type === 'LineString' || geometry.type === 'MultiLineString';
+            });
 
-        const bbox = supportedActions.indexOf(AoiAction.DrawBBox) !== -1 && supportedGeometries.some(geometry => {
-            return geometry.type === 'BBox' || geometry.type === 'Polygon' || geometry.type === 'MultiPolygon';
-        });
+        const bbox =
+            supportedActions.indexOf(AoiAction.DrawBBox) !== -1 &&
+            supportedGeometries.some((geometry) => {
+                return geometry.type === 'BBox' || geometry.type === 'Polygon' || geometry.type === 'MultiPolygon';
+            });
 
-        const polygon = supportedActions.indexOf(AoiAction.DrawPolygon) !== -1 && supportedGeometries.some(geometry => {
-            return geometry.type === 'Polygon' || geometry.type === 'MultiPolygon';
-        });
+        const polygon =
+            supportedActions.indexOf(AoiAction.DrawPolygon) !== -1 &&
+            supportedGeometries.some((geometry) => {
+                return geometry.type === 'Polygon' || geometry.type === 'MultiPolygon';
+            });
 
-        const linkToViewport = supportedActions.indexOf(AoiAction.LinkToMapViewport) !== -1 && supportedGeometries.some(geometry => {
-            return geometry.type === 'BBox' || geometry.type === 'Polygon' || geometry.type === 'MultiPolygon';
-        });
+        const linkToViewport =
+            supportedActions.indexOf(AoiAction.LinkToMapViewport) !== -1 &&
+            supportedGeometries.some((geometry) => {
+                return geometry.type === 'BBox' || geometry.type === 'Polygon' || geometry.type === 'MultiPolygon';
+            });
 
         const importAction = importConfig && supportedActions.indexOf(AoiAction.Import) !== -1;
 
@@ -60,17 +82,13 @@ export const AoiDrawTool = (props:  AoiDrawToolProps) => {
             linkToViewport,
             import: importAction
         };
-
     }, [supportedGeometries, supportedActions]);
 
     const [lastUsedTool, setLastUsedTool] = useState(AoiAction.DrawBBox);
 
     const drawingTools = {
         [AoiAction.DrawPoint]: (
-            <Tooltip
-                title='Select a coordinate'
-                key='point'
-            >
+            <Tooltip title='Select a coordinate' key='point'>
                 <Button
                     key='point'
                     icon={<EnvironmentOutlined />}
@@ -84,15 +102,11 @@ export const AoiDrawTool = (props:  AoiDrawToolProps) => {
                             onActiveActionChange(AoiAction.None);
                         }
                     }}
-                >
-                </Button>
+                ></Button>
             </Tooltip>
         ),
         [AoiAction.DrawLine]: (
-            <Tooltip
-                title='Draw a line string'
-                key='line'
-            >
+            <Tooltip title='Draw a line string' key='line'>
                 <Button
                     key='line'
                     icon={<DrawLineIcon />}
@@ -106,15 +120,11 @@ export const AoiDrawTool = (props:  AoiDrawToolProps) => {
                             onActiveActionChange(AoiAction.None);
                         }
                     }}
-                >
-                </Button>
+                ></Button>
             </Tooltip>
         ),
         [AoiAction.DrawBBox]: (
-            <Tooltip
-                title='Draw a bounding box'
-                key='bbox'
-            >
+            <Tooltip title='Draw a bounding box' key='bbox'>
                 <Button
                     key='bbox'
                     icon={<DrawBboxIcon />}
@@ -128,15 +138,11 @@ export const AoiDrawTool = (props:  AoiDrawToolProps) => {
                             onActiveActionChange(AoiAction.None);
                         }
                     }}
-                >
-                </Button>
+                ></Button>
             </Tooltip>
         ),
         [AoiAction.DrawPolygon]: (
-            <Tooltip
-                title='Draw a polygonal area'
-                key='polygon'
-            >
+            <Tooltip title='Draw a polygonal area' key='polygon'>
                 <Button
                     key='polygon'
                     icon={<DrawPolygonIcon />}
@@ -150,15 +156,11 @@ export const AoiDrawTool = (props:  AoiDrawToolProps) => {
                             onActiveActionChange(AoiAction.None);
                         }
                     }}
-                >
-                </Button>
+                ></Button>
             </Tooltip>
         ),
         [AoiAction.LinkToMapViewport]: (
-            <Tooltip
-                title='Link to map viewport'
-                key='viewport'
-            >
+            <Tooltip title='Link to map viewport' key='viewport'>
                 <Button
                     key='viewport'
                     icon={<LinkOutlined />}
@@ -172,15 +174,11 @@ export const AoiDrawTool = (props:  AoiDrawToolProps) => {
                             onActiveActionChange(AoiAction.None);
                         }
                     }}
-                >
-                </Button>
+                ></Button>
             </Tooltip>
         ),
         [AoiAction.Import]: (
-            <Tooltip
-                title='Import area'
-                key='import'
-            >
+            <Tooltip title='Import area' key='import'>
                 <Button
                     key='import'
                     icon={<ImportOutlined />}
@@ -193,8 +191,7 @@ export const AoiDrawTool = (props:  AoiDrawToolProps) => {
                             onActiveActionChange(AoiAction.None);
                         }
                     }}
-                >
-                </Button>
+                ></Button>
             </Tooltip>
         )
     };
@@ -221,10 +218,10 @@ export const AoiDrawTool = (props:  AoiDrawToolProps) => {
                     className='aoi-tool-selector-more'
                     overlayClassName='aoi-tool-selector-menu'
                 >
-                    <CaretDownOutlined/>
+                    <CaretDownOutlined />
                 </Dropdown>
             </div>
-            {value &&
+            {value && (
                 <React.Fragment>
                     <div className='aoi-draw-tool-current'>
                         <Tag
@@ -235,32 +232,23 @@ export const AoiDrawTool = (props:  AoiDrawToolProps) => {
                         >
                             {name}
                         </Tag>
-                        {onCenterAction && <Button
-                            size={'small'}
-                            type='link'
-                            icon={<AimOutlined/>}
-                            onClick={() => onCenterAction()}
-                        />}
-                        {onVisibleAction && <Button
-                            size={'small'}
-                            type='link'
-                            icon={state.visible ? <EyeOutlined/> : <EyeInvisibleOutlined />}
-                            onClick={() => onVisibleAction(!state.visible)}
-                        />}
-                        <Divider type='vertical'/>
-                        <Tooltip title='Clear area'>
+                        {onCenterAction && <Button size={'small'} type='link' icon={<AimOutlined />} onClick={() => onCenterAction()} />}
+                        {onVisibleAction && (
                             <Button
-                                type='text'
-                                size={'middle'}
-                                icon={<CloseOutlined/>}
-                                onClick={() => onChange(undefined)}
+                                size={'small'}
+                                type='link'
+                                icon={state.visible ? <EyeOutlined /> : <EyeInvisibleOutlined />}
+                                onClick={() => onVisibleAction(!state.visible)}
                             />
+                        )}
+                        <Divider type='vertical' />
+                        <Tooltip title='Clear area'>
+                            <Button type='text' size={'middle'} icon={<CloseOutlined />} onClick={() => onChange(undefined)} />
                         </Tooltip>
                     </div>
                 </React.Fragment>
-            }
-            {
-                aoiControls.import && importConfig &&
+            )}
+            {aoiControls.import && importConfig && (
                 <Drawer
                     push={false}
                     className='aoi-import-drawer'
@@ -280,18 +268,13 @@ export const AoiDrawTool = (props:  AoiDrawToolProps) => {
                     destroyOnClose={true}
                     title='Import area of interest'
                     mask={true}
-                    maskStyle={{display: 'none'}} // to prevent a bug in ant when mask is set to false
+                    maskStyle={{ display: 'none' }} // to prevent a bug in ant when mask is set to false
                 >
-                    <AoiImportRenderer
-                        {...importConfig}
-                    />
+                    <AoiImportRenderer {...importConfig} />
                 </Drawer>
-            }
+            )}
         </div>
     );
 };
 
-antdFormFieldRendererFactory.register<AoiField>(
-    AOI_FIELD_ID, 'tool',
-    AoiDrawTool
-);
+antdFormFieldRendererFactory.register<AoiField>(AOI_FIELD_ID, 'tool', AoiDrawTool);

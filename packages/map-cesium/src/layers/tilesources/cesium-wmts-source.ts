@@ -5,7 +5,7 @@ import { cesiumTileSourcesFactory } from './cesium-tilesources-factory';
 import { getTileGridFromSRS, getUrlFromTemplate } from './cesium-tilesource-utils';
 
 cesiumTileSourcesFactory.register('wmts', (config) => {
-    let tileGrid = getTileGridFromSRS(config.srs || 'EPSG:4326', config.tileGrid);
+    const tileGrid = getTileGridFromSRS(config.srs || 'EPSG:4326', config.tileGrid);
     if (tileGrid) {
         return new WebMapTileServiceImageryProvider({
             url: getUrlFromTemplate(config),

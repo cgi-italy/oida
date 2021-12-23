@@ -1,21 +1,30 @@
 import { autorun, observable, makeObservable, action, computed, reaction } from 'mobx';
 
 import {
-    AoiSupportedGeometry, LoadingState, SubscriptionTracker, IFormFieldDefinition,
-    QueryFilter, CircleGeometry, BBoxGeometry
+    AoiSupportedGeometry,
+    LoadingState,
+    SubscriptionTracker,
+    IFormFieldDefinition,
+    QueryFilter,
+    CircleGeometry,
+    BBoxGeometry
 } from '@oidajs/core';
 import { AsyncDataFetcher, DataFilters } from '@oidajs/state-mobx';
 
 import {
-    DatasetDimension, DataDomain, DomainRange, isValueDomain,
-    DatasetDimensions, HasDatasetDimensions, DatasetDimensionsProps,
+    DatasetDimension,
+    DataDomain,
+    DomainRange,
+    isValueDomain,
+    DatasetDimensions,
+    HasDatasetDimensions,
+    DatasetDimensionsProps,
     ColorMap
- } from '../common';
+} from '../common';
 import { getDatasetVariableDomain, getRasterBandSingleConfig } from '../utils';
 import { RasterBandConfig, RasterBandModeType, RasterMapViz } from '../dataset-map-viz';
 import { DatasetAreaValuesData, DatasetAreaValuesDataMask, DatasetAreaValuesRequest } from './dataset-area-values';
 import { DatasetProcessing, DatasetProcessingProps } from './dataset-processing';
-
 
 export const DATASET_AREA_SERIES_PROCESSING = 'dataset_area_series_processing';
 
@@ -39,7 +48,7 @@ export type DatasetAreaSeriesConfig = {
     variables: RasterBandConfig[];
     supportedGeometries: AoiSupportedGeometry[];
     supportedData: DatasetAreaValuesDataMask;
-    dimensions: (DatasetDimension<DataDomain<SequenceDimensionType>> & {preventSeries?: boolean})[];
+    dimensions: (DatasetDimension<DataDomain<SequenceDimensionType>> & { preventSeries?: boolean })[];
     additionalParameters?: IFormFieldDefinition[];
 };
 
@@ -50,10 +59,10 @@ export type DatasetAreaSeriesProps = {
     autoUpdate?: boolean;
     additionalParameters?: Record<string, any>;
     dataMask?: Partial<DatasetAreaValuesDataMask>;
-} & DatasetProcessingProps<typeof DATASET_AREA_SERIES_PROCESSING, DatasetAreaSeriesConfig> & DatasetDimensionsProps;
+} & DatasetProcessingProps<typeof DATASET_AREA_SERIES_PROCESSING, DatasetAreaSeriesConfig> &
+    DatasetDimensionsProps;
 
 export class DatasetAreaSeries extends DatasetProcessing<undefined> implements HasDatasetDimensions {
-
     readonly config: DatasetAreaSeriesConfig;
     readonly dimensions: DatasetDimensions;
     @observable.ref sequenceDimension: string | undefined;
@@ -75,15 +84,26 @@ export class DatasetAreaSeries extends DatasetProcessing<undefined> implements H
             ...props
         });
 
+        const parentDimensions = (props.parent as HasDatasetDimensions | undefined)?.dimensions;
+
         this.config = props.config;
-        this.dimensions = new DatasetDimensions(props);
+
         this.sequenceDimension = props.sequenceDimension;
         this.sequenceVariable = undefined;
         this.sequenceRange = props.sequenceRange;
         this.data = [];
         this.autoUpdate = props.autoUpdate !== undefined ? props.autoUpdate : true;
         this.colorMap = undefined;
-        this.setVariable(props.sequenceVariable);
+
+        this.dimensions = new DatasetDimensions({
+            dimensionValues: props.dimensionValues || parentDimensions?.values,
+            dataset: props.dataset,
+            currentVariable: () => this.sequenceVariable,
+            dimensions: props.config.dimensions,
+            initDimensions: true
+        });
+
+        this.setVariable(props.sequenceVariable || parentDimensions?.variable);
         this.additionalParameters = new DataFilters({
             values: props.additionalParameters
         });
@@ -96,7 +116,7 @@ export class DatasetAreaSeries extends DatasetProcessing<undefined> implements H
             dataFetcher: (params) => {
                 return this.config.provider(params);
             },
-            debounceInterval: this.autoUpdate ? 1000 :  0
+            debounceInterval: this.autoUpdate ? 1000 : 0
         });
         this.subscriptionTracker_ = new SubscriptionTracker();
         this.needsUpdate_ = true;
@@ -104,7 +124,6 @@ export class DatasetAreaSeries extends DatasetProcessing<undefined> implements H
         makeObservable(this);
 
         this.afterInit_();
-
     }
 
     get loadingState() {
@@ -125,43 +144,43 @@ export class DatasetAreaSeries extends DatasetProcessing<undefined> implements H
         if (dimension) {
             this.dimensions.unsetValue(dimension);
 
-            let dimensionConfig = this.config.dimensions?.find(dim => dim.id === dimension);
+            const dimensionConfig = this.config.dimensions?.find((dim) => dim.id === dimension);
 
             if (dimensionConfig) {
-                getDatasetVariableDomain(dimensionConfig).then((domain) => {
-                    if (domain && isValueDomain(domain) && domain.min !== undefined && domain.max !== undefined) {
-                        // if no range is defined or the current range is outside of the domain extent set the range to the domain extent
-                        if (!range || (range.min >= domain.max || range.max <= domain.min)) {
-                            this.setRange({
-                                min: domain.min,
-                                max: domain.max
-                            });
+                getDatasetVariableDomain(dimensionConfig)
+                    .then((domain) => {
+                        if (domain && isValueDomain(domain) && domain.min !== undefined && domain.max !== undefined) {
+                            // if no range is defined or the current range is outside of the domain extent set the range to the domain extent
+                            if (!range || range.min >= domain.max || range.max <= domain.min) {
+                                this.setRange({
+                                    min: domain.min,
+                                    max: domain.max
+                                });
+                            } else {
+                                // clamp the range to the domain extent
+                                let min = range.min;
+                                let max = range.max;
+                                if (min < domain.min) {
+                                    min = domain.min;
+                                }
+                                if (max > domain.max) {
+                                    max = domain.max;
+                                }
+                                this.setRange({
+                                    min: min,
+                                    max: max
+                                });
+                            }
                         } else {
-                            // clamp the range to the domain extent
-                            let min = range.min;
-                            let max = range.max;
-                            if (min < domain.min) {
-                                min = domain.min;
-                            }
-                            if (max > domain.max) {
-                                max = domain.max;
-                            }
-                            this.setRange({
-                                min: min,
-                                max: max
-                            });
+                            this.setRange(range);
                         }
-                    } else {
+                    })
+                    .catch(() => {
                         this.setRange(range);
-                    }
-                }).catch(() => {
-                    this.setRange(range);
-                });
-
+                    });
             } else {
                 this.setRange(range);
             }
-
         } else {
             this.setRange(range);
         }
@@ -174,9 +193,8 @@ export class DatasetAreaSeries extends DatasetProcessing<undefined> implements H
         this.colorMap = undefined;
 
         if (variable) {
-            const variableConfig = this.config.variables.find(v => v.id === variable);
+            const variableConfig = this.config.variables.find((v) => v.id === variable);
             if (variableConfig?.colorScales) {
-
                 if (this.parent instanceof RasterMapViz) {
                     const parentBandMode = this.parent.bandMode.value;
                     if (parentBandMode?.type === RasterBandModeType.Single && parentBandMode.band === variable) {
@@ -196,7 +214,6 @@ export class DatasetAreaSeries extends DatasetProcessing<undefined> implements H
                 }
             }
         }
-
     }
 
     @action
@@ -221,36 +238,42 @@ export class DatasetAreaSeries extends DatasetProcessing<undefined> implements H
 
     @computed
     get canRunQuery() {
-        return !!this.sequenceDimension
-        && !!this.geometry
-        && !!this.sequenceVariable
-        && this.config.dimensions.every((dim) => {
-            return (dim.id === this.sequenceDimension) || this.dimensions.values.has(dim.id);
-        })
-        && (!this.config.additionalParameters || this.config.additionalParameters.every((field) => {
-            return !field.required || this.additionalParameters.get(field.name);
-        }));
+        return (
+            !!this.sequenceDimension &&
+            !!this.geometry &&
+            !!this.sequenceVariable &&
+            this.config.dimensions.every((dim) => {
+                return dim.id === this.sequenceDimension || this.dimensions.values.has(dim.id);
+            }) &&
+            (!this.config.additionalParameters ||
+                this.config.additionalParameters.every((field) => {
+                    return !field.required || this.additionalParameters.get(field.name);
+                }))
+        );
     }
 
     retrieveData() {
         if (this.canRunQuery) {
             if (this.needsUpdate_) {
                 this.setData_([]);
-                return this.dataFetcher_.fetchData({
-                    dimension: this.sequenceDimension!,
-                    geometry: this.geometry! as (GeoJSON.Polygon | GeoJSON.MultiPolygon | CircleGeometry | BBoxGeometry),
-                    variable: this.sequenceVariable!,
-                    range: this.sequenceRange,
-                    dimensionValues: new Map(this.dimensions.values),
-                    additionalParameters: this.additionalParameters.asArray(),
-                    colorMap: this.colorMap?.asProps(),
-                    dataMask: this.dataMask
-                }).then((data) => {
-                    this.setData_(data || []);
-                    this.needsUpdate_ = false;
-                }).catch(() => {
-                    this.setData_([]);
-                });
+                return this.dataFetcher_
+                    .fetchData({
+                        dimension: this.sequenceDimension!,
+                        geometry: this.geometry! as GeoJSON.Polygon | GeoJSON.MultiPolygon | CircleGeometry | BBoxGeometry,
+                        variable: this.sequenceVariable!,
+                        range: this.sequenceRange,
+                        dimensionValues: new Map(this.dimensions.values),
+                        additionalParameters: this.additionalParameters.asArray(),
+                        colorMap: this.colorMap?.asProps(),
+                        dataMask: this.dataMask
+                    })
+                    .then((data) => {
+                        this.setData_(data || []);
+                        this.needsUpdate_ = false;
+                    })
+                    .catch(() => {
+                        this.setData_([]);
+                    });
             } else {
                 return Promise.resolve();
             }
@@ -284,7 +307,6 @@ export class DatasetAreaSeries extends DatasetProcessing<undefined> implements H
     }
 
     protected afterInit_() {
-
         if (!this.sequenceVariable) {
             this.setVariable(this.config.variables[0].id);
         }
@@ -298,16 +320,19 @@ export class DatasetAreaSeries extends DatasetProcessing<undefined> implements H
             }
         });
 
-        const updateTrackerDisposer = reaction(() => {
-            return {
-                aoi: this.geometry,
-                dimensions: new Map(this.dimensions.values),
-                colorMap: this.colorMap?.asProps(),
-                additionalParameters: this.additionalParameters.asArray()
-            };
-        }, () => {
-            this.needsUpdate_ = true;
-        });
+        const updateTrackerDisposer = reaction(
+            () => {
+                return {
+                    aoi: this.geometry,
+                    dimensions: new Map(this.dimensions.values),
+                    colorMap: this.colorMap?.asProps(),
+                    additionalParameters: this.additionalParameters.asArray()
+                };
+            },
+            () => {
+                this.needsUpdate_ = true;
+            }
+        );
 
         this.subscriptionTracker_.addSubscription(sequenceUpdaterDisposer);
         this.subscriptionTracker_.addSubscription(updateTrackerDisposer);
@@ -317,4 +342,3 @@ export class DatasetAreaSeries extends DatasetProcessing<undefined> implements H
         return undefined;
     }
 }
-

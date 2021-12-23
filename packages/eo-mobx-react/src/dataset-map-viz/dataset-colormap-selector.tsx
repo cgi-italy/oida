@@ -1,27 +1,32 @@
 import React, { useState, useRef, useEffect } from 'react';
 import classnames from 'classnames';
-import { Button, Dropdown, InputNumber, Slider, Checkbox, Tooltip } from 'antd';
+import { Button, Dropdown, InputNumber, Slider, Checkbox } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
 
 import { formatNumber } from '@oidajs/core';
 import { Map } from '@oidajs/state-mobx';
 import {
-    ColorMap, ColorScale, NumericVariable, ColorScaleType,
-    isValueDomain, NumericDomainMapper, DatasetDimensions, isDomainProvider, computeRasterDatasetOptimalBandRange
+    ColorMap,
+    ColorScale,
+    NumericVariable,
+    ColorScaleType,
+    isValueDomain,
+    NumericDomainMapper,
+    DatasetDimensions,
+    isDomainProvider,
+    computeRasterDatasetOptimalBandRange
 } from '@oidajs/eo-mobx';
 import { AdjustSolidIcon, AsyncButton } from '@oidajs/ui-react-antd';
 import { useSelector } from '@oidajs/ui-react-mobx';
 
 import { useDatasetVariableDomain } from '../hooks';
 
-
 export type DatasetColorScaleSelectorItemProps = {
     colorScale: ColorScale;
 };
 
 export const DatasetColorScaleSelectorItem = (props: DatasetColorScaleSelectorItemProps) => {
-
-    let legendRef = useRef<HTMLDivElement>(null);
+    const legendRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         if (legendRef.current) {
@@ -47,27 +52,20 @@ export type DatasetColorScaleListProps = {
 };
 
 export const DatasetColorScaleList = (props: DatasetColorScaleListProps) => {
-
-    let presetItems = props.colorScales.map((colorScale) => {
+    const presetItems = props.colorScales.map((colorScale) => {
         return (
             <div
-                className={classnames('dataset-colormap-preset', {'selected': colorScale.id === props.selectedColorScale})}
+                className={classnames('dataset-colormap-preset', { selected: colorScale.id === props.selectedColorScale })}
                 onClick={() => props.onColorScaleSelect(colorScale.id)}
                 key={colorScale.id}
             >
-                <DatasetColorScaleSelectorItem colorScale={colorScale}/>
+                <DatasetColorScaleSelectorItem colorScale={colorScale} />
             </div>
         );
     });
 
-    return (
-        <div className='dataset-colormap-presets'
-        >
-            {presetItems}
-        </div>
-    );
+    return <div className='dataset-colormap-presets'>{presetItems}</div>;
 };
-
 
 export type DatasetColorScaleSelectorProps = {
     colorScales: ColorScale[];
@@ -75,14 +73,13 @@ export type DatasetColorScaleSelectorProps = {
 };
 
 export const DatasetColorScaleSelector = (props: DatasetColorScaleSelectorProps) => {
+    const [dropDownVisible, setDropDownVisible] = useState(false);
 
-    let [dropDownVisible, setDropDownVisible] = useState(false);
-
-    let selectedColorScale = useSelector(() => {
+    const selectedColorScale = useSelector(() => {
         return props.colorMap.colorScale;
     });
 
-    let selectedColorScaleConfig = props.colorScales.find(colorScale => colorScale.id === selectedColorScale);
+    const selectedColorScaleConfig = props.colorScales.find((colorScale) => colorScale.id === selectedColorScale);
 
     return (
         <Dropdown
@@ -91,20 +88,22 @@ export const DatasetColorScaleSelector = (props: DatasetColorScaleSelectorProps)
             onVisibleChange={(visible) => setDropDownVisible(visible)}
             visible={dropDownVisible}
             overlayClassName='dataset-colormap-preset-dropdown'
-            overlay={<DatasetColorScaleList
-                colorScales={props.colorScales}
-                selectedColorScale={selectedColorScale}
-                onColorScaleSelect={(colorScale) => {
-                    props.colorMap.setColorScale(colorScale);
-                    setDropDownVisible(false);
-                }}
-            />}
+            overlay={
+                <DatasetColorScaleList
+                    colorScales={props.colorScales}
+                    selectedColorScale={selectedColorScale}
+                    onColorScaleSelect={(colorScale) => {
+                        props.colorMap.setColorScale(colorScale);
+                        setDropDownVisible(false);
+                    }}
+                />
+            }
         >
             <div className='dataset-colormap-preset'>
-                {selectedColorScaleConfig && <DatasetColorScaleSelectorItem
-                    colorScale={selectedColorScaleConfig}
-                />}
-                <Button type='link'><DownOutlined/></Button>
+                {selectedColorScaleConfig && <DatasetColorScaleSelectorItem colorScale={selectedColorScaleConfig} />}
+                <Button type='link'>
+                    <DownOutlined />
+                </Button>
             </div>
         </Dropdown>
     );
@@ -118,7 +117,6 @@ export type DatasetColorMapRangeSelectorProps = {
 };
 
 export const DatasetColorMapRangeSelector = (props: DatasetColorMapRangeSelectorProps) => {
-
     const domain = useDatasetVariableDomain({
         variable: props.variable
     });
@@ -144,57 +142,62 @@ export const DatasetColorMapRangeSelector = (props: DatasetColorMapRangeSelector
         max: domainMapper.normalizeValue(mapRange.max)
     };
 
-    let variableDomain: {min: number, max: number, step: number} | undefined;
+    let variableDomain: { min: number; max: number; step: number } | undefined;
     if (domain && isValueDomain(domain) && domain.min !== undefined && domain.max !== undefined) {
         const min = domainMapper.normalizeValue(domain.min);
         const max = domainMapper.normalizeValue(domain.max);
         if (min !== undefined && max !== undefined) {
             variableDomain = {
-                min: parseFloat(formatNumber(min, {
-                    maxLength: 6
-                })),
-                max: parseFloat(formatNumber(max, {
-                    maxLength: 6
-                })),
+                min: parseFloat(
+                    formatNumber(min, {
+                        maxLength: 6
+                    })
+                ),
+                max: parseFloat(
+                    formatNumber(max, {
+                        maxLength: 6
+                    })
+                ),
                 step: domain.step ? domain.step * (domain.scale || 1) : parseFloat(((max - min) / 100).toPrecision(4))
             };
         }
     }
 
     if (variableDomain) {
-
-        let marks = {
+        const marks = {
             [variableDomain.min]: `${variableDomain.min}`,
-            [variableDomain.max]: `${variableDomain.max}`,
+            [variableDomain.max]: `${variableDomain.max}`
         };
 
-        domainSlider = <Slider
-            ref={sliderRef}
-            value={[normalizedRange.min!, normalizedRange.max!]}
-            min={variableDomain.min}
-            max={variableDomain.max}
-            step={variableDomain.step}
-            range={true}
-            marks={marks}
-            tooltipVisible={false}
-            onChange={(value) => {
-                const range = {
-                    min: domainMapper.denormalizeValue(value[0]),
-                    max: domainMapper.denormalizeValue(value[1])
-                };
-                if (sliderRef.current) {
-                    // retrieve from the slider state which handle was moved and update only the corresponding range endpoint
-                    // (to avoid rounding-off the untouched range endpoint)
-                    const movedHandle: number | undefined = sliderRef.current.prevMovedHandleIndex;
-                    if (movedHandle === 0) {
-                        range.max = mapRange.max;
-                    } else if (movedHandle === 1) {
-                        range.min = mapRange.min;
+        domainSlider = (
+            <Slider
+                ref={sliderRef}
+                value={[normalizedRange.min!, normalizedRange.max!]}
+                min={variableDomain.min}
+                max={variableDomain.max}
+                step={variableDomain.step}
+                range={true}
+                marks={marks}
+                tooltipVisible={false}
+                onChange={(value) => {
+                    const range = {
+                        min: domainMapper.denormalizeValue(value[0]),
+                        max: domainMapper.denormalizeValue(value[1])
+                    };
+                    if (sliderRef.current) {
+                        // retrieve from the slider state which handle was moved and update only the corresponding range endpoint
+                        // (to avoid rounding-off the untouched range endpoint)
+                        const movedHandle: number | undefined = sliderRef.current.prevMovedHandleIndex;
+                        if (movedHandle === 0) {
+                            range.max = mapRange.max;
+                        } else if (movedHandle === 1) {
+                            range.min = mapRange.min;
+                        }
                     }
-                }
-                props.colorMap.domain?.setRange(range);
-            }}
-        />;
+                    props.colorMap.domain?.setRange(range);
+                }}
+            />
+        );
     }
 
     const domainProvider = props.variable.domain && isDomainProvider(props.variable.domain) ? props.variable.domain : undefined;
@@ -208,9 +211,9 @@ export const DatasetColorMapRangeSelector = (props: DatasetColorMapRangeSelector
                     max={variableDomain?.max}
                     step={variableDomain?.step}
                     size='small'
-                    formatter={value => `${clamp ? '≤ ' : ''}${value}`}
+                    formatter={(value) => `${clamp ? '≤ ' : ''}${value}`}
                     onChange={(value) => {
-                        if (typeof(value) === 'number') {
+                        if (typeof value === 'number') {
                             const unscaledValue = domainMapper.denormalizeValue(value);
                             if (unscaledValue !== props.colorMap.domain?.mapRange.min) {
                                 props.colorMap.domain?.setRange({
@@ -228,7 +231,7 @@ export const DatasetColorMapRangeSelector = (props: DatasetColorMapRangeSelector
                     max={variableDomain?.max}
                     step={variableDomain?.step}
                     onChange={(value) => {
-                        if (typeof(value) === 'number') {
+                        if (typeof value === 'number') {
                             const unscaledValue = domainMapper.denormalizeValue(value);
                             if (unscaledValue !== props.colorMap.domain?.mapRange.max) {
                                 props.colorMap.domain?.setRange({
@@ -239,24 +242,26 @@ export const DatasetColorMapRangeSelector = (props: DatasetColorMapRangeSelector
                         }
                     }}
                     size='small'
-                    formatter={value => `${clamp ? '≥ ' : ''}${value}`}
+                    formatter={(value) => `${clamp ? '≥ ' : ''}${value}`}
                 />
             </div>
             <div className='dataset-colormap-range-slider'>
                 {domainSlider}
-                {variableDomain && domainProvider && props.dimensionsState &&
+                {variableDomain && domainProvider && props.dimensionsState && (
                     <AsyncButton
                         tooltip='Adjust range based on current visible data domain'
                         onClick={() => {
                             const mapViewport = props.mapState?.renderer.implementation?.getViewportExtent();
                             return computeRasterDatasetOptimalBandRange({
                                 filters: {
-                                    aoi: mapViewport ? {
-                                        geometry: {
-                                            type: 'BBox',
-                                            bbox: mapViewport
-                                        }
-                                    } : undefined,
+                                    aoi: mapViewport
+                                        ? {
+                                              geometry: {
+                                                  type: 'BBox',
+                                                  bbox: mapViewport
+                                              }
+                                          }
+                                        : undefined,
                                     additionaFilters: props.dimensionsState?.additionalFilters,
                                     dimensionValues: props.dimensionsState?.dimensionValues,
                                     toi: props.dimensionsState?.toi
@@ -265,20 +270,24 @@ export const DatasetColorMapRangeSelector = (props: DatasetColorMapRangeSelector
                             }).then((range) => {
                                 if (range) {
                                     props.colorMap.domain?.setRange({
-                                        min: parseFloat(formatNumber(range.min, {
-                                            precision: 3
-                                        })),
-                                        max: parseFloat(formatNumber(range.max, {
-                                            precision: 3
-                                        }))
+                                        min: parseFloat(
+                                            formatNumber(range.min, {
+                                                precision: 3
+                                            })
+                                        ),
+                                        max: parseFloat(
+                                            formatNumber(range.max, {
+                                                precision: 3
+                                            })
+                                        )
                                     });
                                 }
                             });
                         }}
                         type='link'
-                        icon={<AdjustSolidIcon/>}
+                        icon={<AdjustSolidIcon />}
                     />
-                }
+                )}
             </div>
             <Checkbox
                 checked={!clamp}
@@ -292,7 +301,6 @@ export const DatasetColorMapRangeSelector = (props: DatasetColorMapRangeSelector
     );
 };
 
-
 export type DatasetColorMapSelectorProps = {
     colorScales: ColorScale[];
     colorMap: ColorMap;
@@ -302,29 +310,27 @@ export type DatasetColorMapSelectorProps = {
 };
 
 export const DatasetColorMapSelector = (props: DatasetColorMapSelectorProps) => {
-
-    let selectedColorScale = useSelector(() => {
+    const selectedColorScale = useSelector(() => {
         return props.colorMap.colorScale;
     });
 
-    let selectedColorScaleConfig = props.colorScales.find(colorScale => colorScale.id === selectedColorScale);
+    const selectedColorScaleConfig = props.colorScales.find((colorScale) => colorScale.id === selectedColorScale);
 
     let colormapRangeSelector: JSX.Element | undefined;
     if (props.variable && selectedColorScaleConfig?.type === ColorScaleType.Parametric) {
-        colormapRangeSelector = <DatasetColorMapRangeSelector
-            colorMap={props.colorMap}
-            variable={props.variable}
-            dimensionsState={props.dimensionsState}
-            mapState={props.mapState}
-        />;
+        colormapRangeSelector = (
+            <DatasetColorMapRangeSelector
+                colorMap={props.colorMap}
+                variable={props.variable}
+                dimensionsState={props.dimensionsState}
+                mapState={props.mapState}
+            />
+        );
     }
 
     return (
         <div className='dataset-colormap-selector'>
-            <DatasetColorScaleSelector
-                colorMap={props.colorMap}
-                colorScales={props.colorScales}
-            />
+            <DatasetColorScaleSelector colorMap={props.colorMap} colorScales={props.colorScales} />
             {colormapRangeSelector}
         </div>
     );

@@ -2,8 +2,14 @@ import React from 'react';
 import moment from 'moment';
 import { Descriptions } from 'antd';
 
-import { DataDomain, DatasetDimension, DatasetAreaSeriesDataItem, isDomainProvider, NumericDomainMapper, RasterBandConfig } from '@oidajs/eo-mobx';
-
+import {
+    DataDomain,
+    DatasetDimension,
+    DatasetAreaSeriesDataItem,
+    isDomainProvider,
+    NumericDomainMapper,
+    RasterBandConfig
+} from '@oidajs/eo-mobx';
 
 export type DatasetAreaSeriesItemStatsTableProps = {
     item: DatasetAreaSeriesDataItem;
@@ -12,7 +18,6 @@ export type DatasetAreaSeriesItemStatsTableProps = {
 };
 
 export const DatasetAreaSeriesItemStatsTable = (props: DatasetAreaSeriesItemStatsTableProps) => {
-
     const stats = props.item.data.stats;
 
     if (!stats) {
@@ -33,53 +38,44 @@ export const DatasetAreaSeriesItemStatsTable = (props: DatasetAreaSeriesItemStat
         }
     };
 
-
     return (
-        <Descriptions
-            className='dataset-sequence-item-stats-table'
-            size='small'
-            column={1}
-        >
+        <Descriptions className='dataset-sequence-item-stats-table' size='small' column={1}>
             <Descriptions.Item label='Variable'>{props.variableConfig.name}</Descriptions.Item>
-            <Descriptions.Item label={props.dimensionConfig.name}>{dimensionFormatter(props.item.x) }</Descriptions.Item>
-            {props.variableConfig.units &&
-                <Descriptions.Item label='Units'>
-                    {props.variableConfig.units}
-                </Descriptions.Item>
-            }
-            {stats.min !== undefined &&
+            <Descriptions.Item label={props.dimensionConfig.name}>{dimensionFormatter(props.item.x)}</Descriptions.Item>
+            {props.variableConfig.units && <Descriptions.Item label='Units'>{props.variableConfig.units}</Descriptions.Item>}
+            {stats.min !== undefined && (
                 <Descriptions.Item label='Min'>
                     {domainMapper.formatValue(stats.min, {
                         precision: 3
                     })}
                 </Descriptions.Item>
-            }
-            {stats.max !== undefined &&
+            )}
+            {stats.max !== undefined && (
                 <Descriptions.Item label='Max'>
                     {domainMapper.formatValue(stats.max, {
                         precision: 3
                     })}
                 </Descriptions.Item>
-            }
-            {stats.mean !== undefined &&
+            )}
+            {stats.mean !== undefined && (
                 <Descriptions.Item label='Mean'>
                     {domainMapper.formatValue(stats.mean, {
                         precision: 3
                     })}
                 </Descriptions.Item>
-            }
-            {stats.variance !== undefined &&
+            )}
+            {stats.variance !== undefined && (
                 <Descriptions.Item label='Standard deviation'>
                     {(Math.sqrt(stats.variance) * domainMapper.domainScalingFactor).toFixed(3)}
                 </Descriptions.Item>
-            }
-            {stats.median !== undefined &&
+            )}
+            {stats.median !== undefined && (
                 <Descriptions.Item label='Median'>
                     {domainMapper.formatValue(stats.median, {
                         precision: 3
                     })}
                 </Descriptions.Item>
-            }
+            )}
         </Descriptions>
     );
 };

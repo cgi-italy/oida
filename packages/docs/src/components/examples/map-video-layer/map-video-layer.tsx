@@ -31,7 +31,6 @@ const mapState = new Map({
     }
 });
 
-
 //https://storage.googleapis.com/shaka-demo-assets/sintel/dash.mpd
 //http://www.bok.net/dash/tears_of_steel/cleartext/stream.mpd
 //https://dash.akamaized.net/akamai/bbb_30fps/bbb_30fps.mpd
@@ -48,9 +47,8 @@ mapState.layers.children.add([
     })
 ]);
 
-
 type VideoControlsProps = {
-    videoLayer: AdaptiveVideoLayer
+    videoLayer: AdaptiveVideoLayer;
 };
 
 const VideoControls = observer((props: VideoControlsProps) => {
@@ -70,7 +68,6 @@ const VideoControls = observer((props: VideoControlsProps) => {
 });
 
 const MapVideoLayer = () => {
-
     const [videoLayer, setVideoLayer] = useState<AdaptiveVideoLayer>();
 
     useEffect(() => {
@@ -101,8 +98,8 @@ const MapVideoLayer = () => {
 
     return (
         <div>
-            {videoLayer && <VideoControls videoLayer={videoLayer}/>}
-            <MapComponent style={{height: '500px', width: '600px', position: 'relative'}} mapState={mapState}/>
+            {videoLayer && <VideoControls videoLayer={videoLayer} />}
+            <MapComponent style={{ height: '500px', width: '600px', position: 'relative' }} mapState={mapState} />
         </div>
     );
 };

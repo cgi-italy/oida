@@ -11,13 +11,12 @@ import { useAoiModule } from './use-aoi-module';
 import { AoiModule, AoiFormat } from '../aoi-module';
 
 export type MapAoiImporterProps = {
-    aoiModule: AoiModule,
-    activeAction: AoiAction,
-    onActiveActionChange: (action: AoiAction) => void
+    aoiModule: AoiModule;
+    activeAction: AoiAction;
+    onActiveActionChange: (action: AoiAction) => void;
 } & FormFieldState<AoiValue>;
 
 const useMapAoiImporterBase = (props: MapAoiImporterProps) => {
-
     useEffect(() => {
         if (props.activeAction === AoiAction.Import) {
             props.aoiModule.loadLastActiveSource();
@@ -27,7 +26,7 @@ const useMapAoiImporterBase = (props: MapAoiImporterProps) => {
         }
     }, [props.activeAction]);
 
-    let sourceGroups = useSelector(() => {
+    const sourceGroups = useSelector(() => {
         return props.aoiModule.aoiSources.items.map((aoiSource) => {
             return {
                 id: aoiSource.id,
@@ -37,7 +36,6 @@ const useMapAoiImporterBase = (props: MapAoiImporterProps) => {
     });
 
     const onAoiImportAction = (aoi) => {
-
         props.onChange({
             geometry: aoi.geometry.value,
             props: {
@@ -72,92 +70,100 @@ const useMapAoiImporterBase = (props: MapAoiImporterProps) => {
 
     const aoiFormats = props.aoiModule.config.aoiFormats;
 
-    const onFileImportAction = aoiFormats && aoiFormats.length ? (file: File) => {
+    const onFileImportAction =
+        aoiFormats && aoiFormats.length
+            ? (file: File) => {
+                  return new Promise<void>((resolve, reject) => {
+                      if (props.aoiModule.aoiSources.itemWithId(file.name)) {
+                          props.aoiModule.setActiveSource(file.name);
+                          resolve();
+                          return;
+                      }
 
-        return new Promise<void>((resolve, reject) => {
+                      const extensionRegex = /\.([^.]*)$/;
+                      const fileExtensionMatch = file.name.match(extensionRegex);
+                      if (fileExtensionMatch) {
+                          const fileExtension = fileExtensionMatch[1].toLowerCase();
 
-            if (props.aoiModule.aoiSources.itemWithId(file.name)) {
-                props.aoiModule.setActiveSource(file.name);
-                resolve();
-                return;
+                          let nextFormatIdx = 0;
+
+                          const tryParse = () => {
+                              let format: AoiFormat;
+                              do {
+                                  format = aoiFormats[nextFormatIdx];
+                                  nextFormatIdx++;
+                              } while (format && !format.supportedFileTypes.includes(fileExtension));
+
+                              if (!format) {
+                                  reject('Unrecognized file format');
+                              } else {
+                                  format
+                                      .parser(file)
+                                      .then((data) => {
+                                          const aoiSourceProvider = createInMemoryAoiProvider(data);
+
+                                          let propertiesSchema: IFormFieldDefinition[] | undefined;
+                                          if (data.length) {
+                                              const properties = data[0].properties || {};
+                                              propertiesSchema = Object.keys(properties).map((key, idx) => {
+                                                  return {
+                                                      name: key,
+                                                      title: key,
+                                                      type: 'string',
+                                                      config: {}
+                                                  };
+                                              });
+                                          }
+                                          props.aoiModule.aoiSources.add(
+                                              new AoiSource({
+                                                  id: file.name,
+                                                  name: file.name,
+                                                  queryParams: {
+                                                      paging: {
+                                                          pageSize: 50
+                                                      }
+                                                  },
+                                                  provider: aoiSourceProvider,
+                                                  propertiesSchema: propertiesSchema
+                                              })
+                                          );
+
+                                          props.aoiModule.setActiveSource(file.name);
+
+                                          resolve();
+                                      })
+                                      .catch(() => {
+                                          tryParse();
+                                      });
+                              }
+                          };
+
+                          tryParse();
+                      } else {
+                          reject('Unrecognized file format');
+                      }
+                  });
+              }
+            : undefined;
+
+    const filters: IFormFieldDefinition[] = [
+        {
+            name: 'geometryType',
+            title: 'Geometry',
+            type: 'enum',
+            config: {
+                choices: [
+                    { name: 'Point', value: 'Point' },
+                    { name: 'LineString', value: 'LineString' },
+                    { name: 'Polygon', value: 'Polygon' },
+                    { name: 'MultiPoint', value: 'MultiPoint' },
+                    { name: 'MultiLineString', value: 'MultiLineString' },
+                    { name: 'MultiPolygon', value: 'MultiPolygon' }
+                ],
+                multiple: true
             }
-
-            let extensionRegex = /\.([^\.]*)$/;
-            let fileExtensionMatch = file.name.match(extensionRegex);
-            if (fileExtensionMatch) {
-                let fileExtension = fileExtensionMatch[1].toLowerCase();
-
-                let nextFormatIdx = 0;
-
-                const tryParse = () => {
-                    let format: AoiFormat;
-                    do {
-                        format = aoiFormats[nextFormatIdx];
-                        nextFormatIdx++;
-                    } while (format && !format.supportedFileTypes.includes(fileExtension));
-
-                    if (!format) {
-                        reject('Unrecognized file format');
-                    } else {
-                        format.parser(file).then((data) => {
-                            let aoiSourceProvider = createInMemoryAoiProvider(data);
-
-                            let propertiesSchema: IFormFieldDefinition[] | undefined;
-                            if (data.length) {
-                                let properties = data[0].properties || {};
-                                propertiesSchema = Object.keys(properties).map((key, idx) => {
-                                    return {
-                                        name: key,
-                                        title: key,
-                                        type: 'string',
-                                        config: {}
-                                    };
-                                });
-                            }
-                            props.aoiModule.aoiSources.add(new AoiSource({
-                                id: file.name,
-                                name: file.name,
-                                queryParams: {
-                                    paging: {
-                                        pageSize: 50
-                                    }
-                                },
-                                provider: aoiSourceProvider,
-                                propertiesSchema: propertiesSchema
-                            }));
-
-                            props.aoiModule.setActiveSource(file.name);
-
-                            resolve();
-                        }).catch(() => {
-                            tryParse();
-                        });
-                    }
-                };
-
-                tryParse();
-            } else {
-                reject('Unrecognized file format');
-            }
-        });
-    } : undefined;
-
-    let filters: IFormFieldDefinition[] = [{
-        name: 'geometryType',
-        title: 'Geometry',
-        type: 'enum',
-        config: {
-            choices: [
-                {name: 'Point', value: 'Point'},
-                {name: 'LineString', value: 'LineString'},
-                {name: 'Polygon', value: 'Polygon'},
-                {name: 'MultiPoint', value: 'MultiPoint'},
-                {name: 'MultiLineString', value: 'MultiLineString'},
-                {name: 'MultiPolygon', value: 'MultiPolygon'}
-            ],
-            multiple: true
         }
-    }];
+    ];
 
     let sortableFields;
     if (selectedSourceGroup && selectedSourceGroup.propertiesSchema) {
@@ -169,7 +175,6 @@ const useMapAoiImporterBase = (props: MapAoiImporterProps) => {
                 name: field.title
             };
         });
-
     } else {
         filters.unshift({
             name: 'name',
@@ -178,9 +183,7 @@ const useMapAoiImporterBase = (props: MapAoiImporterProps) => {
             config: {}
         });
 
-        sortableFields = [
-            {key: 'name', name: 'Name'}
-        ];
+        sortableFields = [{ key: 'name', name: 'Name' }];
     }
 
     const selectedSourceGroupItems = useEntityCollection({
@@ -194,10 +197,11 @@ const useMapAoiImporterBase = (props: MapAoiImporterProps) => {
         queryParams: selectedSourceGroup?.queryParams
     });
 
-
-    let supportedFileTypes = aoiFormats && aoiFormats.reduce((fileTypes, parser) => {
-        return [...fileTypes, ...parser.supportedFileTypes];
-    }, [] as string[]);
+    const supportedFileTypes =
+        aoiFormats &&
+        aoiFormats.reduce((fileTypes, parser) => {
+            return [...fileTypes, ...parser.supportedFileTypes];
+        }, [] as string[]);
 
     return {
         onAoiImportAction: onAoiImportAction,
@@ -212,9 +216,8 @@ const useMapAoiImporterBase = (props: MapAoiImporterProps) => {
     } as AoiImportConfig;
 };
 
-
 export const useMapAoiImporter = (props: Omit<MapAoiImporterProps, 'aoiModule'>, aoiModuleId?: string) => {
-    let moduleState = useAoiModule(aoiModuleId);
+    const moduleState = useAoiModule(aoiModuleId);
 
     return useMapAoiImporterBase({
         aoiModule: moduleState,

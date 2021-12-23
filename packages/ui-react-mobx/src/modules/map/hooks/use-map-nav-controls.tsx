@@ -10,27 +10,24 @@ export type UseMapNavControlsProps = {
 };
 
 export const useMapNavControls = (props: UseMapNavControlsProps) => {
-
-    const {mapView, zoomFactor} = props;
+    const { mapView, zoomFactor } = props;
 
     const zoom = zoomFactor || 2;
 
     const onZoomIn = () => {
-        mapView.viewport.setResolution(
-            mapView.viewport.resolution / zoom
-        );
+        mapView.viewport.setResolution(mapView.viewport.resolution / zoom);
     };
 
     const onZoomOut = () => {
-        mapView.viewport.setResolution(
-            mapView.viewport.resolution * zoom
-        );
+        mapView.viewport.setResolution(mapView.viewport.resolution * zoom);
     };
 
     const homeViewport = props.homeViewport;
-    const onGoToHome = homeViewport ? () => {
-        mapView.setViewport(homeViewport);
-    } : undefined;
+    const onGoToHome = homeViewport
+        ? () => {
+              mapView.setViewport(homeViewport);
+          }
+        : undefined;
 
     const mapNavProps: MapNavControlsProps = {
         onZoomIn: onZoomIn,
@@ -41,9 +38,8 @@ export const useMapNavControls = (props: UseMapNavControlsProps) => {
     return mapNavProps;
 };
 
-
 export const useMapNavControlsFromModule = (props: Omit<UseMapNavControlsProps, 'mapView'> = {}, mapModuleId?: string) => {
-    let moduleState = useMapModule(mapModuleId);
+    const moduleState = useMapModule(mapModuleId);
 
     return useMapNavControls({
         mapView: moduleState.map.view,
@@ -51,4 +47,3 @@ export const useMapNavControlsFromModule = (props: Omit<UseMapNavControlsProps, 
         ...props
     });
 };
-

@@ -2,8 +2,17 @@ import { autorun, IObservableArray, observable, makeObservable, runInAction, act
 
 import { LoadingState, IVerticalProfile, IVerticalProfileStyle, TileSource, SubscriptionTracker } from '@oidajs/core';
 import {
-    VerticalProfileLayer, Selected, Hovered, SelectedProps, HoveredProps,
-    IsSelectable, IsHoverable, HasVisibility, Visible, VisibleProps, AsyncDataFetcher
+    VerticalProfileLayer,
+    Selected,
+    Hovered,
+    SelectedProps,
+    HoveredProps,
+    IsSelectable,
+    IsHoverable,
+    HasVisibility,
+    Visible,
+    VisibleProps,
+    AsyncDataFetcher
 } from '@oidajs/state-mobx';
 
 import { DatasetViz, DatasetVizProps } from '../common';
@@ -16,9 +25,11 @@ export const VERTICAL_PROFILE_VIZ_TYPE = 'dataset_vertical_profile_viz';
 
 export type VerticalProfileItemProps = {
     id: string;
-    geometry: IVerticalProfile,
+    geometry: IVerticalProfile;
     style: Omit<IVerticalProfileStyle, 'visible'>;
-} & VisibleProps & SelectedProps & HoveredProps;
+} & VisibleProps &
+    SelectedProps &
+    HoveredProps;
 
 export class VerticalProfileItem implements HasVisibility, IsSelectable, IsHoverable {
     readonly id: string;
@@ -50,7 +61,6 @@ export class VerticalProfileItem implements HasVisibility, IsSelectable, IsHover
     }
 }
 
-
 export interface VerticalProfileDataProvider {
     getProfiles: (verticalProfileViz: DatasetVerticalProfileViz) => Promise<VerticalProfileItemProps[]>;
     getProfileData: (profileId: string) => Promise<string>;
@@ -58,16 +68,16 @@ export interface VerticalProfileDataProvider {
 }
 
 export type VerticalProfileSeriesProviderRequest = {
-    profileId: string,
-    direction: 'horizontal' | 'vertical',
+    profileId: string;
+    direction: 'horizontal' | 'vertical';
     coordIndex: number;
 };
 
 export type VerticalProfileLineSeriesItem = DatasetPointSeriesValueItem<number> & {
     imageCoord: {
-        x: number,
-        y: number
-    }
+        x: number;
+        y: number;
+    };
 };
 
 export type VerticalProfileLineSeriesItemResponse = {
@@ -75,27 +85,26 @@ export type VerticalProfileLineSeriesItemResponse = {
     data: VerticalProfileLineSeriesItem[];
 };
 
-
 export type VerticalProfileVizConfig = {
     bandMode: RasterBandModeConfig;
     dataProvider: VerticalProfileDataProvider;
     tileSourceProvider?: (verticalProfileViz: DatasetVerticalProfileViz, profileId: string) => Promise<TileSource>;
     profileCoordTransform?: {
-        forward: (profileId: string, profileCoord: number[]) => Promise<number[] | undefined>,
-        inverse: (profileId: string, geographicCoord: number[]) => Promise<number[] | undefined>
-    },
-    lineSeriesProvider?: (request: VerticalProfileSeriesProviderRequest) => Promise<VerticalProfileLineSeriesItemResponse>,
+        forward: (profileId: string, profileCoord: number[]) => Promise<number[] | undefined>;
+        inverse: (profileId: string, geographicCoord: number[]) => Promise<number[] | undefined>;
+    };
+    lineSeriesProvider?: (request: VerticalProfileSeriesProviderRequest) => Promise<VerticalProfileLineSeriesItemResponse>;
     verticalScaleConfig?: {
-        min: number,
-        max: number,
-        step?: number,
-        default?: number
-    },
+        min: number;
+        max: number;
+        step?: number;
+        default?: number;
+    };
     afterInit?: (verticalProfileViz) => void;
 };
 
-export type DatasetVerticalProfileVizProps =
-    DatasetVizProps<typeof VERTICAL_PROFILE_VIZ_TYPE, VerticalProfileVizConfig> & VerticalScaleProps;
+export type DatasetVerticalProfileVizProps = DatasetVizProps<typeof VERTICAL_PROFILE_VIZ_TYPE, VerticalProfileVizConfig> &
+    VerticalScaleProps;
 
 export class DatasetVerticalProfileViz extends DatasetViz<VerticalProfileLayer<VerticalProfileItem>> {
     readonly config: VerticalProfileVizConfig;
@@ -161,14 +170,17 @@ export class DatasetVerticalProfileViz extends DatasetViz<VerticalProfileLayer<V
         };
 
         this.profiles.forEach((item) => {
-            this.config.dataProvider.getProfileData(item.id).then(data => {
-                item.setStyle({
-                    fillImage: data
-                });
-                onItemReady(true);
-            }, () => {
-                onItemReady(false);
-            });
+            this.config.dataProvider.getProfileData(item.id).then(
+                (data) => {
+                    item.setStyle({
+                        fillImage: data
+                    });
+                    onItemReady(true);
+                },
+                () => {
+                    onItemReady(false);
+                }
+            );
         });
     }
 
@@ -187,24 +199,27 @@ export class DatasetVerticalProfileViz extends DatasetViz<VerticalProfileLayer<V
             runInAction(() => {
                 this.profiles.clear();
             });
-            this.profileGetter_.fetchData(undefined).then((profileData) => {
-                const profiles = profileData.map((profile) => {
-                    return new VerticalProfileItem(profile);
+            this.profileGetter_
+                .fetchData(undefined)
+                .then((profileData) => {
+                    const profiles = profileData.map((profile) => {
+                        return new VerticalProfileItem(profile);
+                    });
+                    runInAction(() => {
+                        this.profiles.push(...profiles);
+                        this.mapLayer.loadingStatus.setValue(LoadingState.Success);
+                    });
+                })
+                .catch((error) => {
+                    this.mapLayer.loadingStatus.update({
+                        value: LoadingState.Error,
+                        message: error.message
+                    });
                 });
-                runInAction(() => {
-                    this.profiles.push(...profiles);
-                    this.mapLayer.loadingStatus.setValue(LoadingState.Success);
-                });
-            }).catch((error) => {
-                this.mapLayer.loadingStatus.update({
-                    value: LoadingState.Error,
-                    message: error.message
-                });
-            });
         });
 
         const widgetVisibilityDisposer = autorun(() => {
-            const selectedProfile = this.profiles.find(profile => profile.selected.value);
+            const selectedProfile = this.profiles.find((profile) => profile.selected.value);
             if (selectedProfile) {
                 this.setWidgetVisible(true);
             } else {
@@ -226,11 +241,11 @@ export class DatasetVerticalProfileViz extends DatasetViz<VerticalProfileLayer<V
             source: undefined,
             config: {
                 profileGetter: (item) => {
-                    let geometry = item.geometry;
+                    const geometry = item.geometry;
 
                     let scaledHeight: number | number[];
                     if (Array.isArray(geometry.height)) {
-                        scaledHeight = geometry.height.map(height => height * this.verticalScale.value);
+                        scaledHeight = geometry.height.map((height) => height * this.verticalScale.value);
                     } else {
                         scaledHeight = geometry.height * this.verticalScale.value;
                     }
@@ -245,7 +260,7 @@ export class DatasetVerticalProfileViz extends DatasetViz<VerticalProfileLayer<V
                     visible: item.visible.value,
                     fillColor: [1.0, 1.0, 1.0, this.mapLayer.opacity.value]
                 })
-            },
+            }
         });
     }
 }

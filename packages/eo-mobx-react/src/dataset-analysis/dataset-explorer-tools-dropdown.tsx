@@ -4,7 +4,6 @@ import { BarChartOutlined } from '@ant-design/icons';
 
 import { DatasetExplorerToolsProps, useDatasetExplorerTools } from '../hooks';
 
-
 export type DatasetExplorerToolsDropdownProps = DatasetExplorerToolsProps & {
     title?: string;
     noDatasetsMessage?: string;
@@ -14,9 +13,8 @@ export type DatasetExplorerToolsDropdownProps = DatasetExplorerToolsProps & {
 /**
  * A react component that displays as a dropdown a list of analytics tool usable for the
  * datasets currently added to the map
-*/
+ */
 export const DatasetExplorerToolsDropDown = (props: DatasetExplorerToolsDropdownProps) => {
-
     const explorerTools = useDatasetExplorerTools({
         datasetExplorer: props.datasetExplorer,
         combinedAnalysisTools: props.combinedAnalysisTools
@@ -24,47 +22,36 @@ export const DatasetExplorerToolsDropDown = (props: DatasetExplorerToolsDropdown
 
     let menuItems = explorerTools.map((item) => {
         return (
-            <Menu.Item
-                key={item.id}
-                icon={item.icon}
-                onClick={() => item.callback()}
-            >
+            <Menu.Item key={item.id} icon={item.icon} onClick={() => item.callback()}>
                 <a>{item.name}</a>
             </Menu.Item>
         );
     });
 
     if (!props.datasetExplorer.items.length) {
-        menuItems = [(
+        menuItems = [
             <Menu.Item disabled={true} className='empty-dropdown-message' key='empty-map'>
                 {props.noDatasetsMessage || 'No datasets currently on the map. Add some dataset to enable analysis tools.'}
             </Menu.Item>
-        )];
+        ];
     } else if (!menuItems.length) {
-        menuItems = [(
+        menuItems = [
             <Menu.Item disabled={true} className='empty-dropdown-message' key='empty-tools'>
                 {props.noToolsMessage || 'No tools available for the current map datasets.'}
             </Menu.Item>
-        )];
+        ];
     }
 
     return (
         <Dropdown
             trigger={['click']}
-            overlay={(
-                <Menu
-                    selectable={false}
-                >
-                    <Menu.ItemGroup
-                        title={props.title || 'Dataset analytics tools'}
-                    >
-                        {menuItems}
-                    </Menu.ItemGroup>
+            overlay={
+                <Menu selectable={false}>
+                    <Menu.ItemGroup title={props.title || 'Dataset analytics tools'}>{menuItems}</Menu.ItemGroup>
                 </Menu>
-            )}>
-            <Button icon={<BarChartOutlined/>}>
-
-            </Button>
+            }
+        >
+            <Button icon={<BarChartOutlined />}></Button>
         </Dropdown>
     );
 };

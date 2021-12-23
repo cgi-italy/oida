@@ -2,7 +2,7 @@
  * [[include:core/README.md]]
  * @packageDocumentation
  * @module core
-*/
+ */
 
 export * from './utils';
 export * from './map-render';

@@ -27,7 +27,6 @@ const defaultDrawStyle = {
 };
 
 export class CesiumFeatureDrawInteraction implements IFeatureDrawInteractionImplementation {
-
     private mapRenderer_: CesiumMapRenderer;
     private dataSource_;
     private drawEntity_;
@@ -41,7 +40,7 @@ export class CesiumFeatureDrawInteraction implements IFeatureDrawInteractionImpl
         this.viewer_ = props.mapRenderer.getViewer();
         this.dataSource_ = props.mapRenderer.getDefaultDataSource();
         this.drawStyle_ = {
-            ...defaultDrawStyle,
+            ...defaultDrawStyle
         };
     }
 
@@ -52,7 +51,6 @@ export class CesiumFeatureDrawInteraction implements IFeatureDrawInteractionImpl
     }
 
     setDrawMode(mode: FeatureDrawMode, options: FeatureDrawOptions) {
-
         if (this.handler_) {
             this.handler_.destroy();
             delete this.handler_;
@@ -68,7 +66,6 @@ export class CesiumFeatureDrawInteraction implements IFeatureDrawInteractionImpl
         }
 
         if (mode !== FeatureDrawMode.Off) {
-
             //prevent a crash on globe zoom in/out while drawing
             this.viewer_.scene.pickTranslucentDepth = false;
 
@@ -77,7 +74,7 @@ export class CesiumFeatureDrawInteraction implements IFeatureDrawInteractionImpl
             let cursorPosition = new Cartesian3();
 
             this.cursorEntity_ = this.dataSource_.entities.add({
-                position : new CallbackProperty(() => {
+                position: new CallbackProperty(() => {
                     return cursorPosition;
                 }, false),
                 point: {
@@ -89,11 +86,10 @@ export class CesiumFeatureDrawInteraction implements IFeatureDrawInteractionImpl
             });
 
             if (mode === FeatureDrawMode.Point) {
-
                 this.drawEntity_ = this.cursorEntity_;
 
                 this.handler_.setInputAction((evt) => {
-                    let position = this.viewer_.camera.pickEllipsoid(evt.position);
+                    const position = this.viewer_.camera.pickEllipsoid(evt.position);
                     if (position) {
                         cursorPosition = position;
                         this.onDrawEnd_(mode, options);
@@ -101,29 +97,28 @@ export class CesiumFeatureDrawInteraction implements IFeatureDrawInteractionImpl
                 }, ScreenSpaceEventType.LEFT_CLICK);
 
                 this.handler_.setInputAction((evt) => {
-                    let position = this.viewer_.camera.pickEllipsoid(evt.endPosition);
+                    const position = this.viewer_.camera.pickEllipsoid(evt.endPosition);
                     if (position) {
                         cursorPosition = position;
                         this.mapRenderer_.defaultDataSourceUpdate();
                     }
                 }, ScreenSpaceEventType.MOUSE_MOVE);
             } else if (mode === FeatureDrawMode.Line) {
-
-                let positions = [new Cartesian3()];
+                const positions = [new Cartesian3()];
 
                 this.drawEntity_ = this.dataSource_.entities.add({
-                    polyline : {
-                        positions : new CallbackProperty(() => {
+                    polyline: {
+                        positions: new CallbackProperty(() => {
                             return positions;
                         }, false),
-                        clampToGround : false,
-                        width : this.drawStyle_.strokeWidth,
+                        clampToGround: false,
+                        width: this.drawStyle_.strokeWidth,
                         material: new Color(...this.drawStyle_.strokeColor)
                     }
                 });
 
                 this.handler_.setInputAction((evt) => {
-                    let position = this.viewer_.camera.pickEllipsoid(evt.position);
+                    const position = this.viewer_.camera.pickEllipsoid(evt.position);
                     if (position) {
                         positions[positions.length - 1] = position;
                         if (options.maxCoords && positions.length === options.maxCoords) {
@@ -135,7 +130,7 @@ export class CesiumFeatureDrawInteraction implements IFeatureDrawInteractionImpl
                 }, ScreenSpaceEventType.LEFT_CLICK);
 
                 this.handler_.setInputAction((evt) => {
-                    let position = this.viewer_.camera.pickEllipsoid(evt.endPosition);
+                    const position = this.viewer_.camera.pickEllipsoid(evt.endPosition);
                     if (position) {
                         cursorPosition = position;
                         positions[positions.length - 1] = position;
@@ -144,20 +139,19 @@ export class CesiumFeatureDrawInteraction implements IFeatureDrawInteractionImpl
                 }, ScreenSpaceEventType.MOUSE_MOVE);
 
                 this.handler_.setInputAction((evt) => {
-                    let position = this.viewer_.camera.pickEllipsoid(evt.position);
+                    const position = this.viewer_.camera.pickEllipsoid(evt.position);
                     positions.length = positions.length - 2; //invalidate the effect of the last two click events
                     if (position) {
                         positions[positions.length - 1] = position;
                         this.onDrawEnd_(mode, options);
                     }
-                }, ScreenSpaceEventType.LEFT_DOUBLE_CLICK );
+                }, ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
             } else if (mode === FeatureDrawMode.BBox) {
-
-                let bbox = [0, 0, 0, 0];
+                const bbox = [0, 0, 0, 0];
 
                 this.drawEntity_ = this.dataSource_.entities.add({
-                    rectangle : {
-                        coordinates : new CallbackProperty(() => {
+                    rectangle: {
+                        coordinates: new CallbackProperty(() => {
                             return Rectangle.fromRadians(
                                 Math.min(bbox[0], bbox[2]),
                                 Math.min(bbox[1], bbox[3]),
@@ -170,16 +164,16 @@ export class CesiumFeatureDrawInteraction implements IFeatureDrawInteractionImpl
                         outline: true,
                         height: 0,
                         outlineColor: new Color(...this.drawStyle_.strokeColor),
-                        outlineWidth: this.drawStyle_.strokeWidth,
+                        outlineWidth: this.drawStyle_.strokeWidth
                     }
                 });
 
                 let firstCornerSet = false;
 
                 this.handler_.setInputAction((evt) => {
-                    let position = this.viewer_.camera.pickEllipsoid(evt.position);
+                    const position = this.viewer_.camera.pickEllipsoid(evt.position);
                     if (position) {
-                        let cartographic = Cartographic.fromCartesian(position);
+                        const cartographic = Cartographic.fromCartesian(position);
                         if (!firstCornerSet) {
                             bbox[0] = cartographic.longitude;
                             bbox[1] = cartographic.latitude;
@@ -196,10 +190,10 @@ export class CesiumFeatureDrawInteraction implements IFeatureDrawInteractionImpl
                 }, ScreenSpaceEventType.LEFT_CLICK);
 
                 this.handler_.setInputAction((evt) => {
-                    let position = this.viewer_.camera.pickEllipsoid(evt.endPosition);
+                    const position = this.viewer_.camera.pickEllipsoid(evt.endPosition);
                     if (position) {
                         cursorPosition = position;
-                        let cartographic = Cartographic.fromCartesian(position);
+                        const cartographic = Cartographic.fromCartesian(position);
                         if (firstCornerSet) {
                             bbox[2] = cartographic.longitude;
                             bbox[3] = cartographic.latitude;
@@ -207,19 +201,17 @@ export class CesiumFeatureDrawInteraction implements IFeatureDrawInteractionImpl
                         this.mapRenderer_.defaultDataSourceUpdate();
                     }
                 }, ScreenSpaceEventType.MOUSE_MOVE);
-
             } else if (mode === FeatureDrawMode.Polygon) {
-
-                let positions = [new Cartesian3()];
+                const positions = [new Cartesian3()];
 
                 this.drawEntity_ = this.dataSource_.entities.add({
                     polygon: {
-                        hierarchy : new CallbackProperty(() => {
+                        hierarchy: new CallbackProperty(() => {
                             return new PolygonHierarchy(positions);
                         }, false),
                         height: 0,
                         outline: false,
-                        outlineWidth : this.drawStyle_.strokeWidth,
+                        outlineWidth: this.drawStyle_.strokeWidth,
                         outlineColor: new Color(...this.drawStyle_.strokeColor),
                         material: new Color(...this.drawStyle_.fillColor)
                     },
@@ -227,13 +219,13 @@ export class CesiumFeatureDrawInteraction implements IFeatureDrawInteractionImpl
                         positions: new CallbackProperty(() => {
                             return positions.length > 1 ? [...positions, positions[0]] : positions;
                         }, false),
-                        width : this.drawStyle_.strokeWidth,
+                        width: this.drawStyle_.strokeWidth,
                         material: new Color(...this.drawStyle_.strokeColor)
                     }
                 });
 
                 this.handler_.setInputAction((evt) => {
-                    let position = this.viewer_.camera.pickEllipsoid(evt.position);
+                    const position = this.viewer_.camera.pickEllipsoid(evt.position);
                     if (position) {
                         positions[positions.length - 1] = position;
                         if (options.maxCoords && positions.length === options.maxCoords) {
@@ -245,7 +237,7 @@ export class CesiumFeatureDrawInteraction implements IFeatureDrawInteractionImpl
                 }, ScreenSpaceEventType.LEFT_CLICK);
 
                 this.handler_.setInputAction((evt) => {
-                    let position = this.viewer_.camera.pickEllipsoid(evt.endPosition);
+                    const position = this.viewer_.camera.pickEllipsoid(evt.endPosition);
                     if (position) {
                         cursorPosition = position;
                         positions[positions.length - 1] = position;
@@ -254,15 +246,14 @@ export class CesiumFeatureDrawInteraction implements IFeatureDrawInteractionImpl
                 }, ScreenSpaceEventType.MOUSE_MOVE);
 
                 this.handler_.setInputAction((evt) => {
-                    let position = this.viewer_.camera.pickEllipsoid(evt.position);
+                    const position = this.viewer_.camera.pickEllipsoid(evt.position);
                     positions.length = positions.length - 2; //invalidate the effect of the last two click events
                     if (position) {
                         positions[positions.length - 1] = position;
                         this.onDrawEnd_(mode, options);
                     }
-                }, ScreenSpaceEventType.LEFT_DOUBLE_CLICK );
+                }, ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
             } else if (mode === FeatureDrawMode.Circle) {
-
                 let center = new Cartesian3(1, 0, 0);
                 let circlePoint = new Cartesian3(0, 1, 0);
 
@@ -282,14 +273,14 @@ export class CesiumFeatureDrawInteraction implements IFeatureDrawInteractionImpl
                         outline: true,
                         height: 0,
                         outlineColor: new Color(...this.drawStyle_.strokeColor),
-                        outlineWidth: this.drawStyle_.strokeWidth,
+                        outlineWidth: this.drawStyle_.strokeWidth
                     }
                 });
 
                 let centerSet = false;
 
                 this.handler_.setInputAction((evt) => {
-                    let position = this.viewer_.camera.pickEllipsoid(evt.position);
+                    const position = this.viewer_.camera.pickEllipsoid(evt.position);
                     if (position) {
                         if (!centerSet) {
                             center = position;
@@ -302,7 +293,7 @@ export class CesiumFeatureDrawInteraction implements IFeatureDrawInteractionImpl
                 }, ScreenSpaceEventType.LEFT_CLICK);
 
                 this.handler_.setInputAction((evt) => {
-                    let position = this.viewer_.camera.pickEllipsoid(evt.endPosition);
+                    const position = this.viewer_.camera.pickEllipsoid(evt.endPosition);
                     if (position) {
                         cursorPosition = position;
                         if (centerSet) {
@@ -310,7 +301,6 @@ export class CesiumFeatureDrawInteraction implements IFeatureDrawInteractionImpl
                         }
                         this.mapRenderer_.defaultDataSourceUpdate();
                     }
-
                 }, ScreenSpaceEventType.MOUSE_MOVE);
             }
         } else {
@@ -327,7 +317,7 @@ export class CesiumFeatureDrawInteraction implements IFeatureDrawInteractionImpl
     }
 
     protected onDrawEnd_(mode, options) {
-        let geometry = this.getDrawnGeometry_(mode);
+        const geometry = this.getDrawnGeometry_(mode);
         this.setDrawMode(mode, options);
         if (options.onDrawEnd) {
             options.onDrawEnd({
@@ -337,30 +327,26 @@ export class CesiumFeatureDrawInteraction implements IFeatureDrawInteractionImpl
     }
 
     protected getCoordinates_(position: Cartesian3) {
-        let cartographic = Cartographic.fromCartesian(position);
-        return [
-            CesiumMath.toDegrees(cartographic.longitude),
-            CesiumMath.toDegrees(cartographic.latitude)
-        ];
+        const cartographic = Cartographic.fromCartesian(position);
+        return [CesiumMath.toDegrees(cartographic.longitude), CesiumMath.toDegrees(cartographic.latitude)];
     }
 
     protected getDrawnGeometry_(mode) {
-
         if (mode === FeatureDrawMode.Point) {
-            let coords = this.getCoordinates_(this.drawEntity_.position.getValue());
+            const coords = this.getCoordinates_(this.drawEntity_.position.getValue());
             return {
                 type: 'Point',
                 coordinates: coords
             };
         } else if (mode === FeatureDrawMode.Line) {
-            let positions = this.drawEntity_.polyline.positions.getValue();
+            const positions = this.drawEntity_.polyline.positions.getValue();
             return {
                 type: 'LineString',
-                coordinates: positions.map(position => this.getCoordinates_(position))
+                coordinates: positions.map((position) => this.getCoordinates_(position))
             };
         } else if (mode === FeatureDrawMode.BBox) {
-            let rectangle = this.drawEntity_.rectangle.coordinates.getValue();
-            let bbox = [
+            const rectangle = this.drawEntity_.rectangle.coordinates.getValue();
+            const bbox = [
                 CesiumMath.toDegrees(rectangle.west),
                 CesiumMath.toDegrees(rectangle.south),
                 CesiumMath.toDegrees(rectangle.east),
@@ -371,25 +357,22 @@ export class CesiumFeatureDrawInteraction implements IFeatureDrawInteractionImpl
                 bbox: bbox
             };
         } else if (mode === FeatureDrawMode.Polygon) {
-            let positions = this.drawEntity_.polyline.positions.getValue();
+            const positions = this.drawEntity_.polyline.positions.getValue();
             return {
                 type: 'Polygon',
-                coordinates: [positions.map(position => this.getCoordinates_(position))]
+                coordinates: [positions.map((position) => this.getCoordinates_(position))]
             };
         } else if (mode === FeatureDrawMode.Circle) {
-            let center = this.drawEntity_.position.getValue();
-            let radius = this.drawEntity_.ellipse.semiMajorAxis.getValue();
+            const center = this.drawEntity_.position.getValue();
+            const radius = this.drawEntity_.ellipse.semiMajorAxis.getValue();
             return {
                 type: 'Circle',
                 center: this.getCoordinates_(center),
                 radius: radius
             };
         }
-
     }
-
 }
-
 
 cesiumInteractionsFactory.register(FEATURE_DRAW_INTERACTION_ID, (config) => {
     return new CesiumFeatureDrawInteraction(config);

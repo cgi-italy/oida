@@ -3,7 +3,6 @@ import { useHistory, useLocation } from 'react-router';
 
 import { useSelector } from './use-selector';
 
-
 type RoutePathStateBindingProps = {
     parentRoute: string;
     updateStateFromRoute: (routePath: string | undefined) => void;
@@ -12,13 +11,13 @@ type RoutePathStateBindingProps = {
 
 export const useRoutePathStateBinding = (props: RoutePathStateBindingProps) => {
     const history = useHistory();
-    const location = useLocation<{updateLocationFromState: boolean}>();
+    const location = useLocation<{ updateLocationFromState: boolean }>();
 
     const [updateMode, setUpdateMode] = useState<'replaceLocation' | 'pushLocation' | 'updateState' | undefined>(
         location.state?.updateLocationFromState ? 'replaceLocation' : 'updateState'
     );
 
-    const routeMatchRegexp = new RegExp(`${props.parentRoute}/([^\/\\\\]*)`);
+    const routeMatchRegexp = new RegExp(`${props.parentRoute}/([^/\\\\]*)`);
 
     const selectedRoute = useSelector(props.stateRouteSelector);
 
@@ -65,5 +64,4 @@ export const useRoutePathStateBinding = (props: RoutePathStateBindingProps) => {
             setUpdateMode('pushLocation');
         }
     }, [selectedRoute]);
-
 };

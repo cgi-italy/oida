@@ -2,9 +2,15 @@ import React, { useState } from 'react';
 
 import { List, Button, Badge, Tooltip } from 'antd';
 import {
-    AimOutlined, SettingOutlined, BarChartOutlined,
-    DownloadOutlined, EyeOutlined, EyeInvisibleOutlined, DragOutlined,
-    CloseOutlined, WarningOutlined
+    AimOutlined,
+    SettingOutlined,
+    BarChartOutlined,
+    DownloadOutlined,
+    EyeOutlined,
+    EyeInvisibleOutlined,
+    DragOutlined,
+    CloseOutlined,
+    WarningOutlined
 } from '@ant-design/icons';
 import { SortableHandle } from 'react-sortable-hoc';
 
@@ -20,7 +26,6 @@ import { DatasetVizSettingsFactory } from './dataset-viz-settings-factory';
 import { DatasetVizDownloadModal, DatasetVizDownloadModalProps } from './dataset-viz-download';
 import { DatasetToolsMenu } from './dataset-tools-menu';
 
-
 export type DatasetVizListItemProps = {
     datasetExplorer: DatasetExplorer;
     datasetViz: DatasetViz<MapLayer>;
@@ -31,10 +36,8 @@ export type DatasetVizListItemProps = {
 };
 
 export const DatasetVizListItem = (props: DatasetVizListItemProps) => {
-
-    let vizState = useSelector(() => {
-
-        let mapLayer = props.datasetViz.mapLayer;
+    const vizState = useSelector(() => {
+        const mapLayer = props.datasetViz.mapLayer;
 
         return {
             name: props.datasetViz.dataset.config.name,
@@ -42,13 +45,12 @@ export const DatasetVizListItem = (props: DatasetVizListItemProps) => {
             visible: mapLayer.visible.value,
             color: props.datasetViz.dataset.config.color
         };
-
     });
 
-    let [activeAction, setActiveAction] = useState<string>();
-    let [downloadVisible, setDownloadVisible] = useState(false);
+    const [activeAction, setActiveAction] = useState<string>();
+    const [downloadVisible, setDownloadVisible] = useState(false);
 
-    let centerOnMap = useCenterOnMapFromModule();
+    const centerOnMap = useCenterOnMapFromModule();
 
     const loadingState = useSelector(() => {
         return {
@@ -57,21 +59,24 @@ export const DatasetVizListItem = (props: DatasetVizListItemProps) => {
         };
     });
 
-    let actions: any[] = [];
+    const actions: any[] = [];
 
     if (loadingState.value !== LoadingState.Error) {
         const spatialCoverageProvider = props.datasetViz.dataset.config.spatialCoverageProvider;
         if (spatialCoverageProvider) {
             actions.push({
                 id: 'areaZoom',
-                icon: <AimOutlined/>,
+                icon: <AimOutlined />,
                 title: 'Zoom to dataset area',
                 callback: () => {
                     return spatialCoverageProvider(props.datasetViz).then((extent) => {
-                        centerOnMap({
-                            type: 'BBox',
-                            bbox: extent as GeoJSON.BBox
-                        }, {animate: true});
+                        centerOnMap(
+                            {
+                                type: 'BBox',
+                                bbox: extent as GeoJSON.BBox
+                            },
+                            { animate: true }
+                        );
                     });
                 }
             });
@@ -85,7 +90,7 @@ export const DatasetVizListItem = (props: DatasetVizListItemProps) => {
         if (settingsContent) {
             actions.push({
                 id: 'settings',
-                icon: <SettingOutlined/>,
+                icon: <SettingOutlined />,
                 title: 'Toggle visualization settings',
                 content: settingsContent,
                 callback: () => {
@@ -101,19 +106,21 @@ export const DatasetVizListItem = (props: DatasetVizListItemProps) => {
         actions.push({
             id: 'tools',
             title: 'Toggle dataset tools',
-            menu: <DatasetToolsMenu
-                datasetViz={props.datasetViz}
-                analyticsTools={props.analyticsTools || []}
-                datasetExplorer={props.datasetExplorer}
-                icon={<BarChartOutlined/>}
-                key='tools'
-            />
+            menu: (
+                <DatasetToolsMenu
+                    datasetViz={props.datasetViz}
+                    analyticsTools={props.analyticsTools || []}
+                    datasetExplorer={props.datasetExplorer}
+                    icon={<BarChartOutlined />}
+                    key='tools'
+                />
+            )
         });
 
         if (props.datasetViz.dataset.config.download) {
-            actions.push(        {
+            actions.push({
                 id: 'download',
-                icon: <DownloadOutlined/>,
+                icon: <DownloadOutlined />,
                 title: 'Download',
                 callback: () => {
                     setDownloadVisible(true);
@@ -122,19 +129,20 @@ export const DatasetVizListItem = (props: DatasetVizListItemProps) => {
         }
     }
 
-
-    let DragHandle = SortableHandle(() => <div className='viz-drag-button'><DragOutlined/></div>);
+    const DragHandle = SortableHandle(() => (
+        <div className='viz-drag-button'>
+            <DragOutlined />
+        </div>
+    ));
 
     const onItemRemove = props.onRemove;
 
     const DownloadComponent = props.downloadComponent || DatasetVizDownloadModal;
 
     return (
-        <List.Item
-            className='viz-item'
-        >
+        <List.Item className='viz-item'>
             <div className='viz-item-content'>
-                <DragHandle/>
+                <DragHandle />
                 <Button
                     size='small'
                     type='link'
@@ -142,64 +150,59 @@ export const DatasetVizListItem = (props: DatasetVizListItemProps) => {
                         vizState.mapLayer.visible.setValue(!vizState.visible);
                     }}
                 >
-                    {vizState.visible ? <EyeOutlined/> : <EyeInvisibleOutlined/>}
+                    {vizState.visible ? <EyeOutlined /> : <EyeInvisibleOutlined />}
                 </Button>
                 <Badge color={vizState.color}></Badge>
-                <div className='viz-item-name' title={vizState.name}>{vizState.name}</div>
-                {loadingState.value === LoadingState.Error &&
+                <div className='viz-item-name' title={vizState.name}>
+                    {vizState.name}
+                </div>
+                {loadingState.value === LoadingState.Error && (
                     <div className='viz-item-error'>
                         <Tooltip title={loadingState.message}>
-                            <Button
-                                size='small'
-                                type='link'
-                            >
+                            <Button size='small' type='link'>
                                 <WarningOutlined />
                             </Button>
                         </Tooltip>
                     </div>
-                }
+                )}
                 <div className='viz-item-actions'>
-                {
-                    actions.map((action) => {
+                    {actions.map((action) => {
                         if (action.menu) {
                             return action.menu;
                         } else {
                             return (
-                                <DataCollectionItemActionButton key={action.id} action={{
-                                    title: action.title,
-                                    icon: action.icon,
-                                    callback: action.callback,
-                                    primary: (action.id === activeAction)
-                                }}/>
+                                <DataCollectionItemActionButton
+                                    key={action.id}
+                                    action={{
+                                        title: action.title,
+                                        icon: action.icon,
+                                        callback: action.callback,
+                                        primary: action.id === activeAction
+                                    }}
+                                />
                             );
                         }
-                    })
-                }
+                    })}
                 </div>
-                {onItemRemove && <Tooltip title='Remove layer'>
-                    <Button
-                        className='viz-iten-remove-btn'
-                        size='small'
-                        onClick={() => onItemRemove()}
-                    >
-                        <CloseOutlined/>
-                    </Button>
-                </Tooltip>
-                }
+                {onItemRemove && (
+                    <Tooltip title='Remove layer'>
+                        <Button className='viz-iten-remove-btn' size='small' onClick={() => onItemRemove()}>
+                            <CloseOutlined />
+                        </Button>
+                    </Tooltip>
+                )}
             </div>
-            <DatasetVizProgressControl
-                datasetViz={props.datasetViz}
-            />
-            {actions.filter((action) => action.id === activeAction).map((action) => {
-                return (
-                    <div key={action.id} className='viz-item-pane'>
-                        {action.content}
-                    </div>
-                );
-            })}
-            {downloadVisible &&
-                <DownloadComponent onClose={() => setDownloadVisible(false)} datasetViz={props.datasetViz}/>
-            }
+            <DatasetVizProgressControl datasetViz={props.datasetViz} />
+            {actions
+                .filter((action) => action.id === activeAction)
+                .map((action) => {
+                    return (
+                        <div key={action.id} className='viz-item-pane'>
+                            {action.content}
+                        </div>
+                    );
+                })}
+            {downloadVisible && <DownloadComponent onClose={() => setDownloadVisible(false)} datasetViz={props.datasetViz} />}
         </List.Item>
     );
 };

@@ -1,6 +1,6 @@
 import ImageLayer from 'ol/layer/Image';
 
-import { IMAGE_LAYER_ID, IImageLayerRenderer, MapLayerRendererConfig, ImageLayerRendererConfig, ImageSourceConfig } from '@oidajs/core';
+import { IMAGE_LAYER_ID, IImageLayerRenderer, ImageLayerRendererConfig, ImageSourceConfig } from '@oidajs/core';
 
 import { olImageSourceFactory } from './image-sources/ol-image-source-factory';
 
@@ -8,7 +8,6 @@ import { olLayersFactory } from './ol-layers-factory';
 import { OLMapLayer } from './ol-map-layer';
 
 export class OLImageLayer extends OLMapLayer<ImageLayer> implements IImageLayerRenderer {
-
     protected onImageLoadStart_;
     protected onImageLoadEnd_;
 
@@ -17,13 +16,12 @@ export class OLImageLayer extends OLMapLayer<ImageLayer> implements IImageLayerR
     }
 
     updateSource(source?: ImageSourceConfig) {
-
         let olSource;
         if (source) {
             olSource = this.createImageSource_(source);
         }
 
-        let prevSource = this.olImpl_.getSource();
+        const prevSource = this.olImpl_.getSource();
         if (prevSource) {
             prevSource.un('imageloadstart', this.onImageLoadStart_);
             prevSource.un('imageloadend', this.onImageLoadEnd_);
@@ -31,7 +29,6 @@ export class OLImageLayer extends OLMapLayer<ImageLayer> implements IImageLayerR
         }
 
         this.olImpl_.setSource(olSource || null);
-
     }
 
     forceRefresh() {
@@ -39,7 +36,6 @@ export class OLImageLayer extends OLMapLayer<ImageLayer> implements IImageLayerR
     }
 
     protected createOLObject_(config: ImageLayerRendererConfig) {
-
         this.onImageLoadStart_ = config.onImageLoadStart;
         this.onImageLoadEnd_ = config.onImageLoadEnd;
 
@@ -48,14 +44,14 @@ export class OLImageLayer extends OLMapLayer<ImageLayer> implements IImageLayerR
             extent: config.extent,
             zIndex: config.zIndex || 0
         });
-
     }
 
     protected destroyOLObject_() {
+        return;
     }
 
     protected createImageSource_(source: ImageSourceConfig) {
-        let olSource = olImageSourceFactory.create(source.type, {
+        const olSource = olImageSourceFactory.create(source.type, {
             ...source.config
         });
 
@@ -67,7 +63,6 @@ export class OLImageLayer extends OLMapLayer<ImageLayer> implements IImageLayerR
 
         return olSource;
     }
-
 }
 
 olLayersFactory.register(IMAGE_LAYER_ID, (config) => {

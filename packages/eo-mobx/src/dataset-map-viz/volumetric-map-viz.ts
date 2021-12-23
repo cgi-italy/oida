@@ -21,17 +21,18 @@ export type VolumetricMapVizConfig = {
     verticalDomain: DataVerticalDomain;
     volumeSourceProvider: (volumetricViz: DatasetVolumetricViz) => VolumeSourceConfig | undefined;
     verticalScaleConfig?: {
-        min: number,
-        max: number,
-        step?: number,
-        default?: number
-    },
+        min: number;
+        max: number;
+        step?: number;
+        default?: number;
+    };
     afterInit?: (volumetricViz: DatasetVolumetricViz) => void;
 };
 
 export type DatasetVolumetricVizProps = {
     bandMode?: RasterBandModeSingleProps | RasterBandModeSingle;
-} & DatasetVizProps<typeof VOLUMETRIC_VIZ_TYPE, VolumetricMapVizConfig> & VerticalScaleProps;
+} & DatasetVizProps<typeof VOLUMETRIC_VIZ_TYPE, VolumetricMapVizConfig> &
+    VerticalScaleProps;
 
 export class DatasetVolumetricViz extends DatasetViz<VolumeLayer> {
     readonly config: VolumetricMapVizConfig;
@@ -65,7 +66,6 @@ export class DatasetVolumetricViz extends DatasetViz<VolumeLayer> {
         makeObservable(this);
 
         this.afterInit_();
-
     }
 
     @action
@@ -84,9 +84,9 @@ export class DatasetVolumetricViz extends DatasetViz<VolumeLayer> {
     protected getLayerColorMap_() {
         const bandMode = this.bandMode;
         if (bandMode) {
-            const bandConfig = this.config.bands.find(band => band.id === bandMode.band);
+            const bandConfig = this.config.bands.find((band) => band.id === bandMode.band);
             if (bandConfig) {
-                const colorScaleConfig = bandConfig.colorScales?.find(colorScale => colorScale.id === bandMode.colorMap.colorScale);
+                const colorScaleConfig = bandConfig.colorScales?.find((colorScale) => colorScale.id === bandMode.colorMap.colorScale);
                 const domain = bandMode.colorMap.domain;
                 if (colorScaleConfig && domain) {
                     return new VolumeColorMap({
@@ -102,12 +102,12 @@ export class DatasetVolumetricViz extends DatasetViz<VolumeLayer> {
 
     protected afterInit_() {
         const sourceUpdateDisposer = autorun(() => {
-            let sourceConfig = this.config.volumeSourceProvider(this);
+            const sourceConfig = this.config.volumeSourceProvider(this);
             this.mapLayer.setSource(sourceConfig);
         });
 
         const colormapUpdateDisposer = autorun(() => {
-            let layerColorMap = this.getLayerColorMap_();
+            const layerColorMap = this.getLayerColorMap_();
             if (layerColorMap) {
                 this.mapLayer.setColorMap(layerColorMap);
             }
@@ -136,6 +136,4 @@ export class DatasetVolumetricViz extends DatasetViz<VolumeLayer> {
             colorMap: this.getLayerColorMap_()
         });
     }
-
 }
-

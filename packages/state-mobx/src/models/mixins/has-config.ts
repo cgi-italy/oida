@@ -1,7 +1,7 @@
 import { makeObservable, observable, action } from 'mobx';
 
 export type ConfigProps<T extends Record<string, any>> = {
-    config: T
+    config: T;
 };
 
 export class Config<T extends Record<string, any>> {

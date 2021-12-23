@@ -5,7 +5,6 @@ import { SubscriptionTracker } from '@oidajs/core';
 import { DatasetAnalysis, DatasetAnalysisProps } from './dataset-analysis';
 import { DatasetAreaValues, DatasetAreaValuesProps } from './dataset-area-values';
 
-
 export const GRID_SCATTER_ANALYSIS = 'grid_scatter_analysis';
 
 export type GridScatterAnalysisProps = {
@@ -18,7 +17,6 @@ export type GridScatterAnalysisProps = {
  * to enable scatter analyses
  */
 export class GridScatterAnalysis extends DatasetAnalysis<DatasetAreaValues> {
-
     protected subscriptionTracker_: SubscriptionTracker;
 
     constructor(props: GridScatterAnalysisProps) {
@@ -84,9 +82,13 @@ export class GridScatterAnalysis extends DatasetAnalysis<DatasetAreaValues> {
         }
         this.processings[1] = analysis;
         analysis.visible.setValue(false);
-        analysis.setAoi(this.aoi ? {
-            geometry: this.aoi.geometry.value
-        } : undefined);
+        analysis.setAoi(
+            this.aoi
+                ? {
+                      geometry: this.aoi.geometry.value
+                  }
+                : undefined
+        );
     }
 
     @action
@@ -96,9 +98,13 @@ export class GridScatterAnalysis extends DatasetAnalysis<DatasetAreaValues> {
         }
         this.processings[2] = analysis;
         analysis.visible.setValue(false);
-        analysis.setAoi(this.aoi ? {
-            geometry: this.aoi.geometry.value
-        } : undefined);
+        analysis.setAoi(
+            this.aoi
+                ? {
+                      geometry: this.aoi.geometry.value
+                  }
+                : undefined
+        );
     }
 
     dispose() {
@@ -114,15 +120,21 @@ export class GridScatterAnalysis extends DatasetAnalysis<DatasetAreaValues> {
     }
 
     protected afterInit_() {
-        const aoiLinkDisposer = reaction(() => this.aoi?.geometry.value, (geometry) => {
-            this.processings.slice(1).forEach((processing) => {
-                processing.setAoi(geometry ? {
-                    geometry: geometry
-                } : undefined);
-            });
-        });
+        const aoiLinkDisposer = reaction(
+            () => this.aoi?.geometry.value,
+            (geometry) => {
+                this.processings.slice(1).forEach((processing) => {
+                    processing.setAoi(
+                        geometry
+                            ? {
+                                  geometry: geometry
+                              }
+                            : undefined
+                    );
+                });
+            }
+        );
 
         this.subscriptionTracker_.addSubscription(aoiLinkDisposer);
     }
-
 }

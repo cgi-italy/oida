@@ -4,7 +4,6 @@ import { Map, TileLayer, MapLayer } from '@oidajs/state-mobx';
 import { MapComponent } from '@oidajs/ui-react-mobx';
 import '@oidajs/map-ol';
 
-
 const mapState = new Map({
     renderer: {
         id: 'ol',
@@ -44,9 +43,8 @@ mapState.layers.children.add([
     })
 ]);
 
-
 const MapMobx = () => {
-    return (<MapComponent style={{height: '300px', width: '400px', position: 'relative'}} mapState={mapState}/>);
+    return <MapComponent style={{ height: '300px', width: '400px', position: 'relative' }} mapState={mapState} />;
 };
 
 export default MapMobx;

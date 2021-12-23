@@ -1,12 +1,17 @@
 import { transformExtent } from 'ol/proj';
 
 import { AxiosInstanceWithCancellation, TileSource } from '@oidajs/core';
-import {
-    RasterMapViz, RasterBandModeSingle, RasterBandModePreset, RasterBandModeCombination, RasterBandMode
-} from '@oidajs/eo-mobx';
+import { RasterMapViz, RasterBandModeSingle, RasterBandModePreset, RasterBandModeCombination, RasterBandMode } from '@oidajs/eo-mobx';
 
 import { ADAM_WCS_SOURCE_ID } from '../adam-wcs-tile-source';
-import { getWcsTimeFilterSubset, getAoiWcsParams, getCoverageWcsParams, getColormapWcsParams, createGeoTiffLoader, GeotiffLoader } from '../../utils';
+import {
+    getWcsTimeFilterSubset,
+    getAoiWcsParams,
+    getCoverageWcsParams,
+    getColormapWcsParams,
+    createGeoTiffLoader,
+    GeotiffLoader
+} from '../../utils';
 import { AdamDatasetConfig, isMultiBandCoverage, AdamDatasetCoverageBand } from '../../adam-dataset-config';
 import { AdamDatasetFactoryConfig } from '../../get-adam-dataset-factory';
 import { AdamSpatialCoverageProvider } from '../../get-adam-dataset-spatial-coverage-provider';
@@ -16,7 +21,6 @@ const getMultiBandColorRange = (
     bandMode: RasterBandMode,
     datasetBandsDict: Record<string, AdamDatasetCoverageBand>
 ) => {
-
     if (!isMultiBandCoverage(datasetConfig.coverages)) {
         return undefined;
     }
@@ -26,18 +30,18 @@ const getMultiBandColorRange = (
     const bandModeValue = bandMode.value;
     if (bandModeValue instanceof RasterBandModePreset) {
         const preset = bandModeValue.preset;
-        const presetConfig = datasetConfig.coverages.presets.find(p => p.id === preset);
+        const presetConfig = datasetConfig.coverages.presets.find((p) => p.id === preset);
         if (presetConfig) {
             const redConfig = datasetBandsDict[presetConfig.bands[0]];
             if (redConfig) {
-                let defaultRange = redConfig.default?.range || redConfig.domain || {min: 0, max: 100};
+                const defaultRange = redConfig.default?.range || redConfig.domain || { min: 0, max: 100 };
                 colorRange = `(${defaultRange.min},${defaultRange.max})`;
             }
         }
     } else if (bandModeValue instanceof RasterBandModeCombination) {
         const redConfig = datasetBandsDict[bandModeValue.red];
         if (redConfig) {
-            let defaultRange = redConfig.default?.range || redConfig.domain || {min: 0, max: 100};
+            const defaultRange = redConfig.default?.range || redConfig.domain || { min: 0, max: 100 };
             colorRange = `(${defaultRange.min},${defaultRange.max})`;
         }
     }
@@ -52,24 +56,21 @@ export const createAdamRasterTileSourceProvider = (
     spatialCoverageProvider: AdamSpatialCoverageProvider,
     useRawData?: boolean
 ) => {
-
     let geotiffLoader: GeotiffLoader | undefined;
 
     if (useRawData) {
-        geotiffLoader = createGeoTiffLoader({axiosInstance, rotateImage: false});
+        geotiffLoader = createGeoTiffLoader({ axiosInstance, rotateImage: false });
     }
 
     const datasetBandsDict: Record<string, AdamDatasetCoverageBand> = {};
 
     if (isMultiBandCoverage(datasetConfig.coverages)) {
-
         datasetConfig.coverages.bands.forEach((band) => {
             datasetBandsDict[band.idx] = band;
         });
     }
 
     const provider = (rasterView: RasterMapViz) => {
-
         if (datasetConfig.aoiRequired && !rasterView.dataset.aoi) {
             return Promise.reject(new Error('Select an area of interest to visualize data from this layer'));
         }
@@ -167,5 +168,4 @@ export const createAdamRasterTileSourceProvider = (
         provider: provider,
         tiffLoader: geotiffLoader
     };
-
 };

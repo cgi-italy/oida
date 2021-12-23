@@ -1,4 +1,3 @@
-
 import flip from '@turf/flip';
 
 import { Geometry } from '../../common';
@@ -13,7 +12,7 @@ export const flipGeometryCoords: (geometry: Geometry) => Geometry = (geometry: G
         };
     }
     if (geometry.type === 'BBox') {
-        let bbox = geometry.bbox;
+        const bbox = geometry.bbox;
         return {
             type: 'BBox',
             bbox: [bbox[1], bbox[0], bbox[3], bbox[2]]
@@ -27,5 +26,4 @@ export const flipGeometryCoords: (geometry: Geometry) => Geometry = (geometry: G
         // @ts-ignore
         return flip(geometry) as Geometry;
     }
-
 };

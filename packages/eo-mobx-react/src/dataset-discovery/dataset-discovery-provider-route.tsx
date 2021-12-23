@@ -5,19 +5,19 @@ import { useSelector } from '@oidajs/ui-react-mobx';
 import { DatasetDiscoveryProviderFactory } from './dataset-discovery-provider-factory';
 import { DatasetDiscoveryProviderTabsSelector } from './dataset-discovery-provider-tabs-selector';
 
-
-const DatasetDiscoveryProviderRedirect = (props: {datasetDiscovery: DatasetDiscovery}) => {
+const DatasetDiscoveryProviderRedirect = (props: { datasetDiscovery: DatasetDiscovery }) => {
     const { path } = useRouteMatch();
 
     const selectedProvider = useSelector(() => props.datasetDiscovery.selectedProvider || props.datasetDiscovery.providers[0]);
     if (selectedProvider) {
         return (
-            <Redirect to={{
-                pathname: `${path}/${selectedProvider.id}`,
-                state: {
-                    updateLocationFromState: true
-                }
-            }}
+            <Redirect
+                to={{
+                    pathname: `${path}/${selectedProvider.id}`,
+                    state: {
+                        updateLocationFromState: true
+                    }
+                }}
             />
         );
     } else {
@@ -31,8 +31,7 @@ export type DatasetDiscoveryProviderRouteProps = {
 };
 
 export const DatasetDiscoveryProviderRoute = (props: DatasetDiscoveryProviderRouteProps) => {
-
-    const { providerId } = useParams<{providerId: string}>();
+    const { providerId } = useParams<{ providerId: string }>();
 
     useEffect(() => {
         props.datasetDiscovery.selectProvider(providerId);
@@ -50,11 +49,7 @@ export const DatasetDiscoveryProviderRoute = (props: DatasetDiscoveryProviderRou
         }
     }, [providerId]);
 
-    return (
-        <React.Fragment>
-            {discoveryContent}
-        </React.Fragment>
-    );
+    return <React.Fragment>{discoveryContent}</React.Fragment>;
 };
 
 export type DatasetDiscoveryProviderRouterProps = {
@@ -63,41 +58,37 @@ export type DatasetDiscoveryProviderRouterProps = {
 };
 
 export const DatasetDiscoveryProviderRouter = (props: DatasetDiscoveryProviderRouterProps) => {
-
     const { path } = useRouteMatch();
 
     return (
         <Switch>
             <Route exact path={path}>
-                <DatasetDiscoveryProviderRedirect datasetDiscovery={props.datasetDiscovery}
-                />
+                <DatasetDiscoveryProviderRedirect datasetDiscovery={props.datasetDiscovery} />
             </Route>
             <Route path={`${path}/:providerId`}>
-                <DatasetDiscoveryProviderRoute
-                    datasetDiscovery={props.datasetDiscovery}
-                    datasetExplorer={props.datasetExplorer}
-                />
+                <DatasetDiscoveryProviderRoute datasetDiscovery={props.datasetDiscovery} datasetExplorer={props.datasetExplorer} />
             </Route>
         </Switch>
     );
 };
 
-export const DatasetDiscoveryProviderTabsNavigation = (props: {datasetDiscovery: DatasetDiscovery}) => {
-
-    const providers = useSelector(() => props.datasetDiscovery.providers.filter(provider => !provider.disabled));
+export const DatasetDiscoveryProviderTabsNavigation = (props: { datasetDiscovery: DatasetDiscovery }) => {
+    const providers = useSelector(() => props.datasetDiscovery.providers.filter((provider) => !provider.disabled));
 
     const history = useHistory();
     const { path } = useRouteMatch();
-    const match = useRouteMatch<{providerId: string}>({
+    const match = useRouteMatch<{ providerId: string }>({
         path: `${path}/:providerId`
     });
     const selectedProvider = match?.params.providerId;
 
-    return <DatasetDiscoveryProviderTabsSelector
-        providers={providers}
-        selectedProvider={selectedProvider}
-        onProviderSelect={(providerId) => {
-            history.push(`${path}/${providerId}`);
-        }}
-    />;
+    return (
+        <DatasetDiscoveryProviderTabsSelector
+            providers={providers}
+            selectedProvider={selectedProvider}
+            onProviderSelect={(providerId) => {
+                history.push(`${path}/${providerId}`);
+            }}
+        />
+    );
 };

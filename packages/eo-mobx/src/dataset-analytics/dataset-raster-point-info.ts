@@ -3,9 +3,16 @@ import { autorun, observable, makeObservable, action, computed } from 'mobx';
 import { LoadingState, QueryFilter, SubscriptionTracker } from '@oidajs/core';
 import { AsyncDataFetcher, MapLayer } from '@oidajs/state-mobx';
 
-import { DatasetViz, DatasetDimension, DataDomain, NumericVariable, DatasetDimensions, HasDatasetDimensions, DatasetDimensionsProps } from '../common';
+import {
+    DatasetViz,
+    DatasetDimension,
+    DataDomain,
+    NumericVariable,
+    DatasetDimensions,
+    HasDatasetDimensions,
+    DatasetDimensionsProps
+} from '../common';
 import { DatasetProcessing, DatasetProcessingProps } from './dataset-processing';
-
 
 export const RASTER_POINT_INFO_PRCESSING = 'raster_point_info_processing';
 
@@ -27,7 +34,6 @@ export type DatasetRasterPointInfoConfig = {
     dimensions: DatasetDimension<DataDomain<DimensionType>>[];
 };
 
-
 export type DatasetRasterPointInfoProps = {
     /**
      * when enabled the query time and other dimension values will be kept in sync with the parent
@@ -35,14 +41,14 @@ export type DatasetRasterPointInfoProps = {
      */
     trackParentViz?: boolean;
     autoUpdate?: boolean;
-    parent?: DatasetViz<MapLayer | undefined> & Partial<HasDatasetDimensions>
-} & Omit<DatasetProcessingProps<typeof RASTER_POINT_INFO_PRCESSING, DatasetRasterPointInfoConfig>, 'parent'> & DatasetDimensionsProps;
+    parent?: DatasetViz<MapLayer | undefined> & Partial<HasDatasetDimensions>;
+} & Omit<DatasetProcessingProps<typeof RASTER_POINT_INFO_PRCESSING, DatasetRasterPointInfoConfig>, 'parent'> &
+    DatasetDimensionsProps;
 
 /**
  * An tool to extract the value on a point location of a raster dataset
  */
 export class DatasetRasterPointInfo extends DatasetProcessing<undefined> implements HasDatasetDimensions {
-
     readonly parent: (DatasetViz<MapLayer | undefined> & Partial<HasDatasetDimensions>) | undefined;
     readonly config: DatasetRasterPointInfoConfig;
     readonly dimensions: DatasetDimensions;
@@ -92,23 +98,28 @@ export class DatasetRasterPointInfo extends DatasetProcessing<undefined> impleme
 
     @computed
     get canRunQuery() {
-        return !!this.aoi?.geometry.value
-        && this.config.dimensions.every((dim) => {
-            return this.dimensions.values.has(dim.id);
-        });
+        return (
+            !!this.aoi?.geometry.value &&
+            this.config.dimensions.every((dim) => {
+                return this.dimensions.values.has(dim.id);
+            })
+        );
     }
 
     retrieveData() {
         if (this.canRunQuery) {
-            this.dataFetcher_.fetchData({
-                position: (this.aoi!.geometry.value as GeoJSON.Point).coordinates,
-                dimensionValues: new Map(this.dimensions.values),
-                additionalDatasetFilters: new Map(this.dataset.additionalFilters.items)
-            }).then((data) => {
-                this.setData_(data);
-            }).catch(() => {
-                this.setData_(undefined);
-            });
+            this.dataFetcher_
+                .fetchData({
+                    position: (this.aoi!.geometry.value as GeoJSON.Point).coordinates,
+                    dimensionValues: new Map(this.dimensions.values),
+                    additionalDatasetFilters: new Map(this.dataset.additionalFilters.items)
+                })
+                .then((data) => {
+                    this.setData_(data);
+                })
+                .catch(() => {
+                    this.setData_(undefined);
+                });
         } else {
             this.loadingState.setValue(LoadingState.Init);
             this.setData_(undefined);
@@ -128,7 +139,6 @@ export class DatasetRasterPointInfo extends DatasetProcessing<undefined> impleme
     }
 
     protected afterInit_(trackParentViz?: boolean) {
-
         if (trackParentViz) {
             const parentTrackerDisposer = autorun(() => {
                 this.syncParentDimensions_();
@@ -176,4 +186,3 @@ export class DatasetRasterPointInfo extends DatasetProcessing<undefined> impleme
         return undefined;
     }
 }
-

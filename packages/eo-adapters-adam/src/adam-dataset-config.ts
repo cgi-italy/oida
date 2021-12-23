@@ -1,5 +1,11 @@
 import {
-    DatasetDimension, ValueDomain, CategoricalDomain, RasterBandConfig, RasterBandPreset, RasterBandGroup, ProductSearchRecord
+    DatasetDimension,
+    ValueDomain,
+    CategoricalDomain,
+    RasterBandConfig,
+    RasterBandPreset,
+    RasterBandGroup,
+    ProductSearchRecord
 } from '@oidajs/eo-mobx';
 
 export type AdamDatasetDimension = DatasetDimension<ValueDomain<number | Date> | CategoricalDomain<number | string>> & {
@@ -12,7 +18,6 @@ export type AdamDatasetDimension = DatasetDimension<ValueDomain<number | Date> |
     preventSeries?: boolean;
 };
 
-
 export type AdamDatasetSingleBandCoverage = Omit<RasterBandConfig, 'domain'> & {
     wcsCoverage: string;
     subdataset?: string;
@@ -21,9 +26,8 @@ export type AdamDatasetSingleBandCoverage = Omit<RasterBandConfig, 'domain'> & {
         value: string;
         idx?: number;
     };
-    domain?: ValueDomain<number>
+    domain?: ValueDomain<number>;
 };
-
 
 export type AdamDatasetCoverageBand = Omit<RasterBandConfig, 'id' | 'domain'> & {
     idx: number;
@@ -44,20 +48,18 @@ export type AdamDatasetMultiBandCoverage = {
     presets: AdamDatasetMultiBandCoveragePreset[];
 };
 
-
 export enum AdamDatasetRenderMode {
     ServerSide = 'ServerSide',
     ClientSide = 'ClientSide'
 }
-
 
 export type AdamDatasetType = 'raster' | 'volume' | 'vertical_profile';
 
 export type AdamDatasetConfig = {
     id: string;
     type: AdamDatasetType;
-    name: string,
-    color?: string,
+    name: string;
+    color?: string;
     coverages: AdamDatasetSingleBandCoverage[] | AdamDatasetMultiBandCoverage;
     coverageSrs: string;
     srsDef?: string;

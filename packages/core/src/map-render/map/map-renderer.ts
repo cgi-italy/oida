@@ -1,6 +1,6 @@
 import { IDynamicFactory } from '../../utils/dynamic-factory';
 import { IMapInteractionImplementation } from '../interactions/map-interaction-implementation';
-import { IMapLayerRenderer, IMapLayerRendererConfigDefinitions, MapLayerRendererConfig } from '../layers/map-layer-renderer';
+import { IMapLayerRenderer, IMapLayerRendererConfigDefinitions } from '../layers/map-layer-renderer';
 import { IGroupLayerRenderer } from '../layers/group-layer-renderer';
 
 export type BBox = [number, number, number, number];
@@ -12,7 +12,7 @@ export interface IMapProjection {
     wrapX?: boolean;
 }
 
-export type MapCoord  = [number, number, number?];
+export type MapCoord = [number, number, number?];
 
 export interface IMapViewport {
     resolution: number;
@@ -35,7 +35,7 @@ export interface IMapRenderer {
     id: string;
     setTarget(target: HTMLElement): void;
     setViewport(viewport: IMapViewport, animate?: boolean): void;
-    updateRendererProps(props: {[key: string]: any}): void;
+    updateRendererProps(props: Record<string, any>): void;
     fitExtent(extent: BBox, animate?: boolean): void;
     getViewportExtent(): BBox;
     getLayersFactory(): IDynamicFactory<IMapLayerRenderer, IMapLayerRendererConfigDefinitions>;
@@ -47,5 +47,5 @@ export interface IMapRenderer {
 }
 
 export type IMapRendererContructor = {
-    new(props: IMapRendererProps): IMapRenderer
+    new (props: IMapRendererProps): IMapRenderer;
 };
