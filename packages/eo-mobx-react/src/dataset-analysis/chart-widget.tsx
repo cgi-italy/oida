@@ -94,7 +94,7 @@ export const ChartWidget = (props: ChartWidgetProps) => {
                     yAxis = props.options.yAxis.map((axisConfig) => {
                         return {
                             ...axisConfig,
-                            splitNumber: Math.floor(size.height / 80)
+                            splitNumber: Math.floor((size.height || 0) / 80)
                         };
                     });
                 }
@@ -149,7 +149,7 @@ export const ChartWidget = (props: ChartWidgetProps) => {
                         yAxis: props.options.yAxis.map((axisConfig) => {
                             return {
                                 ...axisConfig,
-                                splitNumber: Math.floor(size.height / 80)
+                                splitNumber: Math.floor((size.height || 0) / 80)
                             };
                         })
                     },
@@ -158,7 +158,10 @@ export const ChartWidget = (props: ChartWidgetProps) => {
                 );
             }
             if (props.onSizeChange) {
-                props.onSizeChange(size);
+                props.onSizeChange({
+                    width: size.width || 0,
+                    height: size.height || 0
+                });
             }
         }
     }, [size]);

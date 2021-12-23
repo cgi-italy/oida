@@ -1,13 +1,13 @@
+@root-entry-name: default;
+
 @import '~antd/lib/style/themes/default.less';
 @import '~antd/lib/style/mixins/index';
 
+@import '~antd/lib/style/core/base';
 // antd overrides some global rules modifying the docusaurus look'n'feel
 // scope the global rules inside the .oida-sample class
 .oida-sample {
-
-
-
-    @import '~antd/lib/style/core/base.less';
+    @import '~antd/lib/style/core/global.less';
 
     margin: 0; // 1
     color: @text-color;
@@ -17,13 +17,9 @@
     line-height: @line-height-base;
     background-color: @body-background; // 2
     font-feature-settings: @font-feature-settings-base;
-
-
 }
-
 @import '~antd/lib/style/core/iconfont';
 @import '~antd/lib/style/core/motion';
-
 @import '~antd/lib/style/components.less';
 
 .ant-picker-dropdown {

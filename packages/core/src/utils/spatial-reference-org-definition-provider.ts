@@ -20,7 +20,7 @@ export class SpatialReferenceOrgDefinitionProvider {
         return this.axiosInstance_
             .request<string>({
                 url: `${this.serviceUrl_}/ref/${defPath}/proj4/`,
-                responseType: 'text/plain'
+                responseType: 'text'
             })
             .then((response) => {
                 return response.data;

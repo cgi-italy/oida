@@ -35,7 +35,7 @@ export const ScrollableOverlay = (props: ScrollableOverlayProps) => {
                     }
                 }}
             >
-                <div className='scrollable-overlay-scroller-overflow' style={{ height: size.height }} />
+                <div className='scrollable-overlay-scroller-overflow' style={{ height: size.height || 0 }} />
             </div>
         </div>
     );

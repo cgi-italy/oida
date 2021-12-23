@@ -230,14 +230,14 @@ export class DatasetTransectValues extends DatasetProcessing<undefined> implemen
 
     onGeometryHover(coordinate: GeoJSON.Position) {
         if (this.data.length) {
-            const geometry = {
+            const geometry: GeoJSON.LineString = {
                 type: 'LineString',
                 coordinates: this.data.map((item) => item.coordinates)
             };
 
             const nearest = nearestPointOnLine(geometry, coordinate);
             let nearestIdx = nearest.properties.index;
-            if (nearestIdx < this.data.length - 1) {
+            if (nearestIdx !== undefined && nearestIdx < this.data.length - 1 && nearest.properties.location !== undefined) {
                 const distToPrev = Math.abs(this.data[nearestIdx].distance - nearest.properties.location);
                 const distToNext = Math.abs(this.data[nearestIdx + 1].distance - nearest.properties.location);
                 if (distToNext < distToPrev) {

@@ -18,9 +18,9 @@ export type AnalysisAoiFilterProps = {
     supportedGeometries: AoiSupportedGeometry[];
 };
 
+const AOI_DRAG_ITEM = 'ANALYSIS_AOI';
 type AoiItemType = {
     aoi?: SharedAoi;
-    type: string;
 };
 
 export const AnalysisAoiFilter = (props: AnalysisAoiFilterProps) => {
@@ -29,33 +29,40 @@ export const AnalysisAoiFilter = (props: AnalysisAoiFilterProps) => {
 
     const { activeAction, onActiveActionChange } = useAoiAction();
 
-    const [{ isDragging }, drag, preview] = useDrag({
-        item: { type: 'ANALYSIS_AOI', aoi: aoi },
-        canDrag: (item) => {
-            return !!aoi;
-        },
-        collect: (monitor) => {
-            return {
-                isDragging: monitor.isDragging()
-            };
-        }
-    });
-
-    const [{ isOver, canDrop }, drop] = useDrop({
-        accept: ['ANALYSIS_AOI'],
-        collect: (monitor) => ({
-            isOver: monitor.isOver(),
-            canDrop: monitor.canDrop()
-        }),
-        canDrop: (item) => {
-            return !!item.aoi && item.aoi !== aoi;
-        },
-        drop: (item: AoiItemType) => {
-            if (item.aoi) {
-                props.analysis.setAoi(item.aoi);
+    const [{ isDragging }, drag, preview] = useDrag(
+        () => ({
+            type: AOI_DRAG_ITEM,
+            item: { aoi: aoi },
+            canDrag: (item) => {
+                return !!aoi;
+            },
+            collect: (monitor) => {
+                return {
+                    isDragging: monitor.isDragging()
+                };
             }
-        }
-    });
+        }),
+        [aoi]
+    );
+
+    const [{ isOver, canDrop }, drop] = useDrop(
+        () => ({
+            accept: [AOI_DRAG_ITEM],
+            collect: (monitor) => ({
+                isOver: monitor.isOver(),
+                canDrop: monitor.canDrop()
+            }),
+            canDrop: (item) => {
+                return !!item.aoi && item.aoi !== aoi;
+            },
+            drop: (item: AoiItemType) => {
+                if (item.aoi) {
+                    props.analysis.setAoi(item.aoi);
+                }
+            }
+        }),
+        [aoi]
+    );
 
     const isLinked = useSelector(() => props.analysis.aoi?.shared || false, [props.analysis]);
 

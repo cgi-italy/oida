@@ -7,6 +7,8 @@ const cesiumSource = 'cesium/Source';
 const cesiumWorkers = '../Build/Cesium/Workers';
 const cesiumBaseUrl = 'Cesium';
 
+const cesiumAbsPath = path.resolve(`${__dirname}/../../../../node_modules/cesium`);
+
 module.exports = function (context, options) {
     return {
         name: 'custom-webpack-config',
@@ -17,7 +19,7 @@ module.exports = function (context, options) {
                 module: {
                     rules: [
                         {
-                            include: /oida[\/\\]/,
+                            include: /oidajs[/\\]/,
                             test: /\.jsx?$/,
                             enforce: 'pre',
                             use: [
@@ -27,6 +29,12 @@ module.exports = function (context, options) {
                             ]
                         }
                     ]
+                },
+                resolve: {
+                    alias: {
+                        // to address this issue: https://github.com/CesiumGS/cesium/issues/9212
+                        cesium: cesiumAbsPath
+                    }
                 },
                 plugins: [
                     new webpack.DefinePlugin({
@@ -41,7 +49,7 @@ module.exports = function (context, options) {
                         ]
                     })
                 ]
-            }
+            };
         }
     };
 };

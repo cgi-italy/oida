@@ -54,7 +54,7 @@ export const ItemDetailsCard = (props: ItemDetailsCardProps) => {
 
     let numColumns = 1;
     if (props.maxColumnWidth) {
-        numColumns = Math.floor(size.width / props.maxColumnWidth);
+        numColumns = Math.floor((size.width || 0) / props.maxColumnWidth);
     }
 
     return (

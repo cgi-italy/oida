@@ -26,7 +26,6 @@ import { useDatasetVariableDomain } from '../hooks';
 const DatasetBandDnDType = 'DATASET_BAND';
 type DatasetBandDnDItem = {
     id: string;
-    type: typeof DatasetBandDnDType;
 };
 
 type DatasetBandItemProps = {
@@ -34,14 +33,15 @@ type DatasetBandItemProps = {
 };
 
 const DatasetBandItem = (props: DatasetBandItemProps) => {
-    const [{ isDragging }, drag] = useDrag({
-        item: { type: DatasetBandDnDType, id: props.band.id },
+    const [{ isDragging }, drag] = useDrag(() => ({
+        type: DatasetBandDnDType,
+        item: { id: props.band.id },
         collect: (monitor) => {
             return {
                 isDragging: monitor.isDragging()
             };
         }
-    });
+    }));
 
     const { id, name, color } = props.band;
 
@@ -70,19 +70,22 @@ type DatasetChannelItemProps = {
 };
 
 const DatasetChannelItem = (props: DatasetChannelItemProps) => {
-    const [{ isHover, canDrop }, drop] = useDrop({
-        accept: [DatasetBandDnDType],
-        collect: (monitor) => ({
-            isHover: monitor.isOver(),
-            canDrop: monitor.canDrop()
+    const [{ isHover, canDrop }, drop] = useDrop(
+        () => ({
+            accept: [DatasetBandDnDType],
+            collect: (monitor) => ({
+                isHover: monitor.isOver(),
+                canDrop: monitor.canDrop()
+            }),
+            canDrop: (item) => {
+                return !!item.id && item.id !== props.band.id;
+            },
+            drop: (item: DatasetBandDnDItem) => {
+                props.onBandDrop(item.id);
+            }
         }),
-        canDrop: (item) => {
-            return !!item.id && item.id !== props.band.id;
-        },
-        drop: (item: DatasetBandDnDItem) => {
-            props.onBandDrop(item.id);
-        }
-    });
+        [props.band]
+    );
 
     const { id, name, color } = props.band;
 

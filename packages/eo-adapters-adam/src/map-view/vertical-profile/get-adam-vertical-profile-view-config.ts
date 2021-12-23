@@ -108,6 +108,10 @@ export const getAdamVerticalProfileViewConfig = (
             return wcsProvider.getProfileMetadata(profileId).then((profile) => {
                 const nearestPoint = nearestPointOnLine(profile.track, [geographicCoord[0], geographicCoord[1]]);
 
+                if (nearestPoint.properties.index === undefined) {
+                    return undefined;
+                }
+
                 const x = profile.gcps[nearestPoint.properties.index].L;
                 const y = (geographicCoord[2] * profile.dimensions[0]) / profile.metadata.VERTICAL_MAX;
 

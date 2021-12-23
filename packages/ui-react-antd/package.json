@@ -14,7 +14,7 @@
     "types"
   ],
   "scripts": {
-    "pack-icons": "rimraf ./src/icons && svgr --config-file ./config/svgr.config.js --ext tsx --filename-case kebab --out-dir ./src/icons ./assets/icons",
+    "pack-icons": "rimraf ./src/icons && svgr --config-file ./config/svgr.config.js --typescript --filename-case kebab --out-dir ./src/icons -- ./assets/icons",
     "prebuild:es": "npm run pack-icons",
     "build:es": "tsc",
     "build:umd": "tsc --project tsconfig.umd.json",
@@ -32,13 +32,15 @@
     "antd": "^4.x",
     "classnames": "^2.2.6",
     "moment": "^2.x",
-    "react": "^16.8.6",
-    "react-dom": "^16.8.6"
+    "react": "^16.18.0 || ^17.0.0",
+    "react-dom": "^16.18.0 || ^17.0.0"
   },
   "dependencies": {
     "@oidajs/core": "file:../core",
     "@oidajs/ui-react-core": "file:../ui-react-core",
-    "lodash": "4.17.15",
+    "lodash": "^4.17.21",
+    "react-dnd": "^14.0.4",
+    "react-dnd-html5-backend": "^14.0.2",
     "tslib": "^2.3.1"
   }
 }

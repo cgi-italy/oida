@@ -81,7 +81,7 @@ build_docs:
     expire_in: 1 hr
   script:
     - npm run typedoc -- --out ./packages/docs/static/typedoc
-    - cd packages/docs && npm ci && USE_SIMPLE_CSS_MINIFIER=true DEPLOYMENT_URL=https://${DOCS_DEPLOYMENT_HOST} npm run build:docs
+    - cd packages/docs && npm ci && DEPLOYMENT_URL=https://${DOCS_DEPLOYMENT_HOST} npm run build:docs
   only:
     - branches
 

@@ -35,7 +35,7 @@ export function DataCollectionTable<T extends object>(props: DataCollectionTable
 
     const tableColumns = columns
         .filter((column) => {
-            if (column.minTableWidth && size.width < column.minTableWidth) {
+            if (column.minTableWidth && (size.width || 0) < column.minTableWidth) {
                 return false;
             } else {
                 return true;
@@ -257,7 +257,7 @@ export function DataCollectionTable<T extends object>(props: DataCollectionTable
                         scroll={
                             props.fullHeight
                                 ? {
-                                      y: size.height - 40
+                                      y: (size.height || 40) - 40
                                   }
                                 : undefined
                         }

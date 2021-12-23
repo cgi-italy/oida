@@ -32,8 +32,8 @@
     "mobx": "6.x",
     "mobx-react": "7.x",
     "moment": "2.x",
-    "react": "16.x",
-    "react-dom": "16.x"
+    "react": "^16.18.0 || ^17.0.0",
+    "react-dom": "^16.18.0 || ^17.0.0"
   },
   "dependencies": {
     "@oidajs/core": "file:../core",

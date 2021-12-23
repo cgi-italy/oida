@@ -1,10 +1,10 @@
-import axios, { AxiosRequestConfig, AxiosInstance } from 'axios';
+import axios, { AxiosRequestConfig, AxiosInstance, AxiosResponse } from 'axios';
 import { CancelablePromise } from './cancelable-promise';
 
-const cancelableRequest = function <T = any>(this: AxiosInstance, config: AxiosRequestConfig) {
+const cancelableRequest = function <T = any, R = AxiosResponse<T>>(this: AxiosInstance, config: AxiosRequestConfig) {
     const source = axios.CancelToken.source();
 
-    const request = this.request<T>({
+    const request = this.request<T, R>({
         ...config,
         cancelToken: source.token
     });

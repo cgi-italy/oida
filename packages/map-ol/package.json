@@ -25,7 +25,7 @@
   },
   "dependencies": {
     "@oidajs/core": "file:../core",
-    "@turf/bbox-polygon": "^6.0.1",
+    "@turf/bbox-polygon": "^6.5.0",
     "tslib": "^2.3.1"
   },
   "peerDependencies": {
