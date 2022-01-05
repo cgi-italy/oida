@@ -3,7 +3,7 @@ import React from 'react';
 import { SearchOutlined, PlusOutlined } from '@ant-design/icons';
 import { STRING_FIELD_ID, IFormFieldDefinition } from '@oidajs/core';
 
-import { useEntityCollection } from '@oidajs/ui-react-mobx';
+import { useEntityCollection, useQueryCriteriaUrlBinding, useQueryFiltersBreadcrumbBindingFromModule } from '@oidajs/ui-react-mobx';
 import { DataCollectionList } from '@oidajs/ui-react-antd';
 import { DatasetExplorer } from '@oidajs/eo-mobx';
 import { WmsDatasetDiscoveryProvider, WmsDatasetDiscoveryProviderItem } from '@oidajs/eo-adapters-ogc';
@@ -44,15 +44,14 @@ export const WmsDiscoveryProviderResults = (props: WmsDiscoveryProviderResultsPr
         }
     ];
 
-    // TODO: enable once the redirect base url issue is fixed
-    // useQueryCriteriaUrlBinding({
-    //     criteria: props.provider.criteria
-    // });
+    useQueryCriteriaUrlBinding({
+        criteria: props.provider.criteria
+    });
 
-    // useQueryFiltersBreadcrumbBindingFromModule({
-    //     filtersConfig: searchFilters,
-    //     filteringState: props.provider.criteria.filters
-    // });
+    useQueryFiltersBreadcrumbBindingFromModule({
+        filtersConfig: searchFilters,
+        filteringState: props.provider.criteria.filters
+    });
 
     const collectionListProps = useEntityCollection({
         items: props.provider.results,

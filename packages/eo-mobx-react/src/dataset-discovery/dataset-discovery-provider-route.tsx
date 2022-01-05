@@ -1,29 +1,11 @@
-import React, { useEffect, useMemo } from 'react';
-import { useRouteMatch, Route, Redirect, Switch, useParams, useHistory } from 'react-router';
+import React from 'react';
+import { useResolvedPath } from 'react-router-dom';
+import { Tabs, Tooltip } from 'antd';
+
 import { DatasetDiscovery, DatasetExplorer } from '@oidajs/eo-mobx';
-import { useSelector } from '@oidajs/ui-react-mobx';
+import { BreadcrumbItem, useSelector } from '@oidajs/ui-react-mobx';
+
 import { DatasetDiscoveryProviderFactory } from './dataset-discovery-provider-factory';
-import { DatasetDiscoveryProviderTabsSelector } from './dataset-discovery-provider-tabs-selector';
-
-const DatasetDiscoveryProviderRedirect = (props: { datasetDiscovery: DatasetDiscovery }) => {
-    const { path } = useRouteMatch();
-
-    const selectedProvider = useSelector(() => props.datasetDiscovery.selectedProvider || props.datasetDiscovery.providers[0]);
-    if (selectedProvider) {
-        return (
-            <Redirect
-                to={{
-                    pathname: `${path}/${selectedProvider.id}`,
-                    state: {
-                        updateLocationFromState: true
-                    }
-                }}
-            />
-        );
-    } else {
-        return null;
-    }
-};
 
 export type DatasetDiscoveryProviderRouteProps = {
     datasetDiscovery: DatasetDiscovery;
@@ -31,64 +13,61 @@ export type DatasetDiscoveryProviderRouteProps = {
 };
 
 export const DatasetDiscoveryProviderRoute = (props: DatasetDiscoveryProviderRouteProps) => {
-    const { providerId } = useParams<{ providerId: string }>();
-
-    useEffect(() => {
-        props.datasetDiscovery.selectProvider(providerId);
-    }, [providerId]);
-
-    const discoveryContent = useMemo<React.ReactNode>(() => {
-        const provider = props.datasetDiscovery.getProvider(providerId);
+    const { discoveryContent, provider } = useSelector(() => {
+        const provider = props.datasetDiscovery.selectedProvider;
         if (provider) {
-            return DatasetDiscoveryProviderFactory.create(provider.type, {
-                provider: provider,
-                datasetExplorer: props.datasetExplorer
-            });
+            return {
+                discoveryContent: DatasetDiscoveryProviderFactory.create(provider.type, {
+                    provider: provider,
+                    datasetExplorer: props.datasetExplorer
+                }),
+                provider: provider
+            };
         } else {
-            return undefined;
+            return {
+                provider: provider,
+                discoveryContent: undefined
+            };
         }
-    }, [providerId]);
+    });
 
-    return <React.Fragment>{discoveryContent}</React.Fragment>;
-};
-
-export type DatasetDiscoveryProviderRouterProps = {
-    datasetDiscovery: DatasetDiscovery;
-    datasetExplorer: DatasetExplorer;
-};
-
-export const DatasetDiscoveryProviderRouter = (props: DatasetDiscoveryProviderRouterProps) => {
-    const { path } = useRouteMatch();
+    const providerPath = useResolvedPath('./');
 
     return (
-        <Switch>
-            <Route exact path={path}>
-                <DatasetDiscoveryProviderRedirect datasetDiscovery={props.datasetDiscovery} />
-            </Route>
-            <Route path={`${path}/:providerId`}>
-                <DatasetDiscoveryProviderRoute datasetDiscovery={props.datasetDiscovery} datasetExplorer={props.datasetExplorer} />
-            </Route>
-        </Switch>
+        <React.Fragment>
+            {provider && (
+                <BreadcrumbItem
+                    data={{
+                        key: 'discovery-provider',
+                        title: provider.name,
+                        link: providerPath.pathname
+                    }}
+                />
+            )}
+            {discoveryContent}
+        </React.Fragment>
     );
 };
 
 export const DatasetDiscoveryProviderTabsNavigation = (props: { datasetDiscovery: DatasetDiscovery }) => {
-    const providers = useSelector(() => props.datasetDiscovery.providers.filter((provider) => !provider.disabled));
+    const selectedProvider = useSelector(() => props.datasetDiscovery.selectedProvider?.id);
 
-    const history = useHistory();
-    const { path } = useRouteMatch();
-    const match = useRouteMatch<{ providerId: string }>({
-        path: `${path}/:providerId`
+    const tabs = useSelector(() => props.datasetDiscovery.providers.filter((provider) => !provider.disabled)).map((provider) => {
+        return (
+            <Tabs.TabPane
+                tab={
+                    <Tooltip title={provider.description}>
+                        <span>{provider.name}</span>
+                    </Tooltip>
+                }
+                key={provider.id}
+            />
+        );
     });
-    const selectedProvider = match?.params.providerId;
 
     return (
-        <DatasetDiscoveryProviderTabsSelector
-            providers={providers}
-            selectedProvider={selectedProvider}
-            onProviderSelect={(providerId) => {
-                history.push(`${path}/${providerId}`);
-            }}
-        />
+        <Tabs activeKey={selectedProvider} onChange={(tabId) => props.datasetDiscovery.selectProvider(tabId)} size='small'>
+            {tabs}
+        </Tabs>
     );
 };

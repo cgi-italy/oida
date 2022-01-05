@@ -1,10 +1,10 @@
-import queryString from 'query-string';
 import lzString from 'lz-string';
 
 import { SortOrder, getFormFieldSerializer, QueryFilter } from '@oidajs/core';
 import { QueryParams as QueryParamsState } from '@oidajs/state-mobx';
 
 import { useRouteSearchStateBinding } from './use-route-search-state-binding';
+import { useCallback } from 'react';
 
 const defaultQueryKeys = {
     page: 'page',
@@ -41,76 +41,78 @@ export const serializeQueryFilters = (filters: QueryFilter[]): string => {
 export const useQueryCriteriaUrlBinding = (props: QueryCriteriaUrlBindingProps) => {
     const queryUrlKeys = props.queryKeys || defaultQueryKeys;
 
-    const getUrlFromCriteria = () => {
-        const criteria = props.criteria.data;
+    const getUrlParamsFromCriteria = useCallback(() => {
+        const { paging, filters, sortBy } = props.criteria.data;
 
-        const { paging, filters, sortBy } = criteria;
-
-        const urlParams = queryString.parse(window.location.search);
+        const urlParams = new URLSearchParams();
 
         if (paging) {
-            urlParams[queryUrlKeys.page] = paging.page.toString();
-            urlParams[queryUrlKeys.pageSize] = paging.pageSize.toString();
-        } else {
-            delete urlParams[queryUrlKeys.page];
-            delete urlParams[queryUrlKeys.pageSize];
+            urlParams.set(queryUrlKeys.page, paging.page.toString());
+            urlParams.set(queryUrlKeys.pageSize, paging.pageSize.toString());
         }
 
-        urlParams[queryUrlKeys.sortKey] = sortBy?.key || '';
-        urlParams[queryUrlKeys.sortOrder] = sortBy?.order || '';
+        if (sortBy) {
+            urlParams.set(queryUrlKeys.sortKey, sortBy.key);
+            urlParams.set(queryUrlKeys.sortOrder, sortBy.order);
+        } else {
+            urlParams.set(queryUrlKeys.sortKey, '');
+        }
 
         if (filters) {
-            urlParams[queryUrlKeys.filters] = serializeQueryFilters(filters);
-        } else {
-            delete urlParams[queryUrlKeys.filters];
+            urlParams.set(queryUrlKeys.filters, serializeQueryFilters(filters));
         }
 
-        const updatedQueryString = `${queryString.stringify(urlParams)}`;
-        return updatedQueryString;
-    };
+        return urlParams;
+    }, [props.criteria]);
 
-    const updateCriteriaFromUrl = (search) => {
-        const urlParams = queryString.parse(search);
-        if (urlParams[queryUrlKeys.page] !== undefined) {
-            props.criteria.paging.setPage(parseInt(urlParams[queryUrlKeys.page] as string));
-        }
-        if (urlParams[queryUrlKeys.pageSize] !== undefined) {
-            props.criteria.paging.setPageSize(parseInt(urlParams[queryUrlKeys.pageSize] as string));
-        }
+    const updateCriteriaFromUrlParams = useCallback(
+        (searchParams: URLSearchParams) => {
+            const page = searchParams.get(queryUrlKeys.page);
+            if (page) {
+                props.criteria.paging.setPage(parseInt(page));
+            } else {
+                props.criteria.paging.reset();
+            }
+            const pageSize = searchParams.get(queryUrlKeys.pageSize);
+            if (pageSize) {
+                props.criteria.paging.setPageSize(parseInt(pageSize));
+            }
 
-        const sortKey = urlParams[queryUrlKeys.sortKey] as string;
-        if (sortKey !== undefined) {
-            props.criteria.sorting.sortBy({
-                key: sortKey
-            });
-        }
-
-        const sortOrder = urlParams[queryUrlKeys.sortOrder] as string;
-        if (sortOrder !== undefined) {
+            const sortKey = searchParams.get(queryUrlKeys.sortKey);
+            if (sortKey) {
+                props.criteria.sorting.sortBy({
+                    key: sortKey
+                });
+            } else {
+                props.criteria.sorting.clear();
+            }
+            const sortOrder = searchParams.get(queryUrlKeys.sortOrder);
             props.criteria.sorting.sortBy({
                 order: sortOrder === 'desc' ? SortOrder.Descending : SortOrder.Ascending
             });
-        }
 
-        const urlFilters = urlParams[queryUrlKeys.filters];
-        if (urlFilters !== undefined && urlFilters !== serializeQueryFilters(props.criteria.data.filters || [])) {
-            props.criteria.filters.clear();
-            const filterValues = urlFilters ? JSON.parse(lzString.decompressFromEncodedURIComponent(urlFilters)) : [];
-
-            filterValues.forEach((filter) => {
-                const serializer = getFormFieldSerializer(filter.t);
-                if (serializer) {
-                    const value = serializer.fromJSON(filter.v);
-                    if (value) {
-                        props.criteria.filters.set(filter.k, value, filter.t);
+            const queryFilters = searchParams.get(queryUrlKeys.filters);
+            if (queryFilters) {
+                props.criteria.filters.clear();
+                const filterValues = JSON.parse(lzString.decompressFromEncodedURIComponent(queryFilters));
+                filterValues.forEach((filter) => {
+                    const serializer = getFormFieldSerializer(filter.t);
+                    if (serializer) {
+                        const value = serializer.fromJSON(filter.v);
+                        if (value) {
+                            props.criteria.filters.set(filter.k, value, filter.t);
+                        }
                     }
-                }
-            });
-        }
-    };
+                });
+            } else {
+                props.criteria.filters.clear();
+            }
+        },
+        [props.criteria]
+    );
 
     useRouteSearchStateBinding({
-        stateQueryStringSelector: getUrlFromCriteria,
-        updateState: updateCriteriaFromUrl
+        searchParamsStateSelector: getUrlParamsFromCriteria,
+        updateStateFromSearchParams: updateCriteriaFromUrlParams
     });
 };

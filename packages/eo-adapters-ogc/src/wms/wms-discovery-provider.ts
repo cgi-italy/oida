@@ -133,6 +133,7 @@ export class WmsDatasetDiscoveryProvider extends DatasetDiscoveryProvider<WmsDat
         this.results.clear();
         this.criteria.filters.clear();
         this.criteria.paging.setPage(0);
+        this.criteria.paging.setTotal(0);
 
         this.selectedService = selectedService;
     }

@@ -28,7 +28,9 @@
   "peerDependencies": {
     "classnames": "^2.2.6",
     "react": "^16.18.0 || ^17.0.0",
-    "react-dom": "^16.18.0 || ^17.0.0"
+    "react-dom": "^16.18.0 || ^17.0.0",
+    "react-router": "6.x",
+    "react-router-dom": "6.x"
   },
   "dependencies": {
     "@oidajs/core": "file:../core",

@@ -9,6 +9,7 @@ import { BreadcrumbItemProps } from '@oidajs/ui-react-core';
 import { serializeQueryFilters } from '../../../core/hooks/use-query-criteria-url-binding';
 import { BreadcrumbModule } from '../breadcrumb-module';
 import { useBreadcrumbModule } from './use-breadcrumb-module';
+import { useResolvedPath } from 'react-router';
 
 export type QueryFilterBreadcrumbBindingProps = {
     filtersConfig: IFormFieldDefinition[];
@@ -17,6 +18,8 @@ export type QueryFilterBreadcrumbBindingProps = {
 };
 
 export const useQueryFiltersBreadcrumbBinding = (props: QueryFilterBreadcrumbBindingProps) => {
+    const rootPath = useResolvedPath('.');
+
     useEffect(() => {
         const breadcrumbItems: BreadcrumbItemProps[] = [];
 
@@ -41,7 +44,7 @@ export const useQueryFiltersBreadcrumbBinding = (props: QueryFilterBreadcrumbBin
                 if (filterConfig) {
                     const serializer = getFormFieldSerializer(filter.type);
                     if (serializer) {
-                        const filterTitle = serializer.toString({
+                        let filterTitle = serializer.toString({
                             value: filter.value,
                             onChange: () => {
                                 //do nothing
@@ -49,10 +52,14 @@ export const useQueryFiltersBreadcrumbBinding = (props: QueryFilterBreadcrumbBin
                             ...filterConfig
                         });
 
+                        if (filterConfig.title) {
+                            filterTitle = `${filterConfig.title}: ${filterTitle}`;
+                        }
+
                         const breadcrumbItem = {
                             key: filter.key,
                             title: filterTitle,
-                            link: `${window.location.pathname}?q=${filterUrlString}`
+                            link: `${rootPath.pathname}?q=${filterUrlString}`
                         };
 
                         props.breadcrumbModule.breadcrumb.add(breadcrumbItem);

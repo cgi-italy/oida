@@ -1,54 +1,96 @@
-import { useEffect, useState } from 'react';
-import { useHistory, useLocation } from 'react-router';
+import { useEffect, useRef } from 'react';
+import { reaction, runInAction } from 'mobx';
+import { useSearchParams, useResolvedPath } from 'react-router-dom';
 
-import { useSelector } from './use-selector';
-
-type RouteSearchStateBindingProps = {
-    updateState: (queryString: string | undefined) => void;
-    stateQueryStringSelector: () => string | undefined;
+export type RouteSearchStateBindingProps = {
+    updateStateFromSearchParams: (searchParams: URLSearchParams) => void;
+    searchParamsStateSelector: () => URLSearchParams;
 };
 
 export const useRouteSearchStateBinding = (props: RouteSearchStateBindingProps) => {
-    const history = useHistory();
-    const location = useLocation<{ updateLocationFromState: boolean }>();
+    const ignoreNextStateUpdate = useRef(false);
+    const componentUnmounted = useRef(false);
+    const [searchParams, setSearchParams] = useSearchParams();
 
-    const [updateMode, setUpdateMode] = useState<'replaceLocation' | 'pushLocation' | 'updateState' | undefined>(
-        location.state?.updateLocationFromState ? 'replaceLocation' : 'updateState'
-    );
-
-    const stateQuery = useSelector(props.stateQueryStringSelector);
+    const resolvedPath = useResolvedPath('.');
 
     useEffect(() => {
-        if (updateMode) {
-            const stateQuery = props.stateQueryStringSelector();
-            if (updateMode === 'updateState') {
-                props.updateState(window.location.search);
-            } else {
-                if (stateQuery !== window.location.search.substr(1)) {
-                    if (updateMode === 'pushLocation') {
-                        history.push(`${window.location.pathname}?${stateQuery}`, {
-                            updateLocationFromState: true
-                        });
-                    } else {
-                        history.replace(`${window.location.pathname}?${stateQuery}`, {
-                            updateLocationFromState: true
-                        });
+        return () => {
+            componentUnmounted.current = true;
+        };
+    }, []);
+
+    // this is executed once to initialize the missisng url params from state
+    useEffect(() => {
+        if (componentUnmounted.current) {
+            return;
+        }
+        const currentStateParams = props.searchParamsStateSelector();
+        const initialUrlParams = new URLSearchParams(window.location.search);
+        let shouldReplaceUrl = false;
+        currentStateParams.forEach((value, key) => {
+            if (!initialUrlParams.has(key)) {
+                shouldReplaceUrl = true;
+            }
+            initialUrlParams.set(key, value);
+        });
+
+        if (shouldReplaceUrl) {
+            setSearchParams(initialUrlParams, {
+                replace: true
+            });
+        }
+    }, [props.searchParamsStateSelector, resolvedPath.pathname]);
+
+    useEffect(() => {
+        const stateTrackerDisposer = reaction(
+            () => props.searchParamsStateSelector(),
+            (stateParams) => {
+                if (componentUnmounted.current) {
+                    return;
+                }
+                if (!ignoreNextStateUpdate.current) {
+                    let needsUrlUpdate = false;
+                    const updatedSearchParams = new URLSearchParams(window.location.search);
+                    stateParams.forEach((value, key) => {
+                        if (value !== updatedSearchParams.get(key)) {
+                            needsUrlUpdate = true;
+                            updatedSearchParams.set(key, value);
+                        }
+                    });
+                    if (needsUrlUpdate) {
+                        setSearchParams(updatedSearchParams);
                     }
+                } else {
+                    ignoreNextStateUpdate.current = false;
                 }
             }
-            setUpdateMode(undefined);
-        }
-    }, [updateMode]);
+        );
+
+        return () => {
+            stateTrackerDisposer();
+        };
+    }, [props.searchParamsStateSelector, resolvedPath.pathname]);
 
     useEffect(() => {
-        if (!updateMode) {
-            setUpdateMode('updateState');
+        if (componentUnmounted.current) {
+            return;
         }
-    }, [location]);
+        const currentStateParams = props.searchParamsStateSelector();
+        const currentUrlParams = new URLSearchParams(window.location.search);
+        let needStateUpdate = false;
 
-    useEffect(() => {
-        if (!updateMode) {
-            setUpdateMode('pushLocation');
+        currentStateParams.forEach((value, key) => {
+            if (value !== currentUrlParams.get(key)) {
+                needStateUpdate = true;
+            }
+        });
+
+        if (needStateUpdate) {
+            ignoreNextStateUpdate.current = true;
+            runInAction(() => {
+                props.updateStateFromSearchParams(searchParams);
+            });
         }
-    }, [stateQuery]);
+    }, [searchParams]);
 };
