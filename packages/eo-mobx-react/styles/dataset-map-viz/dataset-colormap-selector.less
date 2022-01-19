@@ -1,12 +1,10 @@
 .dataset-colormap-presets {
-
     border: solid 1px @border-color-base;
     border-radius: 5px;
     overflow: hidden;
 }
 
 .dataset-colormap-preset {
-
     display: flex;
     align-items: center;
 
@@ -23,7 +21,7 @@
         .dataset-colormap-preset-legend {
             img {
                 height: 20px;
-                width: 100%
+                width: 100%;
             }
         }
     }
@@ -33,13 +31,11 @@
     }
 
     &:hover {
-        background: @item-hover-bg
+        background: @item-hover-bg;
     }
 }
 
-
 .dataset-colormap-selector {
-
     .dataset-colormap-range {
         .dataset-colormap-range-inputs {
             display: flex;
@@ -47,10 +43,17 @@
             margin: 0.5rem -0.5rem -0 -0.5rem;
             align-items: center;
 
+            .ant-input-number-group-wrapper {
+                flex-basis: 120px;
+
+                .ant-input-number-group-addon {
+                    user-select: none;
+                }
+            }
+
             .dataset-colormap-units {
                 font-size: 12px;
             }
-
         }
 
         .dataset-colormap-range-slider {
@@ -65,8 +68,6 @@
 }
 
 .ant-dropdown-trigger.dataset-colormap-preset {
-
-
     border: solid 1px @border-color-base;
     border-radius: @border-radius-base;
     padding: 0;
@@ -89,15 +90,12 @@
 
     &:hover {
         .ant-btn {
-            visibility: visible
+            visibility: visible;
         }
     }
-
 }
 
-
 .ant-dropdown.dataset-colormap-preset-dropdown {
-
     max-width: 300px;
 
     .dataset-colormap-presets {
@@ -112,5 +110,4 @@
             border-bottom: none;
         }
     }
-
 }

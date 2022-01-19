@@ -211,7 +211,7 @@ export const DatasetColorMapRangeSelector = (props: DatasetColorMapRangeSelector
                     max={variableDomain?.max}
                     step={variableDomain?.step}
                     size='small'
-                    formatter={(value) => `${clamp ? '≤ ' : ''}${value}`}
+                    addonBefore={clamp ? '≤' : undefined}
                     onChange={(value) => {
                         if (typeof value === 'number') {
                             const unscaledValue = domainMapper.denormalizeValue(value);
@@ -242,7 +242,7 @@ export const DatasetColorMapRangeSelector = (props: DatasetColorMapRangeSelector
                         }
                     }}
                     size='small'
-                    formatter={(value) => `${clamp ? '≥ ' : ''}${value}`}
+                    addonBefore={clamp ? '≥' : undefined}
                 />
             </div>
             <div className='dataset-colormap-range-slider'>
