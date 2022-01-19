@@ -95,7 +95,7 @@ export const DatasetVizDownload = (props: DatasetDownloadProps) => {
                 </Form.Item>
             </Form>
             {downloadError && (
-                <Typography.Paragraph className='error-message'>
+                <Typography.Paragraph type='danger' className='download-error-message'>
                     <CloseCircleOutlined />
                     <span>{downloadError}</span>
                 </Typography.Paragraph>
