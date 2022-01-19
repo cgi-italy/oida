@@ -37,6 +37,9 @@ export const DatasetBandSelector = (props: DatasetBandSelectorProps) => {
             }
         }).then((bandMode) => {
             props.state.colorMap.setColorMapDomain(bandMode.colorMap.domain);
+            if (bandMode.colorMap.colorScale) {
+                props.state.colorMap.setColorScale(bandMode.colorMap.colorScale);
+            }
         });
     };
 
