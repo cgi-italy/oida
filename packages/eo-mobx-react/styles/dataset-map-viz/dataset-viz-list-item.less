@@ -52,7 +52,7 @@
             .ant-slider-mark-text {
                 min-width: 40px;
             }
-        };
+        }
 
         &.has-marks {
             margin-bottom: 1.5rem;
@@ -67,8 +67,15 @@
         > span {
             flex-grow: 0;
             flex-shrink: 0;
-            margin-right: 0.5rem;
-        };
+
+            &:first-child {
+                margin-right: 0.5rem;
+            }
+
+            &:last-child {
+                margin-left: 0.5rem;
+            }
+        }
 
         .ant-select {
             flex-grow: 1;
@@ -76,5 +83,4 @@
             min-width: 0;
         }
     }
-
 }

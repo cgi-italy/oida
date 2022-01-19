@@ -63,6 +63,7 @@ export const DatasetValueDimensionSelector = (props: DatasetValueDimensionSelect
             <div className='dataset-dimension-value-selector'>
                 <span>{props.dimension.name}: </span>
                 <InputNumber value={value} onChange={(value) => props.dimensionsState.setValue(props.dimension.id, value)} />
+                {props.dimension.units && <span>{props.dimension.units}</span>}
             </div>
         );
     }
@@ -257,6 +258,7 @@ export const DatasetCategoricalDimensionSelector = (props: DatasetCategoricalDim
             >
                 {domainOptions}
             </Select>
+            {props.dimension.units && <span>{props.dimension.units}</span>}
         </div>
     );
 };
