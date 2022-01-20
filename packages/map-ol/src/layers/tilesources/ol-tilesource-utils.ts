@@ -39,9 +39,21 @@ export const getTileGridFromConfig = (srs, tileGridConfig?: TileGridConfig) => {
     if (!resolutions) {
         resolutions = [];
         let levelResolution = (extent[2] - extent[0]) / gridSize[0] / tileSize[0];
-        for (let i = 0; i < (tileGridConfig.maxZoom || 19); ++i) {
+        // if the root resolution is better than the min res reduce the tile size and use a single level at the best res
+        if (tileGridConfig.allowOptimalTileSize && tileGridConfig.minRes && levelResolution < tileGridConfig.minRes) {
+            const f = levelResolution / tileGridConfig.minRes;
+            tileSize[0] = Math.round(tileSize[0] * f);
+            tileSize[1] = Math.round(tileSize[1] * f);
+            resolutions.push(tileGridConfig.minRes);
+        } else {
             resolutions.push(levelResolution);
-            levelResolution /= 2;
+            for (let i = 1; i <= (tileGridConfig.maxZoom || 19); ++i) {
+                levelResolution /= 2;
+                resolutions.push(levelResolution);
+                if (tileGridConfig.minRes && levelResolution < tileGridConfig.minRes) {
+                    break;
+                }
+            }
         }
     }
 

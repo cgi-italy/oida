@@ -5,8 +5,10 @@ export type TileGridConfig = {
     tileSize?: number | number[];
     gridSize?: number[];
     forceUniformResolution?: boolean;
+    allowOptimalTileSize?: boolean;
     minZoom?: number;
     maxZoom?: number;
+    minRes?: number;
     extent?: number[];
     resolutions?: number[];
     matrixIds?: string[];
@@ -41,9 +43,9 @@ export const computeTileGridParams = (options: TileGridParamsOptions) => {
         const rootYResolution = extentHeight / gridSize[1] / tileSize[1];
 
         if (rootXResolution < rootYResolution) {
-            tileSize = [tileSize[0], Math.ceil((tileSize[1] * rootYResolution) / rootXResolution)];
+            tileSize = [tileSize[0], Math.floor((tileSize[1] * rootYResolution) / rootXResolution)];
         } else {
-            tileSize = [Math.ceil((tileSize[0] * rootXResolution) / rootYResolution), tileSize[1]];
+            tileSize = [Math.floor((tileSize[0] * rootXResolution) / rootYResolution), tileSize[1]];
         }
     }
 

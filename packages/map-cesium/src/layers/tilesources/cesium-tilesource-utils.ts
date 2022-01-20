@@ -59,6 +59,12 @@ export const getTileGridFromSRS = (srs: string, tileGridConfig?: TileGridConfig)
 
     if (tileGridConfig.maxZoom) {
         gridConfig.maximumLevel = tileGridConfig.maxZoom;
+    } else if (tileGridConfig.minRes && extent && gridSize) {
+        const rootRes = (extent[2] - extent[0]) / gridSize[0] / tileSize[0];
+        gridConfig.maximumLevel = Math.ceil(Math.log2(rootRes / tileGridConfig.minRes));
+        if (gridConfig.maximumLevel < 0) {
+            gridConfig.maximumLevel = 0;
+        }
     } else if (tileGridConfig.resolutions) {
         gridConfig.maximumLevel = tileGridConfig.resolutions.length - 1;
     }
