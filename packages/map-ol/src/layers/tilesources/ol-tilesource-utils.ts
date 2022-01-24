@@ -5,6 +5,12 @@ import TileGrid from 'ol/tilegrid/TileGrid';
 
 import { TileGridConfig, computeTileGridParams } from '@oidajs/core';
 
+const getRootLevelResolution = (extent: number[], gridSize: number[], tileSize: number[]) => {
+    const rootXResolution = (extent[2] - extent[0]) / gridSize[0] / tileSize[0];
+    const rootYResolution = (extent[3] - extent[1]) / gridSize[1] / tileSize[1];
+    return Math.max(rootXResolution, rootYResolution);
+};
+
 export const getTileGridFromConfig = (srs, tileGridConfig?: TileGridConfig) => {
     tileGridConfig = tileGridConfig || {};
 
@@ -38,13 +44,13 @@ export const getTileGridFromConfig = (srs, tileGridConfig?: TileGridConfig) => {
     let resolutions = tileGridConfig.resolutions;
     if (!resolutions) {
         resolutions = [];
-        let levelResolution = (extent[2] - extent[0]) / gridSize[0] / tileSize[0];
+        let levelResolution = getRootLevelResolution(extent, gridSize, tileSize);
         // if the root resolution is better than the min res reduce the tile size and use a single level at the best res
         if (tileGridConfig.allowOptimalTileSize && tileGridConfig.minRes && levelResolution < tileGridConfig.minRes) {
-            const f = levelResolution / tileGridConfig.minRes;
-            tileSize[0] = Math.round(tileSize[0] * f);
-            tileSize[1] = Math.round(tileSize[1] * f);
-            resolutions.push(tileGridConfig.minRes);
+            const tileScaleFactor = levelResolution / tileGridConfig.minRes;
+            tileSize[0] = Math.round(tileSize[0] * tileScaleFactor);
+            tileSize[1] = Math.round(tileSize[1] * tileScaleFactor);
+            resolutions.push(getRootLevelResolution(extent, gridSize, tileSize));
         } else {
             resolutions.push(levelResolution);
             for (let i = 1; i <= (tileGridConfig.maxZoom || 19); ++i) {

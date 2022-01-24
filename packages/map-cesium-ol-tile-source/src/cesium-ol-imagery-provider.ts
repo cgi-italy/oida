@@ -153,7 +153,8 @@ CesiumOLImageryProvider.prototype.handleSourceChanged_ = function () {
         if (this.projection_ === getProj('EPSG:4326') || this.projection_ === getProj('EPSG:3857')) {
             const { scheme } = getTileGridFromSRS(this.projection_.getCode(), {
                 ...this.sourceConfig_.tileGrid,
-                extent: this.getTileSourceExtent_()
+                extent: this.getTileSourceExtent_(),
+                gridSize: this.getTileSourceGridSize_()
             })!;
             this.tilingScheme_ = scheme;
         } else {
@@ -244,9 +245,15 @@ CesiumOLImageryProvider.prototype.getTileSourceExtent_ = function () {
     const resolution = tileGrid.getResolution(0);
     const tileSize = toSize(tileGrid.getTileSize(0));
     const minX = origin[0] + tileRange.minX * tileSize[0] * resolution;
-    const minY = origin[1] - (tileRange.minY + 1) * tileSize[1] * resolution;
+    const maxY = origin[1] - tileRange.minY * tileSize[1] * resolution;
     const maxX = origin[0] + (tileRange.maxX + 1) * tileSize[0] * resolution;
-    const maxY = minY + (tileRange.maxY - tileRange.minY + 1) * tileSize[1] * resolution;
+    const minY = origin[1] - (tileRange.maxY + 1) * tileSize[1] * resolution;
 
     return createOrUpdate(minX, minY, maxX, maxY);
+};
+
+CesiumOLImageryProvider.prototype.getTileSourceGridSize_ = function () {
+    const tileGrid = this.source_.getTileGridForProjection(this.projection_);
+    const tileRange = tileGrid.getFullTileRange(0);
+    return [tileRange.maxX - tileRange.minX + 1, tileRange.maxY - tileRange.minY + 1];
 };
