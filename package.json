@@ -34,6 +34,7 @@
     "@commitlint/config-conventional": "^15.0.0",
     "@egjs/hammerjs": "^2.0.17",
     "@svgr/cli": "^6.1.2",
+    "@terraformer/wkt": "^2.0.7",
     "@turf/along": "^6.5.0",
     "@turf/bbox": "^6.5.0",
     "@turf/bbox-polygon": "^6.5.0",

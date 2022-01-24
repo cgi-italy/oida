@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Tag, Button, Tooltip, Drawer, Menu, Dropdown, Divider } from 'antd';
+import { Tag, Button, Tooltip, Drawer, Menu, Dropdown, Divider, Popover, Modal } from 'antd';
 import {
     EnvironmentOutlined,
     LinkOutlined,
@@ -8,7 +8,8 @@ import {
     EyeOutlined,
     EyeInvisibleOutlined,
     CloseOutlined,
-    CaretDownOutlined
+    CaretDownOutlined,
+    EditOutlined
 } from '@ant-design/icons';
 
 import { AoiField, AoiAction, AOI_FIELD_ID } from '@oidajs/core';
@@ -18,6 +19,7 @@ import { DrawLineIcon, DrawBboxIcon, DrawPolygonIcon } from '../icons';
 
 import { antdFormFieldRendererFactory } from './antd-form-field-renderer-factory';
 import { AoiImportRenderer } from './aoi-import';
+import { AoiTextEditor } from './aoi-text-editor';
 
 export type AoiDrawToolProps = FormFieldRendererBaseProps<AoiField<AoiImportConfig>> & {
     importDrawerPlacement?: 'left' | 'right';
@@ -85,6 +87,7 @@ export const AoiDrawTool = (props: AoiDrawToolProps) => {
     }, [supportedGeometries, supportedActions]);
 
     const [lastUsedTool, setLastUsedTool] = useState(AoiAction.DrawBBox);
+    const [editModalVisible, setEditModalVisible] = useState(false);
 
     const drawingTools = {
         [AoiAction.DrawPoint]: (
@@ -159,6 +162,20 @@ export const AoiDrawTool = (props: AoiDrawToolProps) => {
                 ></Button>
             </Tooltip>
         ),
+        ['AoiTextEdit']: (
+            <Tooltip title='Manually enter an AOI string' key='textEdit'>
+                <Button
+                    key='polygon'
+                    icon={<EditOutlined />}
+                    type={'default'}
+                    size={props.size}
+                    onClick={() => {
+                        onActiveActionChange(AoiAction.None);
+                        setEditModalVisible(true);
+                    }}
+                ></Button>
+            </Tooltip>
+        ),
         [AoiAction.LinkToMapViewport]: (
             <Tooltip title='Link to map viewport' key='viewport'>
                 <Button
@@ -202,6 +219,7 @@ export const AoiDrawTool = (props: AoiDrawToolProps) => {
             {aoiControls.line && <Menu.Item>{drawingTools[AoiAction.DrawLine]}</Menu.Item>}
             {aoiControls.bbox && <Menu.Item>{drawingTools[AoiAction.DrawBBox]}</Menu.Item>}
             {aoiControls.polygon && <Menu.Item>{drawingTools[AoiAction.DrawPolygon]}</Menu.Item>}
+            {<Menu.Item>{drawingTools['AoiTextEdit']}</Menu.Item>}
             {aoiControls.import && <Menu.Item>{drawingTools[AoiAction.Import]}</Menu.Item>}
         </Menu>
     );
@@ -242,6 +260,22 @@ export const AoiDrawTool = (props: AoiDrawToolProps) => {
                             />
                         )}
                         <Divider type='vertical' />
+                        <Popover
+                            content={
+                                <AoiTextEditor
+                                    value={value}
+                                    supportedGeometries={props.config.supportedGeometries}
+                                    onChange={(value) => props.onChange(value)}
+                                />
+                            }
+                            title='Edit area'
+                            trigger='click'
+                            destroyTooltipOnHide={false}
+                        >
+                            <Tooltip title='Edit area'>
+                                <Button type='text' size={'middle'} icon={<EditOutlined />} />
+                            </Tooltip>
+                        </Popover>
                         <Tooltip title='Clear area'>
                             <Button type='text' size={'middle'} icon={<CloseOutlined />} onClick={() => onChange(undefined)} />
                         </Tooltip>
@@ -273,6 +307,23 @@ export const AoiDrawTool = (props: AoiDrawToolProps) => {
                     <AoiImportRenderer {...importConfig} />
                 </Drawer>
             )}
+            <Modal
+                visible={editModalVisible}
+                onCancel={() => setEditModalVisible(false)}
+                footer={null}
+                width={600}
+                destroyOnClose={true}
+                className='aoi-draw-tool-text-modal'
+            >
+                <AoiTextEditor
+                    value={undefined}
+                    supportedGeometries={props.config.supportedGeometries}
+                    onChange={(value) => {
+                        props.onChange(value);
+                        setEditModalVisible(false);
+                    }}
+                />
+            </Modal>
         </div>
     );
 };

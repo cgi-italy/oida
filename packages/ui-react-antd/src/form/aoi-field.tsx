@@ -13,7 +13,7 @@ import { DrawPolygonIcon } from '../icons/draw-polygon';
 
 import { antdFormFieldRendererFactory } from './antd-form-field-renderer-factory';
 import { AoiImportRenderer } from './aoi-import';
-import { AoiEditor } from './aoi-editor';
+import { AoiTextEditor } from './aoi-text-editor';
 
 export type AoiFieldRendererProps = FormFieldRendererBaseProps<AoiField<AoiImportConfig>> & {
     importDrawerPlacement?: 'left' | 'right';
@@ -196,19 +196,13 @@ export const AoiFieldRenderer = (props: AoiFieldRendererProps) => {
                     <Tooltip title='Edit aoi'>
                         <Popover
                             className='aoi-editor-popover'
-                            content={
-                                <AoiEditor
-                                    value={value}
-                                    onChange={onChange}
-                                    supportedGeometries={supportedGeometries.map((geometry) => geometry.type)}
-                                    onDone={() => setEditorVisible(false)}
-                                />
-                            }
+                            content={<AoiTextEditor value={value} onChange={onChange} supportedGeometries={supportedGeometries} />}
                             destroyTooltipOnHide={true}
                             title='Edit area'
                             visible={editorVisible}
                             onVisibleChange={(visible) => setEditorVisible(visible)}
                             trigger='click'
+                            zIndex={1050}
                         >
                             <Button type={editorVisible ? 'primary' : 'default'}>
                                 <EditOutlined />

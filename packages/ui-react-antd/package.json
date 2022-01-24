@@ -38,6 +38,7 @@
   "dependencies": {
     "@oidajs/core": "file:../core",
     "@oidajs/ui-react-core": "file:../ui-react-core",
+    "@terraformer/wkt": "^2.0.7",
     "lodash": "^4.17.21",
     "react-dnd": "^14.0.4",
     "react-dnd-html5-backend": "^14.0.2",
