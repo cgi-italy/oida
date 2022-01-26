@@ -43,9 +43,9 @@ export const computeTileGridParams = (options: TileGridParamsOptions) => {
         const rootYResolution = extentHeight / gridSize[1] / tileSize[1];
 
         if (rootXResolution < rootYResolution) {
-            tileSize = [tileSize[0], Math.ceil((tileSize[1] * rootYResolution) / rootXResolution)];
-        } else {
             tileSize = [Math.ceil((tileSize[0] * rootXResolution) / rootYResolution), tileSize[1]];
+        } else {
+            tileSize = [tileSize[0], Math.ceil((tileSize[1] * rootYResolution) / rootXResolution)];
         }
     }
 
