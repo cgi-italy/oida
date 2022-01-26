@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { Button, Tooltip } from 'antd';
-import { PlusOutlined, MinusOutlined, ExpandOutlined } from '@ant-design/icons';
+import { PlusOutlined, MinusOutlined, HomeFilled } from '@ant-design/icons';
 
 import { MapNavControlsProps } from '@oidajs/ui-react-core';
 
@@ -15,7 +15,7 @@ export const MapNavTools = (props: MapNavToolsProps) => {
         <div className={'map-nav-tools'}>
             {props.onGoToHome && (
                 <Tooltip title={props.showTooltips ? 'Map home view' : ''}>
-                    <Button className='home-ctrl' size={props.size} icon={<ExpandOutlined />} onClick={props.onGoToHome} />
+                    <Button className='home-ctrl' size={props.size} icon={<HomeFilled />} onClick={props.onGoToHome} />
                 </Tooltip>
             )}
             <div className='zoom-ctrls'>
