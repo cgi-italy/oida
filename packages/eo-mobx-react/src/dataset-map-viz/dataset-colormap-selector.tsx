@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import classnames from 'classnames';
-import { Button, Dropdown, InputNumber, Slider, Checkbox } from 'antd';
-import { DownOutlined } from '@ant-design/icons';
+import { Button, Dropdown, InputNumber, Slider, Checkbox, Tooltip } from 'antd';
+import { DownOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 
 import { formatNumber } from '@oidajs/core';
 import { Map } from '@oidajs/state-mobx';
@@ -295,7 +295,10 @@ export const DatasetColorMapRangeSelector = (props: DatasetColorMapRangeSelector
                     props.colorMap.domain?.setClamp(!evt.target.checked);
                 }}
             >
-                Filter to data range
+                <span>Filter to data range </span>
+                <Tooltip title={'When enabled data beyond the color map range limits will be transparent on the map'}>
+                    <QuestionCircleOutlined />
+                </Tooltip>
             </Checkbox>
         </div>
     );
