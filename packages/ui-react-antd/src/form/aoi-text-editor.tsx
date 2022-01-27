@@ -56,10 +56,11 @@ export const AoiTextEditor = (props: AoiTextEditorProps) => {
 
     const applyAreaValue = (value) => {
         let aoiValue: AoiValue | undefined;
+        let inputFormat: AoiTextFormat | undefined;
         for (const format of props.formats!) {
             try {
                 aoiValue = format.parser(value);
-                setFormat(format);
+                inputFormat = format;
                 break;
             } catch (e) {
                 // continue
@@ -69,6 +70,9 @@ export const AoiTextEditor = (props: AoiTextEditorProps) => {
             if (!props.supportedGeometries.find((value) => value.type === aoiValue!.geometry.type)) {
                 setParseError(`Unsupported geometry of type ${aoiValue.geometry.type} provided`);
             } else {
+                if (inputFormat) {
+                    setFormat(inputFormat);
+                }
                 props.onChange(aoiValue);
             }
         } else {
