@@ -146,6 +146,7 @@ export const DatasetVizListItem = (props: DatasetVizListItemProps) => {
                 <Button
                     size='small'
                     type='link'
+                    aria-label='toggle layer visibility'
                     onClick={() => {
                         vizState.mapLayer.visible.setValue(!vizState.visible);
                     }}
@@ -186,7 +187,7 @@ export const DatasetVizListItem = (props: DatasetVizListItemProps) => {
                 </div>
                 {onItemRemove && (
                     <Tooltip title='Remove layer'>
-                        <Button className='viz-iten-remove-btn' size='small' onClick={() => onItemRemove()}>
+                        <Button className='viz-iten-remove-btn' aria-label='remove layer' size='small' onClick={() => onItemRemove()}>
                             <CloseOutlined />
                         </Button>
                     </Tooltip>

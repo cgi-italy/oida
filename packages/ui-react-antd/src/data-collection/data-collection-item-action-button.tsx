@@ -17,6 +17,7 @@ export const DataCollectionItemActionButton = (props: DataCollectionItemActionBu
             size='small'
             className='data-collection-item-action-btn'
             tooltip={props.action.title || props.action.content}
+            aria-label={props.action.title}
             onClick={(evt) => {
                 evt.stopPropagation();
                 return action.callback();

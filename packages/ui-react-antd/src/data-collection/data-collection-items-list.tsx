@@ -161,7 +161,7 @@ export function DataCollectionItemsList<T>(props: DataCollectionItemsListProps<T
                 rowKey={keyGetter}
                 {...listProps}
             >
-                {listItems}
+                <ul className='ant-list-items'>{listItems}</ul>
             </List>
         );
     }

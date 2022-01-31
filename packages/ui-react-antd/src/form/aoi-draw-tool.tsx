@@ -97,6 +97,7 @@ export const AoiDrawTool = (props: AoiDrawToolProps) => {
                     icon={<EnvironmentOutlined />}
                     type={activeAction === AoiAction.DrawPoint ? 'primary' : 'default'}
                     size={props.size}
+                    aria-label='Select a coordinate'
                     onClick={() => {
                         if (activeAction !== AoiAction.DrawPoint) {
                             setLastUsedTool(AoiAction.DrawPoint);
@@ -113,6 +114,7 @@ export const AoiDrawTool = (props: AoiDrawToolProps) => {
                 <Button
                     key='line'
                     icon={<DrawLineIcon />}
+                    aria-label='Line string'
                     type={activeAction === AoiAction.DrawLine ? 'primary' : 'default'}
                     size={props.size}
                     onClick={() => {
@@ -131,6 +133,7 @@ export const AoiDrawTool = (props: AoiDrawToolProps) => {
                 <Button
                     key='bbox'
                     icon={<DrawBboxIcon />}
+                    aria-label='Bounding box'
                     type={activeAction === AoiAction.DrawBBox ? 'primary' : 'default'}
                     size={props.size}
                     onClick={() => {
@@ -149,6 +152,7 @@ export const AoiDrawTool = (props: AoiDrawToolProps) => {
                 <Button
                     key='polygon'
                     icon={<DrawPolygonIcon />}
+                    aria-label='Polygonal area'
                     type={activeAction === AoiAction.DrawPolygon ? 'primary' : 'default'}
                     size={props.size}
                     onClick={() => {
@@ -167,6 +171,7 @@ export const AoiDrawTool = (props: AoiDrawToolProps) => {
                 <Button
                     key='polygon'
                     icon={<EditOutlined />}
+                    aria-label='Area edit'
                     type={'default'}
                     size={props.size}
                     onClick={() => {
@@ -181,6 +186,7 @@ export const AoiDrawTool = (props: AoiDrawToolProps) => {
                 <Button
                     key='viewport'
                     icon={<LinkOutlined />}
+                    aria-label='Link area to viewport'
                     type={activeAction === AoiAction.LinkToMapViewport ? 'primary' : 'default'}
                     size={props.size}
                     onClick={() => {
@@ -199,6 +205,7 @@ export const AoiDrawTool = (props: AoiDrawToolProps) => {
                 <Button
                     key='import'
                     icon={<ImportOutlined />}
+                    aria-label='Import area'
                     type={activeAction === AoiAction.Import ? 'primary' : 'default'}
                     size={props.size}
                     onClick={() => {

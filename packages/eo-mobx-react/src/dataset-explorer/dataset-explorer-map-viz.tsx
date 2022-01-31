@@ -65,7 +65,7 @@ export const DatasetExplorerMapViz = (props: DatasetExplorerMapVizProps) => {
                     size='small'
                     itemLayout='horizontal'
                 >
-                    {items}
+                    <ul className='ant-list-items'>{items}</ul>
                 </SortableList>
             )}
         </div>
