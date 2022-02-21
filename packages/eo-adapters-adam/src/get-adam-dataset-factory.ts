@@ -10,13 +10,14 @@ import { getAdamDatasetDownloadConfig } from './download';
 import { getAdamDatasetToolsConfig } from './tools';
 import { getAdamDatasetMapViewConfig } from './map-view';
 import { getAdamDatasetSpatialCoverageProvider } from './get-adam-dataset-spatial-coverage-provider';
-import { AdamOpenSearchClient } from './common';
+import { AdamOpenSearchClient, AdamOpensearchMetadataModelVersion } from './common';
 
 export type AdamDatasetFactoryConfig = {
     wcsServiceUrl: string;
     cswServiceUrl: string;
     wpsServiceUrl?: string;
     opensearchUrl?: string;
+    opensearchMetadataModelVersion?: AdamOpensearchMetadataModelVersion;
     productSearchRecordContent?: (item: ProductSearchRecord) => any;
 };
 
@@ -27,7 +28,8 @@ export const getAdamDatasetFactory = (factoryConfig: AdamDatasetFactoryConfig) =
     if (factoryConfig.opensearchUrl) {
         openSearchClient = new AdamOpenSearchClient({
             axiosInstance: axiosInstance,
-            serviceUrl: factoryConfig.opensearchUrl
+            serviceUrl: factoryConfig.opensearchUrl,
+            metadataModelVersion: factoryConfig.opensearchMetadataModelVersion
         });
     }
 
@@ -51,7 +53,11 @@ export const getAdamDatasetFactory = (factoryConfig: AdamDatasetFactoryConfig) =
             mapView: getAdamDatasetMapViewConfig(axiosInstance, factoryConfig, config, spatialCoverageProvider),
             tools: getAdamDatasetToolsConfig(axiosInstance, factoryConfig, config, timeDistributionConfig?.provider),
             download: getAdamDatasetDownloadConfig(axiosInstance, factoryConfig, config),
-            spatialCoverageProvider: spatialCoverageProvider
+            spatialCoverageProvider: (mapView) => {
+                return spatialCoverageProvider(mapView).then((extent) => {
+                    return extent?.bbox;
+                });
+            }
         };
 
         return datasetConfig;

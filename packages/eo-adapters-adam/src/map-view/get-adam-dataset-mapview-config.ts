@@ -17,8 +17,8 @@ export const getAdamDatasetMapViewConfig = (
     datasetConfig: AdamDatasetConfig,
     spatialCoverageProvider: AdamSpatialCoverageProvider
 ) => {
-    if (datasetConfig.srsDef) {
-        proj4.defs(datasetConfig.coverageSrs, datasetConfig.srsDef);
+    if (datasetConfig.coverageExtent?.srsDef) {
+        proj4.defs(datasetConfig.coverageExtent.srs, datasetConfig.coverageExtent.srsDef);
         register(proj4);
     }
 

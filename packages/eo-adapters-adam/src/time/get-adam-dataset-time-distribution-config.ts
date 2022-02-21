@@ -13,7 +13,7 @@ export const getAdamDatasetTimeDistributionConfig = (
     datasetConfig: AdamDatasetConfig,
     searchProvider?: DatasetProductSearchProvider
 ) => {
-    if (datasetConfig.timeless) {
+    if (datasetConfig.fixedTime) {
         return undefined;
     }
 
@@ -35,7 +35,8 @@ export const getAdamDatasetTimeDistributionConfig = (
     if (searchProvider instanceof AdamOpenSearchProductSearchProvider) {
         productCatalogueConfig = {
             provider: searchProvider,
-            timeRangeQueryParam: 'timeRange'
+            timeRangeQueryParam: 'timeRange',
+            timeSortParam: 'productDate'
         };
     } else if (searchProvider instanceof AdamCswProductSearchProvider) {
         productCatalogueConfig = {
@@ -50,7 +51,8 @@ export const getAdamDatasetTimeDistributionConfig = (
             serviceUrl: factoryConfig.wcsServiceUrl,
             coverageId: coverageId,
             axiosInstance: axiosInstance,
-            productCatalogue: productCatalogueConfig
+            productCatalogue: productCatalogueConfig,
+            timeRange: datasetConfig.timeRange
         })
     };
 

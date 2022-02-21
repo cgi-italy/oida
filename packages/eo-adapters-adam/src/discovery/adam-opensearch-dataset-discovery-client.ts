@@ -6,8 +6,7 @@ import {
     QueryParams,
     getGeometryExtent,
     isValidExtent,
-    BOOLEAN_FIELD_ID,
-    STRING_FIELD_ID
+    BOOLEAN_FIELD_ID
 } from '@oidajs/core';
 
 import { AdamWcsCoverageDescriptionClient, AdamWcsCoverageDescription } from './adam-wcs-coverage-description-client';
@@ -23,14 +22,9 @@ import {
     AdamOpenSearchClient,
     AdamOpensearchDatasetCustomGridSpec,
     AdamOpensearchDatasetMetadata,
-    AdamOpensearchDatasetMetadataSubdataset
+    AdamOpensearchDatasetMetadataSubdataset,
+    AdamOpensearchMetadataModelVersion
 } from '../common';
-
-export enum AdamOpensearchMetadataModelVersion {
-    V1 = 'v1',
-    V2 = 'v2',
-    V3 = 'v3'
-}
 
 export type AdamOpensearchDatasetDiscoveryClientConfig = {
     serviceUrl: string;
@@ -45,38 +39,29 @@ export class AdamOpensearchDatasetDiscoveryClient {
     protected openSearchClient_: AdamOpenSearchClient;
     protected wcsCoverageDescriptionClient_: AdamWcsCoverageDescriptionClient;
     protected additionalDatasetConfig_: Record<string, Partial<AdamDatasetConfig> & { disabled?: boolean }>;
-    protected metadataModelVersion_: AdamOpensearchMetadataModelVersion;
 
     constructor(config: AdamOpensearchDatasetDiscoveryClientConfig) {
         this.axiosInstance_ = config.axiosInstance || createAxiosInstance();
         this.openSearchClient_ = new AdamOpenSearchClient({
             serviceUrl: config.serviceUrl,
-            axiosInstance: this.axiosInstance_
+            axiosInstance: this.axiosInstance_,
+            metadataModelVersion: config.metadataModelVersion
         });
         this.wcsCoverageDescriptionClient_ = new AdamWcsCoverageDescriptionClient({
             wcsUrl: config.wcsUrl,
             axiosInstance: this.axiosInstance_
         });
         this.additionalDatasetConfig_ = config.additionalDatasetConfig || {};
-        this.metadataModelVersion_ = config.metadataModelVersion || AdamOpensearchMetadataModelVersion.V3;
     }
 
     searchDatasets(queryParams: QueryParams) {
         const filters = queryParams.filters?.slice() || [];
 
-        if (this.metadataModelVersion_ === AdamOpensearchMetadataModelVersion.V2) {
-            filters.push({
-                key: 'geolocated',
-                type: BOOLEAN_FIELD_ID,
-                value: true
-            });
-        } else if (this.metadataModelVersion_ === AdamOpensearchMetadataModelVersion.V3) {
-            filters.push({
-                key: 'geolocated',
-                type: STRING_FIELD_ID,
-                value: 'True'
-            });
-        }
+        filters.push({
+            key: 'geolocated',
+            type: BOOLEAN_FIELD_ID,
+            value: true
+        });
 
         return this.openSearchClient_
             .getDatasets({
@@ -114,52 +99,64 @@ export class AdamOpensearchDatasetDiscoveryClient {
             // with 4326 projection and let eo-geotiff library handle the reprojection (not accurate)
             let wcsCoverage = wcsCoverages.length === 1 ? wcsCoverages[0] : undefined;
 
-            let extent: number[] | undefined;
-            let srs: string;
-            let srsDef: string | undefined;
+            let extent:
+                | {
+                      bbox: number[];
+                      srs: string;
+                      srsDef?: string;
+                  }
+                | undefined;
 
             if (!wcsCoverage) {
-                srs = wcsCoverages[0].srs;
-                srsDef = wcsCoverages[0].srsDef;
-                extent = wcsCoverages[0].extent;
+                if (wcsCoverages.length) {
+                    extent = {
+                        srs: wcsCoverages[0].srs,
+                        srsDef: wcsCoverages[0].srsDef,
+                        bbox: wcsCoverages[0].extent
+                    };
 
-                // if all coverages share the same srs compute the combined extent and init
-                // the layer with the native coverages projection
-                for (let i = 0; i < wcsCoverages.length; ++i) {
-                    if (wcsCoverages[i].srs !== srs) {
-                        extent = undefined;
-                        break;
-                    } else {
-                        const coverageExtent = wcsCoverages[i].extent;
-                        extent = [
-                            Math.min(extent[0], coverageExtent[0]),
-                            Math.min(extent[1], coverageExtent[1]),
-                            Math.max(extent[2], coverageExtent[2]),
-                            Math.max(extent[3], coverageExtent[3])
-                        ];
+                    // if all coverages share the same srs compute the combined extent and init
+                    // the layer with the native coverages projection
+                    for (let i = 0; i < wcsCoverages.length; ++i) {
+                        if (wcsCoverages[i].srs !== extent.srs) {
+                            extent = undefined;
+                            break;
+                        } else {
+                            const coverageExtent = wcsCoverages[i].extent;
+                            extent.bbox = [
+                                Math.min(extent.bbox[0], coverageExtent[0]),
+                                Math.min(extent.bbox[1], coverageExtent[1]),
+                                Math.max(extent.bbox[2], coverageExtent[2]),
+                                Math.max(extent.bbox[3], coverageExtent[3])
+                            ];
+                        }
                     }
-                }
-                //otherwise fallback to the 4326 reprojection through eo-geotiff library (not accurate)
-                if (!extent) {
-                    srs = 'EPSG:4326';
-                    srsDef = undefined;
-                    extent = getGeometryExtent(metadata.geometry)!;
-                }
-                if (!extent || !isValidExtent(extent)) {
-                    //no valid extent available in opensearch metadata. use the first available coverage
-                    wcsCoverage = wcsCoverages[0];
-                    if (!wcsCoverage) {
-                        return Promise.reject(new Error('Invalid dataset'));
-                    } else {
-                        extent = wcsCoverage.extent;
-                        srs = wcsCoverage.srs;
-                        srsDef = wcsCoverage.srsDef;
+                    //otherwise fallback to the 4326 reprojection through eo-geotiff library (not accurate)
+                    if (!extent) {
+                        extent = {
+                            srs: 'EPSG:4326',
+                            srsDef: undefined,
+                            bbox: getGeometryExtent(metadata.geometry)!
+                        };
                     }
+                    if (!isValidExtent(extent.bbox)) {
+                        //no valid extent available in opensearch metadata. use the first available coverage
+                        wcsCoverage = wcsCoverages[0];
+                        extent = {
+                            bbox: wcsCoverage.extent,
+                            srs: wcsCoverage.srs,
+                            srsDef: wcsCoverage.srsDef
+                        };
+                    }
+                } else {
+                    extent = undefined;
                 }
             } else {
-                extent = wcsCoverage.extent;
-                srs = wcsCoverage.srs;
-                srsDef = wcsCoverage.srsDef;
+                extent = {
+                    bbox: wcsCoverage.extent,
+                    srs: wcsCoverage.srs,
+                    srsDef: wcsCoverage.srsDef
+                };
             }
 
             let coverages: AdamDatasetSingleBandCoverage[] | AdamDatasetMultiBandCoverage;
@@ -215,7 +212,7 @@ export class AdamOpensearchDatasetDiscoveryClient {
                 });
 
                 const bands: AdamDatasetCoverageBand[] = [];
-                for (let i = 0; i < (wcsCoverages[0]?.numBands || 0); ++i) {
+                for (let i = 0; i < (wcsCoverages[0]?.numBands || 1); ++i) {
                     bands.push({
                         idx: i + 1,
                         name: `B${i + 1}`,
@@ -281,45 +278,45 @@ export class AdamOpensearchDatasetDiscoveryClient {
                 });
             }
 
-            let minDate: moment.Moment | undefined = moment.utc(subdatasets[0].minDate);
+            let minDate: moment.Moment | undefined = moment.utc(metadata.minDate);
             if (!minDate.isValid()) {
                 minDate = wcsCoverages.length === 1 ? moment.utc(wcsCoverages[0].time.start) : undefined;
             }
-            let maxDate: moment.Moment | undefined = moment.utc(subdatasets[0].maxDate);
+            let maxDate: moment.Moment | undefined = moment.utc(metadata.maxDate);
             if (!maxDate.isValid()) {
                 maxDate = wcsCoverages.length === 1 ? moment.utc(wcsCoverages[0].time.end) : undefined;
             }
 
-            let timeless = false;
+            let fixedTime: Date | boolean = false;
             if (minDate && minDate?.isSame(maxDate)) {
-                timeless = true;
+                fixedTime = minDate.toDate();
             }
 
-            if (!isValidExtent(extent)) {
+            if (extent && !isValidExtent(extent.bbox)) {
                 return Promise.reject(new Error('Invalid dataset extent'));
             }
 
             // TODO: fix cesium rectangle intersection error when geographic domain
             // is beyond geographic projection limits
-            if (srs === 'EPSG:4326') {
-                if (extent[0] <= -180) {
-                    extent[0] = -180;
+            if (extent && extent.srs === 'EPSG:4326') {
+                if (extent.bbox[0] <= -180) {
+                    extent.bbox[0] = -180;
                 }
-                if (extent[2] >= 180) {
-                    extent[2] = 180;
+                if (extent.bbox[2] >= 180) {
+                    extent.bbox[2] = 180;
                 }
-                if (extent[1] <= -90) {
-                    extent[1] = -90;
+                if (extent.bbox[1] <= -90) {
+                    extent.bbox[1] = -90;
                 }
-                if (extent[3] >= 90) {
-                    extent[3] = 90;
+                if (extent.bbox[3] >= 90) {
+                    extent.bbox[3] = 90;
                 }
             }
 
             return this.getDatasetDimensionsFromSubdatasets_(subdatasets, metadata.datasetSpecification).then((dimensions) => {
                 //disable time navigation for campaign data
                 if (dimensions.length && (dimensions[0].id === 'SceneType' || dimensions[0].id === 'image')) {
-                    timeless = true;
+                    fixedTime = true;
                 }
 
                 if (subsetDimension) {
@@ -329,14 +326,18 @@ export class AdamOpensearchDatasetDiscoveryClient {
                 return {
                     type: 'raster',
                     id: metadata.datasetId,
-                    coverageExtent: extent!,
-                    coverageSrs: srs,
-                    srsDef: srsDef,
+                    coverageExtent: extent,
                     name: metadata.datasetId,
-                    timeless: timeless,
+                    fixedTime: fixedTime,
                     renderMode: AdamDatasetRenderMode.ClientSide,
                     coverages: coverages,
                     dimensions: dimensions,
+                    timeRange: !fixedTime
+                        ? {
+                              start: minDate!.toDate(),
+                              end: maxDate!.toDate()
+                          }
+                        : undefined,
                     ...this.additionalDatasetConfig_[metadata.datasetId]
                 };
             });

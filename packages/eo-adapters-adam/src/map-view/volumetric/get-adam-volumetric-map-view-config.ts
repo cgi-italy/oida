@@ -27,17 +27,21 @@ export const getAdamVolumetricMapViewConfig = (factoryConfig: AdamDatasetFactory
         return undefined;
     }
 
+    if (!datasetConfig.coverageExtent) {
+        return undefined;
+    }
+
     const tileGrid = {
-        srs: datasetConfig.coverageSrs,
+        srs: datasetConfig.coverageExtent.srs,
         numLevels: 1,
         numRootTiles: [2, 1, 1],
         tileSize: [256, 256, 9],
         extent: {
-            minX: datasetConfig.coverageExtent[0],
-            minY: datasetConfig.coverageExtent[1],
+            minX: datasetConfig.coverageExtent.bbox[0],
+            minY: datasetConfig.coverageExtent.bbox[1],
             minZ: heightDimension.domain.min as number,
-            maxX: datasetConfig.coverageExtent[2],
-            maxY: datasetConfig.coverageExtent[3],
+            maxX: datasetConfig.coverageExtent.bbox[2],
+            maxY: datasetConfig.coverageExtent.bbox[3],
             maxZ: heightDimension.domain.max as number
         }
     };
@@ -69,7 +73,7 @@ export const getAdamVolumetricMapViewConfig = (factoryConfig: AdamDatasetFactory
 
             const sourceSubsets: string[] = [];
 
-            if (!datasetConfig.timeless) {
+            if (!datasetConfig.fixedTime) {
                 const timeSubset = getWcsTimeFilterSubset(volumetricViz.dataset.toi);
                 if (timeSubset) {
                     sourceSubsets.push(timeSubset);
@@ -84,7 +88,7 @@ export const getAdamVolumetricMapViewConfig = (factoryConfig: AdamDatasetFactory
                 return undefined;
             }
 
-            const extent = aoiParams?.extent;
+            const extent = aoiParams.extent.bbox;
             tileGrid.extent.minX = extent[0];
             tileGrid.extent.maxX = extent[2];
             tileGrid.extent.minY = extent[1];

@@ -87,27 +87,27 @@ export const getAdamDatasetToolsConfig = (
         variables.push(...datasetConfig.coverages);
     }
 
-    const timeDimension: AdamDatasetDimension = {
-        id: 'time',
-        name: 'Time',
-        wcsSubset: {
-            id: 'unix'
-        },
-        wcsResponseKey: 'time',
-        tarFilenameRegex: /([0-9]{4})([0-9]{2})([0-9]{2})\.([0-9]{2})([0-9]{2})([0-9]{2})/,
-        domain: timeDistributionProvider
-            ? () => {
-                  return timeDistributionProvider!.getTimeExtent().then((extent) => {
-                      return {
-                          min: extent?.start || new Date(0),
-                          max: extent?.end || new Date()
-                      };
-                  });
-              }
-            : undefined
-    };
+    if (!datasetConfig.fixedTime) {
+        const timeDimension: AdamDatasetDimension = {
+            id: 'time',
+            name: 'Time',
+            wcsSubset: {
+                id: 'unix'
+            },
+            wcsResponseKey: 'time',
+            tarFilenameRegex: /([0-9]{4})([0-9]{2})([0-9]{2})\.([0-9]{2})([0-9]{2})([0-9]{2})/,
+            domain: timeDistributionProvider
+                ? () => {
+                      return timeDistributionProvider!.getTimeExtent().then((extent) => {
+                          return {
+                              min: extent?.start || new Date(0),
+                              max: extent?.end || new Date()
+                          };
+                      });
+                  }
+                : undefined
+        };
 
-    if (!datasetConfig.timeless) {
         dimensions.unshift(timeDimension);
     }
 
@@ -122,10 +122,10 @@ export const getAdamDatasetToolsConfig = (
 
     const tools: DatasetToolConfig[] = [];
 
-    if (dimensions.filter((dimension) => !dimension.preventSeries).length && variables.length) {
+    if (dimensions.filter((dimension) => !dimension.preventSeries).length && variables.length && datasetConfig.coverageExtent) {
         const wcsSeriesProvider = new AdamWcsSeriesProvider({
             axiosInstance: axiosInstance,
-            coverageSrs: datasetConfig.coverageSrs,
+            coverageSrs: datasetConfig.coverageExtent.srs,
             serviceUrl: factoryConfig.wcsServiceUrl,
             extentOffset: datasetConfig.requestExtentOffset,
             variables: variables,
@@ -147,11 +147,18 @@ export const getAdamDatasetToolsConfig = (
         });
     }
 
-    if (wpsAnalysisProvider && variables.length) {
+    // transect supports only time subsetting
+    if (wpsAnalysisProvider && variables.length && (!dimensions.length || (dimensions.length === 1 && dimensions[0].id === 'time'))) {
         const transectSeriesConfig: DatasetTransectValuesConfig = {
             variables: variables,
             dimensions: dimensions,
             provider: (request) => {
+                if (datasetConfig.fixedTime instanceof Date) {
+                    if (!request.dimensionValues) {
+                        request.dimensionValues = new Map();
+                    }
+                    request.dimensionValues.set('time', datasetConfig.fixedTime);
+                }
                 return wpsAnalysisProvider!.getTransectSeries(request);
             },
             maxLineStringLength: 2

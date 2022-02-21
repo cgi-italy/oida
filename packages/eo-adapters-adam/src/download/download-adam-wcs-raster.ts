@@ -6,7 +6,7 @@ import { AdamDatasetConfig } from '../adam-dataset-config';
 export const downloadAdamWcsRaster = (datasetConfig: AdamDatasetConfig, rasterView: RasterMapViz) => {
     const subsets: string[] = [];
 
-    if (!datasetConfig.timeless) {
+    if (!datasetConfig.fixedTime) {
         const timeSubset = getWcsTimeFilterSubset(rasterView.dataset.toi);
         if (!timeSubset) {
             return undefined;
@@ -16,9 +16,7 @@ export const downloadAdamWcsRaster = (datasetConfig: AdamDatasetConfig, rasterVi
     }
 
     const aoiParams = getAoiWcsParams(datasetConfig, rasterView.dataset.aoi);
-    if (!aoiParams) {
-        return undefined;
-    } else {
+    if (aoiParams) {
         subsets.push(...aoiParams.wcsSubsets);
     }
 
@@ -33,7 +31,7 @@ export const downloadAdamWcsRaster = (datasetConfig: AdamDatasetConfig, rasterVi
 
     return {
         subsets,
-        wktFilter: aoiParams.wktFilter,
+        wktFilter: aoiParams?.wktFilter,
         ...wcsCoverageProps
     };
 };

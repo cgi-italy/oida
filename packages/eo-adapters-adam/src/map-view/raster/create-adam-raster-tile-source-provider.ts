@@ -77,18 +77,13 @@ export const createAdamRasterTileSourceProvider = (
 
         const subsets: string[] = [];
 
-        if (!datasetConfig.timeless) {
+        if (!datasetConfig.fixedTime) {
             const timeSubset = getWcsTimeFilterSubset(rasterView.dataset.toi);
             if (!timeSubset) {
                 return Promise.reject(new Error('The layer time span is outside of the selected time range'));
             } else {
                 subsets.push(timeSubset);
             }
-        }
-
-        const aoiParams = getAoiWcsParams(datasetConfig, rasterView.dataset.aoi);
-        if (!aoiParams) {
-            return Promise.reject(new Error('The layer extent does not intersect the selected area of interest'));
         }
 
         const bandMode = rasterView.bandMode;
@@ -123,31 +118,33 @@ export const createAdamRasterTileSourceProvider = (
             }
         }
 
+        const aoi = rasterView.dataset.aoi;
+
         return spatialCoverageProvider(rasterView, true).then((coverageExtent) => {
-            const aoiParams = getAoiWcsParams(datasetConfig, rasterView.dataset.aoi, coverageExtent);
+            const aoiParams = getAoiWcsParams(datasetConfig, aoi, coverageExtent);
 
             if (!aoiParams) {
                 return Promise.reject(new Error('The layer extent does not intersect the selected area of interest'));
             }
 
             let geographicExtent;
-            if (datasetConfig.coverageSrs !== 'EPSG:4326') {
-                geographicExtent = transformExtent(aoiParams.extent, datasetConfig.coverageSrs, 'EPSG:4326');
+            if (aoiParams.extent.srs !== 'EPSG:4326') {
+                geographicExtent = transformExtent(aoiParams.extent.bbox, aoiParams.extent.srs, 'EPSG:4326');
             } else {
-                geographicExtent = aoiParams.extent;
+                geographicExtent = aoiParams.extent.bbox;
             }
 
             return {
                 config: {
                     id: ADAM_WCS_SOURCE_ID,
                     url: factoryConfig.wcsServiceUrl,
-                    srs: datasetConfig.coverageSrs,
+                    srs: aoiParams.extent.srs,
                     coverage: wcsCoverageParams.coverageId,
                     format: format,
                     subsets: subsets,
                     subdataset: wcsCoverageParams.subdataset,
                     tileGrid: {
-                        extent: aoiParams.extent,
+                        extent: aoiParams.extent.bbox,
                         forceUniformResolution: true,
                         tileSize: tileSize
                     },

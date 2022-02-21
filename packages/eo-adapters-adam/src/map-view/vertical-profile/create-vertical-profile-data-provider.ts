@@ -78,7 +78,7 @@ export const createVerticalProfileDataProvider = (
     const load = (vProfileViz: DatasetVerticalProfileViz) => {
         const bandMode = vProfileViz.bandMode.value;
         if (bandMode instanceof RasterBandModeSingle) {
-            const timeFilter = !datasetConfig.timeless ? vProfileViz.dataset.toi : undefined;
+            const timeFilter = !datasetConfig.fixedTime ? vProfileViz.dataset.toi : undefined;
             return new Promise<VerticalProfileItemProps[]>((resolve, reject) => {
                 debouncedProfileGetter(bandMode.band, timeFilter, resolve, reject);
             });

@@ -1,4 +1,5 @@
 import {
+    AoiValue,
     AOI_FIELD_ID,
     AxiosInstanceWithCancellation,
     BOOLEAN_FIELD_ID,
@@ -7,7 +8,9 @@ import {
     DATE_FIELD_ID,
     DATE_RANGE_FIELD_ID,
     ENUM_FIELD_ID,
+    getGeometryAsWkt,
     QueryParams,
+    SortOrder,
     STRING_FIELD_ID
 } from '@oidajs/core';
 
@@ -57,12 +60,20 @@ export type AdamOpensearchDatasetMetadata = {
     subDataset: AdamOpensearchDatasetMetadataSubdataset[];
     description: string;
     datasetSpecification: string;
+    minDate: string;
+    maxDate: string;
 };
 
 export type AdamOpensearchProductMetadata = {
     geometry: GeoJSON.Polygon;
-    sourceRasterGeo: string;
-    metadata: {
+    source: string;
+    sourceRasterGeo?: string;
+    datasetId: string;
+    subDatasetId: string;
+    title: string;
+    productDate: string;
+    EPSG?: string;
+    metadata?: {
         identifier: string;
         datasetId: string;
         subDatasetId: string;
@@ -99,18 +110,27 @@ export type AdamOpensearchProductSearchResponse = {
     features: AdamOpensearchProductMetadata[];
 };
 
+export enum AdamOpensearchMetadataModelVersion {
+    V1 = 'v1',
+    V2 = 'v2',
+    V3 = 'v3'
+}
+
 export type AdamOpenSearchClientConfig = {
     serviceUrl: string;
     axiosInstance?: AxiosInstanceWithCancellation;
+    metadataModelVersion?: AdamOpensearchMetadataModelVersion;
 };
 
 export class AdamOpenSearchClient {
     protected axiosInstance_: AxiosInstanceWithCancellation;
     protected serviceUrl_: string;
+    protected metadataModelVersion_: AdamOpensearchMetadataModelVersion;
 
     constructor(config: AdamOpenSearchClientConfig) {
         this.axiosInstance_ = config.axiosInstance || createAxiosInstance();
         this.serviceUrl_ = config.serviceUrl;
+        this.metadataModelVersion_ = config.metadataModelVersion || AdamOpensearchMetadataModelVersion.V3;
     }
 
     getDatasets(queryParams: QueryParams) {
@@ -132,6 +152,9 @@ export class AdamOpenSearchClient {
                     params[filter.key] = filter.value;
                 } else if (filter.type === BOOLEAN_FIELD_ID) {
                     params[filter.key] = filter.value ? 'true' : 'false';
+                    if (filter.key === 'geolocated' && this.metadataModelVersion_ === AdamOpensearchMetadataModelVersion.V3) {
+                        params[filter.key] = filter.value ? 'True' : 'False';
+                    }
                 } else if (filter.type === DATE_FIELD_ID) {
                     params[filter.key] = filter.value.toISOString();
                 }
@@ -159,18 +182,37 @@ export class AdamOpenSearchClient {
             queryParams.filters.forEach((filter) => {
                 if (filter.type === BOOLEAN_FIELD_ID) {
                     params[filter.key] = filter.value ? 'true' : 'false';
+                    if (filter.key === 'geolocated' && this.metadataModelVersion_ === AdamOpensearchMetadataModelVersion.V3) {
+                        params[filter.key] = filter.value ? 'True' : 'False';
+                    }
                 } else if (filter.type === STRING_FIELD_ID || filter.type === ENUM_FIELD_ID) {
                     params[filter.key] = filter.value;
                 } else if (filter.type === DATE_RANGE_FIELD_ID) {
-                    params['startDate'] = (filter.value as DateRangeValue).start.toISOString();
-                    params['endDate'] = (filter.value as DateRangeValue).end.toISOString();
+                    if ((filter.value as DateRangeValue).start) {
+                        params['startDate'] = (filter.value as DateRangeValue).start.toISOString();
+                    }
+                    if ((filter.value as DateRangeValue).end) {
+                        params['endDate'] = (filter.value as DateRangeValue).end.toISOString();
+                    }
                 } else if (filter.type === DATE_FIELD_ID) {
                     params[filter.key] = filter.value.toISOString();
                 } else if (filter.type === AOI_FIELD_ID) {
-                    //TODO: add wkx dependency
-                    //params[filter.key] = wkx.Geometry.parseGeoJSON((filter.value as AoiValue).geometry).toWkt();
+                    params[filter.key] = getGeometryAsWkt((filter.value as AoiValue).geometry);
                 }
             });
+        }
+
+        if (queryParams.sortBy) {
+            if (queryParams.sortBy.key !== 'productDate') {
+                params['order'] = queryParams.sortBy.key;
+            }
+            if (this.metadataModelVersion_ === AdamOpensearchMetadataModelVersion.V3) {
+                if (queryParams.sortBy.order === SortOrder.Ascending) {
+                    params['sortOrder'] = 'ASC';
+                } else {
+                    params['sortOrder'] = 'DESC';
+                }
+            }
         }
 
         return this.axiosInstance_

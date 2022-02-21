@@ -6,18 +6,34 @@ import { AoiValue } from '@oidajs/core';
 
 import { AdamDatasetConfig } from '../adam-dataset-config';
 
-export const getAoiWcsParams = (datasetConfig: AdamDatasetConfig, aoiFilter: AoiValue | undefined, currentCoverageExtent?: number[]) => {
-    let extent: number[] = currentCoverageExtent || datasetConfig.coverageExtent.slice();
+export const getAoiWcsParams = (
+    datasetConfig: AdamDatasetConfig,
+    aoiFilter: AoiValue | undefined,
+    currentCoverageExtent?: { bbox: number[]; srs: string }
+) => {
+    let extent = currentCoverageExtent || datasetConfig.coverageExtent;
+    if (extent) {
+        // deep clone to avoid side effects
+        extent = {
+            bbox: [...extent.bbox],
+            srs: extent.srs
+        };
+    } else {
+        return undefined;
+    }
+
     let wktFilter: string | undefined;
     let wcsSubsets: string[] = [];
 
     if (aoiFilter) {
         const geometry = aoiFilter.geometry;
         let filterExtent = getGeometryExtent(geometry);
-        filterExtent = transformExtent(filterExtent, 'EPSG:4326', datasetConfig.coverageSrs);
-        extent = getIntersection(extent, filterExtent);
+        if (extent) {
+            filterExtent = transformExtent(filterExtent, 'EPSG:4326', extent.srs);
+            extent.bbox = getIntersection(extent.bbox, filterExtent);
+        }
 
-        if (isEmpty(extent)) {
+        if (isEmpty(extent.bbox)) {
             return undefined;
         }
 
@@ -30,14 +46,17 @@ export const getAoiWcsParams = (datasetConfig: AdamDatasetConfig, aoiFilter: Aoi
 
             wktFilter = `geometry=POLYGON((${polygonCoords}))`;
         } else {
-            const requestExtent = extent.slice();
             if (datasetConfig.requestExtentOffset) {
-                requestExtent[0] += datasetConfig.requestExtentOffset[0];
-                requestExtent[2] += datasetConfig.requestExtentOffset[0];
-                requestExtent[1] += datasetConfig.requestExtentOffset[1];
-                requestExtent[3] += datasetConfig.requestExtentOffset[1];
+                extent.bbox[0] += datasetConfig.requestExtentOffset[0];
+                extent.bbox[2] += datasetConfig.requestExtentOffset[0];
+                extent.bbox[1] += datasetConfig.requestExtentOffset[1];
+                extent.bbox[3] += datasetConfig.requestExtentOffset[1];
             }
-            wcsSubsets = [`E(${requestExtent[0]},${requestExtent[2]})`, `N(${requestExtent[1]},${requestExtent[3]})`];
+            if (extent.srs === 'EPSG:4326') {
+                wcsSubsets = [`Lon(${extent.bbox[0]},${extent.bbox[2]})`, `Lat(${extent.bbox[1]},${extent.bbox[3]})`];
+            } else {
+                wcsSubsets = [`E(${extent.bbox[0]},${extent.bbox[2]})`, `N(${extent.bbox[1]},${extent.bbox[3]})`];
+            }
         }
     }
 

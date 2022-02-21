@@ -12,7 +12,16 @@ import { AdamDatasetFactoryConfig } from './get-adam-dataset-factory';
 import { AdamServiceParamsSerializer } from './utils/adam-service-params-serializer';
 import { getWcsTimeFilterSubset, getCoverageWcsParams } from './utils';
 
-export type AdamSpatialCoverageProvider = (mapView: DatasetViz<any>, keepDatasetSrs?: boolean) => Promise<number[] | undefined>;
+export type AdamSpatialCoverageProvider = (
+    mapView: DatasetViz<any>,
+    keepDatasetSrs?: boolean
+) => Promise<
+    | {
+          bbox: number[];
+          srs: string;
+      }
+    | undefined
+>;
 
 //TODO: This utils were extracted from the eo-geotiff library for lack of time
 // Refactor the code to use the GeotiffLoader class instead
@@ -54,18 +63,19 @@ const transformExtent = (extent: number[], sourceSrs: string, destSrs: string): 
     return [...ll, ...ur];
 };
 
-const getGeotiffExtent = (image, outputSrs?: string) => {
+const getGeotiffExtent = (image) => {
     const imageExtent: number[] = image.getBoundingBox();
-    if (outputSrs) {
-        const imageSrs = getGeotiffSrs(image);
-        if (imageSrs && imageSrs !== outputSrs) {
-            return registerSrs(imageSrs).then(() => {
-                const extent = transformExtent(image.getBoundingBox(), imageSrs, outputSrs);
-                return extent;
-            });
-        }
+    const imageSrs = getGeotiffSrs(image);
+    if (imageSrs) {
+        return registerSrs(imageSrs).then(() => {
+            return {
+                bbox: imageExtent,
+                srs: imageSrs
+            };
+        });
+    } else {
+        return Promise.resolve(undefined);
     }
-    return Promise.resolve(imageExtent);
 };
 
 export const getAdamDatasetSpatialCoverageProvider = (
@@ -73,19 +83,23 @@ export const getAdamDatasetSpatialCoverageProvider = (
     factoryConfig: AdamDatasetFactoryConfig,
     datasetConfig: AdamDatasetConfig
 ) => {
-    if (datasetConfig.srsDef) {
-        proj4.defs(datasetConfig.coverageSrs, datasetConfig.srsDef);
+    if (datasetConfig.coverageExtent?.srsDef) {
+        proj4.defs(datasetConfig.coverageExtent.srs, datasetConfig.coverageExtent.srsDef);
         register(proj4);
     }
 
-    let geogCoverageExtent = datasetConfig.coverageExtent;
-    if (datasetConfig.coverageSrs !== 'EPSG:4326') {
-        geogCoverageExtent = transformExtent(geogCoverageExtent, datasetConfig.coverageSrs, 'EPSG:4326');
+    let geogCoverageExtent: { bbox: number[]; srs: string } | undefined;
+    if (datasetConfig.coverageExtent && datasetConfig.coverageExtent.srs !== 'EPSG:4326') {
+        geogCoverageExtent = {
+            bbox: transformExtent(datasetConfig.coverageExtent.bbox, datasetConfig.coverageExtent.srs, 'EPSG:4326'),
+            srs: 'EPSG:4326'
+        };
     }
 
     return ((mapView: DatasetViz<any>, keepDatasetSrs?: boolean) => {
         if (mapView instanceof RasterMapViz) {
             if (datasetConfig.minZoomLevel || datasetConfig.aoiRequired) {
+                //coarse zoom levels are probably too slow to retrieve. use extent from coverage definition
                 return Promise.resolve(keepDatasetSrs ? datasetConfig.coverageExtent : geogCoverageExtent);
             }
 
@@ -99,7 +113,7 @@ export const getAdamDatasetSpatialCoverageProvider = (
 
             const subsets: string[] = [];
 
-            if (!datasetConfig.timeless) {
+            if (!datasetConfig.fixedTime) {
                 const timeSubset = getWcsTimeFilterSubset(mapView.dataset.toi);
                 if (timeSubset) {
                     subsets.push(timeSubset);
@@ -135,19 +149,24 @@ export const getAdamDatasetSpatialCoverageProvider = (
                             return tiff
                                 .getImage()
                                 .then((image) => {
-                                    return getGeotiffExtent(image, datasetConfig.coverageSrs).then((extent) => {
-                                        if (!keepDatasetSrs && datasetConfig.coverageSrs !== 'EPSG:4326') {
-                                            extent = transformExtent(extent, datasetConfig.coverageSrs, 'EPSG:4326');
-                                            extent = getIntersection(extent, geogCoverageExtent);
+                                    return getGeotiffExtent(image).then((extent) => {
+                                        if (!keepDatasetSrs && extent.srs !== 'EPSG:4326') {
+                                            extent.bbox = transformExtent(extent.bbox, extent.srs, 'EPSG:4326');
+                                            extent.srs = 'EPSG:4326';
+                                            if (geogCoverageExtent) {
+                                                extent.bbox = getIntersection(extent.bbox, geogCoverageExtent.bbox);
+                                            }
                                         } else {
-                                            extent = getIntersection(extent, datasetConfig.coverageExtent);
+                                            if (datasetConfig.coverageExtent && datasetConfig.coverageExtent.srs === extent.srs) {
+                                                extent.bbox = getIntersection(extent.bbox, datasetConfig.coverageExtent.bbox);
+                                            }
                                         }
 
                                         if (datasetConfig.requestExtentOffset) {
-                                            extent[0] -= datasetConfig.requestExtentOffset[0];
-                                            extent[2] -= datasetConfig.requestExtentOffset[0];
-                                            extent[1] -= datasetConfig.requestExtentOffset[1];
-                                            extent[3] -= datasetConfig.requestExtentOffset[1];
+                                            extent.bbox[0] -= datasetConfig.requestExtentOffset[0];
+                                            extent.bbox[2] -= datasetConfig.requestExtentOffset[0];
+                                            extent.bbox[1] -= datasetConfig.requestExtentOffset[1];
+                                            extent.bbox[3] -= datasetConfig.requestExtentOffset[1];
                                         }
                                         return extent;
                                     });

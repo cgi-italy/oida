@@ -61,17 +61,23 @@ export type AdamDatasetConfig = {
     name: string;
     color?: string;
     coverages: AdamDatasetSingleBandCoverage[] | AdamDatasetMultiBandCoverage;
-    coverageSrs: string;
-    srsDef?: string;
-    coverageExtent: number[];
+    coverageExtent?: {
+        bbox: number[];
+        srs: string;
+        srsDef?: string;
+    };
     requestExtentOffset?: number[];
     dimensions?: AdamDatasetDimension[];
-    timeless?: boolean;
+    fixedTime?: Date | boolean;
     renderMode: AdamDatasetRenderMode;
     cswCollection?: string;
     productSearchRecordContent?: (item: ProductSearchRecord) => any;
     minZoomLevel?: number;
     aoiRequired?: boolean;
+    timeRange?: {
+        start: Date;
+        end: Date;
+    };
 };
 
 export function isMultiBandCoverage(
