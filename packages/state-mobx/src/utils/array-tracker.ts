@@ -61,12 +61,17 @@ export class ArrayTracker<T, S> {
     }
 
     protected onItemAdd_(id: string, item: T, idx: number) {
+        if (Object.prototype.hasOwnProperty.call(this.itemTracker_, id)) {
+            this.onItemRemoved_(id);
+        }
         this.itemTracker_[id] = this.trackerConfig_.onItemAdd(item, idx);
     }
 
     protected onItemRemoved_(id) {
-        const itemTracker = this.itemTracker_[id];
-        this.trackerConfig_.onItemRemove(itemTracker);
-        delete this.itemTracker_[id];
+        if (Object.prototype.hasOwnProperty.call(this.itemTracker_, id)) {
+            const itemTracker = this.itemTracker_[id];
+            this.trackerConfig_.onItemRemove(itemTracker);
+            delete this.itemTracker_[id];
+        }
     }
 }
