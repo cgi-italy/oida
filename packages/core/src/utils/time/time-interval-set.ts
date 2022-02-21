@@ -72,7 +72,7 @@ export class TimeIntervalSet {
                 deleteEnd--;
             }
 
-            const deleteRange = deleteEnd - deleteStart;
+            const deleteRange = deleteEnd - deleteStart + 1;
             if (deleteRange > 0) {
                 this.intervals_.splice(deleteStart, deleteRange);
             }
@@ -85,6 +85,27 @@ export class TimeIntervalSet {
      */
     getIntervals() {
         return this.intervals_.slice();
+    }
+
+    /**
+     * Check if an interval is already included in the set (that is the current set already cover the interval
+     * time span)
+     * @param interval the interval to test
+     * @returns a boolean indicating if the set already includes the input interval
+     */
+    isIntervalIncluded(interval: TimeInterval): boolean {
+        const overlapData = this.getOverlappingData(interval);
+        if (overlapData.overlapStart === -1) {
+            //it does not overlap any interval in the set
+            return false;
+        } else if (overlapData.overlapEnd !== overlapData.overlapStart) {
+            // it overlaps more than one interval (with gaps)
+            return false;
+        } else {
+            const overlappingInterval = this.intervals_[overlapData.overlapStart];
+            // check that is included by the overlapping interval
+            return overlappingInterval.start.isSameOrBefore(interval.start) && overlappingInterval.end.isSameOrAfter(interval.end);
+        }
     }
 
     private getOverlappingData(interval: TimeInterval) {
