@@ -77,7 +77,12 @@ export class DatasetTransectValues extends DatasetProcessing<undefined> implemen
 
         this.config = props.config;
 
-        this.seriesVariable = props.seriesVariable || parentDimensions?.variable;
+        this.seriesVariable = props.seriesVariable;
+        if (!this.seriesVariable) {
+            if (parentDimensions?.variable && this.config.variables.find((variable) => variable.id === parentDimensions.variable)) {
+                this.seriesVariable = parentDimensions.variable;
+            }
+        }
         this.numSamples = props.numSamples;
         if (props.config.supportsNumSamples && !this.numSamples) {
             this.numSamples = props.config.maxNumSamples ? Math.min(props.config.maxNumSamples, 20) : 20;

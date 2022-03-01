@@ -95,8 +95,12 @@ export class DatasetAreaValues extends DatasetProcessing<undefined> implements H
 
         this.config = props.config;
 
-        this.variable = props.variable || parentDimensions?.variable;
-
+        this.variable = props.variable;
+        if (!this.variable) {
+            if (parentDimensions?.variable && this.config.variables.find((variable) => variable.id === parentDimensions.variable)) {
+                this.variable = parentDimensions.variable;
+            }
+        }
         this.data = undefined;
         this.autoUpdate = props.autoUpdate !== undefined ? props.autoUpdate : true;
         this.dataMask = props.dataMask || {

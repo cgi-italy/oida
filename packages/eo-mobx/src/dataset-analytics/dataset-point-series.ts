@@ -77,7 +77,12 @@ export class DatasetPointSeries extends DatasetProcessing<undefined> implements 
         const parentDimensions = (props.parent as HasDatasetDimensions | undefined)?.dimensions;
 
         this.seriesDimension = props.seriesDimension;
-        this.seriesVariable = props.seriesVariable || parentDimensions?.variable;
+        this.seriesVariable = props.seriesVariable;
+        if (!this.seriesVariable) {
+            if (parentDimensions?.variable && this.config.variables.find((variable) => variable.id === parentDimensions.variable)) {
+                this.seriesVariable = parentDimensions.variable;
+            }
+        }
         this.seriesRange = props.seriesRange;
         this.data = [];
         this.autoUpdate = props.autoUpdate !== undefined ? props.autoUpdate : true;
@@ -243,7 +248,8 @@ export class DatasetPointSeries extends DatasetProcessing<undefined> implements 
             this.setVariable(this.config.variables[0].id);
         }
         if (!this.seriesDimension) {
-            this.setDimension(this.config.dimensions[0].id);
+            const firstDimension = this.config.dimensions.find((dimension) => !dimension.preventSeries);
+            this.setDimension(firstDimension?.id);
         }
 
         const seriesUpdaterDisposer = autorun(() => {

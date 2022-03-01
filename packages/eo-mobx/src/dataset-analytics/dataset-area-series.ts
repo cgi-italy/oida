@@ -103,7 +103,14 @@ export class DatasetAreaSeries extends DatasetProcessing<undefined> implements H
             initDimensions: true
         });
 
-        this.setVariable(props.sequenceVariable || parentDimensions?.variable);
+        let sequenceVariable = props.sequenceVariable;
+        if (!sequenceVariable) {
+            if (parentDimensions?.variable && this.config.variables.find((variable) => variable.id === parentDimensions.variable)) {
+                sequenceVariable = parentDimensions.variable;
+            }
+        }
+        this.setVariable(sequenceVariable);
+
         this.additionalParameters = new DataFilters({
             values: props.additionalParameters
         });
