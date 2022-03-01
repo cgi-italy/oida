@@ -181,7 +181,13 @@ export const DatasetDimensionRangeSelector = (props: DatasetDimensionRangeProps)
             );
         }
     } else {
-        return null;
+        return (
+            <Form.Item label='Range'>
+                <div>All {dimension.name} values</div>
+            </Form.Item>
+        );
+
+        // TODO: add categorical dimension range selection when supported by the analysis
         // return (
         //     <DatasetCategoricalRangeSelector
         //         dimension={dimension as CategoricalDimension}
