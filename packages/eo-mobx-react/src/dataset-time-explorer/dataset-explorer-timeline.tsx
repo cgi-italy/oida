@@ -232,7 +232,7 @@ export const DatasetDiscoveryTimeline = (props: DatasetExplorerTimelineProps) =>
                             explorerItem?.dataset.toi instanceof Date && evt.time > explorerItem?.dataset.toi
                                 ? TimeSearchDirection.Forward
                                 : TimeSearchDirection.Backward;
-                        provider.getNearestItem(evt.time, searchDirection).then((nearestItem) => {
+                        provider.getNearestItem(evt.time, searchDirection, explorerItem.timeDistributionViz.filters).then((nearestItem) => {
                             if (nearestItem) {
                                 explorerItem!.dataset.setToi(nearestItem.start);
                             } else {

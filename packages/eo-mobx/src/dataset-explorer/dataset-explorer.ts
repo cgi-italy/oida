@@ -148,13 +148,16 @@ export class DatasetExplorerItem {
         const timeDistributionProvider = this.dataset.config.timeDistribution?.provider;
         if (timeDistributionProvider) {
             this.pendingNearestTimeRequests_ = timeDistributionProvider
-                .getNearestItem(dt)
+                .getNearestItem(dt, undefined, this.timeDistributionViz?.filters)
                 .then((item) => {
                     if (!this.toiSyncDisabled) {
                         if (!item || !item.start) {
                             this.dataset.setToi(undefined, true);
                         } else {
-                            this.dataset.setToi(item.start, true);
+                            this.dataset.setToi(
+                                item.start,
+                                this.explorer.items.filter((item) => item.timeDistributionViz !== undefined).length > 1
+                            );
                         }
                     }
                 })

@@ -95,7 +95,7 @@ export const DatasetTimeDimensionSelector = (props: DatasetTimeDimensionSelector
                     }
                 });
             } else {
-                timeDistributionProvider.getNearestItem(val).then((item) => {
+                timeDistributionProvider.getNearestItem(val, undefined, props.dimensionsState).then((item) => {
                     if (item) {
                         props.dimensionsState.setValue(props.dimension.id, item.start);
                     }
