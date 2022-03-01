@@ -91,6 +91,8 @@ export type AdamOpensearchProductMetadata = {
 export type AdamDatasetDiscoveryRequest = {
     maxRecords?: number;
     startIndex?: number;
+    order?: string;
+    sortOrder?: 'ASC' | 'DESC';
 };
 
 export type AdamOpensearchDatasetDiscoveryResponse = {
@@ -139,15 +141,16 @@ export class AdamOpenSearchClient {
     getDatasets(queryParams: QueryParams) {
         const params: AdamDatasetDiscoveryRequest = {};
 
-        // currently the opensearch endpoint doesn't support pagination or sorting
-        // TODO: enable this once available
-        // if (queryParams.paging) {
-        //     params.maxRecords = queryParams.paging.pageSize;
-        //     params.startIndex = queryParams.paging.offset;
-        // }
-        // if (queryParams.sortBy) {
-
-        // }
+        if (this.metadataModelVersion_ === AdamOpensearchMetadataModelVersion.V3) {
+            if (queryParams.paging) {
+                params.maxRecords = queryParams.paging.pageSize;
+                params.startIndex = queryParams.paging.offset;
+            }
+            if (queryParams.sortBy) {
+                params.order = queryParams.sortBy.key;
+                params.sortOrder = queryParams.sortBy.order === SortOrder.Descending ? 'DESC' : 'ASC';
+            }
+        }
 
         if (queryParams.filters) {
             queryParams.filters.forEach((filter) => {

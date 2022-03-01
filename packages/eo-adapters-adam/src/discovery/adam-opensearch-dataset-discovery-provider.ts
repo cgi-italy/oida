@@ -82,6 +82,7 @@ export class AdamOpensearchDatasetDiscoveryProvider extends DatasetDiscoveryProv
                 });
             });
             this.setResults_(datasets);
+            this.criteria.paging.setTotal(data.properties.totalResults);
         });
     }
 
