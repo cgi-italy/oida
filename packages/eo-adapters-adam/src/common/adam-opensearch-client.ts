@@ -1,3 +1,5 @@
+import bboxPolygon from '@turf/bbox-polygon';
+
 import {
     AoiValue,
     AOI_FIELD_ID,
@@ -8,7 +10,6 @@ import {
     DATE_FIELD_ID,
     DATE_RANGE_FIELD_ID,
     ENUM_FIELD_ID,
-    getGeometryAsWkt,
     QueryParams,
     SortOrder,
     STRING_FIELD_ID
@@ -73,6 +74,7 @@ export type AdamOpensearchProductMetadata = {
     title: string;
     productDate: string;
     EPSG?: string;
+    single_multiband: string;
     metadata?: {
         identifier: string;
         datasetId: string;
@@ -82,6 +84,7 @@ export type AdamOpensearchProductMetadata = {
         minValue: number;
         maxValue: number;
         EPSG: string;
+        single_multiband: string;
     };
 };
 
@@ -197,7 +200,16 @@ export class AdamOpenSearchClient {
                 } else if (filter.type === DATE_FIELD_ID) {
                     params[filter.key] = filter.value.toISOString();
                 } else if (filter.type === AOI_FIELD_ID) {
-                    params[filter.key] = getGeometryAsWkt((filter.value as AoiValue).geometry);
+                    const geometry = (filter.value as AoiValue).geometry;
+                    let polygon: GeoJSON.Polygon | GeoJSON.MultiPolygon | undefined;
+                    if (geometry.type === 'BBox') {
+                        polygon = bboxPolygon(geometry.bbox).geometry;
+                    } else if (geometry.type === 'Polygon' || geometry.type === 'MultiPolygon') {
+                        polygon = geometry;
+                    }
+                    if (polygon) {
+                        params[filter.key] = JSON.stringify(polygon);
+                    }
                 }
             });
         }

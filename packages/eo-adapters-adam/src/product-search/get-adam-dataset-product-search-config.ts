@@ -23,7 +23,7 @@ export const getAdamDatasetProductSearchConfig = (
         };
 
         if (!datasetConfig.coverages.isTrueColor) {
-            const bands = datasetConfig.coverages.presets[0].bands;
+            const bands = datasetConfig.coverages.presets.length ? datasetConfig.coverages.presets[0].bands : [1];
             wcsPreviewConfig.subsets = [`bands(${bands.join(',')})`];
         }
     } else {

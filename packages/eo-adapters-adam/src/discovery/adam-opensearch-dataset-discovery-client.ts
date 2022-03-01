@@ -6,7 +6,8 @@ import {
     QueryParams,
     getGeometryExtent,
     isValidExtent,
-    BOOLEAN_FIELD_ID
+    BOOLEAN_FIELD_ID,
+    STRING_FIELD_ID
 } from '@oidajs/core';
 
 import { AdamWcsCoverageDescriptionClient, AdamWcsCoverageDescription } from './adam-wcs-coverage-description-client';
@@ -23,7 +24,8 @@ import {
     AdamOpensearchDatasetCustomGridSpec,
     AdamOpensearchDatasetMetadata,
     AdamOpensearchDatasetMetadataSubdataset,
-    AdamOpensearchMetadataModelVersion
+    AdamOpensearchMetadataModelVersion,
+    AdamOpensearchProductMetadata
 } from '../common';
 
 export type AdamOpensearchDatasetDiscoveryClientConfig = {
@@ -82,16 +84,50 @@ export class AdamOpensearchDatasetDiscoveryClient {
         return this.wcsCoverageDescriptionClient_
             .getCoverageDetails(metadata.datasetId)
             .then((coverages) => {
-                return this.getConfigFromMetadataAndCoverage_(metadata, coverages);
+                return this.getRecordForDataset_(metadata.datasetId)
+                    .then((record) => {
+                        return this.getConfigFromMetadataAndCoverage_(metadata, coverages, record);
+                    })
+                    .catch(() => {
+                        return this.getConfigFromMetadataAndCoverage_(metadata, coverages);
+                    });
             })
             .catch(() => {
-                return this.getConfigFromMetadataAndCoverage_(metadata, []);
+                return this.getRecordForDataset_(metadata.datasetId)
+                    .then((record) => {
+                        return this.getConfigFromMetadataAndCoverage_(metadata, [], record);
+                    })
+                    .catch(() => {
+                        return this.getConfigFromMetadataAndCoverage_(metadata, []);
+                    });
+            });
+    }
+
+    protected getRecordForDataset_(datasetId: string) {
+        return this.openSearchClient_
+            .searchProducts({
+                paging: {
+                    pageSize: 1,
+                    offset: 0,
+                    page: 0
+                },
+                filters: [
+                    {
+                        key: 'datasetId',
+                        type: STRING_FIELD_ID,
+                        value: datasetId
+                    }
+                ]
+            })
+            .then((searchResponse) => {
+                return searchResponse.features[0];
             });
     }
 
     protected getConfigFromMetadataAndCoverage_(
         metadata: AdamOpensearchDatasetMetadata,
-        wcsCoverages: AdamWcsCoverageDescription[]
+        wcsCoverages: AdamWcsCoverageDescription[],
+        sampleRecord?: AdamOpensearchProductMetadata
     ): Promise<AdamDatasetConfig> {
         try {
             //TODO: more than one coverages could be associated to a dataset. Since raster viz currently support
@@ -173,7 +209,15 @@ export class AdamOpensearchDatasetDiscoveryClient {
             }
             let subsetDimension: AdamDatasetDimension | undefined;
             const defaultViewMode = subdatasets[0].defaultViewMode || [];
-            if (defaultViewMode.length > 1) {
+            let numBands = wcsCoverages[0]?.numBands;
+            if (!numBands) {
+                numBands = parseInt(sampleRecord?.single_multiband || sampleRecord?.metadata?.single_multiband || '0');
+            }
+            if (!numBands) {
+                numBands = defaultViewMode.length || 1;
+            }
+
+            if (numBands > 1) {
                 subsetDimension = {
                     id: 'subdataset',
                     name: 'SubDataset',
@@ -212,7 +256,7 @@ export class AdamOpensearchDatasetDiscoveryClient {
                 });
 
                 const bands: AdamDatasetCoverageBand[] = [];
-                for (let i = 0; i < (wcsCoverages[0]?.numBands || 1); ++i) {
+                for (let i = 0; i < numBands; ++i) {
                     bands.push({
                         idx: i + 1,
                         name: `B${i + 1}`,
@@ -226,21 +270,24 @@ export class AdamOpensearchDatasetDiscoveryClient {
                     id: 'bands',
                     name: 'Bands',
                     wcsCoverage: metadata.datasetId,
-                    presets: [
-                        {
-                            id: 'default',
-                            name: 'Default',
-                            bands: defaultViewMode.map((value, idx) => {
-                                // default view mode use the format band1, band2...
-                                const match = value.match(/[0-9]+/);
-                                if (match) {
-                                    return parseInt(match[0]);
-                                } else {
-                                    return idx;
-                                }
-                            })
-                        }
-                    ],
+                    presets:
+                        defaultViewMode.length === 3
+                            ? [
+                                  {
+                                      id: 'default',
+                                      name: 'Default',
+                                      bands: defaultViewMode.map((value, idx) => {
+                                          // default view mode use the format band1, band2...
+                                          const match = value.match(/[0-9]+/);
+                                          if (match) {
+                                              return parseInt(match[0]);
+                                          } else {
+                                              return idx;
+                                          }
+                                      })
+                                  }
+                              ]
+                            : [],
                     bandGroups: [
                         {
                             id: 'bands',
@@ -327,7 +374,7 @@ export class AdamOpensearchDatasetDiscoveryClient {
                     type: 'raster',
                     id: metadata.datasetId,
                     coverageExtent: extent,
-                    name: metadata.datasetId,
+                    name: metadata.title || metadata.datasetId,
                     fixedTime: fixedTime,
                     renderMode: AdamDatasetRenderMode.ClientSide,
                     coverages: coverages,
