@@ -123,7 +123,7 @@ export class AdamWcsTimeDistributionProvider implements DatasetTimeDistributionP
                                 const requests: Promise<Array<{ start: Date; end: Date; aggregated?: boolean }>>[] = missingIntervals.map(
                                     (interval) => {
                                         const intervalSpan = interval.end.diff(interval.start);
-                                        const maxItems = Math.ceil(intervalSpan / resolution) * 1.5;
+                                        const maxItems = Math.ceil((intervalSpan / resolution) * 1.5);
                                         return this.getRecordsForInterval_(interval, filters, maxItems)
                                             .then((records) => {
                                                 if (records.length === 1 && records[0].metadata?.isAggregated) {
@@ -221,21 +221,21 @@ export class AdamWcsTimeDistributionProvider implements DatasetTimeDistributionP
                 if (direction) {
                     let nearestItem = this.getNearestItemFromCache_(timeExtent, dt, direction);
                     if (!nearestItem) {
-                        nearestItem = this.getNearestItemFromCatalogue_(dt, direction);
+                        nearestItem = this.getNearestItemFromCatalogue_(dt, direction, filters);
                     }
                     return nearestItem;
                 } else {
                     return Promise.all([
                         Promise.resolve(this.getNearestItemFromCache_(timeExtent, dt, TimeSearchDirection.Backward)).then((item) => {
                             if (!item) {
-                                return this.getNearestItemFromCatalogue_(dt, TimeSearchDirection.Backward);
+                                return this.getNearestItemFromCatalogue_(dt, TimeSearchDirection.Backward, filters);
                             } else {
                                 return item;
                             }
                         }),
                         Promise.resolve(this.getNearestItemFromCache_(timeExtent, dt, TimeSearchDirection.Forward)).then((item) => {
                             if (!item) {
-                                return this.getNearestItemFromCatalogue_(dt, TimeSearchDirection.Forward);
+                                return this.getNearestItemFromCatalogue_(dt, TimeSearchDirection.Forward, filters);
                             } else {
                                 return item;
                             }
