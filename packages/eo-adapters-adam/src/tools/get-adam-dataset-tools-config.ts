@@ -44,45 +44,43 @@ export const getAdamDatasetToolsConfig = (
         : [];
 
     if (isMultiBandCoverage(datasetConfig.coverages)) {
-        if (!datasetConfig.coverages.isTrueColor) {
-            const bandDimension: AdamDatasetDimension = {
-                id: 'band',
-                name: 'Band',
-                wcsSubset: {
-                    id: 'band'
-                },
-                wcsResponseKey: '',
-                tarFilenameRegex: /band\(([^)]*)\)/,
-                domain: {
-                    values: datasetConfig.coverages.bands.map((band) => {
-                        return {
-                            label: band.name,
-                            value: band.idx
-                        };
-                    })
-                }
-            };
-            dimensions.push(bandDimension);
+        const bandDimension: AdamDatasetDimension = {
+            id: 'band',
+            name: 'Band',
+            wcsSubset: {
+                id: 'band'
+            },
+            wcsResponseKey: '',
+            tarFilenameRegex: /band\(([^)]*)\)/,
+            domain: {
+                values: datasetConfig.coverages.bands.map((band) => {
+                    return {
+                        label: band.name,
+                        value: band.idx
+                    };
+                })
+            }
+        };
+        dimensions.push(bandDimension);
 
-            const bandsDomain = {
-                min: Number.MAX_VALUE,
-                max: -Number.MAX_VALUE
-            };
+        const bandsDomain = {
+            min: Number.MAX_VALUE,
+            max: -Number.MAX_VALUE
+        };
 
-            datasetConfig.coverages.bands.forEach((band) => {
-                if (band.domain && band.domain.min !== undefined && band.domain.max !== undefined) {
-                    bandsDomain.min = Math.min(bandsDomain.min, band.domain.min);
-                    bandsDomain.max = Math.max(bandsDomain.max, band.domain.max);
-                }
-            });
+        datasetConfig.coverages.bands.forEach((band) => {
+            if (band.domain && band.domain.min !== undefined && band.domain.max !== undefined) {
+                bandsDomain.min = Math.min(bandsDomain.min, band.domain.min);
+                bandsDomain.max = Math.max(bandsDomain.max, band.domain.max);
+            }
+        });
 
-            variables.push({
-                id: `${datasetConfig.id}_band_value`,
-                name: 'Band value',
-                wcsCoverage: datasetConfig.coverages.wcsCoverage,
-                domain: bandsDomain[0] < bandsDomain[1] ? bandsDomain : undefined
-            });
-        }
+        variables.push({
+            id: `${datasetConfig.id}_band_value`,
+            name: 'Band value',
+            wcsCoverage: datasetConfig.coverages.wcsCoverage,
+            domain: bandsDomain[0] < bandsDomain[1] ? bandsDomain : undefined
+        });
     } else {
         variables.push(...datasetConfig.coverages);
     }
@@ -122,7 +120,7 @@ export const getAdamDatasetToolsConfig = (
 
     const tools: DatasetToolConfig[] = [];
 
-    if (dimensions.filter((dimension) => !dimension.preventSeries).length && variables.length && datasetConfig.coverageExtent) {
+    if (datasetConfig.coverageExtent && variables.length) {
         const wcsSeriesProvider = new AdamWcsSeriesProvider({
             axiosInstance: axiosInstance,
             coverageSrs: datasetConfig.coverageExtent.srs,
@@ -132,19 +130,21 @@ export const getAdamDatasetToolsConfig = (
             dimensions: dimensions
         });
 
-        const dimensionSeriesToolConfig: DatasetPointSeriesConfig = {
-            variables: variables,
-            dimensions: dimensions,
-            provider: (request) => {
-                return wcsSeriesProvider.getSeries(request);
-            }
-        };
+        if (dimensions.filter((dimension) => !dimension.preventSeries).length) {
+            const dimensionSeriesToolConfig: DatasetPointSeriesConfig = {
+                variables: variables,
+                dimensions: dimensions,
+                provider: (request) => {
+                    return wcsSeriesProvider.getSeries(request);
+                }
+            };
 
-        tools.push({
-            type: POINT_SERIES_PROCESSING,
-            name: 'Series analysis',
-            config: dimensionSeriesToolConfig
-        });
+            tools.push({
+                type: POINT_SERIES_PROCESSING,
+                name: 'Series analysis',
+                config: dimensionSeriesToolConfig
+            });
+        }
     }
 
     // transect supports only time subsetting
