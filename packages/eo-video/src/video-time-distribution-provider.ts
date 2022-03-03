@@ -1,4 +1,9 @@
-import { DatasetTimeDistributionProvider, TimeSearchDirection, TimeDistributionInstantItem } from '@oidajs/eo-mobx';
+import {
+    DatasetTimeDistributionProvider,
+    TimeSearchDirection,
+    TimeDistributionInstantItem,
+    TimeDomainProviderFilters
+} from '@oidajs/eo-mobx';
 
 export type VideoTimeDistributionProviderConfig = {
     timeRange: {
@@ -19,6 +24,10 @@ export class VideoTimeDistributionProvider implements DatasetTimeDistributionPro
 
     supportsHistograms() {
         return true;
+    }
+
+    setDefaultFilters(filters: TimeDomainProviderFilters | null): boolean {
+        return false;
     }
 
     getTimeExtent() {

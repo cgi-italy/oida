@@ -9,7 +9,7 @@ export const getNearestDatasetProduct = function (
     const timeRequests = datasetViews.map((view) => {
         const timeDistribution = view.timeDistributionViz;
         if (timeDistribution) {
-            return timeDistribution.config.provider.getNearestItem(dt, direction, view.timeDistributionViz?.filters);
+            return timeDistribution.config.provider.getNearestItem(dt, direction);
         } else {
             return Promise.resolve(undefined);
         }
@@ -36,7 +36,7 @@ export const getNearestDatasetProduct = function (
             let timeRequests = datasetViews.map((view) => {
                 const timeDistribution = view.timeDistributionViz;
                 if (timeDistribution) {
-                    return timeDistribution.config.provider.getTimeExtent(timeDistribution.filters);
+                    return timeDistribution.config.provider.getTimeExtent();
                 } else {
                     return Promise.resolve(undefined);
                 }

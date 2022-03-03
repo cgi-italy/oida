@@ -9,7 +9,8 @@ import {
     hasDatasetDimensions,
     DataDomainProviderFilters,
     TimeDistributionInstantItem,
-    TimeDistributionRangeItem
+    TimeDistributionRangeItem,
+    TimeDomainProviderFilters
 } from '../common';
 import { TimeDistribution } from './time-distribution';
 import { AsyncDataFetcher } from '@oidajs/state-mobx';
@@ -34,6 +35,7 @@ export class DatasetTimeDistributionViz extends DatasetViz<undefined> {
     readonly config: DatasetTimeDistributionConfig;
     readonly timeDistribution: TimeDistribution<any>;
     @observable.ref searchParams: DatasetTimeDistributionSearchParams | undefined;
+    @observable distributionRevision: number;
 
     protected distributionFetcher_: AsyncDataFetcher<
         (TimeDistributionInstantItem | TimeDistributionRangeItem)[],
@@ -54,6 +56,7 @@ export class DatasetTimeDistributionViz extends DatasetViz<undefined> {
         this.config = props.config;
         this.timeDistribution = new TimeDistribution();
         this.searchParams = undefined;
+        this.distributionRevision = 0;
 
         this.distributionFetcher_ = new AsyncDataFetcher({
             dataFetcher: (params) => {
@@ -77,7 +80,7 @@ export class DatasetTimeDistributionViz extends DatasetViz<undefined> {
         this.afterInit_();
     }
 
-    get filters(): DataDomainProviderFilters | undefined {
+    get filters(): TimeDomainProviderFilters {
         return hasDatasetDimensions(this.parent)
             ? this.parent.dimensions
             : {
@@ -89,6 +92,7 @@ export class DatasetTimeDistributionViz extends DatasetViz<undefined> {
     @action
     setSearchParams(params: DatasetTimeDistributionSearchParams | undefined) {
         this.searchParams = params;
+        this.updateDistributionData_();
     }
 
     dispose() {
@@ -96,42 +100,49 @@ export class DatasetTimeDistributionViz extends DatasetViz<undefined> {
     }
 
     protected afterInit_() {
-        const distributionUpdateDisposer = autorun(() => {
-            const searchParams = this.searchParams;
-            if (searchParams) {
-                const resolution = searchParams.resolution || Math.round((searchParams.end.getTime() - searchParams.start.getTime()) / 100);
-
-                this.distributionFetcher_
-                    .fetchData({
-                        timeRange: {
-                            start: searchParams.start,
-                            end: searchParams.end
-                        },
-                        filters: this.filters,
-                        resolution: resolution
-                    })
-                    .then((items) => {
-                        this.timeDistribution.setItems(items);
-                    })
-                    .catch((e) => {
-                        this.timeDistribution.setItems([
-                            {
-                                start: searchParams.start,
-                                end: searchParams.end,
-                                data: {
-                                    error: true
-                                }
-                            }
-                        ]);
-                    });
-            } else {
-                this.distributionFetcher_.cancelPendingRequest();
+        const filterTrackerDisposer = autorun(() => {
+            if (this.config.provider.setDefaultFilters(this.filters)) {
+                setTimeout(() => {
+                    this.distributionRevision++;
+                    this.updateDistributionData_();
+                }, 0);
             }
         });
 
-        this.subscriptionTracker_.addSubscription(distributionUpdateDisposer);
+        this.subscriptionTracker_.addSubscription(filterTrackerDisposer);
     }
 
+    protected updateDistributionData_() {
+        const searchParams = this.searchParams;
+        if (searchParams) {
+            const resolution = searchParams.resolution || Math.round((searchParams.end.getTime() - searchParams.start.getTime()) / 100);
+
+            this.distributionFetcher_
+                .fetchData({
+                    timeRange: {
+                        start: searchParams.start,
+                        end: searchParams.end
+                    },
+                    resolution: resolution
+                })
+                .then((items) => {
+                    this.timeDistribution.setItems(items);
+                })
+                .catch((e) => {
+                    this.timeDistribution.setItems([
+                        {
+                            start: searchParams.start,
+                            end: searchParams.end,
+                            data: {
+                                error: true
+                            }
+                        }
+                    ]);
+                });
+        } else {
+            this.distributionFetcher_.cancelPendingRequest();
+        }
+    }
     protected initMapLayer_() {
         return undefined;
     }

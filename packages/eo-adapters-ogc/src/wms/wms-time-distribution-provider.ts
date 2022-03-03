@@ -4,7 +4,8 @@ import {
     DatasetTimeDistributionProvider,
     TimeDistributionRangeItem,
     TimeDistributionInstantItem,
-    TimeSearchDirection
+    TimeSearchDirection,
+    TimeDomainProviderFilters
 } from '@oidajs/eo-mobx';
 
 export type WmsTimeDistributionItem =
@@ -29,6 +30,10 @@ export class WmsTimeDistributionProvider implements DatasetTimeDistributionProvi
 
     supportsHistograms() {
         return true;
+    }
+
+    setDefaultFilters(filters: TimeDomainProviderFilters | null): boolean {
+        return false;
     }
 
     getTimeExtent() {

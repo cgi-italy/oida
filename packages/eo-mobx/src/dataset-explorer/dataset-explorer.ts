@@ -1,4 +1,4 @@
-import { autorun, computed, makeObservable, observable, action } from 'mobx';
+import { autorun, reaction, computed, makeObservable, observable, action } from 'mobx';
 import moment from 'moment';
 
 import { SubscriptionTracker, AoiValue, DateRangeValue, randomColorFactory, QueryFilter } from '@oidajs/core';
@@ -106,17 +106,26 @@ export class DatasetExplorerItem {
             this.dataset.setAoi(this.explorer.aoi);
         });
 
-        //propagate the explorer selected time of interest to the dataset (nearest match)
-        const toiSyncDisposer = autorun(() => {
-            if (!this.toiSyncDisabled) {
-                const toi = this.explorer.toi;
-                if (toi instanceof Date) {
-                    this.setDatasetToiFromDate_(toi);
-                } else {
-                    this.dataset.setToi(toi, true);
+        // propagate the explorer selected time of interest to the dataset (nearest match)
+        const toiSyncDisposer = reaction(
+            () => {
+                return {
+                    syncDisabled: this.toiSyncDisabled,
+                    toi: this.explorer.toi,
+                    // force toi update on time distribution change
+                    filtersRevision: this.timeDistributionViz?.distributionRevision
+                };
+            },
+            (data) => {
+                if (!data.syncDisabled) {
+                    if (data.toi instanceof Date) {
+                        this.setDatasetToiFromDate_(data.toi);
+                    } else {
+                        this.dataset.setToi(data.toi, true);
+                    }
                 }
             }
-        });
+        );
 
         this.subscriptionTracker_.addSubscription(aoiSyncDisposer);
         this.subscriptionTracker_.addSubscription(toiSyncDisposer);
@@ -148,7 +157,7 @@ export class DatasetExplorerItem {
         const timeDistributionProvider = this.dataset.config.timeDistribution?.provider;
         if (timeDistributionProvider) {
             this.pendingNearestTimeRequests_ = timeDistributionProvider
-                .getNearestItem(dt, undefined, this.timeDistributionViz?.filters)
+                .getNearestItem(dt)
                 .then((item) => {
                     if (!this.toiSyncDisabled) {
                         if (!item || !item.start) {
