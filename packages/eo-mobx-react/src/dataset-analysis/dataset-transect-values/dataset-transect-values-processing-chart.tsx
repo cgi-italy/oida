@@ -27,7 +27,7 @@ type LegendDataItem = {
 };
 
 export function DatasetTransectValuesProcessingChart(props: DatasetTransectValuesProcessingChartProps) {
-    const [trackCoordinate, setTrackCoordinate] = useState(false);
+    const [trackCoordinate, setTrackCoordinate] = useState(true);
 
     const { chartSeries, colors, loadingState, legendData, yAxes } = useSelector(() => {
         const chartSeries: EChartOption.SeriesLine[] = [];
