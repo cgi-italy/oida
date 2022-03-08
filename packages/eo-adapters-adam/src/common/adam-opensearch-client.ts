@@ -1,4 +1,6 @@
+import moment from 'moment';
 import bboxPolygon from '@turf/bbox-polygon';
+import rewind from '@turf/rewind';
 
 import {
     AoiValue,
@@ -75,6 +77,11 @@ export type AdamOpensearchProductMetadata = {
     productDate: string;
     EPSG?: string;
     single_multiband: string;
+    abstract?: {
+        Identifier: string;
+        Start: string;
+        End: string;
+    };
     metadata?: {
         identifier: string;
         datasetId: string;
@@ -194,8 +201,14 @@ export class AdamOpenSearchClient {
                 } else if (filter.type === STRING_FIELD_ID || filter.type === ENUM_FIELD_ID) {
                     params[filter.key] = filter.value;
                 } else if (filter.type === DATE_RANGE_FIELD_ID) {
-                    if ((filter.value as DateRangeValue).start) {
-                        params['startDate'] = (filter.value as DateRangeValue).start.toISOString();
+                    const startDate = (filter.value as DateRangeValue).start;
+                    if (startDate) {
+                        const start = moment(startDate);
+                        // the backend doesn't support milliseconds so we round up to the next second here
+                        if (start.milliseconds() !== 0) {
+                            start.add(1, 'second').startOf('second');
+                        }
+                        params['startDate'] = start.toISOString();
                     }
                     if ((filter.value as DateRangeValue).end) {
                         params['endDate'] = (filter.value as DateRangeValue).end.toISOString();
@@ -208,7 +221,7 @@ export class AdamOpenSearchClient {
                     if (geometry.type === 'BBox') {
                         polygon = bboxPolygon(geometry.bbox).geometry;
                     } else if (geometry.type === 'Polygon' || geometry.type === 'MultiPolygon') {
-                        polygon = geometry;
+                        polygon = rewind(geometry);
                     }
                     if (polygon) {
                         params[filter.key] = JSON.stringify(polygon);

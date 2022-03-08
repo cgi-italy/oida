@@ -45,6 +45,7 @@
     "@turf/great-circle": "^6.5.0",
     "@turf/helpers": "^6.5.0",
     "@turf/length": "^6.5.0",
+    "@turf/rewind": "^6.5.0",
     "@types/chroma-js": "^2.1.3",
     "@types/echarts": "^4.1.15",
     "@types/geojson": "^7946.0.8",

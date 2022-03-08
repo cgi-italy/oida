@@ -34,7 +34,7 @@ export class AdamOpenSearchProductSearchProvider implements DatasetProductSearch
                     total: data.properties.totalResults,
                     results: data.features.map((product) => {
                         return {
-                            start: new Date(product.metadata?.date || product.productDate),
+                            start: new Date(product.abstract?.Start || product.metadata?.date || product.productDate),
                             metadata: product,
                             geometry: product.geometry
                         };
