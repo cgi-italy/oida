@@ -19,18 +19,18 @@ import {
     TimeSearchDirection,
     TimeDistributionRangeItem,
     DatasetProductSearchProvider,
-    ProductSearchRecord,
-    TimeDomainProviderFilters
+    TimeDomainProviderFilters,
+    TimeDistributionInstantItem
 } from '@oidajs/eo-mobx';
 
 export type AdamWcsTimeDistributionProviderConfig = {
     serviceUrl: string;
-    coverageId: string;
+    isMultiBandCoverage?: boolean;
     axiosInstance?: AxiosInstanceWithCancellation;
     productCatalogue?: {
         provider: DatasetProductSearchProvider;
         timeRangeQueryParam: string;
-        timeSortParam?: string;
+        timeSortParam: string;
     };
     timeRange?: {
         start: Date;
@@ -44,7 +44,7 @@ export class AdamWcsTimeDistributionProvider implements DatasetTimeDistributionP
     protected timeExtent_: Promise<TimeDistributionRangeItem> | undefined;
     protected cswCache_ = {
         intervals: new TimeIntervalSet(),
-        data: [] as any[]
+        data: [] as TimeDistributionInstantItem[]
     };
     protected defaultFilters_: Record<string, QueryFilter> = {};
 
@@ -145,115 +145,34 @@ export class AdamWcsTimeDistributionProvider implements DatasetTimeDistributionP
                 if (timeRange.end < timeExtent.start || timeRange.start > timeExtent.end!) {
                     return [];
                 } else {
-                    let count = timeExtent.data?.count || 1;
                     if (!this.config_.productCatalogue) {
                         return [timeExtent];
                     } else {
                         const overlapStart = timeRange.start > timeExtent.start ? timeRange.start : timeExtent.start;
                         const overlapEnd = timeRange.end < timeExtent.end! ? timeRange.end : timeExtent.end;
 
-                        const overlapSpan = overlapEnd.getTime() - overlapStart.getTime();
-                        const extentSpan = (timeExtent.end as Date).getTime() - (timeExtent.start as Date).getTime();
+                        const requestInterval = new TimeInterval(overlapStart, overlapEnd);
 
-                        count = count * (overlapSpan / extentSpan); // assuming uniform distribution
-                        if (overlapSpan / count > resolution!) {
-                            if (isDefaultRequest) {
-                                const missingIntervals = this.cswCache_.intervals.addInterval(new TimeInterval(overlapStart, overlapEnd));
+                        if (isDefaultRequest) {
+                            const missingIntervals = this.cswCache_.intervals.getMissingIntervals(requestInterval);
 
-                                const maxItems = Math.ceil(overlapSpan / resolution!) * 1.5;
-                                if (!missingIntervals.length) {
-                                    const items = this.cswCache_.data.filter(
-                                        (item) => item.start >= overlapStart && item.start <= overlapEnd
-                                    );
-                                    if (items.length > maxItems) {
-                                        return [
-                                            {
-                                                start: items[0].start,
-                                                end: items[items.length - 1].end
-                                            }
-                                        ];
-                                    } else {
-                                        return items;
-                                    }
-                                } else {
-                                    const requests: Promise<Array<{ start: Date; end: Date; aggregated?: boolean }>>[] =
-                                        missingIntervals.map((interval) => {
-                                            const intervalSpan = interval.end.diff(interval.start);
-                                            const maxItems = Math.ceil((intervalSpan / resolution!) * 1.5);
-                                            return this.getRecordsForInterval_(interval, filters, maxItems)
-                                                .then((records) => {
-                                                    if (records.length === 1 && records[0].metadata?.isAggregated) {
-                                                        this.cswCache_.intervals.removeInterval(interval);
-                                                        return [
-                                                            {
-                                                                start: records[0].start as Date,
-                                                                end: records[0].end as Date,
-                                                                aggregated: true
-                                                            }
-                                                        ];
-                                                    } else {
-                                                        const items = records.map((item) => {
-                                                            return {
-                                                                start: item.start as Date,
-                                                                end: (item.end || item.start) as Date
-                                                            };
-                                                        });
-                                                        this.addCachedItems_(items);
-                                                        return items;
-                                                    }
-                                                })
-                                                .catch((error) => {
-                                                    this.cswCache_.intervals.removeInterval(interval);
-                                                    return [];
-                                                });
-                                        });
-
-                                    return Promise.all(requests).then((responses) => {
-                                        let cachedItems = this.cswCache_.data.filter(
-                                            (item) => item.start >= overlapStart && item.start <= overlapEnd
-                                        );
-                                        if (cachedItems.length > maxItems) {
-                                            cachedItems = [
-                                                {
-                                                    start: cachedItems[0].start,
-                                                    end: cachedItems[cachedItems.length - 1].end
-                                                }
-                                            ];
-                                        }
-                                        responses.forEach((response) => {
-                                            if (response.length === 1 && response[0].aggregated) {
-                                                cachedItems.push(response[0]);
-                                            }
-                                        });
-
-                                        return cachedItems;
-                                    });
-                                }
+                            if (!missingIntervals.length) {
+                                return this.getTimeDistributionFromCache_(requestInterval, filters, resolution);
                             } else {
-                                const maxItems = Math.ceil(overlapSpan / resolution!) * 1.5;
-                                return this.getRecordsForInterval_(new TimeInterval(overlapStart, overlapEnd), filters, maxItems).then(
-                                    (records) => {
-                                        if (records.length === 1 && records[0].metadata?.isAggregated) {
-                                            return [
-                                                {
-                                                    start: records[0].start as Date,
-                                                    end: records[0].end as Date,
-                                                    aggregated: true
-                                                }
-                                            ];
-                                        } else {
-                                            return records.map((item) => {
-                                                return {
-                                                    start: item.start as Date,
-                                                    end: (item.end || item.start) as Date
-                                                };
-                                            });
-                                        }
-                                    }
-                                );
+                                const maxItems = 200;
+
+                                const requests = missingIntervals.map((interval) => {
+                                    return this.getRecordsForInterval_(interval, filters, maxItems);
+                                });
+
+                                return Promise.all(requests).then((responses) => {
+                                    return this.getTimeDistributionFromCache_(requestInterval, filters, resolution);
+                                });
                             }
                         } else {
-                            return [timeExtent];
+                            return this.getRecordsForInterval_(requestInterval, filters, 500).then((records) => {
+                                return this.getAggregatedTimeDistribution(records, resolution);
+                            });
                         }
                     }
                 }
@@ -269,21 +188,18 @@ export class AdamWcsTimeDistributionProvider implements DatasetTimeDistributionP
                 return undefined;
             } else if (dt.getTime() === (timeExtent.start as Date).getTime()) {
                 return {
-                    start: dt,
-                    end: dt
+                    start: dt
                 };
             } else if (dt.getTime() === (timeExtent.end as Date).getTime()) {
                 return {
-                    start: dt,
-                    end: dt
+                    start: dt
                 };
             } else if (dt > timeExtent.end!) {
                 if (direction === TimeSearchDirection.Forward) {
                     return undefined;
                 } else {
                     return {
-                        start: timeExtent.end as Date,
-                        end: timeExtent.end as Date
+                        start: timeExtent.end as Date
                     };
                 }
             } else if (dt < timeExtent.start) {
@@ -291,28 +207,36 @@ export class AdamWcsTimeDistributionProvider implements DatasetTimeDistributionP
                     return undefined;
                 } else {
                     return {
-                        start: timeExtent.start as Date,
-                        end: timeExtent.start as Date
+                        start: timeExtent.start as Date
                     };
                 }
             } else {
                 const isDefaultRequest = filters === undefined;
                 if (direction) {
-                    let nearestItem = isDefaultRequest ? this.getNearestItemFromCache_(timeExtent, dt, direction) : undefined;
+                    let nearestItem: TimeDistributionInstantItem | undefined | Promise<TimeDistributionInstantItem | undefined> =
+                        isDefaultRequest ? this.getNearestItemFromCache_(timeExtent, dt, direction) : undefined;
                     if (!nearestItem) {
                         nearestItem = this.getNearestItemFromCatalogue_(dt, direction, filters);
                     }
                     return nearestItem;
                 } else {
                     return Promise.all([
-                        Promise.resolve(this.getNearestItemFromCache_(timeExtent, dt, TimeSearchDirection.Backward)).then((item) => {
+                        Promise.resolve(
+                            isDefaultRequest
+                                ? this.getNearestItemFromCache_(timeExtent, dt, TimeSearchDirection.Backward)
+                                : Promise.resolve(undefined)
+                        ).then((item) => {
                             if (!item) {
                                 return this.getNearestItemFromCatalogue_(dt, TimeSearchDirection.Backward, filters);
                             } else {
                                 return item;
                             }
                         }),
-                        Promise.resolve(this.getNearestItemFromCache_(timeExtent, dt, TimeSearchDirection.Forward)).then((item) => {
+                        Promise.resolve(
+                            isDefaultRequest
+                                ? this.getNearestItemFromCache_(timeExtent, dt, TimeSearchDirection.Forward)
+                                : Promise.resolve(undefined)
+                        ).then((item) => {
                             if (!item) {
                                 return this.getNearestItemFromCatalogue_(dt, TimeSearchDirection.Forward, filters);
                             } else {
@@ -339,22 +263,48 @@ export class AdamWcsTimeDistributionProvider implements DatasetTimeDistributionP
         });
     }
 
-    protected addCachedItems_(items) {
+    /**
+     * Add an array of ordered items to the cache
+     * @param items The items to add to the cache. The array should be in asceding start date order
+     */
+    protected addItemsToCache_(items: TimeDistributionInstantItem[]) {
         if (items.length) {
             const maxDate = items[items.length - 1].start;
 
-            const idx = this.cswCache_.data.findIndex((item) => item.start >= maxDate);
-            if (idx !== -1) {
-                this.cswCache_.data.splice(idx, 0, ...items);
-            } else {
-                this.cswCache_.data.push(...items);
+            // find the insertion point
+            let idx = this.cswCache_.data.findIndex((item) => item.start.getTime() >= maxDate.getTime());
+            if (idx === -1) {
+                idx = this.cswCache_.data.length;
             }
+
+            // remove any duplicated item at beginning
+            const prevItemInCache = this.cswCache_.data[idx - 1];
+            if (prevItemInCache) {
+                while (items.length && items[0].start.getTime() <= prevItemInCache.start.getTime()) {
+                    items.splice(0, 1);
+                }
+            }
+            if (!items.length) {
+                return;
+            }
+
+            // remove any duplicated item at end
+            const nextItemInCache = this.cswCache_.data[idx];
+            if (nextItemInCache) {
+                while (items.length && items[items.length - 1].start.getTime() >= nextItemInCache.start.getTime()) {
+                    items.splice(items.length - 1, 1);
+                }
+            }
+
+            this.cswCache_.data.splice(idx, 0, ...items);
         }
     }
 
     protected getNearestItemFromCache_(timeExtent, dt: Date, direction: TimeSearchDirection) {
         if (direction === TimeSearchDirection.Forward) {
             const nearestItem = this.cswCache_.data.find((item) => item.start >= dt);
+            // check that the interval between the requested date and the cached item is all cached
+            // (otherwise maybe there is a nearest item in between)
             if (nearestItem && this.cswCache_.intervals.isIntervalIncluded(new TimeInterval(dt, nearestItem.start))) {
                 return nearestItem;
             }
@@ -371,11 +321,15 @@ export class AdamWcsTimeDistributionProvider implements DatasetTimeDistributionP
         return undefined;
     }
 
-    protected getNearestItemFromCatalogue_(dt: Date, direction: TimeSearchDirection, requestFilters?: TimeDomainProviderFilters | null) {
+    protected getNearestItemFromCatalogue_(
+        dt: Date,
+        direction: TimeSearchDirection,
+        requestFilters?: TimeDomainProviderFilters | null
+    ): Promise<TimeDistributionInstantItem | undefined> {
         const productCatalogue = this.config_.productCatalogue;
 
         if (!productCatalogue) {
-            return undefined;
+            return Promise.resolve(undefined);
         }
 
         let params: QueryParams;
@@ -438,9 +392,14 @@ export class AdamWcsTimeDistributionProvider implements DatasetTimeDistributionP
         return productCatalogue.provider.searchProducts(params).then((response) => {
             const item = response.results[0];
             if (item && isDefaultRequest) {
+                // add item to the cache
                 const cachedItem = this.cswCache_.data.find((cachedItem) => item.start.getTime() === cachedItem.start.getTime());
                 if (!cachedItem) {
-                    this.addCachedItems_([item]);
+                    this.addItemsToCache_([
+                        {
+                            start: item.start
+                        }
+                    ]);
                 }
                 if (direction === TimeSearchDirection.Forward) {
                     this.cswCache_.intervals.addInterval(new TimeInterval(dt, item.start));
@@ -450,14 +409,83 @@ export class AdamWcsTimeDistributionProvider implements DatasetTimeDistributionP
             }
             return item
                 ? {
-                      start: item.start as Date,
-                      end: item.start as Date
+                      start: item.start as Date
                   }
                 : undefined;
         });
     }
 
-    protected async getRecordsForInterval_(interval, requestFilters?: TimeDomainProviderFilters | null, maxItems?: number) {
+    protected getTimeDistributionFromCache_(timeInterval: TimeInterval, filters?: TimeDomainProviderFilters | null, resolution?: number) {
+        const distributionItems: (TimeDistributionInstantItem | TimeDistributionRangeItem)[] = [];
+
+        const startIdx = this.cswCache_.data.findIndex((item) => {
+            return timeInterval.start.isSameOrBefore(item.start);
+        });
+
+        if (startIdx !== -1) {
+            for (let i = startIdx; i < this.cswCache_.data.length; ++i) {
+                if (timeInterval.end.isBefore(this.cswCache_.data[i].start)) {
+                    break;
+                }
+                distributionItems.push(this.cswCache_.data[i]);
+            }
+        }
+
+        // TODO: the complexity here is O(N^2). The number of items should be small but we should
+        // probably use a more efficient implementation (e.g. binary search)
+        this.cswCache_.intervals.getMissingIntervals(timeInterval).forEach((interval) => {
+            const insertionIdx = distributionItems.findIndex((item) => {
+                return interval.start.isBefore(item.start);
+            });
+
+            if (insertionIdx !== -1) {
+                distributionItems.splice(insertionIdx, 0, {
+                    start: interval.start.toDate(),
+                    end: interval.end.toDate()
+                });
+            } else {
+                distributionItems.push({
+                    start: interval.start.toDate(),
+                    end: interval.end.toDate()
+                });
+            }
+        });
+
+        return this.getAggregatedTimeDistribution(distributionItems, resolution);
+    }
+
+    protected getAggregatedTimeDistribution(items: (TimeDistributionInstantItem | TimeDistributionRangeItem)[], resolution?: number) {
+        if (!items.length) {
+            return items;
+        }
+
+        const distribution: (TimeDistributionInstantItem | TimeDistributionRangeItem)[] = [];
+
+        let lastItem = {
+            start: items[0].start,
+            end: (items[0] as TimeDistributionRangeItem).end || items[0].start
+        };
+
+        resolution = resolution || 1;
+
+        items.slice(1).forEach((item) => {
+            if (item.start.getTime() - lastItem.end.getTime() < resolution!) {
+                lastItem.end = (item as TimeDistributionRangeItem).end || item.start;
+            } else {
+                distribution.push(lastItem);
+                lastItem = {
+                    start: item.start,
+                    end: (item as TimeDistributionRangeItem).end || item.start
+                };
+            }
+        });
+
+        distribution.push(lastItem);
+
+        return distribution;
+    }
+
+    protected async getRecordsForInterval_(interval: TimeInterval, requestFilters?: TimeDomainProviderFilters | null, maxItems?: number) {
         const productCatalogue = this.config_.productCatalogue;
         if (!productCatalogue) {
             throw new Error('No product catalogue configuration provided');
@@ -482,7 +510,7 @@ export class AdamWcsTimeDistributionProvider implements DatasetTimeDistributionP
             }
         ];
 
-        const data: ProductSearchRecord[] = [];
+        const data: (TimeDistributionInstantItem | TimeDistributionRangeItem)[] = [];
 
         const retrievePage = () => {
             return productCatalogue.provider
@@ -501,39 +529,52 @@ export class AdamWcsTimeDistributionProvider implements DatasetTimeDistributionP
                         : undefined
                 })
                 .then((response) => {
-                    data.push(...response.results);
+                    let prevDate: Date | undefined;
+                    const items = response.results
+                        .filter((record) => {
+                            const keep = record.start.getTime() !== prevDate?.getTime();
+                            prevDate = record.start;
+                            return keep;
+                        })
+                        .map((record) => {
+                            return {
+                                start: record.start
+                            };
+                        });
+
+                    data.push(...items);
+                    if (isDefaultRequest) {
+                        this.addItemsToCache_(items);
+                    }
                     return response;
                 });
         };
 
+        if (isDefaultRequest) {
+            this.cswCache_.intervals.addInterval(interval);
+        }
         let response;
         do {
             response = await retrievePage();
             if (maxItems && response.total > maxItems) {
-                return [
-                    {
-                        start: interval.start.toDate(),
-                        end: interval.end.toDate(),
-                        metadata: {
-                            isAggregated: true
-                        }
+                const missingInterval = new TimeInterval(data[data.length - 1].start, interval.end.toDate());
+                data.push({
+                    start: missingInterval.start.toDate(),
+                    end: missingInterval.end.toDate(),
+                    data: {
+                        count: response.total - data.length
                     }
-                ];
+                });
+                if (isDefaultRequest) {
+                    this.cswCache_.intervals.removeInterval(missingInterval);
+                }
+                break;
             }
+
             page++;
         } while (response.total > page * pageSize);
 
-        if (productCatalogue.timeSortParam) {
-            data.sort((p1, p2) => p1.start.getTime() - p2.start.getTime());
-        }
-
-        let lastDate: Date;
-
-        return data.filter((item) => {
-            const keep = item.start.getTime() !== lastDate?.getTime();
-            lastDate = item.start;
-            return keep;
-        });
+        return data;
     }
 
     protected getOpensearchFilters_(domainFilters?: TimeDomainProviderFilters | null) {
@@ -545,7 +586,9 @@ export class AdamWcsTimeDistributionProvider implements DatasetTimeDistributionP
                 value: domainFilters.aoi
             };
         }
-        if (domainFilters?.variable) {
+        // in multiband datasets the variable is the band number, while for single
+        // band coverage the variable maps to the subdataset id
+        if (domainFilters?.variable && !this.config_.isMultiBandCoverage) {
             filters.subDatasetId = {
                 key: 'subDatasetId',
                 type: STRING_FIELD_ID,
@@ -559,7 +602,7 @@ export class AdamWcsTimeDistributionProvider implements DatasetTimeDistributionP
                     type: STRING_FIELD_ID,
                     value: value
                 };
-            } else {
+            } else if (key !== 'time') {
                 filters['key'] = {
                     key: key,
                     type: STRING_FIELD_ID,

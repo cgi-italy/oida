@@ -17,18 +17,11 @@ export const getAdamDatasetTimeDistributionConfig = (
         return undefined;
     }
 
-    let coverageId: string;
-    if (isMultiBandCoverage(datasetConfig.coverages)) {
-        coverageId = datasetConfig.coverages.wcsCoverage;
-    } else {
-        coverageId = datasetConfig.coverages[0].wcsCoverage;
-    }
-
     let productCatalogueConfig:
         | {
               provider: DatasetProductSearchProvider;
               timeRangeQueryParam: string;
-              timeSortParam?: string;
+              timeSortParam: string;
           }
         | undefined;
 
@@ -49,10 +42,9 @@ export const getAdamDatasetTimeDistributionConfig = (
     const timeDistributionConfig: DatasetTimeDistributionConfig = {
         provider: new AdamWcsTimeDistributionProvider({
             serviceUrl: factoryConfig.wcsServiceUrl,
-            coverageId: coverageId,
+            isMultiBandCoverage: isMultiBandCoverage(datasetConfig.coverages),
             axiosInstance: axiosInstance,
-            productCatalogue: productCatalogueConfig,
-            timeRange: datasetConfig.timeRange
+            productCatalogue: productCatalogueConfig
         })
     };
 
