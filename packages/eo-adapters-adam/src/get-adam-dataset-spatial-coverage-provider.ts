@@ -10,7 +10,7 @@ import { RasterMapViz, DatasetViz } from '@oidajs/eo-mobx';
 import { AdamDatasetConfig } from './adam-dataset-config';
 import { AdamDatasetFactoryConfig } from './get-adam-dataset-factory';
 import { AdamServiceParamsSerializer } from './utils/adam-service-params-serializer';
-import { getWcsTimeFilterSubset, getCoverageWcsParams } from './utils';
+import { getWcsTimeFilterSubset, getCoverageWcsParams, getAoiWcsParams } from './utils';
 
 export type AdamSpatialCoverageProvider = (
     mapView: DatasetViz<any>,
@@ -130,6 +130,11 @@ export const getAdamDatasetSpatialCoverageProvider = (
                 subsets.push(`band(1)`);
             }
             subsets.push(...wcsCoverage.dimensionSubsets);
+
+            const aoiParams = getAoiWcsParams(datasetConfig, mapView.dataset.aoi);
+            if (aoiParams) {
+                subsets.push(...aoiParams.wcsSubsets);
+            }
 
             return axiosInstance
                 .cancelableRequest({
