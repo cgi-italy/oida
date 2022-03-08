@@ -23,6 +23,8 @@ export class TimeIntervalSet {
             return [new TimeInterval(interval.start, interval.end)];
         } else {
             const difference: TimeInterval[] = [];
+            // get the first overlapping interval and extend it.
+            // all other overlapping intervals will be removed
             const mergeInterval = this.intervals_[insertionData.overlapStart];
             if (interval.start.isBefore(mergeInterval.start)) {
                 difference.push(new TimeInterval(interval.start, mergeInterval.start));
@@ -58,9 +60,10 @@ export class TimeIntervalSet {
             let deleteEnd = overlapData.overlapEnd;
 
             if (firstInterval.start.isBefore(interval.start)) {
+                const previousEnd = firstInterval.end;
                 firstInterval.setEnd(interval.start);
-                if (firstInterval.end.isAfter(interval.end)) {
-                    this.intervals_.splice(overlapData.overlapStart + 1, 0, new TimeInterval(interval.end, firstInterval.end));
+                if (previousEnd.isAfter(interval.end)) {
+                    this.intervals_.splice(overlapData.overlapStart + 1, 0, new TimeInterval(interval.end, previousEnd));
                     return;
                 }
                 deleteStart++;
@@ -76,6 +79,27 @@ export class TimeIntervalSet {
             if (deleteRange > 0) {
                 this.intervals_.splice(deleteStart, deleteRange);
             }
+        }
+    }
+
+    getMissingIntervals(interval: TimeInterval): TimeInterval[] {
+        const insertionData = this.getOverlappingData(interval);
+        if (insertionData.overlapStart === -1) {
+            return [new TimeInterval(interval.start, interval.end)];
+        } else {
+            const difference: TimeInterval[] = [];
+            const firstOverlappingInterval = this.intervals_[insertionData.overlapStart];
+            if (interval.start.isBefore(firstOverlappingInterval.start)) {
+                difference.push(new TimeInterval(interval.start, firstOverlappingInterval.start));
+            }
+            for (let idx = insertionData.overlapStart; idx < insertionData.overlapEnd; ++idx) {
+                difference.push(new TimeInterval(this.intervals_[idx].end, this.intervals_[idx + 1].start));
+            }
+            const lastOverlappingInterval = this.intervals_[insertionData.overlapEnd];
+            if (interval.end.isAfter(lastOverlappingInterval.end)) {
+                difference.push(new TimeInterval(lastOverlappingInterval.end, interval.end));
+            }
+            return difference;
         }
     }
 
