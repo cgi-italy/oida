@@ -10,6 +10,7 @@ import { DatasetDiscoveryProvider, DatasetExplorer } from '@oidajs/eo-mobx';
 export type DatasetDiscoveryProviderProps = {
     provider: DatasetDiscoveryProvider;
     datasetExplorer: DatasetExplorer;
+    onDatasetAdd?: () => void;
 };
 
 /** @internal */

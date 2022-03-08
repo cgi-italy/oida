@@ -7,7 +7,7 @@ import { CloseOutlined } from '@ant-design/icons';
 import { DatasetDiscovery, DatasetExplorer } from '@oidajs/eo-mobx';
 import { BreadcrumbItem, StatePathRouter } from '@oidajs/ui-react-mobx';
 
-import { DatasetDiscoveryProviderTabsNavigation, DatasetDiscoveryProviderRoute } from './dataset-discovery-provider-route';
+import { DatasetDiscoveryProviderTabsSelector, DatasetDiscoveryProviderRoute } from './dataset-discovery-provider-route';
 
 export type DatasetDiscoveryDrawerProps = {
     datasetDiscovery: DatasetDiscovery;
@@ -15,10 +15,12 @@ export type DatasetDiscoveryDrawerProps = {
     title?: React.ReactNode;
     backIcon?: React.ReactNode;
     onClose: () => void;
+    closeOnSelection?: boolean;
+    providerSelector?: React.ComponentType<{ datasetDiscovery: DatasetDiscovery }>;
 } & Omit<DrawerProps, 'visible' | 'onClose' | 'afterVisibleChange'>;
 
 export const DatasetDiscoveryDrawer = (props: DatasetDiscoveryDrawerProps) => {
-    const { datasetDiscovery, datasetExplorer, title, backIcon, onClose, ...drawerProps } = props;
+    const { datasetDiscovery, datasetExplorer, title, backIcon, onClose, closeOnSelection, providerSelector, ...drawerProps } = props;
 
     const [visible, setVisible] = useState(true);
 
@@ -31,6 +33,7 @@ export const DatasetDiscoveryDrawer = (props: DatasetDiscoveryDrawerProps) => {
     }, []);
 
     const discoveryPath = useResolvedPath('./');
+    const ProviderSelector = providerSelector || DatasetDiscoveryProviderTabsSelector;
 
     return (
         <React.Fragment>
@@ -57,7 +60,7 @@ export const DatasetDiscoveryDrawer = (props: DatasetDiscoveryDrawerProps) => {
                                         </Tooltip>
                                     )
                                 }
-                                footer={<DatasetDiscoveryProviderTabsNavigation datasetDiscovery={datasetDiscovery} />}
+                                footer={<ProviderSelector datasetDiscovery={datasetDiscovery} />}
                             ></PageHeader>
                         }
                         placement='right'
@@ -78,7 +81,11 @@ export const DatasetDiscoveryDrawer = (props: DatasetDiscoveryDrawerProps) => {
                     </Drawer>
                 }
                 innerRouteElement={
-                    <DatasetDiscoveryProviderRoute datasetDiscovery={props.datasetDiscovery} datasetExplorer={props.datasetExplorer} />
+                    <DatasetDiscoveryProviderRoute
+                        datasetDiscovery={props.datasetDiscovery}
+                        datasetExplorer={props.datasetExplorer}
+                        onDatasetAdd={closeOnSelection ? () => setVisible(false) : undefined}
+                    />
                 }
                 pathParamName='providerId'
                 routePathStateSelector={() => {
