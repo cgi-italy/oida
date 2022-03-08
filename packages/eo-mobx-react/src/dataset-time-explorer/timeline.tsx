@@ -127,17 +127,6 @@ export const Timeline = (props: TimelineProps) => {
 
             const timelineInstance = new VisTimeline(containerRef.current, props.timelineItems, props.timelineGroups, timelineOptions);
 
-            timelineInstance.on('rangechange', (evt) => {
-                if (evt.byUser) {
-                    setWasRangeChangedFromTimeline(true);
-
-                    props.onRangeChange({
-                        start: evt.start,
-                        end: evt.end
-                    });
-                }
-            });
-
             timelineInstance.on('timechange', ({ id, time }) => {
                 const match = id.match(/(.*)\.range\.(start|end)$/);
 
@@ -166,6 +155,31 @@ export const Timeline = (props: TimelineProps) => {
             };
         }
     }, [containerRef]);
+
+    useEffect(() => {
+        const timelineInstance = timeline;
+        if (timelineInstance) {
+            const onRangeChange = (evt) => {
+                if (evt.byUser) {
+                    setWasRangeChangedFromTimeline(true);
+
+                    props.onRangeChange({
+                        start: evt.start,
+                        end: evt.end
+                    });
+                }
+            };
+
+            timelineInstance.on('rangechange', onRangeChange);
+
+            return () => {
+                // @ts-ignore
+                if (timelineInstance.dom) {
+                    timelineInstance.off('rangechange', onRangeChange);
+                }
+            };
+        }
+    }, [timeline, props.onRangeChange]);
 
     useEffect(() => {
         const timelineInstance = timeline;

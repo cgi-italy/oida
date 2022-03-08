@@ -2,10 +2,10 @@ import React, { useRef, useState, useEffect, useCallback } from 'react';
 import ReactDOM from 'react-dom';
 import { autorun } from 'mobx';
 import classnames from 'classnames';
+import useResizeAware from 'react-resize-aware';
 import { TimelineGroup, TimelineItem, TimelineEventPropertiesResult } from 'vis-timeline/peer';
 import { DataSet } from 'vis-data/peer';
 import moment from 'moment';
-
 import { Button, Tooltip } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 
@@ -262,6 +262,56 @@ export const DatasetDiscoveryTimeline = (props: DatasetExplorerTimelineProps) =>
         if (timeExplorer) {
             timeExplorer.setActive(true);
         }
+
+        const pendingTasks: {
+            toAdd: Record<string, TimelineItem>;
+            toRemove: Record<string, string | number>;
+        } = {
+            toAdd: {},
+            toRemove: {}
+        };
+
+        const batchAddMax = 300;
+
+        let scheduledTask: number | undefined;
+
+        const executePendingTasks = () => {
+            scheduledTask = undefined;
+            timelineItems.current.remove(Object.values(pendingTasks.toRemove));
+            pendingTasks.toRemove = {};
+            const toAdd = Object.values(pendingTasks.toAdd);
+            if (toAdd.length > batchAddMax) {
+                const added = timelineItems.current.add(toAdd.slice(0, batchAddMax));
+                added.forEach((id) => {
+                    delete pendingTasks.toAdd[id];
+                });
+                scheduledTask = requestAnimationFrame(executePendingTasks);
+            } else {
+                timelineItems.current.add(toAdd);
+                pendingTasks.toAdd = {};
+            }
+        };
+
+        const scheduleTasksExecution = () => {
+            if (!scheduledTask) {
+                scheduledTask = requestAnimationFrame(executePendingTasks);
+            }
+        };
+
+        const addDistributionItem = (item: TimelineItem) => {
+            pendingTasks.toAdd[item.id] = item;
+            scheduleTasksExecution();
+        };
+
+        const removeDistributionItem = (itemId: string) => {
+            if (pendingTasks.toAdd[itemId]) {
+                delete pendingTasks.toAdd[itemId];
+            } else {
+                pendingTasks.toRemove[itemId] = itemId;
+                scheduleTasksExecution();
+            }
+        };
+
         const groupTracker = new ArrayTracker({
             items: props.explorerState.items,
             idGetter: (datasetView) => datasetView.dataset.id,
@@ -288,7 +338,7 @@ export const DatasetDiscoveryTimeline = (props: DatasetExplorerTimelineProps) =>
                     onItemAdd: (item, idx) => {
                         const itemId = `${datasetView.dataset.id}_${item.isoString}`;
 
-                        timelineItems.current.add({
+                        addDistributionItem({
                             id: itemId,
                             type: item.isRange ? 'range' : 'point',
                             content: '',
@@ -303,7 +353,7 @@ export const DatasetDiscoveryTimeline = (props: DatasetExplorerTimelineProps) =>
                         });
 
                         return () => {
-                            timelineItems.current.remove(itemId);
+                            removeDistributionItem(itemId);
                         };
                     },
                     onItemRemove: (disposer) => {
@@ -424,8 +474,36 @@ export const DatasetDiscoveryTimeline = (props: DatasetExplorerTimelineProps) =>
         }
     }, [timeSelectionMode]);
 
+    const [resizeListener, size] = useResizeAware();
+
+    const timePixelResolution = 16;
+
+    useEffect(() => {
+        if (timeExplorer && size.width) {
+            timeExplorer.timeRange.setResolution(
+                timePixelResolution *
+                    Math.round((timeExplorer.timeRange.end.getTime() - timeExplorer.timeRange.start.getTime()) / size.width)
+            );
+        }
+    }, [size, timeExplorer]);
+
+    const onRangeChange = useCallback(
+        (range) => {
+            if (timeExplorer && range.start && range.end) {
+                timeExplorer.timeRange.setValue(range.start, range.end);
+                if (size.width) {
+                    timeExplorer.timeRange.setResolution(
+                        timePixelResolution * Math.round((range.end.getTime() - range.start.getTime()) / size.width)
+                    );
+                }
+            }
+        },
+        [size, timeExplorer]
+    );
+
     return (
         <div className='dataset-explorer-timeline'>
+            {resizeListener}
             <DatasetExplorerTimelineToolbar
                 onDrawRange={() => props.explorerState.setToi(undefined)}
                 groupLabelsMode={groupLabelsMode}
@@ -463,11 +541,7 @@ export const DatasetDiscoveryTimeline = (props: DatasetExplorerTimelineProps) =>
                     timelineGroups={timelineGroups.current}
                     timelineItems={timelineItems.current}
                     editableRanges={editableRanges}
-                    onRangeChange={(range) => {
-                        if (timeExplorer) {
-                            timeExplorer.timeRange.setValue(range.start!, range.end!);
-                        }
-                    }}
+                    onRangeChange={onRangeChange}
                     groupLabelsMode={groupLabelsMode}
                     groupTemplate={(group: DatasetDiscoveryTimelineGroup, element: Element) => {
                         if (group && element !== group.element) {
