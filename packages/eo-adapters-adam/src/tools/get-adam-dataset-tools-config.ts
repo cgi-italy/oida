@@ -120,10 +120,10 @@ export const getAdamDatasetToolsConfig = (
 
     const tools: DatasetToolConfig[] = [];
 
-    if (datasetConfig.coverageExtent && variables.length) {
+    if (variables.length) {
         const wcsSeriesProvider = new AdamWcsSeriesProvider({
             axiosInstance: axiosInstance,
-            coverageSrs: datasetConfig.coverageExtent.srs,
+            coverageSrs: datasetConfig.coverageExtent?.srs,
             serviceUrl: factoryConfig.wcsServiceUrl,
             extentOffset: datasetConfig.requestExtentOffset,
             variables: variables,

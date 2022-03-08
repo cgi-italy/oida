@@ -10,7 +10,7 @@ export type AdamWCSSeriesProviderConfig = {
     serviceUrl: string;
     dimensions: AdamDatasetDimension[];
     variables: AdamDatasetSingleBandCoverage[];
-    coverageSrs: string;
+    coverageSrs?: string;
     extentOffset?: number[];
     axiosInstance?: AxiosInstanceWithCancellation;
 };
@@ -108,16 +108,23 @@ export class AdamWcsSeriesProvider {
             return `${subsetId}(${subsets[subsetId].join(',')})`;
         });
 
-        const requestCoord = transform(request.location.coordinates, 'EPSG:4326', this.config_.coverageSrs);
+        if (this.config_.coverageSrs) {
+            const requestCoord = transform(request.location.coordinates, 'EPSG:4326', this.config_.coverageSrs);
 
-        const extentOffset = this.config_.extentOffset;
-        if (extentOffset) {
-            requestCoord[0] += extentOffset[0];
-            requestCoord[1] += extentOffset[1];
+            const extentOffset = this.config_.extentOffset;
+            if (extentOffset) {
+                requestCoord[0] += extentOffset[0];
+                requestCoord[1] += extentOffset[1];
+            }
+
+            subset.push(`E(${requestCoord[0]},${requestCoord[0]})`);
+            subset.push(`N(${requestCoord[1]},${requestCoord[1]})`);
+        } else {
+            const requestCoord = request.location.coordinates.slice();
+
+            subset.push(`Lon(${requestCoord[0]},${requestCoord[0]})`);
+            subset.push(`Lat(${requestCoord[1]},${requestCoord[1]})`);
         }
-
-        subset.push(`E(${requestCoord[0]},${requestCoord[0]})`);
-        subset.push(`N(${requestCoord[1]},${requestCoord[1]})`);
 
         return this.axiosInstance_
             .cancelableRequest({
