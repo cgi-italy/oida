@@ -218,21 +218,23 @@ export class AdamOpensearchDatasetDiscoveryClient {
             }
 
             if (numBands > 1) {
-                subsetDimension = {
-                    id: 'subdataset',
-                    name: 'SubDataset',
-                    wcsSubset: {
-                        id: 'subdataset'
-                    },
-                    domain: {
-                        values: subdatasets.map((subdataset) => {
-                            return {
-                                value: subdataset.subDatasetId,
-                                name: subdataset.name
-                            };
-                        })
-                    }
-                };
+                if (subdatasets.length > 1) {
+                    subsetDimension = {
+                        id: 'subdataset',
+                        name: 'SubDataset',
+                        wcsSubset: {
+                            id: 'subdataset'
+                        },
+                        domain: {
+                            values: subdatasets.map((subdataset) => {
+                                return {
+                                    value: subdataset.subDatasetId,
+                                    name: subdataset.name
+                                };
+                            })
+                        }
+                    };
+                }
 
                 // Not reliable. Disable it for now
 
