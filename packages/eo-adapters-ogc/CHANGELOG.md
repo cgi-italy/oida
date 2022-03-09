@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.1.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-adapters-ogc@2.0.1...@oidajs/eo-adapters-ogc@2.1.0) (2022-03-09)
+
+
+### Features
+
+* update routing utils ([8533a76](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/8533a76b4220417d811b4114ff770223d26906d8))
+
+
+
+
+
 ## [2.0.1](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-adapters-ogc@2.0.0...@oidajs/eo-adapters-ogc@2.0.1) (2021-12-21)
 
 **Note:** Version bump only for package @oidajs/eo-adapters-ogc

@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.0.2](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/map-cesium-ol-tile-source@2.0.1...@oidajs/map-cesium-ol-tile-source@2.0.2) (2022-03-09)
+
+
+### Bug Fixes
+
+* improve tile grid computation logic ([a1c394b](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/a1c394b9d760fcfc83f9a66cb86c3b5efa18fa43))
+* solve issue in cesium tiling scheme init in CesiumOLImageryProvider ([5dbcc19](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/5dbcc196b62b4f6395621817159bd53fc3ddd0ef))
+
+
+
+
+
 ## [2.0.1](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/map-cesium-ol-tile-source@2.0.0...@oidajs/map-cesium-ol-tile-source@2.0.1) (2021-12-21)
 
 **Note:** Version bump only for package @oidajs/map-cesium-ol-tile-source

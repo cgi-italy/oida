@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.1.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/ui-react-antd@6.0.1...@oidajs/ui-react-antd@6.1.0) (2022-03-09)
+
+
+### Bug Fixes
+
+* prevent updating format on invalid geometry in AoiTextEditor ([5da38e4](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/5da38e47475830d36be7208abddd2c430bd171d9))
+
+
+### Features
+
+* add aoi text editor component ([bf43337](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/bf43337a98fb48cd2d0813b38d971bcd8438c7f1))
+* enable discovery drawer close on dataset selection ([a03dab5](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/a03dab5e2109b2f0b3700760bfba9efc35077e81))
+* improve accessibility ([ab3b6a0](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/ab3b6a0150ffc43993ed2cafcdd053529a08159a))
+
+
+
+
+
 ## [6.0.1](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/ui-react-antd@6.0.0...@oidajs/ui-react-antd@6.0.1) (2021-12-21)
 
 **Note:** Version bump only for package @oidajs/ui-react-antd

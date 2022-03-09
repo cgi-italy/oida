@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.0.2](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-geotiff@2.0.1...@oidajs/eo-geotiff@2.0.2) (2022-03-09)
+
+
+### Bug Fixes
+
+* add missing PlottyRenderer getters ([a55251a](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/a55251affa1df2456e462cf3fe6938541636134a))
+
+
+
+
+
 ## [2.0.1](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-geotiff@2.0.0...@oidajs/eo-geotiff@2.0.1) (2021-12-21)
 
 **Note:** Version bump only for package @oidajs/eo-geotiff

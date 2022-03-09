@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.1.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-mobx@2.0.1...@oidajs/eo-mobx@2.1.0) (2022-03-09)
+
+
+### Bug Fixes
+
+* check for analysis variable definition when propagating parent variable value ([d45f6c5](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/d45f6c58e3ae62c4af7068fbde04de8c4ba982d6))
+* propagate filters on time distribution nearest item search ([67b4fa1](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/67b4fa1722511c59ac61dfb9186b7fb9addf4d83))
+
+
+### Features
+
+* add utility to get the overall time extent of a set of datasets ([8c9a705](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/8c9a705b6cc56c62d88ecfe099b0477c54b4882f))
+* allow overriding the default dataset discovery footprint style ([b770f15](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/b770f15714353aff44695ba67260872fa51d2bf6))
+
+
+
+
+
 ## [2.0.1](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-mobx@2.0.0...@oidajs/eo-mobx@2.0.1) (2021-12-21)
 
 **Note:** Version bump only for package @oidajs/eo-mobx

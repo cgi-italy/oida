@@ -3,6 +3,32 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.1.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-adapters-adam@2.0.1...@oidajs/eo-adapters-adam@2.1.0) (2022-03-09)
+
+
+### Bug Fixes
+
+* add additional checks in adam series analysis tool initialization ([3a83efc](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/3a83efc066c9bf538041820ce871b5a1918c26c7))
+* disable adam dataset subset dimension when only one subset is available ([80f56f1](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/80f56f1c9bbfddac69d9333585addfbb0bb3cde5))
+* enable dataset discovery pagination/sorting for latest adam opensearch version ([339403b](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/339403bb3f4df21938b3882177154030d6937a4e))
+* enable filters when searching for nearest item in adam time distribution provider ([b84ceb4](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/b84ceb4435c65619b1752e205c7150af07fbaf5d))
+* improve adam opensearch filters convertion ([895699e](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/895699e183e5d0e1d9b5e008018035252ded1e37))
+
+
+### Features
+
+* enable adam time distribution computation from catalogue data ([3d11b18](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/3d11b18d6a16d0158f29b0029a4c04bc1c20ca9c))
+* improve adam opensearch dataset discovery ([ce187e3](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/ce187e396d1fef7e64da7472e10a2acf99bf1e23))
+
+
+### Performance Improvements
+
+* use aoi subset in adam spatial coverage provider ([17e0042](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/17e0042ce89f520c077c28c758c673bedec27308))
+
+
+
+
+
 ## [2.0.1](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-adapters-adam@2.0.0...@oidajs/eo-adapters-adam@2.0.1) (2021-12-21)
 
 **Note:** Version bump only for package @oidajs/eo-adapters-adam
