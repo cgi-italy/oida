@@ -4,78 +4,76 @@ import WmsFeatureInfoParser from 'ol/format/WMSGetFeatureInfo';
 import GeoJsonParser from 'ol/format/GeoJSON';
 
 export type WmsClientConfig = {
-    axiosInstance?: AxiosInstanceWithCancellation
+    axiosInstance?: AxiosInstanceWithCancellation;
 };
 
 export type WmsLayerBBox = {
-    crs: string,
-    extent: number[],
-    res: number[]
+    crs: string;
+    extent: number[];
+    res: number[];
 };
 
 export type WmsLayerStyle = {
-    Name: string,
-    Title?: string,
-    Abstract?: string,
+    Name: string;
+    Title?: string;
+    Abstract?: string;
     LegendURL: Array<{
-        Format: string,
-        OnlineResource: string,
-        size: number[]
-    }>
+        Format: string;
+        OnlineResource: string;
+        size: number[];
+    }>;
 };
 
 export type WmsLayerDimension = {
-    name: string,
-    units: string,
-    unitSymbol?: string,
-    default?: string,
-    multipleValues?: boolean,
-    nearestvalue?: boolean,
-    values: string
+    name: string;
+    units: string;
+    unitSymbol?: string;
+    default?: string;
+    multipleValues?: boolean;
+    nearestvalue?: boolean;
+    values: string;
 };
 
 export type WmsLayer = {
-    Name?: string,
-    Title?: string,
-    Abstract?: string,
-    KeywordList?: string[],
-    Identifier?: string[],
-    CRS: string[],
-    BoundingBox: WmsLayerBBox[],
-    EX_GeographicBoundingBox: number[],
-    Style?: WmsLayerStyle[],
-    Dimension?: WmsLayerDimension[],
-    queryable?: boolean,
-    Layer?: WmsLayer[]
+    Name?: string;
+    Title?: string;
+    Abstract?: string;
+    KeywordList?: string[];
+    Identifier?: string[];
+    CRS: string[];
+    BoundingBox: WmsLayerBBox[];
+    EX_GeographicBoundingBox: number[];
+    Style?: WmsLayerStyle[];
+    Dimension?: WmsLayerDimension[];
+    queryable?: boolean;
+    Layer?: WmsLayer[];
 };
 
 export type WmsCapabilities = {
-    version: string,
+    version: string;
     Service: {
-        Name?: string,
-        Title?: string,
-        Abstract?: string,
-        KeywordList?: string[],
-    },
+        Name?: string;
+        Title?: string;
+        Abstract?: string;
+        KeywordList?: string[];
+    };
     Capability: {
         Request: {
             GetCapabilities: {
-                Format: string[]
-            },
+                Format: string[];
+            };
             GetMap: {
-                Format: string[]
-            },
+                Format: string[];
+            };
             GetFeatureInfo: {
-                Format: string[]
-            }
-        }
-        Layer: WmsLayer
-    }
+                Format: string[];
+            };
+        };
+        Layer: WmsLayer;
+    };
 };
 
-
 export class WmsClient {
-
     private capabilitiesParser_: WmsCapabilitiesParser;
     private featureInfoParser_: WmsFeatureInfoParser;
     private geoJsonParser_: GeoJsonParser;
@@ -88,41 +86,40 @@ export class WmsClient {
         this.geoJsonParser_ = new GeoJsonParser();
     }
 
-    getCapabilities(params: {
-        url: string,
-        version?: string
-    }) {
-        return this.axiosInstance_.cancelableRequest({
-            url: params.url,
-            params: {
-                service: 'WMS',
-                version: params.version || '1.3.0',
-                request: 'GetCapabilities'
-            },
-            responseType: 'text'
-        }).then((response) => {
-            try {
-                return this.capabilitiesParser_.read(response.data) as WmsCapabilities;
-            } catch (e) {
-                throw new Error(`Error parsing WMS capabilities: ${e}`);
-            }
-        });
+    getCapabilities(params: { url: string; version?: string }) {
+        return this.axiosInstance_
+            .cancelableRequest({
+                url: params.url,
+                params: {
+                    service: 'WMS',
+                    version: params.version || '1.3.0',
+                    request: 'GetCapabilities'
+                },
+                responseType: 'text'
+            })
+            .then((response) => {
+                try {
+                    return this.capabilitiesParser_.read(response.data) as WmsCapabilities;
+                } catch (e) {
+                    throw new Error(`Error parsing WMS capabilities: ${e}`);
+                }
+            });
     }
 
     getFeatureInfo(params: {
-        url: string,
-        layers: string,
-        styles: string,
-        srs: string,
-        bbox: number[],
-        width: number,
-        height: number,
-        i: number,
-        j: number,
-        version?: string,
-        count?: number,
-        format?: string,
-        vendorParams?: Record<string, any>
+        url: string;
+        layers: string;
+        styles: string;
+        srs: string;
+        bbox: number[];
+        width: number;
+        height: number;
+        i: number;
+        j: number;
+        version?: string;
+        count?: number;
+        format?: string;
+        vendorParams?: Record<string, any>;
     }) {
         const version = params.version || '1.3.0';
         const format = params.format || 'text/plain';
@@ -151,44 +148,46 @@ export class WmsClient {
             requestParams.srs = params.srs;
         }
 
-
-        return this.axiosInstance_.cancelableRequest({
-            url: params.url,
-            params: requestParams,
-            responseType: 'text'
-        }).then((response) => {
-            try {
-                switch (format) {
-                    case 'text/plain':
-                    case 'text/html':
-                        return response.data;
-                    case 'application/json':
-                        return response.data;
-                    default:
-                        let features = this.featureInfoParser_.read(response.data);
-                        return this.geoJsonParser_.writeFeaturesObject(features);
+        return this.axiosInstance_
+            .cancelableRequest({
+                url: params.url,
+                params: requestParams,
+                responseType: 'text'
+            })
+            .then((response) => {
+                try {
+                    switch (format) {
+                        case 'text/plain':
+                        case 'text/html':
+                            return response.data;
+                        case 'application/json':
+                            return response.data;
+                        default: {
+                            const features = this.featureInfoParser_.read(response.data);
+                            return this.geoJsonParser_.writeFeaturesObject(features);
+                        }
+                    }
+                } catch (e) {
+                    throw new Error(`Error parsing WMS feature info: ${e}`);
                 }
-            } catch (e) {
-                throw new Error(`Error parsing WMS feature info: ${e}`);
-            }
-        });
+            });
     }
 
     getTimeSeries(params: {
-        url: string,
-        layers: string,
-        styles: string,
-        srs: string,
-        bbox: number[],
-        width: number,
-        height: number,
-        i: number,
-        j: number,
-        time: string,
-        version?: string,
-        count?: number,
-        format?: string,
-        vendorParams?: Record<string, any>
+        url: string;
+        layers: string;
+        styles: string;
+        srs: string;
+        bbox: number[];
+        width: number;
+        height: number;
+        i: number;
+        j: number;
+        time: string;
+        version?: string;
+        count?: number;
+        format?: string;
+        vendorParams?: Record<string, any>;
     }) {
         const version = params.version || '1.3.0';
         const format = params.format || 'text/csv';
@@ -218,13 +217,13 @@ export class WmsClient {
             requestParams.srs = params.srs;
         }
 
-
-        return this.axiosInstance_.cancelableRequest({
-            url: params.url,
-            params: requestParams
-        }).then((response) => {
-            return response.data;
-        });
+        return this.axiosInstance_
+            .cancelableRequest({
+                url: params.url,
+                params: requestParams
+            })
+            .then((response) => {
+                return response.data;
+            });
     }
 }
-

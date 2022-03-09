@@ -3,7 +3,7 @@
  * Added cancel callback support
  */
 declare global {
-
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     interface Promise<T> {
         isCancelable?: boolean;
         isCanceled?: boolean;
@@ -11,12 +11,10 @@ declare global {
     }
 }
 
-
 type CancelablePromiseOptions = {
     isCanceled?: boolean;
     onCancel?: () => void;
 };
-
 
 const wrapCallback = <TResult>(
     callback: ((value: any) => TResult | PromiseLike<TResult>) | undefined | null,
@@ -26,7 +24,7 @@ const wrapCallback = <TResult>(
     return (arg) => {
         if (!options.isCanceled) {
             if (callback) {
-                let result = callback(arg);
+                const result = callback(arg);
                 if (result instanceof Promise) {
                     options.onCancel = result.cancel;
                 } else {
@@ -40,46 +38,32 @@ const wrapCallback = <TResult>(
     };
 };
 
-const cancelableThen = function<TResult1, TResult2>(
+const cancelableThen = function <TResult1, TResult2>(
     this: Promise<TResult1>,
     options: CancelablePromiseOptions,
-    onfulfilled?:  ((value: TResult1) => TResult1 | PromiseLike<TResult1>) | undefined | null,
+    onfulfilled?: ((value: TResult1) => TResult1 | PromiseLike<TResult1>) | undefined | null,
     onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null
 ) {
-    return cancelable(
-        this.then(
-            wrapCallback(onfulfilled, options),
-            wrapCallback(onrejected, options, true)
-        ),
-        options
-    );
+    return cancelable(this.then(wrapCallback(onfulfilled, options), wrapCallback(onrejected, options, true)), options);
 };
 
-const cancelableCatch = function<TResult1, TResult2>(
+const cancelableCatch = function <TResult1, TResult2>(
     this: Promise<TResult1>,
     options: CancelablePromiseOptions,
     onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null
 ) {
-    return cancelable(
-        this.catch(
-            wrapCallback(onrejected, options)
-        ),
-        options
-    );
+    return cancelable(this.catch(wrapCallback(onrejected, options)), options);
 };
 
-const cancelableFinally = function<TResult1>(
+const cancelableFinally = function <TResult1>(
     this: Promise<TResult1>,
     options: CancelablePromiseOptions,
     onfinally?: (() => void) | undefined | null
 ) {
-    return cancelable(
-        this.finally(onfinally),
-        options
-    );
+    return cancelable(this.finally(onfinally), options);
 };
 
-const cancelable = <TResult1>(promise: Promise<TResult1>, options: CancelablePromiseOptions = {isCanceled: false}) : Promise<TResult1> => {
+const cancelable = <TResult1>(promise: Promise<TResult1>, options: CancelablePromiseOptions = { isCanceled: false }): Promise<TResult1> => {
     return {
         isCancelable: true,
         then: cancelableThen.bind(promise, options),

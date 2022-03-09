@@ -1,10 +1,16 @@
-import { AxiosInstanceWithCancellation, createAxiosInstance, getXmlDateNodeValue, getXmlFloatNodeValue, getXmlStringNodeValue } from '@oidajs/core';
+import {
+    AxiosInstanceWithCancellation,
+    createAxiosInstance,
+    getXmlDateNodeValue,
+    getXmlFloatNodeValue,
+    getXmlStringNodeValue
+} from '@oidajs/core';
 import { NumericVariable, ValueDomain } from '@oidajs/eo-mobx';
 
 export type WcsVendor = 'geoserver';
 
 export type WcsCoverageBand = Omit<NumericVariable, 'domain'> & {
-    domain?: Partial<ValueDomain<number>>
+    domain?: Partial<ValueDomain<number>>;
 };
 
 export type WcsCoverage = {
@@ -12,10 +18,12 @@ export type WcsCoverage = {
     name?: string;
     description?: string;
     srs: string;
-    time: {
-        start: Date;
-        end: Date;
-    } | undefined;
+    time:
+        | {
+              start: Date;
+              end: Date;
+          }
+        | undefined;
     width: number;
     height: number;
     extent: number[];
@@ -28,7 +36,6 @@ export type WcsClientConfig = {
 };
 
 export class WcsClient {
-
     protected vendor_: WcsVendor;
     protected axiosInstance_: AxiosInstanceWithCancellation;
 
@@ -45,26 +52,25 @@ export class WcsClient {
         this.axiosInstance_ = config.axiosInstance || createAxiosInstance();
     }
 
-    describeCoverage(params: {
-        url: string,
-        coverageId: string
-    }): Promise<WcsCoverage> {
-        return this.axiosInstance_.cancelableRequest<XMLDocument>({
-            url: params.url,
-            responseType: 'document',
-            params: {
-                service: 'WCS',
-                version: '2.0.1',
-                request: 'DescribeCoverage',
-                coverageId: params.coverageId
-            }
-        }).then((response) => {
-            if (this.vendor_ === 'geoserver') {
-                return this.parseGeoserverDescribeCoverageResponse_(response.data);
-            } else {
-                throw new Error('WcsClient: Unknown WCS vendor');
-            }
-        });
+    describeCoverage(params: { url: string; coverageId: string }): Promise<WcsCoverage> {
+        return this.axiosInstance_
+            .cancelableRequest<XMLDocument>({
+                url: params.url,
+                responseType: 'document',
+                params: {
+                    service: 'WCS',
+                    version: '2.0.1',
+                    request: 'DescribeCoverage',
+                    coverageId: params.coverageId
+                }
+            })
+            .then((response) => {
+                if (this.vendor_ === 'geoserver') {
+                    return this.parseGeoserverDescribeCoverageResponse_(response.data);
+                } else {
+                    throw new Error('WcsClient: Unknown WCS vendor');
+                }
+            });
     }
 
     protected parseGeoserverDescribeCoverageResponse_(doc: XMLDocument) {
@@ -77,7 +83,6 @@ export class WcsClient {
     }
 
     protected parseGeoserverCoverage_(coverageDescription: Element): WcsCoverage {
-
         const coverageId = getXmlStringNodeValue(coverageDescription.getElementsByTagNameNS(this.xmlNamespaces_.wcs, 'CoverageId')[0]);
         if (!coverageId) {
             throw new Error();
@@ -110,7 +115,7 @@ export class WcsClient {
 
         let srs = 'EPSG:4326';
 
-        let srsAttr = envelope.getAttribute('srsName');
+        const srsAttr = envelope.getAttribute('srsName');
         if (srsAttr) {
             const matches = srsAttr.match(/crs\/EPSG\/0\/([0-9]+)/);
             if (matches) {
@@ -122,25 +127,24 @@ export class WcsClient {
         if (!lowerCornerString) {
             throw new Error();
         }
-        const lowerCorner = lowerCornerString.split(' ').map((value => parseFloat(value)));
+        const lowerCorner = lowerCornerString.split(' ').map((value) => parseFloat(value));
 
         const upperCornerString = getXmlStringNodeValue(envelope.getElementsByTagNameNS(this.xmlNamespaces_.gml, 'upperCorner')[0]);
         if (!upperCornerString) {
             throw new Error();
         }
 
-
         const beginPosition = getXmlDateNodeValue(envelope.getElementsByTagNameNS(this.xmlNamespaces_.gml, 'beginPosition')[0]);
         const endPosition = getXmlDateNodeValue(envelope.getElementsByTagNameNS(this.xmlNamespaces_.gml, 'endPosition')[0]);
 
-        const upperCorner = upperCornerString.split(' ').map((value => parseFloat(value)));
+        const upperCorner = upperCornerString.split(' ').map((value) => parseFloat(value));
 
         let gridSize = [0, 0];
         const gridEnvelopeNode = coverageDescription.getElementsByTagNameNS(this.xmlNamespaces_.gml, 'GridEnvelope')[0];
         if (gridEnvelopeNode) {
             const highValue = getXmlStringNodeValue(gridEnvelopeNode.getElementsByTagNameNS(this.xmlNamespaces_.gml, 'high')[0]);
             if (highValue) {
-                gridSize = highValue.split(' ').map(value => parseInt(value));
+                gridSize = highValue.split(' ').map((value) => parseInt(value));
             }
         }
 
@@ -160,7 +164,7 @@ export class WcsClient {
                     const allowedValues = allowedValuesString.split(' ');
                     domain = {
                         min: parseFloat(allowedValues[0]),
-                        max: parseFloat(allowedValues[1]),
+                        max: parseFloat(allowedValues[1])
                     };
                 }
                 const noData = getXmlFloatNodeValue(fieldNode.getElementsByTagNameNS(this.xmlNamespaces_.swe, 'nilValue')[0]);
@@ -185,10 +189,13 @@ export class WcsClient {
             name,
             description,
             srs,
-            time: beginPosition && endPosition ? {
-                start: beginPosition,
-                end: endPosition
-            } : undefined,
+            time:
+                beginPosition && endPosition
+                    ? {
+                          start: beginPosition,
+                          end: endPosition
+                      }
+                    : undefined,
             width: gridSize[xAxisIdx],
             height: gridSize[yAxisIdx],
             extent: [lowerCorner[xAxisIdx], lowerCorner[yAxisIdx], upperCorner[xAxisIdx], upperCorner[yAxisIdx]],

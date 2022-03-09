@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import GridLayout from 'react-grid-layout';
 import useResizeAware from 'react-resize-aware';
@@ -53,7 +53,6 @@ export type DashboardPaneProps = {
  * @param props the component properties
  */
 export const DashboardPane = (props: LayoutSectionProps & DashboardPaneProps) => {
-
     const widgetMargin = 10;
 
     const rowSnapHeight = (props.rowSnapHeight || 30) + widgetMargin;
@@ -78,15 +77,20 @@ export const DashboardPane = (props: LayoutSectionProps & DashboardPaneProps) =>
             x = Math.max(0, x);
             y = Math.max(0, y);
             return {
-                x, y, w, h
+                x,
+                y,
+                w,
+                h
             };
         } else {
-            return props.defaultWidgetPosition || {
-                x: 0,
-                y: 0,
-                w: props.numCols,
-                h: 8
-            };
+            return (
+                props.defaultWidgetPosition || {
+                    x: 0,
+                    y: 0,
+                    w: props.numCols,
+                    h: 8
+                }
+            );
         }
     };
 
@@ -94,7 +98,7 @@ export const DashboardPane = (props: LayoutSectionProps & DashboardPaneProps) =>
         //compute the maximum visible y (in dashboard coordinates)
         const maxY = props.containerHeight ? Math.floor((props.containerHeight - widgetMargin) / rowSnapHeight) : undefined;
         if (maxY) {
-            for (let id in updatedLayout) {
+            for (const id in updatedLayout) {
                 if (updatedLayout[id].y + updatedLayout[id].h > maxY) {
                     updatedLayout[id] = {
                         ...updatedLayout[id],
@@ -107,9 +111,8 @@ export const DashboardPane = (props: LayoutSectionProps & DashboardPaneProps) =>
     };
 
     const getLayoutFromComponents = (currentLayout) => {
-        let updatedLayout = {};
+        const updatedLayout = {};
         props.components.forEach((component) => {
-
             if (currentLayout && currentLayout[component.id]) {
                 updatedLayout[component.id] = currentLayout[component.id];
             } else {
@@ -131,12 +134,11 @@ export const DashboardPane = (props: LayoutSectionProps & DashboardPaneProps) =>
     const [resizeListener, size] = useResizeAware();
     const [closedWidgetsLayout, setClosedWidgetsLayout] = useState({});
     const [layout, setLayout] = useState(() => getLayoutFromComponents({}));
-    const [updateTracker] = useState<{evt?: {type: string, item?: any}}>({
+    const [updateTracker] = useState<{ evt?: { type: string; item?: any } }>({
         evt: undefined
     });
 
     const widgets = props.components.map((component) => {
-
         if (!layout[component.id]) {
             const position = closedWidgetsLayout[component.id] || getInitialLayout(component);
             setLayout({
@@ -150,14 +152,11 @@ export const DashboardPane = (props: LayoutSectionProps & DashboardPaneProps) =>
         return (
             <div className='dashboard-widget' key={component.id}>
                 <div className='widget-header'>
-                    <Button
-                        type='link'
-                        className='widget-drag-btn'
-                    >
-                        <DragOutlined/>
+                    <Button type='link' className='widget-drag-btn'>
+                        <DragOutlined />
                     </Button>
                     {component.title}
-                    {component.onClose &&
+                    {component.onClose && (
                         <Button
                             type='link'
                             className='widget-close-btn'
@@ -172,20 +171,16 @@ export const DashboardPane = (props: LayoutSectionProps & DashboardPaneProps) =>
                                 component.onClose!();
                             }}
                         >
-                            <CloseOutlined/>
+                            <CloseOutlined />
                         </Button>
-                    }
+                    )}
                 </div>
-                <div className='widget-content'>
-                    {component.content}
-                </div>
+                <div className='widget-content'>{component.content}</div>
             </div>
         );
     });
 
-
     useEffect(() => {
-
         setLayout((currentLayout) => {
             return getLayoutFromComponents(currentLayout);
         });
@@ -196,9 +191,7 @@ export const DashboardPane = (props: LayoutSectionProps & DashboardPaneProps) =>
                 ...layout
             };
         });
-
     }, [props.components]);
-
 
     return (
         <div className='dashboard-pane' style={props.style}>
@@ -236,11 +229,12 @@ export const DashboardPane = (props: LayoutSectionProps & DashboardPaneProps) =>
                                     const prevItemState = currentLayout[item.i];
                                     if (updatedItem && prevItemState && item.i !== updatedItem.i) {
                                         //check if previous widget position intersects the new updated item position
-                                        if ((prevItemState.x < updatedItem.x + updatedItem.w
-                                            && prevItemState.x + prevItemState.w > updatedItem.x
-                                        ) && (prevItemState.y < updatedItem.y + updatedItem.h
-                                            && prevItemState.y + prevItemState.h > updatedItem.y
-                                        )) {
+                                        if (
+                                            prevItemState.x < updatedItem.x + updatedItem.w &&
+                                            prevItemState.x + prevItemState.w > updatedItem.x &&
+                                            prevItemState.y < updatedItem.y + updatedItem.h &&
+                                            prevItemState.y + prevItemState.h > updatedItem.y
+                                        ) {
                                             let y = item.y;
                                             if (prevItemState.y < item.y) {
                                                 // try to move it immediatly under the new item if the new y is greater than before

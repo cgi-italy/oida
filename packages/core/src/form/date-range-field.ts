@@ -1,4 +1,3 @@
-
 import moment from 'moment';
 import { FormField } from './form-field';
 import { setFormFieldSerializer } from './form-field-serialization';
@@ -6,18 +5,17 @@ import { setFormFieldSerializer } from './form-field-serialization';
 export const DATE_RANGE_FIELD_ID = 'daterange';
 
 export type DateRangeValue = {
-    start: Date,
-    end: Date
+    start: Date;
+    end: Date;
 };
 
 export type DateRangeFieldConfig = {
-    minDate?: Date,
-    maxDate?: Date,
+    minDate?: Date;
+    maxDate?: Date;
     withTime?: boolean;
 };
 
 export type DateRangeField = FormField<typeof DATE_RANGE_FIELD_ID, DateRangeValue, DateRangeFieldConfig>;
-
 
 setFormFieldSerializer(DATE_RANGE_FIELD_ID, {
     toJSON: (value) => {
@@ -34,7 +32,7 @@ setFormFieldSerializer(DATE_RANGE_FIELD_ID, {
     },
     toString: (formField, options) => {
         let config: DateRangeFieldConfig;
-        if (typeof(formField.config) === 'function') {
+        if (typeof formField.config === 'function') {
             config = formField.config(formField);
         } else {
             config = formField.config;
@@ -55,10 +53,9 @@ setFormFieldSerializer(DATE_RANGE_FIELD_ID, {
 
 declare module './form-field' {
     interface IFormFieldDefinitions {
-        [DATE_RANGE_FIELD_ID]:  FormFieldDefinition<typeof DATE_RANGE_FIELD_ID, DateRangeValue, DateRangeFieldConfig>;
+        [DATE_RANGE_FIELD_ID]: FormFieldDefinition<typeof DATE_RANGE_FIELD_ID, DateRangeValue, DateRangeFieldConfig>;
     }
     interface IFormFieldValueTypes {
         [DATE_RANGE_FIELD_ID]: DateRangeValue;
     }
 }
-

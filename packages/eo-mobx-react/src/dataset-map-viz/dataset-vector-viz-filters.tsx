@@ -7,7 +7,6 @@ import { NumericRangeFieldRenderer, SelectEnumRenderer } from '@oidajs/ui-react-
 import { useSelector } from '@oidajs/ui-react-mobx';
 import { DatasetVectorMapViz, VectorFeaturePropertyDescriptor } from '@oidajs/eo-mobx';
 
-
 export type FeaturePropertySelectorProps = {
     featureProperties: VectorFeaturePropertyDescriptor[];
     value: string;
@@ -15,7 +14,6 @@ export type FeaturePropertySelectorProps = {
 };
 
 export const FeaturePropertySelector = (props: FeaturePropertySelectorProps) => {
-
     const choices = props.featureProperties.map((featureProperty) => {
         return {
             name: `${featureProperty.name} (${featureProperty.units})`,
@@ -53,19 +51,27 @@ export const DatasetVectorVizFilters = (props: DatasetVectorVizFiltersProps) => 
     // initialize a dataset filter based on the feature property descriptor
     const initPropertyFilter = (property: VectorFeaturePropertyDescriptor) => {
         if (property.type === 'number') {
-            props.dataset.propertyFilters.set(property.id, {
-                from: property.domain?.min,
-                to: property.domain?.max
-            }, NUMERIC_RANGE_FIELD_ID);
+            props.dataset.propertyFilters.set(
+                property.id,
+                {
+                    from: property.domain?.min,
+                    to: property.domain?.max
+                },
+                NUMERIC_RANGE_FIELD_ID
+            );
         } else if (property.type === 'enum') {
             props.dataset.propertyFilters.set(property.id, property.options[0].value, ENUM_FIELD_ID);
         } else if (property.type === 'boolean') {
             props.dataset.propertyFilters.set(property.id, true, BOOLEAN_FIELD_ID);
         } else if (property.type === 'date') {
-            props.dataset.propertyFilters.set(property.id, {
-                start: property.domain?.min,
-                end: property.domain?.max
-            }, DATE_RANGE_FIELD_ID);
+            props.dataset.propertyFilters.set(
+                property.id,
+                {
+                    start: property.domain?.min,
+                    end: property.domain?.max
+                },
+                DATE_RANGE_FIELD_ID
+            );
         } else {
             props.dataset.propertyFilters.set(property.id, undefined, STRING_FIELD_ID);
         }
@@ -115,18 +121,12 @@ export const DatasetVectorVizFilters = (props: DatasetVectorVizFiltersProps) => 
                         }}
                     />
                     <Tooltip title='Remove filter'>
-                        <Button
-                            type='primary'
-                            size='small'
-                            onClick={() => props.dataset.propertyFilters.unset(featureProperty.id)}
-                        >
-                            <DeleteOutlined/>
+                        <Button type='primary' size='small' onClick={() => props.dataset.propertyFilters.unset(featureProperty.id)}>
+                            <DeleteOutlined />
                         </Button>
                     </Tooltip>
                 </div>
-                <div className='dataset-vector-viz-filter-control'>
-                    {filterElement}
-                </div>
+                <div className='dataset-vector-viz-filter-control'>{filterElement}</div>
             </div>
         );
     });
@@ -145,12 +145,8 @@ export const DatasetVectorVizFilters = (props: DatasetVectorVizFiltersProps) => 
                 <span>Data filters:</span>
                 <Tooltip title='Add filter'>
                     <Dropdown overlay={<Menu>{filterDropdownItems}</Menu>} trigger={['click']}>
-                        <Button
-                            type='primary'
-                            size='small'
-                            disabled={!missingFilters.length}
-                        >
-                            <PlusOutlined/>
+                        <Button type='primary' size='small' disabled={!missingFilters.length}>
+                            <PlusOutlined />
                             <DownOutlined />
                         </Button>
                     </Dropdown>
@@ -159,6 +155,4 @@ export const DatasetVectorVizFilters = (props: DatasetVectorVizFiltersProps) => 
             {filters}
         </div>
     );
-
-
 };

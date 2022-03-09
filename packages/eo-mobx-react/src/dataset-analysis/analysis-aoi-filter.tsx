@@ -13,15 +13,14 @@ import { useMapAoiDrawerFromModule, useAoiAction, useSelector, useMapAoiImporter
 
 import { useAnalysisGeometryFromModule } from './use-analysis-geometry';
 
-
 export type AnalysisAoiFilterProps = {
-    analysis: DatasetProcessing<any>
+    analysis: DatasetProcessing<any>;
     supportedGeometries: AoiSupportedGeometry[];
 };
 
+const AOI_DRAG_ITEM = 'ANALYSIS_AOI';
 type AoiItemType = {
-    aoi?: SharedAoi,
-    type: string
+    aoi?: SharedAoi;
 };
 
 export const AnalysisAoiFilter = (props: AnalysisAoiFilterProps) => {
@@ -30,40 +29,49 @@ export const AnalysisAoiFilter = (props: AnalysisAoiFilterProps) => {
 
     const { activeAction, onActiveActionChange } = useAoiAction();
 
-    const [{isDragging}, drag, preview] = useDrag({
-        item: {type: 'ANALYSIS_AOI', aoi: aoi},
-        canDrag: (item) => {
-            return !!aoi;
-        },
-        collect: (monitor) => {
-            return {
-                isDragging: monitor.isDragging()
-            };
-        }
-    });
-
-    const [{ isOver, canDrop }, drop] = useDrop({
-        accept: ['ANALYSIS_AOI'],
-        collect: (monitor) => ({
-          isOver: monitor.isOver(),
-          canDrop: monitor.canDrop(),
-        }),
-        canDrop: (item) => {
-            return !!item.aoi && item.aoi !== aoi;
-        },
-        drop: (item: AoiItemType) => {
-            if (item.aoi) {
-                props.analysis.setAoi(item.aoi);
+    const [{ isDragging }, drag, preview] = useDrag(
+        () => ({
+            type: AOI_DRAG_ITEM,
+            item: { aoi: aoi },
+            canDrag: (item) => {
+                return !!aoi;
+            },
+            collect: (monitor) => {
+                return {
+                    isDragging: monitor.isDragging()
+                };
             }
-        }
-    });
+        }),
+        [aoi]
+    );
+
+    const [{ isOver, canDrop }, drop] = useDrop(
+        () => ({
+            accept: [AOI_DRAG_ITEM],
+            collect: (monitor) => ({
+                isOver: monitor.isOver(),
+                canDrop: monitor.canDrop()
+            }),
+            canDrop: (item) => {
+                return !!item.aoi && item.aoi !== aoi;
+            },
+            drop: (item: AoiItemType) => {
+                if (item.aoi) {
+                    props.analysis.setAoi(item.aoi);
+                }
+            }
+        }),
+        [aoi]
+    );
 
     const isLinked = useSelector(() => props.analysis.aoi?.shared || false, [props.analysis]);
 
-    let value =  geometryValue ? {
-        geometry: geometryValue,
-        name: aoi?.name
-    } : undefined;
+    const value = geometryValue
+        ? {
+              geometry: geometryValue,
+              name: aoi?.name
+          }
+        : undefined;
 
     const onChange = (value: AoiValue | undefined) => {
         if (value) {
@@ -81,13 +89,7 @@ export const AnalysisAoiFilter = (props: AnalysisAoiFilterProps) => {
         }
     };
 
-    const supportedActions = [
-        AoiAction.DrawPoint,
-        AoiAction.DrawLine,
-        AoiAction.DrawBBox,
-        AoiAction.DrawPolygon,
-        AoiAction.Import
-    ];
+    const supportedActions = [AoiAction.DrawPoint, AoiAction.DrawLine, AoiAction.DrawBBox, AoiAction.DrawPolygon, AoiAction.Import];
 
     useMapAoiDrawerFromModule({
         value: value,
@@ -104,9 +106,9 @@ export const AnalysisAoiFilter = (props: AnalysisAoiFilterProps) => {
         onActiveActionChange
     });
 
-    let analysisGeometryState = useAnalysisGeometryFromModule(props.analysis);
+    const analysisGeometryState = useAnalysisGeometryFromModule(props.analysis);
 
-    let aoiFilterConfig = {
+    const aoiFilterConfig = {
         ...analysisGeometryState,
         importConfig: importerProps,
         activeAction,
@@ -116,44 +118,53 @@ export const AnalysisAoiFilter = (props: AnalysisAoiFilterProps) => {
     };
 
     return (
-        <div ref={preview} className={classnames('analysis-aoi-filter', {
-            'is-linked': isLinked,
-            'is-dragging': isDragging,
-            'is-dropping': isOver,
-            'can-drop': canDrop,
-            'can-drag': !!aoi
-        })}>
-            {aoi &&
-                <Tooltip
-                    title='Drag to link to another analysis area'
-                >
-                    <DragOutlined className='drag-handle' ref={drag}/>
+        <div
+            ref={preview}
+            className={classnames('analysis-aoi-filter', {
+                'is-linked': isLinked,
+                'is-dragging': isDragging,
+                'is-dropping': isOver,
+                'can-drop': canDrop,
+                'can-drag': !!aoi
+            })}
+        >
+            {aoi && (
+                <Tooltip title='Drag to link to another analysis area'>
+                    <DragOutlined className='drag-handle' ref={drag} />
                 </Tooltip>
-            }
+            )}
             <div className='aoi-field-container' ref={drop}>
                 <AoiFieldRenderer
                     config={aoiFilterConfig}
-                    value={geometryValue ? {
-                        geometry: geometryValue,
-                        props: {
-                            name: aoi?.name
-                        }
-                    } : undefined}
+                    value={
+                        geometryValue
+                            ? {
+                                  geometry: geometryValue,
+                                  props: {
+                                      name: aoi?.name
+                                  }
+                              }
+                            : undefined
+                    }
                     onChange={onChange}
                 />
             </div>
-            {isLinked &&
-                <Tooltip
-                    title='Unlink'
-                >
+            {isLinked && (
+                <Tooltip title='Unlink'>
                     <LinkOutlined
                         className='unlink-button'
-                        onClick={() => props.analysis.setAoi(props.analysis.aoi ? {
-                            geometry: props.analysis.aoi.geometry.value
-                        } : undefined)}
+                        onClick={() =>
+                            props.analysis.setAoi(
+                                props.analysis.aoi
+                                    ? {
+                                          geometry: props.analysis.aoi.geometry.value
+                                      }
+                                    : undefined
+                            )
+                        }
                     />
                 </Tooltip>
-            }
+            )}
         </div>
     );
 };

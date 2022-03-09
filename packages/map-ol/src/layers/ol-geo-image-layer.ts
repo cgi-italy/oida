@@ -2,8 +2,11 @@ import ImageLayer from 'ol/layer/Image';
 import CanvasSource from 'ol/source/ImageCanvas';
 
 import {
-    GEO_IMAGE_LAYER_ID, IGeoImageLayerRenderer, GeoImageLayerSource, GeoImageLayerFootprint,
-    MapLayerRendererConfig, GeoImageLayerRendererConfig
+    GEO_IMAGE_LAYER_ID,
+    IGeoImageLayerRenderer,
+    GeoImageLayerSource,
+    GeoImageLayerFootprint,
+    GeoImageLayerRendererConfig
 } from '@oidajs/core';
 
 import { GLGeoImageProjector } from '../utils';
@@ -11,7 +14,6 @@ import { olLayersFactory } from './ol-layers-factory';
 import { OLMapLayer } from './ol-map-layer';
 
 export class OLGeoImageLayer extends OLMapLayer<ImageLayer> implements IGeoImageLayerRenderer {
-
     protected source_: GeoImageLayerSource | undefined;
     protected footprint_: GeoImageLayerFootprint;
     protected imageProjector_: GLGeoImageProjector;
@@ -31,14 +33,18 @@ export class OLGeoImageLayer extends OLMapLayer<ImageLayer> implements IGeoImage
     updateSource(source: GeoImageLayerSource | undefined) {
         this.source_ = source;
         this.imageProjector_.setSource(source);
-        this.olImpl_.setSource(source ? new CanvasSource({
-            canvasFunction: (extent, resolution, pixelRatio, imgSize, projection) => {
-                this.imageProjector_.render(extent, imgSize);
-                return this.imageProjector_.getCanvas();
-            },
-            ratio: 1,
-            projection: 'EPSG:4326'
-        }) : undefined);
+        this.olImpl_.setSource(
+            source
+                ? new CanvasSource({
+                      canvasFunction: (extent, resolution, pixelRatio, imgSize, projection) => {
+                          this.imageProjector_.render(extent, imgSize);
+                          return this.imageProjector_.getCanvas();
+                      },
+                      ratio: 1,
+                      projection: 'EPSG:4326'
+                  })
+                : undefined
+        );
         this.forceRefresh();
     }
 
@@ -54,16 +60,17 @@ export class OLGeoImageLayer extends OLMapLayer<ImageLayer> implements IGeoImage
     }
 
     protected createOLObject_(config: GeoImageLayerRendererConfig) {
-
         const layer = new ImageLayer({
-            source: config.source ? new CanvasSource({
-                canvasFunction: (extent, resolution, pixelRatio, imgSize, projection) => {
-                    this.imageProjector_.render(extent, imgSize);
-                    return this.imageProjector_.getCanvas();
-                },
-                ratio: 1,
-                projection: config.srs
-            }) : undefined,
+            source: config.source
+                ? new CanvasSource({
+                      canvasFunction: (extent, resolution, pixelRatio, imgSize, projection) => {
+                          this.imageProjector_.render(extent, imgSize);
+                          return this.imageProjector_.getCanvas();
+                      },
+                      ratio: 1,
+                      projection: config.srs
+                  })
+                : undefined,
             extent: config.extent,
             zIndex: config.zIndex || 0
         });
@@ -76,6 +83,7 @@ export class OLGeoImageLayer extends OLMapLayer<ImageLayer> implements IGeoImage
     }
 
     protected destroyOLObject_() {
+        return;
     }
 
     protected allowContinousUpdate_(layer: ImageLayer) {
@@ -90,8 +98,6 @@ export class OLGeoImageLayer extends OLMapLayer<ImageLayer> implements IGeoImage
             };
         }
     }
-
-
 }
 
 olLayersFactory.register(GEO_IMAGE_LAYER_ID, (config) => {

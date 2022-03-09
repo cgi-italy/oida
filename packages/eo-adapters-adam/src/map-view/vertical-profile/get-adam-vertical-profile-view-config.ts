@@ -3,7 +3,13 @@ import { autorun } from 'mobx';
 import nearestPointOnLine from '@turf/nearest-point-on-line';
 
 import { AxiosInstanceWithCancellation } from '@oidajs/core';
-import { VERTICAL_PROFILE_VIZ_TYPE, DatasetVerticalProfileViz, VerticalProfileVizConfig, RasterBandModeType, DatasetMapViewConfig } from  '@oidajs/eo-mobx';
+import {
+    VERTICAL_PROFILE_VIZ_TYPE,
+    DatasetVerticalProfileViz,
+    VerticalProfileVizConfig,
+    RasterBandModeType,
+    DatasetMapViewConfig
+} from '@oidajs/eo-mobx';
 
 import { AdamDatasetConfig, isMultiBandCoverage } from '../../adam-dataset-config';
 import { AdamDatasetFactoryConfig } from '../../get-adam-dataset-factory';
@@ -17,21 +23,26 @@ export const getAdamVerticalProfileViewConfig = (
     factoryConfig: AdamDatasetFactoryConfig,
     datasetConfig: AdamDatasetConfig
 ) => {
-
     if (datasetConfig.type !== 'vertical_profile') {
         return;
     }
 
-    const {verticalProfileProvider, geotiffLoader, wcsProvider} =
-        createVerticalProfileDataProvider(factoryConfig, datasetConfig, axiosInstance);
+    const { verticalProfileProvider, geotiffLoader, wcsProvider } = createVerticalProfileDataProvider(
+        factoryConfig,
+        datasetConfig,
+        axiosInstance
+    );
 
-    const {tileSourceProvider, geotiffLoader: tileGeotiffLoader } =
-        createAdamVerticalProfileTileSourceProvider(factoryConfig, datasetConfig, axiosInstance, wcsProvider);
+    const { tileSourceProvider, geotiffLoader: tileGeotiffLoader } = createAdamVerticalProfileTileSourceProvider(
+        factoryConfig,
+        datasetConfig,
+        axiosInstance,
+        wcsProvider
+    );
 
     const afterInit = (mapViz: DatasetVerticalProfileViz) => {
-
-        let renderer = geotiffLoader.renderer;
-        let tileRenderer = tileGeotiffLoader.renderer;
+        const renderer = geotiffLoader.renderer;
+        const tileRenderer = tileGeotiffLoader.renderer;
         autorun(() => {
             const bandMode = mapViz.bandMode.value;
             if (bandMode?.type === RasterBandModeType.Single) {
@@ -49,30 +60,27 @@ export const getAdamVerticalProfileViewConfig = (
                 }
                 mapViz.refreshData();
                 mapViz.refreshTileView();
-
             }
         });
     };
 
     const profileCoordTransform = {
         forward: (profileId, profileCoord) => {
-            return wcsProvider.getProfileMetadata(profileId).then(profile => {
-                let length = profile.dimensions[1];
-                let ratio = profileCoord[0] / length;
+            return wcsProvider.getProfileMetadata(profileId).then((profile) => {
+                const length = profile.dimensions[1];
+                const ratio = profileCoord[0] / length;
 
                 if (ratio > 1 || ratio < 0) {
                     return;
                 }
 
-                let gcps = profile.gcps;
+                const gcps = profile.gcps;
 
-                let startIdx = Math.round(gcps.length * ratio);
+                const startIdx = Math.round(gcps.length * ratio);
                 let i = startIdx;
 
-                let geographicCoord;
-
                 if (profileCoord[0] < gcps[startIdx].L) {
-                    for (i = startIdx;  i > 0; --i) {
+                    for (i = startIdx; i > 0; --i) {
                         if (profileCoord[0] >= gcps[i].L) {
                             break;
                         }
@@ -85,26 +93,27 @@ export const getAdamVerticalProfileViewConfig = (
                     }
                 }
                 //TODO: linear interp
-                geographicCoord = [gcps[i].X, gcps[i].Y];
+                const geographicCoord = [gcps[i].X, gcps[i].Y];
                 if (datasetConfig.requestExtentOffset) {
                     geographicCoord[0] -= datasetConfig.requestExtentOffset[0];
                     geographicCoord[1] -= datasetConfig.requestExtentOffset[1];
                 }
 
-                let height = profileCoord[1] * profile.metadata.VERTICAL_MAX / profile.dimensions[0];
+                const height = (profileCoord[1] * profile.metadata.VERTICAL_MAX) / profile.dimensions[0];
 
                 return [...geographicCoord, height];
             });
         },
         inverse: (profileId, geographicCoord) => {
-            return wcsProvider.getProfileMetadata(profileId).then(profile => {
-                let nearestPoint = nearestPointOnLine(
-                    profile.track,
-                    [geographicCoord[0], geographicCoord[1]]
-                );
+            return wcsProvider.getProfileMetadata(profileId).then((profile) => {
+                const nearestPoint = nearestPointOnLine(profile.track, [geographicCoord[0], geographicCoord[1]]);
 
-                let x = profile.gcps[nearestPoint.properties.index].L;
-                let y = geographicCoord[2] * profile.dimensions[0] / profile.metadata.VERTICAL_MAX;
+                if (nearestPoint.properties.index === undefined) {
+                    return undefined;
+                }
+
+                const x = profile.gcps[nearestPoint.properties.index].L;
+                const y = (geographicCoord[2] * profile.dimensions[0]) / profile.metadata.VERTICAL_MAX;
 
                 return [x, y];
             });
@@ -119,13 +128,15 @@ export const getAdamVerticalProfileViewConfig = (
 
     const vizConfig: VerticalProfileVizConfig = {
         bandMode: {
-            supportedModes: [{
-                type: RasterBandModeType.Single,
-                default: {
-                    band: datasetConfig.coverages[0].id
+            supportedModes: [
+                {
+                    type: RasterBandModeType.Single,
+                    default: {
+                        band: datasetConfig.coverages[0].id
+                    }
                 }
-            }],
-            bands: datasetConfig.coverages.map(coverage => {
+            ],
+            bands: datasetConfig.coverages.map((coverage) => {
                 return {
                     colorScales: colorScales,
                     ...coverage
@@ -159,5 +170,4 @@ export const getAdamVerticalProfileViewConfig = (
         type: VERTICAL_PROFILE_VIZ_TYPE,
         config: vizConfig
     } as DatasetMapViewConfig<typeof VERTICAL_PROFILE_VIZ_TYPE>;
-
 };

@@ -4,8 +4,12 @@ import { Slider, Select, InputNumber, Button, Tooltip } from 'antd';
 import { StepForwardOutlined, StepBackwardOutlined } from '@ant-design/icons';
 
 import {
-    DatasetDimensions, DatasetDimension, ValueDomain,
-    CategoricalDomain, isValueDomain, DataDomain,
+    DatasetDimensions,
+    DatasetDimension,
+    ValueDomain,
+    CategoricalDomain,
+    isValueDomain,
+    DataDomain,
     DatasetTimeDistributionProvider,
     TimeDistributionRangeItem,
     TimeSearchDirection
@@ -23,10 +27,9 @@ export type DatasetValueDimensionSelectorProps = {
 };
 
 export const DatasetValueDimensionSelector = (props: DatasetValueDimensionSelectorProps) => {
-
     const value = useSelector(() => {
-        let val = props.dimensionsState.values.get(props.dimension.id);
-        return val ? val as number : undefined;
+        const val = props.dimensionsState.values.get(props.dimension.id);
+        return val ? (val as number) : undefined;
     }, [props.dimensionsState]);
 
     const domain = useSelector(() => props.dimensionsState.getDimensionDomain<ValueDomain<number>>(props.dimension.id));
@@ -36,10 +39,9 @@ export const DatasetValueDimensionSelector = (props: DatasetValueDimensionSelect
     }
 
     if (domain.min !== undefined && domain.max !== undefined) {
-
-        let marks = {
+        const marks = {
             [domain.min]: `${domain.min} ${props.dimension.units}`,
-            [domain.max]: `${domain.max} ${props.dimension.units}`,
+            [domain.max]: `${domain.max} ${props.dimension.units}`
         };
 
         return (
@@ -60,10 +62,8 @@ export const DatasetValueDimensionSelector = (props: DatasetValueDimensionSelect
         return (
             <div className='dataset-dimension-value-selector'>
                 <span>{props.dimension.name}: </span>
-                <InputNumber
-                    value={value}
-                    onChange={(value) => props.dimensionsState.setValue(props.dimension.id, value)}
-                />
+                <InputNumber value={value} onChange={(value) => props.dimensionsState.setValue(props.dimension.id, value)} />
+                {props.dimension.units && <span>{props.dimension.units}</span>}
             </div>
         );
     }
@@ -76,18 +76,17 @@ export type DatasetTimeDimensionSelectorProps = {
 };
 
 export const DatasetTimeDimensionSelector = (props: DatasetTimeDimensionSelectorProps) => {
-
     const domain = useSelector(() => props.dimensionsState.getDimensionDomain<ValueDomain<Date>>(props.dimension.id));
 
     const value = useSelector(() => {
         const val = props.dimensionsState.values.get(props.dimension.id);
-        return val ? val as Date : undefined;
+        return val ? (val as Date) : undefined;
     }, [props.dimensionsState]);
 
     const timeDistributionProvider = props.timeDistributionProvider;
 
     useEffect(() => {
-        const val = props.dimensionsState.values.get(props.dimension.id) as (Date | undefined);
+        const val = props.dimensionsState.values.get(props.dimension.id) as Date | undefined;
         if (timeDistributionProvider) {
             if (!val) {
                 timeDistributionProvider.getTimeExtent().then((extent) => {
@@ -96,7 +95,7 @@ export const DatasetTimeDimensionSelector = (props: DatasetTimeDimensionSelector
                     }
                 });
             } else {
-                timeDistributionProvider.getNearestItem(val).then((item) => {
+                timeDistributionProvider.getNearestItem(val, undefined, props.dimensionsState).then((item) => {
                     if (item) {
                         props.dimensionsState.setValue(props.dimension.id, item.start);
                     }
@@ -114,27 +113,30 @@ export const DatasetTimeDimensionSelector = (props: DatasetTimeDimensionSelector
     return (
         <div className='dataset-dimension-value-selector'>
             <span>{props.dimension.name}: </span>
-            {timeDistributionProvider && <Tooltip title='Previous'>
-                <Button
-                    disabled={domain && domain.min && (!value || value.getTime() <= domain.min.getTime())}
-                    onClick={() => {
-                        if (value) {
-                            timeDistributionProvider.getNearestItem(
-                                moment(value).subtract(1, 'second').toDate(),
-                                TimeSearchDirection.Backward,
-                                props.dimensionsState
-                            ).then((value) => {
-                                if (value) {
-                                    props.dimensionsState.setValue(props.dimension.id, value.start);
-                                }
-                            });
-                        }
-                    }}
-                >
-                    <StepBackwardOutlined />
-                </Button>
-            </Tooltip>
-            }
+            {timeDistributionProvider && (
+                <Tooltip title='Previous'>
+                    <Button
+                        disabled={domain && domain.min && (!value || value.getTime() <= domain.min.getTime())}
+                        onClick={() => {
+                            if (value) {
+                                timeDistributionProvider
+                                    .getNearestItem(
+                                        moment(value).subtract(1, 'second').toDate(),
+                                        TimeSearchDirection.Backward,
+                                        props.dimensionsState
+                                    )
+                                    .then((value) => {
+                                        if (value) {
+                                            props.dimensionsState.setValue(props.dimension.id, value.start);
+                                        }
+                                    });
+                            }
+                        }}
+                    >
+                        <StepBackwardOutlined />
+                    </Button>
+                </Tooltip>
+            )}
             <DateFieldRenderer
                 value={value}
                 onChange={(value) => props.dimensionsState.setValue(props.dimension.id, value as Date)}
@@ -142,68 +144,80 @@ export const DatasetTimeDimensionSelector = (props: DatasetTimeDimensionSelector
                 config={{
                     minDate: domain ? domain.min : undefined,
                     maxDate: domain ? domain.max : undefined,
-                    selectableDates: timeDistributionProvider ? (range) => {
-                        return timeDistributionProvider.getTimeDistribution(range, props.dimensionsState, 0).then((items) => {
-                            const selectableDates: Set<string> = new Set();
-                            let format: string;
-                            if (range.resolution === 'day') {
-                                format = 'YYYY-MM-DD';
-                            } else if (range.resolution === 'month') {
-                                format = 'YYYY-MM';
-                            } else {
-                                format = 'YYYY';
-                            }
-                            items.forEach((item) => {
-                                const end = (item as TimeDistributionRangeItem).end;
-                                if (end) {
-                                    const current = moment(item.start);
-                                    while (current.isBefore(end, range.resolution)) {
-                                        selectableDates.add(current.format(format));
-                                        current.add(1, range.resolution);
-                                    }
-                                } else {
-                                    selectableDates.add(moment(item.start).format(format));
-                                }
-                            });
-                            return selectableDates;
-                        });
-                    } : undefined,
-                    selectableTimes: timeDistributionProvider ? (date) => {
-                        const dateMoment = moment(date);
-                        return timeDistributionProvider.getTimeDistribution({
-                            start: dateMoment.startOf('day').toDate(),
-                            end: dateMoment.endOf('day').toDate()
-                        }, props.dimensionsState, 0).then((items) => {
-                            return items.map((item) => {
-                                return moment.utc(item.start).format('HH:mm:ss');
-                            });
-                        });
-                    } : undefined,
+                    selectableDates: timeDistributionProvider
+                        ? (range) => {
+                              return timeDistributionProvider.getTimeDistribution(range, props.dimensionsState, 0).then((items) => {
+                                  const selectableDates: Set<string> = new Set();
+                                  let format: string;
+                                  if (range.resolution === 'day') {
+                                      format = 'YYYY-MM-DD';
+                                  } else if (range.resolution === 'month') {
+                                      format = 'YYYY-MM';
+                                  } else {
+                                      format = 'YYYY';
+                                  }
+                                  items.forEach((item) => {
+                                      const end = (item as TimeDistributionRangeItem).end;
+                                      if (end) {
+                                          const current = moment(item.start);
+                                          while (current.isBefore(end, range.resolution)) {
+                                              selectableDates.add(current.format(format));
+                                              current.add(1, range.resolution);
+                                          }
+                                      } else {
+                                          selectableDates.add(moment(item.start).format(format));
+                                      }
+                                  });
+                                  return selectableDates;
+                              });
+                          }
+                        : undefined,
+                    selectableTimes: timeDistributionProvider
+                        ? (date) => {
+                              const dateMoment = moment(date);
+                              return timeDistributionProvider
+                                  .getTimeDistribution(
+                                      {
+                                          start: dateMoment.startOf('day').toDate(),
+                                          end: dateMoment.endOf('day').toDate()
+                                      },
+                                      props.dimensionsState,
+                                      0
+                                  )
+                                  .then((items) => {
+                                      return items.map((item) => {
+                                          return moment.utc(item.start).format('HH:mm:ss');
+                                      });
+                                  });
+                          }
+                        : undefined,
                     withTime: true
                 }}
             />
-            {timeDistributionProvider &&
+            {timeDistributionProvider && (
                 <Tooltip title='Next'>
                     <Button
                         disabled={domain && domain.max && (!value || value.getTime() >= domain.max.getTime())}
                         onClick={() => {
                             if (value) {
-                                timeDistributionProvider.getNearestItem(
-                                    moment(value).add(1, 'second').toDate(),
-                                    TimeSearchDirection.Forward,
-                                    props.dimensionsState
-                                ).then((value) => {
-                                    if (value) {
-                                        props.dimensionsState.setValue(props.dimension.id, value.start);
-                                    }
-                                });
+                                timeDistributionProvider
+                                    .getNearestItem(
+                                        moment(value).add(1, 'second').toDate(),
+                                        TimeSearchDirection.Forward,
+                                        props.dimensionsState
+                                    )
+                                    .then((value) => {
+                                        if (value) {
+                                            props.dimensionsState.setValue(props.dimension.id, value.start);
+                                        }
+                                    });
                             }
                         }}
                     >
-                        <StepForwardOutlined/>
+                        <StepForwardOutlined />
                     </Button>
                 </Tooltip>
-            }
+            )}
         </div>
     );
 };
@@ -214,9 +228,8 @@ export type DatasetCategoricalDimensionSelectorProps = {
 };
 
 export const DatasetCategoricalDimensionSelector = (props: DatasetCategoricalDimensionSelectorProps) => {
-
     const value = useSelector(() => {
-        return props.dimensionsState.values.get(props.dimension.id) as (string | number);
+        return props.dimensionsState.values.get(props.dimension.id) as string | number;
     }, [props.dimensionsState]);
 
     const domain = useSelector(() => props.dimensionsState.getDimensionDomain<CategoricalDomain<string | number>>(props.dimension.id));
@@ -226,7 +239,11 @@ export const DatasetCategoricalDimensionSelector = (props: DatasetCategoricalDim
     }
 
     const domainOptions = domain.values.map((item) => {
-        return (<Select.Option key={item.value} value={item.value}>{item.label || item.value}</Select.Option>);
+        return (
+            <Select.Option key={item.value} value={item.value}>
+                {item.label || item.value}
+            </Select.Option>
+        );
     });
 
     return (
@@ -241,10 +258,10 @@ export const DatasetCategoricalDimensionSelector = (props: DatasetCategoricalDim
             >
                 {domainOptions}
             </Select>
+            {props.dimension.units && <span>{props.dimension.units}</span>}
         </div>
     );
 };
-
 
 export type DatasetDimensionSelectorProps = {
     dimensionsState: DatasetDimensions;
@@ -253,7 +270,6 @@ export type DatasetDimensionSelectorProps = {
 };
 
 export const DatasetDimensionValueSelector = (props: DatasetDimensionSelectorProps) => {
-
     const domain = useSelector(() => props.dimensionsState.getDimensionDomain(props.dimension.id));
 
     const dimension = {
@@ -285,19 +301,11 @@ export const DatasetDimensionValueSelector = (props: DatasetDimensionSelectorPro
                 />
             );
         } else {
-            return (
-                <DatasetValueDimensionSelector
-                    dimensionsState={props.dimensionsState}
-                    dimension={dimension as ValueDimension}
-                />
-            );
+            return <DatasetValueDimensionSelector dimensionsState={props.dimensionsState} dimension={dimension as ValueDimension} />;
         }
     } else {
         return (
-            <DatasetCategoricalDimensionSelector
-                dimensionsState={props.dimensionsState}
-                dimension={dimension as CategoricalDimension}
-            />
+            <DatasetCategoricalDimensionSelector dimensionsState={props.dimensionsState} dimension={dimension as CategoricalDimension} />
         );
     }
 };

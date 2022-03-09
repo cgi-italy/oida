@@ -7,13 +7,12 @@ import { DatasetViz, DatasetVizProps } from '@oidajs/eo-mobx';
 
 import { AdaptiveVideoLayer } from './adaptive-video-source';
 
-
 export const VIDEO_VIZ_TYPE = 'video';
 
 export type DatasetVideoMapVizConfig = {
     timeRange: {
-        start: Date,
-        end: Date
+        start: Date;
+        end: Date;
     };
     videoSource: string | string[];
     footprints: GeoImageLayerFootprint[];
@@ -25,7 +24,6 @@ export type DatasetVideoMapVizConfig = {
 export type DatasetVideoMapVizProps = DatasetVizProps<typeof VIDEO_VIZ_TYPE, DatasetVideoMapVizConfig>;
 
 export class DatasetVideoMapViz extends DatasetViz<GeoImageLayer> {
-
     source!: AdaptiveVideoLayer;
     readonly config: DatasetVideoMapVizConfig;
     protected subscriptionTracker_: SubscriptionTracker;
@@ -41,7 +39,6 @@ export class DatasetVideoMapViz extends DatasetViz<GeoImageLayer> {
         this.subscriptionTracker_ = new SubscriptionTracker();
 
         this.afterInit_();
-
     }
 
     dispose() {
@@ -50,7 +47,6 @@ export class DatasetVideoMapViz extends DatasetViz<GeoImageLayer> {
     }
 
     protected initMapLayer_(props: DatasetVideoMapVizProps) {
-
         //TODO: this enforce a dependency on ui-react-mobx
         //Add map as part of DatasetVizProps?
         const mapState = getMapModule().map;
@@ -69,14 +65,12 @@ export class DatasetVideoMapViz extends DatasetViz<GeoImageLayer> {
         return this.source.mapLayer;
     }
 
-
     protected afterInit_() {
-
         const timeUpdateDisposer = autorun(() => {
             if (this.source.ready) {
                 const selectedTime = this.dataset.toi;
                 if (!this.source.isPlaying) {
-                    let time = selectedTime instanceof Date ? selectedTime : selectedTime?.end;
+                    const time = selectedTime instanceof Date ? selectedTime : selectedTime?.end;
                     if (time) {
                         this.source.seekByPercentage(this.getVideoPercentageFromDate_(time));
                     }
@@ -90,8 +84,8 @@ export class DatasetVideoMapViz extends DatasetViz<GeoImageLayer> {
     protected getDateFromFrameTime_(time) {
         const perdentage = time / this.source.duration;
         const duration = this.config.duration
-        ? this.config.duration * 1000
-        : this.config.timeRange.end.getTime() - this.config.timeRange.start.getTime();
+            ? this.config.duration * 1000
+            : this.config.timeRange.end.getTime() - this.config.timeRange.start.getTime();
 
         let dt = new Date(this.config.timeRange.start.getTime() + duration * perdentage);
 
@@ -126,4 +120,3 @@ export class DatasetVideoMapViz extends DatasetViz<GeoImageLayer> {
         return percentage;
     }
 }
-

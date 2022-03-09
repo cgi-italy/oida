@@ -8,7 +8,6 @@ import { olInteractionsFactory } from './ol-interactions-factory';
 import { OLMapRenderer } from '../map/ol-map-renderer';
 
 export class OLMouseCoordsInteraction implements IMouseCoordsInteraction {
-
     private viewer_;
     private evtSubscriptions_;
     private onMouseCoords_: (coords: MouseCoords | undefined) => void;
@@ -38,41 +37,45 @@ export class OLMouseCoordsInteraction implements IMouseCoordsInteraction {
     }
 
     bindMove_(onMouseCoords: (coords: MouseCoords | undefined) => void) {
-
         const viewport = this.viewer_.getViewport();
 
-        this.evtSubscriptions_.push(listen(viewport, EventType.POINTERMOVE, (evt) => {
-            const px = this.viewer_.getEventPixel(evt);
-            const coord = this.viewer_.getCoordinateFromPixel(px);
+        this.evtSubscriptions_.push(
+            listen(viewport, EventType.POINTERMOVE, (evt) => {
+                const px = this.viewer_.getEventPixel(evt);
+                const coord = this.viewer_.getCoordinateFromPixel(px);
 
-            if (coord) {
-                const geogCoord = this.getGeographicCoord_(coord);
+                if (coord) {
+                    const geogCoord = this.getGeographicCoord_(coord);
 
-                onMouseCoords({
-                    lat: geogCoord[1],
-                    lon: geogCoord[0]
-                });
-            }
-        }));
+                    onMouseCoords({
+                        lat: geogCoord[1],
+                        lon: geogCoord[0]
+                    });
+                }
+            })
+        );
 
-        this.evtSubscriptions_.push(listen(viewport, EventType.POINTEROUT, () => {
-            onMouseCoords(undefined);
-        }));
-
+        this.evtSubscriptions_.push(
+            listen(viewport, EventType.POINTEROUT, () => {
+                onMouseCoords(undefined);
+            })
+        );
     }
 
     bindClick_(onMouseClick: (coords: MouseCoords | undefined) => void) {
-        this.evtSubscriptions_.push(this.viewer_.on('singleclick', (evt) => {
-            if (evt.coordinate) {
-                const geogCoord = this.getGeographicCoord_(evt.coordinate);
-                onMouseClick({
-                    lat: geogCoord[1],
-                    lon: geogCoord[0]
-                });
-            } else {
-                onMouseClick(undefined);
-            }
-        }));
+        this.evtSubscriptions_.push(
+            this.viewer_.on('singleclick', (evt) => {
+                if (evt.coordinate) {
+                    const geogCoord = this.getGeographicCoord_(evt.coordinate);
+                    onMouseClick({
+                        lat: geogCoord[1],
+                        lon: geogCoord[0]
+                    });
+                } else {
+                    onMouseClick(undefined);
+                }
+            })
+        );
     }
 
     protected getGeographicCoord_(coord: number[]) {
@@ -88,4 +91,3 @@ export class OLMouseCoordsInteraction implements IMouseCoordsInteraction {
 olInteractionsFactory.register(MOUSE_COORDS_INTERACTION_ID, (config) => {
     return new OLMouseCoordsInteraction(config);
 });
-

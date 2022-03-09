@@ -1,5 +1,5 @@
 import { SubscriptionTracker } from '@oidajs/core';
-import { action, autorun, makeObservable, observable, ObservableMap, reaction } from 'mobx';
+import { action, makeObservable, observable, ObservableMap, reaction } from 'mobx';
 
 import { Dataset } from './dataset';
 import { DataDomain, DataDomainProviderFilters, DatasetDimension, isDomainProvider, isValueDomain } from './dataset-variable';
@@ -17,28 +17,36 @@ export type DatasetDimensionsProps = {
      * An optional getter to retrieve the currently selected dataset variable.
      * Should be specified if any of the dimension domain depends on the selected dataset variable
      */
-    currentVariable?: () => (string | undefined);
+    currentVariable?: () => string | undefined;
     /** If set all dimension with a domain defined will be initialize to the domain first valid value */
     initDimensions?: boolean;
 };
 
 export class DatasetDimensions implements DataDomainProviderFilters {
-    readonly values: ObservableMap<string, DimensionValueType> = observable.map<string, DimensionValueType>({}, {
-        deep: false
-    });
-    readonly domains = observable.map<string, DataDomain<DimensionValueType> | undefined>({}, {
-        deep: false
-    });
-    readonly domainRequests = observable.map<string, Promise<DataDomain<DimensionValueType> | undefined>>({}, {
-        deep: false
-    });
+    readonly values: ObservableMap<string, DimensionValueType> = observable.map<string, DimensionValueType>(
+        {},
+        {
+            deep: false
+        }
+    );
+    readonly domains = observable.map<string, DataDomain<DimensionValueType> | undefined>(
+        {},
+        {
+            deep: false
+        }
+    );
+    readonly domainRequests = observable.map<string, Promise<DataDomain<DimensionValueType> | undefined>>(
+        {},
+        {
+            deep: false
+        }
+    );
 
-    protected readonly variableGetter_: (() => (string | undefined)) | undefined;
+    protected readonly variableGetter_: (() => string | undefined) | undefined;
     protected readonly dataset_: Dataset;
     protected subscriptionTracker_: SubscriptionTracker;
 
     constructor(props: DatasetDimensionsProps) {
-
         this.dataset_ = props.dataset;
 
         this.variableGetter_ = props.currentVariable;
@@ -94,19 +102,26 @@ export class DatasetDimensions implements DataDomainProviderFilters {
         dimensions.forEach((dimension) => {
             const domainConfig = dimension.domain;
             if (domainConfig && isDomainProvider(domainConfig)) {
-                const domainSubscriptionDisposer = reaction(() => domainConfig(this), (domainRequest) => {
-                    const currentRequest = this.domainRequests.get(dimension.id);
-                    if (currentRequest && currentRequest.cancel) {
-                        currentRequest.cancel();
+                const domainSubscriptionDisposer = reaction(
+                    () => domainConfig(this),
+                    (domainRequest) => {
+                        const currentRequest = this.domainRequests.get(dimension.id);
+                        if (currentRequest && currentRequest.cancel) {
+                            currentRequest.cancel();
+                        }
+                        this.domainRequests.set(
+                            dimension.id,
+                            domainRequest.then((domain) => {
+                                this.setDomain_(dimension.id, domain);
+                                this.checkDimensionValue_(dimension.id, initDimensions);
+                                return domain;
+                            })
+                        );
+                    },
+                    {
+                        fireImmediately: true
                     }
-                    this.domainRequests.set(dimension.id, domainRequest.then((domain) => {
-                        this.setDomain_(dimension.id, domain);
-                        this.checkDimensionValue_(dimension.id, initDimensions);
-                        return domain;
-                    }));
-                }, {
-                    fireImmediately: true
-                });
+                );
 
                 this.subscriptionTracker_.addSubscription(domainSubscriptionDisposer);
             } else {
@@ -151,7 +166,6 @@ export class DatasetDimensions implements DataDomainProviderFilters {
     }
 
     protected initDimensionValue_(dimension: string) {
-
         const currentValue = this.values.get(dimension);
 
         if (currentValue === undefined) {
@@ -179,4 +193,3 @@ export interface HasDatasetDimensions {
 export function hasDatasetDimensions(object: any): object is HasDatasetDimensions {
     return !!object && object.dimensions instanceof DatasetDimensions;
 }
-

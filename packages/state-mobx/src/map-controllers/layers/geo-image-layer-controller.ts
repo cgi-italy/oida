@@ -8,13 +8,11 @@ import { layerControllersFactory } from './layer-controllers-factory';
 import { GeoImageLayer } from '../../models/map/layers/geo-image-layer';
 
 export class GeoImageLayerController extends MapLayerController<IGeoImageLayerRenderer, GeoImageLayer> {
-
     constructor(config) {
         super(config);
     }
 
     protected createLayerRenderer_(mapRenderer: IMapRenderer) {
-
         return <IGeoImageLayerRenderer>mapRenderer.getLayersFactory().create(GEO_IMAGE_LAYER_ID, {
             ...this.getRendererConfig_(mapRenderer),
             ...this.mapLayer_.config,
@@ -29,29 +27,34 @@ export class GeoImageLayerController extends MapLayerController<IGeoImageLayerRe
         const layerRenderer = this.layerRenderer_!;
 
         this.subscriptionTracker_.addSubscription(
-            reaction(() => this.mapLayer_.source, (source) => {
-                layerRenderer.updateSource(source);
-            })
+            reaction(
+                () => this.mapLayer_.source,
+                (source) => {
+                    layerRenderer.updateSource(source);
+                }
+            )
         );
 
         this.subscriptionTracker_.addSubscription(
-            reaction(() => this.mapLayer_.footprint, (footprint) => {
-                layerRenderer.updateFootprint(footprint);
-            })
+            reaction(
+                () => this.mapLayer_.footprint,
+                (footprint) => {
+                    layerRenderer.updateFootprint(footprint);
+                }
+            )
         );
 
         this.subscriptionTracker_.addSubscription(
-            reaction(() => this.mapLayer_.sourceRevision, (revision) => {
-                layerRenderer.forceRefresh();
-            })
+            reaction(
+                () => this.mapLayer_.sourceRevision,
+                (revision) => {
+                    layerRenderer.forceRefresh();
+                }
+            )
         );
-
     }
-
-
 }
 
 layerControllersFactory.register(GEO_IMAGE_LAYER_ID, (config) => {
     return new GeoImageLayerController(config);
 });
-

@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.1.0](https://github.com/cgi-italy/oida/compare/@oidajs/map-cesium@3.0.1...@oidajs/map-cesium@3.1.0) (2022-03-09)
+
+
+### Features
+
+* add support for minimum resolution constraint in tile grid ([d707caa](https://github.com/cgi-italy/oida/commit/d707caa0a1037457ff95eddf7f8c38fec55150eb))
+
+
+
+
+
+## [3.0.1](https://github.com/cgi-italy/oida/compare/@oidajs/map-cesium@3.0.0...@oidajs/map-cesium@3.0.1) (2021-12-21)
+
+**Note:** Version bump only for package @oidajs/map-cesium
+
+
+
+
+
+
 # 3.0.0 (2021-12-21)
 
 

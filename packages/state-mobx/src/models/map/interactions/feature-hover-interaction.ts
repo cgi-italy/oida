@@ -5,9 +5,8 @@ import { FEATURE_HOVER_INTERACTION_ID } from '@oidajs/core';
 import { MapInteraction, MapInteractionProps } from './map-interaction';
 import { SelectionManager, SelectableItem } from '../../core';
 
-
 export type FeatureHoverInteractionProps = {
-    selectionManager?: SelectionManager<SelectableItem>
+    selectionManager?: SelectionManager<SelectableItem>;
 } & Omit<MapInteractionProps, 'interactionType'>;
 
 export class FeatureHoverInteraction extends MapInteraction {

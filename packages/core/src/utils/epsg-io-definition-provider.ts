@@ -6,7 +6,6 @@ export type EpsgIoDefinitionProviderConfig = {
 };
 
 export class EpsgIoDefinitionProvider {
-
     protected axiosInstance_: AxiosInstanceWithCancellation;
     protected serviceUrl_: string;
 
@@ -18,14 +17,16 @@ export class EpsgIoDefinitionProvider {
     getSrsDefinition(code: string) {
         const defPath = code.toLowerCase().split(':');
 
-        return this.axiosInstance_.request({
-            url: `${this.serviceUrl_}`,
-            params: {
-                format: 'json',
-                q: defPath[defPath.length - 1]
-            }
-        }).then((response) => {
-            return response.data.results[0].proj4;
-        });
+        return this.axiosInstance_
+            .request({
+                url: `${this.serviceUrl_}`,
+                params: {
+                    format: 'json',
+                    q: defPath[defPath.length - 1]
+                }
+            })
+            .then((response) => {
+                return response.data.results[0].proj4;
+            });
     }
 }

@@ -1,4 +1,4 @@
-import { autorun, computed, makeObservable, observable, action } from 'mobx';
+import { autorun, reaction, computed, makeObservable, observable, action } from 'mobx';
 import moment from 'moment';
 
 import { SubscriptionTracker, AoiValue, DateRangeValue, randomColorFactory, QueryFilter } from '@oidajs/core';
@@ -9,12 +9,11 @@ import { DatasetTimeDistributionViz } from '../dataset-time-distrbution';
 import { DatasetAnalytics } from '../dataset-analytics';
 import { TimeRange } from './time-range';
 
-
 export type DatasetExplorerItemInitialState = {
-    disableToiSync?: boolean,
-    aoi?: AoiValue,
-    toi?: Date | DateRangeValue,
-    additionalFilters?: Record<string, QueryFilter>,
+    disableToiSync?: boolean;
+    aoi?: AoiValue;
+    toi?: Date | DateRangeValue;
+    additionalFilters?: Record<string, QueryFilter>;
 };
 
 export type DatasetExplorerItemProps = {
@@ -57,12 +56,11 @@ export class DatasetExplorerItem {
                 if (!this.toiSyncDisabled && toi !== undefined) {
                     this.explorer.setToi(toi);
                 }
-            },
+            }
         });
         this.explorer = props.explorer;
 
         if (this.explorer.mapExplorer && props.datasetConfig.mapView) {
-
             this.mapViz = DatasetViz.create<any>({
                 dataset: this.dataset,
                 vizType: props.datasetConfig.mapView.type,
@@ -103,23 +101,31 @@ export class DatasetExplorerItem {
     }
 
     protected afterInit_() {
-
         //propagate the explorer aoi to the dataset
         const aoiSyncDisposer = autorun(() => {
             this.dataset.setAoi(this.explorer.aoi);
         });
 
-        //propagate the explorer selected time of interest to the dataset (nearest match)
-        const toiSyncDisposer = autorun(() => {
-            if (!this.toiSyncDisabled) {
-                const toi = this.explorer.toi;
-                if (toi instanceof Date) {
-                    this.setDatasetToiFromDate_(toi);
-                } else {
-                    this.dataset.setToi(toi, true);
+        // propagate the explorer selected time of interest to the dataset (nearest match)
+        const toiSyncDisposer = reaction(
+            () => {
+                return {
+                    syncDisabled: this.toiSyncDisabled,
+                    toi: this.explorer.toi,
+                    // force toi update on time distribution change
+                    filtersRevision: this.timeDistributionViz?.distributionRevision
+                };
+            },
+            (data) => {
+                if (!data.syncDisabled) {
+                    if (data.toi instanceof Date) {
+                        this.setDatasetToiFromDate_(data.toi);
+                    } else {
+                        this.dataset.setToi(data.toi, true);
+                    }
                 }
             }
-        });
+        );
 
         this.subscriptionTracker_.addSubscription(aoiSyncDisposer);
         this.subscriptionTracker_.addSubscription(toiSyncDisposer);
@@ -131,7 +137,7 @@ export class DatasetExplorerItem {
             //time explorer visible range
             const timeDistributionSearchParamsDisposer = autorun(() => {
                 const active = timeExplorer.active;
-                let timeRange = timeExplorer.timeRange.value;
+                const timeRange = timeExplorer.timeRange.value;
                 if (active) {
                     timeDistributionViz.setSearchParams({
                         ...timeRange,
@@ -145,25 +151,30 @@ export class DatasetExplorerItem {
     }
 
     protected setDatasetToiFromDate_(dt: Date) {
-
         this.cancelPendingTimeRequest_();
 
         //find the nearest match
         const timeDistributionProvider = this.dataset.config.timeDistribution?.provider;
         if (timeDistributionProvider) {
-            this.pendingNearestTimeRequests_ = timeDistributionProvider.getNearestItem(dt).then((item) => {
-                if (!this.toiSyncDisabled) {
-                    if (!item || !item.start) {
-                        this.dataset.setToi(undefined, true);
-                    } else {
-                        this.dataset.setToi(item.start, true);
+            this.pendingNearestTimeRequests_ = timeDistributionProvider
+                .getNearestItem(dt)
+                .then((item) => {
+                    if (!this.toiSyncDisabled) {
+                        if (!item || !item.start) {
+                            this.dataset.setToi(undefined, true);
+                        } else {
+                            this.dataset.setToi(
+                                item.start,
+                                this.explorer.items.filter((item) => item.timeDistributionViz !== undefined).length > 1
+                            );
+                        }
                     }
-                }
-            }).catch((error) => {
-                if (!this.toiSyncDisabled) {
-                    this.dataset.setToi(undefined, true);
-                }
-            });
+                })
+                .catch((error) => {
+                    if (!this.toiSyncDisabled) {
+                        this.dataset.setToi(undefined, true);
+                    }
+                });
         } else {
             this.dataset.setToi(dt, true);
         }
@@ -175,7 +186,6 @@ export class DatasetExplorerItem {
             this.pendingNearestTimeRequests_ = undefined;
         }
     }
-
 }
 
 /**
@@ -192,7 +202,7 @@ export class DatasetTimeExplorer {
         this.active = false;
         this.timeRange = new TimeRange({
             start: moment().subtract(1, 'month').toDate(),
-            end: moment().toDate(),
+            end: moment().toDate()
         });
 
         makeObservable(this);
@@ -269,7 +279,7 @@ export class DatasetExplorer {
     /** The dataset analyses */
     readonly analytics: DatasetAnalytics;
     /** The datasets array */
-    readonly items = observable.array<DatasetExplorerItem>([], {deep: false});
+    readonly items = observable.array<DatasetExplorerItem>([], { deep: false });
 
     protected subscriptionTracker_: SubscriptionTracker;
 
@@ -322,21 +332,21 @@ export class DatasetExplorer {
         this.toi = toi;
     }
 
-
     @computed
     get shouldEnableTimeExplorer(): boolean {
-        return this.timeExplorer !== undefined && this.items.some(dataset => !!dataset.timeDistributionViz);
+        return this.timeExplorer !== undefined && this.items.some((dataset) => !!dataset.timeDistributionViz);
     }
 
-
     @action
-    addDataset(datasetConfig: DatasetConfig, initialState?: {
-        disableToiSync?: boolean,
-        filters?: DataFiltersProps,
-        aoi?: AoiValue,
-        toi?: Date | DateRangeValue
-    }) {
-
+    addDataset(
+        datasetConfig: DatasetConfig,
+        initialState?: {
+            disableToiSync?: boolean;
+            filters?: DataFiltersProps;
+            aoi?: AoiValue;
+            toi?: Date | DateRangeValue;
+        }
+    ) {
         if (!datasetConfig.color) {
             datasetConfig.color = randomColor();
         }
@@ -355,7 +365,7 @@ export class DatasetExplorer {
 
     @action
     removeDataset(datasetId: string) {
-        let item = this.items.find(item => item.dataset.id === datasetId);
+        const item = this.items.find((item) => item.dataset.id === datasetId);
         if (item) {
             item.dispose();
             this.items.remove(item);
@@ -368,7 +378,7 @@ export class DatasetExplorer {
 
     @action
     moveDataset(idx, newIdx) {
-        let item = this.items[idx];
+        const item = this.items[idx];
         if (item) {
             this.items.splice(idx, 1);
             this.items.splice(newIdx, 0, item);
@@ -380,12 +390,12 @@ export class DatasetExplorer {
     }
 
     getDataset(datasetId: string) {
-        return this.items.find(item => item.dataset.id === datasetId);
+        return this.items.find((item) => item.dataset.id === datasetId);
     }
 
     dispose() {
         this.subscriptionTracker_.unsubscribe();
-        this.items.forEach(item => item.dispose());
+        this.items.forEach((item) => item.dispose());
         this.items.clear();
 
         if (this.mapExplorer) {
@@ -398,7 +408,7 @@ export class DatasetExplorer {
 
         if (timeExplorer) {
             const autoTimeZoomDisposer = autorun(() => {
-                let toi = this.toi;
+                const toi = this.toi;
                 if (!toi) {
                     return;
                 }
@@ -419,5 +429,4 @@ export class DatasetExplorer {
             this.subscriptionTracker_.addSubscription(autoTimeZoomDisposer);
         }
     }
-
 }

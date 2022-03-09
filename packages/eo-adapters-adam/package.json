@@ -1,6 +1,6 @@
 {
   "name": "@oidajs/eo-adapters-adam",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "oida EO adam adapters",
   "module": "es/index.js",
   "main": "lib/index.js",
@@ -29,6 +29,7 @@
     "@oidajs/eo-mobx": "file:../eo-mobx",
     "@oidajs/map-cesium": "file:../map-cesium",
     "@oidajs/map-ol": "file:../map-ol",
-    "tslib": "^2.2.0"
+    "@turf/rewind": "^6.5.0",
+    "tslib": "^2.3.1"
   }
 }

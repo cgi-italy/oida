@@ -9,19 +9,16 @@ import { useSelector } from '@oidajs/ui-react-mobx';
 import { AnalysisLoadingStateMessage } from '../analysis-loading-state-message';
 import { ChartWidget } from '../chart-widget';
 
-
 export type GridScatterAnalysisPlotProps = {
-    gridScatter: GridScatterAnalysis
+    gridScatter: GridScatterAnalysis;
 };
 
 export const GridScatterAnalysisPlot = (props: GridScatterAnalysisPlotProps) => {
-
-    const {xAxes, yAxes, chartSeries, loadingState } = useSelector(() => {
-
+    const { xAxes, yAxes, chartSeries, loadingState } = useSelector(() => {
         const chartSeries: EChartOption.SeriesScatter[] = [];
 
         const xAxes: EChartOption.XAxis[] = [];
-        const yAxes: EChartOption.YAxis[]  = [];
+        const yAxes: EChartOption.YAxis[] = [];
 
         let loadingState = LoadingState.Init;
 
@@ -55,20 +52,14 @@ export const GridScatterAnalysisPlot = (props: GridScatterAnalysisPlotProps) => 
                         nameGap: 10
                     });
 
-                    if (
-                        xAnalysis.loadingState.value === LoadingState.Loading
-                        || yAnalysis.loadingState.value === LoadingState.Loading
-                    ) {
+                    if (xAnalysis.loadingState.value === LoadingState.Loading || yAnalysis.loadingState.value === LoadingState.Loading) {
                         loadingState = LoadingState.Loading;
                     } else if (
-                        xAnalysis.loadingState.value === LoadingState.Success
-                        && yAnalysis.loadingState.value === LoadingState.Success
+                        xAnalysis.loadingState.value === LoadingState.Success &&
+                        yAnalysis.loadingState.value === LoadingState.Success
                     ) {
                         loadingState = LoadingState.Success;
-                    } else if (
-                        xAnalysis.loadingState.value === LoadingState.Error
-                        || yAnalysis.loadingState.value === LoadingState.Error
-                    ) {
+                    } else if (xAnalysis.loadingState.value === LoadingState.Error || yAnalysis.loadingState.value === LoadingState.Error) {
                         loadingState = LoadingState.Error;
                     }
 
@@ -89,10 +80,7 @@ export const GridScatterAnalysisPlot = (props: GridScatterAnalysisPlotProps) => 
                         const y = yDomainMapper.normalizeValue(yData[idx]);
 
                         if (x !== undefined && y !== undefined) {
-                            return [
-                                ...data,
-                                [x, y]
-                            ];
+                            return [...data, [x, y]];
                         } else {
                             return data;
                         }
@@ -111,19 +99,13 @@ export const GridScatterAnalysisPlot = (props: GridScatterAnalysisPlotProps) => 
             }
         }
 
-        return {xAxes, yAxes, chartSeries, loadingState};
-
+        return { xAxes, yAxes, chartSeries, loadingState };
     });
 
     const color = useSelector(() => props.gridScatter.xAxisAnalysis?.color);
 
     if (loadingState === LoadingState.Init || loadingState === LoadingState.Error) {
-        return (
-            <AnalysisLoadingStateMessage
-                loadingState={loadingState}
-                initMessage='Fill the series params to retrieve the data'
-            />
-        );
+        return <AnalysisLoadingStateMessage loadingState={loadingState} initMessage='Fill the series params to retrieve the data' />;
     }
 
     return (
@@ -162,23 +144,28 @@ export const GridScatterAnalysisPlot = (props: GridScatterAnalysisPlotProps) => 
                         }
                     },
                     animation: false,
-                    dataZoom: [{
-                        xAxisIndex: 0,
-                        type: 'inside'
-                    }, {
-                        xAxisIndex: 0,
-                        type: 'slider',
-                        // @ts-ignore (wrong echarts typing)
-                        showDataShadow: false
-                    }, {
-                        yAxisIndex: 0,
-                        type: 'inside'
-                    }, {
-                        yAxisIndex: 0,
-                        type: 'slider',
-                        // @ts-ignore (wrong echarts typing)
-                        showDataShadow: false
-                    }],
+                    dataZoom: [
+                        {
+                            xAxisIndex: 0,
+                            type: 'inside'
+                        },
+                        {
+                            xAxisIndex: 0,
+                            type: 'slider',
+                            // @ts-ignore (wrong echarts typing)
+                            showDataShadow: false
+                        },
+                        {
+                            yAxisIndex: 0,
+                            type: 'inside'
+                        },
+                        {
+                            yAxisIndex: 0,
+                            type: 'slider',
+                            // @ts-ignore (wrong echarts typing)
+                            showDataShadow: false
+                        }
+                    ],
                     series: chartSeries,
                     backgroundColor: 'transparent'
                 }}

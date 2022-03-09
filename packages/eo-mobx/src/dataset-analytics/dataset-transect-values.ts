@@ -7,8 +7,13 @@ import { Geometry, IFeatureStyle, IndexableGeometry, LoadingState, QueryFilter, 
 import { AsyncDataFetcher } from '@oidajs/state-mobx';
 
 import {
-    DatasetDimension, DataDomain, TimeSearchDirection, NumericVariable,
-    DatasetDimensions, HasDatasetDimensions, DatasetDimensionsProps
+    DatasetDimension,
+    DataDomain,
+    TimeSearchDirection,
+    NumericVariable,
+    DatasetDimensions,
+    HasDatasetDimensions,
+    DatasetDimensionsProps
 } from '../common';
 import { DatasetProcessing, DatasetProcessingProps } from './dataset-processing';
 import { analysisPlaceHolderIcon } from './analysis-placeholder-icon';
@@ -25,7 +30,7 @@ export type DatasetTransectValuesRequest = {
     additionalDatasetFilters?: Map<string, QueryFilter>;
 };
 
-export type DatasetTransectValuesProvider = (request: DatasetTransectValuesRequest) => Promise<Array<{x: number, y: number}>>;
+export type DatasetTransectValuesProvider = (request: DatasetTransectValuesRequest) => Promise<Array<{ x: number; y: number }>>;
 
 export type DatasetTransectValuesConfig = {
     variables: NumericVariable[];
@@ -36,21 +41,20 @@ export type DatasetTransectValuesConfig = {
     dimensions: DatasetDimension<DataDomain<TransectDimensionType>>[];
 };
 
-
 export type TransectSeriesItem = {
-    value: number,
-    distance: number,
-    coordinates: GeoJSON.Position
+    value: number;
+    distance: number;
+    coordinates: GeoJSON.Position;
 };
 
 export type DatasetTransectValuesProps = {
     seriesVariable?: string;
     numSamples?: number;
     autoUpdate?: boolean;
-} & DatasetProcessingProps<typeof TRANSECT_VALUES_PROCESSING, DatasetTransectValuesConfig> & DatasetDimensionsProps;
+} & DatasetProcessingProps<typeof TRANSECT_VALUES_PROCESSING, DatasetTransectValuesConfig> &
+    DatasetDimensionsProps;
 
 export class DatasetTransectValues extends DatasetProcessing<undefined> implements HasDatasetDimensions {
-
     readonly config: DatasetTransectValuesConfig;
     readonly dimensions: DatasetDimensions;
     @observable.ref seriesVariable: string | undefined;
@@ -69,9 +73,16 @@ export class DatasetTransectValues extends DatasetProcessing<undefined> implemen
             ...props
         });
 
+        const parentDimensions = (props.parent as HasDatasetDimensions | undefined)?.dimensions;
+
         this.config = props.config;
-        this.dimensions = new DatasetDimensions(props);
+
         this.seriesVariable = props.seriesVariable;
+        if (!this.seriesVariable) {
+            if (parentDimensions?.variable && this.config.variables.find((variable) => variable.id === parentDimensions.variable)) {
+                this.seriesVariable = parentDimensions.variable;
+            }
+        }
         this.numSamples = props.numSamples;
         if (props.config.supportsNumSamples && !this.numSamples) {
             this.numSamples = props.config.maxNumSamples ? Math.min(props.config.maxNumSamples, 20) : 20;
@@ -81,10 +92,17 @@ export class DatasetTransectValues extends DatasetProcessing<undefined> implemen
 
         this.highlightedPosition = undefined;
 
+        this.dimensions = new DatasetDimensions({
+            dimensionValues: props.dimensionValues || parentDimensions?.values,
+            dataset: props.dataset,
+            currentVariable: () => this.seriesVariable,
+            dimensions: props.config.dimensions,
+            initDimensions: true
+        });
+
         this.dataFetcher_ = new AsyncDataFetcher({
             dataFetcher: (params) => {
                 return this.config.provider(params).then((data) => {
-
                     const line = {
                         type: 'Feature',
                         geometry: params.geometry,
@@ -114,7 +132,6 @@ export class DatasetTransectValues extends DatasetProcessing<undefined> implemen
     get loadingState() {
         return this.dataFetcher_.loadingStatus;
     }
-
 
     @action
     setVariable(variable: string | undefined) {
@@ -218,16 +235,16 @@ export class DatasetTransectValues extends DatasetProcessing<undefined> implemen
 
     onGeometryHover(coordinate: GeoJSON.Position) {
         if (this.data.length) {
-            const geometry = {
+            const geometry: GeoJSON.LineString = {
                 type: 'LineString',
                 coordinates: this.data.map((item) => item.coordinates)
             };
 
-            let nearest = nearestPointOnLine(geometry, coordinate);
+            const nearest = nearestPointOnLine(geometry, coordinate);
             let nearestIdx = nearest.properties.index;
-            if (nearestIdx < this.data.length - 1) {
-                let distToPrev = Math.abs(this.data[nearestIdx].distance - nearest.properties.location);
-                let distToNext = Math.abs(this.data[nearestIdx + 1].distance - nearest.properties.location);
+            if (nearestIdx !== undefined && nearestIdx < this.data.length - 1 && nearest.properties.location !== undefined) {
+                const distToPrev = Math.abs(this.data[nearestIdx].distance - nearest.properties.location);
+                const distToNext = Math.abs(this.data[nearestIdx + 1].distance - nearest.properties.location);
                 if (distToNext < distToPrev) {
                     nearestIdx = nearestIdx + 1;
                 }
@@ -248,28 +265,33 @@ export class DatasetTransectValues extends DatasetProcessing<undefined> implemen
 
     @computed
     get canRunQuery() {
-        return !!this.aoi?.geometry.value
-        && !!this.seriesVariable
-        && this.config.dimensions.every((dim) => {
-            return this.dimensions.values.has(dim.id) && this.dimensions.values.get(dim.id);
-        });
+        return (
+            !!this.aoi?.geometry.value &&
+            !!this.seriesVariable &&
+            this.config.dimensions.every((dim) => {
+                return this.dimensions.values.has(dim.id) && this.dimensions.values.get(dim.id);
+            })
+        );
     }
 
     retrieveData() {
         if (this.canRunQuery) {
             if (this.needsUpdate_) {
-                this.dataFetcher_.fetchData({
-                    geometry: this.aoi?.geometry.value as GeoJSON.LineString,
-                    variable: this.seriesVariable!,
-                    dimensionValues: new Map(this.dimensions.values),
-                    numSamples: this.numSamples,
-                    additionalDatasetFilters: new Map(this.dataset.additionalFilters.items)
-                }).then((data) => {
-                    this.setData_(data || []);
-                    this.needsUpdate_ = false;
-                }).catch(() => {
-                    this.setData_([]);
-                });
+                this.dataFetcher_
+                    .fetchData({
+                        geometry: this.aoi?.geometry.value as GeoJSON.LineString,
+                        variable: this.seriesVariable!,
+                        dimensionValues: new Map(this.dimensions.values),
+                        numSamples: this.numSamples,
+                        additionalDatasetFilters: new Map(this.dataset.additionalFilters.items)
+                    })
+                    .then((data) => {
+                        this.setData_(data || []);
+                        this.needsUpdate_ = false;
+                    })
+                    .catch(() => {
+                        this.setData_([]);
+                    });
             }
         } else {
             this.loadingState.setValue(LoadingState.Init);
@@ -299,7 +321,6 @@ export class DatasetTransectValues extends DatasetProcessing<undefined> implemen
     }
 
     protected afterInit_() {
-
         if (!this.seriesVariable) {
             this.setVariable(this.config.variables[0].id);
         }
@@ -316,11 +337,7 @@ export class DatasetTransectValues extends DatasetProcessing<undefined> implemen
                         //a time range is currently selected. try to find the time nearest to the range end time
                         const timeProvider = this.dataset.config.timeDistribution?.provider;
                         if (timeProvider) {
-                            timeProvider.getNearestItem(
-                                datasetTime.end,
-                                TimeSearchDirection.Backward,
-                                this.dimensions
-                            ).then((dt) => {
+                            timeProvider.getNearestItem(datasetTime.end, TimeSearchDirection.Backward, this.dimensions).then((dt) => {
                                 if (dt) {
                                     this.dimensions.setValue('time', dt.start);
                                 }
@@ -345,14 +362,17 @@ export class DatasetTransectValues extends DatasetProcessing<undefined> implemen
             }
         });
 
-        const updateTrackerDisposer = reaction(() => {
-            return {
-                aoi: this.aoi?.geometry.value,
-                dimensions: new Map(this.dimensions.values)
-            };
-        }, () => {
-            this.needsUpdate_ = true;
-        });
+        const updateTrackerDisposer = reaction(
+            () => {
+                return {
+                    aoi: this.aoi?.geometry.value,
+                    dimensions: new Map(this.dimensions.values)
+                };
+            },
+            () => {
+                this.needsUpdate_ = true;
+            }
+        );
 
         this.subscriptionTracker_.addSubscription(seriesUpdaterDisposer);
         this.subscriptionTracker_.addSubscription(highlightedCoordDismissDisposer);
@@ -363,4 +383,3 @@ export class DatasetTransectValues extends DatasetProcessing<undefined> implemen
         return undefined;
     }
 }
-

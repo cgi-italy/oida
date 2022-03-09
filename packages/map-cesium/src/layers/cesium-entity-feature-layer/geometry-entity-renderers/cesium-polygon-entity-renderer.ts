@@ -10,37 +10,30 @@ import { CesiumGeometryEntityRenderer } from './cesium-geometry-entity-renderer-
 
 import { IFeatureStyle } from '@oidajs/core';
 
-
 const getPolygonHierarchy = (coordinates) => {
-    let outer = coordinates[0];
-    let holes: any[] = [];
+    const outer = coordinates[0];
+    const holes: any[] = [];
     for (let i = 1; i < coordinates.length; ++i) {
         if (coordinates[i].length > 2) {
-            holes.push(new PolygonHierarchy(
-                Cartesian3.fromDegreesArray(([] as any[]).concat(...coordinates[i]))
-            ));
+            holes.push(new PolygonHierarchy(Cartesian3.fromDegreesArray(([] as any[]).concat(...coordinates[i]))));
         }
     }
 
-    return new PolygonHierarchy(
-        Cartesian3.fromDegreesArray(([] as any).concat(...outer)),
-        holes
-    );
+    return new PolygonHierarchy(Cartesian3.fromDegreesArray(([] as any).concat(...outer)), holes);
 };
 
-
 export const createPolygonEntity = (id: string, geometry: GeoJSON.Polygon, featureStyle: IFeatureStyle, layerOptions?) => {
-    let style = featureStyle.polygon;
+    const style = featureStyle.polygon;
     if (!style) {
         return;
     }
 
-    let polygonEntity = new Entity({
+    const polygonEntity = new Entity({
         id: id,
         show: style.visible
     });
 
-    let polygonHierarchy = getPolygonHierarchy(geometry.coordinates);
+    const polygonHierarchy = getPolygonHierarchy(geometry.coordinates);
 
     let heightReference = HeightReference.None;
     if (layerOptions && layerOptions.clampToGround) {
@@ -61,7 +54,6 @@ export const createPolygonEntity = (id: string, geometry: GeoJSON.Polygon, featu
     });
 
     return polygonEntity;
-
 };
 
 export const updatePolygonEntityGeometry = (polygonEntity, geometry: GeoJSON.Polygon) => {
@@ -69,14 +61,14 @@ export const updatePolygonEntityGeometry = (polygonEntity, geometry: GeoJSON.Pol
 };
 
 export const updatePolygonEntityStyle = (polygonEntity, featureStyle: IFeatureStyle) => {
-    let style = featureStyle.polygon;
+    const style = featureStyle.polygon;
     if (!style) {
         return;
     }
 
     polygonEntity.show = style.visible;
 
-    let polygon = polygonEntity.polygon;
+    const polygon = polygonEntity.polygon;
     if (style.fillColor) {
         polygon.fill = true;
         polygon.material = new Color(...style.fillColor);
@@ -96,18 +88,16 @@ export const updatePolygonEntityStyle = (polygonEntity, featureStyle: IFeatureSt
         polygon.zIndex = undefined;
         polygon.height = 0;
     }
-
 };
 
 export const createMultiPolygonEntity = (id, geometry: GeoJSON.MultiPolygon, featureStyle: IFeatureStyle, layerOptions) => {
-
-    let polygonStyle = featureStyle.polygon;
+    const polygonStyle = featureStyle.polygon;
 
     if (!polygonStyle) {
         return;
     }
 
-    let multiPolygonEntity = new Entity({
+    const multiPolygonEntity = new Entity({
         id: id,
         show: polygonStyle.visible
     });
@@ -115,10 +105,10 @@ export const createMultiPolygonEntity = (id, geometry: GeoJSON.MultiPolygon, fea
     multiPolygonEntity.featureStyle = featureStyle;
     multiPolygonEntity.layerOptions = layerOptions;
 
-    let polygonEntities = geometry.coordinates.map((polygonCoords, idx) => {
-        let polygonEntity = createPolygonEntity(
+    geometry.coordinates.forEach((polygonCoords, idx) => {
+        const polygonEntity = createPolygonEntity(
             `${id}_${idx}`,
-            {type: 'Polygon', coordinates: polygonCoords},
+            { type: 'Polygon', coordinates: polygonCoords },
             featureStyle,
             layerOptions
         );
@@ -129,20 +119,16 @@ export const createMultiPolygonEntity = (id, geometry: GeoJSON.MultiPolygon, fea
 };
 
 export const updateMultiPolygonEntityGeometry = (multiPolygonEntity, geometry: GeoJSON.MultiPolygon) => {
-    let polygonEntities = multiPolygonEntity._children;
-    let coordinates = geometry.coordinates;
+    const polygonEntities = multiPolygonEntity._children;
+    const coordinates = geometry.coordinates;
 
     let i = 0;
     for (i = 0; i < coordinates.length; ++i) {
-        if (polygonEntities[i])
-            updatePolygonEntityGeometry(
-                polygonEntities[i],
-                {type: 'Polygon', coordinates: coordinates[i]}
-            );
+        if (polygonEntities[i]) updatePolygonEntityGeometry(polygonEntities[i], { type: 'Polygon', coordinates: coordinates[i] });
         else {
-            let polygonEntity = createPolygonEntity(
+            const polygonEntity = createPolygonEntity(
                 `${multiPolygonEntity.id}_${i}`,
-                {type: 'Polygon', coordinates: coordinates[i]},
+                { type: 'Polygon', coordinates: coordinates[i] },
                 multiPolygonEntity.featureStyle,
                 multiPolygonEntity.layerOptions
             );
@@ -150,25 +136,22 @@ export const updateMultiPolygonEntityGeometry = (multiPolygonEntity, geometry: G
         }
     }
 
-    let toRemove = polygonEntities.slice(i);
+    const toRemove = polygonEntities.slice(i);
     toRemove.forEach((polygonEntity) => {
         polygonEntity.parent = undefined;
         if (polygonEntity.entityCollection) {
             polygonEntity.entityCollection.remove(polygonEntity);
         }
     });
-
 };
 
 export const updateMultiPolygonEntityStyle = (multiPolygonEntity, featureStyle: IFeatureStyle) => {
-
     multiPolygonEntity.featureStyle = featureStyle;
-    let polygonEntities = multiPolygonEntity._children;
+    const polygonEntities = multiPolygonEntity._children;
     polygonEntities.forEach((polygonEntity) => {
         updatePolygonEntityStyle(polygonEntity, featureStyle);
     });
 };
-
 
 export const polygonEntityRenderer: CesiumGeometryEntityRenderer<GeoJSON.Polygon> = {
     create: createPolygonEntity,

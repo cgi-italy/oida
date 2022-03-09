@@ -3,6 +3,35 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.1.0](https://github.com/cgi-italy/oida/compare/@oidajs/core@4.0.1...@oidajs/core@4.1.0) (2022-03-09)
+
+
+### Bug Fixes
+
+* improve tile grid computation logic ([a1c394b](https://github.com/cgi-italy/oida/commit/a1c394b9d760fcfc83f9a66cb86c3b5efa18fa43))
+
+
+### Features
+
+* add getMissingIntervals method in TimeIntervalSet ([f8f0660](https://github.com/cgi-italy/oida/commit/f8f0660da30ce9ffb68dc24133dfe388ab5c26db))
+* add method to check if an interval is included in TimeIntervalSet ([1c116cd](https://github.com/cgi-italy/oida/commit/1c116cd81cef680a9b24d7f35932daea59d7b3dd))
+* add support for minimum resolution constraint in tile grid ([d707caa](https://github.com/cgi-italy/oida/commit/d707caa0a1037457ff95eddf7f8c38fec55150eb))
+* add util to check for geometries equality ([908ff8d](https://github.com/cgi-italy/oida/commit/908ff8d7f640be3a23822f1fe45a3c061e765b6a))
+* add util to convert a geometry to a wkt string ([35199f9](https://github.com/cgi-italy/oida/commit/35199f94d59348dd5fdd05e5b4b59bd12f357b07))
+
+
+
+
+
+## [4.0.1](https://github.com/cgi-italy/oida/compare/@oidajs/core@4.0.0...@oidajs/core@4.0.1) (2021-12-21)
+
+**Note:** Version bump only for package @oidajs/core
+
+
+
+
+
+
 # 4.0.0 (2021-12-21)
 
 

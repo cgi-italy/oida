@@ -3,13 +3,13 @@ import { makeObservable, observable, action } from 'mobx';
 import { LoadingState } from '@oidajs/core';
 
 export type LoadingStatusValue = {
-    value?: LoadingState,
-    message?: string,
-    percentage?: number
+    value?: LoadingState;
+    message?: string;
+    percentage?: number;
 };
 
 export type LoadingStatusProps = {
-    loadingStatus?: LoadingStatusValue
+    loadingStatus?: LoadingStatusValue;
 };
 
 export class LoadingStatus {
@@ -18,12 +18,13 @@ export class LoadingStatus {
     @observable percentage: number;
 
     constructor(props?: LoadingStatusProps) {
-
-        const {value, message, percentage} = props?.loadingStatus
+        const { value, message, percentage } = props?.loadingStatus
             ? props.loadingStatus
             : {
-                value: undefined, message: undefined, percentage: undefined
-            };
+                  value: undefined,
+                  message: undefined,
+                  percentage: undefined
+              };
         this.value = value !== undefined ? value : LoadingState.Init;
         this.message = message || '';
         this.percentage = percentage || 0;

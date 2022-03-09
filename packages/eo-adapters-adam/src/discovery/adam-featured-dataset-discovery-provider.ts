@@ -11,7 +11,6 @@ export type AdamFeaturedDatasetDiscoveryProviderItemProps = {
 };
 
 export class AdamFeaturedDatasetDiscoveryProviderItem extends Entity {
-
     dataset: AdamFeaturedDataset;
 
     constructor(props: AdamFeaturedDatasetDiscoveryProviderItemProps) {
@@ -33,14 +32,11 @@ export type AdamFeaturedDatasetDiscoveryProviderProps = {
 } & DatasetDiscoveryProviderProps<typeof ADAM_FEATURED_DATASET_DISCOVERY_PROVIDER_TYPE>;
 
 export class AdamFeaturedDatasetDiscoveryProvider extends DatasetDiscoveryProvider<AdamFeaturedDatasetDiscoveryProviderItem> {
-
     readonly criteria: QueryParams;
     readonly searchClient: AdamFeaturedDatasetDiscoveryClient;
     protected datasetFactory_: AdamDatasetFactory;
 
-    constructor(props:
-        Omit<AdamFeaturedDatasetDiscoveryProviderProps, 'providerType'>
-    ) {
+    constructor(props: Omit<AdamFeaturedDatasetDiscoveryProviderProps, 'providerType'>) {
         super({
             providerType: ADAM_FEATURED_DATASET_DISCOVERY_PROVIDER_TYPE,
             ...props

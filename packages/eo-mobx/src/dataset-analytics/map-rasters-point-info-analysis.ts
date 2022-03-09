@@ -8,7 +8,6 @@ import { DatasetExplorer, DatasetExplorerItem } from '../dataset-explorer';
 import { DatasetRasterPointInfo, RASTER_POINT_INFO_PRCESSING } from './dataset-raster-point-info';
 import { DatasetAnalysis } from './dataset-analysis';
 
-
 export const MAP_RASTERS_POINT_INFO_ANALYSIS = 'map_rasters_point_info_analysis';
 
 /**
@@ -30,7 +29,6 @@ export type MapRasterInfoProps = {
  * {@link DatasetRasterPointInfo} amongst its tools to be queried through this analysis.
  */
 export class MapRastersPointInfo extends DatasetAnalysis<DatasetRasterPointInfo> {
-
     @observable.ref location: MouseCoords | undefined;
 
     protected datasetExplorer_: DatasetExplorer;
@@ -72,12 +70,15 @@ export class MapRastersPointInfo extends DatasetAnalysis<DatasetRasterPointInfo>
                         trackParentViz: true,
                         config: rasterInfoTool.config,
                         color: 'white',
-                        aoi: (this.visible.value && this.location) ? {
-                            geometry: {
-                                type: 'Point',
-                                coordinates: [this.location.lon, this.location.lat]
-                            }
-                        } : undefined
+                        aoi:
+                            this.visible.value && this.location
+                                ? {
+                                      geometry: {
+                                          type: 'Point',
+                                          coordinates: [this.location.lon, this.location.lat]
+                                      }
+                                  }
+                                : undefined
                     });
 
                     this.addProcessing(rasterPointInfo, idx);
@@ -148,49 +149,59 @@ export class MapRastersPointInfo extends DatasetAnalysis<DatasetRasterPointInfo>
     }
 
     protected afterInit_() {
-
         let isDrawing = false;
 
-        const drawModeTrackerDisposer = reaction(() => this.featureDrawInteraction_?.drawMode, (drawMode) => {
-            if (drawMode && drawMode !== FeatureDrawMode.Off) {
-                isDrawing = true;
+        const drawModeTrackerDisposer = reaction(
+            () => this.featureDrawInteraction_?.drawMode,
+            (drawMode) => {
+                if (drawMode && drawMode !== FeatureDrawMode.Off) {
+                    isDrawing = true;
+                }
             }
-        });
+        );
 
         let mapFeatureSelected = false;
-        const selectionTrackerDisposer = reaction(() => this.mapSelection_?.selection.items.length, (numSelected) => {
-            if (numSelected) {
-                mapFeatureSelected = true;
+        const selectionTrackerDisposer = reaction(
+            () => this.mapSelection_?.selection.items.length,
+            (numSelected) => {
+                if (numSelected) {
+                    mapFeatureSelected = true;
+                }
             }
-        });
+        );
 
-        const clickTrackerDisposer = reaction(() => this.mouseCoordsInteraction_.lastClickCoords, (coords) => {
-            // do not update the location if there is a feature selected on the map (the user clicked on a vector feature)
-            // or when drawing aois
-            if (!mapFeatureSelected && !isDrawing) {
-                this.setLocation(coords);
+        const clickTrackerDisposer = reaction(
+            () => this.mouseCoordsInteraction_.lastClickCoords,
+            (coords) => {
+                // do not update the location if there is a feature selected on the map (the user clicked on a vector feature)
+                // or when drawing aois
+                if (!mapFeatureSelected && !isDrawing) {
+                    this.setLocation(coords);
+                }
+
+                // check if the drawing tool is still enabled
+                const drawMode = this.featureDrawInteraction_?.drawMode || FeatureDrawMode.Off;
+                if (drawMode === FeatureDrawMode.Off) {
+                    isDrawing = false;
+                }
+
+                // check for feature selection
+                mapFeatureSelected = this.mapSelection_?.selection.items.length ? true : false;
             }
+        );
 
-            // check if the drawing tool is still enabled
-            const drawMode = this.featureDrawInteraction_?.drawMode || FeatureDrawMode.Off;
-            if (drawMode === FeatureDrawMode.Off) {
-                isDrawing = false;
+        const visibleTrackerDisposer = reaction(
+            () => this.visible.value,
+            (visible) => {
+                if (!visible) {
+                    this.setLocation(undefined);
+                }
             }
-
-            // check for feature selection
-            mapFeatureSelected = this.mapSelection_?.selection.items.length ? true : false;
-        });
-
-        const visibleTrackerDisposer = reaction(() => this.visible.value, (visible) => {
-            if (!visible) {
-                this.setLocation(undefined);
-            }
-        });
+        );
 
         this.subscriptionTracker_.addSubscription(clickTrackerDisposer);
         this.subscriptionTracker_.addSubscription(visibleTrackerDisposer);
         this.subscriptionTracker_.addSubscription(drawModeTrackerDisposer);
         this.subscriptionTracker_.addSubscription(selectionTrackerDisposer);
     }
-
 }

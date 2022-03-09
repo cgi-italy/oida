@@ -4,16 +4,14 @@ import { createDynamicFactory } from '@oidajs/core';
 
 import { IsActivable, Active, ActiveProps } from '../../mixins';
 
-
 const mapInteractionFactory = createDynamicFactory<MapInteraction>('mapInteractionFactory');
 
 export type MapInteractionProps = {
-    id?: string,
-    interactionType: string
+    id?: string;
+    interactionType: string;
 } & ActiveProps;
 
 export class MapInteraction implements IsActivable {
-
     static create(props: MapInteractionProps & Record<string, any>) {
         const { interactionType, ...config } = props;
         const mapInteraction = mapInteractionFactory.create(interactionType, config);
@@ -24,7 +22,8 @@ export class MapInteraction implements IsActivable {
     }
 
     static register<P extends Omit<MapInteractionProps, 'interactionType'>>(
-        interactionType: string, interactionCtor: new(props: P) => MapInteraction
+        interactionType: string,
+        interactionCtor: new (props: P) => MapInteraction
     ) {
         mapInteractionFactory.register(interactionType, (props: P) => {
             return new interactionCtor(props);
@@ -40,4 +39,3 @@ export class MapInteraction implements IsActivable {
         this.active = new Active(props);
     }
 }
-

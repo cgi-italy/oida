@@ -50,7 +50,6 @@ export class VolumeColorMap {
     setNoDataValue(noDataValue: number | undefined) {
         this.noDataValue = noDataValue;
     }
-
 }
 
 export type StackVolumeViewModeProps = {
@@ -117,7 +116,7 @@ export type VolumeLayerProps = {
     source?: VolumeSourceConfig;
     verticalScale?: number;
     colorMap?: VolumeColorMap | VolumeColorMapProps;
-    viewMode: VolumeViewMode
+    viewMode: VolumeViewMode;
 } & MapLayerProps<typeof VOLUME_LAYER_ID>;
 
 export class VolumeLayer extends MapLayer {
@@ -171,5 +170,4 @@ export class VolumeLayer extends MapLayer {
     forceRefresh() {
         this.sourceRevision++;
     }
-
 }

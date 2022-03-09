@@ -4,13 +4,12 @@ import { FormatterQuantity, Formatter } from '@oidajs/core';
 
 import { AppModule } from '../app-module';
 
-
 export const DEFAULT_FORMATTERS_MODULE_ID = 'formatters';
 
 export type FormatterOptionsPreset<OPTIONS> = {
-    id: string,
-    name: string,
-    options: OPTIONS
+    id: string;
+    name: string;
+    options: OPTIONS;
 };
 
 export type FormatterQuantityConfig<TYPE, OPTIONS> = {
@@ -21,7 +20,7 @@ export type FormatterQuantityConfig<TYPE, OPTIONS> = {
 };
 
 export type FormattersModuleConfig = {
-    formatters: FormatterQuantityConfig<any, any>[]
+    formatters: FormatterQuantityConfig<any, any>[];
 };
 
 export type FormattersModuleProps = {
@@ -31,10 +30,13 @@ export type FormattersModuleProps = {
 
 export class FormattersModule extends AppModule {
     readonly config: FormattersModuleConfig;
-    @observable.shallow formatters: Map<string, {
-        formatter: Formatter<any, any>,
-        defaultOptions: {id: string} & Record<string, any>
-    }>;
+    @observable.shallow formatters: Map<
+        string,
+        {
+            formatter: Formatter<any, any>;
+            defaultOptions: { id: string } & Record<string, any>;
+        }
+    >;
 
     constructor(props: FormattersModuleProps) {
         super({
@@ -53,7 +55,7 @@ export class FormattersModule extends AppModule {
     addFormatter<VALUE_TYPE, FORMAT_OPTIONS>(
         quantity: FormatterQuantity<VALUE_TYPE, FORMAT_OPTIONS>,
         formatter: Formatter<VALUE_TYPE, FORMAT_OPTIONS>,
-        deafultOptions: FORMAT_OPTIONS & {id: string}
+        deafultOptions: FORMAT_OPTIONS & { id: string }
     ) {
         this.formatters.set(quantity.id, {
             formatter: formatter,
@@ -64,7 +66,7 @@ export class FormattersModule extends AppModule {
     @action
     setDefaultFormatterOptions<VALUE_TYPE, FORMAT_OPTIONS>(
         quantity: FormatterQuantity<VALUE_TYPE, FORMAT_OPTIONS>,
-        defaultOptions: FORMAT_OPTIONS & {id: string}
+        defaultOptions: FORMAT_OPTIONS & { id: string }
     ) {
         const formatterConfig = this.formatters.get(quantity.id);
         if (!formatterConfig) {
@@ -77,10 +79,12 @@ export class FormattersModule extends AppModule {
     }
 
     getFormatter<VALUE_TYPE, FORMAT_OPTIONS>(quantity: FormatterQuantity<VALUE_TYPE, FORMAT_OPTIONS>) {
-        return this.formatters.get(quantity.id) as {
-            formatter: Formatter<VALUE_TYPE, FORMAT_OPTIONS>,
-            defaultOptions: FORMAT_OPTIONS & {id: string}
-        } | undefined;
+        return this.formatters.get(quantity.id) as
+            | {
+                  formatter: Formatter<VALUE_TYPE, FORMAT_OPTIONS>;
+                  defaultOptions: FORMAT_OPTIONS & { id: string };
+              }
+            | undefined;
     }
 
     format<VALUE_TYPE, FORMAT_OPTIONS>(
@@ -88,11 +92,11 @@ export class FormattersModule extends AppModule {
         value: VALUE_TYPE,
         options?: Partial<FORMAT_OPTIONS>
     ) {
-        let formatterConfig = this.getFormatter(quantity);
+        const formatterConfig = this.getFormatter(quantity);
         if (formatterConfig) {
             return formatterConfig.formatter(value, {
                 ...formatterConfig.defaultOptions,
-                ...(options)
+                ...options
             });
         } else {
             return value;
@@ -103,9 +107,10 @@ export class FormattersModule extends AppModule {
         const formatters = config.formatters;
 
         formatters.forEach((formatterConfig) => {
-            let defaultOptions = formatterConfig.formatterOptionPresets.find((options) => {
-                return options.id === formatterConfig.initialOptions;
-            }) || formatterConfig.formatterOptionPresets[0];
+            const defaultOptions =
+                formatterConfig.formatterOptionPresets.find((options) => {
+                    return options.id === formatterConfig.initialOptions;
+                }) || formatterConfig.formatterOptionPresets[0];
             if (!defaultOptions) {
                 throw new Error(`FormattersModule: No options provided for formatter of type ${formatterConfig.quantity.id}`);
             }

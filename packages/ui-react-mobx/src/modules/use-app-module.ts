@@ -23,20 +23,20 @@ export const useAppStore = <APP_STATE extends HasAppModules>() => {
     return useContext(appStoreContext) as APP_STATE;
 };
 
-export const useAppModule = <M extends AppModule> (id: string, moduleCtor: new(...args: any[]) => M) => {
-    let appStore = useAppStore<HasAppModules>();
+export const useAppModule = <M extends AppModule>(id: string, moduleCtor: new (...args: any[]) => M) => {
+    const appStore = useAppStore<HasAppModules>();
 
-    let module = appStore.modules.getModule(id);
+    const module = appStore.modules.getModule(id);
     if (!(module instanceof moduleCtor)) {
         throw new Error(`useAppModule: no module of type ${moduleCtor.name} with id '${id}' found`);
     }
     return module as M;
 };
 
-export const getAppModule = <M extends AppModule> (id: string, moduleCtor: new(...args: any[]) => M) => {
-    let appStore = appStoreContext._currentValue;
+export const getAppModule = <M extends AppModule>(id: string, moduleCtor: new (...args: any[]) => M) => {
+    const appStore = appStoreContext._currentValue;
 
-    let module = appStore.modules.getModule(id);
+    const module = appStore.modules.getModule(id);
     if (!(module instanceof moduleCtor)) {
         throw new Error(`getAppModule: no module of type ${moduleCtor.name} with id '${id}' found`);
     }

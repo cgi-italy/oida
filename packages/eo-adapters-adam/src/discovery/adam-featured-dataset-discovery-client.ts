@@ -2,7 +2,10 @@ import { QueryParams, SortOrder } from '@oidajs/core';
 import { AdamDatasetConfig, isMultiBandCoverage, AdamDatasetRenderMode } from '../adam-dataset-config';
 import { AdamWcsCoverageDescriptionClient, AdamWcCoverageDescriptionClientConfig } from './adam-wcs-coverage-description-client';
 
-export type AdamFeaturedDataset = Omit<AdamDatasetConfig, 'id' | 'coverageSrs' | 'srsDef' | 'coverageExtent' | 'renderMode' | 'productSearchRecordContent' | 'color'> & {
+export type AdamFeaturedDataset = Omit<
+    AdamDatasetConfig,
+    'id' | 'coverageSrs' | 'srsDef' | 'coverageExtent' | 'renderMode' | 'productSearchRecordContent' | 'color'
+> & {
     id: string;
     color?: string;
     description?: string;
@@ -19,7 +22,6 @@ export type AdamFeaturedDatasetClientConfig = {
 };
 
 export class AdamFeaturedDatasetDiscoveryClient {
-
     protected datasets_: AdamFeaturedDataset[];
     protected wcsCoverageDescriptionClient_: AdamWcsCoverageDescriptionClient;
 
@@ -29,7 +31,6 @@ export class AdamFeaturedDatasetDiscoveryClient {
     }
 
     searchDatasets(queryParams: QueryParams): Promise<AdamFeaturedDatasetDiscoveryResponse> {
-
         let datasets = this.datasets_.slice();
 
         if (queryParams.filters) {
@@ -81,12 +82,14 @@ export class AdamFeaturedDatasetDiscoveryClient {
                 const coverage = coverages[0];
                 return {
                     ...config,
-                    coverageExtent: coverage.extent,
-                    coverageSrs: coverage.srs,
-                    srsDef: coverage.srsDef,
+                    coverageExtent: {
+                        bbox: coverage.extent,
+                        srs: coverage.srs,
+                        srsDef: coverage.srsDef
+                    },
                     renderMode: AdamDatasetRenderMode.ClientSide,
                     color: config.color,
-                    timeless: coverage.time.start.getTime() === coverage.time.end.getTime() ? true : undefined
+                    fixedTime: coverage.time.start.getTime() === coverage.time.end.getTime() ? new Date(coverage.time.start) : undefined
                 };
             }
         });

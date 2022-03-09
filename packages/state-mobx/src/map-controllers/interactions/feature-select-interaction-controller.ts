@@ -9,20 +9,18 @@ import { interactionControllersFactory } from './interaction-controllers-factory
 import { FeatureSelectInteraction } from '../../models/map/interactions/feature-select-interaction';
 import { FeatureData } from '../layers/feature-layer-controller';
 
-export class FeatureSelectInteractionController extends
-    MapInteractionController<IFeatureSelectInteractionImplementation, FeatureSelectInteraction> {
-
-    constructor(config)  {
+export class FeatureSelectInteractionController extends MapInteractionController<
+    IFeatureSelectInteractionImplementation,
+    FeatureSelectInteraction
+> {
+    constructor(config) {
         super(config);
     }
 
     protected getImplementationProps_() {
         return {
             ...super.getImplementationProps_(),
-            onFeatureSelect: (selected: {
-                feature: IFeature<FeatureData> | undefined,
-                mode: SelectionMode
-            }) => {
+            onFeatureSelect: (selected: { feature: IFeature<FeatureData> | undefined; mode: SelectionMode }) => {
                 if (selected.feature) {
                     this.interaction_.selectionManager.selection.modifySelection(selected.feature.data.model, selected.mode);
                 } else {
@@ -34,9 +32,11 @@ export class FeatureSelectInteractionController extends
 
     protected bindToInteractionState_() {
         super.bindToInteractionState_();
-        this.subscriptionTracker_.addSubscription(autorun(() => {
-            this.interactionImpl_!.setMultiple(this.interaction_.config.value.multiple);
-        }));
+        this.subscriptionTracker_.addSubscription(
+            autorun(() => {
+                this.interactionImpl_!.setMultiple(this.interaction_.config.value.multiple);
+            })
+        );
     }
 }
 

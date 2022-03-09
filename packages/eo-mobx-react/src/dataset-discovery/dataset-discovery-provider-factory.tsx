@@ -6,16 +6,15 @@ import { DatasetDiscoveryProvider, DatasetExplorer } from '@oidajs/eo-mobx';
 /**
  * Input props provided to the {@Link DatasetDiscoveryProviderFactory} create method
  * to generate the UI for a {@Link DatasetDiscoveryProvider}
-*/
+ */
 export type DatasetDiscoveryProviderProps = {
-    provider: DatasetDiscoveryProvider,
-    datasetExplorer: DatasetExplorer
+    provider: DatasetDiscoveryProvider;
+    datasetExplorer: DatasetExplorer;
+    onDatasetAdd?: () => void;
 };
 
 /** @internal */
-export interface DatasetDiscoveryProviderDefinitions {
-
-}
+export interface DatasetDiscoveryProviderDefinitions {}
 
 /**
  * A {@link IDynamicFactory | dynamic factory} for DatasetDiscoveryProvider components.
@@ -40,5 +39,7 @@ export interface DatasetDiscoveryProviderDefinitions {
  * ```
  */
 export const DatasetDiscoveryProviderFactory = createDynamicFactory<
-    React.ReactNode, DatasetDiscoveryProviderDefinitions, DatasetDiscoveryProviderProps
+    React.ReactNode,
+    DatasetDiscoveryProviderDefinitions,
+    DatasetDiscoveryProviderProps
 >('dataset-discovery-provider');

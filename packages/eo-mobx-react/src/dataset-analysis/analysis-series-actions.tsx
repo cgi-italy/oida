@@ -16,29 +16,34 @@ export type AnalysisDatasetActions = {
 };
 
 export const AnalysisSeriesActions = (props: AnalysisDatasetActions) => {
-
     const numAnalyses = useSelector(() => props.combinedAnalysis.processings.length);
 
     const exportMenu = (
         <Menu>
             <Menu.ItemGroup title='Move to...'>
-                <Menu.Item key='undock' onClick={() => {
-                    //TODO: empty analysis creation
-                    props.combinedAnalysis.removeProcessing(props.analysis, false);
-                }}>
-                        New widget
+                <Menu.Item
+                    key='undock'
+                    onClick={() => {
+                        //TODO: empty analysis creation
+                        props.combinedAnalysis.removeProcessing(props.analysis, false);
+                    }}
+                >
+                    New widget
                 </Menu.Item>
                 {props.availableTargets.length && <Menu.Divider />}
-                {
-                    props.availableTargets.map((target) => {
-                        return <Menu.Item key={target.id} onClick={() => {
-                            props.combinedAnalysis.removeProcessing(props.analysis, true);
-                            target.addProcessing(props.analysis);
-                        }}>
+                {props.availableTargets.map((target) => {
+                    return (
+                        <Menu.Item
+                            key={target.id}
+                            onClick={() => {
+                                props.combinedAnalysis.removeProcessing(props.analysis, true);
+                                target.addProcessing(props.analysis);
+                            }}
+                        >
                             {target.name}
-                        </Menu.Item>;
-                    })
-                }
+                        </Menu.Item>
+                    );
+                })}
             </Menu.ItemGroup>
         </Menu>
     );
@@ -57,7 +62,7 @@ export const AnalysisSeriesActions = (props: AnalysisDatasetActions) => {
                     <PlusOutlined />
                 </Button>
             </Tooltip>
-            {numAnalyses > 1 &&
+            {numAnalyses > 1 && (
                 <Tooltip title='Remove series'>
                     <Button
                         type='primary'
@@ -70,20 +75,16 @@ export const AnalysisSeriesActions = (props: AnalysisDatasetActions) => {
                         <MinusOutlined />
                     </Button>
                 </Tooltip>
-            }
-            {numAnalyses > 1 && !props.disableMove &&
+            )}
+            {numAnalyses > 1 && !props.disableMove && (
                 <Tooltip title='Move series'>
                     <Dropdown trigger={['click']} overlay={exportMenu}>
-                        <Button
-                            type='primary'
-                            shape='circle'
-                            size='small'
-                        >
+                        <Button type='primary' shape='circle' size='small'>
                             <ExportOutlined />
                         </Button>
                     </Dropdown>
                 </Tooltip>
-            }
+            )}
         </Space>
     );
 };

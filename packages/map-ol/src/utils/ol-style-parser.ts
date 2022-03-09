@@ -7,9 +7,7 @@ import Fill from 'ol/style/Fill';
 import { GeometryTypes, IFeatureStyle, IPointStyle, isIcon, ILineStyle, IPolygonStyle } from '@oidajs/core';
 
 export class OLStyleParser {
-
     getStyleForGeometry(geometryType: GeometryTypes, style: IFeatureStyle) {
-
         let olStyle: Style = null;
         let pickingDisabled = false;
         if (style) {
@@ -45,7 +43,7 @@ export class OLStyleParser {
     }
 
     protected parseColor_(color) {
-        let olColor = [Math.floor(color[0] * 255), Math.floor(color[1] * 255), Math.floor(color[2] * 255)];
+        const olColor = [Math.floor(color[0] * 255), Math.floor(color[1] * 255), Math.floor(color[2] * 255)];
         if (color.length === 4) {
             olColor[3] = color[3];
         }
@@ -53,25 +51,28 @@ export class OLStyleParser {
     }
 
     protected getPointStyle_(pointStyle: IPointStyle | undefined) {
-
         if (!pointStyle || !pointStyle.visible) {
             return null;
         }
 
-        let style = new Style();
+        const style = new Style();
 
         if (isIcon(pointStyle)) {
-            style.setImage(new Icon({
-                src: pointStyle.url,
-                color: pointStyle.color ? this.parseColor_(pointStyle.color) : undefined,
-                scale: pointStyle.scale
-            }));
+            style.setImage(
+                new Icon({
+                    src: pointStyle.url,
+                    color: pointStyle.color ? this.parseColor_(pointStyle.color) : undefined,
+                    scale: pointStyle.scale
+                })
+            );
         } else {
-            style.setImage(new Circle({
-                radius: pointStyle.radius,
-                fill: pointStyle.fillColor ? new Fill({color: this.parseColor_(pointStyle.fillColor)}) : undefined,
-                stroke: pointStyle.strokeColor ? new Stroke({color: this.parseColor_(pointStyle.strokeColor)}) : undefined
-            }));
+            style.setImage(
+                new Circle({
+                    radius: pointStyle.radius,
+                    fill: pointStyle.fillColor ? new Fill({ color: this.parseColor_(pointStyle.fillColor) }) : undefined,
+                    stroke: pointStyle.strokeColor ? new Stroke({ color: this.parseColor_(pointStyle.strokeColor) }) : undefined
+                })
+            );
         }
 
         if (pointStyle.zIndex !== undefined) {
@@ -82,17 +83,18 @@ export class OLStyleParser {
     }
 
     protected getLineStyle_(lineStyle: ILineStyle | undefined) {
-
         if (!lineStyle || !lineStyle.visible) {
             return null;
         }
 
-        let style = new Style();
+        const style = new Style();
 
-        style.setStroke(new Stroke({
-            color: this.parseColor_(lineStyle.color),
-            width: lineStyle.width
-        }));
+        style.setStroke(
+            new Stroke({
+                color: this.parseColor_(lineStyle.color),
+                width: lineStyle.width
+            })
+        );
 
         if (lineStyle.zIndex !== undefined) {
             style.setZIndex(lineStyle.zIndex);
@@ -102,21 +104,22 @@ export class OLStyleParser {
     }
 
     protected getPolygonStyle_(polygonStyle: IPolygonStyle | undefined) {
-
         if (!polygonStyle || !polygonStyle.visible) {
             return null;
         }
 
-        let style = new Style();
+        const style = new Style();
 
         if (polygonStyle.fillColor) {
-            style.setFill(new Fill({color: this.parseColor_(polygonStyle.fillColor)}));
+            style.setFill(new Fill({ color: this.parseColor_(polygonStyle.fillColor) }));
         }
         if (polygonStyle.strokeColor) {
-            style.setStroke(new Stroke({
-                color: polygonStyle.strokeColor ? this.parseColor_(polygonStyle.strokeColor) : undefined,
-                width: polygonStyle.strokeWidth
-            }));
+            style.setStroke(
+                new Stroke({
+                    color: polygonStyle.strokeColor ? this.parseColor_(polygonStyle.strokeColor) : undefined,
+                    width: polygonStyle.strokeWidth
+                })
+            );
         }
 
         if (polygonStyle.zIndex !== undefined) {
@@ -126,4 +129,3 @@ export class OLStyleParser {
         return style;
     }
 }
-

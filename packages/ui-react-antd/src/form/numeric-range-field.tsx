@@ -10,21 +10,19 @@ import { FormFieldRendererBaseProps } from '@oidajs/ui-react-core';
 
 import { antdFormFieldRendererFactory } from './antd-form-field-renderer-factory';
 
-
 export type NumericRangeFieldRendererProps = FormFieldRendererBaseProps<NumericRangeField> & {
-    sliderProps?: Partial<SliderRangeProps>,
-    numericInputProps?: Partial<InputNumberProps>,
+    sliderProps?: Partial<SliderRangeProps>;
+    numericInputProps?: Partial<InputNumberProps>;
     /** Extra content to be displayed between the two range inputs */
-    inputInfraContent?: React.ReactNode,
+    inputInfraContent?: React.ReactNode;
     /** Extra content to be displayed on the right of the range selection slider */
-    sliderExtraContent?: React.ReactNode
+    sliderExtraContent?: React.ReactNode;
 };
 
 export const NumericRangeFieldRenderer = (props: NumericRangeFieldRendererProps) => {
-
     const sliderRef = useRef<any>();
 
-    const {value, onChange, title, required, config, autoFocus, sliderProps, numericInputProps} = props;
+    const { value, onChange, config, sliderProps, numericInputProps } = props;
 
     const hasLimits = config.min !== undefined && config.max !== undefined;
 
@@ -32,25 +30,24 @@ export const NumericRangeFieldRenderer = (props: NumericRangeFieldRendererProps)
         if (range && range.length === 2) {
             onChange({
                 from: range[0],
-                to: range[1],
+                to: range[1]
             });
         } else {
             onChange(undefined);
         }
     };
 
-
     let domainSlider: JSX.Element | undefined;
     if (hasLimits) {
-        let marks = {
+        const marks = {
             [config.min!]: `${config.min}`,
-            [config.max!]: `${config.max}`,
+            [config.max!]: `${config.max}`
         };
 
         domainSlider = (
             <Slider
                 ref={sliderRef}
-                style={{minWidth: '140px'}}
+                style={{ minWidth: '140px' }}
                 value={value ? [value.from, value.to] : undefined}
                 defaultValue={value ? [value.from, value.to] : [config.min!, config.max!]}
                 onChange={(range) => {
@@ -78,7 +75,7 @@ export const NumericRangeFieldRenderer = (props: NumericRangeFieldRendererProps)
     }
 
     return (
-        <div className={classnames('numeric-range-field', {'with-slider': hasLimits})}>
+        <div className={classnames('numeric-range-field', { 'with-slider': hasLimits })}>
             <div className='numeric-range-field-inputs'>
                 <InputNumber
                     value={value ? value.from : undefined}
@@ -86,9 +83,9 @@ export const NumericRangeFieldRenderer = (props: NumericRangeFieldRendererProps)
                     max={config.max}
                     size='small'
                     step={config.step}
-                    formatter={value => `≥ ${value}`}
+                    formatter={(value) => `≥ ${value}`}
                     onChange={(minValue) => {
-                        if (typeof(minValue) === 'number') {
+                        if (typeof minValue === 'number') {
                             onRangeChange([minValue, value ? value.to : undefined]);
                         }
                     }}
@@ -101,9 +98,9 @@ export const NumericRangeFieldRenderer = (props: NumericRangeFieldRendererProps)
                     max={config.max}
                     step={config.step}
                     size='small'
-                    formatter={value => `≤ ${value}`}
+                    formatter={(value) => `≤ ${value}`}
                     onChange={(maxValue) => {
-                        if (typeof(maxValue) === 'number') {
+                        if (typeof maxValue === 'number') {
                             onRangeChange([value ? value.from : undefined, maxValue]);
                         }
                     }}
@@ -116,10 +113,6 @@ export const NumericRangeFieldRenderer = (props: NumericRangeFieldRendererProps)
             </div>
         </div>
     );
-
 };
 
-antdFormFieldRendererFactory.register<NumericRangeField>(
-    NUMERIC_RANGE_FIELD_ID, 'rangepicker',
-    NumericRangeFieldRenderer
-);
+antdFormFieldRendererFactory.register<NumericRangeField>(NUMERIC_RANGE_FIELD_ID, 'rangepicker', NumericRangeFieldRenderer);

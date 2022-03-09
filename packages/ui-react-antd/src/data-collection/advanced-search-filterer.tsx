@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Dropdown, Tag, Tooltip, Button, Space } from 'antd';
-import { DownOutlined, UpOutlined, SearchOutlined, FilterOutlined } from '@ant-design/icons';
+import { DownOutlined, UpOutlined, SearchOutlined } from '@ant-design/icons';
 import classnames from 'classnames';
 
 import { getFormFieldSerializer, IFormField } from '@oidajs/core';
@@ -8,23 +8,18 @@ import { DataFiltererProps } from '@oidajs/ui-react-core';
 
 import { DataForm, InputFieldRenderer } from '../form';
 
-
 type QueryFiltersTagsProps = {
     filters: IFormField[];
 };
 
 const QueryFiltersTags = (props: QueryFiltersTagsProps) => {
-
     const tags = props.filters.map((filter) => {
         const serializer = getFormFieldSerializer(filter.type);
         if (serializer) {
             const tagContent = serializer.toString(filter);
             if (tagContent) {
                 return (
-                    <Tag
-                        key={filter.name}
-                        closable={true} onClose={() => filter.onChange(undefined)}
-                    >
+                    <Tag key={filter.name} closable={true} onClose={() => filter.onChange(undefined)}>
                         {filter.title || filter.name}:{tagContent}
                     </Tag>
                 );
@@ -49,25 +44,28 @@ export type AdvancedSearchFiltererProps = {
     expandButtonIcon?: React.ReactNode;
 } & DataFiltererProps;
 export const AdvancedSearchFilterer = (props: AdvancedSearchFiltererProps) => {
-
     const { mainFilter, expandButtonTooltip, expandButtonIcon, searchIcon, ...formProps } = props;
     const [advancedSearchVisible, setAdvancedSearchVisible] = useState(false);
 
-    const tagsFilters: IFormField[] = formProps.fields.filter((filter) => {
-        return (filter.name !== mainFilter && formProps.values.has(filter.name));
-    }).map((filter) => {
-        return {
-            ...filter,
-            value: formProps.values.get(filter.name),
-            onChange: (value) => {
-                formProps.onFieldChange(filter.name, value);
-            }
-        };
-    });
+    const tagsFilters: IFormField[] = formProps.fields
+        .filter((filter) => {
+            return filter.name !== mainFilter && formProps.values.has(filter.name);
+        })
+        .map((filter) => {
+            return {
+                ...filter,
+                value: formProps.values.get(filter.name),
+                onChange: (value) => {
+                    formProps.onFieldChange(filter.name, value);
+                }
+            };
+        });
 
-    const enableAdvancedSearch = !mainFilter || formProps.fields.some((filter) => {
-        return filter.name !== mainFilter;
-    });
+    const enableAdvancedSearch =
+        !mainFilter ||
+        formProps.fields.some((filter) => {
+            return filter.name !== mainFilter;
+        });
 
     const clearFilters = () => {
         formProps.fields.forEach((filter) => {
@@ -75,7 +73,7 @@ export const AdvancedSearchFilterer = (props: AdvancedSearchFiltererProps) => {
         });
     };
 
-    const inputSearchIcon = props.searchIcon || <SearchOutlined/>;
+    const inputSearchIcon = props.searchIcon || <SearchOutlined />;
 
     const advancedSearchPanel = (
         <Dropdown
@@ -84,24 +82,24 @@ export const AdvancedSearchFilterer = (props: AdvancedSearchFiltererProps) => {
             onVisibleChange={(visible) => setAdvancedSearchVisible(visible)}
             overlay={
                 <React.Fragment>
-                    {advancedSearchVisible &&
-                    <React.Fragment>
-                        <DataForm
-                            className='antd-data-filterer'
-                            {...formProps}
-                        />
-                        <div className='advanced-search-actions'>
-                            <Space>
-                                <Button size='small' onClick={() => clearFilters()}>Reset</Button>
-                                <Button size='small' type='primary' onClick={() => setAdvancedSearchVisible(false)}>OK</Button>
-                            </Space>
-                        </div>
-                    </React.Fragment>
-                    }
+                    {advancedSearchVisible && (
+                        <React.Fragment>
+                            <DataForm className='antd-data-filterer' {...formProps} />
+                            <div className='advanced-search-actions'>
+                                <Space>
+                                    <Button size='small' onClick={() => clearFilters()}>
+                                        Reset
+                                    </Button>
+                                    <Button size='small' type='primary' onClick={() => setAdvancedSearchVisible(false)}>
+                                        OK
+                                    </Button>
+                                </Space>
+                            </div>
+                        </React.Fragment>
+                    )}
                 </React.Fragment>
-
             }
-            className={classnames('advanced-search-filterer', {'without-main-filter': !mainFilter})}
+            className={classnames('advanced-search-filterer', { 'without-main-filter': !mainFilter })}
             overlayClassName='advanced-search-filterer-dropdown'
         >
             <InputFieldRenderer
@@ -122,37 +120,36 @@ export const AdvancedSearchFilterer = (props: AdvancedSearchFiltererProps) => {
                 prefix={
                     <React.Fragment>
                         <span className='input-prefix-icon'>{inputSearchIcon}</span>
-                        <QueryFiltersTags filters={tagsFilters}/>
+                        <QueryFiltersTags filters={tagsFilters} />
                     </React.Fragment>
                 }
                 suffix={
-                    !mainFilter || enableAdvancedSearch
-                    ? <React.Fragment>
-                            {!!mainFilter && enableAdvancedSearch &&
+                    !mainFilter || enableAdvancedSearch ? (
+                        <React.Fragment>
+                            {!!mainFilter && enableAdvancedSearch && (
                                 <Tooltip title={expandButtonTooltip || 'Advanced filtering'}>
-                                {
-                                    advancedSearchVisible
-                                    ? <UpOutlined onClick={() => setAdvancedSearchVisible(false)}/>
-                                    : <DownOutlined onClick={() => setAdvancedSearchVisible(true)}/>
-                                }
+                                    {advancedSearchVisible ? (
+                                        <UpOutlined onClick={() => setAdvancedSearchVisible(false)} />
+                                    ) : (
+                                        <DownOutlined onClick={() => setAdvancedSearchVisible(true)} />
+                                    )}
                                 </Tooltip>
-                            }
-                            {!mainFilter &&
+                            )}
+                            {!mainFilter && (
                                 <Tooltip title={expandButtonTooltip || 'Filters'}>
-                                {
-                                    advancedSearchVisible
-                                    ? <UpOutlined onClick={() => setAdvancedSearchVisible(false)}/>
-                                    : <DownOutlined onClick={() => setAdvancedSearchVisible(true)}/>
-                                }
+                                    {advancedSearchVisible ? (
+                                        <UpOutlined onClick={() => setAdvancedSearchVisible(false)} />
+                                    ) : (
+                                        <DownOutlined onClick={() => setAdvancedSearchVisible(true)} />
+                                    )}
                                 </Tooltip>
-                            }
+                            )}
                         </React.Fragment>
-                    : undefined
+                    ) : undefined
                 }
             />
         </Dropdown>
     );
 
     return advancedSearchPanel;
-
 };

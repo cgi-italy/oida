@@ -27,9 +27,9 @@ export type VolumeTileKey = {
 export type VolumeSliceData = HTMLImageElement | HTMLCanvasElement | ArrayBufferView;
 
 export type VolumeSliceUrl = {
-    z: number,
-    url: string,
-    postData?: any
+    z: number;
+    url: string;
+    postData?: any;
 };
 
 export type VolumeSourceConfig = {
@@ -40,12 +40,12 @@ export type VolumeSourceConfig = {
 
 export type VolumeColorMap = {
     range: {
-        min: number,
-        max: number
+        min: number;
+        max: number;
     };
     clamp: boolean;
     noData: number | undefined;
-    image: HTMLImageElement | HTMLCanvasElement
+    image: HTMLImageElement | HTMLCanvasElement;
 };
 
 export interface IVolumeViewMode {
@@ -65,24 +65,19 @@ export interface SliceVolumeView extends IVolumeViewMode {
 export const SLICE_VOLUME_VIEW_ID = 'sliceView';
 export const STACK_VOLUME_VIEW_ID = 'stackView';
 
-
 export type VolumeLayerRendererConfig = MapLayerRendererConfig & {
     onSliceLoadStart: () => void;
     onSliceLoadEnd: () => void;
-    source?: VolumeSourceConfig,
-    colorMap?: VolumeColorMap
+    source?: VolumeSourceConfig;
+    colorMap?: VolumeColorMap;
 };
-
 
 export interface IVolumeLayerRenderer extends IMapLayerRenderer {
     setViewMode(mode: string): IVolumeViewMode | undefined;
     updateSource(source?: VolumeSourceConfig): void;
     forceRefresh(): void;
     setColorMap(colorMap: HTMLImageElement | HTMLCanvasElement): void;
-    setMapRange(range: {
-        min: number,
-        max: number
-    }): void;
+    setMapRange(range: { min: number; max: number }): void;
     setClamp(clamp: boolean): void;
     setNoDataValue(noDataValue: number): void;
     setVerticalScale(verticalScale: number): void;

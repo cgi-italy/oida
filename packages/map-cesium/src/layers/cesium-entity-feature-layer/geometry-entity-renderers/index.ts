@@ -13,4 +13,3 @@ geometryEntityRendererFactory.register('MultiPolygon', () => multiPolygonEntityR
 geometryEntityRendererFactory.register('BBox', () => bboxEntityRenderer);
 
 export { geometryEntityRendererFactory };
-

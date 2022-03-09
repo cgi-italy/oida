@@ -1,11 +1,15 @@
 import { DatasetDiscoveryProvider } from '@oidajs/eo-mobx';
 
 import {
-    ADAM_OPENSEARCH_DATASET_DISCOVERY_PROVIDER_TYPE, AdamOpensearchDatasetDiscoveryProvider, AdamOpensearchDatasetDiscoveryProviderProps,
+    ADAM_OPENSEARCH_DATASET_DISCOVERY_PROVIDER_TYPE,
+    AdamOpensearchDatasetDiscoveryProvider,
+    AdamOpensearchDatasetDiscoveryProviderProps
 } from './adam-opensearch-dataset-discovery-provider';
 
 import {
-    ADAM_FEATURED_DATASET_DISCOVERY_PROVIDER_TYPE, AdamFeaturedDatasetDiscoveryProvider, AdamFeaturedDatasetDiscoveryProviderProps,
+    ADAM_FEATURED_DATASET_DISCOVERY_PROVIDER_TYPE,
+    AdamFeaturedDatasetDiscoveryProvider,
+    AdamFeaturedDatasetDiscoveryProviderProps
 } from './adam-featured-dataset-discovery-provider';
 
 declare module '@oidajs/eo-mobx' {
@@ -19,7 +23,6 @@ declare module '@oidajs/eo-mobx' {
         [ADAM_FEATURED_DATASET_DISCOVERY_PROVIDER_TYPE]: AdamFeaturedDatasetDiscoveryProvider;
     }
 }
-
 
 DatasetDiscoveryProvider.register(ADAM_OPENSEARCH_DATASET_DISCOVERY_PROVIDER_TYPE, AdamOpensearchDatasetDiscoveryProvider);
 DatasetDiscoveryProvider.register(ADAM_FEATURED_DATASET_DISCOVERY_PROVIDER_TYPE, AdamFeaturedDatasetDiscoveryProvider);

@@ -67,4 +67,3 @@ export class HlsVideoAdapter implements VideoAdapter {
         this.videoElement_.addEventListener('pause', events.onPlayEnd);
     }
 }
-

@@ -4,29 +4,37 @@ import chroma from 'chroma-js';
 import { IFeatureStyle, randomColorFactory } from '@oidajs/core';
 import {
     MapLayer,
-    HasVisibility, Visible, VisibleProps,
-    IsHoverable, Hovered, HoveredProps,
-    IsSelectable, Selected, SelectedProps
+    HasVisibility,
+    Visible,
+    VisibleProps,
+    IsHoverable,
+    Hovered,
+    HoveredProps,
+    IsSelectable,
+    Selected,
+    SelectedProps
 } from '@oidajs/state-mobx';
 
 import { DatasetViz, DatasetVizProps, SharedAoi, SharedAoiProps } from '../common';
-
 
 const randomColorGenerator = randomColorFactory();
 
 export type DatasetProcessingProps<TYPE extends string = string, CONFIG extends Record<string, any> = Record<string, any>> = {
     color?: string;
     aoi?: SharedAoi | SharedAoiProps;
-} & DatasetVizProps<TYPE, CONFIG> & VisibleProps & SelectedProps & HoveredProps;
+} & DatasetVizProps<TYPE, CONFIG> &
+    VisibleProps &
+    SelectedProps &
+    HoveredProps;
 
 /**
  * A base class for a dataset processing operation.
  * It manages the logic to perform some processing on a single dataset: inputs, outputs and data retrieval logic
  */
 export abstract class DatasetProcessing<T extends MapLayer | undefined>
-extends DatasetViz<T>
-implements HasVisibility, IsHoverable, IsSelectable {
-
+    extends DatasetViz<T>
+    implements HasVisibility, IsHoverable, IsSelectable
+{
     readonly visible: Visible;
     readonly hovered: Hovered;
     readonly selected: Selected;
@@ -86,7 +94,9 @@ implements HasVisibility, IsHoverable, IsSelectable {
      *
      * @param coordinate The hovered geometry lat lon position
      */
-    onGeometryHover(coordinate: GeoJSON.Position) {}
+    onGeometryHover(coordinate: GeoJSON.Position) {
+        return;
+    }
 
     dispose() {
         if (this.aoi) {

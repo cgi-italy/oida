@@ -4,19 +4,17 @@ import { useSelector } from '../../../core';
 import { MapProjectionConfig } from '../map-module';
 import { useMapModule } from './use-map-module';
 
-
 export type ProjSelectorProps = {
     projections: MapProjectionConfig[];
     mapView: MapView;
 };
 
 export const useMapProjectionSelector = (props: ProjSelectorProps) => {
-
-    const {mapView, projections} = props;
+    const { mapView, projections } = props;
 
     return useSelector(() => ({
         items: projections.map((projection) => {
-            let { code, name }  = projection;
+            const { code, name } = projection;
             return {
                 value: code,
                 name: name
@@ -24,7 +22,7 @@ export const useMapProjectionSelector = (props: ProjSelectorProps) => {
         }),
         value: mapView.projection.code,
         onSelect: (code) => {
-            let projection = projections.find((projection) => {
+            const projection = projections.find((projection) => {
                 return projection.code === code;
             });
 
@@ -36,10 +34,9 @@ export const useMapProjectionSelector = (props: ProjSelectorProps) => {
 };
 
 export const useMapProjectionSelectorFromModule = (mapModuleid?: string) => {
-    let mapModuleState = useMapModule(mapModuleid);
+    const mapModuleState = useMapModule(mapModuleid);
     return useMapProjectionSelector({
         mapView: mapModuleState.map.view,
         projections: mapModuleState.config.projections || []
     });
 };
-

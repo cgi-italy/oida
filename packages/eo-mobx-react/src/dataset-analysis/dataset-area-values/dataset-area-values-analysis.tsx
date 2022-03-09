@@ -12,76 +12,74 @@ import { DatasetAnalysisWidgetFactory, DatasetAnalysisWidgetFactoryConfig } from
 import { DatasetAreaValuesProcessingFilters } from './dataset-area-values-processing-filters';
 import { DatasetAreaValuesProcessingHistogram } from './dataset-area-values-processing-histogram';
 
-
 export const DatasetAreaValuesAnalysisWidget = (props: DatasetAnalysisWidgetFactoryConfig) => {
-
     const [filtersVisible, setFiltersVisible] = useState(true);
 
     const processings = props.combinedAnalysis.processings as IObservableArray<DatasetAreaValues>;
 
-    const statsFilters = useSelector(() => processings.map((processing, idx) => {
+    const statsFilters = useSelector(
+        () =>
+            processings.map((processing, idx) => {
+                processing.setAutoUpdate(false);
 
-        processing.setAutoUpdate(false);
+                const avaialbleDatasetItems = props.datasetExplorerItems.filter((item) => {
+                    return item.dataset.config.tools?.find((tool) => tool.type === DATASET_AREA_VALUES_PROCESSING);
+                });
 
-        const avaialbleDatasetItems = props.datasetExplorerItems.filter(item => {
-            return item.dataset.config.tools?.find(tool => tool.type === DATASET_AREA_VALUES_PROCESSING);
-        });
+                const availableTargets = props.availableCombos[props.combinedAnalysis.type].filter(
+                    (combo) => combo.id !== props.combinedAnalysis.id
+                );
 
-        const availableTargets = props.availableCombos[props.combinedAnalysis.type]
-            .filter((combo => combo.id !== props.combinedAnalysis.id));
+                const selectedDataset = avaialbleDatasetItems.find((item) => item.dataset === processing.dataset);
+                if (!selectedDataset) {
+                    setTimeout(() => {
+                        props.combinedAnalysis.removeProcessing(processing);
+                    }, 0);
+                }
 
-        let selectedDataset = avaialbleDatasetItems.find(item => item.dataset === processing.dataset);
-        if (!selectedDataset) {
-            setTimeout(() => {
-                props.combinedAnalysis.removeProcessing(processing);
-            }, 0);
-        }
+                return (
+                    <div className='analysis-parameters' key={processing.id}>
+                        <Form layout='inline' size='small'>
+                            <Form.Item label='Dataset'>
+                                <DatasetSelector
+                                    value={processing.dataset.id}
+                                    datasets={avaialbleDatasetItems.map((item) => item.dataset.config)}
+                                    onChange={(value) => {
+                                        const aoi = processing.aoi;
+                                        props.combinedAnalysis.removeProcessing(processing);
+                                        if (value) {
+                                            const item = avaialbleDatasetItems.find((item) => item.dataset.id === value);
 
-        return (
-            <div className='analysis-parameters' key={processing.id}>
-                <Form layout='inline' size='small'>
-                    <Form.Item label='Dataset'>
-                        <DatasetSelector
-                            value={processing.dataset.id}
-                            datasets={avaialbleDatasetItems.map(item => item.dataset.config)}
-                            onChange={(value) => {
-                                const aoi = processing.aoi;
-                                props.combinedAnalysis.removeProcessing(processing);
-                                if (value) {
-                                    let item = avaialbleDatasetItems.find(item => item.dataset.id === value);
+                                            if (item) {
+                                                const areaValuesProcessing = new DatasetAreaValues({
+                                                    dataset: item.dataset,
+                                                    config: item.dataset.config!.tools!.find(
+                                                        (tool) => tool.type === DATASET_AREA_VALUES_PROCESSING
+                                                    )!.config as DatasetAreaValuesConfig,
+                                                    aoi: aoi,
+                                                    autoUpdate: false,
+                                                    parent: item.mapViz
+                                                });
 
-                                    if (item) {
-                                        const areaValuesProcessing = new DatasetAreaValues({
-                                            dataset: item.dataset,
-                                            config: item.dataset.config!.tools!.find(
-                                                tool => tool.type === DATASET_AREA_VALUES_PROCESSING
-                                            )!.config as DatasetAreaValuesConfig,
-                                            aoi: aoi,
-                                            autoUpdate: false,
-                                            parent: item.mapViz
-                                        });
-
-
-                                        props.combinedAnalysis.addProcessing(areaValuesProcessing, idx);
-                                    }
-                                }
-                            }}
+                                                props.combinedAnalysis.addProcessing(areaValuesProcessing, idx);
+                                            }
+                                        }
+                                    }}
+                                />
+                            </Form.Item>
+                            <DatasetAreaValuesProcessingFilters processing={processing} />
+                        </Form>
+                        <AnalysisSeriesActions
+                            analysis={processing}
+                            idx={idx}
+                            availableTargets={availableTargets}
+                            combinedAnalysis={props.combinedAnalysis}
                         />
-                    </Form.Item>
-                    <DatasetAreaValuesProcessingFilters
-                        processing={processing}
-                    />
-
-                </Form>
-                <AnalysisSeriesActions
-                    analysis={processing}
-                    idx={idx}
-                    availableTargets={availableTargets}
-                    combinedAnalysis={props.combinedAnalysis}
-                />
-            </div>
-        );
-    }), [props.datasetExplorerItems, props.availableCombos]);
+                    </div>
+                );
+            }),
+        [props.datasetExplorerItems, props.availableCombos]
+    );
 
     const canRunQuery = useSelector(() => {
         return processings.every((item) => item.canRunQuery);
@@ -89,11 +87,9 @@ export const DatasetAreaValuesAnalysisWidget = (props: DatasetAnalysisWidgetFact
 
     return (
         <div className='dataset-chart'>
-            {filtersVisible &&
+            {filtersVisible && (
                 <div className='dataset-chart-form'>
-                    <div className='dataset-chart-filters'>
-                        {statsFilters}
-                    </div>
+                    <div className='dataset-chart-filters'>{statsFilters}</div>
                     <Button
                         className='dataset-chart-search-btn'
                         type='primary'
@@ -106,8 +102,8 @@ export const DatasetAreaValuesAnalysisWidget = (props: DatasetAnalysisWidgetFact
                         Apply
                     </Button>
                 </div>
-            }
-            {!filtersVisible &&
+            )}
+            {!filtersVisible && (
                 <div className='dataset-chart-result'>
                     <Button
                         className='dataset-chart-modify-params-btn'
@@ -120,13 +116,13 @@ export const DatasetAreaValuesAnalysisWidget = (props: DatasetAnalysisWidgetFact
                     >
                         Modify parameters
                     </Button>
-                    <DatasetAreaValuesProcessingHistogram processings={processings}/>
+                    <DatasetAreaValuesProcessingHistogram processings={processings} />
                 </div>
-            }
+            )}
         </div>
     );
 };
 
 DatasetAnalysisWidgetFactory.register(DATASET_AREA_VALUES_PROCESSING, (config: DatasetAnalysisWidgetFactoryConfig) => {
-    return <DatasetAreaValuesAnalysisWidget {...config}/>;
+    return <DatasetAreaValuesAnalysisWidget {...config} />;
 });

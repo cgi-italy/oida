@@ -1,7 +1,7 @@
 import { observable, action, makeObservable } from 'mobx';
 
 export type CollectionProps<T> = {
-    items?: T[]
+    items?: T[];
 };
 
 export class Collection<T> {
@@ -48,7 +48,7 @@ export class Collection<T> {
 
     @action
     move(item: T, position: number) {
-        let currentPosition = this.items.indexOf(item);
+        const currentPosition = this.items.indexOf(item);
         if (currentPosition !== -1) {
             this.items.splice(currentPosition, 1);
             this.items.splice(position, 0, item);
@@ -56,7 +56,7 @@ export class Collection<T> {
     }
 
     @action
-    sort(compareFn: ((a: T, b: T) => number)) {
+    sort(compareFn: (a: T, b: T) => number) {
         this.items.replace(this.items.sort(compareFn));
     }
 

@@ -4,29 +4,33 @@ import { Select } from 'antd';
 import { Map } from '@oidajs/state-mobx';
 import { useSelector } from '@oidajs/ui-react-mobx';
 import {
-    RasterBandModeType, RasterBandMode, RasterBandModeConfig, getRasterBandModeFromConfig,
-    RasterBandModeSingle, RasterBandModePreset, RasterBandModeCombination, DatasetDimensions
+    RasterBandModeType,
+    RasterBandMode,
+    RasterBandModeConfig,
+    getRasterBandModeFromConfig,
+    RasterBandModeSingle,
+    RasterBandModePreset,
+    RasterBandModeCombination,
+    DatasetDimensions
 } from '@oidajs/eo-mobx';
 
 import { DatasetBandSingleSelector } from './dataset-band-single-selector';
 import { DatasetBandPresetSelector } from './dataset-band-preset-selector';
 import { DatasetBandCombinationSelector } from './dataset-band-combination-selector';
 
-
 const BandModeTitles = {
     [RasterBandModeType.Single]: 'Single band',
     [RasterBandModeType.Preset]: 'Presets',
     [RasterBandModeType.Combination]: 'Custom band combination',
-    [RasterBandModeType.Formula]: 'Band math',
+    [RasterBandModeType.Formula]: 'Band math'
 };
 
 export type DatasetBandModeSelectorProps = {
-    bandMode: RasterBandMode,
-    bandModeConfig: RasterBandModeConfig
+    bandMode: RasterBandMode;
+    bandModeConfig: RasterBandModeConfig;
 };
 
 export const DatasetBandModeSelector = (props: DatasetBandModeSelectorProps) => {
-
     const [isLoading, setIsLoading] = useState(false);
 
     const modes = props.bandModeConfig.supportedModes;
@@ -36,7 +40,11 @@ export const DatasetBandModeSelector = (props: DatasetBandModeSelectorProps) => 
     });
 
     const modeOptions = modes.map((item) => {
-        return (<Select.Option key={item.type} value={item.type}>{BandModeTitles[item.type]}</Select.Option>);
+        return (
+            <Select.Option key={item.type} value={item.type}>
+                {BandModeTitles[item.type]}
+            </Select.Option>
+        );
     });
 
     const onModeSelection = (mode: RasterBandModeType) => {
@@ -44,56 +52,46 @@ export const DatasetBandModeSelector = (props: DatasetBandModeSelectorProps) => 
         getRasterBandModeFromConfig({
             config: props.bandModeConfig,
             mode: mode
-        }).then((bandModeProps) => {
-            props.bandMode.setValue(bandModeProps);
-        }).finally(() => {
-            setIsLoading(false);
-        });
+        })
+            .then((bandModeProps) => {
+                props.bandMode.setValue(bandModeProps);
+            })
+            .finally(() => {
+                setIsLoading(false);
+            });
     };
 
     return (
         <div className='dataset-band-mode-selector dataset-combo-selector'>
             <span>Mode: </span>
-            <Select
-                value={selectedMode}
-                placeholder='Select mode'
-                onChange={onModeSelection}
-                loading={isLoading}
-            >
+            <Select value={selectedMode} placeholder='Select mode' onChange={onModeSelection} loading={isLoading}>
                 {modeOptions}
             </Select>
         </div>
     );
 };
 
-
 export type DatasetBandModeControlsProps = {
-    bandMode: RasterBandMode,
-    bandModeConfig: RasterBandModeConfig,
-    dimensionsState?: DatasetDimensions,
-    mapState?: Map
+    bandMode: RasterBandMode;
+    bandModeConfig: RasterBandModeConfig;
+    dimensionsState?: DatasetDimensions;
+    mapState?: Map;
 };
 
 export const DatasetBandModeControls = (props: DatasetBandModeControlsProps) => {
-
     const selectedMode = useSelector(() => {
         return props.bandMode.value;
     });
 
     let bandModeSelector: JSX.Element | undefined;
     if (props.bandModeConfig.supportedModes.length > 1) {
-        bandModeSelector = (
-            <DatasetBandModeSelector
-                bandMode={props.bandMode}
-                bandModeConfig={props.bandModeConfig}
-            />
-        );
+        bandModeSelector = <DatasetBandModeSelector bandMode={props.bandMode} bandModeConfig={props.bandModeConfig} />;
     }
 
     return (
         <div className='dataset-band-mode-controls'>
             {bandModeSelector}
-            {selectedMode instanceof RasterBandModeSingle &&
+            {selectedMode instanceof RasterBandModeSingle && (
                 <DatasetBandSingleSelector
                     rasterBands={props.bandModeConfig.bands!}
                     state={selectedMode}
@@ -101,14 +99,11 @@ export const DatasetBandModeControls = (props: DatasetBandModeControlsProps) => 
                     dimensionsState={props.dimensionsState}
                     mapState={props.mapState}
                 />
-            }
-            {selectedMode instanceof RasterBandModePreset &&
-                <DatasetBandPresetSelector
-                    state={selectedMode}
-                    presets={props.bandModeConfig.presets!}
-                />
-            }
-            {selectedMode instanceof RasterBandModeCombination &&
+            )}
+            {selectedMode instanceof RasterBandModePreset && (
+                <DatasetBandPresetSelector state={selectedMode} presets={props.bandModeConfig.presets!} />
+            )}
+            {selectedMode instanceof RasterBandModeCombination && (
                 <DatasetBandCombinationSelector
                     bandCombo={selectedMode}
                     bands={props.bandModeConfig.bands!}
@@ -116,7 +111,7 @@ export const DatasetBandModeControls = (props: DatasetBandModeControlsProps) => 
                     dimensionsState={props.dimensionsState}
                     mapState={props.mapState}
                 />
-            }
+            )}
         </div>
     );
 };

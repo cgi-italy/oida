@@ -9,7 +9,6 @@ import { cesiumInteractionsFactory } from './cesium-interactions-factory';
 import { CesiumMapRenderer } from '../map/cesium-map-renderer';
 
 export class CesiumMouseCoordsInteraction implements IMouseCoordsInteraction {
-
     protected viewer_;
     protected handler_;
     protected onMouseCoords_: (coords: MouseCoords | undefined) => void;
@@ -35,7 +34,7 @@ export class CesiumMouseCoordsInteraction implements IMouseCoordsInteraction {
                     this.viewer_.scene.canvas.removeEventListener('mouseleave', this.mouseLeaveHandler_);
                     delete this.handler_;
                 } catch (e) {
-
+                    // do nothing
                 }
             }
         }
@@ -46,7 +45,6 @@ export class CesiumMouseCoordsInteraction implements IMouseCoordsInteraction {
     }
 
     protected bindMouseEvents_(onMouseCoords, onMouseClick) {
-
         this.handler_ = new ScreenSpaceEventHandler(this.viewer_.scene.canvas);
 
         this.handler_.setInputAction((movement) => {
@@ -67,7 +65,6 @@ export class CesiumMouseCoordsInteraction implements IMouseCoordsInteraction {
             } else {
                 onMouseClick(undefined);
             }
-
         }, ScreenSpaceEventType.LEFT_CLICK);
     }
 
@@ -78,10 +75,8 @@ export class CesiumMouseCoordsInteraction implements IMouseCoordsInteraction {
             lat: CesiumMath.toDegrees(cartographic.latitude)
         };
     }
-
 }
 
 cesiumInteractionsFactory.register(MOUSE_COORDS_INTERACTION_ID, (config) => {
     return new CesiumMouseCoordsInteraction(config);
 });
-

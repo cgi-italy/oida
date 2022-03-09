@@ -14,7 +14,6 @@ import { olLayersFactory } from './ol-layers-factory';
 import { OLStyleParser } from '../utils/ol-style-parser';
 
 export class OLFeatureLayer extends OLMapLayer<VectorLayer> implements IFeatureLayerRenderer {
-
     static readonly FEATURE_DATA_KEY = 'data';
     static readonly FEATURE_LAYER_KEY = 'layer';
     static readonly FEATURE_PICKING_DISABLED_KEY = 'pickingDisabled';
@@ -32,13 +31,11 @@ export class OLFeatureLayer extends OLMapLayer<VectorLayer> implements IFeatureL
         this.onFeatureSelect_ = config.onFeatureSelect;
     }
 
-
     addFeature(id, geometry, style, data) {
-
-        let geom = this.parseGeometry_(geometry);
+        const geom = this.parseGeometry_(geometry);
 
         if (geom) {
-            let feature = new Feature({
+            const feature = new Feature({
                 geometry: geom
             });
 
@@ -67,21 +64,21 @@ export class OLFeatureLayer extends OLMapLayer<VectorLayer> implements IFeatureL
     }
 
     getFeatureData(id: string) {
-        let feature = this.getFeature(id);
+        const feature = this.getFeature(id);
         if (feature) {
             return feature.get(OLFeatureLayer.FEATURE_DATA_KEY);
         }
     }
 
     updateFeatureGeometry(id, geometry) {
-        let feature = this.getFeature(id);
+        const feature = this.getFeature(id);
         if (feature) {
             feature.setGeometry(this.parseGeometry_(geometry));
         }
     }
 
     updateFeatureStyle(id, style) {
-        let feature = this.getFeature(id);
+        const feature = this.getFeature(id);
         if (feature) {
             const featureStyle = this.styleParser_.getStyleForGeometry(feature.getGeometry().getType(), style);
             feature.setStyle(featureStyle);
@@ -92,12 +89,11 @@ export class OLFeatureLayer extends OLMapLayer<VectorLayer> implements IFeatureL
     }
 
     removeFeature(id) {
-        let feature = this.getFeature(id);
+        const feature = this.getFeature(id);
         if (feature) {
             this.olImpl_.getSource().removeFeature(feature);
         }
     }
-
 
     removeAllFeatures() {
         this.olImpl_.getSource().clear(true);
@@ -120,14 +116,13 @@ export class OLFeatureLayer extends OLMapLayer<VectorLayer> implements IFeatureL
     }
 
     protected parseGeometry_(geometry) {
-
         if (!geometry || !geometry.type) {
             return;
         }
 
         if (geometry.type === 'Circle') {
             let center = geometry.center;
-            let mapProjection = this.mapRenderer_.getViewer().getView().getProjection();
+            const mapProjection = this.mapRenderer_.getViewer().getView().getProjection();
             if (mapProjection.getCode() !== 'EPSG:4326') {
                 center = transform(center, 'EPSG:4326', mapProjection);
                 if (isNaN(center[0]) || isNaN(center[1])) {
@@ -148,7 +143,7 @@ export class OLFeatureLayer extends OLMapLayer<VectorLayer> implements IFeatureL
     }
 
     protected createOLObject_(config: FeatureLayerRendererConfig) {
-        let source = new VectorSource({
+        const source = new VectorSource({
             wrapX: this.mapRenderer_.getViewer().getView().wrapX
         });
 
@@ -165,7 +160,6 @@ export class OLFeatureLayer extends OLMapLayer<VectorLayer> implements IFeatureL
     protected destroyOLObject_() {
         this.olImpl_.dispose();
     }
-
 }
 
 olLayersFactory.register(FEATURE_LAYER_ID, (config) => {

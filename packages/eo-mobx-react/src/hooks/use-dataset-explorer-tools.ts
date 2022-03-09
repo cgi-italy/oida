@@ -1,6 +1,4 @@
-import {
-    DatasetAnalysis, DatasetAnalysisProps, DatasetProcessing,
-    DatasetExplorer, DatasetExplorerItem, DatasetViz, generateAnalysisName, Dataset } from '@oidajs/eo-mobx';
+import { DatasetAnalysis, DatasetExplorer, Dataset } from '@oidajs/eo-mobx';
 import { useSelector } from '@oidajs/ui-react-mobx';
 
 /** A combo analysis tool configuration */
@@ -31,7 +29,7 @@ export type DatasetExplorerTool = {
 export type DatasetExplorerToolsProps = {
     datasetExplorer: DatasetExplorer;
     combinedAnalysisTools: ComboToolConfig[];
-    dataset?: Dataset
+    dataset?: Dataset;
 };
 
 /**
@@ -40,34 +38,34 @@ export type DatasetExplorerToolsProps = {
  * @returns A list of tools configuration to be used as menu items or toolbar buttons
  */
 export const useDatasetExplorerTools = (props: DatasetExplorerToolsProps) => {
-
     const explorerItems = useSelector(() => props.datasetExplorer.items.slice());
 
-    const tools: DatasetExplorerTool[] = props.combinedAnalysisTools.filter((tool) => {
-        if (!tool.condition) {
-            return true;
-        } else {
-            if (props.dataset) {
-                return tool.condition(props.dataset);
+    const tools: DatasetExplorerTool[] = props.combinedAnalysisTools
+        .filter((tool) => {
+            if (!tool.condition) {
+                return true;
             } else {
-                // check that there is at least one explorer item supporting the analysis
-                return explorerItems.some((item) => {
-                    return tool.condition!(item.dataset);
-                });
+                if (props.dataset) {
+                    return tool.condition(props.dataset);
+                } else {
+                    // check that there is at least one explorer item supporting the analysis
+                    return explorerItems.some((item) => {
+                        return tool.condition!(item.dataset);
+                    });
+                }
             }
-        }
-    }).map((tool) => {
-        return {
-            id: tool.type,
-            icon: tool.icon,
-            name: tool.name,
-            callback: () => {
-                const analysis = tool.analysisFactory(props.dataset);
-                props.datasetExplorer.analytics.addAnalysis(analysis);
-            }
-        };
-    });
+        })
+        .map((tool) => {
+            return {
+                id: tool.type,
+                icon: tool.icon,
+                name: tool.name,
+                callback: () => {
+                    const analysis = tool.analysisFactory(props.dataset);
+                    props.datasetExplorer.analytics.addAnalysis(analysis);
+                }
+            };
+        });
 
     return tools;
-
 };

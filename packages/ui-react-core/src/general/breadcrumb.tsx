@@ -27,7 +27,7 @@ export type BreadcrumbProps = {
     /** the breadcrumb items */
     items: BreadcrumbItemProps[];
     /** override the component used for link rendering. default to {@link BreadcrumbRouterLinkItem} */
-    linkItem?: React.ComponentType<BreadcrumbItemProps>
+    linkItem?: React.ComponentType<BreadcrumbItemProps>;
 };
 
 /**
@@ -35,9 +35,7 @@ export type BreadcrumbProps = {
  * @param props the link properties
  */
 export const BreadcrumbRouterLinkItem = (props: BreadcrumbItemProps) => {
-    return (
-        <Link to={props.link || '#'}>{props.title}</Link>
-    );
+    return <Link to={props.link || '#'}>{props.title}</Link>;
 };
 
 /**

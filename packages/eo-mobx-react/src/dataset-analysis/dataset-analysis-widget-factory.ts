@@ -8,6 +8,6 @@ export const DatasetAnalysisWidgetFactory = createDynamicFactory<React.ReactNode
 
 export type DatasetAnalysisWidgetFactoryConfig = {
     datasetExplorerItems: DatasetExplorerItem[];
-    combinedAnalysis: DatasetAnalysis,
+    combinedAnalysis: DatasetAnalysis;
     availableCombos: Record<string, Array<DatasetAnalysis>>;
 };

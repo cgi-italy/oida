@@ -5,16 +5,17 @@ export type WcsServiceConfig = {
     wcsClient: WcsVendor | WcsClient;
 };
 
-
 export class WcsService {
-
     protected wcsClient_: WcsClient;
     protected config_: WcsServiceConfig;
 
     constructor(config: WcsServiceConfig) {
-        this.wcsClient_ = config.wcsClient instanceof WcsClient ? config.wcsClient : new WcsClient({
-            vendor: config.wcsClient
-        });
+        this.wcsClient_ =
+            config.wcsClient instanceof WcsClient
+                ? config.wcsClient
+                : new WcsClient({
+                      vendor: config.wcsClient
+                  });
         this.config_ = config;
     }
 

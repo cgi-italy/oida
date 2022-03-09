@@ -8,15 +8,14 @@ import { NumericFieldRenderer, SelectEnumRenderer } from '@oidajs/ui-react-antd'
 import { DatasetDimensionValueSelector } from '../../dataset-map-viz/dataset-dimension-value-selector';
 import { AnalysisAoiFilter } from '../analysis-aoi-filter';
 
-
 type DatasetVariableSelectorProps = {
-    series: DatasetTransectValues
+    series: DatasetTransectValues;
 };
 
 const DatasetVariableSeletor = (props: DatasetVariableSelectorProps) => {
-    let variableValue = useSelector(() => props.series.seriesVariable);
+    const variableValue = useSelector(() => props.series.seriesVariable);
 
-    let variableFieldConfig = {
+    const variableFieldConfig = {
         choices: props.series.config.variables.map((variable) => {
             return {
                 value: variable.id,
@@ -38,19 +37,16 @@ const DatasetVariableSeletor = (props: DatasetVariableSelectorProps) => {
     );
 };
 
-
 export type DatasetTransectValuesProcessingFiltersProps = {
     series: DatasetTransectValues;
 };
 
 export const DatasetTransectValuesProcessingFilters = (props: DatasetTransectValuesProcessingFiltersProps) => {
-
     let dimensionValueSelectors: JSX.Element[] | undefined;
 
-    let dimensions = props.series.config.dimensions;
+    const dimensions = props.series.config.dimensions;
     if (dimensions.length) {
-        dimensionValueSelectors = dimensions
-        .map((dimension) => {
+        dimensionValueSelectors = dimensions.map((dimension) => {
             return (
                 <Form.Item key={dimension.id} label={dimension.name}>
                     <DatasetDimensionValueSelector
@@ -71,22 +67,22 @@ export const DatasetTransectValuesProcessingFilters = (props: DatasetTransectVal
         <React.Fragment>
             {dimensionValueSelectors}
             <Form.Item label='Variable'>
-                <DatasetVariableSeletor
-                    series={props.series}
-                />
+                <DatasetVariableSeletor series={props.series} />
             </Form.Item>
             <Form.Item label='Path'>
                 <AnalysisAoiFilter
                     analysis={props.series}
-                    supportedGeometries={[{
-                        type: 'LineString',
-                        constraints: {
-                            maxCoords: props.series.config.maxLineStringLength
+                    supportedGeometries={[
+                        {
+                            type: 'LineString',
+                            constraints: {
+                                maxCoords: props.series.config.maxLineStringLength
+                            }
                         }
-                    }]}
+                    ]}
                 />
             </Form.Item>
-            {props.series.config.supportsNumSamples &&
+            {props.series.config.supportsNumSamples && (
                 <Form.Item label='Num samples'>
                     <NumericFieldRenderer
                         config={{
@@ -99,8 +95,7 @@ export const DatasetTransectValuesProcessingFilters = (props: DatasetTransectVal
                         onChange={(value) => props.series.setNumSamples(value)}
                     />
                 </Form.Item>
-            }
+            )}
         </React.Fragment>
     );
-
 };

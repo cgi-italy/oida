@@ -3,9 +3,7 @@ import { IMapRenderer } from '../map/map-renderer';
 
 export const FEATURE_DRAW_INTERACTION_ID = 'featuredraw';
 
-export type IFeatureDrawInteractionProps<T extends IMapRenderer = IMapRenderer> = {
-
-} & IMMapInteractionProps<T>;
+export type IFeatureDrawInteractionProps<T extends IMapRenderer = IMapRenderer> = IMMapInteractionProps<T>;
 
 export enum FeatureDrawMode {
     Off = 'OFF',
@@ -17,9 +15,8 @@ export enum FeatureDrawMode {
     Edit = 'EDIT'
 }
 
-
 export type FeatureDrawEvent = {
-    geometry: any
+    geometry: any;
 };
 
 export type FeatureDrawOptions = {
@@ -27,7 +24,7 @@ export type FeatureDrawOptions = {
     onDrawChange?: (evt: FeatureDrawEvent) => void;
     onDrawEnd?: (evt: FeatureDrawEvent) => void;
     minCoords?: number;
-    maxCoords?: number
+    maxCoords?: number;
 };
 
 export interface IFeatureDrawInteractionImplementation extends IMapInteractionImplementation {

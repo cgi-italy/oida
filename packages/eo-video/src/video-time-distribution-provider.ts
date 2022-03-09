@@ -1,16 +1,20 @@
-import { DatasetTimeDistributionProvider, TimeSearchDirection, TimeDistributionInstantItem } from '@oidajs/eo-mobx';
+import {
+    DatasetTimeDistributionProvider,
+    TimeSearchDirection,
+    TimeDistributionInstantItem,
+    TimeDomainProviderFilters
+} from '@oidajs/eo-mobx';
 
 export type VideoTimeDistributionProviderConfig = {
     timeRange: {
-        start: Date,
-        end: Date
-    },
+        start: Date;
+        end: Date;
+    };
     frameRate?: number;
 };
 
 export class VideoTimeDistributionProvider implements DatasetTimeDistributionProvider {
-
-    protected readonly timeRange_: {start: Date, end: Date};
+    protected readonly timeRange_: { start: Date; end: Date };
     protected readonly frameDuration_: number | undefined;
 
     constructor(config: VideoTimeDistributionProviderConfig) {
@@ -20,6 +24,10 @@ export class VideoTimeDistributionProvider implements DatasetTimeDistributionPro
 
     supportsHistograms() {
         return true;
+    }
+
+    setDefaultFilters(filters: TimeDomainProviderFilters | null): boolean {
+        return false;
     }
 
     getTimeExtent() {
@@ -34,21 +42,24 @@ export class VideoTimeDistributionProvider implements DatasetTimeDistributionPro
         } else {
             if (this.frameDuration_ && resolution < this.frameDuration_) {
                 const distance = timeRange.start.getTime() - this.timeRange_.start.getTime();
-                let frame = distance > 0
-                    ? this.timeRange_.start.getTime() + this.frameDuration_ * Math.floor(distance / this.frameDuration_)
-                    : this.timeRange_.start.getTime();
+                let frame =
+                    distance > 0
+                        ? this.timeRange_.start.getTime() + this.frameDuration_ * Math.floor(distance / this.frameDuration_)
+                        : this.timeRange_.start.getTime();
                 const end = this.timeRange_.end < timeRange.end ? this.timeRange_.end.getTime() : timeRange.end.getTime();
                 const distributionItems: TimeDistributionInstantItem[] = [];
                 while (frame <= end) {
-                    distributionItems.push({start: new Date(frame)});
+                    distributionItems.push({ start: new Date(frame) });
                     frame += this.frameDuration_;
                 }
                 return Promise.resolve(distributionItems);
             } else {
-                return Promise.resolve([{
-                    start: new Date(this.timeRange_.start),
-                    end: new Date(this.timeRange_.end)
-                }]);
+                return Promise.resolve([
+                    {
+                        start: new Date(this.timeRange_.start),
+                        end: new Date(this.timeRange_.end)
+                    }
+                ]);
             }
         }
     }
@@ -72,7 +83,7 @@ export class VideoTimeDistributionProvider implements DatasetTimeDistributionPro
                 target = nextDistance < prevDistance ? next : prev;
             }
         }
-        return Promise.resolve(target ? {start: new Date(target)} : undefined);
+        return Promise.resolve(target ? { start: new Date(target) } : undefined);
     }
 
     protected getNextItem_(dt: Date) {
@@ -105,4 +116,3 @@ export class VideoTimeDistributionProvider implements DatasetTimeDistributionPro
         return target;
     }
 }
-

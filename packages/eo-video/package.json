@@ -1,6 +1,6 @@
 {
   "name": "@oidajs/eo-video",
-  "version": "2.0.0",
+  "version": "2.0.2",
   "description": "oida EO video library",
   "module": "es/index.js",
   "main": "lib/index.js",
@@ -32,7 +32,7 @@
     "@oidajs/state-mobx": "file:../state-mobx",
     "@oidajs/ui-react-mobx": "file:../ui-react-mobx",
     "mediaelement": "^4.2.16",
-    "tslib": "^2.2.0",
-    "uuid": "^8.0.0"
+    "tslib": "^2.3.1",
+    "uuid": "^8.3.2"
   }
 }

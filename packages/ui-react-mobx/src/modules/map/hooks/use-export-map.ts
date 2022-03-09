@@ -5,7 +5,6 @@ import { Map } from '@oidajs/state-mobx';
 import { useSelector } from '../../../core';
 import { useMapModule } from './use-map-module';
 
-
 export type ExportMapProps = {
     map: Map;
     format?: string;
@@ -13,25 +12,24 @@ export type ExportMapProps = {
 };
 
 export const useExportMap = (props: ExportMapProps) => {
-
-    let target = useSelector(() => {
+    const target = useSelector(() => {
         return props.map.view.target;
     });
 
     return () => {
         if (target) {
-            let canvas = target.querySelector('canvas');
+            const canvas = target.querySelector('canvas');
             if (canvas) {
-                let format = props.format || 'image/png';
+                const format = props.format || 'image/png';
 
-                let extensionFromMimeType = format.match(/\/(.*)$/);
+                const extensionFromMimeType = format.match(/\/(.*)$/);
                 let extension = '';
                 if (extensionFromMimeType) {
                     extension = `.${extensionFromMimeType[1]}`;
                 }
-                let fileName = props.fileName || `map${extension}`;
+                const fileName = props.fileName || `map${extension}`;
 
-                let img = canvas.toDataURL(format);
+                const img = canvas.toDataURL(format);
                 download(img, fileName, format);
             }
         }
@@ -39,7 +37,7 @@ export const useExportMap = (props: ExportMapProps) => {
 };
 
 export const useExportMapFromModule = (props?: Omit<ExportMapProps, 'map'>, mapModuleId?: string) => {
-    let mapModuleState = useMapModule(mapModuleId);
+    const mapModuleState = useMapModule(mapModuleId);
     return useExportMap({
         map: mapModuleState.map,
         ...props

@@ -2,12 +2,10 @@ import Cartesian2 from 'cesium/Source/Core/Cartesian2';
 import Texture from 'cesium/Source/Renderer/Texture';
 import PixelDataType from 'cesium/Source/Renderer/PixelDatatype';
 import PixelFormat from 'cesium/Source/Core/PixelFormat';
-import ShaderSource from 'cesium/Source/Renderer/ShaderSource';
 
 import { VolumeTileKey } from '@oidajs/core';
 
 import { CesiumVolumeSource, CesiumVolumeSlice } from './cesium-volume-source';
-
 
 export type CesiumVolumeTileTextureConfig = {
     source: CesiumVolumeSource;
@@ -15,7 +13,6 @@ export type CesiumVolumeTileTextureConfig = {
 };
 
 export class CesiumVolumeTileTexture {
-
     static getSamplingShaderSources() {
         return CesiumVolumeTileTexture.samplingShaders_;
     }
@@ -58,10 +55,8 @@ export class CesiumVolumeTileTexture {
     }
 
     load(context) {
-
-        return new Promise<void>((resolve, reject) => {
-
-            let slices = this.config_.source.loadTileData(this.config_.tileKey, (slice) => {
+        return new Promise<void>((resolve) => {
+            const slices = this.config_.source.loadTileData(this.config_.tileKey, (slice) => {
                 this.updateTextureSlice_(slice, context);
                 resolve();
             });
@@ -70,17 +65,12 @@ export class CesiumVolumeTileTexture {
         });
     }
 
-
     isReady() {
         return !!this.texture_;
     }
 
-    isReadyPromise() {
-
-    }
-
     destroy() {
-
+        return;
     }
 
     getSamplingUniforms() {
@@ -95,14 +85,16 @@ export class CesiumVolumeTileTexture {
             this.initTexture_(slice, context);
         }
 
-        let gridOffset = this.getTextureOffset_(slice.z);
+        const gridOffset = this.getTextureOffset_(slice.z);
 
         if (ArrayBuffer.isView(slice.data)) {
-            let tileGrid = this.config_.source.getTileGrid();
-            let [tileWidth, tileHeight] = tileGrid.tileSize;
+            const tileGrid = this.config_.source.getTileGrid();
+            const [tileWidth, tileHeight] = tileGrid.tileSize;
             this.texture_.copyFrom({
                 source: {
-                    width: tileWidth, height: tileHeight, arrayBufferView: slice.data
+                    width: tileWidth,
+                    height: tileHeight,
+                    arrayBufferView: slice.data
                 },
                 xOffset: gridOffset.x,
                 yOffset: gridOffset.y
@@ -117,8 +109,8 @@ export class CesiumVolumeTileTexture {
     }
 
     protected initTexture_(slice: CesiumVolumeSlice, context) {
-        let tileGrid = this.config_.source.getTileGrid();
-        let [tileWidth, tileHeight] = tileGrid.tileSize;
+        const tileGrid = this.config_.source.getTileGrid();
+        const [tileWidth, tileHeight] = tileGrid.tileSize;
 
         let pixelFormat, pixelDataType;
         if (slice.data instanceof HTMLImageElement || slice.data instanceof HTMLCanvasElement) {
@@ -140,27 +132,23 @@ export class CesiumVolumeTileTexture {
             pixelFormat: pixelFormat,
             pixelDatatype: pixelDataType
         });
-
     }
 
     protected computeSliceGridSize_(numSlices: number) {
-        let gridSize = Math.sqrt(numSlices);
-        this.sliceGridSize_ = new Cartesian2(
-            Math.floor(gridSize),
-            Math.ceil(gridSize)
-        );
+        const gridSize = Math.sqrt(numSlices);
+        this.sliceGridSize_ = new Cartesian2(Math.floor(gridSize), Math.ceil(gridSize));
     }
 
     protected getTextureOffset_(z: number) {
-        let tileGrid = this.config_.source.getTileGrid();
+        const tileGrid = this.config_.source.getTileGrid();
 
-        let tileExtent = this.config_.source.getTileExtentForKey(this.config_.tileKey);
-        let sizeZ = tileExtent.maxZ - tileExtent.minZ;
-        let normZ = (z - tileExtent.minZ) / sizeZ;
-        let gridIdx = Math.floor(normZ * this.sliceGridSize_.x * this.sliceGridSize_.y);
+        const tileExtent = this.config_.source.getTileExtentForKey(this.config_.tileKey);
+        const sizeZ = tileExtent.maxZ - tileExtent.minZ;
+        const normZ = (z - tileExtent.minZ) / sizeZ;
+        const gridIdx = Math.floor(normZ * this.sliceGridSize_.x * this.sliceGridSize_.y);
 
-        let gridX = Math.floor(gridIdx % this.sliceGridSize_.x);
-        let gridY  = Math.floor(gridIdx / this.sliceGridSize_.x);
+        const gridX = Math.floor(gridIdx % this.sliceGridSize_.x);
+        const gridY = Math.floor(gridIdx / this.sliceGridSize_.x);
 
         return {
             x: gridX * tileGrid.tileSize[0],

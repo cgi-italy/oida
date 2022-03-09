@@ -3,20 +3,17 @@ import { ColorScale, ColorScaleType } from '@oidajs/eo-mobx';
 import chroma from 'chroma-js';
 
 let plottyColorScales: (ColorScale & {
-    colors: string[]
+    colors: string[];
 })[];
 
 export const getPlottyColorScales = () => {
-
     if (!plottyColorScales) {
-        let colorLegendCanvas = document.createElement('canvas');
+        const colorLegendCanvas = document.createElement('canvas');
 
         plottyColorScales = Object.keys(colorscales).map((id) => {
-
             renderColorScaleToCanvas(id, colorLegendCanvas);
-            let legend = new Image();
+            const legend = new Image();
             legend.src = colorLegendCanvas.toDataURL();
-
 
             const colorscale = colorscales[id];
             let colors = colorscale.colors;
@@ -35,9 +32,7 @@ export const getPlottyColorScales = () => {
                 colors: colors,
                 positions: colorscale.positions
             };
-
         });
     }
     return plottyColorScales;
 };
-

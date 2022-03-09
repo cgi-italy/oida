@@ -8,14 +8,13 @@ import { IFeatureStyle, BBoxGeometry } from '@oidajs/core';
 
 import { CesiumGeometryEntityRenderer } from './cesium-geometry-entity-renderer-factory';
 
-
 export const createBBoxEntity = (id: string, geometry: BBoxGeometry, featureStyle: IFeatureStyle, layerOptions?) => {
-    let style = featureStyle.polygon;
+    const style = featureStyle.polygon;
     if (!style) {
         return;
     }
 
-    let bboxEntity = new Entity({
+    const bboxEntity = new Entity({
         id: id,
         show: style.visible
     });
@@ -42,7 +41,6 @@ export const createBBoxEntity = (id: string, geometry: BBoxGeometry, featureStyl
     });
 
     return bboxEntity;
-
 };
 
 export const updateBBoxEntityGeometry = (bboxEntity, geometry: BBoxGeometry) => {
@@ -50,12 +48,12 @@ export const updateBBoxEntityGeometry = (bboxEntity, geometry: BBoxGeometry) => 
 };
 
 export const updateBBoxEntityStyle = (bboxEntity, featureStyle: IFeatureStyle) => {
-    let style = featureStyle.polygon;
+    const style = featureStyle.polygon;
     if (!style) {
         return;
     }
 
-    let rectangle = bboxEntity.rectangle;
+    const rectangle = bboxEntity.rectangle;
     if (style.fillColor) {
         rectangle.fill = true;
         rectangle.material = new Color(...style.fillColor);

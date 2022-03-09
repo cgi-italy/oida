@@ -1,4 +1,3 @@
-
 import { autorun } from 'mobx';
 import { SubscriptionTracker, IMapInteractionImplementation, IMapRenderer } from '@oidajs/core';
 
@@ -35,9 +34,11 @@ export class MapInteractionController<
     }
 
     protected bindToInteractionState_() {
-        this.subscriptionTracker_.addSubscription(autorun(() => {
-            this.interactionImpl_!.setActive(this.interaction_.active.value);
-        }));
+        this.subscriptionTracker_.addSubscription(
+            autorun(() => {
+                this.interactionImpl_!.setActive(this.interaction_.active.value);
+            })
+        );
     }
 
     protected unbindFromInteractionState_() {
@@ -56,5 +57,4 @@ export class MapInteractionController<
             active: this.interaction_.active
         };
     }
-
 }

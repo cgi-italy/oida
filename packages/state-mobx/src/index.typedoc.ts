@@ -11,7 +11,7 @@
  *
  * @packageDocumentation
  * @module state-mobx
-*/
+ */
 
 /**@ignore */
 export const core = 'STATE_MOBX';

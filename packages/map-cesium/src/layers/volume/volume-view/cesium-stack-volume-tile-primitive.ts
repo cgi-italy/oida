@@ -9,12 +9,10 @@ import BoundingSphere from 'cesium/Source/Core/BoundingSphere';
 import { CesiumVolumeTilePrimitive, CesiumVolumeTilePrimitiveConfig } from '../cesium-volume-tile-primitive';
 
 export type CesiumStackVolumeTilePrimitiveConfig = {
-    numSlices: number
+    numSlices: number;
 } & CesiumVolumeTilePrimitiveConfig;
 
-
 export class CesiumStackVolumeTilePrimitive extends CesiumVolumeTilePrimitive {
-
     protected numSlices_: number;
 
     constructor(config: CesiumStackVolumeTilePrimitiveConfig) {
@@ -23,17 +21,17 @@ export class CesiumStackVolumeTilePrimitive extends CesiumVolumeTilePrimitive {
     }
 
     protected createGeometry_() {
-        let extent = this.tileSet_.getTileExtentForKey(this.tileKey_);
+        const extent = this.tileSet_.getTileExtentForKey(this.tileKey_);
 
-        let numSlices = this.numSlices_;
-        let positions = new Float32Array(numSlices * 12);
-        let str = new Float32Array(numSlices * 12);
-        let indices = new Uint16Array(numSlices * 6);
+        const numSlices = this.numSlices_;
+        const positions = new Float32Array(numSlices * 12);
+        const str = new Float32Array(numSlices * 12);
+        const indices = new Uint16Array(numSlices * 6);
 
         let sliceZ = extent.minZ;
-        let zStep = (extent.maxZ - extent.minZ) / numSlices;
+        const zStep = (extent.maxZ - extent.minZ) / numSlices;
         for (let i = 0; i < numSlices; ++i) {
-            let sliceCoords = this.createSliceCoordinates_(sliceZ, extent, i);
+            const sliceCoords = this.createSliceCoordinates_(sliceZ, extent, i);
             positions.set(sliceCoords.positions, i * 12);
             str.set(sliceCoords.str, i * 12);
             indices.set(sliceCoords.indices, i * 6);
@@ -41,7 +39,7 @@ export class CesiumStackVolumeTilePrimitive extends CesiumVolumeTilePrimitive {
             sliceZ += zStep;
         }
 
-        let geometry = new Geometry({
+        const geometry = new Geometry({
             attributes: {
                 position: new GeometryAttribute({
                     componentDatatype: ComponentDatatype.FLOAT,
@@ -60,36 +58,33 @@ export class CesiumStackVolumeTilePrimitive extends CesiumVolumeTilePrimitive {
         });
 
         return GeometryPipeline.computeNormal(geometry);
-
     }
 
     protected createSliceCoordinates_(z, extent, sliceIdx) {
+        const reproject = this.getCoordReprojectionFunction_();
 
-        let reproject = this.getCoordReprojectionFunction_();
-
-        let cartesianPositions = Cartesian3.fromDegreesArrayHeights([
+        const cartesianPositions = Cartesian3.fromDegreesArrayHeights([
             ...reproject([extent.minX, extent.minY, z]),
             ...reproject([extent.minX, extent.maxY, z]),
             ...reproject([extent.maxX, extent.maxY, z]),
             ...reproject([extent.maxX, extent.minY, z])
         ]);
 
-        let positions = Cartesian3.packArray(cartesianPositions, new Float32Array(cartesianPositions.length * 3));
+        const positions = Cartesian3.packArray(cartesianPositions, new Float32Array(cartesianPositions.length * 3));
 
-        let normZ = (z - extent.minZ) / (extent.maxZ - extent.minZ);
+        const normZ = (z - extent.minZ) / (extent.maxZ - extent.minZ);
 
-        let str = new Float32Array([
-            0, 0, normZ,
-            0, 1, normZ,
-            1, 1, normZ,
-            1, 0, normZ
-        ]);
+        const str = new Float32Array([0, 0, normZ, 0, 1, normZ, 1, 1, normZ, 1, 0, normZ]);
 
-        let indexOffset = sliceIdx * 4;
+        const indexOffset = sliceIdx * 4;
 
-        let indices = new Uint16Array([
-            indexOffset + 0, indexOffset + 1, indexOffset + 2,
-            indexOffset + 0, indexOffset + 2, indexOffset + 3
+        const indices = new Uint16Array([
+            indexOffset + 0,
+            indexOffset + 1,
+            indexOffset + 2,
+            indexOffset + 0,
+            indexOffset + 2,
+            indexOffset + 3
         ]);
 
         return {

@@ -1,4 +1,4 @@
-import { observable, makeObservable, autorun, action, reaction } from 'mobx';
+import { observable, makeObservable, action, reaction } from 'mobx';
 
 import { LoadingState, GeoImageLayerFootprint, getGeometryExtent } from '@oidajs/core';
 import { Map, GeoImageLayer } from '@oidajs/state-mobx';
@@ -21,7 +21,6 @@ type AdaptiveStream = VideoStream & {
 };
 
 export class AdaptiveVideoLayer {
-
     @observable.ref isPlaying: boolean;
     @observable.ref ready: boolean;
     readonly mapLayer: GeoImageLayer;
@@ -36,7 +35,6 @@ export class AdaptiveVideoLayer {
     protected readonly timeUpdateCb_: ((time: number) => void) | undefined;
 
     constructor(config: AdaptiveVideoLayerConfig) {
-
         this.map_ = config.mapState;
         this.mapLayer = new GeoImageLayer({
             id: config.id,
@@ -83,7 +81,7 @@ export class AdaptiveVideoLayer {
 
     seek(time: number) {
         if (time >= this.mediaElement_.duration) {
-            time = this.mediaElement_.duration - (this.frameDuration_ / 2);
+            time = this.mediaElement_.duration - this.frameDuration_ / 2;
         }
         if (time < 0) {
             time = 0;
@@ -129,58 +127,56 @@ export class AdaptiveVideoLayer {
     }
 
     protected initVideoObject_(videoSource: string | string[]) {
-
         this.mapLayer.loadingStatus.setValue(LoadingState.Loading);
 
-        createAdaptiveVideo(videoSource).then(({media}) => {
+        createAdaptiveVideo(videoSource)
+            .then(({ media }) => {
+                this.mediaElement_ = media;
+                this.mediaElement_.setMuted(true);
 
-            this.mediaElement_ = media;
-            this.mediaElement_.setMuted(true);
+                // chrome has a lagging issue when HW acceleration is enabled and the video
+                // is not visible on the screen. Append the video element to body and make it
+                // 'almost' invisible
+                this.appendVideoElementToBody_();
 
-            // chrome has a lagging issue when HW acceleration is enabled and the video
-            // is not visible on the screen. Append the video element to body and make it
-            // 'almost' invisible
-            this.appendVideoElementToBody_();
+                if (media.dashPlayer) {
+                    this.videoAdapter_ = new DashVideoAdapter({
+                        dashPlayer: media.dashPlayer,
+                        videoElement: this.mediaElement_.renderer
+                    });
+                } else if (media.hlsPlayer) {
+                    this.videoAdapter_ = new HlsVideoAdapter({
+                        hlsPlayer: media.hlsPlayer,
+                        videoElement: this.mediaElement_.renderer
+                    });
+                } else {
+                    this.videoAdapter_ = new HtmlVideoAdapter({
+                        videoElement: this.mediaElement_.renderer
+                    });
+                }
 
-            if (media.dashPlayer) {
-                this.videoAdapter_ = new DashVideoAdapter({
-                    dashPlayer: media.dashPlayer,
-                    videoElement: this.mediaElement_.renderer
+                const streams = this.videoAdapter_.getAvailableStreams();
+
+                const fullResWidth = streams[streams.length - 1].width;
+                if (!this.resolution_) {
+                    this.resolution_ = this.getVideoResolutionInMeters_(fullResWidth);
+                }
+                this.videoStreams_ = streams.map((stream) => {
+                    return {
+                        ...stream,
+                        resolution: (fullResWidth / stream.width) * this.resolution_
+                    };
                 });
-            } else if (media.hlsPlayer) {
-                this.videoAdapter_ = new HlsVideoAdapter({
-                    hlsPlayer: media.hlsPlayer,
-                    videoElement: this.mediaElement_.renderer
-                });
-            } else {
-                this.videoAdapter_ = new HtmlVideoAdapter({
-                    videoElement: this.mediaElement_.renderer
-                });
-            }
 
-            const streams = this.videoAdapter_.getAvailableStreams();
-
-            const fullResWidth = streams[streams.length - 1].width;
-            if (!this.resolution_) {
-                this.resolution_ = this.getVideoResolutionInMeters_(fullResWidth);
-            }
-            this.videoStreams_ = streams.map((stream) => {
-                return {
-                    ...stream,
-                    resolution: fullResWidth / stream.width * this.resolution_
-                };
+                this.setFrameMode_();
+                this.forceFrameReload_();
+            })
+            .catch(() => {
+                this.mapLayer.loadingStatus.setValue(LoadingState.Error);
             });
-
-            this.setFrameMode_();
-            this.forceFrameReload_();
-
-        }).catch(() => {
-            this.mapLayer.loadingStatus.setValue(LoadingState.Error);
-        });
     }
 
     protected getQualityForResolution_(resolution: number): AdaptiveStream | undefined {
-
         const videoStreams = this.videoStreams_;
         if (!videoStreams) {
             return undefined;
@@ -196,11 +192,9 @@ export class AdaptiveVideoLayer {
             ...videoStreams[videoStreams.length - 1],
             bitrate: -1
         };
-
     }
 
     protected setPlayMode_() {
-
         const preferredStream = this.map_ ? this.getQualityForResolution_(this.map_.view.viewport.resolution) : undefined;
         this.videoAdapter_?.setPlayMode(preferredStream);
 
@@ -223,16 +217,15 @@ export class AdaptiveVideoLayer {
             }
         };
         updateTexture();
-
-
     }
 
     protected setFrameMode_() {
-
         this.setIsPlaying_(false);
         const preferredStream = this.map_
             ? this.getQualityForResolution_(this.map_.view.viewport.resolution)
-            : this.videoStreams_ ? this.videoStreams_[this.videoStreams_.length - 1] : undefined;
+            : this.videoStreams_
+            ? this.videoStreams_[this.videoStreams_.length - 1]
+            : undefined;
         this.videoAdapter_?.setFrameMode(preferredStream);
         //this.forceFrameReload_();
     }
@@ -253,7 +246,7 @@ export class AdaptiveVideoLayer {
             coordinates: [this.footprints_[0]]
         });
 
-        return (extent![2] - extent![0]) * 111111 / videoWidth;
+        return ((extent![2] - extent![0]) * 111111) / videoWidth;
     }
 
     protected updateFootprintForCurrentTime_() {
@@ -291,11 +284,15 @@ export class AdaptiveVideoLayer {
 
         const map = this.map_;
         if (map && this.videoStreams_?.length && this.videoStreams_.length > 1) {
-            reaction(() => map.view.viewport.resolution, (resolution) => {
-                this.onMapResolutionChange_(resolution);
-            }, {
-                delay: 1000
-            });
+            reaction(
+                () => map.view.viewport.resolution,
+                (resolution) => {
+                    this.onMapResolutionChange_(resolution);
+                },
+                {
+                    delay: 1000
+                }
+            );
         }
 
         this.ready = true;
@@ -312,7 +309,6 @@ export class AdaptiveVideoLayer {
         setTimeout(() => {
             this.mediaElement_.currentTime = currentTime;
             if (!this.ready) {
-
                 const onFirstSeek = () => {
                     this.mapLayer.setSource(this.mediaElement_.renderer);
                     this.setReady_();
@@ -345,4 +341,3 @@ export class AdaptiveVideoLayer {
         document.body.append(videoElement);
     }
 }
-

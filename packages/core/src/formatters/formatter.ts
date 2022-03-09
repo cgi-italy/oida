@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export type FormatterQuantity<VALUE_TYPE, FORMATTER_OPTIONS> = {
     id: string;
 };

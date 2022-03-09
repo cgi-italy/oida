@@ -4,7 +4,6 @@ import { useSelector } from '../../../core';
 import { FormattersModule, FormatterOptionsPreset } from '../formatters-module';
 import { useFormattersModule } from './use-formatters-module';
 
-
 export type FormatSelectorProps<VALUE_TYPE, FORMATTER_OPTIONS> = {
     quantity: FormatterQuantity<VALUE_TYPE, FORMATTER_OPTIONS>;
     optionsPresets: FormatterOptionsPreset<FORMATTER_OPTIONS>[];
@@ -12,11 +11,9 @@ export type FormatSelectorProps<VALUE_TYPE, FORMATTER_OPTIONS> = {
 };
 
 export const useFormatSelectorBase = <VALUE_TYPE, FORMATTER_OPTIONS>(props: FormatSelectorProps<VALUE_TYPE, FORMATTER_OPTIONS>) => {
-
-    let { quantity, optionsPresets, formattersModule} = props;
+    const { quantity, optionsPresets, formattersModule } = props;
 
     return useSelector(() => {
-
         const value = formattersModule.getFormatter(quantity)?.defaultOptions.id;
 
         return {
@@ -28,8 +25,7 @@ export const useFormatSelectorBase = <VALUE_TYPE, FORMATTER_OPTIONS>(props: Form
             }),
             value: value,
             onSelect: (id) => {
-
-                let preset = optionsPresets.find((preset) => {
+                const preset = optionsPresets.find((preset) => {
                     return preset.id === id;
                 });
 
@@ -44,11 +40,13 @@ export const useFormatSelectorBase = <VALUE_TYPE, FORMATTER_OPTIONS>(props: Form
     });
 };
 
-export const useFormatSelector =
-<VALUE_TYPE, FORMATTER_OPTIONS>(quantity: FormatterQuantity<VALUE_TYPE, FORMATTER_OPTIONS>, formatterModuleId?: string) => {
-    let formattersModule = useFormattersModule(formatterModuleId);
+export const useFormatSelector = <VALUE_TYPE, FORMATTER_OPTIONS>(
+    quantity: FormatterQuantity<VALUE_TYPE, FORMATTER_OPTIONS>,
+    formatterModuleId?: string
+) => {
+    const formattersModule = useFormattersModule(formatterModuleId);
 
-    let quantityConfig = formattersModule.config.formatters.find((item) => {
+    const quantityConfig = formattersModule.config.formatters.find((item) => {
         return item.quantity === quantity;
     });
 

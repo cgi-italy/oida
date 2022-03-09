@@ -9,7 +9,6 @@ import { layerControllersFactory } from './layer-controllers-factory';
 import { volumeViewModeControllerFactory, VolumeViewModeController } from './volume-view-mode';
 
 export class VolumeLayerController extends MapLayerController<IVolumeLayerRenderer, VolumeLayer> {
-
     protected colorMapObserverDisposer_: (() => void) | undefined;
     protected viewModeController_: VolumeViewModeController | undefined;
     protected sliceLoadingState_ = {
@@ -22,7 +21,6 @@ export class VolumeLayerController extends MapLayerController<IVolumeLayerRender
     }
 
     protected createLayerRenderer_(mapRenderer: IMapRenderer) {
-
         const onSliceLoadStart = () => {
             this.sliceLoadingState_.pending++;
             this.mapLayer_.loadingStatus.update({
@@ -49,16 +47,17 @@ export class VolumeLayerController extends MapLayerController<IVolumeLayerRender
             }
         };
 
-
         return <IVolumeLayerRenderer>mapRenderer.getLayersFactory().create(VOLUME_LAYER_ID, {
             ...this.getRendererConfig_(mapRenderer),
             source: this.mapLayer_.source,
-            colorMap: this.mapLayer_.colorMap ? {
-                clamp: this.mapLayer_.colorMap.clamp,
-                noData: this.mapLayer_.colorMap.noDataValue,
-                range: this.mapLayer_.colorMap.mapRange,
-                image: this.mapLayer_.colorMap.colorScale
-            } : undefined,
+            colorMap: this.mapLayer_.colorMap
+                ? {
+                      clamp: this.mapLayer_.colorMap.clamp,
+                      noData: this.mapLayer_.colorMap.noDataValue,
+                      range: this.mapLayer_.colorMap.mapRange,
+                      image: this.mapLayer_.colorMap.colorScale
+                  }
+                : undefined,
             onSliceLoadStart: onSliceLoadStart,
             onSliceLoadEnd: onSliceLoadEnd
         });
@@ -70,17 +69,25 @@ export class VolumeLayerController extends MapLayerController<IVolumeLayerRender
         const layerRenderer = this.layerRenderer_!;
 
         this.subscriptionTracker_.addSubscription(
-            reaction(() => this.mapLayer_.source, (source) => {
-                this.resetLoadingState_();
-                layerRenderer.updateSource(source);
-            }, {fireImmediately: true})
+            reaction(
+                () => this.mapLayer_.source,
+                (source) => {
+                    this.resetLoadingState_();
+                    layerRenderer.updateSource(source);
+                },
+                { fireImmediately: true }
+            )
         );
 
         this.subscriptionTracker_.addSubscription(
-            reaction(() => this.mapLayer_.verticalScale, (verticalScale) => {
-                this.resetLoadingState_();
-                layerRenderer.setVerticalScale(verticalScale);
-            }, {fireImmediately: true})
+            reaction(
+                () => this.mapLayer_.verticalScale,
+                (verticalScale) => {
+                    this.resetLoadingState_();
+                    layerRenderer.setVerticalScale(verticalScale);
+                },
+                { fireImmediately: true }
+            )
         );
 
         this.subscriptionTracker_.addSubscription(
@@ -90,57 +97,65 @@ export class VolumeLayerController extends MapLayerController<IVolumeLayerRender
             })
         );
 
-        this.subscriptionTracker_.addSubscription(reaction(() => this.mapLayer_.colorMap, (colorMap) => {
+        this.subscriptionTracker_.addSubscription(
+            reaction(
+                () => this.mapLayer_.colorMap,
+                (colorMap) => {
+                    if (this.colorMapObserverDisposer_) {
+                        this.colorMapObserverDisposer_();
+                        delete this.colorMapObserverDisposer_;
+                    }
 
-            if (this.colorMapObserverDisposer_) {
-                this.colorMapObserverDisposer_();
-                delete this.colorMapObserverDisposer_;
-            }
+                    if (colorMap) {
+                        const colorapDisposer = autorun(() => {
+                            layerRenderer.setColorMap(colorMap.colorScale);
+                        });
 
-            if (colorMap) {
-                let colorapDisposer = autorun(() => {
-                    layerRenderer.setColorMap(colorMap.colorScale);
-                });
+                        const rangeDisposer = autorun(() => {
+                            layerRenderer.setMapRange(colorMap.mapRange);
+                        });
 
-                let rangeDisposer = autorun(() => {
-                    layerRenderer.setMapRange(colorMap.mapRange);
-                });
+                        const clampDisposer = autorun(() => {
+                            layerRenderer.setClamp(colorMap.clamp);
+                        });
 
-                let clampDisposer = autorun(() => {
-                    layerRenderer.setClamp(colorMap.clamp);
-                });
+                        const noDataDisposer = autorun(() => {
+                            layerRenderer.setNoDataValue(colorMap.noDataValue || -Number.MAX_VALUE);
+                        });
 
-                let noDataDisposer = autorun(() => {
-                    layerRenderer.setNoDataValue(colorMap.noDataValue || -Number.MAX_VALUE);
-                });
+                        this.colorMapObserverDisposer_ = () => {
+                            colorapDisposer();
+                            rangeDisposer();
+                            clampDisposer();
+                            noDataDisposer();
+                        };
+                    }
+                },
+                { fireImmediately: true }
+            )
+        );
 
-                this.colorMapObserverDisposer_ = () => {
-                    colorapDisposer();
-                    rangeDisposer();
-                    clampDisposer();
-                    noDataDisposer();
-                };
-            }
-        }, {fireImmediately: true}));
+        this.subscriptionTracker_.addSubscription(
+            reaction(
+                () => this.mapLayer_.viewMode,
+                (viewMode) => {
+                    if (this.viewModeController_) {
+                        this.viewModeController_.destroy();
+                        delete this.viewModeController_;
+                    }
 
-        this.subscriptionTracker_.addSubscription(reaction(() => this.mapLayer_.viewMode, (viewMode) => {
-
-            if (this.viewModeController_) {
-                this.viewModeController_.destroy();
-                delete this.viewModeController_;
-            }
-
-            let viewModeImplementation = layerRenderer.setViewMode(viewMode.mode);
-            if (viewModeImplementation) {
-                this.viewModeController_ = volumeViewModeControllerFactory.create(viewMode.mode, {
-                    viewModeState: viewMode,
-                    viewModeImplementation: viewModeImplementation
-                });
-            }
-        }, {fireImmediately: true}));
-
+                    const viewModeImplementation = layerRenderer.setViewMode(viewMode.mode);
+                    if (viewModeImplementation) {
+                        this.viewModeController_ = volumeViewModeControllerFactory.create(viewMode.mode, {
+                            viewModeState: viewMode,
+                            viewModeImplementation: viewModeImplementation
+                        });
+                    }
+                },
+                { fireImmediately: true }
+            )
+        );
     }
-
 
     protected unbindFromLayerState_() {
         super.unbindFromLayerState_();
@@ -162,10 +177,8 @@ export class VolumeLayerController extends MapLayerController<IVolumeLayerRender
             percentage: 100
         });
     }
-
 }
 
 layerControllersFactory.register(VOLUME_LAYER_ID, (config) => {
     return new VolumeLayerController(config);
 });
-

@@ -13,6 +13,5 @@ volumeViewModeControllerFactory.register(SLICE_VOLUME_VIEW_ID, (config) => {
     return new VolumeSliceViewController(config);
 });
 
-
 export { volumeViewModeControllerFactory, VolumeStackViewController, VolumeSliceViewController };
 export * from './volume-view-mode-controller';

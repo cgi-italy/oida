@@ -8,23 +8,25 @@ import { RasterBandModeSingle, RasterBandConfig, getRasterBandSingleConfig, Data
 import { DatasetColorMapSelector } from './dataset-colormap-selector';
 import { DatasetInfoTooltip } from './dataset-info-tooltip';
 
-
 export type DatasetBandSelectorProps = {
     state: RasterBandModeSingle;
     bands: RasterBandConfig[];
-    bandSelectorLabel?: string
+    bandSelectorLabel?: string;
 };
 
 export const DatasetBandSelector = (props: DatasetBandSelectorProps) => {
-
-    let selectedBand = useSelector(() => {
+    const selectedBand = useSelector(() => {
         return props.state.band;
     });
 
     const selectedBandConfig = props.bands.find((bandConfig) => bandConfig.id === selectedBand);
 
     const bandOptions = props.bands.map((band) => {
-        return (<Select.Option key={band.id} value={band.id}>{band.name}</Select.Option>);
+        return (
+            <Select.Option key={band.id} value={band.id}>
+                {band.name}
+            </Select.Option>
+        );
     });
 
     const setDefaultBandDomain = (band: string) => {
@@ -35,6 +37,9 @@ export const DatasetBandSelector = (props: DatasetBandSelectorProps) => {
             }
         }).then((bandMode) => {
             props.state.colorMap.setColorMapDomain(bandMode.colorMap.domain);
+            if (bandMode.colorMap.colorScale) {
+                props.state.colorMap.setColorScale(bandMode.colorMap.colorScale);
+            }
         });
     };
 
@@ -50,7 +55,7 @@ export const DatasetBandSelector = (props: DatasetBandSelectorProps) => {
             >
                 {bandOptions}
             </Select>
-            <DatasetInfoTooltip info={selectedBandConfig?.description}/>
+            <DatasetInfoTooltip info={selectedBandConfig?.description} />
         </div>
     );
 };
@@ -64,7 +69,6 @@ export type DatasetBandSingleSelectorProps = {
 };
 
 export const DatasetBandSingleSelector = (props: DatasetBandSingleSelectorProps) => {
-
     const colorScales = useSelector(() => {
         let bandConfig: RasterBandConfig | undefined;
         if (Array.isArray(props.rasterBands)) {
@@ -86,17 +90,12 @@ export const DatasetBandSingleSelector = (props: DatasetBandSingleSelectorProps)
 
     let selectedBandConfig: RasterBandConfig | undefined;
     if (Array.isArray(props.rasterBands)) {
-        bandSelector = <DatasetBandSelector
-            state={props.state}
-            bands={props.rasterBands}
-            bandSelectorLabel={props.bandSelectorLabel}
-        />;
+        bandSelector = <DatasetBandSelector state={props.state} bands={props.rasterBands} bandSelectorLabel={props.bandSelectorLabel} />;
 
         selectedBandConfig = props.rasterBands.find((bandConfig) => bandConfig.id === selectedBand);
     } else {
         selectedBandConfig = props.rasterBands;
     }
-
 
     let colorMapSelector: JSX.Element | undefined;
     if (colorScales) {

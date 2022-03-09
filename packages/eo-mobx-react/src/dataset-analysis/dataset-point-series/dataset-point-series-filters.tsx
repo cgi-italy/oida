@@ -14,12 +14,11 @@ type DatasetDimensionSelectorProps = {
 };
 
 const DatasetDimensionSelector = (props: DatasetDimensionSelectorProps) => {
-
     const value = useSelector(() => {
         return props.series.seriesDimension;
     });
 
-    const dimensions = [...(props.series.config.dimensions.filter(dimension => !dimension.preventSeries) || [])];
+    const dimensions = [...(props.series.config.dimensions.filter((dimension) => !dimension.preventSeries) || [])];
 
     if (!dimensions.length) {
         return null;
@@ -57,13 +56,13 @@ const DatasetDimensionSelector = (props: DatasetDimensionSelectorProps) => {
 };
 
 type DatasetVariableSelectorProps = {
-    series: DatasetPointSeries
+    series: DatasetPointSeries;
 };
 
 const DatasetVariableSeletor = (props: DatasetVariableSelectorProps) => {
-    let variableValue = useSelector(() => props.series.seriesVariable);
+    const variableValue = useSelector(() => props.series.seriesVariable);
 
-    let variableFieldConfig = {
+    const variableFieldConfig = {
         choices: props.series.config.variables.map((variable) => {
             return {
                 value: variable.id,
@@ -96,14 +95,11 @@ const DatasetVariableSeletor = (props: DatasetVariableSelectorProps) => {
     );
 };
 
-
 export type DatasetPointSeriesFiltersProps = {
     series: DatasetPointSeries;
 };
 
 export const DatasetPointSeriesFilters = (props: DatasetPointSeriesFiltersProps) => {
-
-
     let dimensionValueSelectors: JSX.Element[] | undefined;
 
     const selectedDimension = useSelector(() => {
@@ -114,54 +110,41 @@ export const DatasetPointSeriesFilters = (props: DatasetPointSeriesFiltersProps)
         return props.series.seriesRange;
     });
 
-    let dimensions = props.series.config.dimensions;
+    const dimensions = props.series.config.dimensions;
     if (dimensions.length) {
         dimensionValueSelectors = dimensions
-        .filter(
-            dimension => dimension.id !== selectedDimension
-        ).map((dimension) => {
-            return (
-                <Form.Item key={dimension.id} label={dimension.name}>
-                    <DatasetDimensionValueSelector
-                        dimensionsState={props.series.dimensions}
-                        dimension={dimension}
-                        timeDistributionProvider={props.series.dataset.config.timeDistribution?.provider}
-                    />
-                </Form.Item>
-            );
-        });
+            .filter((dimension) => dimension.id !== selectedDimension)
+            .map((dimension) => {
+                return (
+                    <Form.Item key={dimension.id} label={dimension.name}>
+                        <DatasetDimensionValueSelector
+                            dimensionsState={props.series.dimensions}
+                            dimension={dimension}
+                            timeDistributionProvider={props.series.dataset.config.timeDistribution?.provider}
+                        />
+                    </Form.Item>
+                );
+            });
     }
 
     let dimensionRangeField: JSX.Element | undefined;
-    const dimension = dimensions?.find(dimension => dimension.id === selectedDimension);
+    const dimension = dimensions?.find((dimension) => dimension.id === selectedDimension);
 
     if (dimension) {
         dimensionRangeField = (
-            <DatasetDimensionRangeSelector
-                dimension={dimension}
-                value={selectedRange}
-                onChange={(value) => props.series.setRange(value)}
-            />
+            <DatasetDimensionRangeSelector dimension={dimension} value={selectedRange} onChange={(value) => props.series.setRange(value)} />
         );
     }
 
     return (
         <React.Fragment>
-            <DatasetDimensionSelector
-                series={props.series}
-            />
+            <DatasetDimensionSelector series={props.series} />
             {dimensionRangeField}
             {dimensionValueSelectors}
-            <DatasetVariableSeletor
-                series={props.series}
-            />
+            <DatasetVariableSeletor series={props.series} />
             <Form.Item label='Location'>
-                <AnalysisAoiFilter
-                    analysis={props.series}
-                    supportedGeometries={[{type: 'Point'}]}
-                />
+                <AnalysisAoiFilter analysis={props.series} supportedGeometries={[{ type: 'Point' }]} />
             </Form.Item>
         </React.Fragment>
     );
-
 };

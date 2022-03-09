@@ -5,7 +5,6 @@ export type PlottyRendererConfig = {
 };
 
 export class PlottyRenderer {
-
     /**
      * Use the same plotty renderer instance for all loaders. Each plotty instance create a
      * new webGL context and we want to avoid the creation of multiple GL contexts.
@@ -59,6 +58,26 @@ export class PlottyRenderer {
         return this.flipY_ ? PlottyRenderer.getFlipCanvas_()[0] : this.plottyInstance_.getCanvas();
     }
 
+    get noDataValue() {
+        return this.noDataValue_;
+    }
+
+    get colorScale() {
+        return this.colorScale_;
+    }
+
+    get domain() {
+        return this.domain_.slice();
+    }
+
+    get clamp() {
+        return this.clamp_;
+    }
+
+    get flipY() {
+        return this.flipY_;
+    }
+
     setNoDataValue(noDataValue: number | undefined) {
         this.noDataValue_ = noDataValue;
     }
@@ -97,5 +116,4 @@ export class PlottyRenderer {
         }
         return this.canvas;
     }
-
 }

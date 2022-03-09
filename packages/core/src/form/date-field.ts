@@ -5,22 +5,19 @@ import { setFormFieldSerializer } from './form-field-serialization';
 
 export const DATE_FIELD_ID = 'date';
 
-export type SelectableDates = Set<string> | ((range: {
-    start: Date,
-    end: Date,
-    resolution: 'year' | 'month' | 'day'
-}) => Promise<Set<string>>);
+export type SelectableDates =
+    | Set<string>
+    | ((range: { start: Date; end: Date; resolution: 'year' | 'month' | 'day' }) => Promise<Set<string>>);
 
 export type DateFieldConfig = {
-    minDate?: Date,
-    maxDate?: Date,
+    minDate?: Date;
+    maxDate?: Date;
     selectableDates?: SelectableDates;
     withTime?: boolean;
     selectableTimes?: (day: Date) => Promise<string[]>;
 };
 
 export type DateField = FormField<typeof DATE_FIELD_ID, Date, DateFieldConfig>;
-
 
 setFormFieldSerializer(DATE_FIELD_ID, {
     toJSON: (value) => {
@@ -31,7 +28,7 @@ setFormFieldSerializer(DATE_FIELD_ID, {
     },
     toString: (formField, options) => {
         let config: DateFieldConfig;
-        if (typeof(formField.config) === 'function') {
+        if (typeof formField.config === 'function') {
             config = formField.config(formField);
         } else {
             config = formField.config;
@@ -50,11 +47,10 @@ setFormFieldSerializer(DATE_FIELD_ID, {
 
 declare module './form-field' {
     interface IFormFieldDefinitions {
-        [DATE_FIELD_ID]:  FormFieldDefinition<typeof DATE_FIELD_ID, Date, DateFieldConfig>;
+        [DATE_FIELD_ID]: FormFieldDefinition<typeof DATE_FIELD_ID, Date, DateFieldConfig>;
     }
 
     interface IFormFieldValueTypes {
         [DATE_FIELD_ID]: Date;
     }
 }
-

@@ -11,16 +11,14 @@ import { getAdamRasterMapViewConfig } from './raster';
 import { getAdamVerticalProfileViewConfig } from './vertical-profile';
 import { getAdamVolumetricMapViewConfig } from './volumetric';
 
-
 export const getAdamDatasetMapViewConfig = (
     axiosInstance: AxiosInstanceWithCancellation,
     factoryConfig: AdamDatasetFactoryConfig,
     datasetConfig: AdamDatasetConfig,
     spatialCoverageProvider: AdamSpatialCoverageProvider
 ) => {
-
-    if (datasetConfig.srsDef) {
-        proj4.defs(datasetConfig.coverageSrs, datasetConfig.srsDef);
+    if (datasetConfig.coverageExtent?.srsDef) {
+        proj4.defs(datasetConfig.coverageExtent.srs, datasetConfig.coverageExtent.srsDef);
         register(proj4);
     }
 
@@ -31,6 +29,4 @@ export const getAdamDatasetMapViewConfig = (
     } else {
         return getAdamRasterMapViewConfig(axiosInstance, factoryConfig, datasetConfig, spatialCoverageProvider);
     }
-
 };
-

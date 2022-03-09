@@ -11,21 +11,27 @@ export class HtmlVideoAdapter implements VideoAdapter {
         this.videoElement_ = config.videoElement;
     }
 
-    setFrameMode(stream?: VideoStream) {}
+    setFrameMode(stream?: VideoStream) {
+        return;
+    }
 
-    setPlayMode(stream?: VideoStream) {}
+    setPlayMode(stream?: VideoStream) {
+        return;
+    }
 
     setPreferredStream(stream: VideoStream) {
         return false;
     }
 
     getAvailableStreams() {
-        return [{
-            id: 0,
-            width: this.videoElement_.videoWidth,
-            height: this.videoElement_.videoHeight,
-            bitrate: -1
-        }];
+        return [
+            {
+                id: 0,
+                width: this.videoElement_.videoWidth,
+                height: this.videoElement_.videoHeight,
+                bitrate: -1
+            }
+        ];
     }
 
     seek(time: number) {
@@ -42,4 +48,3 @@ export class HtmlVideoAdapter implements VideoAdapter {
         this.videoElement_.addEventListener('pause', events.onPlayEnd);
     }
 }
-

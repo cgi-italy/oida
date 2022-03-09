@@ -3,6 +3,44 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.1.0](https://github.com/cgi-italy/oida/compare/@oidajs/eo-mobx-react@3.0.1...@oidajs/eo-mobx-react@3.1.0) (2022-03-09)
+
+
+### Bug Fixes
+
+* add categorical dimension range selection placeholder ([a1b9e4e](https://github.com/cgi-italy/oida/commit/a1b9e4e45c600f29c39b13ee67753bda9d81c675))
+* apply default colorscale on variable/band selection ([eae81d6](https://github.com/cgi-italy/oida/commit/eae81d6f1003f23c40e7417f4339a11f324748f6))
+* improve download error message layout ([7a34aca](https://github.com/cgi-italy/oida/commit/7a34acaef4e88bb705b7971015f40638d048865f))
+* propagate filters on time distribution nearest item search ([67b4fa1](https://github.com/cgi-italy/oida/commit/67b4fa1722511c59ac61dfb9186b7fb9addf4d83))
+* track coordinates on init in transect chart ([9acea0e](https://github.com/cgi-italy/oida/commit/9acea0e3dd29c731928a7d20fa462703f863da97))
+
+
+### Features
+
+* add tooltip to describe colormap clamping checkbox behaviour ([608b227](https://github.com/cgi-italy/oida/commit/608b227d35098f5798aa75faf3e8c859c750a1c0))
+* add units display in dimension value selector ([af4464b](https://github.com/cgi-italy/oida/commit/af4464b8d447d6f04a43abc6d3816e389aa635a0))
+* enable discovery drawer close on dataset selection ([a03dab5](https://github.com/cgi-italy/oida/commit/a03dab5e2109b2f0b3700760bfba9efc35077e81))
+* improve accessibility ([ab3b6a0](https://github.com/cgi-italy/oida/commit/ab3b6a0150ffc43993ed2cafcdd053529a08159a))
+* update routing utils ([8533a76](https://github.com/cgi-italy/oida/commit/8533a76b4220417d811b4114ff770223d26906d8))
+
+
+### Performance Improvements
+
+* group timeline items add/remove operations and enhance clustering ([fb32fe7](https://github.com/cgi-italy/oida/commit/fb32fe7b869052a7a6440738de8bf77c4ac82481))
+
+
+
+
+
+## [3.0.1](https://github.com/cgi-italy/oida/compare/@oidajs/eo-mobx-react@3.0.0...@oidajs/eo-mobx-react@3.0.1) (2021-12-21)
+
+**Note:** Version bump only for package @oidajs/eo-mobx-react
+
+
+
+
+
+
 # 3.0.0 (2021-12-21)
 
 

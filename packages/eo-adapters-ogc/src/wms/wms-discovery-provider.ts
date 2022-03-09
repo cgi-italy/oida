@@ -21,7 +21,6 @@ export type WmsDatasetDiscoveryProviderItemProps = {
 };
 
 export class WmsDatasetDiscoveryProviderItem extends Entity {
-
     readonly service: WmsService;
     readonly layer: WmsLayer;
     readonly disablePreview: boolean;
@@ -61,15 +60,14 @@ export type WmsItemProps = {
 export type WmsDatasetDiscoveryProviderProps = {
     services: (WmsItem | WmsItemProps)[];
     queryParams?: QueryParamsProps;
-}  & DatasetDiscoveryProviderProps<typeof WMS_DATASET_DISCOVERY_PROVIDER_TYPE>;
+} & DatasetDiscoveryProviderProps<typeof WMS_DATASET_DISCOVERY_PROVIDER_TYPE>;
 
 export class WmsDatasetDiscoveryProvider extends DatasetDiscoveryProvider<WmsDatasetDiscoveryProviderItem> {
-
     readonly criteria: QueryParams;
     readonly services: IObservableArray<WmsItem>;
     @observable.ref selectedService: WmsItem | undefined;
 
-    protected readonly dataFetcher_: AsyncDataFetcher<WmsLayer[], {selectedService: WmsItem, criteria: QueryCriteria}>;
+    protected readonly dataFetcher_: AsyncDataFetcher<WmsLayer[], { selectedService: WmsItem; criteria: QueryCriteria }>;
     protected readonly subscriptionTracker_: SubscriptionTracker;
 
     constructor(props: Omit<WmsDatasetDiscoveryProviderProps, 'providerType'>) {
@@ -109,11 +107,13 @@ export class WmsDatasetDiscoveryProvider extends DatasetDiscoveryProvider<WmsDat
     @action
     addServices(services: (WmsItem | WmsItemProps)[]) {
         const items = services.map((item) => {
-            const {service, ...other} = item;
-            return service instanceof WmsService ? item as WmsItem : {
-                ...other,
-                service: new WmsService(service)
-            } ;
+            const { service, ...other } = item;
+            return service instanceof WmsService
+                ? (item as WmsItem)
+                : {
+                      ...other,
+                      service: new WmsService(service)
+                  };
         });
         this.services.push(...items);
     }
@@ -121,7 +121,7 @@ export class WmsDatasetDiscoveryProvider extends DatasetDiscoveryProvider<WmsDat
     @action
     selectService(service: WmsItem | string | undefined) {
         let selectedService: WmsItem | undefined;
-        if (typeof(service) === 'string') {
+        if (typeof service === 'string') {
             selectedService = this.services.find((item) => item.id === service);
         } else {
             selectedService = service;
@@ -133,6 +133,7 @@ export class WmsDatasetDiscoveryProvider extends DatasetDiscoveryProvider<WmsDat
         this.results.clear();
         this.criteria.filters.clear();
         this.criteria.paging.setPage(0);
+        this.criteria.paging.setTotal(0);
 
         this.selectedService = selectedService;
     }
@@ -156,17 +157,24 @@ export class WmsDatasetDiscoveryProvider extends DatasetDiscoveryProvider<WmsDat
         const dataUpdateDisposer = autorun(() => {
             const wmsService = this.selectedService;
             if (this.active.value && wmsService) {
-                this.dataFetcher_.fetchData({
-                    criteria: this.criteria.data,
-                    selectedService: wmsService
-                }).then((data) => {
-                    this.setResults_(data.map(item => new WmsDatasetDiscoveryProviderItem({
-                        service: wmsService.service,
-                        layer: item,
-                        disablePreview: wmsService.disablePreview,
-                        datasetFactory: wmsService.datasetFactory
-                    })));
-                });
+                this.dataFetcher_
+                    .fetchData({
+                        criteria: this.criteria.data,
+                        selectedService: wmsService
+                    })
+                    .then((data) => {
+                        this.setResults_(
+                            data.map(
+                                (item) =>
+                                    new WmsDatasetDiscoveryProviderItem({
+                                        service: wmsService.service,
+                                        layer: item,
+                                        disablePreview: wmsService.disablePreview,
+                                        datasetFactory: wmsService.datasetFactory
+                                    })
+                            )
+                        );
+                    });
             }
         });
 

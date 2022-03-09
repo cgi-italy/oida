@@ -18,18 +18,16 @@ import { VolumeTileKey } from '@oidajs/core';
 import { CesiumVolumeTileTexture } from './cesium-volume-tile-texture';
 import { CesiumVolumeTileSet } from './cesium-volume-tile-set';
 
-
 export type CesiumVolumeTilePrimitiveConfig = {
     tileSet: CesiumVolumeTileSet;
     tileKey: VolumeTileKey;
 };
 
 export abstract class CesiumVolumeTilePrimitive {
-
     static defaultShaderSource_ = CesiumVolumeTilePrimitive.createDefaultVertexShaderSource_();
 
     static createDefaultVertexShaderSource_() {
-        let vertexShaderSource = `
+        const vertexShaderSource = `
             attribute vec3 position;
             attribute vec3 normal;
             attribute vec3 str;
@@ -46,7 +44,7 @@ export abstract class CesiumVolumeTilePrimitive {
             }
         `;
 
-        let fragmentShaderSource = `
+        const fragmentShaderSource = `
             varying vec3 v_positionEC;
             varying vec3 v_normalEC;
             varying vec3 v_str;
@@ -83,7 +81,6 @@ export abstract class CesiumVolumeTilePrimitive {
     }
 
     update(frameState) {
-
         //TODO: use a Primitive with _createCommandsFunction option instead
         if (!this.drawCommand_) {
             this.drawCommand_ = this.createDrawCommand_(frameState.context);
@@ -115,13 +112,12 @@ export abstract class CesiumVolumeTilePrimitive {
     }
 
     protected getCoordReprojectionFunction_() {
-
         const minZ = this.tileSet_.getSource()?.getTileGrid().extent.minZ;
-        let srs = this.tileSet_.getSource()?.getTileGrid().srs;
-        let verticalScale = this.tileSet_.getVerticalScale();
+        const srs = this.tileSet_.getSource()?.getTileGrid().srs;
+        const verticalScale = this.tileSet_.getVerticalScale();
         if (srs !== 'EPSG:4326') {
             return (coord) => {
-                let outputCoord = proj4(srs, 'EPSG:4326', [coord[0], coord[1]]);
+                const outputCoord = proj4(srs, 'EPSG:4326', [coord[0], coord[1]]);
 
                 if (minZ && minZ < 0) {
                     outputCoord[2] = coord[2] - minZ;
@@ -139,10 +135,9 @@ export abstract class CesiumVolumeTilePrimitive {
     }
 
     protected createDrawCommand_(context) {
+        const { vertexArray, attributeLocations, primitiveType, boundingSphere } = this.createVertexArray_(context);
 
-        let {vertexArray, attributeLocations, primitiveType, boundingSphere } = this.createVertexArray_(context);
-
-        let shaderProgram = this.createShaderProgram_(context, attributeLocations);
+        const shaderProgram = this.createShaderProgram_(context, attributeLocations);
 
         return new DrawCommand({
             vertexArray: vertexArray,
@@ -167,8 +162,7 @@ export abstract class CesiumVolumeTilePrimitive {
     }
 
     protected createVertexArray_(context) {
-
-        let geometry = this.createGeometry_(context);
+        const geometry = this.createGeometry_(context);
 
         if (!geometry) {
             return {
@@ -178,7 +172,7 @@ export abstract class CesiumVolumeTilePrimitive {
             };
         }
 
-        let attributeLocations = GeometryPipeline.createAttributeLocations(geometry);
+        const attributeLocations = GeometryPipeline.createAttributeLocations(geometry);
 
         return {
             vertexArray: VertexArray.fromGeometry({
@@ -186,7 +180,7 @@ export abstract class CesiumVolumeTilePrimitive {
                 geometry: geometry,
                 attributeLocations: attributeLocations,
                 bufferUsage: BufferUsage.STATIC_DRAW,
-                interleave : false
+                interleave: false
             }),
             attributeLocations: attributeLocations,
             primitiveType: geometry.primitiveType,
@@ -195,7 +189,7 @@ export abstract class CesiumVolumeTilePrimitive {
     }
 
     protected createFragmentShaderSource_() {
-        let defines: string[] = [];
+        const defines: string[] = [];
         if (!this.texture_) {
             defines.push('DISABLE_TEXTURE_SAMPLING');
         } else {

@@ -13,48 +13,44 @@ import { useSelector } from '@oidajs/ui-react-mobx';
 import { AnalysisLoadingStateMessage } from '../analysis-loading-state-message';
 import { ChartWidget } from '../chart-widget';
 
-
 export type DatasetTransectValuesProcessingChartProps = {
     series: DatasetTransectValues[];
 };
 
 type LegendDataItem = {
-    id: string,
-    name: string,
-    seriesIdx: number,
-    disabled?: boolean,
-    hovered?: boolean,
-    description?: string
+    id: string;
+    name: string;
+    seriesIdx: number;
+    disabled?: boolean;
+    hovered?: boolean;
+    description?: string;
 };
 
 export function DatasetTransectValuesProcessingChart(props: DatasetTransectValuesProcessingChartProps) {
+    const [trackCoordinate, setTrackCoordinate] = useState(true);
 
-    const [trackCoordinate, setTrackCoordinate] = useState(false);
-
-    const {chartSeries, colors, loadingState, legendData, yAxes} = useSelector(() => {
-
-        let chartSeries: EChartOption.SeriesLine[] = [];
-        let colors: string[] = [];
+    const { chartSeries, colors, loadingState, legendData, yAxes } = useSelector(() => {
+        const chartSeries: EChartOption.SeriesLine[] = [];
+        const colors: string[] = [];
 
         let loadingState = LoadingState.Init;
         const legendData: LegendDataItem[] = [];
 
-        let yAxes = {};
+        const yAxes = {};
 
         let nextYAxisIndex = 0;
 
         props.series.forEach((series, idx) => {
-
             if (series.loadingState.value === LoadingState.Init) {
                 return;
             }
 
-            let variable = series.seriesVariable;
+            const variable = series.seriesVariable;
             if (!variable) {
                 return;
             }
 
-            let variableConfig = series.config.variables.find((v) => v.id === variable);
+            const variableConfig = series.config.variables.find((v) => v.id === variable);
             if (!variableConfig) {
                 return;
             }
@@ -69,7 +65,7 @@ export function DatasetTransectValuesProcessingChart(props: DatasetTransectValue
                 unitsSymbol: variableConfig.units
             });
 
-            let yAxisUnits = variableConfig.units || variableConfig.id;
+            const yAxisUnits = variableConfig.units || variableConfig.id;
             if (!yAxes[yAxisUnits]) {
                 yAxes[yAxisUnits] = {
                     idx: nextYAxisIndex++,
@@ -111,7 +107,7 @@ export function DatasetTransectValuesProcessingChart(props: DatasetTransectValue
                 name: `${series.dataset.config.name}: ${variableConfig.name}`,
                 description: description,
                 disabled: !series.visible.value,
-                hovered: series.hovered.value,
+                hovered: series.hovered.value
             };
 
             const chartData: Array<number[]> = [];
@@ -129,75 +125,72 @@ export function DatasetTransectValuesProcessingChart(props: DatasetTransectValue
                 smooth: true,
                 data: chartData
             });
-
         });
 
-        return {chartSeries, colors, legendData, loadingState, yAxes};
+        return { chartSeries, colors, legendData, loadingState, yAxes };
     });
 
-    let yAx = Object.keys(yAxes).map((axisUnits, idx) => {
+    const yAx = Object.keys(yAxes).map((axisUnits, idx) => {
         return {
             type: 'value',
             name: yAxes[axisUnits].label,
             nameLocation: 'end',
-            position: (idx % 2) ? 'right' : 'left',
+            position: idx % 2 ? 'right' : 'left',
             nameGap: 10,
             offset: Math.floor(idx / 2) * 60
         };
     });
 
-    const tooltipFormatter = useCallback((series: EChartOption.Tooltip.Format[]) => {
+    const tooltipFormatter = useCallback(
+        (series: EChartOption.Tooltip.Format[]) => {
+            if (!series.length) {
+                return '';
+            }
 
-        if (!series.length) {
-            return '';
-        }
+            const lines: Array<{
+                geometry: GeoJSON.LineString;
+                content: string[];
+                distance: number;
+                coords: number[];
+            }> = [];
 
-        let lines: Array<{
-            geometry: GeoJSON.LineString,
-            content: string[],
-            distance: number,
-            coords: number[]
-        }> = [];
+            try {
+                series.forEach((data) => {
+                    const seriesInfo = legendData[parseInt(data.seriesName!)];
+                    const transectSeries = props.series[seriesInfo.seriesIdx];
 
-        try {
+                    let line = lines.find((l) => l.geometry === transectSeries.aoi?.geometry.value);
+                    if (!line) {
+                        const coordinates = transectSeries.data[data.dataIndex!].coordinates;
 
-            series.forEach((data) => {
-
-                let seriesInfo = legendData[parseInt(data.seriesName!)];
-                let transectSeries = props.series[seriesInfo.seriesIdx];
-
-                let line = lines.find(l => l.geometry === transectSeries.aoi?.geometry.value);
-                if (!line) {
-
-                    let coordinates = transectSeries.data[data.dataIndex!].coordinates;
-
-                    line = {
-                        geometry: transectSeries.aoi!.geometry.value as GeoJSON.LineString,
-                        distance: data.axisValue as number,
-                        coords: coordinates,
-                        content: []
-                    };
-                    lines.push(line);
-                    if (trackCoordinate) {
-                        transectSeries.setHighlightedPosition(data.dataIndex);
+                        line = {
+                            geometry: transectSeries.aoi!.geometry.value as GeoJSON.LineString,
+                            distance: data.axisValue as number,
+                            coords: coordinates,
+                            content: []
+                        };
+                        lines.push(line);
+                        if (trackCoordinate) {
+                            transectSeries.setHighlightedPosition(data.dataIndex);
+                        }
+                    } else {
+                        if (trackCoordinate) {
+                            transectSeries.setHighlightedPosition(data.dataIndex);
+                        }
                     }
-                } else {
-                    if (trackCoordinate) {
-                        transectSeries.setHighlightedPosition(data.dataIndex);
-                    }
-                }
 
-                line.content.push( `
+                    line.content.push(`
                     <div class="series-item is-point">
                         <span>${data.marker}</span>
                         <span class="label">${seriesInfo.name}:</span>
                         <span class="value">${data.data[1].toFixed(2)}</span>
                     </div>
                 `);
-            });
+                });
 
-            let items = lines.map((line, idx) => {
-                return `
+                const items = lines
+                    .map((line, idx) => {
+                        return `
                     <div class="axis-item">
                         <div class="axis-header">
                             <span class="label">Position:</span>
@@ -208,21 +201,24 @@ export function DatasetTransectValuesProcessingChart(props: DatasetTransectValue
                         </div>
                     </div>
                 `;
-            }).join('');
+                    })
+                    .join('');
 
-            return `
+                return `
                 <div class="dataset-dimension-series-tooltip">
                     ${items}
                 </div>
             `;
-        } catch (e) {
-            return '';
-        }
-    }, [trackCoordinate]);
+            } catch (e) {
+                return '';
+            }
+        },
+        [trackCoordinate]
+    );
 
     const disableCoordinateTrack = () => {
         setTrackCoordinate(false);
-        props.series.forEach(series => {
+        props.series.forEach((series) => {
             series.setHighlightedPosition(undefined);
         });
     };
@@ -230,7 +226,7 @@ export function DatasetTransectValuesProcessingChart(props: DatasetTransectValue
     const highlightedItems = useSelector(() => {
         const highlightedItems: any[] = [];
         legendData.forEach((item) => {
-            let highlightedPosition = props.series[item.seriesIdx].highlightedPosition;
+            const highlightedPosition = props.series[item.seriesIdx].highlightedPosition;
             if (highlightedPosition !== undefined) {
                 highlightedItems.push({
                     seriesIndex: item.seriesIdx,
@@ -243,71 +239,70 @@ export function DatasetTransectValuesProcessingChart(props: DatasetTransectValue
     }, [legendData]);
 
     if (loadingState === LoadingState.Init || loadingState === LoadingState.Error) {
-        return (
-            <AnalysisLoadingStateMessage
-                loadingState={loadingState}
-                initMessage='Fill the series params to retrieve the data'
-            />
-        );
+        return <AnalysisLoadingStateMessage loadingState={loadingState} initMessage='Fill the series params to retrieve the data' />;
     }
 
-    const highlightedSeries = legendData.findIndex(item => item.hovered);
+    const highlightedSeries = legendData.findIndex((item) => item.hovered);
 
     return (
         <div className='series-chart'>
             <ChartWidget
                 onMouseEnter={() => setTrackCoordinate(true)}
                 onMouseLeave={disableCoordinateTrack}
-                options={{
-                    color: colors,
-                    legend: {
-                        data: legendData.map(item => item.id),
-                        right: '10px',
-                        formatter: (name) => {
-                            return legendData[name].name;
+                options={
+                    {
+                        color: colors,
+                        legend: {
+                            data: legendData.map((item) => item.id),
+                            right: '10px',
+                            formatter: (name) => {
+                                return legendData[name].name;
+                            },
+                            tooltip: {
+                                show: true,
+                                formatter: (data: EChartOption.Tooltip.Format) => {
+                                    return legendData[data.name!].description || '';
+                                }
+                            },
+                            selected: legendData.reduce((selected, item) => {
+                                return {
+                                    ...selected,
+                                    [item.id]: !item.disabled
+                                };
+                            }, {})
                         },
                         tooltip: {
-                            show: true,
-                            formatter: (data: EChartOption.Tooltip.Format) => {
-                                return legendData[data.name!].description || '';
+                            trigger: 'axis',
+                            transitionDuration: 0,
+                            formatter: tooltipFormatter,
+                            textStyle: {
+                                fontSize: 13
+                            },
+                            axisPointer: {
+                                type: 'line',
+                                snap: true
                             }
                         },
-                        selected: legendData.reduce((selected, item) => {
-                            return {
-                                ...selected,
-                                [item.id]: !item.disabled
-                            };
-                        }, {})
-                    },
-                    tooltip: {
-                        trigger: 'axis',
-                        transitionDuration: 0,
-                        formatter: tooltipFormatter,
-                        textStyle: {
-                            fontSize: 13
+                        xAxis: [
+                            {
+                                type: 'value',
+                                name: 'Relative distance (km)',
+                                nameLocation: 'middle',
+                                nameGap: 20
+                            }
+                        ],
+                        yAxis: yAx,
+                        grid: {
+                            left: 40,
+                            right: 40,
+                            bottom: 40,
+                            top: 60,
+                            containLabel: true
                         },
-                        axisPointer: {
-                            type: 'line',
-                            snap: true
-                        }
-                    },
-                    xAxis: [{
-                        type: 'value',
-                        name: 'Relative distance (km)',
-                        nameLocation: 'middle',
-                        nameGap: 20
-                    }],
-                    yAxis: yAx,
-                    grid: {
-                        left: 40,
-                        right: 40,
-                        bottom: 40,
-                        top: 60,
-                        containLabel: true
-                    },
-                    series: chartSeries,
-                    backgroundColor: 'transparent'
-                } as EChartOption}
+                        series: chartSeries,
+                        backgroundColor: 'transparent'
+                    } as EChartOption
+                }
                 onHighlight={(evt, highlighted) => {
                     if (evt.seriesName) {
                         const series = props.series[parseInt(evt.seriesName)];
@@ -317,7 +312,7 @@ export function DatasetTransectValuesProcessingChart(props: DatasetTransectValue
                     }
                 }}
                 onLegendItemSelection={(evt) => {
-                    for (let idx in evt.selected) {
+                    for (const idx in evt.selected) {
                         props.series[parseInt(idx)].visible.setValue(evt.selected[idx]);
                     }
                 }}

@@ -9,7 +9,7 @@ import { BreadcrumbItemProps } from '@oidajs/ui-react-core';
 import { serializeQueryFilters } from '../../../core/hooks/use-query-criteria-url-binding';
 import { BreadcrumbModule } from '../breadcrumb-module';
 import { useBreadcrumbModule } from './use-breadcrumb-module';
-
+import { useResolvedPath } from 'react-router';
 
 export type QueryFilterBreadcrumbBindingProps = {
     filtersConfig: IFormFieldDefinition[];
@@ -18,9 +18,9 @@ export type QueryFilterBreadcrumbBindingProps = {
 };
 
 export const useQueryFiltersBreadcrumbBinding = (props: QueryFilterBreadcrumbBindingProps) => {
+    const rootPath = useResolvedPath('.');
 
     useEffect(() => {
-
         const breadcrumbItems: BreadcrumbItemProps[] = [];
 
         const clearBreadcrumbItems = () => {
@@ -30,34 +30,36 @@ export const useQueryFiltersBreadcrumbBinding = (props: QueryFilterBreadcrumbBin
             breadcrumbItems.length = 0;
         };
 
-        let filterTrackerDisposer = autorun(() => {
-
+        const filterTrackerDisposer = autorun(() => {
             clearBreadcrumbItems();
 
-            let filterValues = values(props.filteringState.items) as QueryFilter[];
+            const filterValues = values(props.filteringState.items) as QueryFilter[];
 
             filterValues.forEach((filter, idx) => {
-
-                let filterUrlString = serializeQueryFilters(filterValues.slice(0, idx + 1));
-                let filterConfig = props.filtersConfig.find((f) => {
+                const filterUrlString = serializeQueryFilters(filterValues.slice(0, idx + 1));
+                const filterConfig = props.filtersConfig.find((f) => {
                     return f.name === filter.key;
                 });
 
                 if (filterConfig) {
-
-                    let serializer = getFormFieldSerializer(filter.type);
+                    const serializer = getFormFieldSerializer(filter.type);
                     if (serializer) {
-
-                        const filterTitle = serializer.toString({
+                        let filterTitle = serializer.toString({
                             value: filter.value,
-                            onChange: () => {},
+                            onChange: () => {
+                                //do nothing
+                            },
                             ...filterConfig
                         });
+
+                        if (filterConfig.title) {
+                            filterTitle = `${filterConfig.title}: ${filterTitle}`;
+                        }
 
                         const breadcrumbItem = {
                             key: filter.key,
                             title: filterTitle,
-                            link: `${window.location.pathname}?q=${filterUrlString}`
+                            link: `${rootPath.pathname}?q=${filterUrlString}`
                         };
 
                         props.breadcrumbModule.breadcrumb.add(breadcrumbItem);
@@ -65,17 +67,13 @@ export const useQueryFiltersBreadcrumbBinding = (props: QueryFilterBreadcrumbBin
                         breadcrumbItems.push(breadcrumbItem);
                     }
                 }
-
             });
-
         });
         return () => {
             clearBreadcrumbItems();
             filterTrackerDisposer();
         };
-
     }, []);
-
 };
 
 export const useQueryFiltersBreadcrumbBindingFromModule = (props: Omit<QueryFilterBreadcrumbBindingProps, 'breadcrumbModule'>) => {

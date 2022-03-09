@@ -4,7 +4,6 @@ import { action, makeObservable, observable } from 'mobx';
 
 import { DatasetConfig } from './dataset-config';
 
-
 export type DatasetProps = {
     /** The dataset configuration object */
     config: DatasetConfig;
@@ -22,7 +21,6 @@ export type DatasetProps = {
  * shared across all {@link DatasetViz | dataset visualizations}
  */
 export class Dataset {
-
     /** The dataset configuration */
     readonly config: DatasetConfig;
     /** The dataset selected area of interest */
@@ -36,9 +34,8 @@ export class Dataset {
 
     constructor(props: DatasetProps) {
         this.config = props.config;
-        this.additionalFilters = props.additionalFilters instanceof DataFilters
-            ? props.additionalFilters
-            : new DataFilters(props.additionalFilters);
+        this.additionalFilters =
+            props.additionalFilters instanceof DataFilters ? props.additionalFilters : new DataFilters(props.additionalFilters);
 
         this.aoi = props.aoi;
         this.toi = props.toi;
@@ -59,7 +56,6 @@ export class Dataset {
 
     @action
     setToi(toi: Date | DateRangeValue | undefined, silent?: boolean) {
-
         //avoid update on deep equality
         if (toi instanceof Date) {
             if (this.toi instanceof Date && toi.getTime() === this.toi.getTime()) {

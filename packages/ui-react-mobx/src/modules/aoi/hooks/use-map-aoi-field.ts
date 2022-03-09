@@ -20,15 +20,13 @@ export const useAoiAction = () => {
     };
 };
 
-export type MapAoiFieldProps =
-Omit<MapAoiDrawerProps, 'activeAction' | 'onActiveActionChange'>
-& MapAoiInstanceProps
-& Omit<MapAoiViewportProps, 'activeAction' | 'onActiveActionChange'>
-& Omit<MapAoiImporterProps, 'activeAction' | 'onActiveActionChange'>;
+export type MapAoiFieldProps = Omit<MapAoiDrawerProps, 'activeAction' | 'onActiveActionChange'> &
+    MapAoiInstanceProps &
+    Omit<MapAoiViewportProps, 'activeAction' | 'onActiveActionChange'> &
+    Omit<MapAoiImporterProps, 'activeAction' | 'onActiveActionChange'>;
 
 export const useMapAoiField = (props: MapAoiFieldProps) => {
-
-    let {activeAction, onActiveActionChange} = useAoiAction();
+    const { activeAction, onActiveActionChange } = useAoiAction();
 
     useMapAoiDrawer({
         ...props,
@@ -36,17 +34,17 @@ export const useMapAoiField = (props: MapAoiFieldProps) => {
         onActiveActionChange
     });
 
-    let aoiInstanceProps = useMapAoiInstance({
+    const aoiInstanceProps = useMapAoiInstance({
         ...props
     });
 
-    let viewportProps = useMapAoiViewport({
+    const viewportProps = useMapAoiViewport({
         ...props,
         activeAction,
         onActiveActionChange
     });
 
-    let importerProps = useMapAoiImporter({
+    const importerProps = useMapAoiImporter({
         ...props,
         activeAction,
         onActiveActionChange
@@ -61,28 +59,32 @@ export const useMapAoiField = (props: MapAoiFieldProps) => {
     };
 };
 
-export const useMapAoiFieldFromModule =
-(props: Omit<MapAoiFieldProps, 'map' | 'aois' | 'aoiModule' | 'mapSelection' | 'drawInteraction'>, aoiModule?) => {
+export const useMapAoiFieldFromModule = (
+    props: Omit<MapAoiFieldProps, 'map' | 'aois' | 'aoiModule' | 'mapSelection' | 'drawInteraction'>,
+    aoiModule?
+) => {
+    const { activeAction, onActiveActionChange } = useAoiAction();
 
-    let {activeAction, onActiveActionChange} = useAoiAction();
+    useMapAoiDrawerFromModule(
+        {
+            ...props,
+            activeAction,
+            onActiveActionChange
+        },
+        aoiModule
+    );
 
-    useMapAoiDrawerFromModule({
-        ...props,
-        activeAction,
-        onActiveActionChange
-    }, aoiModule);
-
-    let aoiInstanceProps = useMapAoiInstanceFromModule({
+    const aoiInstanceProps = useMapAoiInstanceFromModule({
         ...props
     });
 
-    let viewportProps = useMapAoiViewportFromModule({
+    const viewportProps = useMapAoiViewportFromModule({
         ...props,
         activeAction,
         onActiveActionChange
     });
 
-    let importerProps = useMapAoiImporter({
+    const importerProps = useMapAoiImporter({
         ...props,
         activeAction,
         onActiveActionChange

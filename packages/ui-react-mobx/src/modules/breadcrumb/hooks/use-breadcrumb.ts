@@ -6,35 +6,35 @@ import { useBreadcrumbModule } from './use-breadcrumb-module';
 
 /**
  * {@link useBreadcrumb} hook input properties
-*/
+ */
 export type useBreadcrumbProps = {
     /** the breadcrumb observable state */
-    breadcrumb: IndexedCollection<BreadcrumbItemProps>
+    breadcrumb: IndexedCollection<BreadcrumbItemProps>;
     /**
      * the min level breadcrumb item to extract from the state. It can be a number
      * representing the item index or a string representing the item key
-    */
+     */
     minLevel?: number | string;
     /**
      * the max level breadcrumb to extract from the state. It can be a number
      * representing the item index or a string representing the item key
-    */
+     */
     maxLevel?: number | string;
 };
 
 /**
  * react hooks that extracts the breadcrumb items from the state.
-*/
+ */
 export const useBreadcrumb = (props: useBreadcrumbProps) => {
     return useSelector(() => {
-        let items: BreadcrumbItemProps[] = props.breadcrumb.items.map((item) => {
+        const items: BreadcrumbItemProps[] = props.breadcrumb.items.map((item) => {
             return {
                 ...item
             };
         });
         let minLevel: number | undefined;
         let maxLevel: number | undefined;
-        if (typeof(props.minLevel) === 'string') {
+        if (typeof props.minLevel === 'string') {
             minLevel = items.findIndex((item) => item.key === props.minLevel);
             if (minLevel === -1) {
                 minLevel = undefined;
@@ -42,7 +42,7 @@ export const useBreadcrumb = (props: useBreadcrumbProps) => {
         } else {
             minLevel = props.minLevel;
         }
-        if (typeof(props.maxLevel) === 'string') {
+        if (typeof props.maxLevel === 'string') {
             maxLevel = items.findIndex((item) => item.key === props.maxLevel);
             if (maxLevel === -1) {
                 maxLevel = undefined;

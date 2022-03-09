@@ -23,24 +23,22 @@ export type RenderFromUrlParams = {
 };
 
 export type RenderFromBufferParams = {
-    data: ArrayBuffer,
+    data: ArrayBuffer;
     outputExtent?: number[];
     outputSrs?: string;
 };
 
 type GeotiffRendererData = {
-    values: ArrayBuffer,
-    width: number,
-    height: number,
-    noData?: number,
-    imageExtent: number[],
-    outputExtent?: number[],
-    flipY?: boolean
+    values: ArrayBuffer;
+    width: number;
+    height: number;
+    noData?: number;
+    imageExtent: number[];
+    outputExtent?: number[];
+    flipY?: boolean;
 };
 
 export class GeotiffRenderer {
-
-
     /**
      * Set a decoder (pool) to use for geotiff deconding.
      * See {@link https://github.com/geotiffjs/geotiff.js/#using-decoder-pools-to-improve-parsing-performance | geotiffjs documentation}
@@ -111,7 +109,7 @@ export class GeotiffRenderer {
         return this.plotty_;
     }
 
-    renderFromUrl(params: RenderFromUrlParams): Promise<{canvas: HTMLCanvasElement, newSrsDefinition: boolean} | undefined> {
+    renderFromUrl(params: RenderFromUrlParams): Promise<{ canvas: HTMLCanvasElement; newSrsDefinition: boolean } | undefined> {
         const dataRequest: AxiosRequestConfig = {
             url: params.url,
             method: params.postData ? 'POST' : 'GET',
@@ -147,50 +145,53 @@ export class GeotiffRenderer {
             }
         }
 
-        return requestHandler<ArrayBuffer>(dataRequest).then((response) => {
-            return this.renderBuffer_({
-                data: response.data,
-                outputExtent: params.outputExtent,
-                outputSrs: params.outputSrs
-            }).then((response) => {
-                const { canvas, newSrsDefinition, ...renderData } = response;
+        return requestHandler<ArrayBuffer>(dataRequest)
+            .then((response) => {
+                return this.renderBuffer_({
+                    data: response.data,
+                    outputExtent: params.outputExtent,
+                    outputSrs: params.outputSrs
+                })
+                    .then((response) => {
+                        const { canvas, newSrsDefinition, ...renderData } = response;
 
-                if (!params.disableCache) {
-                    this.cache_.set(params.url, renderData);
-                }
-                return {
-                    canvas,
-                    newSrsDefinition
-                };
-            }).catch(() => {
+                        if (!params.disableCache) {
+                            this.cache_.set(params.url, renderData);
+                        }
+                        return {
+                            canvas,
+                            newSrsDefinition
+                        };
+                    })
+                    .catch(() => {
+                        if (params.retryCount) {
+                            return this.renderFromUrl({
+                                ...params,
+                                retryCount: params.retryCount - 1
+                            });
+                        }
+                        return undefined;
+                    });
+            })
+            .catch(() => {
                 if (params.retryCount) {
                     return this.renderFromUrl({
                         ...params,
                         retryCount: params.retryCount - 1
                     });
                 }
+                if (!params.disableCache) {
+                    this.cache_.set(params.url, {
+                        values: undefined
+                    });
+                }
                 return undefined;
             });
-        }).catch(() => {
-            if (params.retryCount) {
-                return this.renderFromUrl({
-                    ...params,
-                    retryCount: params.retryCount - 1
-                });
-            }
-            if (!params.disableCache) {
-                this.cache_.set(params.url, {
-                    values: undefined
-                });
-            }
-            return undefined;
-        });
-
     }
 
     renderFromBuffer(params: RenderFromBufferParams) {
         return this.renderBuffer_(params).then((response) => {
-            const { canvas, newSrsDefinition, ...renderData } = response;
+            const { canvas, newSrsDefinition } = response;
             return {
                 canvas,
                 newSrsDefinition
@@ -198,12 +199,12 @@ export class GeotiffRenderer {
         });
     }
 
-    protected renderBuffer_(params: RenderFromBufferParams): Promise<
-        GeotiffRendererData & {newSrsDefinition: boolean, canvas: HTMLCanvasElement}
-    > {
+    protected renderBuffer_(
+        params: RenderFromBufferParams
+    ): Promise<GeotiffRendererData & { newSrsDefinition: boolean; canvas: HTMLCanvasElement }> {
         return fromArrayBuffer(params.data).then((tiff) => {
             return tiff.getImage().then((image) => {
-                return image.readRasters({pool: GeotiffRenderer.decoder_}).then((data) => {
+                return image.readRasters({ pool: GeotiffRenderer.decoder_ }).then((data) => {
                     let noData: number | undefined;
                     const gdalNoData = image.getFileDirectory().GDAL_NODATA;
                     if (gdalNoData) {
@@ -238,7 +239,6 @@ export class GeotiffRenderer {
     }
 
     protected renderTiffImage_(data: GeotiffRendererData) {
-
         this.plotty_.setNoDataValue(data.noData);
         this.plotty_.setFlipY(data.flipY || false);
         let outputCanvas = this.plotty_.render(data.values, data.width, data.height);
@@ -249,7 +249,7 @@ export class GeotiffRenderer {
     }
 
     protected getImageExtent_(image, outputSrs?: string) {
-        let imageExtent: number[] = image.getBoundingBox();
+        const imageExtent: number[] = image.getBoundingBox();
         if (outputSrs) {
             const imageSrs = this.getImageSrs_(image);
             if (imageSrs && imageSrs !== outputSrs) {
@@ -287,11 +287,14 @@ export class GeotiffRenderer {
      */
     protected registerSrs_(code: string) {
         if (!proj4.defs(code)) {
-            return GeotiffRenderer.srsDefProvider_.getSrsDefinition(code).then((srsDef) => {
-                proj4.defs(code, srsDef);
-            }).then(() => {
-                return true;
-            });
+            return GeotiffRenderer.srsDefProvider_
+                .getSrsDefinition(code)
+                .then((srsDef) => {
+                    proj4.defs(code, srsDef);
+                })
+                .then(() => {
+                    return true;
+                });
         } else {
             return Promise.resolve(false);
         }
@@ -301,7 +304,7 @@ export class GeotiffRenderer {
         const imageSrs: number = image.geoKeys?.ProjectedCSTypeGeoKey || image.geoKeys?.GeographicTypeGeoKey;
         if (imageSrs) {
             if (imageSrs < 32767) {
-                return  `EPSG:${imageSrs}`;
+                return `EPSG:${imageSrs}`;
             } else {
                 // user defined srs (http://geotiff.maptools.org/spec/geotiff6.html#6.3.3.1)
                 return undefined;
@@ -319,11 +322,10 @@ export class GeotiffRenderer {
         const eps = 0.001;
 
         if (outputWidth - sourceWidth > eps || outputHeight - sourceHeight > eps) {
-
-            const dw = sourceWidth / outputWidth * sourceCanvas.width;
-            const dh = sourceHeight / outputHeight * sourceCanvas.height;
-            const dx = (sourceExtent[0] - outputExtent[0]) / outputWidth * sourceCanvas.width;
-            const dy = (outputExtent[3] - sourceExtent[3]) / outputHeight * sourceCanvas.height;
+            const dw = (sourceWidth / outputWidth) * sourceCanvas.width;
+            const dh = (sourceHeight / outputHeight) * sourceCanvas.height;
+            const dx = ((sourceExtent[0] - outputExtent[0]) / outputWidth) * sourceCanvas.width;
+            const dy = ((outputExtent[3] - sourceExtent[3]) / outputHeight) * sourceCanvas.height;
 
             const [outputCanvas, outputContext] = GeotiffRenderer.getTransformCanvas_();
             outputCanvas.width = sourceCanvas.width;
@@ -336,5 +338,4 @@ export class GeotiffRenderer {
             return sourceCanvas;
         }
     }
-
 }

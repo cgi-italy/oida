@@ -8,7 +8,6 @@ import { layerControllersFactory } from './layer-controllers-factory';
 import { TileLayer } from '../../models/map/layers/tile-layer';
 
 export class TileLayerController extends MapLayerController<ITileLayerRenderer, TileLayer> {
-
     protected tileLoadingState_ = {
         pending: 0,
         loaded: 0
@@ -19,7 +18,6 @@ export class TileLayerController extends MapLayerController<ITileLayerRenderer, 
     }
 
     protected createLayerRenderer_(mapRenderer: IMapRenderer) {
-
         const onTileLoadStart = () => {
             this.tileLoadingState_.pending++;
             this.mapLayer_.loadingStatus.update({
@@ -46,7 +44,6 @@ export class TileLayerController extends MapLayerController<ITileLayerRenderer, 
             }
         };
 
-
         return <ITileLayerRenderer>mapRenderer.getLayersFactory().create(TILE_LAYER_ID, {
             ...this.getRendererConfig_(mapRenderer),
             source: this.mapLayer_.source,
@@ -63,33 +60,44 @@ export class TileLayerController extends MapLayerController<ITileLayerRenderer, 
         const layerRenderer = this.layerRenderer_!;
 
         this.subscriptionTracker_.addSubscription(
-            reaction(() => this.mapLayer_.source, (source) => {
-                this.resetLoadingState_();
-                layerRenderer.updateSource(source);
-            })
+            reaction(
+                () => this.mapLayer_.source,
+                (source) => {
+                    this.resetLoadingState_();
+                    layerRenderer.updateSource(source);
+                }
+            )
         );
 
         this.subscriptionTracker_.addSubscription(
-            reaction(() => this.mapLayer_.minZoomLevel, (level) => {
-                this.resetLoadingState_();
-                layerRenderer.setMinZoomLevel(level);
-            })
+            reaction(
+                () => this.mapLayer_.minZoomLevel,
+                (level) => {
+                    this.resetLoadingState_();
+                    layerRenderer.setMinZoomLevel(level);
+                }
+            )
         );
 
         this.subscriptionTracker_.addSubscription(
-            reaction(() => this.mapLayer_.maxZoomLevel, (level) => {
-                this.resetLoadingState_();
-                layerRenderer.setMaxZoomLevel(level);
-            })
+            reaction(
+                () => this.mapLayer_.maxZoomLevel,
+                (level) => {
+                    this.resetLoadingState_();
+                    layerRenderer.setMaxZoomLevel(level);
+                }
+            )
         );
 
         this.subscriptionTracker_.addSubscription(
-            reaction(() => this.mapLayer_.sourceRevision, (revision) => {
-                this.resetLoadingState_();
-                layerRenderer.forceRefresh();
-            })
+            reaction(
+                () => this.mapLayer_.sourceRevision,
+                (revision) => {
+                    this.resetLoadingState_();
+                    layerRenderer.forceRefresh();
+                }
+            )
         );
-
     }
 
     protected resetLoadingState_() {
@@ -100,10 +108,8 @@ export class TileLayerController extends MapLayerController<ITileLayerRenderer, 
             percentage: 100
         });
     }
-
 }
 
 layerControllersFactory.register(TILE_LAYER_ID, (config) => {
     return new TileLayerController(config);
 });
-

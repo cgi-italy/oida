@@ -6,13 +6,11 @@ import { Map } from '@oidajs/state-mobx';
 import { useSelector } from '../../../core';
 import { useMapModule } from './use-map-module';
 
-
 export type CenterOnMapProps = {
-    map: Map
+    map: Map;
 };
 
 export const useCenterOnMap = (props: CenterOnMapProps) => {
-
     const pendingRequest = useRef<(renderer: IMapRenderer) => void>();
 
     const renderer = useSelector(() => {
@@ -41,7 +39,7 @@ export const useCenterOnMap = (props: CenterOnMapProps) => {
 };
 
 export const useCenterOnMapFromModule = (mapModuleId?: string) => {
-    let mapModuleState = useMapModule(mapModuleId);
+    const mapModuleState = useMapModule(mapModuleId);
     return useCenterOnMap({
         map: mapModuleState.map
     });

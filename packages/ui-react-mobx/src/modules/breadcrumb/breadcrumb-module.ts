@@ -5,20 +5,18 @@ import { BreadcrumbItemProps } from '@oidajs/ui-react-core';
 
 import { AppModule } from '../app-module';
 
-
 export const DEFAULT_BREADCRUMB_MODULE_ID = 'breadcrumb';
 
 export type BreadcrumbModuleConfig = {
-    pageTitle: string
+    pageTitle: string;
 };
 
 export type BreadcrumbModuleProps = {
     config: BreadcrumbModuleConfig;
-    id?: string
+    id?: string;
 };
 
 export class BreadcrumbModule extends AppModule {
-
     readonly config: BreadcrumbModuleConfig;
     readonly breadcrumb: IndexedCollection<BreadcrumbItemProps>;
 
@@ -36,7 +34,7 @@ export class BreadcrumbModule extends AppModule {
 
     afterInit_() {
         autorun(() => {
-            let title = this.breadcrumb.items.reduce((title, breadcrumbItem) => {
+            const title = this.breadcrumb.items.reduce((title, breadcrumbItem) => {
                 return `${title} - ${breadcrumbItem.title}`;
             }, this.config.pageTitle);
             document.title = title;

@@ -1,27 +1,25 @@
 import React, { useEffect, useRef } from 'react';
-import  classNames from 'classnames';
+import classNames from 'classnames';
 import useResizeAware from 'react-resize-aware';
 
 import { Map, MapRendererController } from '@oidajs/state-mobx';
 import { useMapModule } from '../hooks';
 
 export type MapComponentProps = {
-    mapState: Map,
-    className?: string,
-    style?: React.CSSProperties
+    mapState: Map;
+    className?: string;
+    style?: React.CSSProperties;
 };
 
 export const MapComponent = (props: MapComponentProps) => {
-    const {mapState, className, style} = props;
+    const { mapState, className, style } = props;
 
     const [resizeListener, size] = useResizeAware();
 
     const mapContainer = useRef<HTMLDivElement>(null);
     let rendererController: MapRendererController;
 
-
     useEffect(() => {
-
         if (size && size.width && size.height) {
             mapState.view.setDomTarget(mapContainer.current || undefined);
         } else {
@@ -31,7 +29,6 @@ export const MapComponent = (props: MapComponentProps) => {
         return () => {
             mapState.view.setDomTarget(undefined);
         };
-
     }, [mapState, mapContainer]);
 
     useEffect(() => {
@@ -57,23 +54,16 @@ export const MapComponent = (props: MapComponentProps) => {
     }, [size]);
 
     return (
-        <div
-            className={classNames('map-widget', className)}
-            style={style}
-            ref={mapContainer}
-        >
+        <div className={classNames('map-widget', className)} style={style} ref={mapContainer}>
             {resizeListener}
         </div>
     );
 };
 
-export const MapComponentFromModule = (props: Omit<MapComponentProps, 'mapState'> & {mapModuleId?: string}) => {
-
+export const MapComponentFromModule = (props: Omit<MapComponentProps, 'mapState'> & { mapModuleId?: string }) => {
     const { mapModuleId, ...others } = props;
 
-    let mapModuleState = useMapModule(mapModuleId);
+    const mapModuleState = useMapModule(mapModuleId);
 
-    return (
-        <MapComponent mapState={mapModuleState.map} {...others}></MapComponent>
-    );
+    return <MapComponent mapState={mapModuleState.map} {...others}></MapComponent>;
 };

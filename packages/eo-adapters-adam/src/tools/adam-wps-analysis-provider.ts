@@ -1,9 +1,6 @@
-
 import length from '@turf/length';
 
-import {
-    AxiosInstanceWithCancellation, createAxiosInstance
-} from '@oidajs/core';
+import { AxiosInstanceWithCancellation, createAxiosInstance } from '@oidajs/core';
 
 import { DatasetAreaSeriesRequest, DatasetAreaSeriesDataItem, DatasetTransectValuesRequest } from '@oidajs/eo-mobx';
 
@@ -16,8 +13,7 @@ export type AdamWpsAnalysisProviderConfig = {
     axiosInstance?: AxiosInstanceWithCancellation;
 };
 
-export class AdamWpsAnalysisProvider  {
-
+export class AdamWpsAnalysisProvider {
     protected axiosInstance_: AxiosInstanceWithCancellation;
     protected config_: AdamWpsAnalysisProviderConfig;
 
@@ -33,7 +29,6 @@ export class AdamWpsAnalysisProvider  {
     }
 
     getBBoxTimeSeries(request: DatasetAreaSeriesRequest) {
-
         const wpsParams = {
             service: 'WPS',
             request: 'execute',
@@ -42,7 +37,6 @@ export class AdamWpsAnalysisProvider  {
         };
 
         if (request.geometry.type === 'BBox' && request.range && request.dimension === 'time') {
-
             const bbox = request.geometry.bbox;
 
             const variable = this.getVariableConfig_(request.variable);
@@ -58,27 +52,29 @@ export class AdamWpsAnalysisProvider  {
                 end_time: (request.range.max as Date).toISOString()
             };
 
-            return this.axiosInstance_.cancelableRequest({
-                url: this.config_.serviceUrl,
-                params: {
-                    ...wpsParams,
-                    datainputs: this.serializeWpsInputs_(wpsInputs),
-                },
-                responseType: 'document',
-                paramsSerializer: AdamServiceParamsSerializer
-            }).then((response) => {
-                let data = this.parseBBoxTimeSeriesResponse_(response.data);
-                if (data) {
-                    const noData = variable?.domain?.noData;
-                    if (noData !== undefined) {
-                        return data.filter(item => item.data.stats?.mean !== noData);
+            return this.axiosInstance_
+                .cancelableRequest({
+                    url: this.config_.serviceUrl,
+                    params: {
+                        ...wpsParams,
+                        datainputs: this.serializeWpsInputs_(wpsInputs)
+                    },
+                    responseType: 'document',
+                    paramsSerializer: AdamServiceParamsSerializer
+                })
+                .then((response) => {
+                    const data = this.parseBBoxTimeSeriesResponse_(response.data);
+                    if (data) {
+                        const noData = variable?.domain?.noData;
+                        if (noData !== undefined) {
+                            return data.filter((item) => item.data.stats?.mean !== noData);
+                        } else {
+                            return data;
+                        }
                     } else {
-                        return data;
+                        throw new Error('Error parsing WPS response');
                     }
-                } else {
-                    throw new Error('Error parsing WPS response');
-                }
-            });
+                });
         } else {
             return Promise.reject();
         }
@@ -110,57 +106,57 @@ export class AdamWpsAnalysisProvider  {
             time_t: time.toISOString()
         };
 
-        return this.axiosInstance_.cancelableRequest({
-            url: this.config_.serviceUrl,
-            params: {
-                ...wpsParams,
-                datainputs: this.serializeWpsInputs_(wpsInputs),
-            },
-            responseType: 'document',
-            paramsSerializer: AdamServiceParamsSerializer
-        }).then((response) => {
-            let data = this.parseTransectSeriesResponse_(response.data);
-            const line = {
-                type: 'Feature',
-                geometry: request.geometry,
-                properties: {}
-            } as GeoJSON.Feature<GeoJSON.LineString>;
+        return this.axiosInstance_
+            .cancelableRequest({
+                url: this.config_.serviceUrl,
+                params: {
+                    ...wpsParams,
+                    datainputs: this.serializeWpsInputs_(wpsInputs)
+                },
+                responseType: 'document',
+                paramsSerializer: AdamServiceParamsSerializer
+            })
+            .then((response) => {
+                const data = this.parseTransectSeriesResponse_(response.data);
+                const line = {
+                    type: 'Feature',
+                    geometry: request.geometry,
+                    properties: {}
+                } as GeoJSON.Feature<GeoJSON.LineString>;
 
-            const totalLength = length(line);
+                const totalLength = length(line);
 
-            if (data) {
+                if (data) {
+                    const indexToDistance = totalLength / (data.length - 1);
+                    const series = data.map((value, index) => {
+                        const relativeDistance = index * indexToDistance;
+                        return {
+                            x: relativeDistance,
+                            y: value
+                        };
+                    });
 
-                const indexToDistance = totalLength / (data.length - 1);
-                const series = data.map((value, index) => {
-                    const relativeDistance = index * indexToDistance;
-                    return {
-                        x: relativeDistance,
-                        y: value
-                    };
-                });
-
-                const noData = variable?.domain?.noData;
-                if (noData !== undefined) {
-                    return series.filter(item => item.y !== noData);
+                    const noData = variable?.domain?.noData;
+                    if (noData !== undefined) {
+                        return series.filter((item) => item.y !== noData);
+                    } else {
+                        return series;
+                    }
                 } else {
-                    return series;
+                    throw new Error('Error parsing WPS response');
                 }
-
-            } else {
-                throw new Error('Error parsing WPS response');
-            }
-        });
+            });
     }
 
     protected parseBBoxTimeSeriesResponse_(response: XMLDocument) {
         try {
-            let processOutput = response.getElementsByTagNameNS(this.xmlNamespaces_['wps'], 'ProcessOutputs')[0];
-            let outputs = processOutput.getElementsByTagNameNS(this.xmlNamespaces_['wps'], 'Output');
+            const processOutput = response.getElementsByTagNameNS(this.xmlNamespaces_['wps'], 'ProcessOutputs')[0];
+            const outputs = processOutput.getElementsByTagNameNS(this.xmlNamespaces_['wps'], 'Output');
 
-            let outs: Record<string, (number | string)[]> = {};
+            const outs: Record<string, (number | string)[]> = {};
             Array.from(outputs).forEach((output) => {
-                let id = output.getElementsByTagNameNS(this.xmlNamespaces_['ows'], 'Identifier')[0].textContent;
-                let dataString = output.getElementsByTagNameNS(this.xmlNamespaces_['wps'], 'LiteralData')[0].textContent;
+                const id = output.getElementsByTagNameNS(this.xmlNamespaces_['ows'], 'Identifier')[0].textContent;
+                const dataString = output.getElementsByTagNameNS(this.xmlNamespaces_['wps'], 'LiteralData')[0].textContent;
                 if (id && dataString) {
                     outs[id] = JSON.parse(dataString.replace(/'/g, '"').replace(/nan/g, 'null'));
                 }
@@ -173,12 +169,11 @@ export class AdamWpsAnalysisProvider  {
                         stats: {
                             min: outs['min_values'][idx],
                             max: outs['max_values'][idx],
-                            mean: outs['mean_values'][idx],
+                            mean: outs['mean_values'][idx]
                         }
                     }
                 };
             }) as DatasetAreaSeriesDataItem[];
-
         } catch (e) {
             return undefined;
         }
@@ -186,22 +181,23 @@ export class AdamWpsAnalysisProvider  {
 
     protected parseTransectSeriesResponse_(response: XMLDocument) {
         try {
-            let processOutput = response.getElementsByTagNameNS(this.xmlNamespaces_['wps'], 'ProcessOutputs')[0];
-            let output = processOutput.getElementsByTagNameNS(this.xmlNamespaces_['wps'], 'Output')[0];
+            const processOutput = response.getElementsByTagNameNS(this.xmlNamespaces_['wps'], 'ProcessOutputs')[0];
+            const output = processOutput.getElementsByTagNameNS(this.xmlNamespaces_['wps'], 'Output')[0];
 
-            let dataString = output.getElementsByTagNameNS(this.xmlNamespaces_['wps'], 'LiteralData')[0].textContent;
+            const dataString = output.getElementsByTagNameNS(this.xmlNamespaces_['wps'], 'LiteralData')[0].textContent;
 
             return JSON.parse(dataString!) as number[];
-
         } catch (e) {
             return undefined;
         }
     }
 
     protected serializeWpsInputs_(wpsInputs: Record<string, any>) {
-        return Object.keys(wpsInputs).map((key) => {
-            return `${key}=${wpsInputs[key]}`;
-        }).join(';');
+        return Object.keys(wpsInputs)
+            .map((key) => {
+                return `${key}=${wpsInputs[key]}`;
+            })
+            .join(';');
     }
 
     protected getVariableConfig_(id: string) {

@@ -5,8 +5,17 @@ import { Geometry, LoadingState, SubscriptionTracker } from '@oidajs/core';
 import {
     DataFilters,
     DataFiltersProps,
-    FeatureLayer, FeatureStyleGetter, HasVisibility, Hovered, HoveredProps,
-    IsHoverable, IsSelectable, Selected, SelectedProps, Visible, VisibleProps
+    FeatureLayer,
+    FeatureStyleGetter,
+    HasVisibility,
+    Hovered,
+    HoveredProps,
+    IsHoverable,
+    IsSelectable,
+    Selected,
+    SelectedProps,
+    Visible,
+    VisibleProps
 } from '@oidajs/state-mobx';
 
 import { ColorMap, ColorScale, DatasetViz, DatasetVizProps } from '../common';
@@ -19,11 +28,9 @@ import { VectorFeatureDescriptor, VectorFeatureProperties } from './vector-featu
  * @returns The map layer feature style function
  */
 export const defaultVectoreFeatureStyleFactory = (color?: string) => {
-
     const defaultColor = chroma(color || '0000AA');
 
     const featureStyleGetter: FeatureStyleGetter<DatasetVectorFeature> = (feature: DatasetVectorFeature) => {
-
         let color = feature.color ? chroma(feature.color) : defaultColor;
         let opacity = 0.1;
 
@@ -71,13 +78,16 @@ export const defaultVectoreFeatureStyleFactory = (color?: string) => {
 
 export type DatasetVectorFeatureProps<T extends VectorFeatureProperties = VectorFeatureProperties> = {
     id: string;
-    geometry: Geometry,
+    geometry: Geometry;
     properties: T;
     color?: string;
-} & VisibleProps & SelectedProps & HoveredProps;
+} & VisibleProps &
+    SelectedProps &
+    HoveredProps;
 
-export class DatasetVectorFeature
-<T extends VectorFeatureProperties = VectorFeatureProperties> implements HasVisibility, IsSelectable, IsHoverable {
+export class DatasetVectorFeature<T extends VectorFeatureProperties = VectorFeatureProperties>
+    implements HasVisibility, IsSelectable, IsHoverable
+{
     readonly id: string;
     readonly visible: Visible;
     readonly selected: Selected;
@@ -129,9 +139,11 @@ export type DatasetVectorMapVizConfig = {
     /**
      * The color scales to be used for dynamic feature coloring
      */
-    colorScales?: Array<ColorScale & {
-        colors: string[];
-    }>;
+    colorScales?: Array<
+        ColorScale & {
+            colors: string[];
+        }
+    >;
     /**
      * The style factory function. It receive the dataset color as input and shall returns a feature style function
      * used as input for the internal {@link FeatureLayer}.
@@ -146,11 +158,10 @@ export type DatasetVectorMapVizProps = DatasetVizProps<typeof VECTOR_VIZ_TYPE, D
     /**
      * Optional {@link DatasetVectorMapViz.propertyFilters | DatasetVectorMapViz property filters} initialization
      */
-    propertyFilters?: DataFiltersProps | DataFilters
+    propertyFilters?: DataFiltersProps | DataFilters;
 };
 
 export class DatasetVectorMapViz extends DatasetViz<FeatureLayer<DatasetVectorFeature>> {
-
     /** The visualization configuration */
     readonly config: DatasetVectorMapVizConfig;
     /** The feature descriptor */
@@ -182,16 +193,15 @@ export class DatasetVectorMapViz extends DatasetViz<FeatureLayer<DatasetVectorFe
         this.colorProperty = undefined;
         this.colorMap = undefined;
         this.chromaScale_ = undefined;
-        this.propertyFilters = (props.propertyFilters instanceof DataFilters)
-            ? props.propertyFilters
-            : new DataFilters(props.propertyFilters);
+        this.propertyFilters =
+            props.propertyFilters instanceof DataFilters ? props.propertyFilters : new DataFilters(props.propertyFilters);
 
         this.data_ = observable.array([], {
             deep: false
         });
         this.mapLayer.setSource(this.data_);
 
-        if (typeof(props.config.featureDescriptor) === 'function') {
+        if (typeof props.config.featureDescriptor === 'function') {
             props.config.featureDescriptor().then((featureDescriptor) => {
                 this.featureDescriptor = featureDescriptor;
             });
@@ -221,7 +231,7 @@ export class DatasetVectorMapViz extends DatasetViz<FeatureLayer<DatasetVectorFe
             if (featureProperty && featureProperty.type === 'number') {
                 if (!this.colorMap) {
                     this.colorMap = new ColorMap({
-                        colorScale: this.config.colorScales[0].id,
+                        colorScale: this.config.colorScales[0].id
                     });
                 }
                 this.colorMap.setColorMapDomain({
@@ -281,7 +291,7 @@ export class DatasetVectorMapViz extends DatasetViz<FeatureLayer<DatasetVectorFe
     @computed
     protected get featureColorGetter() {
         const colorProperty = this.colorProperty
-            ? this.featureDescriptor?.properties.find((property => property.id === this.colorProperty))
+            ? this.featureDescriptor?.properties.find((property) => property.id === this.colorProperty)
             : undefined;
 
         const colorMapDomain = this.colorMap?.domain?.mapRange;
@@ -290,8 +300,8 @@ export class DatasetVectorMapViz extends DatasetViz<FeatureLayer<DatasetVectorFe
         if (colorProperty && colorProperty.type === 'number' && colorMapDomain && chromaScale) {
             return (feature) => {
                 const rawValue = colorProperty.valueExtractor
-                ? colorProperty.valueExtractor(feature.properties)
-                : feature.properties[colorProperty.id];
+                    ? colorProperty.valueExtractor(feature.properties)
+                    : feature.properties[colorProperty.id];
 
                 let value: number = colorProperty.parser ? colorProperty.parser(rawValue) : rawValue;
                 value = (value - colorMapDomain.min) / (colorMapDomain.max - colorMapDomain.min);
@@ -315,42 +325,61 @@ export class DatasetVectorMapViz extends DatasetViz<FeatureLayer<DatasetVectorFe
     @action
     protected refreshData_(data: DatasetVectorFeatureProps[]) {
         const colorGetter = this.featureColorGetter;
-        this.data_.replace(data.map(props => new DatasetVectorFeature({
-            ...props,
-            color: colorGetter(props)
-        })));
+        this.data_.replace(
+            data.map(
+                (props) =>
+                    new DatasetVectorFeature({
+                        ...props,
+                        color: colorGetter(props)
+                    })
+            )
+        );
     }
 
     protected afterInit_() {
-        const dataUpdaterDisposer = autorun(() => {
-            this.mapLayer.loadingStatus.setValue(LoadingState.Loading);
-            this.config.dataProvider(this).then((data) => {
-                this.refreshData_(data);
-                this.mapLayer.loadingStatus.setValue(LoadingState.Success);
-            }).catch((error) => {
-                runInAction(() => {
-                    this.data_.clear();
-                    this.mapLayer.loadingStatus.update({
-                        value: LoadingState.Error,
-                        message: error.message
+        const dataUpdaterDisposer = autorun(
+            () => {
+                this.mapLayer.loadingStatus.setValue(LoadingState.Loading);
+                this.config
+                    .dataProvider(this)
+                    .then((data) => {
+                        this.refreshData_(data);
+                        this.mapLayer.loadingStatus.setValue(LoadingState.Success);
+                    })
+                    .catch((error) => {
+                        runInAction(() => {
+                            this.data_.clear();
+                            this.mapLayer.loadingStatus.update({
+                                value: LoadingState.Error,
+                                message: error.message
+                            });
+                        });
                     });
-                });
-            });
-        }, {
-            delay: 500
-        });
+            },
+            {
+                delay: 500
+            }
+        );
 
-        const chromaScaleUpdateDisposer = reaction(() => this.colorMap?.colorScale, () => {
-            this.updateChromaScale_();
-        }, {
-            fireImmediately: true
-        });
+        const chromaScaleUpdateDisposer = reaction(
+            () => this.colorMap?.colorScale,
+            () => {
+                this.updateChromaScale_();
+            },
+            {
+                fireImmediately: true
+            }
+        );
 
-        const featureColorUpdateDisposer = reaction(() => this.featureColorGetter, () => {
-            this.updateFeatureColors_();
-        }, {
-            delay: 100
-        });
+        const featureColorUpdateDisposer = reaction(
+            () => this.featureColorGetter,
+            () => {
+                this.updateFeatureColors_();
+            },
+            {
+                delay: 100
+            }
+        );
 
         // enable dataset widget visibility when a feature is selected (i.e. display feature information)
         const widgetVisibilityDisposer = autorun(() => {
@@ -360,7 +389,6 @@ export class DatasetVectorMapViz extends DatasetViz<FeatureLayer<DatasetVectorFe
                 this.setWidgetVisible(false);
             }
         });
-
 
         this.subscriptionTracker_.addSubscription(dataUpdaterDisposer);
         this.subscriptionTracker_.addSubscription(chromaScaleUpdateDisposer);

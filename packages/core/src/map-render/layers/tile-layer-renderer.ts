@@ -1,13 +1,14 @@
 import { IMapLayerRenderer, MapLayerRendererConfig } from './map-layer-renderer';
 import { TileSource } from './tile-sources/tile-source';
 
-
 export type TileGridConfig = {
     tileSize?: number | number[];
     gridSize?: number[];
     forceUniformResolution?: boolean;
+    allowOptimalTileSize?: boolean;
     minZoom?: number;
     maxZoom?: number;
+    minRes?: number;
     extent?: number[];
     resolutions?: number[];
     matrixIds?: string[];
@@ -22,15 +23,14 @@ type TileGridParamsOptions = {
 };
 
 export const computeTileGridParams = (options: TileGridParamsOptions) => {
-
-    let {extent, tileSize, gridSize, forceUniformResolution} = options;
+    let { tileSize, gridSize } = options;
+    const { extent, forceUniformResolution } = options;
 
     const extentWidth = extent[2] - extent[0];
     const extentHeight = extent[3] - extent[1];
 
     if (!gridSize) {
-
-        const ratio = (extentWidth / tileSize[0]) / (extentHeight / tileSize[1]);
+        const ratio = extentWidth / tileSize[0] / (extentHeight / tileSize[1]);
         if (ratio > 1) {
             gridSize = [Math.round(ratio), 1];
         } else {
@@ -39,13 +39,13 @@ export const computeTileGridParams = (options: TileGridParamsOptions) => {
     }
 
     if (forceUniformResolution) {
-        let rootXResolution = (extentWidth / gridSize[0]) / tileSize[0];
-        let rootYResolution = (extentHeight / gridSize[1]) / tileSize[1];
+        const rootXResolution = extentWidth / gridSize[0] / tileSize[0];
+        const rootYResolution = extentHeight / gridSize[1] / tileSize[1];
 
         if (rootXResolution < rootYResolution) {
-            tileSize = [tileSize[0], Math.ceil(tileSize[1] * rootYResolution / rootXResolution)];
+            tileSize = [Math.ceil((tileSize[0] * rootXResolution) / rootYResolution), tileSize[1]];
         } else {
-            tileSize = [Math.ceil(tileSize[0] * rootXResolution / rootYResolution), tileSize[1]];
+            tileSize = [tileSize[0], Math.ceil((tileSize[1] * rootYResolution) / rootXResolution)];
         }
     }
 
@@ -67,7 +67,7 @@ export interface ITileLayerRenderer extends IMapLayerRenderer {
     updateSource(source: TileSource | undefined): void;
     setMinZoomLevel(level: number | undefined): void;
     setMaxZoomLevel(level: number | undefined): void;
-    forceRefresh() : void;
+    forceRefresh(): void;
 }
 
 export const TILE_LAYER_ID = 'tile';

@@ -2,7 +2,12 @@ import { fromArrayBuffer } from 'geotiff';
 
 import { VolumeSliceUrl } from '@oidajs/core';
 import {
-    DatasetVolumetricViz, VolumetricMapVizConfig, VOLUMETRIC_VIZ_TYPE, isValueDomain, isDomainProvider, DatasetMapViewConfig
+    DatasetVolumetricViz,
+    VolumetricMapVizConfig,
+    VOLUMETRIC_VIZ_TYPE,
+    isValueDomain,
+    isDomainProvider,
+    DatasetMapViewConfig
 } from '@oidajs/eo-mobx';
 
 import { AdamDatasetConfig, isMultiBandCoverage } from '../../adam-dataset-config';
@@ -11,15 +16,8 @@ import { AdamDatasetFactoryConfig } from '../../get-adam-dataset-factory';
 import { AdamServiceParamsSerializer, getAoiWcsParams, getWcsTimeFilterSubset } from '../../utils';
 import { getPlottyColorScales } from '@oidajs/eo-geotiff';
 
-export const getAdamVolumetricMapViewConfig = (
-    factoryConfig: AdamDatasetFactoryConfig,
-    datasetConfig: AdamDatasetConfig
-) => {
-
-
-    const heightDimension = datasetConfig.dimensions
-        ? datasetConfig.dimensions.find((dimension) => dimension.id === 'height')
-        : undefined;
+export const getAdamVolumetricMapViewConfig = (factoryConfig: AdamDatasetFactoryConfig, datasetConfig: AdamDatasetConfig) => {
+    const heightDimension = datasetConfig.dimensions ? datasetConfig.dimensions.find((dimension) => dimension.id === 'height') : undefined;
 
     if (!heightDimension || !heightDimension.domain || isDomainProvider(heightDimension.domain) || !isValueDomain(heightDimension.domain)) {
         return undefined;
@@ -29,31 +27,35 @@ export const getAdamVolumetricMapViewConfig = (
         return undefined;
     }
 
+    if (!datasetConfig.coverageExtent) {
+        return undefined;
+    }
+
     const tileGrid = {
-        srs: datasetConfig.coverageSrs,
+        srs: datasetConfig.coverageExtent.srs,
         numLevels: 1,
         numRootTiles: [2, 1, 1],
         tileSize: [256, 256, 9],
         extent: {
-            minX: datasetConfig.coverageExtent[0],
-            minY: datasetConfig.coverageExtent[1],
+            minX: datasetConfig.coverageExtent.bbox[0],
+            minY: datasetConfig.coverageExtent.bbox[1],
             minZ: heightDimension.domain.min as number,
-            maxX: datasetConfig.coverageExtent[2],
-            maxY: datasetConfig.coverageExtent[3],
+            maxX: datasetConfig.coverageExtent.bbox[2],
+            maxY: datasetConfig.coverageExtent.bbox[3],
             maxZ: heightDimension.domain.max as number
         }
     };
 
     const colorScales = getPlottyColorScales();
 
-    const bands = datasetConfig.coverages.map(coverage => {
+    const bands = datasetConfig.coverages.map((coverage) => {
         return {
             colorScales: colorScales,
             ...coverage
         };
     });
 
-    let volumetricVizConfig: VolumetricMapVizConfig = {
+    const volumetricVizConfig: VolumetricMapVizConfig = {
         verticalDomain: {
             step: 1,
             min: heightDimension.domain.min as number,
@@ -61,10 +63,9 @@ export const getAdamVolumetricMapViewConfig = (
         },
         bands: bands,
         volumeSourceProvider: (volumetricViz: DatasetVolumetricViz) => {
-
             const selectedVariable = volumetricViz.bandMode?.band;
 
-            let variableConfig = bands.find((variable) => {
+            const variableConfig = bands.find((variable) => {
                 return variable.id === selectedVariable;
             });
 
@@ -72,14 +73,14 @@ export const getAdamVolumetricMapViewConfig = (
 
             const sourceSubsets: string[] = [];
 
-            if (!datasetConfig.timeless) {
+            if (!datasetConfig.fixedTime) {
                 const timeSubset = getWcsTimeFilterSubset(volumetricViz.dataset.toi);
                 if (timeSubset) {
                     sourceSubsets.push(timeSubset);
                 }
             }
 
-            let aoiFilter = volumetricViz.dataset.aoi;
+            const aoiFilter = volumetricViz.dataset.aoi;
 
             const aoiParams = getAoiWcsParams(datasetConfig, aoiFilter);
 
@@ -87,14 +88,14 @@ export const getAdamVolumetricMapViewConfig = (
                 return undefined;
             }
 
-            const extent = aoiParams?.extent;
+            const extent = aoiParams.extent.bbox;
             tileGrid.extent.minX = extent[0];
             tileGrid.extent.maxX = extent[2];
             tileGrid.extent.minY = extent[1];
             tileGrid.extent.maxY = extent[3];
 
-            let sizeX = extent[2] - extent[0];
-            let sizeY = extent[3] - extent[1];
+            const sizeX = extent[2] - extent[0];
+            const sizeY = extent[3] - extent[1];
 
             if (sizeX >= sizeY) {
                 tileGrid.numRootTiles[1] = 1;
@@ -107,7 +108,7 @@ export const getAdamVolumetricMapViewConfig = (
             return {
                 tileGrid: tileGrid,
                 tileSliceUrls: (tileKey, tileExtent) => {
-                    let wcsParams = {
+                    const wcsParams = {
                         service: 'WCS',
                         request: 'GetCoverage',
                         version: '2.0.0',
@@ -116,18 +117,17 @@ export const getAdamVolumetricMapViewConfig = (
                         size: `(${tileGrid.tileSize[0]},${tileGrid.tileSize[1]})`
                     };
 
-                    let subsets: string[] = [];
+                    const subsets: string[] = [];
                     subsets.push(`E(${tileExtent.minX},${tileExtent.maxX})`);
                     subsets.push(`N(${tileExtent.minY},${tileExtent.maxY})`);
 
-                    let numSlices = tileGrid.tileSize[2];
+                    const numSlices = tileGrid.tileSize[2];
                     let z = tileExtent.minZ;
-                    let zStep = (tileExtent.maxZ - tileExtent.minZ) / numSlices;
-                    let urls: VolumeSliceUrl[] = [];
+                    const zStep = (tileExtent.maxZ - tileExtent.minZ) / numSlices;
+                    const urls: VolumeSliceUrl[] = [];
                     for (let i = 0; i < numSlices; ++i) {
-
-                        let heightSubset = `${heightDimension.wcsSubset.id}(${Math.round(z)})`;
-                        let params = AdamServiceParamsSerializer({
+                        const heightSubset = `${heightDimension.wcsSubset.id}(${Math.round(z)})`;
+                        const params = AdamServiceParamsSerializer({
                             ...wcsParams,
                             subset: [...sourceSubsets, ...subsets, heightSubset]
                         });
@@ -142,7 +142,6 @@ export const getAdamVolumetricMapViewConfig = (
                     }
 
                     return urls;
-
                 },
                 tileSliceLoader: (slice, sliceData) => {
                     return fromArrayBuffer(sliceData).then((tiff) => {
@@ -161,6 +160,4 @@ export const getAdamVolumetricMapViewConfig = (
         type: VOLUMETRIC_VIZ_TYPE,
         config: volumetricVizConfig
     } as DatasetMapViewConfig<typeof VOLUMETRIC_VIZ_TYPE>;
-
 };
-

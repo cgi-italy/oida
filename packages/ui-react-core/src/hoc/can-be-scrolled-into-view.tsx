@@ -1,7 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import scrollIntoView from 'scroll-into-view-if-needed';
 
-
 export type useScrollIntoViewProps = {
     scrollToElement: boolean;
     element: Element | null | undefined;
@@ -19,7 +18,7 @@ export const useScrollIntoView = (props: useScrollIntoViewProps) => {
 
 export type canBeScrolledIntoViewProps = {
     scrollToItem: boolean;
-    children: React.ReactNode
+    children: React.ReactNode;
 };
 
 export const CanBeScrolledIntoView = (props: canBeScrolledIntoViewProps) => {
@@ -30,9 +29,5 @@ export const CanBeScrolledIntoView = (props: canBeScrolledIntoViewProps) => {
         scrollToElement: props.scrollToItem
     });
 
-    return (
-        <div ref={wrapperRef}>
-            {props.children}
-        </div>
-    );
+    return <div ref={wrapperRef}>{props.children}</div>;
 };

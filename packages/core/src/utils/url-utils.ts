@@ -3,7 +3,7 @@
  * @param fileUrl The file url
  */
 export const getFileLocation = (fileUrl: string) => {
-    return fileUrl.replace(/\/[^\/]+$/, '');
+    return fileUrl.replace(/\/[^/]+$/, '');
 };
 
 /**
@@ -30,7 +30,7 @@ export const getFullUrlStartingFromFile = (url: string, fileUrl: string) => {
 };
 
 export type UrlParamsSerializerOptions = {
-    arrayExpandMode?: 'repeat'
+    arrayExpandMode?: 'repeat' | 'comma';
 };
 
 /**
@@ -40,16 +40,20 @@ export type UrlParamsSerializerOptions = {
  * @returns the serialized query string
  */
 export const urlParamsSerializer = (params: Record<string, string | string[]>, options?: UrlParamsSerializerOptions) => {
-    let urlParams: string[] = [];
-    for (let key in params) {
+    const urlParams: string[] = [];
+    for (const key in params) {
         const value = params[key];
         if (Array.isArray(value)) {
-            value.forEach((param) => {
-                urlParams.push(`${key}=${param}`);
-            });
+            if (options?.arrayExpandMode === 'comma') {
+                urlParams.push(`${key}=${value.join(',')}`);
+            } else {
+                value.forEach((param) => {
+                    urlParams.push(`${key}=${param}`);
+                });
+            }
         } else {
             if (value !== undefined) {
-                urlParams.push(`${key}=${value.replace(/\%/g, '%25')}`);
+                urlParams.push(`${key}=${value.replace(/%/g, '%25')}`);
             }
         }
     }

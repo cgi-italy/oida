@@ -1,8 +1,12 @@
 import { v4 as uuid } from 'uuid';
 
 import {
-    DatasetConfig, RASTER_VIZ_TYPE, RasterBandPreset, DatasetToolConfig,
-    DatasetSpatialCoverageProvider, DatasetTimeDistributionProvider
+    DatasetConfig,
+    RASTER_VIZ_TYPE,
+    RasterBandPreset,
+    DatasetToolConfig,
+    DatasetSpatialCoverageProvider,
+    DatasetTimeDistributionProvider
 } from '@oidajs/eo-mobx';
 
 import { WmsService } from './wms-service';
@@ -13,7 +17,7 @@ import { WmsLayerStyle } from './wms-client';
 
 /**
  * The configuration object for the {@Link getWmsDatasetConfig} function
-*/
+ */
 export type WmsDatasetConfig = {
     /** The WMS service */
     service: WmsService;
@@ -36,7 +40,7 @@ export type WmsDatasetConfig = {
     /** See the corresponding option in {@Link WmsRasterSourceProviderConfig} */
     tileGridOptions?: WmsRasterSourceTileGridOptions;
     /** See the corresponding option in {@Link WmsRasterSourceProviderConfig} */
-    additionalFiltersSerializer?: WmsRasterSourceFiltersSerializer,
+    additionalFiltersSerializer?: WmsRasterSourceFiltersSerializer;
 };
 
 /**
@@ -44,7 +48,7 @@ export type WmsDatasetConfig = {
  * If the layer present a time dimension, it will be used to enable time exploration (and in case of ncWMS for time series operations)
  * @params config: the request configuration object
  * @return The dataset configuration object. It can be used as input to the {@Link DatasetExplorer.addDataset} method
-*/
+ */
 export const getWmsDatasetConfig = (config: WmsDatasetConfig) => {
     const wmsService = config.service;
 
@@ -57,31 +61,37 @@ export const getWmsDatasetConfig = (config: WmsDatasetConfig) => {
             return dimension.name === 'time';
         });
 
-        const timeDistributionProvider = timeDimension && !config.disableTimeDimension
-            ? new WmsTimeDistributionProvider({
-                timeDimension: timeDimension.values
-            })
-            : undefined;
+        const timeDistributionProvider =
+            timeDimension && !config.disableTimeDimension
+                ? new WmsTimeDistributionProvider({
+                      timeDimension: timeDimension.values
+                  })
+                : undefined;
 
         const tools: DatasetToolConfig[] = [];
 
         if (timeDistributionProvider && wmsService.isNcWms()) {
-            tools.push(getWmsTimeSeriesToolConfig({
-                wmsService: wmsService,
-                layerName: config.layerName,
-                timeDistributionProvider: timeDistributionProvider
-            }));
+            tools.push(
+                getWmsTimeSeriesToolConfig({
+                    wmsService: wmsService,
+                    layerName: config.layerName,
+                    timeDistributionProvider: timeDistributionProvider
+                })
+            );
         }
 
         // wrap the provided spatial coverage provider (if any), and fallback to WMS layer
         // extent in case it fails to provide the geographic extent
         const spatialCoverageProvider: DatasetSpatialCoverageProvider = (datasetViz) => {
             if (config.spatialCoverageProvider) {
-                return config.spatialCoverageProvider(datasetViz).then((geographicExtent) => {
-                    return geographicExtent || layer.EX_GeographicBoundingBox;
-                }).catch(() => {
-                    return layer.EX_GeographicBoundingBox;
-                });
+                return config
+                    .spatialCoverageProvider(datasetViz)
+                    .then((geographicExtent) => {
+                        return geographicExtent || layer.EX_GeographicBoundingBox;
+                    })
+                    .catch(() => {
+                        return layer.EX_GeographicBoundingBox;
+                    });
             } else {
                 return Promise.resolve(layer.EX_GeographicBoundingBox);
             }
@@ -103,12 +113,13 @@ export const getWmsDatasetConfig = (config: WmsDatasetConfig) => {
                 getPresetFromStyle: config.getPresetFromStyle,
                 additionalFiltersSerializer: config.additionalFiltersSerializer,
                 tileGridOptions: config.tileGridOptions
-
             }),
             spatialCoverageProvider: spatialCoverageProvider,
-            timeDistribution: timeDistributionProvider ? {
-                provider: timeDistributionProvider
-            } : undefined,
+            timeDistribution: timeDistributionProvider
+                ? {
+                      provider: timeDistributionProvider
+                  }
+                : undefined,
             tools: tools
         } as DatasetConfig<typeof RASTER_VIZ_TYPE>;
     });

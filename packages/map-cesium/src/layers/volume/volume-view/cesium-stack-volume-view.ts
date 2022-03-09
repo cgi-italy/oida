@@ -4,7 +4,6 @@ import { CesiumVolumeTile } from '../cesium-volume-tile';
 import { CesiumStackVolumeTilePrimitive } from './cesium-stack-volume-tile-primitive';
 
 export class CesiumStackVolumeView extends CesiumVolumeView implements StackVolumeView {
-
     protected numSlices_: number;
 
     constructor(config) {
@@ -19,7 +18,7 @@ export class CesiumStackVolumeView extends CesiumVolumeView implements StackVolu
     }
 
     destroy() {
-
+        return;
     }
 
     protected createTilePrimitive_(tile: CesiumVolumeTile) {
@@ -30,4 +29,3 @@ export class CesiumStackVolumeView extends CesiumVolumeView implements StackVolu
         });
     }
 }
-

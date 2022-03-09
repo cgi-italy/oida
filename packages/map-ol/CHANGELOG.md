@@ -3,6 +3,31 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.1.0](https://github.com/cgi-italy/oida/compare/@oidajs/map-ol@3.0.1...@oidajs/map-ol@3.1.0) (2022-03-09)
+
+
+### Bug Fixes
+
+* improve tile grid computation logic ([a1c394b](https://github.com/cgi-italy/oida/commit/a1c394b9d760fcfc83f9a66cb86c3b5efa18fa43))
+
+
+### Features
+
+* add support for minimum resolution constraint in tile grid ([d707caa](https://github.com/cgi-italy/oida/commit/d707caa0a1037457ff95eddf7f8c38fec55150eb))
+
+
+
+
+
+## [3.0.1](https://github.com/cgi-italy/oida/compare/@oidajs/map-ol@3.0.0...@oidajs/map-ol@3.0.1) (2021-12-21)
+
+**Note:** Version bump only for package @oidajs/map-ol
+
+
+
+
+
+
 # 3.0.0 (2021-12-21)
 
 

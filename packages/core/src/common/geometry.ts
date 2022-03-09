@@ -1,4 +1,4 @@
-export interface BBoxGeometry  {
+export interface BBoxGeometry {
     type: 'BBox';
     bbox: GeoJSON.BBox;
 }
@@ -9,11 +9,10 @@ export interface CircleGeometry {
     radius: number;
 }
 
-
-export type Geometry =  GeoJSON.Geometry | BBoxGeometry | CircleGeometry | GeometryCollection;
+export type Geometry = GeoJSON.Geometry | BBoxGeometry | CircleGeometry | GeometryCollection;
 
 export type IndexableGeometry = Geometry & {
-    id?: string
+    id?: string;
 };
 
 export interface GeometryCollection {

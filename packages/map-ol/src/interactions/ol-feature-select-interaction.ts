@@ -15,8 +15,7 @@ import { OLMapRenderer } from '../map/ol-map-renderer';
 import { OLFeatureLayer } from '../layers/ol-feature-layer';
 import { OLMapLayer } from '../layers/ol-map-layer';
 
-export class OLFeatureSelectInteraction  implements IFeatureSelectInteractionImplementation  {
-
+export class OLFeatureSelectInteraction implements IFeatureSelectInteractionImplementation {
     private viewer_;
     private olInteraction_: OLSelectInteraction | undefined;
     private multiple_: boolean;
@@ -55,7 +54,7 @@ export class OLFeatureSelectInteraction  implements IFeatureSelectInteractionImp
 
         // @ts-ignore
         this.olInteraction_.on('select', (evt) => {
-            let features = evt.selected;
+            const features = evt.selected;
 
             let selectionMode = SelectionMode.Replace;
             if (this.multiple_) {
@@ -86,7 +85,7 @@ export class OLFeatureSelectInteraction  implements IFeatureSelectInteractionImp
                         const layer: OLMapLayer | undefined = selected.get(OLFeatureLayer.FEATURE_LAYER_KEY);
                         if (layer && layer.shouldReceiveFeatureSelectEvents()) {
                             let coordinate = evt.mapBrowserEvent.coordinate;
-                            let proj = this.viewer_.getView().getProjection();
+                            const proj = this.viewer_.getView().getProjection();
                             if (proj.getCode() !== 'EPSG:4326') {
                                 coordinate = transform(coordinate, proj, 'EPSG:4326');
                             }
@@ -101,7 +100,7 @@ export class OLFeatureSelectInteraction  implements IFeatureSelectInteractionImp
                 } else {
                     lastSelectedFeatureIdx = -1;
                     features.forEach((selected) => {
-                        const feature =  {
+                        const feature = {
                             id: selected.getId(),
                             data: selected.get(OLFeatureLayer.FEATURE_DATA_KEY)
                         };

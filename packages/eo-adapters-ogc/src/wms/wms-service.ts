@@ -28,31 +28,30 @@ export enum WmsLayerPreviewMode {
 }
 
 export type WmsLayerPreviewOptions = {
-    mode?: WmsLayerPreviewMode,
-    width?: number,
-    height?: number,
-    transparent?: boolean
+    mode?: WmsLayerPreviewMode;
+    width?: number;
+    height?: number;
+    transparent?: boolean;
 };
 
 export type WmsFeatureInfoParams = {
-    layer: string,
-    position: number[],
-    format: string,
-    buffer?: number[],
-    additionalParams?: Record<string, string>
+    layer: string;
+    position: number[];
+    format: string;
+    buffer?: number[];
+    additionalParams?: Record<string, string>;
 };
 
 export type WmsTimeSeriesParams = {
-    layer: string,
-    position: number[],
-    buffer?: number[],
-    start: Date,
-    end: Date,
-    csvParser?: (data: string) => Array<{x: Date, y: number}>
+    layer: string;
+    position: number[];
+    buffer?: number[];
+    start: Date;
+    end: Date;
+    csvParser?: (data: string) => Array<{ x: Date; y: number }>;
 };
 
 export class WmsService {
-
     protected wmsClient_: WmsClient;
     protected config_: WmsServiceConfig;
     protected globalCapabilities_: Promise<WmsCapabilities> | undefined;
@@ -78,15 +77,18 @@ export class WmsService {
     getCapabilities() {
         if (!this.globalCapabilities_) {
             this.globalCapabilities_ = new Promise((resolve, reject) => {
-                this.wmsClient_.getCapabilities({
-                    url: this.config_.url,
-                    version: this.config_.version
-                }).then((response) => {
-                    resolve(response);
-                }).catch((error) => {
-                    this.globalCapabilities_ = undefined;
-                    reject(error);
-                });
+                this.wmsClient_
+                    .getCapabilities({
+                        url: this.config_.url,
+                        version: this.config_.version
+                    })
+                    .then((response) => {
+                        resolve(response);
+                    })
+                    .catch((error) => {
+                        this.globalCapabilities_ = undefined;
+                        reject(error);
+                    });
             });
         }
         return this.globalCapabilities_;
@@ -95,23 +97,24 @@ export class WmsService {
     getLayerCapabilities(layerName: string) {
         // Geoserver support WMS capabilities retrieval for a single layer
         if (this.config_.vendor === 'geoserver' && !this.globalCapabilities_) {
-
             if (!this.cachedCapabilities_[layerName]) {
-
-                this.cachedCapabilities_[layerName] = this.wmsClient_.getCapabilities({
-                    url: this.getGeoserverLayerNamespacedUrl_(layerName),
-                    version: this.config_.version
-                }).then((capabilities) => {
-                    const rootLayer = capabilities.Capability.Layer;
-                    if (rootLayer.Layer) {
-                        return rootLayer.Layer[0];
-                    } else {
-                        return undefined;
-                    }
-                }).catch((error) => {
-                    delete this.cachedCapabilities_[layerName];
-                    throw error;
-                });
+                this.cachedCapabilities_[layerName] = this.wmsClient_
+                    .getCapabilities({
+                        url: this.getGeoserverLayerNamespacedUrl_(layerName),
+                        version: this.config_.version
+                    })
+                    .then((capabilities) => {
+                        const rootLayer = capabilities.Capability.Layer;
+                        if (rootLayer.Layer) {
+                            return rootLayer.Layer[0];
+                        } else {
+                            return undefined;
+                        }
+                    })
+                    .catch((error) => {
+                        delete this.cachedCapabilities_[layerName];
+                        throw error;
+                    });
             }
 
             return this.cachedCapabilities_[layerName];
@@ -145,70 +148,72 @@ export class WmsService {
     }
 
     getTimeSeries(params: WmsTimeSeriesParams) {
-
         if (!this.config_.ncWms) {
             throw new Error('WmsService: getTimeSeries opeation not supported');
         }
 
         const buffer = params.buffer || [0.1, 0.2];
 
-        return this.wmsClient_.getTimeSeries({
-            url: this.config_.url,
-            layers: params.layer,
-            styles: '',
-            srs: 'EPSG:4326',
-            bbox: [
-                params.position[1] - buffer[1],
-                params.position[0] - buffer[0],
-                params.position[1] + buffer[1],
-                params.position[0] + buffer[0]
-            ],
-            width: 64,
-            height: 64,
-            i: 32,
-            j: 32,
-            time: `${params.start.toISOString()}/${params.end.toISOString()}`,
-            format: 'text/csv'
-        }).then((data: string) => {
-            if (params.csvParser) {
-                return params.csvParser(data);
-            } else {
-                let rows = data.split('\n');
-                let series = rows.map((row) => {
-                    try {
-                        const [timeStr, valueStr] = row.split(',');
-                        const dt = moment.utc(timeStr);
-                        const value = parseFloat(valueStr);
-                        if (!dt.isValid() || Number.isNaN(value)) {
-                            return undefined;
-                        }
-                        return {
-                            x: dt.toDate(),
-                            y: value
-                        };
-                    } catch {
-                        return undefined;
-                    }
-                }).filter(v => !!v);
-                return series as Array<{
-                    x: Date,
-                    y: number
-                }>;
-            }
-        });
+        return this.wmsClient_
+            .getTimeSeries({
+                url: this.config_.url,
+                layers: params.layer,
+                styles: '',
+                srs: 'EPSG:4326',
+                bbox: [
+                    params.position[1] - buffer[1],
+                    params.position[0] - buffer[0],
+                    params.position[1] + buffer[1],
+                    params.position[0] + buffer[0]
+                ],
+                width: 64,
+                height: 64,
+                i: 32,
+                j: 32,
+                time: `${params.start.toISOString()}/${params.end.toISOString()}`,
+                format: 'text/csv'
+            })
+            .then((data: string) => {
+                if (params.csvParser) {
+                    return params.csvParser(data);
+                } else {
+                    const rows = data.split('\n');
+                    const series = rows
+                        .map((row) => {
+                            try {
+                                const [timeStr, valueStr] = row.split(',');
+                                const dt = moment.utc(timeStr);
+                                const value = parseFloat(valueStr);
+                                if (!dt.isValid() || Number.isNaN(value)) {
+                                    return undefined;
+                                }
+                                return {
+                                    x: dt.toDate(),
+                                    y: value
+                                };
+                            } catch {
+                                return undefined;
+                            }
+                        })
+                        .filter((v) => !!v);
+                    return series as Array<{
+                        x: Date;
+                        y: number;
+                    }>;
+                }
+            });
     }
 
     getLayerPreview(layerName: string, options: WmsLayerPreviewOptions = {}) {
         return this.getLayerCapabilities(layerName).then((layer) => {
             if (layer) {
-
                 let width: number, height: number;
 
-                let crs: string = 'EPSG:4326';
+                let crs = 'EPSG:4326';
                 let [miny, minx, maxy, maxx] = layer.EX_GeographicBoundingBox;
 
                 if (layer.CRS && layer.CRS.length) {
-                    let nativeBBox = layer.BoundingBox.find(bbox => bbox.crs === layer.CRS[0]);
+                    const nativeBBox = layer.BoundingBox.find((bbox) => bbox.crs === layer.CRS[0]);
                     if (nativeBBox) {
                         crs = nativeBBox.crs;
                         [minx, miny, maxx, maxy] = nativeBBox.extent;
@@ -222,7 +227,7 @@ export class WmsService {
                     sizeY = maxx - minx;
                 }
 
-                let ratio = sizeX / sizeY;
+                const ratio = sizeX / sizeY;
                 if (!options.mode || options.mode === WmsLayerPreviewMode.Stretch) {
                     width = options.width || 128;
                     height = options.height || width;
@@ -249,7 +254,11 @@ export class WmsService {
                 const wmsVersion = this.config_.version || '1.3.0';
                 const format = options.transparent ? 'image/png' : 'image/jpeg';
 
-                return `${this.config_.url}?service=WMS&version=${wmsVersion}&request=GetMap&layers=${layerName}&format=${format}&${wmsVersion === '1.3.0' ? 'crs' : 'srs'}=${crs}&width=${width}&height=${height}&bbox=${minx},${miny},${maxx},${maxy}&transparent=${options.transparent ? 'true' : 'false'}`;
+                return `${this.config_.url}?service=WMS&version=${wmsVersion}&request=GetMap&layers=${layerName}&format=${format}&${
+                    wmsVersion === '1.3.0' ? 'crs' : 'srs'
+                }=${crs}&width=${width}&height=${height}&bbox=${minx},${miny},${maxx},${maxy}&transparent=${
+                    options.transparent ? 'true' : 'false'
+                }`;
             } else {
                 throw new Error(`WMSService: No layer found with name ${layerName}`);
             }
@@ -262,12 +271,12 @@ export class WmsService {
             if (queryParams.filters) {
                 queryParams.filters.forEach((filter) => {
                     if (filter.key === 'search') {
-                        let searchRegex = new RegExp(`${filter.value}`, 'i');
+                        const searchRegex = new RegExp(`${filter.value}`, 'i');
                         layers = layers.filter((layer) => {
                             return (
-                                (layer.Name && searchRegex.test(layer.Name))
-                                || (layer.Title && searchRegex.test(layer.Title))
-                                || (layer.Abstract && searchRegex.test(layer.Abstract))
+                                (layer.Name && searchRegex.test(layer.Name)) ||
+                                (layer.Title && searchRegex.test(layer.Title)) ||
+                                (layer.Abstract && searchRegex.test(layer.Abstract))
                             );
                         });
                     }
@@ -278,7 +287,7 @@ export class WmsService {
 
             const sortKey = queryParams.sortBy?.key;
             if (sortKey) {
-                let order = queryParams.sortBy?.order;
+                const order = queryParams.sortBy?.order;
                 layers = layers.sort((l1, l2) => {
                     let sort: number;
                     if (l1[sortKey] === l2[sortKey]) {
@@ -314,10 +323,9 @@ export class WmsService {
         } else {
             return [...leafLayers, layerNode];
         }
-
     }
 
-    protected findLayerCapabilities_(layerName: string, layerNode: WmsLayer, result?: WmsLayer) : WmsLayer | undefined {
+    protected findLayerCapabilities_(layerName: string, layerNode: WmsLayer, result?: WmsLayer): WmsLayer | undefined {
         if (!layerNode) {
             return undefined;
         }

@@ -1,38 +1,42 @@
 import moment from 'moment';
 
 import {
-    QueryParams, SortOrder,
+    QueryParams,
+    SortOrder,
     getGeometryExtent,
-    AxiosInstanceWithCancellation, createAxiosInstance, BBoxGeometry, QueryFilter, AOI_FIELD_ID, DATE_RANGE_FIELD_ID
+    AxiosInstanceWithCancellation,
+    createAxiosInstance,
+    BBoxGeometry,
+    QueryFilter,
+    AOI_FIELD_ID,
+    DATE_RANGE_FIELD_ID
 } from '@oidajs/core';
 
 import { DatasetProductSearchProvider } from '@oidajs/eo-mobx';
 
 import { AdamServiceParamsSerializer } from '../utils';
 
-
 export type AdamWcsPreviewConfig = {
     serviceUrl: string;
     coverageId: string;
     colorTable?: string;
     colorRange?: {
-        min: number,
-        max: number
-    },
-    subsets?: string[],
-    size: number
+        min: number;
+        max: number;
+    };
+    subsets?: string[];
+    size: number;
 };
 
 export type AdamCswProductSearchProviderConfig = {
     serviceUrl: string;
-    wcsPreview: AdamWcsPreviewConfig,
-    extentOffset?: number[],
+    wcsPreview: AdamWcsPreviewConfig;
+    extentOffset?: number[];
     collectionId: string;
     axiosInstance?: AxiosInstanceWithCancellation;
 };
 
 export class AdamCswProductSearchProvider implements DatasetProductSearchProvider {
-
     protected config_: AdamCswProductSearchProviderConfig;
 
     protected axiosInstance_: AxiosInstanceWithCancellation;
@@ -51,24 +55,26 @@ export class AdamCswProductSearchProvider implements DatasetProductSearchProvide
     }
 
     searchProducts(queryParams: QueryParams) {
-        return this.axiosInstance_.cancelableRequest({
-            url: this.config_.serviceUrl,
-            params: {
-                service: 'CSW',
-                version: '2.0.2',
-                request: 'GetRecords',
-                typenames: 'csw:Record',
-                resulttype: 'results',
-                elementsetname: 'full',
-                mode: 'opensearch',
-                q: this.config_.collectionId,
-                ...this.geCSWParams_(queryParams)
-            },
-            responseType: 'document',
-            paramsSerializer: AdamServiceParamsSerializer
-        }).then((response) => {
-            return this.parseGetRecordResponse_(response.data);
-        });
+        return this.axiosInstance_
+            .cancelableRequest({
+                url: this.config_.serviceUrl,
+                params: {
+                    service: 'CSW',
+                    version: '2.0.2',
+                    request: 'GetRecords',
+                    typenames: 'csw:Record',
+                    resulttype: 'results',
+                    elementsetname: 'full',
+                    mode: 'opensearch',
+                    q: this.config_.collectionId,
+                    ...this.geCSWParams_(queryParams)
+                },
+                responseType: 'document',
+                paramsSerializer: AdamServiceParamsSerializer
+            })
+            .then((response) => {
+                return this.parseGetRecordResponse_(response.data);
+            });
     }
 
     protected geCSWParams_(queryParams: QueryParams) {
@@ -93,28 +99,24 @@ export class AdamCswProductSearchProvider implements DatasetProductSearchProvide
     }
 
     protected filterSerializer_(filters: QueryFilter[]) {
-
-        let filterParams: any = {};
+        const filterParams: any = {};
 
         filters.forEach((filter) => {
             if (filter.type === AOI_FIELD_ID) {
-                let geom = filter.value.geometry;
+                const geom = filter.value.geometry;
                 let bbox = getGeometryExtent(geom);
 
                 if (bbox) {
-                    let extentOffset = this.config_.extentOffset;
+                    const extentOffset = this.config_.extentOffset;
                     if (extentOffset) {
-                        bbox = [
-                            bbox[0] + extentOffset[0],
-                            bbox[1] + extentOffset[1],
-                            bbox[2] + extentOffset[0],
-                            bbox[3] + extentOffset[1]
-                        ];
+                        bbox = [bbox[0] + extentOffset[0], bbox[1] + extentOffset[1], bbox[2] + extentOffset[0], bbox[3] + extentOffset[1]];
                     }
                     filterParams.bbox = bbox.join(',');
                 }
             } else if (filter.type === DATE_RANGE_FIELD_ID) {
-                filterParams.time = `${filter.value.start ? moment.utc(filter.value.start).toISOString() : ''}/${filter.value.end ? moment.utc(filter.value.end).toISOString() : ''}`;
+                filterParams.time = `${filter.value.start ? moment.utc(filter.value.start).toISOString() : ''}/${
+                    filter.value.end ? moment.utc(filter.value.end).toISOString() : ''
+                }`;
             }
         });
 
@@ -122,45 +124,39 @@ export class AdamCswProductSearchProvider implements DatasetProductSearchProvide
     }
 
     protected parseGetRecordResponse_(doc: Document) {
-
         try {
+            const feed = doc.getElementsByTagNameNS(this.xmlNamespaces.atom, 'feed')[0];
 
-            let feed = doc.getElementsByTagNameNS(this.xmlNamespaces.atom, 'feed')[0];
+            const totalResults = parseInt(feed.getElementsByTagNameNS(this.xmlNamespaces.os, 'totalResults')[0].childNodes[0].nodeValue!);
 
-            let totalResults = parseInt(feed.getElementsByTagNameNS(this.xmlNamespaces.os, 'totalResults')[0].childNodes[0].nodeValue!);
+            const entries = feed.getElementsByTagNameNS(this.xmlNamespaces.atom, 'entry');
+            const records = Array.from(entries).map((entry) => {
+                const summaryNode = entry.getElementsByTagNameNS(this.xmlNamespaces.atom, 'summary')[0];
+                const summary = this.domParser.parseFromString(summaryNode.childNodes[0].nodeValue!, 'text/html');
+                const columns = summary.getElementsByTagName('td');
 
-            let entries = feed.getElementsByTagNameNS(this.xmlNamespaces.atom, 'entry');
-            let records = Array.from(entries).map((entry) => {
-                let summaryNode = entry.getElementsByTagNameNS(this.xmlNamespaces.atom, 'summary')[0];
-                let summary = this.domParser.parseFromString(summaryNode.childNodes[0].nodeValue!, 'text/html');
-                let columns = summary.getElementsByTagName('td');
-
-                let properties: any = {};
+                const properties: any = {};
                 Array.from(columns).forEach((column, idx) => {
-                    let fieldName = column.getElementsByTagName('strong')[0];
+                    const fieldName = column.getElementsByTagName('strong')[0];
                     if (fieldName) {
-                        let fieldValue = columns[idx + 1].childNodes[0].nodeValue;
+                        const fieldValue = columns[idx + 1].childNodes[0].nodeValue;
                         properties[fieldName.childNodes[0].nodeValue!] = fieldValue;
                     }
                 });
 
-                let envelope = entry.getElementsByTagNameNS(this.xmlNamespaces.gml, 'Envelope')[0];
-                let lowerCorner = envelope.getElementsByTagNameNS(this.xmlNamespaces.gml, 'lowerCorner')[0]
-                    .childNodes[0]
-                    .nodeValue!
-                    .split(' ')
-                    .map(coord => parseFloat(coord)
-                 );
-                let upperCorner = envelope.getElementsByTagNameNS(this.xmlNamespaces.gml, 'upperCorner')[0]
-                    .childNodes[0]
-                    .nodeValue!
-                    .split(' ')
-                    .map(coord => parseFloat(coord)
-                );
+                const envelope = entry.getElementsByTagNameNS(this.xmlNamespaces.gml, 'Envelope')[0];
+                const lowerCorner = envelope
+                    .getElementsByTagNameNS(this.xmlNamespaces.gml, 'lowerCorner')[0]
+                    .childNodes[0].nodeValue!.split(' ')
+                    .map((coord) => parseFloat(coord));
+                const upperCorner = envelope
+                    .getElementsByTagNameNS(this.xmlNamespaces.gml, 'upperCorner')[0]
+                    .childNodes[0].nodeValue!.split(' ')
+                    .map((coord) => parseFloat(coord));
 
-                let bbox = [lowerCorner[1], lowerCorner[0], upperCorner[1], upperCorner[0]];
+                const bbox = [lowerCorner[1], lowerCorner[0], upperCorner[1], upperCorner[0]];
 
-                let extentOffset = this.config_.extentOffset;
+                const extentOffset = this.config_.extentOffset;
                 if (extentOffset) {
                     bbox[0] -= extentOffset[0];
                     bbox[2] -= extentOffset[0];
@@ -183,7 +179,6 @@ export class AdamCswProductSearchProvider implements DatasetProductSearchProvide
                 total: totalResults,
                 results: records
             };
-
         } catch (e) {
             return {
                 total: 0,
@@ -193,21 +188,14 @@ export class AdamCswProductSearchProvider implements DatasetProductSearchProvide
     }
 
     protected getWcsPreview_(record) {
-
-        let colorRange = this.config_.wcsPreview.colorRange;
-
-        let wcsParams = {
+        const wcsParams = {
             service: 'WCS',
             request: 'GetCoverage',
             version: '2.0.0',
             coverageId: this.config_.wcsPreview.coverageId,
-            subset: [
-                `unix(${record.Start},${record.End})`,
-                ...(this.config_.wcsPreview.subsets || [])
-            ],
+            subset: [`unix(${record.Start},${record.End})`, ...(this.config_.wcsPreview.subsets || [])],
             format: 'image/png',
             colortable: this.config_.wcsPreview.colorTable,
-            //colorrange: colorRange ? `(${colorRange.min},${colorRange.max})` : undefined,
             size: `(${this.config_.wcsPreview.size},${this.config_.wcsPreview.size})`
         };
 

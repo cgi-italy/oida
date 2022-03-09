@@ -2,14 +2,12 @@ import { formatNumber, FormatterQuantity, NumberFormatOptions } from '@oidajs/co
 import { isValueDomain, NumericalValueDomain, NumericDomain } from './dataset-variable';
 
 export type NumericDomainMapperConfig = {
-    domain: NumericDomain | undefined,
-    unitsSymbol?: string,
+    domain: NumericDomain | undefined;
+    unitsSymbol?: string;
 };
 
 export class NumericDomainMapper {
-
     protected static normalizeDomainValue_(domain: NumericalValueDomain, value: number) {
-
         if (value === domain.noData || (domain.reservedValues && domain.reservedValues[value] !== undefined)) {
             return undefined;
         }
@@ -23,8 +21,8 @@ export class NumericDomainMapper {
     readonly unitsSymbol: string | undefined;
 
     protected domain_: NumericDomain | undefined;
-    protected normalizeValueImpl_: ((value: number) => number | undefined);
-    protected denormalizeValueImpl_: ((value: number) => number);
+    protected normalizeValueImpl_: (value: number) => number | undefined;
+    protected denormalizeValueImpl_: (value: number) => number;
     protected domainValuesDict_: Record<number, string> | undefined;
 
     constructor(config: NumericDomainMapperConfig) {
@@ -90,25 +88,18 @@ export class NumericDomainMapper {
             }
         }
     }
-
 }
 
 export type NumericDomainValueFormatterOptions = {
-    domain: NumericDomainMapper,
-    appendUnits?: boolean
+    domain: NumericDomainMapper;
+    appendUnits?: boolean;
 } & NumberFormatOptions;
-
 
 export const NumericDomainValueQuantity: FormatterQuantity<number, NumericDomainValueFormatterOptions> = {
     id: 'numeric_domain_value'
 };
 
-
-export const formatDomainValue = (
-    value: number,
-    options: NumericDomainValueFormatterOptions
-)  => {
-
+export const formatDomainValue = (value: number, options: NumericDomainValueFormatterOptions) => {
     let formattedValue: string | number | undefined;
 
     if (typeof value !== 'number') {
@@ -118,4 +109,3 @@ export const formatDomainValue = (
     }
     return formattedValue;
 };
-

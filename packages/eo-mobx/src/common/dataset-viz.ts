@@ -6,7 +6,6 @@ import { MapLayer } from '@oidajs/state-mobx';
 
 import { Dataset } from './dataset';
 
-
 const datasetVizFactory = createDynamicFactory<DatasetViz<MapLayer | undefined>>('datasetVizFactory');
 
 export type DatasetVizProps<TYPE extends string = string, CONFIG extends Record<string, any> = Record<string, any>> = {
@@ -14,23 +13,23 @@ export type DatasetVizProps<TYPE extends string = string, CONFIG extends Record<
     vizType: TYPE;
     config: CONFIG;
     id?: string;
-    parent?: DatasetViz<any>
+    parent?: DatasetViz<any>;
 };
 
-export interface DatasetVizDefinitions {
-}
-export interface DatasetVizTypes {
-}
+export interface DatasetVizDefinitions {}
+export interface DatasetVizTypes {}
 
-export type DatasetVizDefinition<TYPE extends keyof DatasetVizDefinitions = keyof DatasetVizDefinitions> =
-    {vizType: TYPE} & Extract<DatasetVizDefinitions[TYPE], DatasetVizProps<TYPE>>;
+export type DatasetVizDefinition<TYPE extends keyof DatasetVizDefinitions = keyof DatasetVizDefinitions> = { vizType: TYPE } & Extract<
+    DatasetVizDefinitions[TYPE],
+    DatasetVizProps<TYPE>
+>;
 
-export type DatasetVizType<TYPE extends keyof DatasetVizTypes = keyof DatasetVizTypes> =
-    Extract<DatasetVizTypes[TYPE], DatasetViz<MapLayer | undefined>>;
+export type DatasetVizType<TYPE extends keyof DatasetVizTypes = keyof DatasetVizTypes> = Extract<
+    DatasetVizTypes[TYPE],
+    DatasetViz<MapLayer | undefined>
+>;
 
-export type DatasetVizConfig<TYPE extends keyof DatasetVizDefinitions = keyof DatasetVizDefinitions> =
-    DatasetVizDefinition<TYPE>['config'];
-
+export type DatasetVizConfig<TYPE extends keyof DatasetVizDefinitions = keyof DatasetVizDefinitions> = DatasetVizDefinition<TYPE>['config'];
 
 /**
  * Base abstract class for {@link Dataset} visualization. A dataset visualization can include a {@link MapLayer}
@@ -38,8 +37,7 @@ export type DatasetVizConfig<TYPE extends keyof DatasetVizDefinitions = keyof Da
  *
  * @template T the type of MapLayer associated to this visualization
  */
-export abstract class DatasetViz<T extends (MapLayer | undefined) = undefined> {
-
+export abstract class DatasetViz<T extends MapLayer | undefined = undefined> {
     static create<TYPE extends keyof DatasetVizTypes>(props: DatasetVizDefinition<TYPE>): DatasetVizType<TYPE> {
         const datasetViz = datasetVizFactory.create(props.vizType, props);
         if (!datasetViz) {
@@ -50,7 +48,7 @@ export abstract class DatasetViz<T extends (MapLayer | undefined) = undefined> {
 
     static register<TYPE extends keyof DatasetVizDefinitions, V extends DatasetViz<MapLayer | undefined>>(
         vizType: TYPE,
-        vizCtor: new(props: Omit<DatasetVizDefinition<TYPE>, 'vizType'>) => V
+        vizCtor: new (props: Omit<DatasetVizDefinition<TYPE>, 'vizType'>) => V
     ) {
         datasetVizFactory.register(vizType, (props) => {
             return new vizCtor(props);
@@ -80,7 +78,9 @@ export abstract class DatasetViz<T extends (MapLayer | undefined) = undefined> {
         this.widgetVisible = widgetVisible;
     }
 
-    dispose() {}
+    dispose() {
+        return;
+    }
 
     protected clone_(specProps?: Record<string, any>) {
         return new (this.constructor as any)({
@@ -91,5 +91,5 @@ export abstract class DatasetViz<T extends (MapLayer | undefined) = undefined> {
         });
     }
 
-    protected abstract initMapLayer_(props: DatasetVizProps) : T;
+    protected abstract initMapLayer_(props: DatasetVizProps): T;
 }

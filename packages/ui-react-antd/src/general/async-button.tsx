@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Button, ButtonProps, Tooltip } from 'antd';
 
-
 export type AsyncButtonProps = {
     /**
      * The button onClick event. When the return value of the event function is a Promise the button will
@@ -11,7 +10,7 @@ export type AsyncButtonProps = {
     /**
      * An optional toolip for the button
      */
-    tooltip?: React.ReactNode
+    tooltip?: React.ReactNode;
 } & Omit<ButtonProps, 'onClick' | 'loading'>;
 
 /**
@@ -19,7 +18,6 @@ export type AsyncButtonProps = {
  * @param props the component props
  */
 export const AsyncButton = (props: AsyncButtonProps) => {
-
     const mounted = useRef(true);
 
     useEffect(() => {
@@ -35,14 +33,11 @@ export const AsyncButton = (props: AsyncButtonProps) => {
     const { onClick, ...buttonProps } = props;
 
     return (
-        <Tooltip
-            visible={tooltipVisible}
-            title={props.tooltip}
-        >
+        <Tooltip visible={tooltipVisible} title={props.tooltip}>
             <Button
                 onClick={(evt) => {
                     setTooltipVisible(false);
-                    const callbackReturn = props.onClick(evt);
+                    const callbackReturn = onClick(evt);
                     if (callbackReturn) {
                         setLoading(true);
                         callbackReturn.finally(() => {

@@ -8,13 +8,12 @@ import { IFeatureStyle } from '@oidajs/core';
 import { CesiumGeometryEntityRenderer } from './cesium-geometry-entity-renderer-factory';
 
 export const createLineEntity = (id: string, geometry: GeoJSON.LineString, featureStyle: IFeatureStyle, layerOptions?) => {
-
-    let style = featureStyle.line;
+    const style = featureStyle.line;
     if (!style) {
         return;
     }
 
-    let lineEntity = new Entity({
+    const lineEntity = new Entity({
         id: id,
         show: style.visible
     });
@@ -35,15 +34,14 @@ export const updateLineEntityGeometry = (lineEntity, geometry: GeoJSON.LineStrin
 };
 
 export const updateLineEntityStyle = (lineEntity, featureStyle: IFeatureStyle) => {
-
-    let style = featureStyle.line;
+    const style = featureStyle.line;
     if (!style) {
         return;
     }
 
     lineEntity.show = style.visible;
 
-    let polyline = lineEntity.polyline;
+    const polyline = lineEntity.polyline;
     if (style.color) {
         polyline.material = new Color(...style.color);
     }
@@ -51,18 +49,16 @@ export const updateLineEntityStyle = (lineEntity, featureStyle: IFeatureStyle) =
         polyline.width = style.width;
     }
     polyline.zIndex = style.zIndex || 0;
-
 };
 
 export const createMultiLineEntity = (id, geometry: GeoJSON.MultiLineString, featureStyle: IFeatureStyle, layerOptions) => {
-
-    let lineStyle = featureStyle.line;
+    const lineStyle = featureStyle.line;
 
     if (!lineStyle) {
         return;
     }
 
-    let multiLineEntity = new Entity({
+    const multiLineEntity = new Entity({
         id: id,
         show: lineStyle.visible
     });
@@ -70,13 +66,8 @@ export const createMultiLineEntity = (id, geometry: GeoJSON.MultiLineString, fea
     multiLineEntity.featureStyle = featureStyle;
     multiLineEntity.layerOptions = layerOptions;
 
-    let lineEntities = geometry.coordinates.map((lineCoords, idx) => {
-        let lineEntity = createLineEntity(
-            `${id}_${idx}`,
-            {type: 'LineString', coordinates: lineCoords},
-            featureStyle,
-            layerOptions
-        );
+    geometry.coordinates.forEach((lineCoords, idx) => {
+        const lineEntity = createLineEntity(`${id}_${idx}`, { type: 'LineString', coordinates: lineCoords }, featureStyle, layerOptions);
         lineEntity.parent = multiLineEntity;
     });
 
@@ -84,20 +75,16 @@ export const createMultiLineEntity = (id, geometry: GeoJSON.MultiLineString, fea
 };
 
 export const updateMultiLineEntityGeometry = (multiLineEntity, geometry: GeoJSON.MultiLineString) => {
-    let lineEntities = multiLineEntity._children;
-    let coordinates = geometry.coordinates;
+    const lineEntities = multiLineEntity._children;
+    const coordinates = geometry.coordinates;
 
     let i = 0;
     for (i = 0; i < coordinates.length; ++i) {
-        if (lineEntities[i])
-            updateLineEntityGeometry(
-                lineEntities[i],
-                {type: 'LineString', coordinates: coordinates[i]}
-            );
+        if (lineEntities[i]) updateLineEntityGeometry(lineEntities[i], { type: 'LineString', coordinates: coordinates[i] });
         else {
-            let lineEntity = createLineEntity(
+            const lineEntity = createLineEntity(
                 `${multiLineEntity.id}_${i}`,
-                {type: 'LineString', coordinates: coordinates[i]},
+                { type: 'LineString', coordinates: coordinates[i] },
                 multiLineEntity.featureStyle,
                 multiLineEntity.layerOptions
             );
@@ -105,20 +92,18 @@ export const updateMultiLineEntityGeometry = (multiLineEntity, geometry: GeoJSON
         }
     }
 
-    let toRemove = lineEntities.slice(i);
+    const toRemove = lineEntities.slice(i);
     toRemove.forEach((lineEntity) => {
         lineEntity.parent = undefined;
         if (lineEntity.entityCollection) {
             lineEntity.entityCollection.remove(lineEntity);
         }
     });
-
 };
 
 export const updateMultiLineEntityStyle = (multiLineEntity, featureStyle: IFeatureStyle) => {
-
     multiLineEntity.featureStyle = featureStyle;
-    let lineEntities = multiLineEntity._children;
+    const lineEntities = multiLineEntity._children;
     lineEntities.forEach((lineEntity) => {
         updateLineEntityStyle(lineEntity, featureStyle);
     });

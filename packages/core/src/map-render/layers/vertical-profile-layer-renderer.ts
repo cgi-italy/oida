@@ -2,16 +2,16 @@ import { Color } from './feature-layer-renderer';
 import { IMapLayerRenderer, MapLayerRendererConfig } from './map-layer-renderer';
 
 export type IVerticalProfile = {
-    bottomCoords: GeoJSON.LineString,
-    height: number | number[],
-    topCoords?: GeoJSON.LineString,
-    bottomHeight?: number | number[]
+    bottomCoords: GeoJSON.LineString;
+    height: number | number[];
+    topCoords?: GeoJSON.LineString;
+    bottomHeight?: number | number[];
 };
 
 export type IVerticalProfileStyle = {
-    visible: boolean,
-    fillImage?: string,
-    fillColor?: Color
+    visible: boolean;
+    fillImage?: string;
+    fillColor?: Color;
 };
 
 export type VerticalProfileCoordinate = {
@@ -21,8 +21,8 @@ export type VerticalProfileCoordinate = {
 };
 
 export type VerticalProfileLayerRendererConfig = MapLayerRendererConfig & {
-    onCoordinateSelect?: (selected?: {profileId: string, coordinate: number[]}) => void;
-    onCoordinateHover?: (hovered?: {profileId: string, coordinate: number[]}) => void;
+    onCoordinateSelect?: (selected?: { profileId: string; coordinate: number[] }) => void;
+    onCoordinateHover?: (hovered?: { profileId: string; coordinate: number[] }) => void;
 };
 
 export interface IVerticalProfileLayerRenderer extends IMapLayerRenderer {
@@ -38,7 +38,6 @@ export interface IVerticalProfileLayerRenderer extends IMapLayerRenderer {
 }
 
 export const VERTICAL_PROFILE_LAYER_ID = 'vertical_profile';
-
 
 declare module './map-layer-renderer' {
     export interface IMapLayerRendererConfigDefinitions {

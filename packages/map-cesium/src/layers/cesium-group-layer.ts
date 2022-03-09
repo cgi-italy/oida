@@ -8,20 +8,17 @@ export class CesiumGroupLayer extends CesiumMapLayer implements IGroupLayerRende
     }
 
     addLayer(layer: CesiumMapLayer, idx?: number) {
-
         layer.setParent(this);
 
-        let layerImageries = layer.getImageries();
+        const layerImageries = layer.getImageries();
 
         this.imageries_.add(layerImageries, idx);
         this.primitives_.add(layer.getPrimitives());
         this.dataSources_.add(layer.getDataSources());
-
     }
 
     removeLayer(layer: CesiumMapLayer) {
-
-        let layerImageries = layer.getImageries();
+        const layerImageries = layer.getImageries();
 
         this.primitives_.remove(layer.getPrimitives());
         this.dataSources_.remove(layer.getDataSources());
@@ -29,5 +26,4 @@ export class CesiumGroupLayer extends CesiumMapLayer implements IGroupLayerRende
 
         layer.setParent(null);
     }
-
 }

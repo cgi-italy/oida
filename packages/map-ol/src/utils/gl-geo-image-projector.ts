@@ -1,4 +1,3 @@
-
 import { GeoImageLayerSource, GeoImageLayerFootprint } from '@oidajs/core';
 
 export type GLGeoImageProjectorConfig = {
@@ -14,7 +13,6 @@ type GeoImageTextureData = {
 };
 
 export class GLGeoImageProjector {
-
     protected static readonly shaders_ = {
         vertex: `
             attribute vec2 a_position;
@@ -67,7 +65,6 @@ export class GLGeoImageProjector {
     protected readonly gridSize_: number;
 
     constructor(config: GLGeoImageProjectorConfig) {
-
         this.gridSize_ = config.gridSize || 2;
 
         this.canvas_ = document.createElement('canvas');
@@ -137,10 +134,7 @@ export class GLGeoImageProjector {
     protected updateFootprintPositions_(extent: number[], imageSize: number[]) {
         const gl = this.gl_;
 
-        const extentSize = [
-            extent[2] - extent[0],
-            extent[3] - extent[1]
-        ];
+        const extentSize = [extent[2] - extent[0], extent[3] - extent[1]];
 
         const canvasPositions = this.footprint_.map((coord) => {
             return this.getCanvasPosition_(coord, extent, extentSize, imageSize);
@@ -154,7 +148,7 @@ export class GLGeoImageProjector {
             canvasPositions[0],
             canvasPositions[2],
             canvasPositions[1],
-            canvasPositions[3],
+            canvasPositions[3]
         );
 
         //compute the ratios to get texture coordinates homogenous factor
@@ -169,21 +163,23 @@ export class GLGeoImageProjector {
         const q3 = (d3 + d1) / d1;
 
         gl.bindBuffer(gl.ARRAY_BUFFER, this.textureCoords_);
-        gl.bufferSubData(gl.ARRAY_BUFFER, 0, new Float32Array([
-            0.0, q0, q0,
-            q1, q1, q1,
-            0.0, 0.0, q3,
-            q2, 0.0, q2
-        ]));
+        gl.bufferSubData(gl.ARRAY_BUFFER, 0, new Float32Array([0.0, q0, q0, q1, q1, q1, 0.0, 0.0, q3, q2, 0.0, q2]));
 
         gl.bindBuffer(gl.ARRAY_BUFFER, this.footprintBuffer_);
-        gl.bufferSubData(gl.ARRAY_BUFFER, 0, new Float32Array([
-            canvasPositions[0][0], canvasPositions[0][1],
-            canvasPositions[1][0], canvasPositions[1][1],
-            canvasPositions[3][0], canvasPositions[3][1],
-            canvasPositions[2][0], canvasPositions[2][1]
-        ]));
-
+        gl.bufferSubData(
+            gl.ARRAY_BUFFER,
+            0,
+            new Float32Array([
+                canvasPositions[0][0],
+                canvasPositions[0][1],
+                canvasPositions[1][0],
+                canvasPositions[1][1],
+                canvasPositions[3][0],
+                canvasPositions[3][1],
+                canvasPositions[2][0],
+                canvasPositions[2][1]
+            ])
+        );
     }
 
     protected createTextureData_(source: GeoImageLayerSource): GeoImageTextureData {
@@ -211,10 +207,7 @@ export class GLGeoImageProjector {
     }
 
     protected getCanvasPosition_(coord: number[], extent: number[], extentSize: number[], imageSize: number[]) {
-        return [
-            (coord[0] - extent[0]) / extentSize[0] * imageSize[0],
-            (coord[1] - extent[1]) / extentSize[1] * imageSize[1]
-        ];
+        return [((coord[0] - extent[0]) / extentSize[0]) * imageSize[0], ((coord[1] - extent[1]) / extentSize[1]) * imageSize[1]];
     }
 
     protected getSourceSize_(source: HTMLImageElement | HTMLVideoElement | HTMLCanvasElement) {
@@ -237,16 +230,7 @@ export class GLGeoImageProjector {
         }
 
         gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-        gl.bufferData(
-            gl.ARRAY_BUFFER,
-            new Float32Array([
-                0, 0,
-                0, 0,
-                0, 0,
-                0, 0
-            ]),
-            gl.DYNAMIC_DRAW
-        );
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([0, 0, 0, 0, 0, 0, 0, 0]), gl.DYNAMIC_DRAW);
 
         const positionLocation = gl.getAttribLocation(this.program_, 'a_position');
         gl.enableVertexAttribArray(positionLocation);
@@ -265,15 +249,8 @@ export class GLGeoImageProjector {
             throw new Error('GLGeoImageProjector: Unable to create index buffer');
         }
 
-        const indices = [
-            0, 1, 2,
-            2, 1, 3,
-          ];
-          gl.bufferData(
-              gl.ELEMENT_ARRAY_BUFFER,
-              new Uint16Array(indices),
-              gl.STATIC_DRAW
-          );
+        const indices = [0, 1, 2, 2, 1, 3];
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
 
         return indexBuffer;
     }
@@ -288,12 +265,7 @@ export class GLGeoImageProjector {
             throw new Error('GLGeoImageProjector: Unable to create textcoord buffer');
         }
         gl.bindBuffer(gl.ARRAY_BUFFER, texCoordBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-            0.0, 1.0, 1.0,
-            1.0, 1.0, 1.0,
-            0.0, 0.0, 1.0,
-            1.0, 0.0, 1.0
-        ]), gl.DYNAMIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0]), gl.DYNAMIC_DRAW);
         gl.enableVertexAttribArray(texCoordLocation);
         gl.vertexAttribPointer(texCoordLocation, 3, gl.FLOAT, false, 0, 0);
 
@@ -307,6 +279,7 @@ export class GLGeoImageProjector {
             try {
                 context = this.canvas_.getContext(names[ii]) as WebGLRenderingContext | null;
             } catch (e) {
+                // do nothing
             }
             if (context) {
                 break;
@@ -319,7 +292,6 @@ export class GLGeoImageProjector {
     }
 
     protected createGLProgram_(gl: WebGLRenderingContext, vertexShaderSource: string, fragmentShaderSource: string) {
-
         const vertexShader = gl.createShader(gl.VERTEX_SHADER);
         const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
         if (!vertexShader || !fragmentShader) {
@@ -349,17 +321,14 @@ export class GLGeoImageProjector {
     }
 
     protected getDialogonalIntersection_(p1: number[], p2: number[], p3: number[], p4: number[]) {
-        const t = ((p1[0] - p3[0]) * (p3[1] - p4[1]) - (p1[1] - p3[1]) * (p3[0] - p4[0]))
-            / ((p1[0] - p2[0]) * (p3[1] - p4[1]) - (p1[1] - p2[1]) * (p3[0] - p4[0]));
+        const t =
+            ((p1[0] - p3[0]) * (p3[1] - p4[1]) - (p1[1] - p3[1]) * (p3[0] - p4[0])) /
+            ((p1[0] - p2[0]) * (p3[1] - p4[1]) - (p1[1] - p2[1]) * (p3[0] - p4[0]));
 
-        return [
-            p1[0] + t * (p2[0] - p1[0]),
-            p1[1] + t * (p2[1] - p1[1])
-        ];
+        return [p1[0] + t * (p2[0] - p1[0]), p1[1] + t * (p2[1] - p1[1])];
     }
 
     protected getDistance_(p1: number[], p2: number[]) {
         return Math.sqrt((p2[0] - p1[0]) * (p2[0] - p1[0]) - (p2[1] - p1[1]) + (p2[1] - p1[1]));
     }
 }
-

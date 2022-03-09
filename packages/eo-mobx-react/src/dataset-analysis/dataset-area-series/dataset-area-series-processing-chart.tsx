@@ -17,7 +17,6 @@ import { DatasetAreaSeriesItemHistogram } from './dataset-area-series-item-histo
 import { DatasetAreaSeriesProcessingStatsSlider } from './dataset-area-series-processing-stats-slider';
 import { DatasetAreaSeriesProcessingPercentilesSlider } from './dataset-area-series-processing-percentiles-slider';
 
-
 export type DatasetAreaSeriesProcessingThumbProps = {
     data: HTMLCanvasElement | HTMLImageElement | string;
     value: number | string | Date;
@@ -26,7 +25,6 @@ export type DatasetAreaSeriesProcessingThumbProps = {
 };
 
 export const DatasetAreaSeriesProcessingThumb = (props: DatasetAreaSeriesProcessingThumbProps) => {
-
     const [dataUri, setDataUri] = useState<string>();
 
     useEffect(() => {
@@ -39,15 +37,15 @@ export const DatasetAreaSeriesProcessingThumb = (props: DatasetAreaSeriesProcess
         }
     }, [props.data]);
 
-
     return (
         <div className='raster-sequence-thumb'>
-            <img src={dataUri}/>
-            <div className='raster-sequence-thumb-caption'>{props.dimensionConfig.name} = {props.valueFormatter(props.value)}</div>
+            <img src={dataUri} />
+            <div className='raster-sequence-thumb-caption'>
+                {props.dimensionConfig.name} = {props.valueFormatter(props.value)}
+            </div>
         </div>
     );
 };
-
 
 export type DatasetAreaSeriesProcessingChartProps = {
     series: DatasetAreaSeries;
@@ -55,7 +53,6 @@ export type DatasetAreaSeriesProcessingChartProps = {
 };
 
 export const DatasetAreaSeriesProcessingChart = (props: DatasetAreaSeriesProcessingChartProps) => {
-
     const [mode, setMode] = useState('slide');
 
     const [activeThumb, setActiveThumb] = useState(0);
@@ -79,9 +76,12 @@ export const DatasetAreaSeriesProcessingChart = (props: DatasetAreaSeriesProcess
             props.series.retrieveData();
         }, 1000);
 
-        const colorMapTrackerDisposer = reaction(() => props.series.colorMap?.asProps(), (colorMap) => {
-            updateSeriesData();
-        });
+        const colorMapTrackerDisposer = reaction(
+            () => props.series.colorMap?.asProps(),
+            (colorMap) => {
+                updateSeriesData();
+            }
+        );
         return () => {
             colorMapTrackerDisposer();
         };
@@ -107,14 +107,11 @@ export const DatasetAreaSeriesProcessingChart = (props: DatasetAreaSeriesProcess
 
     return (
         <div className='dataset-dimension-raster-sequence-chart'>
-            <AnalysisLoadingStateMessage
-                loadingState={loadingState}
-                errorMessage={props.series.loadingState.message}
-            />
-            {!!items.length &&
+            <AnalysisLoadingStateMessage loadingState={loadingState} errorMessage={props.series.loadingState.message} />
+            {!!items.length && (
                 <React.Fragment>
                     <div className='dataset-raster-sequence-selectors'>
-                        {colorMap && variableConfig.colorScales &&
+                        {colorMap && variableConfig.colorScales && (
                             <DatasetColorMapSelector
                                 colorMap={colorMap}
                                 colorScales={variableConfig.colorScales}
@@ -123,16 +120,11 @@ export const DatasetAreaSeriesProcessingChart = (props: DatasetAreaSeriesProcess
                                     domain: props.dataRange ? props.dataRange : variableConfig.domain
                                 }}
                             />
-                        }
+                        )}
                         <div className='dataset-raster-sequence-settings'>
                             <Space direction='vertical' className='dataset-raster-sequence-display-mode-controls'>
                                 <span>Display mode: </span>
-                                <Radio.Group
-                                    onChange={(evt) => setMode(evt.target.value)}
-                                    value={mode}
-                                    buttonStyle='solid'
-                                    size='small'
-                                >
+                                <Radio.Group onChange={(evt) => setMode(evt.target.value)} value={mode} buttonStyle='solid' size='small'>
                                     <Space size={0}>
                                         <Radio.Button value='slide'>Slider</Radio.Button>
                                         <Radio.Button value='grid'>Grid</Radio.Button>
@@ -140,7 +132,7 @@ export const DatasetAreaSeriesProcessingChart = (props: DatasetAreaSeriesProcess
                                     </Space>
                                 </Radio.Group>
                             </Space>
-                            {(hasPercentilesData || hasHistogramData) && mode !== 'grid' &&
+                            {(hasPercentilesData || hasHistogramData) && mode !== 'grid' && (
                                 <Space direction='vertical' className='dataset-raster-sequence-stats-mode-controls'>
                                     <span>Statistics mode: </span>
                                     <Radio.Group
@@ -157,84 +149,84 @@ export const DatasetAreaSeriesProcessingChart = (props: DatasetAreaSeriesProcess
                                         </Space>
                                     </Radio.Group>
                                 </Space>
-                            }
+                            )}
                         </div>
                     </div>
-                    {mode !== 'slide' &&
-                        <div className={classnames('dataset-raster-sequence-grid', {'is-detailed': mode === 'list'})}>
+                    {mode !== 'slide' && (
+                        <div className={classnames('dataset-raster-sequence-grid', { 'is-detailed': mode === 'list' })}>
                             {items.map((item) => {
                                 return (
                                     <div className='dataset-raster-sequence-item' key={item.x.toString()}>
-                                        {item.data.image &&
+                                        {item.data.image && (
                                             <DatasetAreaSeriesProcessingThumb
                                                 value={item.x}
                                                 dimensionConfig={dimensionConfig}
                                                 data={item.data.image}
                                                 valueFormatter={valueFormatter}
                                             />
-                                        }
-                                        {statsMode === 'basic' &&
+                                        )}
+                                        {statsMode === 'basic' && (
                                             <DatasetAreaSeriesItemStatsTable
                                                 dimensionConfig={dimensionConfig}
                                                 variableConfig={variableConfig}
                                                 item={item}
                                             />
-                                        }
-                                        {statsMode === 'percentiles' &&
+                                        )}
+                                        {statsMode === 'percentiles' && (
                                             <DatasetAreaSeriesItemPercentilesTable
                                                 dimensionConfig={dimensionConfig}
                                                 variableConfig={variableConfig}
                                                 item={item}
                                             />
-                                        }
-                                        {statsMode === 'histogram' &&
+                                        )}
+                                        {statsMode === 'histogram' && (
                                             <DatasetAreaSeriesItemHistogram
                                                 item={item}
                                                 variableConfig={variableConfig}
                                                 color={color}
                                                 isLoading={loadingState === LoadingState.Loading}
                                             />
-                                        }
+                                        )}
                                     </div>
                                 );
                             })}
                         </div>
-                    }
-                    {mode === 'slide' && items[activeThumb] &&
+                    )}
+                    {mode === 'slide' && items[activeThumb] && (
                         <div className='dataset-raster-sequence-player'>
                             <div className='dataset-raster-sequence-item'>
-                                {items[activeThumb].data.image &&
+                                {items[activeThumb].data.image && (
                                     <DatasetAreaSeriesProcessingThumb
                                         value={items[activeThumb].x}
                                         dimensionConfig={dimensionConfig}
                                         data={items[activeThumb].data.image!}
                                         valueFormatter={valueFormatter}
                                     />
-                                }
-                                {statsMode === 'basic' &&
+                                )}
+                                {statsMode === 'basic' && (
                                     <DatasetAreaSeriesItemStatsTable
                                         dimensionConfig={dimensionConfig}
                                         variableConfig={variableConfig}
                                         item={items[activeThumb]}
                                     />
-                                }
-                                {statsMode === 'percentiles' &&
+                                )}
+                                {statsMode === 'percentiles' && (
                                     <DatasetAreaSeriesItemPercentilesTable
                                         dimensionConfig={dimensionConfig}
                                         variableConfig={variableConfig}
                                         item={items[activeThumb]}
                                     />
-                                }
-                                {statsMode === 'histogram' &&
+                                )}
+                                {statsMode === 'histogram' && (
                                     <DatasetAreaSeriesItemHistogram
                                         item={items[activeThumb]}
                                         variableConfig={variableConfig}
                                         color={color}
                                         isLoading={loadingState === LoadingState.Loading}
                                     />
-                                }
+                                )}
                             </div>
-                            {!!items.length && !items[0].data.stats &&
+                            {!!items.length && !items[0].data.stats && (
                                 <div className='dataset-raster-sequence-player-slider'>
                                     <Slider
                                         value={activeThumb}
@@ -249,10 +241,10 @@ export const DatasetAreaSeriesProcessingChart = (props: DatasetAreaSeriesProcess
                                         onChange={(value) => setActiveThumb(value as number)}
                                     />
                                 </div>
-                            }
-                            {!!items.length && items[0].data.stats !== undefined &&
+                            )}
+                            {!!items.length && items[0].data.stats !== undefined && (
                                 <div className='dataset-raster-sequence-player-slider-stats'>
-                                    {statsMode !== 'percentiles' &&
+                                    {statsMode !== 'percentiles' && (
                                         <DatasetAreaSeriesProcessingStatsSlider
                                             items={items}
                                             dimensionConfig={dimensionConfig}
@@ -262,8 +254,8 @@ export const DatasetAreaSeriesProcessingChart = (props: DatasetAreaSeriesProcess
                                             onActiveItemChange={(active) => setActiveThumb(active)}
                                             isLoading={loadingState === LoadingState.Loading}
                                         />
-                                    }
-                                    {statsMode === 'percentiles' &&
+                                    )}
+                                    {statsMode === 'percentiles' && (
                                         <DatasetAreaSeriesProcessingPercentilesSlider
                                             items={items}
                                             dimensionConfig={dimensionConfig}
@@ -273,14 +265,13 @@ export const DatasetAreaSeriesProcessingChart = (props: DatasetAreaSeriesProcess
                                             onActiveItemChange={(active) => setActiveThumb(active)}
                                             isLoading={loadingState === LoadingState.Loading}
                                         />
-                                    }
+                                    )}
                                 </div>
-                            }
+                            )}
                         </div>
-                    }
+                    )}
                 </React.Fragment>
-            }
+            )}
         </div>
     );
-
 };

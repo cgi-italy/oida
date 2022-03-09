@@ -17,15 +17,15 @@ export type FeatureLayerConfig<T extends FeatureInterface> = {
     styleGetter: FeatureStyleGetter<T>;
     onFeatureHover?: (feature: T, coordinate: GeoJSON.Position) => void;
     onFeatureSelect?: (feature: T, coordinate: GeoJSON.Position) => void;
-    rendererOptions?: Record<string, {[props: string]: any}>;
+    rendererOptions?: Record<string, { [props: string]: any }>;
 };
 
 export type FeatureLayerProps<T extends FeatureInterface> = {
-    source?: IObservableArray<T>
-} & MapLayerProps<typeof FEATURE_LAYER_ID> & ConfigProps<FeatureLayerConfig<T>>;
+    source?: IObservableArray<T>;
+} & MapLayerProps<typeof FEATURE_LAYER_ID> &
+    ConfigProps<FeatureLayerConfig<T>>;
 
 export class FeatureLayer<T extends FeatureInterface> extends MapLayer implements HasConfig<FeatureLayerConfig<T>> {
-
     readonly config: Config<FeatureLayerConfig<T>>;
     @observable.ref source: IObservableArray<T> | undefined;
 

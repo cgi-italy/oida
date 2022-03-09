@@ -12,6 +12,5 @@ cesiumVolumeViewFactory.register(SLICE_VOLUME_VIEW_ID, (config) => {
     return new CesiumSliceVolumeView(config);
 });
 
-
 export { cesiumVolumeViewFactory, CesiumStackVolumeView, CesiumSliceVolumeView };
 export * from './cesium-volume-view';

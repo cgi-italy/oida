@@ -8,27 +8,19 @@ import { useAoiModule } from './use-aoi-module';
 
 type GeometryConstraints = {
     [type in GeometryTypes]: {
-        maxCoords: number
-    }
+        maxCoords: number;
+    };
 };
 
 export type MapAoiDrawerProps = {
     drawInteraction: FeatureDrawInteraction;
-    activeAction: AoiAction,
-    supportedGeometries: AoiSupportedGeometry[],
-    onActiveActionChange: (action: AoiAction) => void
+    activeAction: AoiAction;
+    supportedGeometries: AoiSupportedGeometry[];
+    onActiveActionChange: (action: AoiAction) => void;
 } & FormFieldState<AoiValue>;
 
-
 export const useMapAoiDrawer = (props: MapAoiDrawerProps) => {
-
-    const {
-        drawInteraction,
-        supportedGeometries,
-        activeAction,
-        onActiveActionChange,
-        onChange
-    } = props;
+    const { drawInteraction, supportedGeometries, activeAction, onActiveActionChange, onChange } = props;
 
     const geometryConstraints = useMemo(() => {
         return supportedGeometries.reduce((constraints, geometry) => {
@@ -40,16 +32,14 @@ export const useMapAoiDrawer = (props: MapAoiDrawerProps) => {
     }, [supportedGeometries]);
 
     const onDrawEnd = (evt: FeatureDrawEvent) => {
-
         onChange({
-            geometry: evt.geometry,
+            geometry: evt.geometry
         });
 
         onActiveActionChange(AoiAction.None);
     };
 
     useEffect(() => {
-
         if (activeAction === AoiAction.None) {
             drawInteraction.setDrawMode(FeatureDrawMode.Off, {});
         } else if (activeAction === AoiAction.DrawPoint) {
@@ -75,17 +65,15 @@ export const useMapAoiDrawer = (props: MapAoiDrawerProps) => {
         return () => {
             drawInteraction.setDrawMode(FeatureDrawMode.Off, {});
         };
-
     }, [activeAction]);
 };
 
 export const useMapAoiDrawerFromModule = (props: Omit<MapAoiDrawerProps, 'map' | 'drawInteraction'>, aoiModuleId?: string) => {
-    let moduleState = useAoiModule(aoiModuleId);
+    const moduleState = useAoiModule(aoiModuleId);
 
     let drawInteraction = moduleState.mapModule.map.interactions.items.find((interaction) => {
         return interaction instanceof FeatureDrawInteraction;
     }) as FeatureDrawInteraction | undefined;
-
 
     if (!drawInteraction) {
         drawInteraction = new FeatureDrawInteraction({});
@@ -97,4 +85,3 @@ export const useMapAoiDrawerFromModule = (props: Omit<MapAoiDrawerProps, 'map' |
         ...props
     });
 };
-

@@ -4,19 +4,17 @@ import KeyboardEventModifier from 'cesium/Source/Core/KeyboardEventModifier';
 import Cartesian3 from 'cesium/Source/Core/Cartesian3';
 
 import {
-    IFeatureHoverInteractionImplementation, IFeatureHoverInteractionProps,
-    FEATURE_HOVER_INTERACTION_ID, IFeature
+    IFeatureHoverInteractionImplementation,
+    IFeatureHoverInteractionProps,
+    FEATURE_HOVER_INTERACTION_ID,
+    IFeature
 } from '@oidajs/core';
 
 import { cesiumInteractionsFactory } from './cesium-interactions-factory';
 import { CesiumMapRenderer } from '../map/cesium-map-renderer';
-import {
-    getPickInfo, PickInfo, setNonPickableFeaturesVisibility, CesiumFeatureCoordPickMode
-} from '../utils';
-
+import { getPickInfo, PickInfo, setNonPickableFeaturesVisibility, CesiumFeatureCoordPickMode } from '../utils';
 
 export class CesiumFeatureHoverInteraction implements IFeatureHoverInteractionImplementation {
-
     private viewer_;
     private handler_;
     private onFeatureHover_: (hovered: IFeature<any> | undefined) => void;
@@ -43,26 +41,25 @@ export class CesiumFeatureHoverInteraction implements IFeatureHoverInteractionIm
     }
 
     protected bindMove_(onFeatureHover: (hovered: IFeature<any> | undefined) => void) {
-
         let hoveredFeature: string | undefined = undefined;
 
         this.handler_ = new ScreenSpaceEventHandler(this.viewer_.scene.canvas);
 
         let lastPickTime = performance.now();
         const onMouseMove = (movement) => {
-            let now = performance.now();
+            const now = performance.now();
             if (now - lastPickTime < 30) {
                 return;
             }
             lastPickTime = now;
-            let pickedObjects = this.viewer_.scene.drillPick(movement.endPosition, 10);
+            const pickedObjects = this.viewer_.scene.drillPick(movement.endPosition, 10);
 
             const pickInfo: PickInfo = pickedObjects
-                .map(pickedObject => getPickInfo(pickedObject))
-                .find(pickInfo => !!pickInfo && pickInfo.pickable);
+                .map((pickedObject) => getPickInfo(pickedObject))
+                .find((pickInfo) => !!pickInfo && pickInfo.pickable);
 
             if (pickInfo) {
-                this.viewer_.container .style.cursor = 'pointer';
+                this.viewer_.container.style.cursor = 'pointer';
 
                 const layer = pickInfo.layer;
                 if (layer.shouldReceiveFeatureHoverEvents()) {
@@ -86,7 +83,7 @@ export class CesiumFeatureHoverInteraction implements IFeatureHoverInteractionIm
                     hoveredFeature = pickInfo.id;
                 }
             } else {
-                this.viewer_.container .style.cursor = '';
+                this.viewer_.container.style.cursor = '';
                 if (hoveredFeature) {
                     onFeatureHover(undefined);
                     hoveredFeature = undefined;
@@ -98,7 +95,6 @@ export class CesiumFeatureHoverInteraction implements IFeatureHoverInteractionIm
         this.handler_.setInputAction(onMouseMove, ScreenSpaceEventType.MOUSE_MOVE, KeyboardEventModifier.SHIFT);
         this.handler_.setInputAction(onMouseMove, ScreenSpaceEventType.MOUSE_MOVE, KeyboardEventModifier.CTRL);
     }
-
 }
 
 cesiumInteractionsFactory.register(FEATURE_HOVER_INTERACTION_ID, (config) => {

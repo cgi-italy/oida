@@ -23,7 +23,6 @@ type DebouncedRequestType<RESPONSE = any, PARAMS = any> = (
  * @template PARAMS the params input of the data fetch method
  */
 export class AsyncDataFetcher<RESPONSE = any, PARAMS = any> implements HasLoadingStatus {
-
     /** The data fetching loading state */
     readonly loadingStatus: LoadingStatus;
 
@@ -32,7 +31,6 @@ export class AsyncDataFetcher<RESPONSE = any, PARAMS = any> implements HasLoadin
     protected dataFetcher_: (params: PARAMS) => Promise<RESPONSE>;
 
     constructor(props: AsyncDataFetcherProps<RESPONSE, PARAMS>) {
-
         this.loadingStatus = new LoadingStatus();
         this.dataFetcher_ = props.dataFetcher;
         this.setDebounceInterval(props.debounceInterval);
@@ -54,15 +52,19 @@ export class AsyncDataFetcher<RESPONSE = any, PARAMS = any> implements HasLoadin
     /** Set the data retrieval debounce interval in milliseconds */
     setDebounceInterval(debounceInterval: number | undefined) {
         if (debounceInterval) {
-            this.debouncedRequest_ = debounce((
-                params: PARAMS, resolve: (value: RESPONSE | PromiseLike<RESPONSE>) => void, reject: (reason: any) => void
-            ) => {
-                this.invokeFetchRequest_(params).then((response) => {
-                    resolve(response);
-                }, (error) => {
-                    reject(error);
-                });
-            }, debounceInterval);
+            this.debouncedRequest_ = debounce(
+                (params: PARAMS, resolve: (value: RESPONSE | PromiseLike<RESPONSE>) => void, reject: (reason: any) => void) => {
+                    this.invokeFetchRequest_(params).then(
+                        (response) => {
+                            resolve(response);
+                        },
+                        (error) => {
+                            reject(error);
+                        }
+                    );
+                },
+                debounceInterval
+            );
         } else {
             delete this.debouncedRequest_;
         }
@@ -84,30 +86,38 @@ export class AsyncDataFetcher<RESPONSE = any, PARAMS = any> implements HasLoadin
         this.loadingStatus.setValue(LoadingState.Loading);
         const dataRequest = this.dataFetcher_(params);
 
-        const requestWrapper = CancelablePromise(new Promise<RESPONSE>((resolve, reject) => {
-            dataRequest.then((data) => {
-                if (!requestWrapper.isCanceled) {
-                    this.loadingStatus.setValue(LoadingState.Success);
-                    resolve(data);
-                }
-            }, (error) => {
-                if (!requestWrapper.isCanceled) {
-                    this.loadingStatus.update({
-                        value: LoadingState.Error,
-                        message: error.message
+        const requestWrapper = CancelablePromise(
+            new Promise<RESPONSE>((resolve, reject) => {
+                dataRequest
+                    .then(
+                        (data) => {
+                            if (!requestWrapper.isCanceled) {
+                                this.loadingStatus.setValue(LoadingState.Success);
+                                resolve(data);
+                            }
+                        },
+                        (error) => {
+                            if (!requestWrapper.isCanceled) {
+                                this.loadingStatus.update({
+                                    value: LoadingState.Error,
+                                    message: error.message
+                                });
+                                reject(error);
+                            }
+                        }
+                    )
+                    .finally(() => {
+                        if (requestWrapper === this.pendingDataRequest_) {
+                            delete this.pendingDataRequest_;
+                        }
                     });
-                    reject(error);
+            }),
+            () => {
+                if (dataRequest.cancel) {
+                    dataRequest.cancel();
                 }
-            }).finally(() => {
-                if (requestWrapper === this.pendingDataRequest_) {
-                    delete this.pendingDataRequest_;
-                }
-            });
-        }), () => {
-            if (dataRequest.cancel) {
-                dataRequest.cancel();
             }
-        });
+        );
 
         this.pendingDataRequest_ = requestWrapper;
         return requestWrapper;

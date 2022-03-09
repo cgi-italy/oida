@@ -10,7 +10,6 @@ export type WmtsDomainDiscoveryClientConfig = {
  *
  */
 export class WmtsDomainDiscoveryClient {
-
     private domParser = new DOMParser();
     private xmlNamespaces = {
         ows: 'http://www.opengis.net/ows/1.1',
@@ -25,16 +24,15 @@ export class WmtsDomainDiscoveryClient {
     }
 
     describeDomains(parameters: {
-        url: string,
-        layer: string,
-        tileMatrix: string,
-        bbox?: string,
-        version?: string,
-        restrictions?: Array<{dimension: string, range: string}>,
-        domains?: string,
-        expandLimit?: number
+        url: string;
+        layer: string;
+        tileMatrix: string;
+        bbox?: string;
+        version?: string;
+        restrictions?: Array<{ dimension: string; range: string }>;
+        domains?: string;
+        expandLimit?: number;
     }) {
-
         let params: any = {
             service: 'WMTS',
             version: parameters.version || '1.0.0',
@@ -64,26 +62,26 @@ export class WmtsDomainDiscoveryClient {
             params.Domains = parameters.domains;
         }
 
-        return this.axiosInstance_.cancelableRequest({
-            url: parameters.url,
-            params: params
-        }).then((response) => {
-            return this.parseDescribeDomainsResponse(response.data);
-        });
+        return this.axiosInstance_
+            .cancelableRequest({
+                url: parameters.url,
+                params: params
+            })
+            .then((response) => {
+                return this.parseDescribeDomainsResponse(response.data);
+            });
     }
 
-
     getHistogram(parameters: {
-        url: string,
-        layer: string,
-        tileMatrix: string,
-        dimension: string,
-        resolution?: string,
-        bbox?: string,
-        restrictions?: Array<{dimension: string, range: string}>,
-        version?: string
+        url: string;
+        layer: string;
+        tileMatrix: string;
+        dimension: string;
+        resolution?: string;
+        bbox?: string;
+        restrictions?: Array<{ dimension: string; range: string }>;
+        version?: string;
     }) {
-
         let params: any = {
             service: 'WMTS',
             version: parameters.version || '1.0.0',
@@ -107,24 +105,24 @@ export class WmtsDomainDiscoveryClient {
             };
         }, params);
 
-        return this.axiosInstance_.cancelableRequest({
-            url: parameters.url,
-            params: params
-        }).then((response) => {
-            return this.parseGetHistogramResponse(response.data);
-        });
-
+        return this.axiosInstance_
+            .cancelableRequest({
+                url: parameters.url,
+                params: params
+            })
+            .then((response) => {
+                return this.parseGetHistogramResponse(response.data);
+            });
     }
 
     getFeature(parameters: {
-        url: string,
-        layer: string,
-        tileMatrix: string,
-        bbox?: string,
-        restrictions?: Array<{dimension: string, range: string}>,
-        version?: string
+        url: string;
+        layer: string;
+        tileMatrix: string;
+        bbox?: string;
+        restrictions?: Array<{ dimension: string; range: string }>;
+        version?: string;
     }) {
-
         let params: any = {
             service: 'WMTS',
             version: parameters.version || '1.0.0',
@@ -146,28 +144,27 @@ export class WmtsDomainDiscoveryClient {
             };
         }, params);
 
-        return this.axiosInstance_.cancelableRequest({
-            url: parameters.url,
-            params: params
-        }).then((response) => {
-            return this.parseGetFeatureResponse(response.data);
-        });
-
+        return this.axiosInstance_
+            .cancelableRequest({
+                url: parameters.url,
+                params: params
+            })
+            .then((response) => {
+                return this.parseGetFeatureResponse(response.data);
+            });
     }
 
-
     private parseDescribeDomainsResponse(response) {
-
         try {
-            let doc = this.domParser.parseFromString(response, 'application/xml');
+            const doc = this.domParser.parseFromString(response, 'application/xml');
 
-            let domains = doc.getElementsByTagNameNS(this.xmlNamespaces.wmts_md, 'Domains')[0];
+            const domains = doc.getElementsByTagNameNS(this.xmlNamespaces.wmts_md, 'Domains')[0];
 
-            let output: any = {};
+            const output: any = {};
 
-            let spaceDimension = domains.getElementsByTagNameNS(this.xmlNamespaces.wmts_md, 'SpaceDomain')[0];
+            const spaceDimension = domains.getElementsByTagNameNS(this.xmlNamespaces.wmts_md, 'SpaceDomain')[0];
             if (spaceDimension) {
-                let bboxTag = spaceDimension.getElementsByTagNameNS(this.xmlNamespaces.wmts_md, 'BoundingBox')[0];
+                const bboxTag = spaceDimension.getElementsByTagNameNS(this.xmlNamespaces.wmts_md, 'BoundingBox')[0];
 
                 if (bboxTag) {
                     output.bbox = {
@@ -180,11 +177,10 @@ export class WmtsDomainDiscoveryClient {
                 }
             }
 
-            let dimensions = domains.getElementsByTagNameNS(this.xmlNamespaces.wmts_md, 'DimensionDomain');
+            const dimensions = domains.getElementsByTagNameNS(this.xmlNamespaces.wmts_md, 'DimensionDomain');
 
-            output.domains =  Array.from(dimensions).map((item) => {
-
-                let rangeNode = item.getElementsByTagNameNS(this.xmlNamespaces.wmts_md, 'Domain')[0].childNodes[0];
+            output.domains = Array.from(dimensions).map((item) => {
+                const rangeNode = item.getElementsByTagNameNS(this.xmlNamespaces.wmts_md, 'Domain')[0].childNodes[0];
 
                 return {
                     dimension: item.getElementsByTagNameNS(this.xmlNamespaces.ows, 'Identifier')[0].childNodes[0].nodeValue,
@@ -194,39 +190,39 @@ export class WmtsDomainDiscoveryClient {
             });
 
             return output;
-
         } catch (e) {
             return null;
         }
-
     }
 
     private parseGetHistogramResponse(response) {
-        let doc = this.domParser.parseFromString(response, 'application/xml');
+        const doc = this.domParser.parseFromString(response, 'application/xml');
 
-        let histogram = doc.getElementsByTagNameNS(this.xmlNamespaces.wmts_md, 'Histogram')[0];
-        let range = histogram.getElementsByTagNameNS(this.xmlNamespaces.wmts_md, 'Domain')[0].childNodes[0];
-        let values = histogram.getElementsByTagNameNS(this.xmlNamespaces.wmts_md, 'Values')[0].childNodes[0];
+        const histogram = doc.getElementsByTagNameNS(this.xmlNamespaces.wmts_md, 'Histogram')[0];
+        const range = histogram.getElementsByTagNameNS(this.xmlNamespaces.wmts_md, 'Domain')[0].childNodes[0];
+        const values = histogram.getElementsByTagNameNS(this.xmlNamespaces.wmts_md, 'Values')[0].childNodes[0];
 
         return {
             range: range ? range.nodeValue : null,
-            values: values ? values.nodeValue!.split(',').map((val) => {
-                return parseInt(val);
-            }) : []
+            values: values
+                ? values.nodeValue!.split(',').map((val) => {
+                      return parseInt(val);
+                  })
+                : []
         };
     }
 
     private parseGetFeatureResponse(response) {
-        let doc = this.domParser.parseFromString(response, 'application/xml');
-        let collection = doc.getElementsByTagNameNS(this.xmlNamespaces.wmts, 'FeatureCollection')[0];
-        let features = collection.getElementsByTagNameNS(this.xmlNamespaces.wmts, 'feature');
+        const doc = this.domParser.parseFromString(response, 'application/xml');
+        const collection = doc.getElementsByTagNameNS(this.xmlNamespaces.wmts, 'FeatureCollection')[0];
+        const features = collection.getElementsByTagNameNS(this.xmlNamespaces.wmts, 'feature');
 
         return Array.from(features).map((item) => {
-            let dimensions_el = item.getElementsByTagNameNS(this.xmlNamespaces.wmts, 'dimension');
-            let dimensions = Array.from(dimensions_el).map((dimension) => {
+            const dimensions_el = item.getElementsByTagNameNS(this.xmlNamespaces.wmts, 'dimension');
+            const dimensions = Array.from(dimensions_el).map((dimension) => {
                 return {
                     name: dimension.getAttribute('name'),
-                    value: dimension.childNodes[0].nodeValue,
+                    value: dimension.childNodes[0].nodeValue
                 };
             });
 
@@ -236,5 +232,4 @@ export class WmtsDomainDiscoveryClient {
             };
         });
     }
-
 }

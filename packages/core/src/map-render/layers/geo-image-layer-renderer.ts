@@ -1,7 +1,7 @@
 import { IMapLayerRenderer, MapLayerRendererConfig } from './map-layer-renderer';
 
 export type GeoImageLayerSource = HTMLImageElement | HTMLCanvasElement | HTMLVideoElement;
-export type GeoImageLayerFootprint =  Array<number[]>;
+export type GeoImageLayerFootprint = Array<number[]>;
 
 export type GeoImageLayerRendererConfig = MapLayerRendererConfig & {
     source: GeoImageLayerSource | undefined;
@@ -11,7 +11,7 @@ export type GeoImageLayerRendererConfig = MapLayerRendererConfig & {
 };
 
 export interface IGeoImageLayerRendererConstructor {
-    new(props: GeoImageLayerRendererConfig & MapLayerRendererConfig): IGeoImageLayerRenderer;
+    new (props: GeoImageLayerRendererConfig & MapLayerRendererConfig): IGeoImageLayerRenderer;
 }
 
 export interface IGeoImageLayerRenderer extends IMapLayerRenderer {

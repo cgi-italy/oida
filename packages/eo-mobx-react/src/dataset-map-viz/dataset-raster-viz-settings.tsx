@@ -8,34 +8,23 @@ import { DatasetDimensionValueSelector } from './dataset-dimension-value-selecto
 import { DatasetVizSettingsFactory } from './dataset-viz-settings-factory';
 import { DatasetBandModeControls } from './dataset-band-mode-controls';
 
-
 export type DatasetRasterVizSettingsProps = {
     datasetViz: RasterMapViz;
     mapState?: Map;
 };
 
 export const DatasetRasterVizSettings = (props: DatasetRasterVizSettingsProps) => {
-
     let dimensionSelectors: JSX.Element[] | undefined;
 
     if (props.datasetViz.config.dimensions) {
-        dimensionSelectors = props.datasetViz.config.dimensions
-            .map((dimension) => {
-                return (
-                    <DatasetDimensionValueSelector
-                        dimensionsState={props.datasetViz.dimensions}
-                        dimension={dimension}
-                        key={dimension.id}
-                    />
-                );
-            });
+        dimensionSelectors = props.datasetViz.config.dimensions.map((dimension) => {
+            return <DatasetDimensionValueSelector dimensionsState={props.datasetViz.dimensions} dimension={dimension} key={dimension.id} />;
+        });
     }
 
     return (
         <div className='dataset-raster-viz-settins'>
-            <DatasetVizOpacityControl
-                datasetViz={props.datasetViz}
-            />
+            <DatasetVizOpacityControl datasetViz={props.datasetViz} />
             {dimensionSelectors}
             <DatasetBandModeControls
                 bandModeConfig={props.datasetViz.config.bandMode}
@@ -48,5 +37,5 @@ export const DatasetRasterVizSettings = (props: DatasetRasterVizSettingsProps) =
 };
 
 DatasetVizSettingsFactory.register(RASTER_VIZ_TYPE, (config) => {
-    return <DatasetRasterVizSettings {...config}/>;
+    return <DatasetRasterVizSettings {...config} />;
 });

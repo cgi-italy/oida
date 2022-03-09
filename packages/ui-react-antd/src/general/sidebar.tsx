@@ -13,41 +13,39 @@ export type SidebarProps = LayoutSectionProps & {
 };
 
 export const SideBar = (props: SidebarProps) => {
+    const { components, activeComponent, showComponent, isRight, isBottom } = props;
 
-    let {components, activeComponent, showComponent, isRight, isBottom} = props;
-
-    let panes = components.map((component) => {
+    const panes = components.map((component) => {
         return (
             <TabPane
-                tab={<Tooltip placement='right' title={component.title}>{component.icon as React.ReactElement}</Tooltip>}
+                tab={
+                    <Tooltip placement='right' title={component.title}>
+                        {component.icon as React.ReactElement}
+                    </Tooltip>
+                }
                 key={component.id}
             >
                 <div className='side-component-title'>{component.title}</div>
-                <div className='side-component-content'>{(component.id === activeComponent) && component.content}</div>
+                <div className='side-component-content'>{component.id === activeComponent && component.content}</div>
             </TabPane>
         );
     });
 
     return (
-        <Tabs className={classnames('sidebar', {'active': !!activeComponent, 'is-right': isRight, 'is-bottom': isBottom})}
+        <Tabs
+            className={classnames('sidebar', { active: !!activeComponent, 'is-right': isRight, 'is-bottom': isBottom })}
             tabPosition={'left'}
             activeKey={activeComponent}
-            onChange={
-                (activeKey) => {
-                    showComponent(activeKey);
+            onChange={(activeKey) => {
+                showComponent(activeKey);
+            }}
+            onTabClick={(key) => {
+                if (key === activeComponent) {
+                    showComponent(undefined);
                 }
-            }
-            onTabClick={
-                (key) => {
-                    if (key === activeComponent) {
-                        showComponent(undefined);
-                    }
-                }
-            }
+            }}
         >
             {panes}
         </Tabs>
     );
-
 };
-

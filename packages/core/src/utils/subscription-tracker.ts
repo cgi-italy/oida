@@ -2,7 +2,7 @@ export class SubscriptionTracker {
     private unsubscribeCbs_: Array<() => any> = [];
 
     public addSubscription(unsubscribeCb: () => any) {
-      this.unsubscribeCbs_.push(unsubscribeCb);
+        this.unsubscribeCbs_.push(unsubscribeCb);
     }
 
     public unsubscribe() {
@@ -12,5 +12,4 @@ export class SubscriptionTracker {
 
         this.unsubscribeCbs_ = [];
     }
-
 }

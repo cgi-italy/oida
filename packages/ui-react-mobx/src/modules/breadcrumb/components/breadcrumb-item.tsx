@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 
 import { IndexedCollection } from '@oidajs/state-mobx';
 import { BreadcrumbItemProps } from '@oidajs/ui-react-core';
@@ -6,13 +6,12 @@ import { BreadcrumbItemProps } from '@oidajs/ui-react-core';
 import { useBreadcrumbModule } from '../hooks/use-breadcrumb-module';
 
 export type BreadcrumbItemInjectorProps = {
-    breadcrumb: IndexedCollection<BreadcrumbItemProps>,
-    data: BreadcrumbItemProps
+    breadcrumb: IndexedCollection<BreadcrumbItemProps>;
+    data: BreadcrumbItemProps;
 };
 
 export const BreadcrumbItemInjector = (props: BreadcrumbItemInjectorProps) => {
-
-    const {breadcrumb, data} = props;
+    const { breadcrumb, data } = props;
 
     useEffect(() => {
         if (data) {
@@ -34,7 +33,6 @@ export const BreadcrumbItemInjector = (props: BreadcrumbItemInjectorProps) => {
     }, [breadcrumb]);
 
     useEffect(() => {
-
         const idx = breadcrumb.items.findIndex((item) => item.key === data.key);
         if (idx !== -1) {
             breadcrumb.update(idx, data);
@@ -42,11 +40,10 @@ export const BreadcrumbItemInjector = (props: BreadcrumbItemInjectorProps) => {
     }, [data]);
 
     return null;
-
 };
 
-export const BreadcrumbItem = (props: Omit<BreadcrumbItemInjectorProps, 'breadcrumb'> & {breadcrumbModuleId?: string}) => {
+export const BreadcrumbItem = (props: Omit<BreadcrumbItemInjectorProps, 'breadcrumb'> & { breadcrumbModuleId?: string }) => {
     const breadcrumbModule = useBreadcrumbModule(props.breadcrumbModuleId);
 
-    return <BreadcrumbItemInjector breadcrumb={breadcrumbModule.breadcrumb} {...props}/>;
+    return <BreadcrumbItemInjector breadcrumb={breadcrumbModule.breadcrumb} {...props} />;
 };

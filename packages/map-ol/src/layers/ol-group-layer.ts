@@ -6,13 +6,12 @@ import { OLMapLayer } from './ol-map-layer';
 import { olLayersFactory } from './ol-layers-factory';
 
 export class OLGroupLayer extends OLMapLayer<Group> implements IGroupLayerRenderer {
-
     constructor(config: MapLayerRendererConfig) {
         super(config);
     }
 
     addLayer(layer: OLMapLayer, position?: number) {
-        if (typeof (position) === 'number') {
+        if (typeof position === 'number') {
             this.olImpl_.getLayers().insertAt(position, layer.getOLObject());
         } else {
             this.olImpl_.getLayers().push(layer.getOLObject());
@@ -34,7 +33,6 @@ export class OLGroupLayer extends OLMapLayer<Group> implements IGroupLayerRender
     protected destroyOLObject_() {
         this.olImpl_.getLayers().clear();
     }
-
 }
 
 olLayersFactory.register(GROUP_LAYER_ID, (config) => {

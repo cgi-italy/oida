@@ -8,17 +8,14 @@ import { useCenterOnMap } from '../../map';
 import { useAoiModule } from './use-aoi-module';
 import { Aoi } from '../models/aoi';
 
-
 export type MapAoiInstanceProps = {
     mapSelection: SelectionManager;
     map: Map;
     aois: IndexedCollection<Aoi>;
 } & FormFieldState<AoiValue>;
 
-
 export const useMapAoiInstance = (props: MapAoiInstanceProps) => {
-
-    const { mapSelection, aois, map, value} = props;
+    const { mapSelection, aois, map, value } = props;
 
     const aoiInstance = useMemo(() => {
         const aoiId = value?.props?.id;
@@ -98,7 +95,7 @@ export const useMapAoiInstance = (props: MapAoiInstanceProps) => {
 };
 
 export const useMapAoiInstanceFromModule = (aoiFieldState: FormFieldState<AoiValue>, aoiModuleId?: string) => {
-    let moduleState = useAoiModule(aoiModuleId);
+    const moduleState = useAoiModule(aoiModuleId);
 
     return useMapAoiInstance({
         mapSelection: moduleState.mapModule.selectionManager,
@@ -107,4 +104,3 @@ export const useMapAoiInstanceFromModule = (aoiFieldState: FormFieldState<AoiVal
         ...aoiFieldState
     });
 };
-

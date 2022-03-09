@@ -11,19 +11,14 @@ export type CenterOnMapOptions = {
 };
 
 export const centerOnMap = (renderer: IMapRenderer, geometry: Geometry, options: CenterOnMapOptions = {}) => {
-
-    let extent = getGeometryExtent(geometry);
+    const extent = getGeometryExtent(geometry);
 
     if (!extent) {
         return;
     }
 
     if (options.notIfInViewport) {
-
-        if (!booleanDisjoint(
-            bboxPolygon(renderer.getViewportExtent()),
-            bboxPolygon(extent)
-        )) {
+        if (!booleanDisjoint(bboxPolygon(renderer.getViewportExtent()), bboxPolygon(extent))) {
             return;
         }
     }

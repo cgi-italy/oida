@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { InputNumber } from 'antd';
 import { InputNumberProps } from 'antd/lib/input-number';
@@ -8,19 +8,16 @@ import { FormFieldRendererBaseProps } from '@oidajs/ui-react-core';
 
 import { antdFormFieldRendererFactory } from './antd-form-field-renderer-factory';
 
-
 export type NumericFieldRendererProps = {
     changeDelay?: number;
 } & Omit<InputNumberProps, 'onChange' | 'onPressEnter' | 'value'>;
 
 export const NumericFieldRenderer = (props: FormFieldRendererBaseProps<NumericField> & NumericFieldRendererProps) => {
-
     const [inputValue, setInputValue] = useState(props.value);
 
     useEffect(() => {
         setInputValue(props.value);
     }, [props.value]);
-
 
     useEffect(() => {
         if (props.changeDelay) {
@@ -53,29 +50,24 @@ export const NumericFieldRenderer = (props: FormFieldRendererBaseProps<NumericFi
         }
     };
 
-    let { value, onChange, title, required, config, autoFocus, changeDelay, ...renderProps } =  props;
+    const { value, onChange, title, required, config, autoFocus, changeDelay, ...renderProps } = props;
 
     return (
         <InputNumber
             value={inputValue}
             onPressEnter={onEnterPress}
             onChange={onInputChange}
-            autoFocus={props.autoFocus}
+            autoFocus={autoFocus}
             min={config.min}
             max={config.max}
             step={config.step}
             {...renderProps}
-        >
-        </InputNumber>
+        ></InputNumber>
     );
 };
-
 
 NumericFieldRenderer.defaultProps = {
     changeDelay: 1000
 };
 
-antdFormFieldRendererFactory.register<NumericField>(
-    NUMERIC_FIELD_ID, 'input',
-    NumericFieldRenderer
-);
+antdFormFieldRendererFactory.register<NumericField>(NUMERIC_FIELD_ID, 'input', NumericFieldRenderer);

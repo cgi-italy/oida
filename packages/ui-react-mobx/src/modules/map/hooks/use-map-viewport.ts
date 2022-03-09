@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 
 import { autorun } from 'mobx';
@@ -14,17 +13,16 @@ export type MapViewportProps = {
 };
 
 export const useMapViewport = (props: MapViewportProps) => {
+    const [viewportExtent, setViewportExtent] = useState<BBox>();
 
-    let [ viewportExtent, setViewportExtent ] = useState<BBox>();
-
-    let debouncedSetViewport = debounce((viewport) => {
+    const debouncedSetViewport = debounce((viewport) => {
         setViewportExtent(props.map.renderer.implementation!.getViewportExtent());
     }, props.debounce);
 
     useEffect(() => {
-        let disposeViewportObserver = autorun(() => {
-            let renderer = props.map.renderer.implementation;
-            let viewport = props.map.view.viewport;
+        const disposeViewportObserver = autorun(() => {
+            const renderer = props.map.renderer.implementation;
+            const viewport = props.map.view.viewport;
 
             if (renderer) {
                 debouncedSetViewport(viewport);
@@ -40,10 +38,9 @@ export const useMapViewport = (props: MapViewportProps) => {
 };
 
 export const useMapViewportFromModule = (props: Omit<MapViewportProps, 'map'> = {}, mapModuleid?: string) => {
-    let mapModuleState = useMapModule(mapModuleid);
+    const mapModuleState = useMapModule(mapModuleid);
     return useMapViewport({
         map: mapModuleState.map,
         ...props
     });
 };
-

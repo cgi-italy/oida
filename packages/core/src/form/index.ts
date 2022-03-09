@@ -15,4 +15,3 @@ export * from './enum-field';
 export * from './date-field';
 export * from './date-range-field';
 export * from './aoi-field';
-

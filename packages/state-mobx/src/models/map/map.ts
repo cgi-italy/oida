@@ -10,11 +10,10 @@ export type MapProps = {
     view: MapView | MapViewProps;
     renderer: MapRenderer | MapRendererProps;
     layers?: GroupLayer | GroupLayerProps;
-    interactions?: Array<MapInteraction | MapInteractionProps>
+    interactions?: Array<MapInteraction | MapInteractionProps>;
 };
 
 export class Map {
-
     readonly layers: GroupLayer;
     readonly interactions: IndexedCollection<MapInteraction>;
     @observable.ref view: MapView;
@@ -33,7 +32,7 @@ export class Map {
 
         this.interactions = new IndexedCollection({
             idGetter: (item) => item.id,
-            items: (props.interactions || []).map(item => item instanceof MapInteraction ? item : MapInteraction.create(item))
+            items: (props.interactions || []).map((item) => (item instanceof MapInteraction ? item : MapInteraction.create(item)))
         });
 
         makeObservable(this);

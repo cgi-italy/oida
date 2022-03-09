@@ -5,7 +5,7 @@ import { Geometry, getGeometryExtent } from '@oidajs/core';
 type GeometryType = Geometry | (Geometry | undefined);
 
 export type GeometryProps<T extends GeometryType = Geometry> = {
-    geometry: T
+    geometry: T;
 };
 
 export class GeometryState<T extends GeometryType = Geometry> {

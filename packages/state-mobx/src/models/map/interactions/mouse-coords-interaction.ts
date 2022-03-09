@@ -5,12 +5,11 @@ import { MOUSE_COORDS_INTERACTION_ID } from '@oidajs/core';
 import { MapInteraction, MapInteractionProps } from './map-interaction';
 
 export type MouseCoords = {
-    lat: number,
-    lon: number
+    lat: number;
+    lon: number;
 };
 
-export type MouseCoordsInteractionProps = {
-} & Omit<MapInteractionProps, 'interactionType'>;
+export type MouseCoordsInteractionProps = Omit<MapInteractionProps, 'interactionType'>;
 
 export class MouseCoordsInteraction extends MapInteraction {
     @observable.ref mouseCoords: MouseCoords | undefined;

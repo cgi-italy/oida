@@ -4,17 +4,16 @@ import chroma from 'chroma-js';
 import { randomColorFactory } from '@oidajs/core';
 import { Entity, EntityProps, HasGeometry, GeometryProps, GeometryState } from '@oidajs/state-mobx';
 
-
 const generateAoiColor = randomColorFactory();
 
 export type AoiProps = {
     name: string;
     color?: string;
     properties?: Record<string, any>;
-} & Omit<EntityProps, 'entityType'> & GeometryProps;
+} & Omit<EntityProps, 'entityType'> &
+    GeometryProps;
 
 export class Aoi extends Entity implements HasGeometry {
-
     @observable.ref name: string;
     @observable.ref geometry: GeometryState;
     readonly properties: Record<string, any> | undefined;
@@ -36,7 +35,7 @@ export class Aoi extends Entity implements HasGeometry {
     @computed
     get color() {
         let color = this.baseColor_;
-        if ( this.selected.value) {
+        if (this.selected.value) {
             color = '#FFFF00';
         } else if (this.hovered.value) {
             color = chroma(color).brighten(1).hex();

@@ -1,5 +1,5 @@
 import { AxiosInstanceWithCancellation } from '@oidajs/core';
-import { DatasetTimeDistributionConfig, DatasetProductSearchProvider } from  '@oidajs/eo-mobx';
+import { DatasetTimeDistributionConfig, DatasetProductSearchProvider } from '@oidajs/eo-mobx';
 
 import { AdamDatasetConfig, isMultiBandCoverage } from '../adam-dataset-config';
 import { AdamDatasetFactoryConfig } from '../get-adam-dataset-factory';
@@ -13,28 +13,23 @@ export const getAdamDatasetTimeDistributionConfig = (
     datasetConfig: AdamDatasetConfig,
     searchProvider?: DatasetProductSearchProvider
 ) => {
-
-    if (datasetConfig.timeless) {
+    if (datasetConfig.fixedTime) {
         return undefined;
     }
 
-    let coverageId: string;
-    if (isMultiBandCoverage(datasetConfig.coverages)) {
-        coverageId = datasetConfig.coverages.wcsCoverage;
-    } else {
-        coverageId = datasetConfig.coverages[0].wcsCoverage;
-    }
-
-    let productCatalogueConfig: {
-        provider: DatasetProductSearchProvider;
-        timeRangeQueryParam: string;
-        timeSortParam?: string
-    } | undefined;
+    let productCatalogueConfig:
+        | {
+              provider: DatasetProductSearchProvider;
+              timeRangeQueryParam: string;
+              timeSortParam: string;
+          }
+        | undefined;
 
     if (searchProvider instanceof AdamOpenSearchProductSearchProvider) {
         productCatalogueConfig = {
             provider: searchProvider,
-            timeRangeQueryParam: 'timeRange'
+            timeRangeQueryParam: 'timeRange',
+            timeSortParam: 'productDate'
         };
     } else if (searchProvider instanceof AdamCswProductSearchProvider) {
         productCatalogueConfig = {
@@ -47,7 +42,7 @@ export const getAdamDatasetTimeDistributionConfig = (
     const timeDistributionConfig: DatasetTimeDistributionConfig = {
         provider: new AdamWcsTimeDistributionProvider({
             serviceUrl: factoryConfig.wcsServiceUrl,
-            coverageId: coverageId,
+            isMultiBandCoverage: isMultiBandCoverage(datasetConfig.coverages),
             axiosInstance: axiosInstance,
             productCatalogue: productCatalogueConfig
         })

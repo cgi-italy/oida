@@ -24,7 +24,7 @@ export type QueryFilter<K extends string = string, T extends IFormFieldType = an
  * ```
  */
 export type QueryParams<FILTERS extends QueryFilter = QueryFilter> = {
-    paging?: {page: number, pageSize: number, offset: number};
+    paging?: { page: number; pageSize: number; offset: number };
     filters?: Array<FILTERS>;
-    sortBy?: {key: string, order: SortOrder};
+    sortBy?: { key: string; order: SortOrder };
 };

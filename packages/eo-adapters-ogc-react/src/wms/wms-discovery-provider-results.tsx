@@ -3,23 +3,19 @@ import React from 'react';
 import { SearchOutlined, PlusOutlined } from '@ant-design/icons';
 import { STRING_FIELD_ID, IFormFieldDefinition } from '@oidajs/core';
 
-import { useEntityCollection } from '@oidajs/ui-react-mobx';
+import { useEntityCollection, useQueryCriteriaUrlBinding, useQueryFiltersBreadcrumbBindingFromModule } from '@oidajs/ui-react-mobx';
 import { DataCollectionList } from '@oidajs/ui-react-antd';
 import { DatasetExplorer } from '@oidajs/eo-mobx';
-import {
-    WmsDatasetDiscoveryProvider, WmsDatasetDiscoveryProviderItem,
- } from '@oidajs/eo-adapters-ogc';
-import { useQueryCriteriaUrlBinding, useQueryFiltersBreadcrumbBindingFromModule } from '@oidajs/ui-react-mobx';
+import { WmsDatasetDiscoveryProvider, WmsDatasetDiscoveryProviderItem } from '@oidajs/eo-adapters-ogc';
 
 import { WmsDiscoveryProviderLayerItem } from './wms-discovery-provider-layer-item';
 
 export type WmsDiscoveryProviderResultsProps = {
-    provider: WmsDatasetDiscoveryProvider,
-    datasetExplorer: DatasetExplorer
+    provider: WmsDatasetDiscoveryProvider;
+    datasetExplorer: DatasetExplorer;
 };
 
 export const WmsDiscoveryProviderResults = (props: WmsDiscoveryProviderResultsProps) => {
-
     const searchFilters: IFormFieldDefinition[] = [
         {
             name: 'search',
@@ -27,7 +23,7 @@ export const WmsDiscoveryProviderResults = (props: WmsDiscoveryProviderResultsPr
             config: {},
             rendererConfig: {
                 props: {
-                    prefix: (<SearchOutlined/>)
+                    prefix: <SearchOutlined />
                 }
             }
         }
@@ -37,7 +33,7 @@ export const WmsDiscoveryProviderResults = (props: WmsDiscoveryProviderResultsPr
         {
             name: 'Add to map',
             content: 'Add to map',
-            icon: (<PlusOutlined/>),
+            icon: <PlusOutlined />,
             callback: (item: WmsDatasetDiscoveryProviderItem) => {
                 return props.provider.createDataset(item).then((datasetConfig) => {
                     if (datasetConfig) {
@@ -48,15 +44,14 @@ export const WmsDiscoveryProviderResults = (props: WmsDiscoveryProviderResultsPr
         }
     ];
 
-    // TODO: enable once the redirect base url issue is fixed
-    // useQueryCriteriaUrlBinding({
-    //     criteria: props.provider.criteria
-    // });
+    useQueryCriteriaUrlBinding({
+        criteria: props.provider.criteria
+    });
 
-    // useQueryFiltersBreadcrumbBindingFromModule({
-    //     filtersConfig: searchFilters,
-    //     filteringState: props.provider.criteria.filters
-    // });
+    useQueryFiltersBreadcrumbBindingFromModule({
+        filtersConfig: searchFilters,
+        filteringState: props.provider.criteria.filters
+    });
 
     const collectionListProps = useEntityCollection({
         items: props.provider.results,
@@ -67,7 +62,7 @@ export const WmsDiscoveryProviderResults = (props: WmsDiscoveryProviderResultsPr
             filters: searchFilters,
             mainFilter: 'search'
         },
-        sortableFields: [{key: 'Title', name: 'Name'}],
+        sortableFields: [{ key: 'Title', name: 'Name' }]
     });
 
     if (!collectionListProps) {
@@ -78,7 +73,7 @@ export const WmsDiscoveryProviderResults = (props: WmsDiscoveryProviderResultsPr
         <div className='wms-discovery-provider-service'>
             <DataCollectionList<WmsDatasetDiscoveryProviderItem>
                 className='dataset-discovery-results wms-discovery-layer-list'
-                content={(item) => <WmsDiscoveryProviderLayerItem wmsDiscoveryItem={item}/>}
+                content={(item) => <WmsDiscoveryProviderLayerItem wmsDiscoveryItem={item} />}
                 size='default'
                 itemLayout='vertical'
                 autoScrollOnSelection={false}

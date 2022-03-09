@@ -7,11 +7,8 @@ const originalFactoryCreate = cesiumTileSourcesFactory.create;
 
 cesiumTileSourcesFactory.create = (id: string, config: any) => {
     //use ol tile source for unsupported source types and unsupported projections
-    if (
-        !cesiumTileSourcesFactory.isRegistered(id) ||
-        (config.srs && (getProjectionType(config.srs) === ProjectionType.Other))
-    ) {
-        let olSource = olTileSourcesFactory.create(id, config);
+    if (!cesiumTileSourcesFactory.isRegistered(id) || (config.srs && getProjectionType(config.srs) === ProjectionType.Other)) {
+        const olSource = olTileSourcesFactory.create(id, config);
         if (olSource) {
             return new CesiumOLImageryProvider(olSource, config);
         }

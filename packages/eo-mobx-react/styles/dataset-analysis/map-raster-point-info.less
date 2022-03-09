@@ -24,7 +24,6 @@
                         overflow: hidden;
                         text-overflow: ellipsis;
                     }
-
                 }
 
                 .ant-collapse-arrow {
@@ -39,6 +38,19 @@
                     .ant-descriptions-row {
                         td {
                             padding-bottom: 0px;
+
+                            .ant-descriptions-item-content {
+                                white-space: nowrap;
+                                justify-content: end;
+                                color: @primary-color;
+                            }
+                        }
+
+                        &:not(:last-child) {
+                            .ant-descriptions-item-container {
+                                margin-bottom: 6px;
+                                border-bottom: solid 1px @border-color-base;
+                            }
                         }
                     }
                 }

@@ -8,12 +8,8 @@ import { ArrayTracker } from '../../utils';
 import { MapLayer, GroupLayer } from '../../models/map/layers';
 
 export class GroupLayerController extends MapLayerController<IGroupLayerRenderer, GroupLayer> {
-
     private mapRenderer_: IMapRenderer | undefined;
-    private layersTracker_: ArrayTracker<
-        MapLayer,
-        MapLayerController | undefined
-    > | undefined;
+    private layersTracker_: ArrayTracker<MapLayer, MapLayerController | undefined> | undefined;
 
     constructor(config) {
         super(config);
@@ -39,7 +35,6 @@ export class GroupLayerController extends MapLayerController<IGroupLayerRenderer
             onItemAdd: this.createChildLayer_.bind(this),
             onItemRemove: this.destroyChildLayer_.bind(this)
         });
-
     }
 
     protected unbindFromLayerState_() {
@@ -49,12 +44,12 @@ export class GroupLayerController extends MapLayerController<IGroupLayerRenderer
     }
 
     protected createChildLayer_(mapLayer: MapLayer, idx?: number) {
-        let childLayerController = layerControllersFactory.create(mapLayer.layerType, {
+        const childLayerController = layerControllersFactory.create(mapLayer.layerType, {
             mapLayer
         });
         if (childLayerController) {
             childLayerController.setMapRenderer(this.mapRenderer_!);
-            let childLayerRenderer = childLayerController.getLayerRenderer();
+            const childLayerRenderer = childLayerController.getLayerRenderer();
             if (childLayerRenderer) {
                 this.layerRenderer_!.addLayer(childLayerRenderer, idx);
             }
@@ -64,14 +59,13 @@ export class GroupLayerController extends MapLayerController<IGroupLayerRenderer
 
     protected destroyChildLayer_(childLayerController: MapLayerController | undefined) {
         if (childLayerController) {
-            let childLayerRenderer = childLayerController.getLayerRenderer();
+            const childLayerRenderer = childLayerController.getLayerRenderer();
             if (childLayerRenderer) {
                 this.layerRenderer_!.removeLayer(childLayerRenderer);
             }
             childLayerController.destroy();
         }
     }
-
 }
 
 layerControllersFactory.register(GROUP_LAYER_ID, (config) => {

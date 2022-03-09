@@ -9,13 +9,10 @@ import { FormFieldRendererBaseProps } from '@oidajs/ui-react-core';
 
 import { antdFormFieldRendererFactory } from './antd-form-field-renderer-factory';
 
-
 export const DateRangeFieldRenderer = (
     props: FormFieldRendererBaseProps<DateRangeField> & Omit<RangePickerProps, 'value' | 'onChange'>
 ) => {
-
-    const {value, onChange, title, required, config, autoFocus, ...renderProps} = props;
-
+    const { value, onChange, title, required, config, autoFocus, ...renderProps } = props;
 
     const onDateChange = (range) => {
         if (range && range.length === 2) {
@@ -39,22 +36,21 @@ export const DateRangeFieldRenderer = (
             });
             onChange({
                 start: range[0].add(range[0].utcOffset(), 'minutes').toDate(),
-                end: range[1].add(range[1].utcOffset(), 'minutes').toDate(),
+                end: range[1].add(range[1].utcOffset(), 'minutes').toDate()
             });
         } else {
             onChange(undefined);
         }
     };
 
-
     let disabledDates;
     if (config.minDate || config.maxDate) {
         disabledDates = (current: moment.Moment) => {
-            return (config.minDate && current.isBefore(config.minDate, 'date'))
-                || (config.maxDate && current.isAfter(config.maxDate, 'date'));
+            return (
+                (config.minDate && current.isBefore(config.minDate, 'date')) || (config.maxDate && current.isAfter(config.maxDate, 'date'))
+            );
         };
     }
-
 
     return (
         <DatePicker.RangePicker
@@ -62,17 +58,16 @@ export const DateRangeFieldRenderer = (
             onChange={onDateChange}
             disabledDate={disabledDates}
             allowClear={!props.required}
-            showTime={config.withTime ? {
-                defaultValue: [moment.utc('00:00:00', 'HH:mm:ss'), moment.utc('23:59:59', 'HH:mm:ss')]
-            } : false}
+            showTime={
+                config.withTime
+                    ? {
+                          defaultValue: [moment.utc('00:00:00', 'HH:mm:ss'), moment.utc('23:59:59', 'HH:mm:ss')]
+                      }
+                    : false
+            }
             {...renderProps}
-        >
-        </DatePicker.RangePicker>
+        ></DatePicker.RangePicker>
     );
-
 };
 
-antdFormFieldRendererFactory.register<DateRangeField>(
-    DATE_RANGE_FIELD_ID, 'rangepicker',
-    DateRangeFieldRenderer
-);
+antdFormFieldRendererFactory.register<DateRangeField>(DATE_RANGE_FIELD_ID, 'rangepicker', DateRangeFieldRenderer);

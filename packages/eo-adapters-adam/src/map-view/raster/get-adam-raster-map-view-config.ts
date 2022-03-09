@@ -19,43 +19,47 @@ import { AdamSpatialCoverageProvider } from '../../get-adam-dataset-spatial-cove
 
 import trueColorPreview from './true-color-preset-preview';
 
-
 export const getAdamRasterMapViewConfig = (
     axiosInstance: AxiosInstanceWithCancellation,
     factoryConfig: AdamDatasetFactoryConfig,
     datasetConfig: AdamDatasetConfig,
     spatialCoverageProvider: AdamSpatialCoverageProvider
 ) => {
-
     let afterInit: ((mapViz: RasterMapViz) => void) | undefined = undefined;
 
-    let useRawData = datasetConfig.renderMode !== AdamDatasetRenderMode.ServerSide;
+    const useRawData = datasetConfig.renderMode !== AdamDatasetRenderMode.ServerSide;
 
-    const {provider, tiffLoader} = createAdamRasterTileSourceProvider(
-        factoryConfig, datasetConfig, axiosInstance, spatialCoverageProvider, useRawData
+    const { provider, tiffLoader } = createAdamRasterTileSourceProvider(
+        factoryConfig,
+        datasetConfig,
+        axiosInstance,
+        spatialCoverageProvider,
+        useRawData
     );
 
     if (tiffLoader) {
         afterInit = (mapViz: RasterMapViz) => {
-            autorun(() => {
-                const bandMode = mapViz.bandMode.value;
-                if (bandMode?.type === RasterBandModeType.Single) {
-                    tiffLoader.renderer.setColorScale(bandMode.colorMap.colorScale);
-                    const domain = bandMode.colorMap.domain;
-                    if (domain) {
-                        tiffLoader.renderer.setDomain([domain.mapRange.min, domain.mapRange.max]);
-                        tiffLoader.renderer.setClamp(domain.clamp);
-                        tiffLoader.renderer.setNoDataValue(domain.noDataValue);
+            autorun(
+                () => {
+                    const bandMode = mapViz.bandMode.value;
+                    if (bandMode?.type === RasterBandModeType.Single) {
+                        tiffLoader.renderer.setColorScale(bandMode.colorMap.colorScale);
+                        const domain = bandMode.colorMap.domain;
+                        if (domain) {
+                            tiffLoader.renderer.setDomain([domain.mapRange.min, domain.mapRange.max]);
+                            tiffLoader.renderer.setClamp(domain.clamp);
+                            tiffLoader.renderer.setNoDataValue(domain.noDataValue);
+                        }
+
+                        mapViz.mapLayer.children.items.forEach((layer) => {
+                            (layer as TileLayer).forceRefresh();
+                        });
                     }
-
-
-                    mapViz.mapLayer.children.items.forEach((layer) => {
-                        (layer as TileLayer).forceRefresh();
-                    });
+                },
+                {
+                    delay: 1000
                 }
-            }, {
-                delay: 1000
-            });
+            );
         };
     }
 
@@ -64,35 +68,40 @@ export const getAdamRasterMapViewConfig = (
     let rasterVizconfig: RasterMapVizConfig;
 
     if (isMultiBandCoverage(datasetConfig.coverages)) {
-
         if (datasetConfig.coverages.isTrueColor) {
             rasterVizconfig = {
                 rasterSourceProvider: provider,
                 bandMode: {
-                    supportedModes: [{
-                        type: RasterBandModeType.Preset,
-                    }],
-                    presets: [{
-                        id: 'tci',
-                        name: 'True color image',
-                        preview: trueColorPreview
-                    }],
+                    supportedModes: [
+                        {
+                            type: RasterBandModeType.Preset
+                        }
+                    ],
+                    presets: [
+                        {
+                            id: 'tci',
+                            name: 'True color image',
+                            preview: trueColorPreview
+                        }
+                    ],
                     defaultMode: 0
                 },
                 dimensions: datasetConfig.dimensions
             };
         } else {
-            const supportedModes: RasterBandModeChoice[] = [{
-                type: RasterBandModeType.Single,
-                default: {
-                    band: datasetConfig.coverages.bands[0].idx.toString()
+            const supportedModes: RasterBandModeChoice[] = [
+                {
+                    type: RasterBandModeType.Single,
+                    default: {
+                        band: datasetConfig.coverages.bands[0].idx.toString()
+                    }
                 }
-            }];
+            ];
 
             let hasPresets = false;
             if (datasetConfig.coverages.presets && datasetConfig.coverages.presets.length) {
                 hasPresets = true;
-                supportedModes.push(                    {
+                supportedModes.push({
                     type: RasterBandModeType.Preset,
                     default: {
                         preset: datasetConfig.coverages.presets[0].id
@@ -127,13 +136,15 @@ export const getAdamRasterMapViewConfig = (
         rasterVizconfig = {
             rasterSourceProvider: provider,
             bandMode: {
-                supportedModes: [{
-                    type: RasterBandModeType.Single,
-                    default: {
-                        band: datasetConfig.coverages[0].id
+                supportedModes: [
+                    {
+                        type: RasterBandModeType.Single,
+                        default: {
+                            band: datasetConfig.coverages[0].id
+                        }
                     }
-                }],
-                bands: datasetConfig.coverages.map(coverage => {
+                ],
+                bands: datasetConfig.coverages.map((coverage) => {
                     return {
                         colorScales: colorScales,
                         ...coverage
@@ -144,14 +155,10 @@ export const getAdamRasterMapViewConfig = (
             dimensions: datasetConfig.dimensions,
             afterInit: afterInit
         };
-
     }
-
 
     return {
         type: RASTER_VIZ_TYPE,
         config: rasterVizconfig
     } as DatasetMapViewConfig<typeof RASTER_VIZ_TYPE>;
-
 };
-

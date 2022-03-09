@@ -17,7 +17,6 @@ export type PickInfo<T = any> = {
     cesiumPickObject?: any;
 };
 
-
 export const getPickInfo = (cesiumPickObject) => {
     let primitive;
     if (cesiumPickObject.id instanceof Entity) {
@@ -52,4 +51,3 @@ export const setNonPickableFeaturesVisibility = (cesiumPickObjectList, visible) 
     });
     return hasNonPickableObjects;
 };
-

@@ -6,19 +6,18 @@ import { HasConfig, ConfigProps, Config } from '../../mixins';
 import { MapLayer, MapLayerProps } from './map-layer';
 import { FeatureInterface } from './feature-layer';
 
-
 export type VerticalProfileGeometryGetter<T extends FeatureInterface> = (entity: T) => IVerticalProfile;
 export type VerticalProfileStyleGetter<T extends FeatureInterface> = (entity: T) => IVerticalProfileStyle;
 
-
 export type VerticalProfileLayerConfig<T extends FeatureInterface> = {
-    profileGetter: VerticalProfileGeometryGetter<T>,
-    styleGetter: VerticalProfileStyleGetter<T>
+    profileGetter: VerticalProfileGeometryGetter<T>;
+    styleGetter: VerticalProfileStyleGetter<T>;
 };
 
 export type VerticalProfileLayerProps<T extends FeatureInterface> = {
-    source?: IObservableArray<T>
-} & MapLayerProps<typeof VERTICAL_PROFILE_LAYER_ID> & ConfigProps<VerticalProfileLayerConfig<T>>;
+    source?: IObservableArray<T>;
+} & MapLayerProps<typeof VERTICAL_PROFILE_LAYER_ID> &
+    ConfigProps<VerticalProfileLayerConfig<T>>;
 
 export class VerticalProfileLayer<T extends FeatureInterface> extends MapLayer implements HasConfig<VerticalProfileLayerConfig<T>> {
     readonly config: Config<VerticalProfileLayerConfig<T>>;

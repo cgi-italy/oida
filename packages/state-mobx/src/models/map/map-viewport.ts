@@ -23,7 +23,6 @@ export class MapViewport {
         makeAutoObservable(this, {
             center: observable.ref
         });
-
     }
 
     setCenter(center: MapCoord) {

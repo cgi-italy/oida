@@ -5,11 +5,16 @@ import TileGrid from 'ol/tilegrid/TileGrid';
 
 import { TileGridConfig, computeTileGridParams } from '@oidajs/core';
 
-export const getTileGridFromConfig = (srs, tileGridConfig?: TileGridConfig) => {
+const getRootLevelResolution = (extent: number[], gridSize: number[], tileSize: number[]) => {
+    const rootXResolution = (extent[2] - extent[0]) / gridSize[0] / tileSize[0];
+    const rootYResolution = (extent[3] - extent[1]) / gridSize[1] / tileSize[1];
+    return Math.max(rootXResolution, rootYResolution);
+};
 
+export const getTileGridFromConfig = (srs, tileGridConfig?: TileGridConfig) => {
     tileGridConfig = tileGridConfig || {};
 
-    let projection = getProjection(srs);
+    const projection = getProjection(srs);
 
     let tileSize = Array.isArray(tileGridConfig.tileSize)
         ? tileGridConfig.tileSize
@@ -39,14 +44,26 @@ export const getTileGridFromConfig = (srs, tileGridConfig?: TileGridConfig) => {
     let resolutions = tileGridConfig.resolutions;
     if (!resolutions) {
         resolutions = [];
-        let levelResolution = ((extent[2] - extent[0]) / gridSize[0]) / tileSize[0];
-        for (let i = 0; i < (tileGridConfig.maxZoom || 19); ++i) {
+        let levelResolution = getRootLevelResolution(extent, gridSize, tileSize);
+        // if the root resolution is better than the min res reduce the tile size and use a single level at the best res
+        if (tileGridConfig.allowOptimalTileSize && tileGridConfig.minRes && levelResolution < tileGridConfig.minRes) {
+            const tileScaleFactor = levelResolution / tileGridConfig.minRes;
+            tileSize[0] = Math.round(tileSize[0] * tileScaleFactor);
+            tileSize[1] = Math.round(tileSize[1] * tileScaleFactor);
+            resolutions.push(getRootLevelResolution(extent, gridSize, tileSize));
+        } else {
             resolutions.push(levelResolution);
-            levelResolution /= 2;
+            for (let i = 1; i <= (tileGridConfig.maxZoom || 19); ++i) {
+                levelResolution /= 2;
+                resolutions.push(levelResolution);
+                if (tileGridConfig.minRes && levelResolution < tileGridConfig.minRes) {
+                    break;
+                }
+            }
         }
     }
 
-    let tileGridOptions = {
+    const tileGridOptions = {
         minZoom: tileGridConfig.minZoom || 0,
         extent: extent,
         tileSize: tileSize,
@@ -67,15 +84,13 @@ export const getTileGridFromConfig = (srs, tileGridConfig?: TileGridConfig) => {
     } else {
         return new TileGrid(tileGridOptions);
     }
-
 };
 
 export const getUrlFromConfig = (sourceConfig) => {
-
-    let url = sourceConfig.url;
+    const url = sourceConfig.url;
 
     if (sourceConfig.subdomains) {
-        let urls = sourceConfig.subdomains.map((subdomain) => {
+        const urls = sourceConfig.subdomains.map((subdomain) => {
             return url.replace(/\{s\}/, subdomain);
         });
         return {

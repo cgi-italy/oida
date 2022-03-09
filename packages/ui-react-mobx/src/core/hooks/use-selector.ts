@@ -11,27 +11,29 @@ import { reaction } from 'mobx';
  * @returns the data extracted by the selector function
  */
 export const useSelector = <T>(selector: () => T, deps?: React.DependencyList) => {
-
     const initialState = useMemo(() => selector(), []);
 
     const [data, setData] = useState<T>(initialState);
 
     useEffect(() => {
-        const reactionDisposer = reaction(selector, (data) => {
-            if (typeof(data) === 'function') {
-                // if the selector returns a callback we have to wrap the setData
-                // within a function
-                setData(() => data);
-            } else {
-                setData(data);
+        const reactionDisposer = reaction(
+            selector,
+            (data) => {
+                if (typeof data === 'function') {
+                    // if the selector returns a callback we have to wrap the setData
+                    // within a function
+                    setData(() => data);
+                } else {
+                    setData(data);
+                }
+            },
+            {
+                fireImmediately: true
             }
-        }, {
-            fireImmediately: true
-        });
+        );
 
         return reactionDisposer;
     }, deps || []);
 
     return data;
 };
-

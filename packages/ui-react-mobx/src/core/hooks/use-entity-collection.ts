@@ -8,12 +8,10 @@ import { useDataSorting } from './use-data-sorting';
 import { useFormData } from './use-form-data';
 import { useDataPaging } from './use-data-paging';
 
-
 /**
  * {@Link useEntityCollection} hook props
  **/
-export type UseEntityCollectionProps<T extends IsEntity> =
-UseEntityCollectionListProps<T> & {
+export type UseEntityCollectionProps<T extends IsEntity> = UseEntityCollectionListProps<T> & {
     /** The collection query parameters state */
     queryParams?: QueryParams;
     filtering?: {
@@ -22,7 +20,7 @@ UseEntityCollectionListProps<T> & {
         /** Default filter name (used for simple search) */
         mainFilter?: string;
         trackFieldsDefinition?: boolean;
-    }
+    };
     /** Fields supported for sorting */
     sortableFields?: DataSortField[];
     /** The data retrieval loading state */
@@ -36,9 +34,11 @@ UseEntityCollectionListProps<T> & {
  * @param props The hook input parameters
  * @return properties to be used as input to a {@Link DataCollectionRenderer}
  */
-export const useEntityCollection: <T extends IsEntity>(props: UseEntityCollectionProps<T>) => DataCollectionProps<T> | undefined =
-<T extends IsEntity>(props: UseEntityCollectionProps<T>) => {
-
+export const useEntityCollection: <T extends IsEntity>(props: UseEntityCollectionProps<T>) => DataCollectionProps<T> | undefined = <
+    T extends IsEntity
+>(
+    props: UseEntityCollectionProps<T>
+) => {
     const { items, actions, selectionManager, queryParams, filtering, sortableFields, loadingState, ...otherItemsParams } = props;
     const pagingProps = useDataPaging(queryParams?.paging);
 
@@ -66,10 +66,12 @@ export const useEntityCollection: <T extends IsEntity>(props: UseEntityCollectio
     }
 
     return {
-        filters: filteringProps ? {
-            ...filteringProps,
-            mainFilter: filtering?.mainFilter
-        } : undefined,
+        filters: filteringProps
+            ? {
+                  ...filteringProps,
+                  mainFilter: filtering?.mainFilter
+              }
+            : undefined,
         sorting: sortingProps,
         paging: pagingProps,
         items: {

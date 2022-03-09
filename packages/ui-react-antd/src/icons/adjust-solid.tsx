@@ -4,6 +4,7 @@ export const SvgAdjustSolid = (props: React.SVGProps<SVGSVGElement>) => (
     <svg
         aria-hidden='true'
         data-icon='adjust'
+        xmlns='http://www.w3.org/2000/svg'
         viewBox='0 0 512 512'
         width='1em'
         height='1em'
@@ -16,6 +17,4 @@ export const SvgAdjustSolid = (props: React.SVGProps<SVGSVGElement>) => (
         />
     </svg>
 );
-export const AdjustSolidIcon = (props: any) => (
-    <Icon component={SvgAdjustSolid} {...props} />
-);
+export const AdjustSolidIcon = (props: any) => <Icon component={SvgAdjustSolid} {...props} />;

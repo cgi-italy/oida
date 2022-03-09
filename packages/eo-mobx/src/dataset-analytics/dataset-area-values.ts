@@ -4,8 +4,18 @@ import { AoiSupportedGeometry, BBoxGeometry, CircleGeometry, LoadingState, Query
 import { AsyncDataFetcher } from '@oidajs/state-mobx';
 
 import {
-    DatasetVariable, DatasetDimension, DataDomain, TimeSearchDirection, NumericDomain, CategoricalDomain,
-    DatasetDimensions, HasDatasetDimensions, DatasetDimensionsProps, ColorMapProps, DistributionHistogramBin, DistributionPercentile
+    DatasetVariable,
+    DatasetDimension,
+    DataDomain,
+    TimeSearchDirection,
+    NumericDomain,
+    CategoricalDomain,
+    DatasetDimensions,
+    HasDatasetDimensions,
+    DatasetDimensionsProps,
+    ColorMapProps,
+    DistributionHistogramBin,
+    DistributionPercentile
 } from '../common';
 import { DatasetProcessing, DatasetProcessingProps } from './dataset-processing';
 
@@ -56,15 +66,14 @@ export type DatasetAreaValuesConfig = {
     dimensions: DatasetDimension<DataDomain<DatasetAreaValuesDimensionType>>[];
 };
 
-
 export type DatasetAreaValuesProps = {
     variable?: string;
     autoUpdate?: boolean;
     dataMask?: Partial<DatasetAreaValuesDataMask>;
-} & DatasetProcessingProps<typeof DATASET_AREA_VALUES_PROCESSING, DatasetAreaValuesConfig> & DatasetDimensionsProps;
+} & DatasetProcessingProps<typeof DATASET_AREA_VALUES_PROCESSING, DatasetAreaValuesConfig> &
+    DatasetDimensionsProps;
 
 export class DatasetAreaValues extends DatasetProcessing<undefined> implements HasDatasetDimensions {
-
     readonly config: DatasetAreaValuesConfig;
     readonly dimensions: DatasetDimensions;
     @observable.ref variable: string | undefined;
@@ -82,9 +91,16 @@ export class DatasetAreaValues extends DatasetProcessing<undefined> implements H
             ...props
         });
 
+        const parentDimensions = (props.parent as HasDatasetDimensions | undefined)?.dimensions;
+
         this.config = props.config;
-        this.dimensions = new DatasetDimensions(props);
+
         this.variable = props.variable;
+        if (!this.variable) {
+            if (parentDimensions?.variable && this.config.variables.find((variable) => variable.id === parentDimensions.variable)) {
+                this.variable = parentDimensions.variable;
+            }
+        }
         this.data = undefined;
         this.autoUpdate = props.autoUpdate !== undefined ? props.autoUpdate : true;
         this.dataMask = props.dataMask || {
@@ -100,6 +116,14 @@ export class DatasetAreaValues extends DatasetProcessing<undefined> implements H
         this.subscriptionTracker_ = new SubscriptionTracker();
         this.needsUpdate_ = true;
 
+        this.dimensions = new DatasetDimensions({
+            dimensionValues: props.dimensionValues || parentDimensions?.values,
+            dataset: props.dataset,
+            currentVariable: () => this.variable,
+            dimensions: props.config.dimensions,
+            initDimensions: true
+        });
+
         makeObservable(this);
 
         this.afterInit_();
@@ -108,7 +132,6 @@ export class DatasetAreaValues extends DatasetProcessing<undefined> implements H
     get loadingState() {
         return this.dataFetcher_.loadingStatus;
     }
-
 
     @action
     setVariable(variable: string | undefined) {
@@ -134,28 +157,33 @@ export class DatasetAreaValues extends DatasetProcessing<undefined> implements H
 
     @computed
     get canRunQuery() {
-        return !!this.aoi?.geometry.value
-        && !!this.variable
-        && this.config.dimensions.every((dim) => {
-            return this.dimensions.values.has(dim.id);
-        });
+        return (
+            !!this.aoi?.geometry.value &&
+            !!this.variable &&
+            this.config.dimensions.every((dim) => {
+                return this.dimensions.values.has(dim.id);
+            })
+        );
     }
 
     retrieveData() {
         if (this.canRunQuery) {
             if (this.needsUpdate_) {
-                this.dataFetcher_.fetchData({
-                    geometry: this.aoi!.geometry.value as (GeoJSON.Polygon | GeoJSON.MultiPolygon | CircleGeometry | BBoxGeometry),
-                    variable: this.variable!,
-                    additionalDatasetFilters: new Map(this.dataset.additionalFilters.items),
-                    dimensionValues: new Map(this.dimensions.values),
-                    dataMask: this.dataMask
-                }).then((data) => {
-                    this.needsUpdate_ = false;
-                    this.setData_(data);
-                }).catch(() => {
-                    this.setData_(undefined);
-                });
+                this.dataFetcher_
+                    .fetchData({
+                        geometry: this.aoi!.geometry.value as GeoJSON.Polygon | GeoJSON.MultiPolygon | CircleGeometry | BBoxGeometry,
+                        variable: this.variable!,
+                        additionalDatasetFilters: new Map(this.dataset.additionalFilters.items),
+                        dimensionValues: new Map(this.dimensions.values),
+                        dataMask: this.dataMask
+                    })
+                    .then((data) => {
+                        this.needsUpdate_ = false;
+                        this.setData_(data);
+                    })
+                    .catch(() => {
+                        this.setData_(undefined);
+                    });
             }
         } else {
             this.loadingState.setValue(LoadingState.Init);
@@ -184,7 +212,6 @@ export class DatasetAreaValues extends DatasetProcessing<undefined> implements H
     }
 
     protected afterInit_() {
-
         if (!this.variable) {
             this.setVariable(this.config.variables[0].id);
         }
@@ -201,11 +228,7 @@ export class DatasetAreaValues extends DatasetProcessing<undefined> implements H
                         //a time range is currently selected. try to find the time nearest to the range end time
                         const timeProvider = this.dataset.config.timeDistribution?.provider;
                         if (timeProvider) {
-                            timeProvider.getNearestItem(
-                                datasetTime.end,
-                                TimeSearchDirection.Backward,
-                                this.dimensions
-                            ).then((dt) => {
+                            timeProvider.getNearestItem(datasetTime.end, TimeSearchDirection.Backward, this.dimensions).then((dt) => {
                                 if (dt) {
                                     this.dimensions.setValue('time', dt.start);
                                 }
@@ -224,14 +247,17 @@ export class DatasetAreaValues extends DatasetProcessing<undefined> implements H
             }
         });
 
-        const updateTrackerDisposer = reaction(() => {
-            return {
-                aoi: this.geometry,
-                dimensions: new Map(this.dimensions.values)
-            };
-        }, () => {
-            this.needsUpdate_ = true;
-        });
+        const updateTrackerDisposer = reaction(
+            () => {
+                return {
+                    aoi: this.geometry,
+                    dimensions: new Map(this.dimensions.values)
+                };
+            },
+            () => {
+                this.needsUpdate_ = true;
+            }
+        );
 
         this.subscriptionTracker_.addSubscription(statsUpdaterDisposer);
         this.subscriptionTracker_.addSubscription(updateTrackerDisposer);
@@ -241,4 +267,3 @@ export class DatasetAreaValues extends DatasetProcessing<undefined> implements H
         return undefined;
     }
 }
-

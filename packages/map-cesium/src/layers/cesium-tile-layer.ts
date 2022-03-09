@@ -8,7 +8,6 @@ import { cesiumTileSourcesFactory } from './tilesources/cesium-tilesources-facto
 import { CesiumMapLayer } from './cesium-map-layer';
 
 export class CesiumTileLayer extends CesiumMapLayer implements ITileLayerRenderer {
-
     protected onTileLoadStart_: (() => void) | undefined;
     protected onTileLoadEnd_: (() => void) | undefined;
     protected extent_: number[] | undefined;
@@ -32,7 +31,6 @@ export class CesiumTileLayer extends CesiumMapLayer implements ITileLayerRendere
     }
 
     updateSource(sourceConfig: TileSource | undefined) {
-
         if (this.source_) {
             this.source_.tileLoadStartEvent.removeEventListener(this.onTileLoadStart_, this);
             this.source_.tileLoadEndEvent.removeEventListener(this.onTileLoadEnd_, this);
@@ -42,23 +40,25 @@ export class CesiumTileLayer extends CesiumMapLayer implements ITileLayerRendere
         this.source_ = undefined;
 
         try {
-            let source = sourceConfig ? cesiumTileSourcesFactory.create(sourceConfig.id, sourceConfig) : undefined;
+            const source = sourceConfig ? cesiumTileSourcesFactory.create(sourceConfig.id, sourceConfig) : undefined;
             if (source) {
-
                 source.tileLoadStartEvent = new Event();
                 source.tileLoadEndEvent = new Event();
 
                 // wrap source requestImage to track tile requests
-                let originalRequestImage = source.requestImage;
-                source.requestImage = function() {
-                    let request = originalRequestImage.apply(this, arguments);
+                const originalRequestImage = source.requestImage;
+                source.requestImage = function (...args) {
+                    const request = originalRequestImage.apply(this, args);
                     if (request) {
                         this.tileLoadStartEvent.raiseEvent();
-                        request.then(() => {
-                            this.tileLoadEndEvent.raiseEvent();
-                        }, () => {
-                            this.tileLoadEndEvent.raiseEvent();
-                        });
+                        request.then(
+                            () => {
+                                this.tileLoadEndEvent.raiseEvent();
+                            },
+                            () => {
+                                this.tileLoadEndEvent.raiseEvent();
+                            }
+                        );
                     }
                     return request;
                 };
@@ -70,7 +70,7 @@ export class CesiumTileLayer extends CesiumMapLayer implements ITileLayerRendere
 
             this.source_ = source;
         } catch (e) {
-
+            // do nothing
         }
 
         this.sourceConfig_ = sourceConfig;
@@ -82,7 +82,7 @@ export class CesiumTileLayer extends CesiumMapLayer implements ITileLayerRendere
         this.updateSource(this.sourceConfig_);
     }
 
-    setExtent(extent) {
+    setExtent(extent: number[] | undefined) {
         this.extent_ = extent;
         if (this.source_) {
             this.imageries_.removeAll(false);
@@ -107,7 +107,7 @@ export class CesiumTileLayer extends CesiumMapLayer implements ITileLayerRendere
     }
 
     protected getLayerOptions_() {
-        let options: any = {};
+        const options: Record<string, any> = {};
         if (this.extent_) {
             options.rectangle = Rectangle.fromDegrees(...this.extent_);
         }
@@ -119,5 +119,4 @@ export class CesiumTileLayer extends CesiumMapLayer implements ITileLayerRendere
         }
         return options;
     }
-
 }

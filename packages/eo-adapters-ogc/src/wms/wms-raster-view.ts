@@ -3,7 +3,12 @@ import { transformExtent } from 'ol/proj';
 
 import { getGeometryExtent, NUMERIC_FIELD_ID, QueryFilter, STRING_FIELD_ID, TileGridConfig, TileSource } from '@oidajs/core';
 import {
-    RasterMapViz, RasterMapVizConfig, RASTER_VIZ_TYPE, RasterBandModeType, RasterBandPreset, RasterBandModePreset,
+    RasterMapViz,
+    RasterMapVizConfig,
+    RASTER_VIZ_TYPE,
+    RasterBandModeType,
+    RasterBandPreset,
+    RasterBandModePreset,
     DatasetSpatialCoverageProvider,
     DatasetMapViewConfig
 } from '@oidajs/eo-mobx';
@@ -15,34 +20,32 @@ export type WmsRasterSourceFiltersSerializer = (filters: QueryFilter[]) => Recor
 
 export type WmsRasterSourceProviderConfig = {
     /** The WMS layer capabilities object */
-    layer: WmsLayer,
+    layer: WmsLayer;
     /** The WMS service URL */
-    wmsServiceUrl: string,
+    wmsServiceUrl: string;
     /** The WMS service version */
-    wmsVersion: string,
+    wmsVersion: string;
     /**
      * The spatial coverage provider. It will be used to initialize the layer source extent
      * If not provided the extent from the capabilities will be used
-    */
-    spatialCoverageProvider?: DatasetSpatialCoverageProvider,
+     */
+    spatialCoverageProvider?: DatasetSpatialCoverageProvider;
     /**
      * This function is used to serialize the {@Link Dataset.additionalFilters} as additional WMS request parameters
      * If not provided by default all string and numeric filters will be serialized as key value pairs
      */
-    additionalFiltersSerializer?: WmsRasterSourceFiltersSerializer,
+    additionalFiltersSerializer?: WmsRasterSourceFiltersSerializer;
     /**
      * The source tile grid options. By default the tile grid is initialized with the extent coming from the spatialCoverageProvider
      */
-    tileGridOptions?: WmsRasterSourceTileGridOptions
+    tileGridOptions?: WmsRasterSourceTileGridOptions;
 };
 
 export const createWmsRasterSourceProvider = (config: WmsRasterSourceProviderConfig) => {
-
     const isTimeless = !config.layer.Dimension?.find((dimension) => dimension.name === 'time');
 
     return (rasterView: RasterMapViz) => {
-
-        let params: Record<string, string> = {
+        const params: Record<string, string> = {
             transparent: 'TRUE',
             format: 'image/png',
             styles: ''
@@ -53,7 +56,7 @@ export const createWmsRasterSourceProvider = (config: WmsRasterSourceProviderCon
         }
 
         if (!isTimeless) {
-            let timeFilter = rasterView.dataset.toi;
+            const timeFilter = rasterView.dataset.toi;
             if (timeFilter) {
                 if (timeFilter instanceof Date) {
                     params.time = timeFilter.toISOString().replace(/\.[^Z]*Z$/, 'Z');
@@ -68,7 +71,7 @@ export const createWmsRasterSourceProvider = (config: WmsRasterSourceProviderCon
             params.styles = bandMode.preset;
         }
 
-        let bbox = config.layer.BoundingBox[0];
+        const bbox = config.layer.BoundingBox[0];
         let extent = Promise.resolve(bbox.extent);
         let crs = bbox.crs;
 
@@ -92,7 +95,6 @@ export const createWmsRasterSourceProvider = (config: WmsRasterSourceProviderCon
         const aoiFilter = rasterView.dataset.aoi;
 
         return extent.then((extent) => {
-
             if (aoiFilter && !aoiFilter.props?.fromMapViewport) {
                 let aoiExtent = getGeometryExtent(aoiFilter.geometry);
                 aoiExtent = transformExtent(aoiExtent, 'EPSG:4326', crs);
@@ -154,12 +156,13 @@ export type WmsLayerRasterViewConfig = WmsRasterSourceProviderConfig & {
 };
 
 export const getWmsLayerRasterView = (config: WmsLayerRasterViewConfig) => {
-
-    let dimensions = config.layer.Dimension;
+    const dimensions = config.layer.Dimension;
     if (dimensions) {
-        dimensions.filter(dimension => dimension.name !== 'time').map((dimension) => {
-            //TODO: map to dataset dimensions
-        });
+        dimensions
+            .filter((dimension) => dimension.name !== 'time')
+            .map((dimension) => {
+                //TODO: map to dataset dimensions
+            });
     }
 
     const presets: RasterBandPreset[] = config.layer.Style?.map((style) => {
@@ -171,21 +174,25 @@ export const getWmsLayerRasterView = (config: WmsLayerRasterViewConfig) => {
             legend: `${style.LegendURL[0].OnlineResource}`,
             ...(config.getPresetFromStyle ? config.getPresetFromStyle(style) : undefined)
         };
-    }) || [{
-        id: 'default',
-        name: 'Default',
-        preview: ''
-    }];
+    }) || [
+        {
+            id: 'default',
+            name: 'Default',
+            preview: ''
+        }
+    ];
 
-    let rasterVizConfig: RasterMapVizConfig = {
+    const rasterVizConfig: RasterMapVizConfig = {
         rasterSourceProvider: createWmsRasterSourceProvider(config),
         bandMode: {
-            supportedModes: [{
-                type: RasterBandModeType.Preset,
-                default: {
-                    preset: presets[0].id
+            supportedModes: [
+                {
+                    type: RasterBandModeType.Preset,
+                    default: {
+                        preset: presets[0].id
+                    }
                 }
-            }],
+            ],
             presets: presets
         }
     };

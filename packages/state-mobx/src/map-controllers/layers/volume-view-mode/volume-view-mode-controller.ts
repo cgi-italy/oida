@@ -2,9 +2,7 @@ import { SubscriptionTracker, IVolumeViewMode } from '@oidajs/core';
 
 import { VolumeViewMode } from '../../../models/map/layers/volume-layer';
 
-export abstract class VolumeViewModeController
-<T extends IVolumeViewMode = IVolumeViewMode, S extends VolumeViewMode = VolumeViewMode> {
-
+export abstract class VolumeViewModeController<T extends IVolumeViewMode = IVolumeViewMode, S extends VolumeViewMode = VolumeViewMode> {
     protected viewModeState_: S;
     protected viewModeImplementation_: T;
     protected subscriptionTracker_: SubscriptionTracker = new SubscriptionTracker();
@@ -22,10 +20,10 @@ export abstract class VolumeViewModeController
     }
 
     protected bindToViewModeState_() {
+        return;
     }
 
     protected unbindFromViewModeState_() {
         this.subscriptionTracker_.unsubscribe();
     }
-
 }

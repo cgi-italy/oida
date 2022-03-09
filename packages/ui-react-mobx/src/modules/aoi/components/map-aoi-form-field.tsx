@@ -16,7 +16,6 @@ export type MapAoiFormFieldProps = AoiFieldFactoryProps & {
 };
 
 export const MapAoiFormField = (props: MapAoiFormFieldProps) => {
-
     const aoi = useLocalObservable(() => ({
         value: props.value,
         setValue(value) {
@@ -51,10 +50,17 @@ export const MapAoiFormField = (props: MapAoiFormFieldProps) => {
 
     const aoiValue = useSelector(() => aoi.value);
 
-    return <AoiField value={aoiValue} onChange={(value) => {
-        aoi.setValue(value);
-        if (props.onChange) {
-            props.onChange(value);
-        }
-    }} {...aoiFieldConfig} {...props.rendererConfig?.props}/>;
+    return (
+        <AoiField
+            value={aoiValue}
+            onChange={(value) => {
+                aoi.setValue(value);
+                if (props.onChange) {
+                    props.onChange(value);
+                }
+            }}
+            {...aoiFieldConfig}
+            {...props.rendererConfig?.props}
+        />
+    );
 };

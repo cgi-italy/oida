@@ -4,7 +4,7 @@ import { VolumeSourceConfig, VolumeTileKey, VolumeSliceData } from '@oidajs/core
 
 export type CesiumVolumeSlice = {
     z: number;
-    data: VolumeSliceData
+    data: VolumeSliceData;
 };
 
 export type CesiumVolumeSourceConfig = {
@@ -13,7 +13,6 @@ export type CesiumVolumeSourceConfig = {
 } & VolumeSourceConfig;
 
 export class CesiumVolumeSource {
-
     protected config_: CesiumVolumeSourceConfig;
 
     constructor(config: CesiumVolumeSourceConfig) {
@@ -25,22 +24,23 @@ export class CesiumVolumeSource {
     }
 
     loadTileData(key: VolumeTileKey, onSliceReady: (slice: CesiumVolumeSlice) => void) {
-
         const sliceLoader = this.config_.tileSliceLoader;
-        const {onSliceLoadStart, onSliceLoadEnd} = this.config_;
+        const { onSliceLoadStart, onSliceLoadEnd } = this.config_;
 
-        let tileExtent = this.getTileExtentForKey(key);
-        let slices = this.config_.tileSliceUrls(key, tileExtent);
+        const tileExtent = this.getTileExtentForKey(key);
+        const slices = this.config_.tileSliceUrls(key, tileExtent);
         setTimeout(() => {
             slices.forEach((slice) => {
                 // assume that the source provide image data
                 if (!sliceLoader) {
-                    Resource.createIfNeeded(slice.url).fetchImage().then(image => {
-                        onSliceReady({
-                            z: slice.z,
-                            data: image
+                    Resource.createIfNeeded(slice.url)
+                        .fetchImage()
+                        .then((image) => {
+                            onSliceReady({
+                                z: slice.z,
+                                data: image
+                            });
                         });
-                    });
                 } else {
                     let resource: Resource;
 
@@ -58,26 +58,32 @@ export class CesiumVolumeSource {
                     if (onSliceLoadStart) {
                         onSliceLoadStart();
                     }
-                    resource.then(sliceData => {
-                        sliceLoader(slice, sliceData).then(textureData => {
-                            onSliceReady({
-                                z: slice.z,
-                                data: textureData
-                            });
+                    resource.then(
+                        (sliceData) => {
+                            sliceLoader(slice, sliceData).then(
+                                (textureData) => {
+                                    onSliceReady({
+                                        z: slice.z,
+                                        data: textureData
+                                    });
 
+                                    if (onSliceLoadEnd) {
+                                        onSliceLoadEnd();
+                                    }
+                                },
+                                () => {
+                                    if (onSliceLoadEnd) {
+                                        onSliceLoadEnd();
+                                    }
+                                }
+                            );
+                        },
+                        () => {
                             if (onSliceLoadEnd) {
                                 onSliceLoadEnd();
                             }
-                        }, () => {
-                            if (onSliceLoadEnd) {
-                                onSliceLoadEnd();
-                            }
-                        });
-                    }, () => {
-                        if (onSliceLoadEnd) {
-                            onSliceLoadEnd();
                         }
-                    });
+                    );
                 }
             });
         }, 0);
@@ -86,15 +92,14 @@ export class CesiumVolumeSource {
     }
 
     getTileExtentForKey(key: VolumeTileKey, normalized?: boolean) {
+        const tileGrid = this.config_.tileGrid;
+        const tileSize = this.getTileSizeForLevel_(key.level);
 
-        let tileGrid = this.config_.tileGrid;
-        let tileSize = this.getTileSizeForLevel_(key.level);
+        const minX = tileGrid.extent.minX + key.x * tileSize.sizeX;
+        const minY = tileGrid.extent.minY + key.y * tileSize.sizeY;
+        const minZ = tileGrid.extent.minZ + key.z * tileSize.sizeZ;
 
-        let minX = tileGrid.extent.minX + key.x * tileSize.sizeX;
-        let minY = tileGrid.extent.minY + key.y * tileSize.sizeY;
-        let minZ = tileGrid.extent.minZ + key.z * tileSize.sizeZ;
-
-        let tileExtent =  {
+        const tileExtent = {
             minX: minX,
             minY: minY,
             minZ: minZ,
@@ -104,10 +109,10 @@ export class CesiumVolumeSource {
         };
 
         if (normalized) {
-            let size = {
-                x: (tileGrid.extent.maxX - tileGrid.extent.minX),
-                y: (tileGrid.extent.maxY - tileGrid.extent.minY),
-                z: (tileGrid.extent.maxZ - tileGrid.extent.minZ)
+            const size = {
+                x: tileGrid.extent.maxX - tileGrid.extent.minX,
+                y: tileGrid.extent.maxY - tileGrid.extent.minY,
+                z: tileGrid.extent.maxZ - tileGrid.extent.minZ
             };
             tileExtent.minX = (tileExtent.minX - tileGrid.extent.minX) / size.x;
             tileExtent.maxX = (tileExtent.maxX - tileGrid.extent.minX) / size.x;
@@ -121,11 +126,10 @@ export class CesiumVolumeSource {
     }
 
     private getTileSizeForLevel_(level: number) {
+        const tileGrid = this.config_.tileGrid;
 
-        let tileGrid = this.config_.tileGrid;
-
-        let levelFactor = Math.pow(2, level);
-        let sizeFactor = tileGrid.numRootTiles.map(numTiles => levelFactor * numTiles);
+        const levelFactor = Math.pow(2, level);
+        const sizeFactor = tileGrid.numRootTiles.map((numTiles) => levelFactor * numTiles);
 
         return {
             sizeX: (tileGrid.extent.maxX - tileGrid.extent.minX) / sizeFactor[0],

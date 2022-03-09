@@ -10,16 +10,16 @@ import { DownOutlined } from '@ant-design/icons';
 //TODO: move chart export code out of here
 
 export type ChartWidgetProps = {
-    options: echarts.EChartOption,
-    isLoading?: boolean,
+    options: echarts.EChartOption;
+    isLoading?: boolean;
     showTip?: {
-        x?: number,
-        y?: number,
-        position?: Array<number>| string | Function
-        seriesIndex?: number,
-        dataIndex?: number,
-        name?: string,
-    },
+        x?: number;
+        y?: number;
+        position?: echarts.EChartOption.Tooltip.Position.Type;
+        seriesIndex?: number;
+        dataIndex?: number;
+        name?: string;
+    };
     highlightedSeries?: number;
     brushMode?: 'none' | 'rect' | 'polygon' | 'lineX' | 'lineY';
     onBrushEnd?: (evt) => void;
@@ -30,20 +30,19 @@ export type ChartWidgetProps = {
     onItemClick?: (evt) => void;
     onHighlight?: (evt, highlighted?: boolean) => void;
     onLegendItemSelection?: (evt) => void;
-    onSizeChange?: (size: {width: number, height: number}) => void;
+    onSizeChange?: (size: { width: number; height: number }) => void;
 };
 
 export const ChartWidget = (props: ChartWidgetProps) => {
-
     const [resizeListener, size] = useResizeAware();
 
-    let chartContainer = useRef<HTMLDivElement>(null);
+    const chartContainer = useRef<HTMLDivElement>(null);
 
-    let [chart, setChart] = useState<echarts.ECharts>();
+    const [chart, setChart] = useState<echarts.ECharts>();
 
     useEffect(() => {
         if (chartContainer.current) {
-            let chartInstance = echarts.init(chartContainer.current, 'dark');
+            const chartInstance = echarts.init(chartContainer.current, 'dark');
             setChart(chartInstance);
 
             return () => {
@@ -53,7 +52,6 @@ export const ChartWidget = (props: ChartWidgetProps) => {
     }, [chartContainer]);
 
     useEffect(() => {
-
         const onHighlight = props.onHighlight;
         const chartInstance = chart;
 
@@ -75,7 +73,6 @@ export const ChartWidget = (props: ChartWidgetProps) => {
     }, [chart, props.onHighlight]);
 
     useEffect(() => {
-
         const onItemClick = props.onItemClick;
         const chartInstance = chart;
 
@@ -94,10 +91,10 @@ export const ChartWidget = (props: ChartWidgetProps) => {
                 let yAxis = props.options.yAxis;
                 // automatically set the number of split lines (parallel to xAxis) based on the chart height
                 if (Array.isArray(props.options.yAxis)) {
-                    yAxis = props.options.yAxis.map(axisConfig => {
+                    yAxis = props.options.yAxis.map((axisConfig) => {
                         return {
                             ...axisConfig,
-                            splitNumber: Math.floor(size.height / 80)
+                            splitNumber: Math.floor((size.height || 0) / 80)
                         };
                     });
                 }
@@ -113,11 +110,15 @@ export const ChartWidget = (props: ChartWidgetProps) => {
                         };
                     });
                 }
-                chart.setOption({
-                    ...props.options,
-                    yAxis,
-                    dataZoom
-                }, true, false);
+                chart.setOption(
+                    {
+                        ...props.options,
+                        yAxis,
+                        dataZoom
+                    },
+                    true,
+                    false
+                );
             }
             // reapply brush state
             if (props.brushMode && props.brushMode !== 'none') {
@@ -143,17 +144,24 @@ export const ChartWidget = (props: ChartWidgetProps) => {
         if (chart) {
             chart.resize();
             if (props.options && Array.isArray(props.options.yAxis)) {
-                chart.setOption({
-                    yAxis: props.options.yAxis.map(axisConfig => {
-                        return {
-                            ...axisConfig,
-                            splitNumber: Math.floor(size.height / 80)
-                        };
-                    })
-                }, false, true);
+                chart.setOption(
+                    {
+                        yAxis: props.options.yAxis.map((axisConfig) => {
+                            return {
+                                ...axisConfig,
+                                splitNumber: Math.floor((size.height || 0) / 80)
+                            };
+                        })
+                    },
+                    false,
+                    true
+                );
             }
             if (props.onSizeChange) {
-                props.onSizeChange(size);
+                props.onSizeChange({
+                    width: size.width || 0,
+                    height: size.height || 0
+                });
             }
         }
     }, [size]);
@@ -229,14 +237,13 @@ export const ChartWidget = (props: ChartWidgetProps) => {
                 chart.dispatchAction({
                     type: 'brush',
                     command: 'clear',
-                    areas: [],
+                    areas: []
                 });
             }
         }
     }, [chart, props.brushMode]);
 
     useEffect(() => {
-
         const onBrushSelected = props.onBrushEnd;
         const chartInstance = chart;
 
@@ -259,7 +266,6 @@ export const ChartWidget = (props: ChartWidgetProps) => {
     }, [chart, props.brushArea]);
 
     useEffect(() => {
-
         const onDataZoom = props.onDataZoom;
         const chartInstance = chart;
 
@@ -272,7 +278,6 @@ export const ChartWidget = (props: ChartWidgetProps) => {
     }, [chart, props.onDataZoom]);
 
     useEffect(() => {
-
         const onLegendItemSelection = props.onLegendItemSelection;
         const chartInstance = chart;
 
@@ -284,68 +289,67 @@ export const ChartWidget = (props: ChartWidgetProps) => {
         }
     }, [chart, props.onLegendItemSelection]);
 
-
     return (
         <React.Fragment>
-            <div className='chart'
-                onMouseEnter={props.onMouseEnter}
-                onMouseLeave={props.onMouseLeave}
-            >
+            <div className='chart' onMouseEnter={props.onMouseEnter} onMouseLeave={props.onMouseLeave}>
                 {resizeListener}
-                <div style={{width: '100%', height: '100%'}}
-                    ref={chartContainer}
-                >
-                </div>
-
+                <div style={{ width: '100%', height: '100%' }} ref={chartContainer}></div>
             </div>
             <div className='chart-ops'>
-                <Dropdown overlay={
-                    <Menu>
-                        <Menu.Item>
-                            <a onClick={(evt) => {
-                                if (chart) {
-                                    let img = chart.getDataURL({
-                                        type: 'png'
-                                    });
-                                    download(img, 'chart.png', 'image/png');
-                                }
-                            }}>PNG</a>
-                        </Menu.Item>
-                        <Menu.Item>
-                            <a onClick={(evt) => {
-                                if (chartContainer.current) {
+                <Dropdown
+                    overlay={
+                        <Menu>
+                            <Menu.Item>
+                                <a
+                                    onClick={(evt) => {
+                                        if (chart) {
+                                            const img = chart.getDataURL({
+                                                type: 'png'
+                                            });
+                                            download(img, 'chart.png', 'image/png');
+                                        }
+                                    }}
+                                >
+                                    PNG
+                                </a>
+                            </Menu.Item>
+                            <Menu.Item>
+                                <a
+                                    onClick={(evt) => {
+                                        if (chartContainer.current) {
+                                            let csvData;
+                                            const series: EChartOption.SeriesLine | undefined = props.options.series
+                                                ? (props.options.series[0] as EChartOption.SeriesLine)
+                                                : undefined;
 
-                                    let csvData;
-                                    let series: EChartOption.SeriesLine | undefined = props.options.series
-                                        ? props.options.series[0] as EChartOption.SeriesLine
-                                        : undefined;
+                                            if (series) {
+                                                const xAxis = props.options.xAxis![series.xAxisIndex || 0];
 
-                                    if (series) {
-                                        let xAxis = props.options.xAxis![series.xAxisIndex || 0];
+                                                csvData = `${xAxis.name},${series.name}\n`;
 
-                                        csvData = `${xAxis.name},${series.name}\n`;
+                                                const csvLines = (series.data as number[]).map((item) => {
+                                                    if (item[0] instanceof Date) {
+                                                        return `${item[0].toISOString()},${item[1]}`;
+                                                    } else {
+                                                        return `${item[0]},${item[1]}`;
+                                                    }
+                                                });
 
-                                        let csvLines = (series.data as number[]).map((item) => {
-                                            if (item[0] instanceof Date) {
-                                                return `${item[0].toISOString()},${item[1]}`;
-                                            } else {
-                                                return `${item[0]},${item[1]}`;
+                                                csvData += csvLines.join('\n');
+
+                                                download(csvData, 'chart.csv', 'text/csv');
                                             }
-                                        });
-
-                                        csvData += csvLines.join('\n');
-
-                                        download(csvData, 'chart.csv', 'text/csv');
-                                    }
-                                }
-
-                            }}>CSV</a>
-                        </Menu.Item>
-                    </Menu>
-                }
+                                        }
+                                    }}
+                                >
+                                    CSV
+                                </a>
+                            </Menu.Item>
+                        </Menu>
+                    }
                 >
                     <a className='ant-dropdown-link'>
-                        Export <DownOutlined/>
+                        Export <DownOutlined />
                     </a>
                 </Dropdown>
             </div>

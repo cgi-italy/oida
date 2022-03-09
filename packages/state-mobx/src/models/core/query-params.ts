@@ -2,8 +2,7 @@ import { makeObservable, observable, action, computed, reaction, ObservableMap }
 
 import { SortOrder, QueryFilter, QueryParams as QueryCriteria } from '@oidajs/core';
 
-
-export type FilterTypeReaction =  (filters: DataFilters, key: string) => (() => void);
+export type FilterTypeReaction = (filters: DataFilters, key: string) => () => void;
 
 const filterTypeReactions: Record<string, FilterTypeReaction> = {};
 
@@ -14,9 +13,8 @@ export const setReactionForFilterType = (type: string, reaction: FilterTypeReact
 /** {@Link DataFilters} props */
 export type DataFiltersProps<FILTER extends QueryFilter = any> = {
     /** The initial filter values */
-    values?: Record<string, FILTER>
+    values?: Record<string, FILTER>;
 };
-
 
 type FindByKey<Union, Key> = Union extends { key: Key } ? Union : never;
 
@@ -53,8 +51,7 @@ export class DataFilters<FILTERS extends QueryFilter = any> {
     protected reactionsDisposer_: Record<string, () => void>;
 
     constructor(props?: DataFiltersProps<FILTERS>) {
-
-        this.items =  observable.map(props?.values || {}, {
+        this.items = observable.map(props?.values || {}, {
             deep: false
         });
 
@@ -87,7 +84,7 @@ export class DataFilters<FILTERS extends QueryFilter = any> {
     @action
     clear() {
         this.items.clear();
-        Object.values(this.reactionsDisposer_).forEach(disposer => disposer());
+        Object.values(this.reactionsDisposer_).forEach((disposer) => disposer());
         this.reactionsDisposer_ = {};
     }
 
@@ -107,8 +104,8 @@ export class DataFilters<FILTERS extends QueryFilter = any> {
 
 /** {@Linki DataSorting} props */
 export type DataSortingProps = {
-    key: string,
-    order?: SortOrder
+    key: string;
+    order?: SortOrder;
 };
 
 /** A class to manage the sorting state of a collection */
@@ -117,7 +114,6 @@ export class DataSorting {
     @observable order: SortOrder;
 
     constructor(props?: DataSortingProps) {
-
         this.key = props?.key;
         this.order = props?.order || SortOrder.Ascending;
 
@@ -125,7 +121,7 @@ export class DataSorting {
     }
 
     @action
-    sortBy(params: {key?: string, order?: SortOrder}) {
+    sortBy(params: { key?: string; order?: SortOrder }) {
         if (params.key) {
             this.key = params.key;
         }
@@ -157,7 +153,6 @@ export class DataPaging {
     @observable total: number;
 
     constructor(props?: DataPagingProps) {
-
         this.page = props?.page || 0;
         this.pageSize = props?.pageSize || 20;
         this.total = props?.total || 0;
@@ -228,9 +223,9 @@ export class DataPaging {
 
 /** {@Link QueryParam} props */
 export type QueryParamsProps<FILTERS extends QueryFilter = any> = {
-    filters?: DataFilters<FILTERS> | DataFiltersProps<FILTERS>,
-    paging?: DataPaging | DataPagingProps,
-    sorting?: DataSorting | DataSortingProps,
+    filters?: DataFilters<FILTERS> | DataFiltersProps<FILTERS>;
+    paging?: DataPaging | DataPagingProps;
+    sorting?: DataSorting | DataSortingProps;
 };
 
 /**
@@ -275,10 +270,12 @@ export class QueryParams<FILTERS extends QueryFilter = any> {
                 offset: this.paging.offset
             },
             filters: this.filters.asArray(),
-            sortBy: this.sorting.key ? {
-                key: this.sorting.key,
-                order: this.sorting.order
-            } : undefined
+            sortBy: this.sorting.key
+                ? {
+                      key: this.sorting.key,
+                      order: this.sorting.order
+                  }
+                : undefined
         };
     }
 
@@ -290,8 +287,11 @@ export class QueryParams<FILTERS extends QueryFilter = any> {
     }
 
     protected afterInit_() {
-        reaction(() => this.filters.asArray(), () => {
-            this.paging.setPage(0);
-        });
+        reaction(
+            () => this.filters.asArray(),
+            () => {
+                this.paging.setPage(0);
+            }
+        );
     }
 }

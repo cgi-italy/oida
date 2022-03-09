@@ -11,9 +11,7 @@ import { DatasetAnalysisWidgetFactory, DatasetAnalysisWidgetFactoryConfig } from
 import { DatasetAreaSeriesPrcessingFilters } from './dataset-area-series-processing-filters';
 import { DatasetAreaSeriesProcessingChart } from './dataset-area-series-processing-chart';
 
-
 export const DatasetAreaSeriesAnalysisWidget = (props: DatasetAnalysisWidgetFactoryConfig) => {
-
     const [filtersVisible, setFiltersVisible] = useState(true);
 
     const getSeries = () => {
@@ -27,8 +25,7 @@ export const DatasetAreaSeriesAnalysisWidget = (props: DatasetAnalysisWidgetFact
         return getSeries();
     });
 
-    let seriesFilters = useSelector(() => {
-
+    const seriesFilters = useSelector(() => {
         const series = getSeries();
         if (!series) {
             return null;
@@ -36,8 +33,8 @@ export const DatasetAreaSeriesAnalysisWidget = (props: DatasetAnalysisWidgetFact
 
         series.setAutoUpdate(false);
 
-        const avaialbleDatasetItems = props.datasetExplorerItems.filter(item => {
-            return item.dataset.config.tools?.find(tool => tool.type === DATASET_AREA_SERIES_PROCESSING);
+        const avaialbleDatasetItems = props.datasetExplorerItems.filter((item) => {
+            return item.dataset.config.tools?.find((tool) => tool.type === DATASET_AREA_SERIES_PROCESSING);
         });
 
         return (
@@ -46,16 +43,16 @@ export const DatasetAreaSeriesAnalysisWidget = (props: DatasetAnalysisWidgetFact
                     <Form.Item label='Dataset'>
                         <DatasetSelector
                             value={series.dataset.id}
-                            datasets={avaialbleDatasetItems.map(item => item.dataset.config)}
+                            datasets={avaialbleDatasetItems.map((item) => item.dataset.config)}
                             onChange={(value) => {
                                 const aoi = series.aoi;
                                 props.combinedAnalysis.removeProcessing(series);
                                 if (value) {
-                                    let item = avaialbleDatasetItems.find(item => item.dataset.id === value);
+                                    const item = avaialbleDatasetItems.find((item) => item.dataset.id === value);
 
                                     if (item) {
                                         const tool = item.dataset.config!.tools!.find(
-                                            tool => tool.type === DATASET_AREA_SERIES_PROCESSING
+                                            (tool) => tool.type === DATASET_AREA_SERIES_PROCESSING
                                         );
 
                                         const areaSeries = new DatasetAreaSeries({
@@ -78,10 +75,7 @@ export const DatasetAreaSeriesAnalysisWidget = (props: DatasetAnalysisWidgetFact
                             }}
                         />
                     </Form.Item>
-                    <DatasetAreaSeriesPrcessingFilters
-                        series={series}
-                    />
-
+                    <DatasetAreaSeriesPrcessingFilters series={series} />
                 </Form>
             </div>
         );
@@ -96,11 +90,9 @@ export const DatasetAreaSeriesAnalysisWidget = (props: DatasetAnalysisWidgetFact
 
     return (
         <div className='dataset-dimension-raster-sequence dataset-chart'>
-            {filtersVisible &&
+            {filtersVisible && (
                 <div className='dataset-chart-form'>
-                    <div className='dataset-chart-filters'>
-                        {seriesFilters}
-                    </div>
+                    <div className='dataset-chart-filters'>{seriesFilters}</div>
                     <Button
                         className='dataset-chart-search-btn'
                         type='primary'
@@ -108,22 +100,26 @@ export const DatasetAreaSeriesAnalysisWidget = (props: DatasetAnalysisWidgetFact
                             const series = getSeries();
                             series?.retrieveData().then(() => {
                                 if (series.data.length) {
-                                    const minmax = series.data.reduce((minmax, item) => {
-                                        const min = typeof(item.data.stats?.min) === 'number' ? item.data.stats.min : Number.MAX_VALUE;
-                                        const max = typeof(item.data.stats?.max) === 'number' ? item.data.stats.max : -Number.MAX_VALUE;
-                                        return [
-                                            Math.min(min, minmax[0]),
-                                            Math.max(max, minmax[1])
-                                        ];
-                                    }, [Number.MAX_VALUE, -Number.MAX_VALUE]);
+                                    const minmax = series.data.reduce(
+                                        (minmax, item) => {
+                                            const min = typeof item.data.stats?.min === 'number' ? item.data.stats.min : Number.MAX_VALUE;
+                                            const max = typeof item.data.stats?.max === 'number' ? item.data.stats.max : -Number.MAX_VALUE;
+                                            return [Math.min(min, minmax[0]), Math.max(max, minmax[1])];
+                                        },
+                                        [Number.MAX_VALUE, -Number.MAX_VALUE]
+                                    );
 
                                     const dataRange = {
-                                        min: parseFloat(formatNumber(minmax[0], {
-                                            precision: 3
-                                        })),
-                                        max: parseFloat(formatNumber(minmax[1], {
-                                            precision: 3
-                                        }))
+                                        min: parseFloat(
+                                            formatNumber(minmax[0], {
+                                                precision: 3
+                                            })
+                                        ),
+                                        max: parseFloat(
+                                            formatNumber(minmax[1], {
+                                                precision: 3
+                                            })
+                                        )
                                     };
                                     setDataRange(dataRange);
                                     series.colorMap?.domain?.setRange(dataRange);
@@ -136,8 +132,8 @@ export const DatasetAreaSeriesAnalysisWidget = (props: DatasetAnalysisWidgetFact
                         Apply
                     </Button>
                 </div>
-            }
-            {!filtersVisible &&
+            )}
+            {!filtersVisible && (
                 <div className='dataset-chart-result'>
                     <Button
                         className='dataset-chart-modify-params-btn'
@@ -152,18 +148,13 @@ export const DatasetAreaSeriesAnalysisWidget = (props: DatasetAnalysisWidgetFact
                     >
                         Modify parameters
                     </Button>
-                    {series &&
-                        <DatasetAreaSeriesProcessingChart
-                            series={series}
-                            dataRange={dataRange}
-                        />
-                    }
+                    {series && <DatasetAreaSeriesProcessingChart series={series} dataRange={dataRange} />}
                 </div>
-            }
+            )}
         </div>
     );
 };
 
 DatasetAnalysisWidgetFactory.register(DATASET_AREA_SERIES_PROCESSING, (config: DatasetAnalysisWidgetFactoryConfig) => {
-    return <DatasetAreaSeriesAnalysisWidget {...config}/>;
+    return <DatasetAreaSeriesAnalysisWidget {...config} />;
 });

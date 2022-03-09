@@ -1,7 +1,7 @@
 import debounce from 'lodash/debounce';
 
-import { AxiosInstanceWithCancellation, DateRangeValue } from '@oidajs/core';
-import { DatasetVerticalProfileViz, VerticalProfileItemProps, RasterBandModeSingle } from  '@oidajs/eo-mobx';
+import { AxiosInstanceWithCancellation } from '@oidajs/core';
+import { DatasetVerticalProfileViz, VerticalProfileItemProps, RasterBandModeSingle } from '@oidajs/eo-mobx';
 
 import { createGeoTiffLoader } from '../../utils';
 import { AdamDatasetConfig, AdamDatasetSingleBandCoverage, isMultiBandCoverage } from '../../adam-dataset-config';
@@ -13,8 +13,7 @@ export const createVerticalProfileDataProvider = (
     datasetConfig: AdamDatasetConfig,
     axiosInstance: AxiosInstanceWithCancellation
 ) => {
-
-    let geotiffLoader = createGeoTiffLoader({
+    const geotiffLoader = createGeoTiffLoader({
         axiosInstance,
         rotateImage: true
     });
@@ -25,7 +24,7 @@ export const createVerticalProfileDataProvider = (
         variables.push(...datasetConfig.coverages);
     }
 
-    let wcsVerticalProfileProvider = new AdamWcsVerticalProfileDataProvider({
+    const wcsVerticalProfileProvider = new AdamWcsVerticalProfileDataProvider({
         serviceUrl: factoryConfig.wcsServiceUrl,
         axiosInstance: axiosInstance,
         variables: variables
@@ -37,41 +36,49 @@ export const createVerticalProfileDataProvider = (
     const swap = datasetConfig.id === 'earthcare_atlid';
 
     const debouncedProfileGetter = debounce((variable, timeFilter, resolve, reject) => {
-        wcsVerticalProfileProvider.getProfiles({
-            variable,
-            timeFilter
-        }).then((profiles) => {
-            Promise.all(
-                profiles.map(profile => {
-                    return geotiffLoader.load({url: profile.dataUrl}, swap).then(imageData => {
-                        let verticalProfile = {
-                            id: profile.id,
-                            geometry: {
-                                bottomCoords: profile.track,
-                                height: profile.metadata.VERTICAL_MAX,
-                                minHeight: 0
-                            },
-                            style: {
-                                fillImage: imageData as string
-                            }
-                        };
-                        return verticalProfile;
-                    });
-                })
-            ).then((profiles) => {
-                resolve(profiles);
-            }, (error) => {
-                reject(error);
-            });
-        }, (error) => {
-            reject(error);
-        });
+        wcsVerticalProfileProvider
+            .getProfiles({
+                variable,
+                timeFilter
+            })
+            .then(
+                (profiles) => {
+                    Promise.all(
+                        profiles.map((profile) => {
+                            return geotiffLoader.load({ url: profile.dataUrl }, swap).then((imageData) => {
+                                const verticalProfile = {
+                                    id: profile.id,
+                                    geometry: {
+                                        bottomCoords: profile.track,
+                                        height: profile.metadata.VERTICAL_MAX,
+                                        minHeight: 0
+                                    },
+                                    style: {
+                                        fillImage: imageData as string
+                                    }
+                                };
+                                return verticalProfile;
+                            });
+                        })
+                    ).then(
+                        (profiles) => {
+                            resolve(profiles);
+                        },
+                        (error) => {
+                            reject(error);
+                        }
+                    );
+                },
+                (error) => {
+                    reject(error);
+                }
+            );
     }, 10);
 
     const load = (vProfileViz: DatasetVerticalProfileViz) => {
         const bandMode = vProfileViz.bandMode.value;
         if (bandMode instanceof RasterBandModeSingle) {
-            let timeFilter = !datasetConfig.timeless ?  vProfileViz.dataset.toi : undefined;
+            const timeFilter = !datasetConfig.fixedTime ? vProfileViz.dataset.toi : undefined;
             return new Promise<VerticalProfileItemProps[]>((resolve, reject) => {
                 debouncedProfileGetter(bandMode.band, timeFilter, resolve, reject);
             });
@@ -83,13 +90,15 @@ export const createVerticalProfileDataProvider = (
     const verticalProfileProvider = {
         getProfiles: load,
         getProfileData: (profileId: string) => {
-            return wcsVerticalProfileProvider.getProfileDataUrl({
-                profileId: profileId
-            }).then((dataUrl) => {
-                return geotiffLoader.load({url: dataUrl}, swap).then(imageData => {
-                    return imageData as string;
+            return wcsVerticalProfileProvider
+                .getProfileDataUrl({
+                    profileId: profileId
+                })
+                .then((dataUrl) => {
+                    return geotiffLoader.load({ url: dataUrl }, swap).then((imageData) => {
+                        return imageData as string;
+                    });
                 });
-            });
         }
     };
 

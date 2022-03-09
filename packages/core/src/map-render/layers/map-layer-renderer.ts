@@ -5,7 +5,7 @@ export type MapLayerRendererConfig = {
     zIndex?: number;
     visible?: boolean;
     opacity?: number;
-    extent: number[] | undefined
+    extent: number[] | undefined;
 };
 
 export interface IMapLayerRenderer {
@@ -16,6 +16,4 @@ export interface IMapLayerRenderer {
     destroy(): void;
 }
 
-export interface IMapLayerRendererConfigDefinitions {
-
-}
+export interface IMapLayerRendererConfigDefinitions {}

@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.0.2](https://github.com/cgi-italy/oida/compare/@oidajs/state-mobx@2.0.1...@oidajs/state-mobx@2.0.2) (2022-03-09)
+
+
+### Bug Fixes
+
+* add some checks in ArrayTracker item add/removal ([17e252a](https://github.com/cgi-italy/oida/commit/17e252ac1fa0ff3ef4fed23a8b9e9d8200b9d526))
+
+
+
+
+
+## [2.0.1](https://github.com/cgi-italy/oida/compare/@oidajs/state-mobx@2.0.0...@oidajs/state-mobx@2.0.1) (2021-12-21)
+
+**Note:** Version bump only for package @oidajs/state-mobx
+
+
+
+
+
+
 # 2.0.0 (2021-12-21)
 
 

@@ -4,14 +4,6 @@ import { DataFiltererProps } from '@oidajs/ui-react-core';
 
 import { DataForm } from '../form';
 
-
 export const DataFilterer = (props: DataFiltererProps) => {
-
-    return (
-        <DataForm
-            className='antd-data-filterer'
-            {...props}
-        />
-    );
-
+    return <DataForm className='antd-data-filterer' {...props} />;
 };
