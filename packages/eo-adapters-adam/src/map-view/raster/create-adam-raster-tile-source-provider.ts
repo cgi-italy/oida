@@ -121,6 +121,9 @@ export const createAdamRasterTileSourceProvider = (
         const aoi = rasterView.dataset.aoi;
 
         return spatialCoverageProvider(rasterView, true).then((coverageExtent) => {
+            if (!coverageExtent) {
+                return Promise.reject(new Error('Error retrieving coverage data'));
+            }
             const aoiParams = getAoiWcsParams(datasetConfig, aoi, coverageExtent);
 
             if (!aoiParams) {

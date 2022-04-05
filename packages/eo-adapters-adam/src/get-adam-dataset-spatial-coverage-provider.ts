@@ -99,10 +99,13 @@ export const getAdamDatasetSpatialCoverageProvider = (
     return ((mapView: DatasetViz<any>, keepDatasetSrs?: boolean) => {
         if (mapView instanceof RasterMapViz) {
             if (datasetConfig.minZoomLevel || datasetConfig.aoiRequired) {
-                //coarse zoom levels are probably too slow to retrieve. use extent from coverage definition
+                // typically this is set when coarse zoom levels are too slow to retrieve (e.g. hundreds of images are involved).
+                // use the extent from the coverage definition in this case
                 return Promise.resolve(keepDatasetSrs ? datasetConfig.coverageExtent : geogCoverageExtent);
             }
 
+            // the coverage extent defined in the metadata doesn't consider the filters set on the visualization (e.g. time or scene)
+            // use a small GetCoverage, without spatial subsetting, to extract the extent information from the tiff metadata
             const wcsParams: any = {
                 service: 'WCS',
                 request: 'GetCoverage',
@@ -162,7 +165,19 @@ export const getAdamDatasetSpatialCoverageProvider = (
                                                 extent.bbox = getIntersection(extent.bbox, geogCoverageExtent.bbox);
                                             }
                                         } else {
-                                            if (datasetConfig.coverageExtent && datasetConfig.coverageExtent.srs === extent.srs) {
+                                            if (datasetConfig.coverageExtent) {
+                                                // when the coverage includes images in different srs, the output of the
+                                                // GetCoverage can be in any of them, but the subset should be specified in the global
+                                                // coverage srs (typically EPSG:4326). So we force the extent to be in the
+                                                // configured srs.
+                                                if (datasetConfig.coverageExtent.srs !== extent.srs) {
+                                                    extent.bbox = transformExtent(
+                                                        extent.bbox,
+                                                        extent.srs,
+                                                        datasetConfig.coverageExtent.srs
+                                                    );
+                                                    extent.srs = datasetConfig.coverageExtent.srs;
+                                                }
                                                 extent.bbox = getIntersection(extent.bbox, datasetConfig.coverageExtent.bbox);
                                             }
                                         }
