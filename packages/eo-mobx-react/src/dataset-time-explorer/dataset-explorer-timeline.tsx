@@ -9,7 +9,7 @@ import moment from 'moment';
 import { Button, Tooltip } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 
-import { AOI_FIELD_ID, DateRangeValue } from '@oidajs/core';
+import { DateRangeValue } from '@oidajs/core';
 import { ArrayTracker } from '@oidajs/state-mobx';
 import { useSelector } from '@oidajs/ui-react-mobx';
 import { DatasetExplorer, DatasetExplorerItem, TimeSearchDirection, getNearestDatasetProduct } from '@oidajs/eo-mobx';
@@ -55,17 +55,7 @@ export const DatasetTimelineGroupTemplate = (props: DatasetTimelineGroupTemplate
                     size='small'
                     type='link'
                     onClick={() => {
-                        const filters = datasetView.dataset.additionalFilters.asArray();
-                        const aoi = datasetView.dataset.aoi;
-                        if (aoi) {
-                            filters.push({
-                                key: 'aoi',
-                                type: AOI_FIELD_ID,
-                                value: aoi
-                            });
-                        }
-
-                        timeDistribution.config.provider.getTimeExtent(timeDistribution.filters).then((range) => {
+                        timeDistribution.config.provider.getTimeExtent().then((range) => {
                             if (range) {
                                 props.explorerState.timeExplorer?.timeRange.centerRange(new Date(range.start), new Date(range.end), {
                                     margin: 0.1,
