@@ -11,7 +11,7 @@ import {
     DatasetMapViewConfig
 } from '@oidajs/eo-mobx';
 
-import { AdamDatasetConfig, isMultiBandCoverage } from '../../adam-dataset-config';
+import { AdamWcsDatasetConfig, isMultiBandCoverage } from '../../adam-dataset-config';
 import { AdamDatasetFactoryConfig } from '../../get-adam-dataset-factory';
 
 import { createVerticalProfileDataProvider } from './create-vertical-profile-data-provider';
@@ -21,7 +21,7 @@ import { getPlottyColorScales } from '@oidajs/eo-geotiff';
 export const getAdamVerticalProfileViewConfig = (
     axiosInstance: AxiosInstanceWithCancellation,
     factoryConfig: AdamDatasetFactoryConfig,
-    datasetConfig: AdamDatasetConfig
+    datasetConfig: AdamWcsDatasetConfig
 ) => {
     if (datasetConfig.type !== 'vertical_profile') {
         return;

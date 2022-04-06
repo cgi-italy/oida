@@ -4,10 +4,10 @@ import { getIntersection, isEmpty } from 'ol/extent';
 import { getGeometryExtent } from '@oidajs/core';
 import { AoiValue } from '@oidajs/core';
 
-import { AdamDatasetConfig } from '../adam-dataset-config';
+import { AdamWcsDatasetConfig } from '../adam-dataset-config';
 
 export const getAoiWcsParams = (
-    datasetConfig: AdamDatasetConfig,
+    datasetConfig: AdamWcsDatasetConfig,
     aoiFilter: AoiValue | undefined,
     currentCoverageExtent?: { bbox: number[]; srs: string }
 ) => {

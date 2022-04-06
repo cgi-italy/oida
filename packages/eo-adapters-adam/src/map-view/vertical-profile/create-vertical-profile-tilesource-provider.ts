@@ -4,13 +4,13 @@ import { DatasetVerticalProfileViz, RasterBandModeSingle } from '@oidajs/eo-mobx
 
 import { createGeoTiffLoader } from '../../utils';
 import { ADAM_WCS_SOURCE_ID } from '../adam-wcs-tile-source';
-import { AdamDatasetConfig, isMultiBandCoverage } from '../../adam-dataset-config';
+import { AdamWcsDatasetConfig, isMultiBandCoverage } from '../../adam-dataset-config';
 import { AdamDatasetFactoryConfig } from '../../get-adam-dataset-factory';
 import { AdamWcsVerticalProfileDataProvider } from './adam-wcs-vertical-profile-data-provider';
 
 export const createAdamVerticalProfileTileSourceProvider = (
     factoryConfig: AdamDatasetFactoryConfig,
-    datasetConfig: AdamDatasetConfig,
+    datasetConfig: AdamWcsDatasetConfig,
     axiosInstance: AxiosInstanceWithCancellation,
     wcsProvider: AdamWcsVerticalProfileDataProvider
 ) => {

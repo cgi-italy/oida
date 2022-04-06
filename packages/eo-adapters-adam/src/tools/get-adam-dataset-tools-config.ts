@@ -19,6 +19,12 @@ export const getAdamDatasetToolsConfig = (
     datasetConfig: AdamDatasetConfig,
     timeDistributionProvider?: DatasetTimeDistributionProvider
 ) => {
+    const tools: DatasetToolConfig[] = [];
+
+    if (datasetConfig.type === 'vector' || datasetConfig.type === 'vertical_profile') {
+        return tools;
+    }
+
     const variables: AdamDatasetSingleBandCoverage[] = [];
 
     const dimensions: AdamDatasetDimension[] = datasetConfig.dimensions
@@ -117,8 +123,6 @@ export const getAdamDatasetToolsConfig = (
             variables: variables
         });
     }
-
-    const tools: DatasetToolConfig[] = [];
 
     if (variables.length) {
         const wcsSeriesProvider = new AdamWcsSeriesProvider({

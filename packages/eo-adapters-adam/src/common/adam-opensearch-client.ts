@@ -58,16 +58,18 @@ export type AdamOpensearchDatasetMetadataSubdataset = {
 export type AdamOpensearchDatasetMetadata = {
     datasetId: string;
     title: string;
-    datasetType: 'Raster' | 'Vertical' | 'Tomo';
+    datasetType: 'Raster' | 'Vertical' | 'Tomo' | 'Vector';
     geometry: GeoJSON.Geometry;
     subDataset: AdamOpensearchDatasetMetadataSubdataset[];
     description: string;
     datasetSpecification: string;
     minDate: string;
     maxDate: string;
+    geolocated?: 'True' | 'False';
 };
 
 export type AdamOpensearchProductMetadata = {
+    catalogueId: string;
     geometry: GeoJSON.Polygon;
     source: string;
     sourceRasterGeo?: string;
@@ -116,7 +118,7 @@ export type AdamOpensearchProductSearchResponse = {
     type: 'FeatureCollection';
     properties: {
         totalResults: number;
-        startIndex: number;
+        Index: number;
         itemPerPage: number;
     };
     features: AdamOpensearchProductMetadata[];
@@ -246,7 +248,25 @@ export class AdamOpenSearchClient {
         return this.axiosInstance_
             .request<AdamOpensearchProductSearchResponse>({
                 url: `${this.serviceUrl_}/search`,
-                params: params
+                params: params,
+                paramsSerializer: (params) => {
+                    // axios by default encode spaces in params with '+' char
+                    // adam opensearch endpoint doesn't support this encoding so
+                    // we override the default serializer here
+                    const urlParams: string[] = [];
+                    for (const key in params) {
+                        if (Array.isArray(params[key])) {
+                            params[key].forEach((param) => {
+                                urlParams.push(`${key}=${param}`);
+                            });
+                        } else {
+                            if (params[key] !== undefined) {
+                                urlParams.push(`${key}=${params[key]}`);
+                            }
+                        }
+                    }
+                    return urlParams.join('&');
+                }
             })
             .then((response) => {
                 return response.data;

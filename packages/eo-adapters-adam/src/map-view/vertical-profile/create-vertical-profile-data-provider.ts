@@ -4,13 +4,13 @@ import { AxiosInstanceWithCancellation } from '@oidajs/core';
 import { DatasetVerticalProfileViz, VerticalProfileItemProps, RasterBandModeSingle } from '@oidajs/eo-mobx';
 
 import { createGeoTiffLoader } from '../../utils';
-import { AdamDatasetConfig, AdamDatasetSingleBandCoverage, isMultiBandCoverage } from '../../adam-dataset-config';
+import { AdamWcsDatasetConfig, AdamDatasetSingleBandCoverage, isMultiBandCoverage } from '../../adam-dataset-config';
 import { AdamDatasetFactoryConfig } from '../../get-adam-dataset-factory';
 import { AdamWcsVerticalProfileDataProvider } from './adam-wcs-vertical-profile-data-provider';
 
 export const createVerticalProfileDataProvider = (
     factoryConfig: AdamDatasetFactoryConfig,
-    datasetConfig: AdamDatasetConfig,
+    datasetConfig: AdamWcsDatasetConfig,
     axiosInstance: AxiosInstanceWithCancellation
 ) => {
     const geotiffLoader = createGeoTiffLoader({
@@ -78,6 +78,9 @@ export const createVerticalProfileDataProvider = (
     const load = (vProfileViz: DatasetVerticalProfileViz) => {
         const bandMode = vProfileViz.bandMode.value;
         if (bandMode instanceof RasterBandModeSingle) {
+            if (!datasetConfig.fixedTime && !vProfileViz.dataset.toi) {
+                return Promise.reject(new Error('No time selected'));
+            }
             const timeFilter = !datasetConfig.fixedTime ? vProfileViz.dataset.toi : undefined;
             return new Promise<VerticalProfileItemProps[]>((resolve, reject) => {
                 debouncedProfileGetter(bandMode.band, timeFilter, resolve, reject);

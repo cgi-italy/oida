@@ -20,6 +20,10 @@ export const getAdamDatasetDownloadConfig = (
     factoryConfig: AdamDatasetFactoryConfig,
     datasetConfig: AdamDatasetConfig
 ) => {
+    if (datasetConfig.type === 'vector') {
+        return undefined;
+    }
+
     const getDownloadRequestConfig = (request: DownloaMapVizRequest) => {
         if (request.datasetViz instanceof RasterMapViz) {
             const rasterParams = downloadAdamWcsRaster(datasetConfig, request.datasetViz);

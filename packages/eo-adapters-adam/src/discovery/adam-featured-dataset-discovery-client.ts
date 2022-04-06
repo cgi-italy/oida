@@ -1,9 +1,9 @@
 import { QueryParams, SortOrder } from '@oidajs/core';
-import { AdamDatasetConfig, isMultiBandCoverage, AdamDatasetRenderMode } from '../adam-dataset-config';
+import { AdamWcsDatasetConfig, isMultiBandCoverage, AdamDatasetRenderMode } from '../adam-dataset-config';
 import { AdamWcsCoverageDescriptionClient, AdamWcCoverageDescriptionClientConfig } from './adam-wcs-coverage-description-client';
 
 export type AdamFeaturedDataset = Omit<
-    AdamDatasetConfig,
+    AdamWcsDatasetConfig,
     'id' | 'coverageSrs' | 'srsDef' | 'coverageExtent' | 'renderMode' | 'productSearchRecordContent' | 'color'
 > & {
     id: string;
@@ -68,7 +68,7 @@ export class AdamFeaturedDatasetDiscoveryClient {
         });
     }
 
-    getAdamDatasetConfig(config: AdamFeaturedDataset): Promise<AdamDatasetConfig> {
+    getAdamDatasetConfig(config: AdamFeaturedDataset): Promise<AdamWcsDatasetConfig> {
         let coverageId: string;
         if (isMultiBandCoverage(config.coverages)) {
             coverageId = config.coverages.wcsCoverage;
