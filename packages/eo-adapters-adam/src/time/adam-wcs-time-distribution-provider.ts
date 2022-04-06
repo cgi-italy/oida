@@ -1,5 +1,3 @@
-import moment from 'moment';
-
 import {
     AxiosInstanceWithCancellation,
     createAxiosInstance,
@@ -24,7 +22,6 @@ import {
 } from '@oidajs/eo-mobx';
 
 export type AdamWcsTimeDistributionProviderConfig = {
-    serviceUrl: string;
     isMultiBandCoverage?: boolean;
     axiosInstance?: AxiosInstanceWithCancellation;
     productCatalogue?: {
@@ -490,7 +487,7 @@ export class AdamWcsTimeDistributionProvider implements DatasetTimeDistributionP
         if (!productCatalogue) {
             throw new Error('No product catalogue configuration provided');
         }
-        const pageSize = maxItems ? Math.min(maxItems, 200) : 200;
+        let pageSize = maxItems ? Math.min(maxItems, 200) : 200;
         let page = 0;
 
         const isDefaultRequest = requestFilters === undefined;
@@ -556,6 +553,10 @@ export class AdamWcsTimeDistributionProvider implements DatasetTimeDistributionP
         let response;
         do {
             response = await retrievePage();
+            // requested page size is bigger than server limits?
+            if (response.pageSize !== pageSize) {
+                pageSize = response.pageSize;
+            }
             if (maxItems && response.total > maxItems) {
                 const missingInterval = new TimeInterval(data[data.length - 1].start, interval.end.toDate());
                 data.push({
