@@ -3,7 +3,7 @@ import { Button, Dropdown, Menu, Tooltip } from 'antd';
 import { DeleteOutlined, PlusOutlined, DownOutlined } from '@ant-design/icons';
 
 import { BOOLEAN_FIELD_ID, DATE_RANGE_FIELD_ID, ENUM_FIELD_ID, NUMERIC_RANGE_FIELD_ID, STRING_FIELD_ID } from '@oidajs/core';
-import { NumericRangeFieldRenderer, SelectEnumRenderer } from '@oidajs/ui-react-antd';
+import { InputFieldRenderer, NumericRangeFieldRenderer, SelectEnumRenderer } from '@oidajs/ui-react-antd';
 import { useSelector } from '@oidajs/ui-react-mobx';
 import { DatasetVectorMapViz, VectorFeaturePropertyDescriptor } from '@oidajs/eo-mobx';
 
@@ -15,8 +15,12 @@ export type FeaturePropertySelectorProps = {
 
 export const FeaturePropertySelector = (props: FeaturePropertySelectorProps) => {
     const choices = props.featureProperties.map((featureProperty) => {
+        let name = featureProperty.name;
+        if (featureProperty.units) {
+            name += ` (${featureProperty.units})`;
+        }
         return {
-            name: `${featureProperty.name} (${featureProperty.units})`,
+            name: name,
             value: featureProperty.id,
             description: featureProperty.description
         };
@@ -103,6 +107,35 @@ export const DatasetVectorVizFilters = (props: DatasetVectorVizFiltersProps) => 
                     title={featureProperty.name}
                 />
             );
+        } else if (featureProperty.type === 'string') {
+            filterElement = (
+                <InputFieldRenderer
+                    config={{}}
+                    value={filter.value}
+                    onChange={(value) => {
+                        props.dataset.propertyFilters.set(featureProperty.id, value || '', STRING_FIELD_ID);
+                    }}
+                    title={featureProperty.name}
+                />
+            );
+        } else if (featureProperty.type === 'enum') {
+            filterElement = (
+                <SelectEnumRenderer
+                    config={{
+                        choices: featureProperty.options.map((option) => {
+                            return {
+                                name: option.name,
+                                value: option.value.toString()
+                            };
+                        })
+                    }}
+                    value={filter.value}
+                    required={true}
+                    onChange={(value) => {
+                        props.dataset.propertyFilters.set(featureProperty.id, value, ENUM_FIELD_ID);
+                    }}
+                />
+            );
         }
         //TODO: add filters for other feature property types
 
@@ -144,8 +177,8 @@ export const DatasetVectorVizFilters = (props: DatasetVectorVizFiltersProps) => 
             <div className='dataset-vector-viz-filter-header'>
                 <span>Data filters:</span>
                 <Tooltip title='Add filter'>
-                    <Dropdown overlay={<Menu>{filterDropdownItems}</Menu>} trigger={['click']}>
-                        <Button type='primary' size='small' disabled={!missingFilters.length}>
+                    <Dropdown overlay={<Menu>{filterDropdownItems}</Menu>} trigger={['click']} disabled={!missingFilters.length}>
+                        <Button type='primary' size='small'>
                             <PlusOutlined />
                             <DownOutlined />
                         </Button>
