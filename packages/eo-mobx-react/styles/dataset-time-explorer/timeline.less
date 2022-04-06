@@ -8,11 +8,9 @@
         border: none;
 
         .vis-panel {
-
             border-color: @border-color-split;
 
             &.vis-left {
-
                 .vis-content {
                     max-width: 250px;
                     width: fit-content;
@@ -20,7 +18,6 @@
                     min-width: 150px;
 
                     .vis-labelset {
-
                         .vis-label {
                             font-size: @font-size-sm;
                             color: @text-color;
@@ -64,7 +61,6 @@
                 }
 
                 .vis-text {
-
                     padding: 1px;
 
                     &.vis-major {
@@ -81,10 +77,9 @@
 
             .vis-item {
                 &.vis-range {
-
                     // ensure a min pixel width
                     padding-right: @range-item-min-width;
-                    left: -@range-item-min-width / 2;
+                    left: -(@range-item-min-width / 2);
                     box-sizing: content-box;
 
                     .vis-item-overflow {
@@ -92,11 +87,9 @@
                         .vis-item-content {
                             padding: 0;
                         }
-
                     }
 
                     &.is-loading {
-
                         display: flex;
                         padding: 1px;
                         opacity: 0.6;
@@ -106,7 +99,6 @@
                             animation: range-load-animation 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
                             height: 2px;
                         }
-
                     }
 
                     &.is-error {
@@ -115,7 +107,6 @@
                 }
 
                 &.vis-point {
-
                     height: 8px;
                     width: 8px;
                     border-radius: 4px;
@@ -131,7 +122,6 @@
                 }
 
                 &.editable-range {
-
                     background-color: rgba(@primary-color, 0.2);
                     border: solid 1px rgba(@primary-color, 0.5);
                     border-bottom: none;
@@ -141,7 +131,7 @@
                         background-color: rgba(@primary-color, 0.3);
                     }
                     &.dragging {
-                        cursor: grabbing
+                        cursor: grabbing;
                     }
                 }
             }
@@ -156,7 +146,6 @@
                 height: 46px !important;
                 bottom: 0px !important;
                 top: auto !important;
-
 
                 &:hover {
                     width: 6px;
@@ -186,7 +175,16 @@
 }
 
 @keyframes range-load-animation {
-    0% { margin-left: 0px; margin-right: 100%; }
-    50% { margin-left: 25%; margin-right: 0%; }
-    100% { margin-left: 100%; margin-right: 0; }
-  }
+    0% {
+        margin-left: 0px;
+        margin-right: 100%;
+    }
+    50% {
+        margin-left: 25%;
+        margin-right: 0%;
+    }
+    100% {
+        margin-left: 100%;
+        margin-right: 0;
+    }
+}
