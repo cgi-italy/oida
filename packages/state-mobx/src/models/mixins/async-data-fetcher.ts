@@ -11,11 +11,7 @@ export type AsyncDataFetcherProps<RESPONSE = any, PARAMS = any> = {
     debounceInterval?: number;
 };
 
-type DebouncedRequestType<RESPONSE = any, PARAMS = any> = (
-    params: PARAMS,
-    resolve: (value: RESPONSE | PromiseLike<RESPONSE>) => void,
-    reject: (reason: any) => void
-) => void;
+type DebouncedRequestType<PARAMS = any> = (params: PARAMS) => void;
 
 /**
  * A class to manage async data fetching logic with loading state tracking and optional debouncing.
@@ -26,7 +22,15 @@ export class AsyncDataFetcher<RESPONSE = any, PARAMS = any> implements HasLoadin
     /** The data fetching loading state */
     readonly loadingStatus: LoadingStatus;
 
-    protected debouncedRequest_: DebouncedRequestType<RESPONSE, PARAMS> | undefined;
+    protected debouncedRequest_: DebouncedRequestType<PARAMS> | undefined;
+    protected debouncedPromise_:
+        | {
+              instance: Promise<RESPONSE>;
+              resolve: (value: any) => void;
+              reject: (reason: any) => void;
+          }
+        | undefined;
+
     protected pendingDataRequest_: Promise<RESPONSE> | undefined;
     protected dataFetcher_: (params: PARAMS) => Promise<RESPONSE>;
 
@@ -41,9 +45,21 @@ export class AsyncDataFetcher<RESPONSE = any, PARAMS = any> implements HasLoadin
         this.cancelPendingRequest();
         const debouncedRequest = this.debouncedRequest_;
         if (debouncedRequest) {
-            return new Promise<RESPONSE>((resolve, reject) => {
-                return debouncedRequest(params, resolve, reject);
-            });
+            if (!this.debouncedPromise_) {
+                // store the promise for the current debounced request.
+                // the same promise will be returned for subsequent call to
+                // fetchData until the request is resolved
+                const debouncedPromise = new Promise<RESPONSE>((resolve, reject) => {
+                    this.debouncedPromise_ = {
+                        instance: debouncedPromise,
+                        resolve: resolve,
+                        reject: reject
+                    };
+                });
+                this.debouncedPromise_!.instance = debouncedPromise;
+            }
+            debouncedRequest(params);
+            return this.debouncedPromise_!.instance;
         } else {
             return this.invokeFetchRequest_(params);
         }
@@ -52,19 +68,24 @@ export class AsyncDataFetcher<RESPONSE = any, PARAMS = any> implements HasLoadin
     /** Set the data retrieval debounce interval in milliseconds */
     setDebounceInterval(debounceInterval: number | undefined) {
         if (debounceInterval) {
-            this.debouncedRequest_ = debounce(
-                (params: PARAMS, resolve: (value: RESPONSE | PromiseLike<RESPONSE>) => void, reject: (reason: any) => void) => {
-                    this.invokeFetchRequest_(params).then(
+            this.debouncedRequest_ = debounce((params: PARAMS) => {
+                this.invokeFetchRequest_(params)
+                    .then(
                         (response) => {
-                            resolve(response);
+                            if (this.debouncedPromise_) {
+                                this.debouncedPromise_.resolve(response);
+                            }
                         },
                         (error) => {
-                            reject(error);
+                            if (this.debouncedPromise_) {
+                                this.debouncedPromise_.reject(error);
+                            }
                         }
-                    );
-                },
-                debounceInterval
-            );
+                    )
+                    .finally(() => {
+                        this.debouncedPromise_ = undefined;
+                    });
+            }, debounceInterval);
         } else {
             delete this.debouncedRequest_;
         }
