@@ -18,7 +18,16 @@ import {
     VisibleProps
 } from '@oidajs/state-mobx';
 
-import { ColorMap, ColorScale, DatasetViz, DatasetVizProps } from '../common';
+import {
+    ColorMap,
+    ColorScale,
+    DataDomain,
+    DatasetDimension,
+    DatasetDimensions,
+    DatasetDimensionsProps,
+    DatasetViz,
+    DatasetVizProps
+} from '../common';
 import { VectorFeatureDescriptor, VectorFeatureProperties } from './vector-feature-descriptor';
 
 /**
@@ -121,6 +130,13 @@ export const VECTOR_VIZ_TYPE = 'dataset_vector_viz';
  */
 export type VectorDataProvider = (vectorViz: DatasetVectorMapViz) => Promise<DatasetVectorFeatureProps[]>;
 
+export type VectorDataGenerator = Generator<Promise<DatasetVectorFeatureProps[]>, void, void>;
+export type VectorDataGeneratorFactory = (vectorViz: DatasetVectorMapViz) => VectorDataGenerator;
+
+const isDataGenerator = function <T>(type: Generator<Promise<T>> | Promise<T>): type is Generator<Promise<T>> {
+    return typeof (type as Generator<Promise<T>>).next === 'function';
+};
+
 /**
  * The configuration for a {@link DatasetVectorMapViz | dataset vector map visualization}
  */
@@ -130,12 +146,12 @@ export type DatasetVectorMapVizConfig = {
      * the {@link DatasetVectorMapViz} properties accessed by the provider changes, the function is called again to
      * retrieve the new data
      */
-    dataProvider: VectorDataProvider;
+    dataProvider: VectorDataProvider | VectorDataGeneratorFactory;
     /**
      * The feature type descriptor. If provided it will be used for dynamica feature styling, filtering and feature information
      * display.
      */
-    featureDescriptor?: VectorFeatureDescriptor | (() => Promise<VectorFeatureDescriptor>);
+    featureDescriptor?: VectorFeatureDescriptor | ((vectorViz: DatasetVectorMapViz) => Promise<VectorFeatureDescriptor>);
     /**
      * The color scales to be used for dynamic feature coloring
      */
@@ -149,6 +165,8 @@ export type DatasetVectorMapVizConfig = {
      * used as input for the internal {@link FeatureLayer}.
      */
     featureStyleFactory?: (color?: string) => FeatureStyleGetter<DatasetVectorFeature>;
+
+    dimensions?: DatasetDimension<DataDomain<string | number | Date>>[];
 };
 
 /**
@@ -159,7 +177,7 @@ export type DatasetVectorMapVizProps = DatasetVizProps<typeof VECTOR_VIZ_TYPE, D
      * Optional {@link DatasetVectorMapViz.propertyFilters | DatasetVectorMapViz property filters} initialization
      */
     propertyFilters?: DataFiltersProps | DataFilters;
-};
+} & DatasetDimensionsProps;
 
 export class DatasetVectorMapViz extends DatasetViz<FeatureLayer<DatasetVectorFeature>> {
     /** The visualization configuration */
@@ -175,6 +193,8 @@ export class DatasetVectorMapViz extends DatasetViz<FeatureLayer<DatasetVectorFe
      * filter the results based on the current filtering state
      */
     propertyFilters: DataFilters;
+
+    readonly dimensions: DatasetDimensions;
 
     /** The current feature array. Automatically filled from the {@link VectorDataProvider} response */
     protected data_: IObservableArray<DatasetVectorFeature>;
@@ -201,13 +221,16 @@ export class DatasetVectorMapViz extends DatasetViz<FeatureLayer<DatasetVectorFe
         });
         this.mapLayer.setSource(this.data_);
 
-        if (typeof props.config.featureDescriptor === 'function') {
-            props.config.featureDescriptor().then((featureDescriptor) => {
-                this.featureDescriptor = featureDescriptor;
-            });
-        } else {
+        if (typeof props.config.featureDescriptor !== 'function') {
             this.featureDescriptor = props.config.featureDescriptor;
         }
+
+        this.dimensions = new DatasetDimensions({
+            dataset: this.dataset,
+            dimensionValues: props.dimensionValues,
+            dimensions: props.config.dimensions,
+            initDimensions: true
+        });
 
         this.subscriptionTracker_ = new SubscriptionTracker();
 
@@ -337,24 +360,82 @@ export class DatasetVectorMapViz extends DatasetViz<FeatureLayer<DatasetVectorFe
     }
 
     protected afterInit_() {
+        let runningGenerator: VectorDataGenerator | undefined;
+        let runningDataPromise: Promise<DatasetVectorFeatureProps[]> | undefined;
+
+        const onDataError = (error) => {
+            runInAction(() => {
+                this.data_.clear();
+                this.mapLayer.loadingStatus.update({
+                    value: LoadingState.Error,
+                    message: error.message
+                });
+            });
+        };
+
         const dataUpdaterDisposer = autorun(
             () => {
                 this.mapLayer.loadingStatus.setValue(LoadingState.Loading);
-                this.config
-                    .dataProvider(this)
-                    .then((data) => {
-                        this.refreshData_(data);
-                        this.mapLayer.loadingStatus.setValue(LoadingState.Success);
-                    })
-                    .catch((error) => {
+                runInAction(() => {
+                    this.data_.clear();
+                });
+
+                // cancel any running promise
+                if (runningDataPromise) {
+                    if (runningDataPromise.cancel) {
+                        runningDataPromise.cancel();
+                    } else {
+                        runningDataPromise.isCanceled = true;
+                    }
+                    runningDataPromise = undefined;
+                }
+
+                // stop any running generator
+                if (runningGenerator) {
+                    runningGenerator.return();
+                }
+                const dataRequest = this.config.dataProvider(this);
+
+                if (isDataGenerator(dataRequest)) {
+                    // retrieve data in batches until the generator completes
+                    let next = dataRequest.next();
+                    const handleNextValue = (data: DatasetVectorFeatureProps<VectorFeatureProperties>[]) => {
                         runInAction(() => {
-                            this.data_.clear();
-                            this.mapLayer.loadingStatus.update({
-                                value: LoadingState.Error,
-                                message: error.message
-                            });
+                            const colorGetter = this.featureColorGetter;
+                            this.data_.push(
+                                ...data.map(
+                                    (props) =>
+                                        new DatasetVectorFeature({
+                                            ...props,
+                                            color: colorGetter(props)
+                                        })
+                                )
+                            );
                         });
-                    });
+                        next = dataRequest.next();
+                        if (!next.done) {
+                            runningDataPromise = next.value;
+                            next.value.then(handleNextValue).catch(onDataError);
+                        } else {
+                            runningDataPromise = undefined;
+                            runningGenerator = undefined;
+                            this.mapLayer.loadingStatus.setValue(LoadingState.Success);
+                        }
+                    };
+
+                    if (!next.done) {
+                        runningGenerator = dataRequest;
+                        runningDataPromise = next.value;
+                        next.value.then(handleNextValue).catch(onDataError);
+                    }
+                } else {
+                    dataRequest
+                        .then((data) => {
+                            this.refreshData_(data);
+                            this.mapLayer.loadingStatus.setValue(LoadingState.Success);
+                        })
+                        .catch(onDataError);
+                }
             },
             {
                 delay: 500
@@ -394,6 +475,17 @@ export class DatasetVectorMapViz extends DatasetViz<FeatureLayer<DatasetVectorFe
         this.subscriptionTracker_.addSubscription(chromaScaleUpdateDisposer);
         this.subscriptionTracker_.addSubscription(featureColorUpdateDisposer);
         this.subscriptionTracker_.addSubscription(widgetVisibilityDisposer);
+
+        const featureDescriptor = this.config.featureDescriptor;
+        if (typeof featureDescriptor === 'function') {
+            const featureDescriptorUpdater = autorun(() => {
+                featureDescriptor(this).then((featureDescriptor) => {
+                    this.featureDescriptor = featureDescriptor;
+                });
+
+                this.subscriptionTracker_.addSubscription(featureDescriptorUpdater);
+            });
+        }
     }
 
     protected initMapLayer_(props) {

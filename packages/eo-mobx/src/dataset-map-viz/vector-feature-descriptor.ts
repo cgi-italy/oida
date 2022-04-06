@@ -13,7 +13,7 @@ export interface VectorFeaturePropertyFormatterOutputTypes {
  * @return The formatted value (typically as a string). If undefined the property will not be displayed
  */
 export type VectorFeaturePropertyFormatter<TYPE extends keyof FeaturePropertyValueTypes = keyof FeaturePropertyValueTypes> = (
-    value: FeaturePropertyValueTypes[TYPE],
+    value: FeaturePropertyValueTypes[TYPE] | undefined,
     idx?: number
 ) => VectorFeaturePropertyFormatterOutputTypes[keyof VectorFeaturePropertyFormatterOutputTypes];
 
@@ -110,7 +110,7 @@ export interface FeaturePropertyValueTypes {
     [ENUM_FEATURE_PROPERTY_TYPE]: string | number;
     [DATE_FEATURE_PROPERTY_TYPE]: Date;
     [COMPOSITE_FEATURE_PROPERTY_TYPE]: {
-        [key: string]: FeaturePropertyValueTypes[keyof FeaturePropertyValueTypes];
+        [key: string]: FeaturePropertyValueType;
     };
 }
 
@@ -135,7 +135,7 @@ export type VectorFeatureDescriptor = {
     properties: VectorFeaturePropertyDescriptor[];
 };
 
-export type FeaturePropertyValueType = FeaturePropertyValueTypes[keyof FeaturePropertyValueTypes];
+export type FeaturePropertyValueType = FeaturePropertyValueTypes[keyof FeaturePropertyValueTypes] | undefined;
 
 /** The feature property object type */
 export type VectorFeatureProperties = Record<string, FeaturePropertyValueType | FeaturePropertyValueType[]>;
