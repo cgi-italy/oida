@@ -124,6 +124,9 @@ export class DatasetExplorerItem {
                         this.dataset.setToi(data.toi, true);
                     }
                 }
+            },
+            {
+                fireImmediately: true
             }
         );
 
