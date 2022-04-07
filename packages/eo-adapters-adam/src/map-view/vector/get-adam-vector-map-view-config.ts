@@ -60,15 +60,21 @@ export const getAdamVectorMapViewConfig = (datasetConfig: AdamVectorDatasetConfi
 
             if (Array.isArray(featureProperties)) {
                 // feature properties are common to all subdatasets
-                featureDescriptor.properties.push(...featureProperties, sourceProperty);
+                featureDescriptor.properties.push(...featureProperties);
             } else if (featureProperties) {
                 // subdataset specific feature properties
                 const subdataset = vectorViz.dimensions.values.get('subdataset');
                 if (typeof subdataset === 'string') {
-                    featureDescriptor.properties.push(...(featureProperties[subdataset] || []), sourceProperty);
-                    featureDescriptor.typeName = `${datasetConfig.id}_${subdataset}_featuretype`;
+                    const subdatasetProperties = featureProperties[subdataset];
+                    if (subdatasetProperties) {
+                        featureDescriptor.properties.push(...subdatasetProperties);
+                        featureDescriptor.typeName = `${datasetConfig.id}_${subdataset}_featuretype`;
+                    }
                 }
             }
+
+            //add the download link as last property
+            featureDescriptor.properties.push(sourceProperty);
 
             return Promise.resolve(featureDescriptor);
         }
