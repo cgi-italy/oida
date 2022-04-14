@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.0.3](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-geotiff@2.0.2...@oidajs/eo-geotiff@2.0.3) (2022-04-14)
+
+**Note:** Version bump only for package @oidajs/eo-geotiff
+
+
+
+
+
 ## [2.0.2](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-geotiff@2.0.1...@oidajs/eo-geotiff@2.0.2) (2022-03-09)
 
 

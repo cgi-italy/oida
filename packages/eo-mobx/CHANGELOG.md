@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.2.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-mobx@2.1.0...@oidajs/eo-mobx@2.2.0) (2022-04-14)
+
+
+### Bug Fixes
+
+* check for server side page limits on dataset product search response ([3f3017c](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/3f3017cff258ecc3b2b91ca1ec2a483c08cbad22))
+* sync dataset toi immediatly on DatasetExplorerItem initialization ([7f4d587](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/7f4d58735a441e34e4058e6a4e84e851984abc6c))
+
+
+### Features
+
+* add support for dimensions in vertical profile dataset ([9753f91](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/9753f91a2049c04f3ad8193bafa4d3ce3f7ed0a4))
+* improve vector dataset visualization ([38f84c8](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/38f84c84e605bfc83707352215c872a930a24465))
+
+
+
+
+
 # [2.1.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-mobx@2.0.1...@oidajs/eo-mobx@2.1.0) (2022-03-09)
 
 
