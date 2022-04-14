@@ -12,7 +12,7 @@ import {
 } from '@oidajs/eo-mobx';
 import { getPlottyColorScales } from '@oidajs/eo-geotiff';
 
-import { AdamDatasetConfig, AdamDatasetRenderMode, isMultiBandCoverage } from '../../adam-dataset-config';
+import { AdamWcsDatasetConfig, AdamDatasetRenderMode, isMultiBandCoverage } from '../../adam-dataset-config';
 import { AdamDatasetFactoryConfig } from '../../get-adam-dataset-factory';
 import { createAdamRasterTileSourceProvider } from './create-adam-raster-tile-source-provider';
 import { AdamSpatialCoverageProvider } from '../../get-adam-dataset-spatial-coverage-provider';
@@ -22,7 +22,7 @@ import trueColorPreview from './true-color-preset-preview';
 export const getAdamRasterMapViewConfig = (
     axiosInstance: AxiosInstanceWithCancellation,
     factoryConfig: AdamDatasetFactoryConfig,
-    datasetConfig: AdamDatasetConfig,
+    datasetConfig: AdamWcsDatasetConfig,
     spatialCoverageProvider: AdamSpatialCoverageProvider
 ) => {
     let afterInit: ((mapViz: RasterMapViz) => void) | undefined = undefined;

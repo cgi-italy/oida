@@ -27,11 +27,14 @@ import {
     AdamOpensearchMetadataModelVersion,
     AdamOpensearchProductMetadata
 } from '../common';
+import { AdamVectorDatasetConfig } from '..';
+import { VectorFeaturePropertyDescriptor } from '@oidajs/eo-mobx';
 
 export type AdamOpensearchDatasetDiscoveryClientConfig = {
     serviceUrl: string;
     wcsUrl: string;
     additionalDatasetConfig?: Record<string, Partial<AdamDatasetConfig>>;
+    additionalDatasets?: AdamDatasetConfig[];
     metadataModelVersion?: AdamOpensearchMetadataModelVersion;
     axiosInstance?: AxiosInstanceWithCancellation;
 };
@@ -59,12 +62,6 @@ export class AdamOpensearchDatasetDiscoveryClient {
     searchDatasets(queryParams: QueryParams) {
         const filters = queryParams.filters?.slice() || [];
 
-        filters.push({
-            key: 'geolocated',
-            type: BOOLEAN_FIELD_ID,
-            value: true
-        });
-
         return this.openSearchClient_
             .getDatasets({
                 ...queryParams,
@@ -81,26 +78,132 @@ export class AdamOpensearchDatasetDiscoveryClient {
     }
 
     getAdamDatasetConfig(metadata: AdamOpensearchDatasetMetadata): Promise<AdamDatasetConfig> {
-        return this.wcsCoverageDescriptionClient_
-            .getCoverageDetails(metadata.datasetId)
-            .then((coverages) => {
-                return this.getRecordForDataset_(metadata.datasetId)
-                    .then((record) => {
-                        return this.getConfigFromMetadataAndCoverage_(metadata, coverages, record);
+        const additionalConfig = this.additionalDatasetConfig_[metadata.datasetId];
+
+        if (metadata.geolocated === 'True' && additionalConfig?.type !== 'vector') {
+            return this.wcsCoverageDescriptionClient_
+                .getCoverageDetails(metadata.datasetId)
+                .then((coverages) => {
+                    return this.getRecordForDataset_(metadata.datasetId)
+                        .then((record) => {
+                            return this.getConfigFromMetadataAndCoverage_(metadata, coverages, record);
+                        })
+                        .catch(() => {
+                            return this.getConfigFromMetadataAndCoverage_(metadata, coverages);
+                        });
+                })
+                .catch(() => {
+                    return this.getRecordForDataset_(metadata.datasetId)
+                        .then((record) => {
+                            return this.getConfigFromMetadataAndCoverage_(metadata, [], record);
+                        })
+                        .catch(() => {
+                            return this.getConfigFromMetadataAndCoverage_(metadata, []);
+                        });
+                });
+        } else {
+            let subdatasets = metadata.subDataset;
+            if (!Array.isArray(subdatasets)) {
+                subdatasets = Object.entries(metadata.subDataset).map(([id, subdataset]) => {
+                    return {
+                        ...subdataset,
+                        subDatasetId: id,
+                        name: id
+                    };
+                });
+            }
+
+            const minDate: moment.Moment | undefined = moment.utc(metadata.minDate);
+            const maxDate: moment.Moment | undefined = moment.utc(metadata.maxDate);
+
+            let fixedTime: Date | boolean = false;
+            if (minDate && minDate?.isSame(maxDate)) {
+                fixedTime = minDate.toDate();
+            }
+
+            const vectorDatasetConfig: AdamVectorDatasetConfig = {
+                id: metadata.datasetId,
+                type: 'vector',
+                bbox: getGeometryExtent(metadata.geometry)!,
+                name: metadata.title,
+                fixedTime: fixedTime,
+                dimensions: [
+                    {
+                        id: 'subdataset',
+                        name: 'SubDataset',
+                        domain: {
+                            values: subdatasets.map((subdataset) => {
+                                return {
+                                    value: subdataset.subDatasetId,
+                                    name: subdataset.name
+                                };
+                            })
+                        }
+                    }
+                ],
+                ...(additionalConfig as Partial<AdamVectorDatasetConfig>)
+            };
+
+            if (metadata.datasetSpecification) {
+                // campaign dataset. disable time dimension and retrieve subregion/scene information
+                vectorDatasetConfig.fixedTime = true;
+                return this.getDatasetSpecification_(metadata.datasetSpecification)
+                    .then((specs) => {
+                        const campaignProps: VectorFeaturePropertyDescriptor[] = [
+                            {
+                                id: 'SubRegion',
+                                name: 'SubRegion',
+                                type: 'enum',
+                                options: Object.keys(specs.SubRegion).map((key) => {
+                                    return {
+                                        name: key,
+                                        value: key
+                                    };
+                                }),
+                                filterable: true
+                            },
+                            {
+                                id: 'Product',
+                                name: 'Product',
+                                type: 'string'
+                            },
+                            {
+                                id: 'SceneType',
+                                name: 'Scene Type',
+                                type: 'string'
+                            },
+                            {
+                                id: 'SceneType_value',
+                                name: 'Scene',
+                                type: 'string'
+                            }
+                        ];
+
+                        const featureProperties = vectorDatasetConfig.featureProperties || [];
+
+                        if (Array.isArray(featureProperties)) {
+                            featureProperties.push(...campaignProps);
+                        } else {
+                            subdatasets.forEach((subdataset) => {
+                                if (featureProperties[subdataset.subDatasetId]) {
+                                    featureProperties[subdataset.subDatasetId].push(...campaignProps);
+                                } else {
+                                    featureProperties[subdataset.subDatasetId] = campaignProps;
+                                }
+                            });
+                        }
+
+                        vectorDatasetConfig.featureProperties = featureProperties;
+
+                        return vectorDatasetConfig;
                     })
                     .catch(() => {
-                        return this.getConfigFromMetadataAndCoverage_(metadata, coverages);
+                        return vectorDatasetConfig;
                     });
-            })
-            .catch(() => {
-                return this.getRecordForDataset_(metadata.datasetId)
-                    .then((record) => {
-                        return this.getConfigFromMetadataAndCoverage_(metadata, [], record);
-                    })
-                    .catch(() => {
-                        return this.getConfigFromMetadataAndCoverage_(metadata, []);
-                    });
-            });
+            } else {
+                return Promise.resolve(vectorDatasetConfig);
+            }
+        }
     }
 
     protected getRecordForDataset_(datasetId: string) {
@@ -219,6 +322,7 @@ export class AdamOpensearchDatasetDiscoveryClient {
 
             if (numBands > 1) {
                 if (subdatasets.length > 1) {
+                    // for multiband datasets the subdataset is modeled as an additional dimension
                     subsetDimension = {
                         id: 'subdataset',
                         name: 'SubDataset',
@@ -388,7 +492,7 @@ export class AdamOpensearchDatasetDiscoveryClient {
                           }
                         : undefined,
                     ...this.additionalDatasetConfig_[metadata.datasetId]
-                };
+                } as AdamDatasetConfig;
             });
         } catch (error) {
             return Promise.reject(new Error('Invalid dataset'));
@@ -560,5 +664,15 @@ export class AdamOpensearchDatasetDiscoveryClient {
                 return Promise.resolve([]);
             }
         }
+    }
+
+    protected getDatasetSpecification_(gridDetailsUrl: string) {
+        return this.axiosInstance_
+            .cancelableRequest<AdamOpensearchDatasetCustomGridSpec>({
+                url: gridDetailsUrl
+            })
+            .then((response) => {
+                return response.data;
+            });
     }
 }

@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.2.0](https://github.com/cgi-italy/oida/compare/@oidajs/eo-adapters-adam@2.1.0...@oidajs/eo-adapters-adam@2.2.0) (2022-04-14)
+
+
+### Bug Fixes
+
+* add download link as last property in Adam feature descriptor ([2cd3533](https://github.com/cgi-italy/oida/commit/2cd353375458eea52855c985dad4975b7854910e))
+* check for server side page limits on dataset product search response ([3f3017c](https://github.com/cgi-italy/oida/commit/3f3017cff258ecc3b2b91ca1ec2a483c08cbad22))
+* force usage of configured coverage srs for adam dataset extent computation ([643dec7](https://github.com/cgi-italy/oida/commit/643dec7fe7ed0521cc27f52227b86fd0eac1c7dc))
+* prevent products retrieval when no time is specified in adam vector data provider ([58a091c](https://github.com/cgi-italy/oida/commit/58a091c2e5625ccebf0b615df79023d506f3243e))
+
+
+### Features
+
+* add preliminary support for adam opensearch vector datasets ([ca27437](https://github.com/cgi-italy/oida/commit/ca274373160c494080bd67174685dc3a38472ce9))
+* add support for dimensions in adam vertical profile dataset ([3434d4b](https://github.com/cgi-italy/oida/commit/3434d4b3d6e9aeb99409cbf29991d77e07f1c8a4))
+
+
+
+
+
 # [2.1.0](https://github.com/cgi-italy/oida/compare/@oidajs/eo-adapters-adam@2.0.1...@oidajs/eo-adapters-adam@2.1.0) (2022-03-09)
 
 

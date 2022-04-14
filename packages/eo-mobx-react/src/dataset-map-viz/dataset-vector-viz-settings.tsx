@@ -7,12 +7,21 @@ import { useSelector } from '@oidajs/ui-react-mobx';
 import { DatasetVizSettingsFactory } from './dataset-viz-settings-factory';
 import { DatasetColorMapSelector } from './dataset-colormap-selector';
 import { DatasetVectorVizFilters } from './dataset-vector-viz-filters';
+import { DatasetDimensionValueSelector } from './dataset-dimension-value-selector';
 
 export type DatasetVectorVizSettingsProps = {
     datasetViz: DatasetVectorMapViz;
 };
 
 export const DatasetVectorVizSettings = (props: DatasetVectorVizSettingsProps) => {
+    let dimensionSelectors: JSX.Element[] | undefined;
+
+    if (props.datasetViz.config.dimensions) {
+        dimensionSelectors = props.datasetViz.config.dimensions.map((dimension) => {
+            return <DatasetDimensionValueSelector dimensionsState={props.datasetViz.dimensions} dimension={dimension} key={dimension.id} />;
+        });
+    }
+
     const numericProperties = useSelector(() => {
         return props.datasetViz.featureDescriptor?.properties.filter((property) => {
             return property.type === NUMERIC_FEATURE_PROPERTY_TYPE;
@@ -30,8 +39,9 @@ export const DatasetVectorVizSettings = (props: DatasetVectorVizSettingsProps) =
 
     return (
         <div className='dataset-vector-viz-settings'>
+            {dimensionSelectors}
             <DatasetVectorVizFilters dataset={props.datasetViz} />
-            {numericProperties?.length && props.datasetViz.config.colorScales?.length && (
+            {!!numericProperties?.length && !!props.datasetViz.config.colorScales?.length && (
                 <div className='dataset-vector-viz-colormap'>
                     <Checkbox
                         checked={!!colorProperty}

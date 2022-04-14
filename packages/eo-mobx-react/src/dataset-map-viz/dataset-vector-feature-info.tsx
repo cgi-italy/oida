@@ -26,6 +26,9 @@ declare module '@oidajs/eo-mobx' {
 
 /** A default property formatter function */
 const formatVectorFeaturePropertyValue = (property: VectorFeaturePropertyDescriptor, value: FeaturePropertyValueType, idx?: number) => {
+    if (value === undefined) {
+        return 'N/A';
+    }
     if (property.type === 'number' && typeof value === 'number') {
         return formatNumber(value, {
             precision: 3,

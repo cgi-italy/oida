@@ -9,5 +9,7 @@ export type ProductSearchRecord = {
 };
 
 export interface DatasetProductSearchProvider {
-    searchProducts: (queryParams: QueryParams) => Promise<{ total: number; results: ProductSearchRecord[] }>;
+    searchProducts: (
+        queryParams: QueryParams
+    ) => Promise<{ total: number; results: ProductSearchRecord[]; pageSize?: number; offset?: number }>;
 }

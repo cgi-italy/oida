@@ -84,7 +84,7 @@ export class CesiumFeatureSelectInteraction implements IFeatureSelectInteraction
 
         if (pickInfos.length) {
             if (selectionMode === SelectionMode.Replace) {
-                this.lastSelectedFeatureIdx_ = (this.lastSelectedFeatureIdx_ + 1) % pickedObjects.length;
+                this.lastSelectedFeatureIdx_ = (this.lastSelectedFeatureIdx_ + 1) % pickInfos.length;
                 const pickInfo = pickInfos[this.lastSelectedFeatureIdx_];
 
                 const layer = pickInfo.layer;

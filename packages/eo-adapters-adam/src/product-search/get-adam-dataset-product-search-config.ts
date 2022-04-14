@@ -1,5 +1,5 @@
 import { AxiosInstanceWithCancellation } from '@oidajs/core';
-import { DatasetProductSearchConfig } from '@oidajs/eo-mobx';
+import { DatasetProductSearchConfig, DatasetProductSearchProvider } from '@oidajs/eo-mobx';
 
 import { AdamDatasetConfig, isMultiBandCoverage } from '../adam-dataset-config';
 import { AdamOpenSearchClient } from '../common';
@@ -14,48 +14,56 @@ export const getAdamDatasetProductSearchConfig = (
     datasetConfig: AdamDatasetConfig,
     openSearchClient?: AdamOpenSearchClient
 ) => {
-    let wcsPreviewConfig: AdamWcsPreviewConfig;
-    if (isMultiBandCoverage(datasetConfig.coverages)) {
-        wcsPreviewConfig = {
-            serviceUrl: factoryConfig.wcsServiceUrl,
-            coverageId: datasetConfig.coverages.wcsCoverage,
-            size: 64
-        };
+    let searchProvider: DatasetProductSearchProvider | undefined;
 
-        if (!datasetConfig.coverages.isTrueColor) {
-            const bands = datasetConfig.coverages.presets.length ? datasetConfig.coverages.presets[0].bands : [1];
-            wcsPreviewConfig.subsets = [`bands(${bands.join(',')})`];
-        }
-    } else {
-        const defaultCoverage = datasetConfig.coverages[0];
+    if (openSearchClient) {
+        searchProvider = new AdamOpenSearchProductSearchProvider({
+            datasetId: datasetConfig.id,
+            openSearchClient: openSearchClient
+        });
+    } else if (datasetConfig.type !== 'vector') {
+        let wcsPreviewConfig: AdamWcsPreviewConfig;
+        if (isMultiBandCoverage(datasetConfig.coverages)) {
+            wcsPreviewConfig = {
+                serviceUrl: factoryConfig.wcsServiceUrl,
+                coverageId: datasetConfig.coverages.wcsCoverage,
+                size: 64
+            };
 
-        let colorTable: string | undefined;
-        if (defaultCoverage.default?.colorScale) {
-            colorTable = plottyToAdamWcsColormap[defaultCoverage.default?.colorScale];
+            if (!datasetConfig.coverages.isTrueColor) {
+                const bands = datasetConfig.coverages.presets.length ? datasetConfig.coverages.presets[0].bands : [1];
+                wcsPreviewConfig.subsets = [`bands(${bands.join(',')})`];
+            }
+        } else {
+            const defaultCoverage = datasetConfig.coverages[0];
+
+            let colorTable: string | undefined;
+            if (defaultCoverage.default?.colorScale) {
+                colorTable = plottyToAdamWcsColormap[defaultCoverage.default?.colorScale];
+            }
+            wcsPreviewConfig = {
+                serviceUrl: factoryConfig.wcsServiceUrl,
+                coverageId: defaultCoverage.wcsCoverage,
+                colorTable: colorTable,
+                size: 64
+            };
         }
-        wcsPreviewConfig = {
-            serviceUrl: factoryConfig.wcsServiceUrl,
-            coverageId: defaultCoverage.wcsCoverage,
-            colorTable: colorTable,
-            size: 64
-        };
+
+        searchProvider = new AdamCswProductSearchProvider({
+            collectionId: datasetConfig.cswCollection || datasetConfig.id,
+            serviceUrl: factoryConfig.cswServiceUrl,
+            wcsPreview: wcsPreviewConfig,
+            axiosInstance: axiosInstance,
+            extentOffset: datasetConfig.requestExtentOffset
+        });
     }
 
-    const searchConfig: DatasetProductSearchConfig = {
-        searchProvider: openSearchClient
-            ? new AdamOpenSearchProductSearchProvider({
-                  datasetId: datasetConfig.id,
-                  openSearchClient: openSearchClient
-              })
-            : new AdamCswProductSearchProvider({
-                  collectionId: datasetConfig.id,
-                  serviceUrl: factoryConfig.cswServiceUrl,
-                  wcsPreview: wcsPreviewConfig,
-                  axiosInstance: axiosInstance,
-                  extentOffset: datasetConfig.requestExtentOffset
-              }),
-        searchItemContent: datasetConfig.productSearchRecordContent || factoryConfig.productSearchRecordContent
-    };
-
+    let searchConfig: DatasetProductSearchConfig | undefined;
+    if (searchProvider) {
+        searchConfig = {
+            searchProvider: searchProvider,
+            searchItemContent: datasetConfig.productSearchRecordContent || factoryConfig.productSearchRecordContent
+        };
+    }
     return searchConfig;
 };

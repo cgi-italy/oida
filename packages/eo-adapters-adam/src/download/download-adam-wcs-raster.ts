@@ -1,9 +1,9 @@
 import { RasterMapViz } from '@oidajs/eo-mobx';
 import { getWcsTimeFilterSubset } from '../utils/get-wcs-time-filter-subset';
 import { getAoiWcsParams, getCoverageWcsParams } from '../utils';
-import { AdamDatasetConfig } from '../adam-dataset-config';
+import { AdamWcsDatasetConfig } from '../adam-dataset-config';
 
-export const downloadAdamWcsRaster = (datasetConfig: AdamDatasetConfig, rasterView: RasterMapViz) => {
+export const downloadAdamWcsRaster = (datasetConfig: AdamWcsDatasetConfig, rasterView: RasterMapViz) => {
     const subsets: string[] = [];
 
     if (!datasetConfig.fixedTime) {

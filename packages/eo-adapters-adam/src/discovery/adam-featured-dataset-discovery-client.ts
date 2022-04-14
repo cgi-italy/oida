@@ -1,14 +1,13 @@
 import { QueryParams, SortOrder } from '@oidajs/core';
-import { AdamDatasetConfig, isMultiBandCoverage, AdamDatasetRenderMode } from '../adam-dataset-config';
+import { AdamWcsDatasetConfig, isMultiBandCoverage, AdamDatasetRenderMode } from '../adam-dataset-config';
 import { AdamWcsCoverageDescriptionClient, AdamWcCoverageDescriptionClientConfig } from './adam-wcs-coverage-description-client';
 
 export type AdamFeaturedDataset = Omit<
-    AdamDatasetConfig,
-    'id' | 'coverageSrs' | 'srsDef' | 'coverageExtent' | 'renderMode' | 'productSearchRecordContent' | 'color'
+    AdamWcsDatasetConfig,
+    'coverageSrs' | 'srsDef' | 'coverageExtent' | 'renderMode' | 'productSearchRecordContent'
 > & {
-    id: string;
-    color?: string;
     description?: string;
+    fixedTime?: string;
 };
 
 export type AdamFeaturedDatasetDiscoveryResponse = {
@@ -68,7 +67,7 @@ export class AdamFeaturedDatasetDiscoveryClient {
         });
     }
 
-    getAdamDatasetConfig(config: AdamFeaturedDataset): Promise<AdamDatasetConfig> {
+    getAdamDatasetConfig(config: AdamFeaturedDataset): Promise<AdamWcsDatasetConfig> {
         let coverageId: string;
         if (isMultiBandCoverage(config.coverages)) {
             coverageId = config.coverages.wcsCoverage;
@@ -80,6 +79,13 @@ export class AdamFeaturedDatasetDiscoveryClient {
                 throw new Error('Invalid dataset');
             } else {
                 const coverage = coverages[0];
+                let fixedTime: Date | undefined;
+
+                if (config.fixedTime) {
+                    fixedTime = new Date(config.fixedTime);
+                } else if (coverage.time.start.getTime() === coverage.time.end.getTime()) {
+                    fixedTime = new Date(coverage.time.start);
+                }
                 return {
                     ...config,
                     coverageExtent: {
@@ -89,7 +95,7 @@ export class AdamFeaturedDatasetDiscoveryClient {
                     },
                     renderMode: AdamDatasetRenderMode.ClientSide,
                     color: config.color,
-                    fixedTime: coverage.time.start.getTime() === coverage.time.end.getTime() ? new Date(coverage.time.start) : undefined
+                    fixedTime: fixedTime
                 };
             }
         });

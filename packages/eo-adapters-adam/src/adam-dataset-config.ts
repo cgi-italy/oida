@@ -5,7 +5,8 @@ import {
     RasterBandConfig,
     RasterBandPreset,
     RasterBandGroup,
-    ProductSearchRecord
+    ProductSearchRecord,
+    VectorFeaturePropertyDescriptor
 } from '@oidajs/eo-mobx';
 
 export type AdamDatasetDimension = DatasetDimension<ValueDomain<number | Date> | CategoricalDomain<number | string>> & {
@@ -55,7 +56,7 @@ export enum AdamDatasetRenderMode {
 
 export type AdamDatasetType = 'raster' | 'volume' | 'vertical_profile';
 
-export type AdamDatasetConfig = {
+export type AdamWcsDatasetConfig = {
     id: string;
     type: AdamDatasetType;
     name: string;
@@ -78,7 +79,27 @@ export type AdamDatasetConfig = {
         start: Date;
         end: Date;
     };
+    verticalScaleConfig?: {
+        min: number;
+        max: number;
+        step?: number;
+        default?: number;
+    };
 };
+
+export type AdamVectorDatasetConfig = {
+    id: string;
+    type: 'vector';
+    name: string;
+    color?: string;
+    bbox: number[];
+    dimensions?: DatasetDimension<ValueDomain<number | Date> | CategoricalDomain<number | string>>[];
+    featureProperties?: VectorFeaturePropertyDescriptor[] | Record<string, VectorFeaturePropertyDescriptor[]>;
+    fixedTime?: Date | boolean;
+    productSearchRecordContent?: (item: ProductSearchRecord) => any;
+};
+
+export type AdamDatasetConfig = AdamWcsDatasetConfig | AdamVectorDatasetConfig;
 
 export function isMultiBandCoverage(
     coverages: AdamDatasetSingleBandCoverage[] | AdamDatasetMultiBandCoverage

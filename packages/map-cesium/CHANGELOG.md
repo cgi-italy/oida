@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.1.1](https://github.com/cgi-italy/oida/compare/@oidajs/map-cesium@3.1.0...@oidajs/map-cesium@3.1.1) (2022-04-14)
+
+
+### Bug Fixes
+
+* reset entity visibility for non pickable objects in cesium picker ([18e7383](https://github.com/cgi-italy/oida/commit/18e73837e9123c2d02701a72c62ee778dbbdc0e3))
+
+
+
+
+
 # [3.1.0](https://github.com/cgi-italy/oida/compare/@oidajs/map-cesium@3.0.1...@oidajs/map-cesium@3.1.0) (2022-03-09)
 
 

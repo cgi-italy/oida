@@ -3,14 +3,14 @@ import debounce from 'lodash/debounce';
 import { AxiosInstanceWithCancellation } from '@oidajs/core';
 import { DatasetVerticalProfileViz, VerticalProfileItemProps, RasterBandModeSingle } from '@oidajs/eo-mobx';
 
-import { createGeoTiffLoader } from '../../utils';
-import { AdamDatasetConfig, AdamDatasetSingleBandCoverage, isMultiBandCoverage } from '../../adam-dataset-config';
+import { createGeoTiffLoader, getCoverageWcsParams } from '../../utils';
+import { AdamWcsDatasetConfig, AdamDatasetSingleBandCoverage, isMultiBandCoverage } from '../../adam-dataset-config';
 import { AdamDatasetFactoryConfig } from '../../get-adam-dataset-factory';
-import { AdamWcsVerticalProfileDataProvider } from './adam-wcs-vertical-profile-data-provider';
+import { AdamWcsVerticalProfileDataProvider, AdamWcsVerticalProfilesRequest } from './adam-wcs-vertical-profile-data-provider';
 
 export const createVerticalProfileDataProvider = (
     factoryConfig: AdamDatasetFactoryConfig,
-    datasetConfig: AdamDatasetConfig,
+    datasetConfig: AdamWcsDatasetConfig,
     axiosInstance: AxiosInstanceWithCancellation
 ) => {
     const geotiffLoader = createGeoTiffLoader({
@@ -18,73 +18,77 @@ export const createVerticalProfileDataProvider = (
         rotateImage: true
     });
 
-    const variables: AdamDatasetSingleBandCoverage[] = [];
-
-    if (!isMultiBandCoverage(datasetConfig.coverages)) {
-        variables.push(...datasetConfig.coverages);
-    }
-
     const wcsVerticalProfileProvider = new AdamWcsVerticalProfileDataProvider({
         serviceUrl: factoryConfig.wcsServiceUrl,
-        axiosInstance: axiosInstance,
-        variables: variables
+        axiosInstance: axiosInstance
     });
 
-    // TODO: cesium wall textures don't follow coordinates ordering and we cannot predict
-    // in which direction the texture will be applied. Use a custom primitive to specify
-    // texture coordinates
-    const swap = datasetConfig.id === 'earthcare_atlid';
-
-    const debouncedProfileGetter = debounce((variable, timeFilter, resolve, reject) => {
-        wcsVerticalProfileProvider
-            .getProfiles({
-                variable,
-                timeFilter
-            })
-            .then(
-                (profiles) => {
-                    Promise.all(
-                        profiles.map((profile) => {
-                            return geotiffLoader.load({ url: profile.dataUrl }, swap).then((imageData) => {
-                                const verticalProfile = {
-                                    id: profile.id,
-                                    geometry: {
-                                        bottomCoords: profile.track,
-                                        height: profile.metadata.VERTICAL_MAX,
-                                        minHeight: 0
-                                    },
-                                    style: {
-                                        fillImage: imageData as string
-                                    }
-                                };
-                                return verticalProfile;
-                            });
-                        })
-                    ).then(
-                        (profiles) => {
-                            resolve(profiles);
-                        },
-                        (error) => {
-                            reject(error);
-                        }
-                    );
-                },
-                (error) => {
-                    reject(error);
-                }
-            );
+    const debouncedProfileGetter = debounce((request: AdamWcsVerticalProfilesRequest, resolve, reject) => {
+        wcsVerticalProfileProvider.getProfiles(request).then(
+            (profiles) => {
+                Promise.all(
+                    profiles.map((profile) => {
+                        return geotiffLoader.load({ url: profile.dataUrl }).then((imageData) => {
+                            const verticalProfile = {
+                                id: profile.id,
+                                geometry: {
+                                    bottomCoords: profile.track,
+                                    height: profile.metadata.VERTICAL_MAX,
+                                    minHeight: 0
+                                },
+                                style: {
+                                    fillImage: imageData as string
+                                }
+                            };
+                            return verticalProfile;
+                        });
+                    })
+                ).then(
+                    (profiles) => {
+                        resolve(profiles);
+                    },
+                    (error) => {
+                        reject(error);
+                    }
+                );
+            },
+            (error) => {
+                reject(error);
+            }
+        );
     }, 10);
 
     const load = (vProfileViz: DatasetVerticalProfileViz) => {
-        const bandMode = vProfileViz.bandMode.value;
-        if (bandMode instanceof RasterBandModeSingle) {
-            const timeFilter = !datasetConfig.fixedTime ? vProfileViz.dataset.toi : undefined;
-            return new Promise<VerticalProfileItemProps[]>((resolve, reject) => {
-                debouncedProfileGetter(bandMode.band, timeFilter, resolve, reject);
-            });
-        } else {
+        const subsets: string[] = [];
+        const bandMode = vProfileViz.bandMode;
+        if (!(bandMode.value instanceof RasterBandModeSingle)) {
             return Promise.reject(new Error('Unsupported band mode'));
         }
+        const wcsCoverageParams = getCoverageWcsParams(datasetConfig, vProfileViz.dimensions, bandMode);
+        if (!wcsCoverageParams) {
+            return Promise.reject(new Error('Unsupported coverage'));
+        }
+        if (wcsCoverageParams.bandSubset) {
+            subsets.push(wcsCoverageParams.bandSubset);
+        }
+        subsets.push(...wcsCoverageParams.dimensionSubsets);
+
+        const timeFilter = datasetConfig.fixedTime instanceof Date ? datasetConfig.fixedTime : vProfileViz.dataset.toi;
+        if (!timeFilter) {
+            return Promise.reject(new Error('No time selected'));
+        }
+        return new Promise<VerticalProfileItemProps[]>((resolve, reject) => {
+            debouncedProfileGetter(
+                {
+                    wcsCoverage: wcsCoverageParams.coverageId,
+                    timeFilter: timeFilter,
+                    dimensionSubsets: subsets,
+                    geometryOffset: datasetConfig.requestExtentOffset
+                },
+                resolve,
+                reject
+            );
+        });
     };
 
     const verticalProfileProvider = {
@@ -95,7 +99,7 @@ export const createVerticalProfileDataProvider = (
                     profileId: profileId
                 })
                 .then((dataUrl) => {
-                    return geotiffLoader.load({ url: dataUrl }, swap).then((imageData) => {
+                    return geotiffLoader.load({ url: dataUrl }).then((imageData) => {
                         return imageData as string;
                     });
                 });

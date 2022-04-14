@@ -12,12 +12,12 @@ import {
     createGeoTiffLoader,
     GeotiffLoader
 } from '../../utils';
-import { AdamDatasetConfig, isMultiBandCoverage, AdamDatasetCoverageBand } from '../../adam-dataset-config';
+import { isMultiBandCoverage, AdamDatasetCoverageBand, AdamWcsDatasetConfig } from '../../adam-dataset-config';
 import { AdamDatasetFactoryConfig } from '../../get-adam-dataset-factory';
 import { AdamSpatialCoverageProvider } from '../../get-adam-dataset-spatial-coverage-provider';
 
 const getMultiBandColorRange = (
-    datasetConfig: AdamDatasetConfig,
+    datasetConfig: AdamWcsDatasetConfig,
     bandMode: RasterBandMode,
     datasetBandsDict: Record<string, AdamDatasetCoverageBand>
 ) => {
@@ -51,7 +51,7 @@ const getMultiBandColorRange = (
 
 export const createAdamRasterTileSourceProvider = (
     factoryConfig: AdamDatasetFactoryConfig,
-    datasetConfig: AdamDatasetConfig,
+    datasetConfig: AdamWcsDatasetConfig,
     axiosInstance: AxiosInstanceWithCancellation,
     spatialCoverageProvider: AdamSpatialCoverageProvider,
     useRawData?: boolean
@@ -121,6 +121,9 @@ export const createAdamRasterTileSourceProvider = (
         const aoi = rasterView.dataset.aoi;
 
         return spatialCoverageProvider(rasterView, true).then((coverageExtent) => {
+            if (!coverageExtent) {
+                return Promise.reject(new Error('Error retrieving coverage data'));
+            }
             const aoiParams = getAoiWcsParams(datasetConfig, aoi, coverageExtent);
 
             if (!aoiParams) {

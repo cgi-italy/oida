@@ -10,13 +10,13 @@ import {
     DatasetMapViewConfig
 } from '@oidajs/eo-mobx';
 
-import { AdamDatasetConfig, isMultiBandCoverage } from '../../adam-dataset-config';
+import { AdamWcsDatasetConfig, isMultiBandCoverage } from '../../adam-dataset-config';
 import { AdamDatasetFactoryConfig } from '../../get-adam-dataset-factory';
 
 import { AdamServiceParamsSerializer, getAoiWcsParams, getWcsTimeFilterSubset } from '../../utils';
 import { getPlottyColorScales } from '@oidajs/eo-geotiff';
 
-export const getAdamVolumetricMapViewConfig = (factoryConfig: AdamDatasetFactoryConfig, datasetConfig: AdamDatasetConfig) => {
+export const getAdamVolumetricMapViewConfig = (factoryConfig: AdamDatasetFactoryConfig, datasetConfig: AdamWcsDatasetConfig) => {
     const heightDimension = datasetConfig.dimensions ? datasetConfig.dimensions.find((dimension) => dimension.id === 'height') : undefined;
 
     if (!heightDimension || !heightDimension.domain || isDomainProvider(heightDimension.domain) || !isValueDomain(heightDimension.domain)) {

@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.2.0](https://github.com/cgi-italy/oida/compare/@oidajs/eo-mobx-react@3.1.0...@oidajs/eo-mobx-react@3.2.0) (2022-04-14)
+
+
+### Bug Fixes
+
+* keep settings and tools buttons also on dataset map viz error ([93a6347](https://github.com/cgi-italy/oida/commit/93a634776352c154e20a7ae8e252dcd622b9472e))
+* use default time distribution filters in timeline zoom to dataset time extent action ([8a0a7bf](https://github.com/cgi-italy/oida/commit/8a0a7bf6ed48b793658c64079ef2a0930f122a46))
+
+
+### Features
+
+* add support for dimensions in vertical profile dataset ([9753f91](https://github.com/cgi-italy/oida/commit/9753f91a2049c04f3ad8193bafa4d3ce3f7ed0a4))
+* add support for more filter types in DatasetVectorVizFilters ([3b99be4](https://github.com/cgi-italy/oida/commit/3b99be485f375e1cbcda9a4a6ab26405d11562b6))
+* improve vector dataset visualization ([38f84c8](https://github.com/cgi-italy/oida/commit/38f84c84e605bfc83707352215c872a930a24465))
+
+
+
+
+
 # [3.1.0](https://github.com/cgi-italy/oida/compare/@oidajs/eo-mobx-react@3.0.1...@oidajs/eo-mobx-react@3.1.0) (2022-03-09)
 
 
