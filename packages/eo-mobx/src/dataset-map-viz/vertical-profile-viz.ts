@@ -15,9 +15,9 @@ import {
     AsyncDataFetcher
 } from '@oidajs/state-mobx';
 
-import { DatasetViz, DatasetVizProps } from '../common';
+import { DataDomain, DatasetDimension, DatasetDimensions, DatasetDimensionsProps, DatasetViz, DatasetVizProps } from '../common';
 import { DatasetPointSeriesValueItem } from '../dataset-analytics';
-import { RasterBandModeConfig, RasterBandMode } from './raster-band-mode';
+import { RasterBandModeConfig, RasterBandMode, RasterBandModeType } from './raster-band-mode';
 import { getRasterBandModeFromConfig } from '../utils';
 import { VerticalScale, VerticalScaleProps } from './vertical-scale';
 
@@ -101,10 +101,12 @@ export type VerticalProfileVizConfig = {
         default?: number;
     };
     afterInit?: (verticalProfileViz) => void;
+    dimensions?: DatasetDimension<DataDomain<string | number | Date>>[];
 };
 
 export type DatasetVerticalProfileVizProps = DatasetVizProps<typeof VERTICAL_PROFILE_VIZ_TYPE, VerticalProfileVizConfig> &
-    VerticalScaleProps;
+    VerticalScaleProps &
+    DatasetDimensionsProps;
 
 export class DatasetVerticalProfileViz extends DatasetViz<VerticalProfileLayer<VerticalProfileItem>> {
     readonly config: VerticalProfileVizConfig;
@@ -112,6 +114,7 @@ export class DatasetVerticalProfileViz extends DatasetViz<VerticalProfileLayer<V
     @observable tileSourceRevision: number;
     profiles: IObservableArray<VerticalProfileItem>;
     readonly bandMode: RasterBandMode;
+    readonly dimensions: DatasetDimensions;
 
     protected subscriptionTracker_: SubscriptionTracker;
     protected profileGetter_: AsyncDataFetcher<VerticalProfileItemProps[], undefined>;
@@ -129,6 +132,14 @@ export class DatasetVerticalProfileViz extends DatasetViz<VerticalProfileLayer<V
         if (verticalScaleConfig && verticalScaleConfig.default) {
             this.verticalScale.setValue(verticalScaleConfig.default);
         }
+
+        this.dimensions = new DatasetDimensions({
+            dataset: this.dataset,
+            dimensionValues: props.dimensionValues,
+            dimensions: props.config.dimensions,
+            currentVariable: () => (this.bandMode.value?.type === RasterBandModeType.Single ? this.bandMode.value.band : undefined),
+            initDimensions: true
+        });
 
         this.tileSourceRevision = 0;
 

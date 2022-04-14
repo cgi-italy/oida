@@ -275,8 +275,8 @@ export const VerticalProfileSeries = (props: VerticalProfileSeriesProps) => {
 
                         return `
                             <div><span>${
-                                props.direction === 'horizontal' ? 'Distance (km)' : 'Height (m)'
-                            }: </span>${fParams.value[0].toFixed(0)}</div>
+                                props.direction === 'horizontal' ? 'Distance (km)' : 'Height (km)'
+                            }: </span>${fParams.value[0].toFixed(2)}</div>
                             <div><span>${variableConfig?.name}${
                             variableConfig?.units ? ' (' + variableConfig.units + ')' : ''
                         }: </span><span>${fParams.value[1].toFixed(2)}</span></div>
@@ -296,7 +296,7 @@ export const VerticalProfileSeries = (props: VerticalProfileSeriesProps) => {
             xAxis: [
                 {
                     type: 'value',
-                    name: props.direction === 'horizontal' ? 'Distance (km)' : 'Height (m)',
+                    name: props.direction === 'horizontal' ? 'Distance (km)' : 'Height (km)',
                     nameLocation: 'middle',
                     nameGap: 30
                 }
