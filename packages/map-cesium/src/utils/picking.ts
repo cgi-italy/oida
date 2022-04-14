@@ -21,9 +21,6 @@ export const getPickInfo = (cesiumPickObject) => {
     let primitive;
     if (cesiumPickObject.id instanceof Entity) {
         primitive = cesiumPickObject.id;
-        if (primitive.parent) {
-            primitive = primitive.parent;
-        }
     } else if (cesiumPickObject.primitive) {
         primitive = cesiumPickObject.primitive;
     }
@@ -42,9 +39,11 @@ export const setNonPickableFeaturesVisibility = (cesiumPickObjectList, visible) 
     let hasNonPickableObjects = false;
     cesiumPickObjectList.forEach((cesiumPickObject) => {
         if (!getPickInfo(cesiumPickObject)?.pickable) {
-            cesiumPickObject.primitive.show = visible;
             if (cesiumPickObject.id instanceof Entity) {
-                cesiumPickObject.id.show = false;
+                cesiumPickObject.id.show = visible;
+            }
+            if (cesiumPickObject.primitive) {
+                cesiumPickObject.primitive.show = visible;
             }
             hasNonPickableObjects = true;
         }
