@@ -22,6 +22,7 @@ export const createAdamVectorDataProvider = (datasetConfig: AdamVectorDatasetCon
             });
         }
 
+        let hasValidTime = true;
         if (!datasetConfig.fixedTime) {
             const toi = vectorViz.dataset.toi;
             if (toi) {
@@ -44,6 +45,8 @@ export const createAdamVectorDataProvider = (datasetConfig: AdamVectorDatasetCon
                         }
                     });
                 }
+            } else {
+                hasValidTime = false;
             }
         } else if (datasetConfig.fixedTime instanceof Date) {
             filters.push({
@@ -75,33 +78,37 @@ export const createAdamVectorDataProvider = (datasetConfig: AdamVectorDatasetCon
             let done = false;
 
             const getNextPage = () => {
-                return openSearchClient
-                    .searchProducts({
-                        filters: filters,
-                        paging: {
-                            pageSize: pageSize,
-                            page: page,
-                            offset: offset
-                        }
-                    })
-                    .then((response) => {
-                        if (offset + pageSize < response.properties.totalResults) {
-                            page++;
-                            offset += pageSize;
-                        } else {
-                            done = true;
-                        }
-                        return response.features.map((feature) => {
-                            const { catalogueId, geometry, ...properties } = feature;
-                            return {
-                                id: catalogueId,
-                                geometry: geometry,
-                                properties: {
-                                    ...properties
-                                }
-                            };
+                if (!hasValidTime) {
+                    return Promise.reject(new Error('No time selected'));
+                } else {
+                    return openSearchClient
+                        .searchProducts({
+                            filters: filters,
+                            paging: {
+                                pageSize: pageSize,
+                                page: page,
+                                offset: offset
+                            }
+                        })
+                        .then((response) => {
+                            if (offset + pageSize < response.properties.totalResults) {
+                                page++;
+                                offset += pageSize;
+                            } else {
+                                done = true;
+                            }
+                            return response.features.map((feature) => {
+                                const { catalogueId, geometry, ...properties } = feature;
+                                return {
+                                    id: catalogueId,
+                                    geometry: geometry,
+                                    properties: {
+                                        ...properties
+                                    }
+                                };
+                            });
                         });
-                    });
+                }
             };
 
             while (!done) {
