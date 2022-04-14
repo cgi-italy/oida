@@ -12,7 +12,7 @@ export type createGeotiffTileLoaderProps = {
 };
 
 export type GeotiffLoader = {
-    load: (source: { url: string; postData?: string; requestExtent?: number[]; requestSrs?: string }, flip: boolean) => Promise<string>;
+    load: (source: { url: string; postData?: string; requestExtent?: number[]; requestSrs?: string }) => Promise<string>;
     renderer: PlottyRenderer;
     dataCache: LruCache;
 };
@@ -24,24 +24,26 @@ export const createGeoTiffLoader = (props: createGeotiffTileLoaderProps): Geotif
         axiosInstace: axiosInstance
     });
 
+    // vertical profile rendering needs the image to be rotated by 90 degrees and mirrored
     let getRotatedImage;
     if (rotateImage) {
         const rotationCanvas = document.createElement('canvas');
         const rotCtx = rotationCanvas.getContext('2d')!;
-        rotCtx.rotate(-Math.PI / 2);
 
         getRotatedImage = (canvas) => {
             rotationCanvas.width = canvas.height;
             rotationCanvas.height = canvas.width;
 
+            rotCtx.translate(rotationCanvas.width / 2, rotationCanvas.height / 2);
             rotCtx.rotate(-Math.PI / 2);
-            rotCtx.drawImage(canvas, -canvas.width, 0);
+            rotCtx.scale(1, -1);
+            rotCtx.drawImage(canvas, -canvas.width / 2, -canvas.height / 2);
 
             return rotationCanvas.toDataURL();
         };
     }
 
-    const load = (source: { url: string; data?: any; requestExtent?: number[]; requestSrs?: string }, flip?: boolean) => {
+    const load = (source: { url: string; data?: any; requestExtent?: number[]; requestSrs?: string }) => {
         return geotiffRenderer
             .renderFromUrl({
                 url: source.url,

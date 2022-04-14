@@ -79,6 +79,12 @@ export type AdamWcsDatasetConfig = {
         start: Date;
         end: Date;
     };
+    verticalScaleConfig?: {
+        min: number;
+        max: number;
+        step?: number;
+        default?: number;
+    };
 };
 
 export type AdamVectorDatasetConfig = {

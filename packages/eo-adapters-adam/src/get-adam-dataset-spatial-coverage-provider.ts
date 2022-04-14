@@ -5,7 +5,7 @@ import { getIntersection } from 'ol/extent';
 import { fromArrayBuffer } from 'geotiff';
 
 import { AxiosInstanceWithCancellation, EpsgIoDefinitionProvider, GeometryCollection, getGeometryExtent } from '@oidajs/core';
-import { RasterMapViz, DatasetVectorMapViz, DatasetViz } from '@oidajs/eo-mobx';
+import { RasterMapViz, DatasetVectorMapViz, DatasetViz, DatasetVerticalProfileViz } from '@oidajs/eo-mobx';
 
 import { AdamDatasetConfig } from './adam-dataset-config';
 import { AdamDatasetFactoryConfig } from './get-adam-dataset-factory';
@@ -103,6 +103,34 @@ export const getAdamDatasetSpatialCoverageProvider = (
                     return Promise.reject(new Error('No features currently on map for dataset'));
                 }
             }
+            return Promise.resolve({
+                srs: 'EPSG:4326',
+                bbox: bbox
+            });
+        };
+    } else if (datasetConfig.type === 'vertical_profile') {
+        spatialCoverageProvider = (mapView: DatasetViz<any>) => {
+            let bbox: number[] | undefined;
+
+            if (mapView instanceof DatasetVerticalProfileViz) {
+                const source = mapView.mapLayer.source;
+                if (source && source.length) {
+                    const geomCollection: GeometryCollection = {
+                        type: 'GeometryCollectionEx',
+                        geometries: source.map((item) => {
+                            return item.geometry.bottomCoords;
+                        })
+                    };
+                    bbox = getGeometryExtent(geomCollection);
+                } else {
+                    return Promise.reject(new Error('No vertical profiles currently displayed'));
+                }
+            }
+
+            if (!bbox) {
+                return Promise.reject(new Error('Unable to compute dataset bounding box'));
+            }
+
             return Promise.resolve({
                 srs: 'EPSG:4326',
                 bbox: bbox

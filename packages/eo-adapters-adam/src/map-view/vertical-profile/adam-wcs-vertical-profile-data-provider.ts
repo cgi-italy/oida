@@ -4,11 +4,6 @@ import { AdamServiceParamsSerializer, getWcsTimeFilterSubset } from '../../utils
 
 export type AdamWcsVerticalProfileDataProviderConfig = {
     serviceUrl: string;
-    variables: Array<{
-        id: string;
-        wcsCoverage: string;
-        geometryOffset?: number[];
-    }>;
     axiosInstance?: AxiosInstanceWithCancellation;
 };
 
@@ -32,14 +27,18 @@ export type AdamWcsVerticalProfile = {
         VERTICAL_RES: number;
     };
     noDataValue: number;
+    coverageId: string;
+    dimensionSubsets?: string[];
 };
 
 export type AdamWcsVerticalProfilesRequest = {
-    variable: string;
+    wcsCoverage: string;
     timeFilter?: Date | DateRangeValue;
     scale?: number;
     xSubset?: number[];
     ySubset?: number[];
+    geometryOffset?: number[];
+    dimensionSubsets?: string[];
 };
 
 export type AdamWcsVerticalProfileDataRequest = {
@@ -77,20 +76,15 @@ export class AdamWcsVerticalProfileDataProvider {
     }
 
     getProfiles(request: AdamWcsVerticalProfilesRequest) {
-        const variable = this.getVariableConfig_(request.variable);
-        if (!variable) {
-            return Promise.reject(`AdamWcsVerticalProfileDataProvider: no config provided for variable ${request.variable}`);
-        }
-
         const wcsParams: any = {
             service: 'WCS',
             request: 'GetCoverage',
             version: '2.0.0',
-            coverageId: variable.wcsCoverage,
+            coverageId: request.wcsCoverage,
             format: 'image/tiff'
         };
 
-        const subset: string[] = [];
+        const subset = request.dimensionSubsets?.slice() || [];
 
         if (request.xSubset) {
             subset.push(`x(${request.xSubset[0]},${request.xSubset[1]}`);
@@ -99,7 +93,7 @@ export class AdamWcsVerticalProfileDataProvider {
             subset.push(`y(${request.ySubset[0]},${request.ySubset[1]}`);
         }
 
-        return this.getProfilesMetadata_(variable, request.timeFilter).then((profiles) => {
+        return this.getProfilesMetadata_(request).then((profiles) => {
             return Object.keys(profiles).map((profileId) => {
                 const profileInfo = profiles[profileId];
                 const timeSubset = `unix(${profileInfo.time.toISOString()})`;
@@ -122,26 +116,24 @@ export class AdamWcsVerticalProfileDataProvider {
     }
 
     getProfileDataUrl(request: AdamWcsVerticalProfileDataRequest) {
-        const coverageId = this.getCoverageFromProfileId_(request.profileId);
-
-        const wcsParams: any = {
-            service: 'WCS',
-            request: 'GetCoverage',
-            version: '2.0.0',
-            coverageId: coverageId,
-            format: 'image/tiff'
-        };
-
-        const subset: string[] = [];
-
-        if (request.xSubset) {
-            subset.push(`x(${request.xSubset[0]},${request.xSubset[1]}`);
-        }
-        if (request.ySubset) {
-            subset.push(`y(${request.ySubset[0]},${request.ySubset[1]}`);
-        }
-
         return this.getProfileMetadata(request.profileId).then((profile) => {
+            const wcsParams: any = {
+                service: 'WCS',
+                request: 'GetCoverage',
+                version: '2.0.0',
+                coverageId: profile.coverageId,
+                format: 'image/tiff'
+            };
+
+            const subset: string[] = profile.dimensionSubsets?.slice() || [];
+
+            if (request.xSubset) {
+                subset.push(`x(${request.xSubset[0]},${request.xSubset[1]}`);
+            }
+            if (request.ySubset) {
+                subset.push(`y(${request.ySubset[0]},${request.ySubset[1]}`);
+            }
+
             const timeSubset = `unix(${profile.time.toISOString()})`;
 
             const desiredHorizontalRes = 4000;
@@ -157,21 +149,19 @@ export class AdamWcsVerticalProfileDataProvider {
     }
 
     getProfileLineSeries(request: AdamWcsVerticalProfileSeriesRequest) {
-        const coverageId = this.getCoverageFromProfileId_(request.profileId);
-
-        const wcsParams: any = {
-            service: 'WCS',
-            request: 'GetCoverage',
-            version: '2.0.0',
-            coverageId: coverageId,
-            format: 'application/json'
-        };
-
-        const subset: string[] = [];
-
-        const index = Math.round(request.series.index);
-
         return this.getProfileMetadata(request.profileId).then((profile) => {
+            const wcsParams: any = {
+                service: 'WCS',
+                request: 'GetCoverage',
+                version: '2.0.0',
+                coverageId: profile.coverageId,
+                format: 'application/json'
+            };
+
+            const subset: string[] = profile.dimensionSubsets?.slice() || [];
+
+            const index = Math.round(request.series.index);
+
             const targetSamples = request.targetSamples || 100;
 
             if (request.series.direction === 'horizontal') {
@@ -231,10 +221,6 @@ export class AdamWcsVerticalProfileDataProvider {
         return Promise.resolve(this.cachedProfiles_[profileId]);
     }
 
-    protected getVariableConfig_(variableId: string) {
-        return this.config_.variables.find((variable) => variable.id === variableId);
-    }
-
     protected getHeightFromVerticalCoord_(profile: AdamWcsVerticalProfile, coordIndex: number, scale?: number) {
         const absoluteIdx = coordIndex / (scale || 1);
         return (
@@ -248,17 +234,22 @@ export class AdamWcsVerticalProfileDataProvider {
         return absoluteIdx * profile.metadata.HORIZONTAL_RES;
     }
 
-    protected getProfilesMetadata_(variableConfig, timeFilter?: Date | DateRangeValue) {
-        const { wcsCoverage: coverageId, geometryOffset } = variableConfig;
+    protected getProfilesMetadata_(request: AdamWcsVerticalProfilesRequest) {
+        const { wcsCoverage, geometryOffset, timeFilter, dimensionSubsets } = request;
+
+        const subsets = dimensionSubsets?.slice() || [];
 
         const timeFilterSubset = getWcsTimeFilterSubset(timeFilter);
+        if (timeFilterSubset) {
+            subsets.push(timeFilterSubset);
+        }
 
         const wcsParams: any = {
             service: 'WCS',
             request: 'GetInfo',
             version: '2.0.0',
-            subset: timeFilterSubset ? [timeFilterSubset] : [],
-            coverageId: coverageId
+            subset: subsets,
+            coverageId: wcsCoverage
         };
 
         return this.axiosInstance_
@@ -270,12 +261,16 @@ export class AdamWcsVerticalProfileDataProvider {
             })
             .then((response) => {
                 const profiles: AdamWcsVerticalProfile[] = response.data.prods.map((prod) =>
-                    this.parseProfileMetadata_(prod, geometryOffset)
+                    this.parseProfileMetadata_(prod, wcsCoverage, geometryOffset, dimensionSubsets)
                 );
                 const profilesMap: { [profileId: string]: AdamWcsVerticalProfile } = profiles.reduce((profileMap, profile) => {
+                    let profileId = `${wcsCoverage}_${profile.time.getTime()}`;
+                    if (dimensionSubsets) {
+                        profileId += `_${request.dimensionSubsets?.join('_')}`;
+                    }
                     return {
                         ...profileMap,
-                        [`${coverageId}_${profile.time.getTime()}`]: profile
+                        [profileId]: profile
                     };
                 }, {});
 
@@ -288,18 +283,29 @@ export class AdamWcsVerticalProfileDataProvider {
             });
     }
 
-    protected parseProfileMetadata_(data, geometryOffset?) {
+    protected parseProfileMetadata_(data, coverageId: string, geometryOffset?: number[], dimensionSubsets?: string[]) {
+        const horizontalLength = parseFloat(data.metadata.HORIZONTAL_LEGHT);
+        const horizontalRes = data.metadata.HORIZONTAL_RES
+            ? parseFloat(data.metadata.HORIZONTAL_RES)
+            : horizontalLength / data.dimentions[1];
+
+        const verticalMin = parseFloat(data.metadata.VERTICAL_MIN);
+        const verticalMax = parseFloat(data.metadata.VERTICAL_MAX);
+        const verticalRes = data.metadata.VERTICAL_RES
+            ? parseFloat(data.metadata.VERTICAL_RES)
+            : (verticalMax - verticalMin) / data.dimentions[0];
+
         return {
             time: new Date(data.time * 1000),
             dimensions: data.dimentions,
             gcps: data.gcps,
             metadata: {
-                HORIZONTAL_LENGTH: parseFloat(data.metadata.HORIZONTAL_LEGHT),
-                HORIZONTAL_RES: parseFloat(data.metadata.HORIZONTAL_RES),
+                HORIZONTAL_LENGTH: horizontalLength,
+                HORIZONTAL_RES: horizontalRes,
                 UNIT: data.UNIT,
-                VERTICAL_MAX: parseFloat(data.metadata.VERTICAL_MAX),
-                VERTICAL_MIN: parseFloat(data.metadata.VERTICAL_MIN),
-                VERTICAL_RES: parseFloat(data.metadata.VERTICAL_RES)
+                VERTICAL_MAX: verticalMax,
+                VERTICAL_MIN: verticalMin,
+                VERTICAL_RES: verticalRes
             },
             noDataValue: data.bands[0].nodata,
             track: {
@@ -314,11 +320,9 @@ export class AdamWcsVerticalProfileDataProvider {
                         }
                         return coord;
                     })
-            }
+            },
+            coverageId: coverageId,
+            dimensionSubsets: dimensionSubsets?.slice()
         } as AdamWcsVerticalProfile;
-    }
-
-    protected getCoverageFromProfileId_(profileId: string) {
-        return profileId.substr(0, profileId.lastIndexOf('_'));
     }
 }

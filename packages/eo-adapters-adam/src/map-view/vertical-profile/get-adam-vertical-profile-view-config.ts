@@ -157,12 +157,13 @@ export const getAdamVerticalProfileViewConfig = (
                 }
             });
         },
-        verticalScaleConfig: {
+        verticalScaleConfig: datasetConfig.verticalScaleConfig || {
             min: 20,
             max: 100,
             step: 1,
             default: 50
         },
+        dimensions: datasetConfig.dimensions,
         afterInit: afterInit
     };
 
