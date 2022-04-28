@@ -46,50 +46,6 @@ export const UnprojectedImageLayer = (props: UnprojectedImageLayerProps) => {
         });
         setMap(map);
 
-        let potentialClick = false;
-        const viewport = map.getViewport();
-
-        const downListener = listen(viewport, EventType.POINTERDOWN, () => {
-            potentialClick = true;
-        });
-
-        const moveListener = listen(viewport, EventType.POINTERMOVE, (evt) => {
-            const px = map.getEventPixel(evt);
-            const coord = map.getCoordinateFromPixel(px);
-            if (props.onMouseCoord) {
-                if (map.selectedCoord_) {
-                    const selectedCoord = map.selectedCoord_.getCoordinates();
-                    const mapRes = map.getView().getResolution();
-                    const snapThreshold = 5 * mapRes;
-                    if (Math.abs(coord[0] - selectedCoord[0]) < snapThreshold) {
-                        coord[0] = selectedCoord[0];
-                    }
-                    if (Math.abs(coord[1] - selectedCoord[1]) < snapThreshold) {
-                        coord[1] = selectedCoord[1];
-                    }
-                }
-                props.onMouseCoord(coord);
-            }
-            potentialClick = false;
-        });
-
-        const upListener = listen(viewport, EventType.POINTERUP, (evt) => {
-            if (potentialClick) {
-                potentialClick = false;
-                const px = map.getEventPixel(evt);
-                const coord = map.getCoordinateFromPixel(px);
-                if (props.onMouseClick) {
-                    props.onMouseClick(coord);
-                }
-            }
-        });
-
-        const outListener = listen(viewport, EventType.POINTEROUT, () => {
-            if (props.onMouseCoord) {
-                props.onMouseCoord(undefined);
-            }
-        });
-
         const cursorStyle = new Style({
             image: new CircleStyle({
                 radius: 3,
@@ -147,6 +103,56 @@ export const UnprojectedImageLayer = (props: UnprojectedImageLayerProps) => {
                 vectorContext.drawGeometry(map.cursorCoord_);
             }
         });
+    }, []);
+
+    useEffect(() => {
+        if (!map) {
+            return;
+        }
+
+        let potentialClick = false;
+        const viewport = map.getViewport();
+
+        const downListener = listen(viewport, EventType.POINTERDOWN, () => {
+            potentialClick = true;
+        });
+
+        const moveListener = listen(viewport, EventType.POINTERMOVE, (evt) => {
+            const px = map.getEventPixel(evt);
+            const coord = map.getCoordinateFromPixel(px);
+            if (props.onMouseCoord) {
+                if (map.selectedCoord_) {
+                    const selectedCoord = map.selectedCoord_.getCoordinates();
+                    const mapRes = map.getView().getResolution();
+                    const snapThreshold = 5 * mapRes;
+                    if (Math.abs(coord[0] - selectedCoord[0]) < snapThreshold) {
+                        coord[0] = selectedCoord[0];
+                    }
+                    if (Math.abs(coord[1] - selectedCoord[1]) < snapThreshold) {
+                        coord[1] = selectedCoord[1];
+                    }
+                }
+                props.onMouseCoord(coord);
+            }
+            potentialClick = false;
+        });
+
+        const upListener = listen(viewport, EventType.POINTERUP, (evt) => {
+            if (potentialClick) {
+                potentialClick = false;
+                const px = map.getEventPixel(evt);
+                const coord = map.getCoordinateFromPixel(px);
+                if (props.onMouseClick) {
+                    props.onMouseClick(coord);
+                }
+            }
+        });
+
+        const outListener = listen(viewport, EventType.POINTEROUT, () => {
+            if (props.onMouseCoord) {
+                props.onMouseCoord(undefined);
+            }
+        });
 
         return () => {
             unlistenByKey(moveListener);
@@ -154,7 +160,7 @@ export const UnprojectedImageLayer = (props: UnprojectedImageLayerProps) => {
             unlistenByKey(downListener);
             unlistenByKey(upListener);
         };
-    }, []);
+    }, [map, props.onMouseCoord, props.onMouseClick]);
 
     useEffect(() => {
         if (!props.sourceConfig || !map) {

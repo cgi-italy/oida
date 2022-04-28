@@ -53,7 +53,7 @@ export const VerticalProfileImage = (props: VerticalProfileImageProps) => {
         return () => {
             sourceUpdateDisposer();
         };
-    }, []);
+    }, [props.selectedProfile]);
 
     const centerOnMap = useCenterOnMapFromModule();
 
