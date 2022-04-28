@@ -47,7 +47,6 @@ export const NumericRangeFieldRenderer = (props: NumericRangeFieldRendererProps)
         domainSlider = (
             <Slider
                 ref={sliderRef}
-                style={{ minWidth: '140px' }}
                 value={value ? [value.from, value.to] : undefined}
                 defaultValue={value ? [value.from, value.to] : [config.min!, config.max!]}
                 onChange={(range) => {
