@@ -120,7 +120,13 @@ export class DatasetPointSeries extends DatasetProcessing<undefined> implements 
         if (dimension) {
             this.dimensions.unsetValue(dimension);
 
-            const domainPromise = this.dimensions.domainRequests.get(dimension);
+            let domainPromise = this.dimensions.domainRequests.get(dimension);
+            if (!domainPromise) {
+                const domain = this.dimensions.domains.get(dimension);
+                if (domain) {
+                    domainPromise = Promise.resolve(domain);
+                }
+            }
             if (domainPromise) {
                 domainPromise
                     .then((domain) => {
