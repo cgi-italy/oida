@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.2.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/core@4.1.0...@oidajs/core@4.2.0) (2022-05-16)
+
+
+### Features
+
+* add duration formatting utils ([ac2b968](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/ac2b9682f2a80134163067f9b5b51ff971ff4c9b))
+* improve dataset dimensions management ([3f1d0d8](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/3f1d0d8c1539166694976ea8ba893d826c8ea652))
+
+
+
+
+
 # [4.1.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/core@4.0.1...@oidajs/core@4.1.0) (2022-03-09)
 
 

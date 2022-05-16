@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.3.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-mobx@2.2.0...@oidajs/eo-mobx@2.3.0) (2022-05-16)
+
+
+### Bug Fixes
+
+* init point series range on fixed dimension domain case ([46d6c5c](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/46d6c5cdae5728cfb3b57879f42768491e7088a8))
+
+
+### Features
+
+* improve dataset dimensions management ([3f1d0d8](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/3f1d0d8c1539166694976ea8ba893d826c8ea652))
+
+
+
+
+
 # [2.2.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-mobx@2.1.0...@oidajs/eo-mobx@2.2.0) (2022-04-14)
 
 

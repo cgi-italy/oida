@@ -1,6 +1,6 @@
 {
   "name": "@oidajs/map-cesium",
-  "version": "3.1.1",
+  "version": "3.1.2",
   "description": "Cesium map renderer wrapper library",
   "module": "es/index.js",
   "main": "lib/index.js",

@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.3.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-mobx-react@3.2.0...@oidajs/eo-mobx-react@3.3.0) (2022-05-16)
+
+
+### Bug Fixes
+
+* force tile source update on selected profile change ([6f6150a](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/6f6150a09133323a61e2c4c6af2e0e30716e9236))
+
+
+### Features
+
+* improve dataset dimensions management ([3f1d0d8](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/3f1d0d8c1539166694976ea8ba893d826c8ea652))
+
+
+
+
+
 # [3.2.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-mobx-react@3.1.0...@oidajs/eo-mobx-react@3.2.0) (2022-04-14)
 
 
