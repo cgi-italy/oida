@@ -132,7 +132,13 @@ export const DatasetPointSeriesFilters = (props: DatasetPointSeriesFiltersProps)
 
     if (dimension) {
         dimensionRangeField = (
-            <DatasetDimensionRangeSelector dimension={dimension} value={selectedRange} onChange={(value) => props.series.setRange(value)} />
+            <Form.Item label={`${dimension.name} range`}>
+                <DatasetDimensionRangeSelector
+                    dimension={dimension}
+                    value={selectedRange}
+                    onChange={(value) => props.series.setRange(value)}
+                />
+            </Form.Item>
         );
     }
 

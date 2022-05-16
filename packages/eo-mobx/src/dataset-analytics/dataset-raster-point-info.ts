@@ -1,17 +1,9 @@
 import { autorun, observable, makeObservable, action, computed } from 'mobx';
 
 import { LoadingState, QueryFilter, SubscriptionTracker } from '@oidajs/core';
-import { AsyncDataFetcher, MapLayer } from '@oidajs/state-mobx';
+import { AsyncDataFetcher } from '@oidajs/state-mobx';
 
-import {
-    DatasetViz,
-    DatasetDimension,
-    DataDomain,
-    NumericVariable,
-    DatasetDimensions,
-    HasDatasetDimensions,
-    DatasetDimensionsProps
-} from '../common';
+import { DatasetDimension, NumericVariable, DimensionDomainType } from '../common';
 import { DatasetProcessing, DatasetProcessingProps } from './dataset-processing';
 
 export const RASTER_POINT_INFO_PRCESSING = 'raster_point_info_processing';
@@ -31,27 +23,26 @@ export type DatasetRasterPointInfoProvider = (request: DatasetRasterPointInfoReq
 export type DatasetRasterPointInfoConfig = {
     variables: NumericVariable[];
     provider: DatasetRasterPointInfoProvider;
-    dimensions: DatasetDimension<DataDomain<DimensionType>>[];
+    dimensions: DatasetDimension<DimensionDomainType>[];
 };
 
-export type DatasetRasterPointInfoProps = {
+export type DatasetRasterPointInfoProps = Omit<
+    DatasetProcessingProps<typeof RASTER_POINT_INFO_PRCESSING, DatasetRasterPointInfoConfig>,
+    'dimensions' | 'currentVariable' | 'initDimensions'
+> & {
     /**
      * when enabled the query time and other dimension values will be kept in sync with the parent
      * map visualization dimensions (if available)
      */
     trackParentViz?: boolean;
     autoUpdate?: boolean;
-    parent?: DatasetViz<MapLayer | undefined> & Partial<HasDatasetDimensions>;
-} & Omit<DatasetProcessingProps<typeof RASTER_POINT_INFO_PRCESSING, DatasetRasterPointInfoConfig>, 'parent'> &
-    DatasetDimensionsProps;
+};
 
 /**
  * An tool to extract the value on a point location of a raster dataset
  */
-export class DatasetRasterPointInfo extends DatasetProcessing<undefined> implements HasDatasetDimensions {
-    readonly parent: (DatasetViz<MapLayer | undefined> & Partial<HasDatasetDimensions>) | undefined;
+export class DatasetRasterPointInfo extends DatasetProcessing<undefined> {
     readonly config: DatasetRasterPointInfoConfig;
-    readonly dimensions: DatasetDimensions;
     @observable.ref data: DatasetRasterPointData | undefined;
     @observable.ref autoUpdate: boolean;
 
@@ -61,11 +52,13 @@ export class DatasetRasterPointInfo extends DatasetProcessing<undefined> impleme
     constructor(props: Omit<DatasetRasterPointInfoProps, 'vizType'>) {
         super({
             vizType: RASTER_POINT_INFO_PRCESSING,
+            dimensions: props.config.dimensions,
+            dimensionValues: props.dimensionValues || props.parent?.dimensions.values,
+            initDimensions: false,
             ...props
         });
 
         this.config = props.config;
-        this.dimensions = new DatasetDimensions(props);
         this.data = undefined;
         this.autoUpdate = props.autoUpdate !== undefined ? props.autoUpdate : true;
 
@@ -128,14 +121,13 @@ export class DatasetRasterPointInfo extends DatasetProcessing<undefined> impleme
 
     clone() {
         return this.clone_({
-            config: this.config,
-            dimensionValues: this.dimensions.values
+            config: this.config
         }) as DatasetRasterPointInfo;
     }
 
     dispose() {
+        super.dispose();
         this.subscriptionTracker_.unsubscribe();
-        this.dimensions.dispose();
     }
 
     protected afterInit_(trackParentViz?: boolean) {

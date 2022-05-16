@@ -1,13 +1,22 @@
 import React from 'react';
-import { Form } from 'antd';
+import { Select } from 'antd';
 
-import { DatasetDimension, DomainRange, ValueDomain, isValueDomain, DataDomain, CategoricalDomain } from '@oidajs/eo-mobx';
-import { NumericRangeFieldRenderer, DateRangeFieldRenderer, SelectEnumRenderer } from '@oidajs/ui-react-antd';
+import {
+    DatasetDimension,
+    DomainRange,
+    ValueDomain,
+    isValueDomain,
+    CategoricalDomain,
+    DimensionDomainType,
+    DimensionRangeType
+} from '@oidajs/eo-mobx';
+import { NumericRangeFieldRenderer, DateRangeFieldRenderer } from '@oidajs/ui-react-antd';
+
 import { useDatasetDomain } from './use-dataset-domain';
 
 type TimeDimension = DatasetDimension<ValueDomain<Date, number>>;
 type ValueDimension = DatasetDimension<ValueDomain<number>>;
-type CategoricalDimension = DatasetDimension<CategoricalDomain<number | string>>;
+type CategoricalDimension<T extends string | number | Date = string | number | Date> = DatasetDimension<CategoricalDomain<T>>;
 
 export type DatasetValueRangeSelectorProps = {
     dimension: ValueDimension;
@@ -23,7 +32,8 @@ export const DatasetValueRangeSelector = (props: DatasetValueRangeSelectorProps)
     });
 
     return (
-        <Form.Item label='Range'>
+        <div className='dataset-dimension-range-selector dataset-slider-selector'>
+            <span>{props.dimension.name}: </span>
             <NumericRangeFieldRenderer
                 value={
                     props.value
@@ -39,13 +49,14 @@ export const DatasetValueRangeSelector = (props: DatasetValueRangeSelectorProps)
                     max: domain?.max,
                     step: domain?.step
                 }}
+                inputInfraContent={props.dimension.units}
                 sliderProps={{
                     tipFormatter: (value) => {
                         return `${value} ${units}`;
                     }
                 }}
             />
-        </Form.Item>
+        </div>
     );
 };
 
@@ -61,7 +72,8 @@ export const DatasetTimeRangeSelector = (props: DatasetTimeRangeSelectorProps) =
     });
 
     return (
-        <Form.Item label='Range'>
+        <div className='dataset-dimension-range-selector'>
+            <span>{props.dimension.name}: </span>
             <DateRangeFieldRenderer
                 value={
                     props.value
@@ -87,17 +99,17 @@ export const DatasetTimeRangeSelector = (props: DatasetTimeRangeSelectorProps) =
                     maxDate: domain?.max
                 }}
             />
-        </Form.Item>
+        </div>
     );
 };
 
-export type DatasetCategoricalRangeSelectorProps = {
-    dimension: CategoricalDimension;
-    value?: string[];
-    onChange: (value: string[]) => void;
+export type DatasetCategoricalRangeSelectorProps<T extends string | number | Date> = {
+    dimension: CategoricalDimension<T>;
+    value?: T[] | undefined;
+    onChange: (value: T[] | undefined) => void;
 };
 
-export const DatasetCategoricalRangeSelector = (props: DatasetCategoricalRangeSelectorProps) => {
+export const DatasetCategoricalRangeSelector = <T extends string | number | Date>(props: DatasetCategoricalRangeSelectorProps<T>) => {
     const domain = useDatasetDomain({
         dimension: props.dimension
     });
@@ -107,32 +119,34 @@ export const DatasetCategoricalRangeSelector = (props: DatasetCategoricalRangeSe
     }
 
     return (
-        <Form.Item label='Range'>
-            <SelectEnumRenderer
-                value={props.value}
-                onChange={(value) => props.onChange(value as string[])}
-                config={{
-                    choices: domain.values.map((domainValue) => {
-                        return {
-                            name: domainValue.label || domainValue.value.toString(),
-                            value: domainValue.value.toString()
-                        };
-                    }),
-                    multiple: true
-                }}
+        <div className='dataset-dimension-range-selector dataset-combo-selector'>
+            <span>{props.dimension.name}: </span>
+            <Select
+                mode='multiple'
+                options={domain.values.map((domainValue) => {
+                    return {
+                        value: domainValue.value.toString(),
+                        label: domainValue.label || domainValue.value.toString()
+                    };
+                })}
+                value={props.value as string[] | undefined}
+                onChange={(value) => props.onChange(value as T[] | undefined)}
+                placeholder={`Select some ${props.dimension.name.toLowerCase()} value`}
+                allowClear={false}
             />
-        </Form.Item>
+        </div>
     );
 };
 
-export type DatasetDimensionRangeProps = {
-    dimension: DatasetDimension<DataDomain<number | Date | string>>;
-    value?: DomainRange<number | Date | string>;
-    onChange: (value: DomainRange<Date | number> | undefined) => void;
+export type DatasetDimensionRangeSelectorProps = {
+    dimension: DatasetDimension<DimensionDomainType>;
+    value?: DimensionRangeType;
+    onChange: (value: DimensionRangeType | undefined) => void;
+    allowRangeSelection?: boolean;
 };
 
 // TODO: This should be updated to support dynamic domains (in a similar way as DatasetDimensionValueSelector)
-export const DatasetDimensionRangeSelector = (props: DatasetDimensionRangeProps) => {
+export const DatasetDimensionRangeSelector = (props: DatasetDimensionRangeSelectorProps) => {
     const domain = useDatasetDomain({
         dimension: props.dimension
     });
@@ -143,57 +157,54 @@ export const DatasetDimensionRangeSelector = (props: DatasetDimensionRangeProps)
     };
 
     if (!domain) {
+        const { value, onChange } = props;
         if (props.dimension.id === 'time') {
             return (
-                <DatasetTimeRangeSelector
-                    dimension={dimension as TimeDimension}
-                    value={props.value as DomainRange<Date>}
-                    onChange={props.onChange}
-                />
+                <DatasetTimeRangeSelector dimension={dimension as TimeDimension} value={value as DomainRange<Date>} onChange={onChange} />
             );
         } else {
             return (
                 <DatasetValueRangeSelector
                     dimension={dimension as ValueDimension}
-                    value={props.value as DomainRange<number>}
-                    onChange={props.onChange}
+                    value={value as DomainRange<number>}
+                    onChange={onChange}
                 />
             );
         }
     }
 
     if (isValueDomain(domain)) {
+        const { value, onChange } = props;
         if (domain.min instanceof Date) {
             return (
-                <DatasetTimeRangeSelector
-                    dimension={dimension as TimeDimension}
-                    value={props.value as DomainRange<Date>}
-                    onChange={props.onChange}
-                />
+                <DatasetTimeRangeSelector dimension={dimension as TimeDimension} value={value as DomainRange<Date>} onChange={onChange} />
             );
         } else {
             return (
                 <DatasetValueRangeSelector
                     dimension={dimension as ValueDimension}
-                    value={props.value as DomainRange<number>}
-                    onChange={props.onChange}
+                    value={value as DomainRange<number>}
+                    onChange={onChange}
                 />
             );
         }
     } else {
-        return (
-            <Form.Item label='Range'>
-                <div>All {dimension.name} values</div>
-            </Form.Item>
-        );
-
-        // TODO: add categorical dimension range selection when supported by the analysis
-        // return (
-        //     <DatasetCategoricalRangeSelector
-        //         dimension={dimension as CategoricalDimension}
-        //         value={props.value as string[]}
-        //         onChange={props.onChange}
-        //     />
-        // );
+        const { value, onChange, allowRangeSelection } = props;
+        if (allowRangeSelection) {
+            return (
+                <DatasetCategoricalRangeSelector
+                    dimension={dimension as CategoricalDimension<string>}
+                    value={value as string[]}
+                    onChange={onChange}
+                />
+            );
+        } else {
+            return (
+                <div className='dataset-dimension-range-selector'>
+                    <span>{props.dimension.name}: </span>
+                    <div>All values</div>
+                </div>
+            );
+        }
     }
 };

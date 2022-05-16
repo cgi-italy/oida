@@ -11,17 +11,8 @@ import {
 } from '@oidajs/core';
 import { AsyncDataFetcher, DataFilters } from '@oidajs/state-mobx';
 
-import {
-    DatasetDimension,
-    DataDomain,
-    DomainRange,
-    isValueDomain,
-    DatasetDimensions,
-    HasDatasetDimensions,
-    DatasetDimensionsProps,
-    ColorMap
-} from '../common';
-import { getDatasetVariableDomain, getRasterBandSingleConfig } from '../utils';
+import { DatasetDimension, ColorMap, DimensionDomainType, DimensionRangeType } from '../common';
+import { getRasterBandSingleConfig } from '../utils';
 import { RasterBandConfig, RasterBandModeType, RasterMapViz } from '../dataset-map-viz';
 import { DatasetAreaValuesData, DatasetAreaValuesDataMask, DatasetAreaValuesRequest } from './dataset-area-values';
 import { DatasetProcessing, DatasetProcessingProps } from './dataset-processing';
@@ -32,7 +23,7 @@ type SequenceDimensionType = string | Date | number;
 
 export type DatasetAreaSeriesRequest = DatasetAreaValuesRequest & {
     dimension: string;
-    range?: DomainRange<SequenceDimensionType>;
+    range?: DimensionRangeType;
     additionalParameters?: QueryFilter[];
 };
 
@@ -48,26 +39,26 @@ export type DatasetAreaSeriesConfig = {
     variables: RasterBandConfig[];
     supportedGeometries: AoiSupportedGeometry[];
     supportedData: DatasetAreaValuesDataMask;
-    dimensions: (DatasetDimension<DataDomain<SequenceDimensionType>> & { preventSeries?: boolean })[];
+    dimensions: (DatasetDimension<DimensionDomainType> & { preventSeries?: boolean })[];
     additionalParameters?: IFormFieldDefinition[];
 };
 
-export type DatasetAreaSeriesProps = {
+export type DatasetAreaSeriesProps = Omit<
+    DatasetProcessingProps<typeof DATASET_AREA_SERIES_PROCESSING, DatasetAreaSeriesConfig>,
+    'dimensions' | 'currentVariable' | 'initDimensions'
+> & {
     sequenceDimension?: string;
     sequenceVariable?: string;
-    sequenceRange?: DomainRange<SequenceDimensionType>;
+    sequenceRange?: DimensionRangeType;
     autoUpdate?: boolean;
     additionalParameters?: Record<string, any>;
     dataMask?: Partial<DatasetAreaValuesDataMask>;
-} & DatasetProcessingProps<typeof DATASET_AREA_SERIES_PROCESSING, DatasetAreaSeriesConfig> &
-    DatasetDimensionsProps;
+};
 
-export class DatasetAreaSeries extends DatasetProcessing<undefined> implements HasDatasetDimensions {
+export class DatasetAreaSeries extends DatasetProcessing<undefined> {
     readonly config: DatasetAreaSeriesConfig;
-    readonly dimensions: DatasetDimensions;
     @observable.ref sequenceDimension: string | undefined;
     @observable.ref sequenceVariable: string | undefined;
-    @observable.ref sequenceRange: DomainRange<SequenceDimensionType> | undefined;
     @observable.ref colorMap: ColorMap | undefined;
     @observable.ref data: DatasetAreaSeriesDataItem[];
     @observable.ref autoUpdate: boolean;
@@ -81,35 +72,30 @@ export class DatasetAreaSeries extends DatasetProcessing<undefined> implements H
     constructor(props: Omit<DatasetAreaSeriesProps, 'vizType'>) {
         super({
             vizType: DATASET_AREA_SERIES_PROCESSING,
+            dimensionValues: props.dimensionValues || props.parent?.dimensions.values,
+            currentVariable: () => this.sequenceVariable,
+            dimensions: props.config.dimensions,
+            initDimensions: true,
             ...props
         });
 
-        const parentDimensions = (props.parent as HasDatasetDimensions | undefined)?.dimensions;
-
         this.config = props.config;
 
-        this.sequenceDimension = props.sequenceDimension;
+        this.sequenceDimension = undefined;
         this.sequenceVariable = undefined;
-        this.sequenceRange = props.sequenceRange;
         this.data = [];
         this.autoUpdate = props.autoUpdate !== undefined ? props.autoUpdate : true;
         this.colorMap = undefined;
 
-        this.dimensions = new DatasetDimensions({
-            dimensionValues: props.dimensionValues || parentDimensions?.values,
-            dataset: props.dataset,
-            currentVariable: () => this.sequenceVariable,
-            dimensions: props.config.dimensions,
-            initDimensions: true
-        });
-
         let sequenceVariable = props.sequenceVariable;
         if (!sequenceVariable) {
-            if (parentDimensions?.variable && this.config.variables.find((variable) => variable.id === parentDimensions.variable)) {
-                sequenceVariable = parentDimensions.variable;
+            const parentVariable = this.parent?.dimensions.variable;
+            if (parentVariable && this.config.variables.find((variable) => variable.id === parentVariable)) {
+                sequenceVariable = parentVariable;
             }
         }
         this.setVariable(sequenceVariable);
+        this.setDimension(props.sequenceDimension, props.sequenceRange);
 
         this.additionalParameters = new DataFilters({
             values: props.additionalParameters
@@ -133,63 +119,28 @@ export class DatasetAreaSeries extends DatasetProcessing<undefined> implements H
         this.afterInit_();
     }
 
+    @computed
+    get sequenceRange() {
+        if (this.sequenceDimension) {
+            return this.dimensions.ranges.get(this.sequenceDimension);
+        } else {
+            return undefined;
+        }
+    }
+
     get loadingState() {
         return this.dataFetcher_.loadingStatus;
     }
 
     @action
-    setDimension(dimension: string | undefined, range?: DomainRange<SequenceDimensionType>) {
-        if (dimension === this.sequenceDimension) {
-            if (range) {
-                this.setRange(range);
-            }
-            return;
-        }
-
+    setDimension(dimension: string | undefined, range?: DimensionRangeType) {
         this.needsUpdate_ = true;
+        if (this.sequenceDimension) {
+            this.dimensions.unsetRange(this.sequenceDimension);
+        }
         this.sequenceDimension = dimension;
         if (dimension) {
-            this.dimensions.unsetValue(dimension);
-
-            const dimensionConfig = this.config.dimensions?.find((dim) => dim.id === dimension);
-
-            if (dimensionConfig) {
-                getDatasetVariableDomain(dimensionConfig)
-                    .then((domain) => {
-                        if (domain && isValueDomain(domain) && domain.min !== undefined && domain.max !== undefined) {
-                            // if no range is defined or the current range is outside of the domain extent set the range to the domain extent
-                            if (!range || range.min >= domain.max || range.max <= domain.min) {
-                                this.setRange({
-                                    min: domain.min,
-                                    max: domain.max
-                                });
-                            } else {
-                                // clamp the range to the domain extent
-                                let min = range.min;
-                                let max = range.max;
-                                if (min < domain.min) {
-                                    min = domain.min;
-                                }
-                                if (max > domain.max) {
-                                    max = domain.max;
-                                }
-                                this.setRange({
-                                    min: min,
-                                    max: max
-                                });
-                            }
-                        } else {
-                            this.setRange(range);
-                        }
-                    })
-                    .catch(() => {
-                        this.setRange(range);
-                    });
-            } else {
-                this.setRange(range);
-            }
-        } else {
-            this.setRange(range);
+            this.dimensions.setRange(dimension, range);
         }
     }
 
@@ -224,13 +175,11 @@ export class DatasetAreaSeries extends DatasetProcessing<undefined> implements H
     }
 
     @action
-    setRange(range: DomainRange<SequenceDimensionType> | undefined) {
-        // deep equality check
-        if (range && this.sequenceRange && this.sequenceRange.min === range.min && this.sequenceRange.max === range.max) {
-            return;
+    setRange(range: DimensionRangeType | undefined) {
+        if (this.sequenceDimension) {
+            this.needsUpdate_ = true;
+            this.dimensions.setRange(this.sequenceDimension, range);
         }
-        this.needsUpdate_ = true;
-        this.sequenceRange = range;
     }
 
     @action
@@ -297,7 +246,6 @@ export class DatasetAreaSeries extends DatasetProcessing<undefined> implements H
             sequenceDimension: this.sequenceDimension,
             sequenceVariable: this.sequenceVariable,
             sequenceRange: this.sequenceRange,
-            dimensionValues: this.dimensions.values,
             autoUpdate: this.autoUpdate
         }) as DatasetAreaSeries;
     }
@@ -305,7 +253,6 @@ export class DatasetAreaSeries extends DatasetProcessing<undefined> implements H
     dispose() {
         super.dispose();
         this.subscriptionTracker_.unsubscribe();
-        this.dimensions.dispose();
     }
 
     @action
@@ -318,7 +265,8 @@ export class DatasetAreaSeries extends DatasetProcessing<undefined> implements H
             this.setVariable(this.config.variables[0].id);
         }
         if (!this.sequenceDimension) {
-            this.setDimension(this.config.dimensions[0].id);
+            const firstDimension = this.config.dimensions.find((dimension) => !dimension.preventSeries);
+            this.setDimension(firstDimension?.id);
         }
 
         const sequenceUpdaterDisposer = autorun(() => {

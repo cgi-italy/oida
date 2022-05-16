@@ -9,5 +9,6 @@ export * from './map-coord';
 export * from './area';
 export * from './length';
 export * from './date';
+export * from './duration';
 export * from './file-size';
 export * from './utils';

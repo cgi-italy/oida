@@ -3,16 +3,7 @@ import { autorun, observable, makeObservable, action, computed, reaction } from 
 import { LoadingState, SubscriptionTracker } from '@oidajs/core';
 import { AsyncDataFetcher } from '@oidajs/state-mobx';
 
-import {
-    DatasetDimension,
-    DataDomain,
-    DomainRange,
-    isValueDomain,
-    NumericVariable,
-    DatasetDimensions,
-    HasDatasetDimensions,
-    DatasetDimensionsProps
-} from '../common';
+import { DatasetDimension, NumericVariable, DimensionDomainType, DimensionRangeType, CategoricalDimensionValueType } from '../common';
 import { DatasetProcessing, DatasetProcessingProps } from './dataset-processing';
 import { DatasetAnalysis, DatasetAnalysisProps } from './dataset-analysis';
 
@@ -20,10 +11,10 @@ export const POINT_SERIES_PROCESSING = 'point_series_processing';
 
 type SeriesDimensionType = string | Date | number;
 
-export type DatasetPointSeriesRequest<T = SeriesDimensionType> = {
+export type DatasetPointSeriesRequest = {
     dimension: string;
-    range?: DomainRange<T>;
-    dimensionValues?: Map<string, SeriesDimensionType>;
+    range?: DimensionRangeType;
+    dimensionValues?: Map<string, CategoricalDimensionValueType>;
     variable: string;
     location: GeoJSON.Point;
 };
@@ -36,66 +27,62 @@ export type DatasetPointSeriesValueItem<T = SeriesDimensionType> = {
 export type DatasetPointSeriesData<T = SeriesDimensionType> = DatasetPointSeriesValueItem<T>[];
 
 export type DatasetPointSeriesProvider<T = SeriesDimensionType> = (
-    request: DatasetPointSeriesRequest<T>
+    request: DatasetPointSeriesRequest
 ) => Promise<DatasetPointSeriesData<T>>;
 
 export type DatasetPointSeriesConfig<T = SeriesDimensionType> = {
     provider: DatasetPointSeriesProvider<T>;
     variables: NumericVariable[];
-    dimensions: (DatasetDimension<DataDomain<T>> & { preventSeries?: boolean })[];
+    dimensions: (DatasetDimension<DimensionDomainType> & { preventSeries?: boolean })[];
 };
 
-export type DatasetPointSeriesProps = {
+export type DatasetPointSeriesProps = Omit<
+    DatasetProcessingProps<typeof POINT_SERIES_PROCESSING, DatasetPointSeriesConfig>,
+    'dimensions' | 'currentVariable' | 'initDimensions'
+> & {
     seriesDimension?: string;
     seriesVariable?: string;
-    seriesRange?: DomainRange<SeriesDimensionType>;
+    seriesRange?: DimensionRangeType;
     autoUpdate?: boolean;
-} & DatasetProcessingProps<typeof POINT_SERIES_PROCESSING, DatasetPointSeriesConfig> &
-    DatasetDimensionsProps;
+};
 
-export class DatasetPointSeries extends DatasetProcessing<undefined> implements HasDatasetDimensions {
+export class DatasetPointSeries extends DatasetProcessing<undefined> {
     readonly config: DatasetPointSeriesConfig;
-    readonly dimensions: DatasetDimensions;
     @observable.ref seriesDimension: string | undefined;
     @observable.ref seriesVariable: string | undefined;
-    @observable.ref seriesRange: DomainRange<SeriesDimensionType> | undefined;
     @observable.ref data: DatasetPointSeriesData<SeriesDimensionType>;
     @observable.ref autoUpdate: boolean;
 
-    protected dataFetcher_: AsyncDataFetcher<DatasetPointSeriesData | undefined, DatasetPointSeriesRequest<SeriesDimensionType>>;
+    protected dataFetcher_: AsyncDataFetcher<DatasetPointSeriesData | undefined, DatasetPointSeriesRequest>;
     protected subscriptionTracker_: SubscriptionTracker;
     protected needsUpdate_: boolean;
 
     constructor(props: Omit<DatasetPointSeriesProps, 'vizType'>) {
         super({
             vizType: POINT_SERIES_PROCESSING,
+            dimensionValues: props.dimensionValues || props.parent?.dimensions.values,
+            currentVariable: () => this.seriesVariable,
+            dimensions: props.config.dimensions,
+            initDimensions: true,
             ...props
         });
 
         this.config = props.config;
 
-        const parentDimensions = (props.parent as HasDatasetDimensions | undefined)?.dimensions;
-
-        this.seriesDimension = props.seriesDimension;
+        this.seriesDimension = undefined;
         this.seriesVariable = props.seriesVariable;
-        if (!this.seriesVariable) {
-            if (parentDimensions?.variable && this.config.variables.find((variable) => variable.id === parentDimensions.variable)) {
-                this.seriesVariable = parentDimensions.variable;
-            }
-        }
-        this.seriesRange = props.seriesRange;
+
         this.data = [];
         this.autoUpdate = props.autoUpdate !== undefined ? props.autoUpdate : true;
 
-        makeObservable(this);
+        if (!this.seriesVariable) {
+            const parentVariable = this.parent?.dimensions.variable;
+            if (parentVariable && this.config.variables.find((variable) => variable.id === parentVariable)) {
+                this.seriesVariable = parentVariable;
+            }
+        }
 
-        this.dimensions = new DatasetDimensions({
-            dimensionValues: props.dimensionValues || parentDimensions?.values,
-            dataset: props.dataset,
-            currentVariable: () => this.seriesVariable,
-            dimensions: props.config.dimensions,
-            initDimensions: true
-        });
+        this.setDimension(props.seriesDimension, props.seriesRange);
 
         this.dataFetcher_ = new AsyncDataFetcher({
             dataFetcher: (params) => {
@@ -106,6 +93,8 @@ export class DatasetPointSeries extends DatasetProcessing<undefined> implements 
         this.needsUpdate_ = true;
         this.subscriptionTracker_ = new SubscriptionTracker();
 
+        makeObservable(this);
+
         this.afterInit_();
     }
 
@@ -113,51 +102,24 @@ export class DatasetPointSeries extends DatasetProcessing<undefined> implements 
         return this.dataFetcher_.loadingStatus;
     }
 
+    @computed
+    get seriesRange() {
+        if (this.seriesDimension) {
+            return this.dimensions.ranges.get(this.seriesDimension);
+        } else {
+            return undefined;
+        }
+    }
+
     @action
-    setDimension(dimension: string | undefined, range?: DomainRange<SeriesDimensionType>) {
+    setDimension(dimension: string | undefined, range?: DimensionRangeType) {
         this.needsUpdate_ = true;
+        if (this.seriesDimension) {
+            this.dimensions.unsetRange(this.seriesDimension);
+        }
         this.seriesDimension = dimension;
         if (dimension) {
-            this.dimensions.unsetValue(dimension);
-
-            const domainPromise = this.dimensions.domainRequests.get(dimension);
-            if (domainPromise) {
-                domainPromise
-                    .then((domain) => {
-                        if (domain && isValueDomain(domain) && domain.min !== undefined && domain.max !== undefined) {
-                            // if no range is defined or the current range is outside of the domain extent set the range to the domain extent
-                            if (!range || range.min >= domain.max || range.max <= domain.min) {
-                                this.setRange({
-                                    min: domain.min,
-                                    max: domain.max
-                                });
-                            } else {
-                                // clamp the range to the domain extent
-                                let min = range.min;
-                                let max = range.max;
-                                if (min < domain.min) {
-                                    min = domain.min;
-                                }
-                                if (max > domain.max) {
-                                    max = domain.max;
-                                }
-                                this.setRange({
-                                    min: min,
-                                    max: max
-                                });
-                            }
-                        } else {
-                            this.setRange(range);
-                        }
-                    })
-                    .catch(() => {
-                        this.setRange(range);
-                    });
-            } else {
-                this.setRange(range);
-            }
-        } else {
-            this.seriesRange = undefined;
+            this.dimensions.setRange(dimension, range);
         }
     }
 
@@ -168,9 +130,11 @@ export class DatasetPointSeries extends DatasetProcessing<undefined> implements 
     }
 
     @action
-    setRange(range: DomainRange<SeriesDimensionType> | undefined) {
-        this.needsUpdate_ = true;
-        this.seriesRange = range;
+    setRange(range: DimensionRangeType | undefined) {
+        if (this.seriesDimension) {
+            this.needsUpdate_ = true;
+            this.dimensions.setRange(this.seriesDimension, range);
+        }
     }
 
     @action
@@ -227,7 +191,6 @@ export class DatasetPointSeries extends DatasetProcessing<undefined> implements 
             seriesDimension: this.seriesDimension,
             seriesVariable: this.seriesVariable,
             seriesRange: this.seriesRange,
-            dimensionValues: this.dimensions.values,
             autoUpdate: this.autoUpdate
         }) as DatasetPointSeries;
     }

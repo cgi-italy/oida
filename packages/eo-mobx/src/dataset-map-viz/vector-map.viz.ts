@@ -18,16 +18,7 @@ import {
     VisibleProps
 } from '@oidajs/state-mobx';
 
-import {
-    ColorMap,
-    ColorScale,
-    DataDomain,
-    DatasetDimension,
-    DatasetDimensions,
-    DatasetDimensionsProps,
-    DatasetViz,
-    DatasetVizProps
-} from '../common';
+import { ColorMap, ColorScale, DatasetDimension, DatasetViz, DatasetVizProps, DimensionDomainType } from '../common';
 import { VectorFeatureDescriptor, VectorFeatureProperties } from './vector-feature-descriptor';
 
 /**
@@ -166,18 +157,21 @@ export type DatasetVectorMapVizConfig = {
      */
     featureStyleFactory?: (color?: string) => FeatureStyleGetter<DatasetVectorFeature>;
 
-    dimensions?: DatasetDimension<DataDomain<string | number | Date>>[];
+    dimensions?: DatasetDimension<DimensionDomainType>[];
 };
 
 /**
  * The {@link DatasetVectorMapViz} constructor properties type
  */
-export type DatasetVectorMapVizProps = DatasetVizProps<typeof VECTOR_VIZ_TYPE, DatasetVectorMapVizConfig> & {
+export type DatasetVectorMapVizProps = Omit<
+    DatasetVizProps<typeof VECTOR_VIZ_TYPE, DatasetVectorMapVizConfig>,
+    'dimensions' | 'currentVariable' | 'initDimensions'
+> & {
     /**
      * Optional {@link DatasetVectorMapViz.propertyFilters | DatasetVectorMapViz property filters} initialization
      */
     propertyFilters?: DataFiltersProps | DataFilters;
-} & DatasetDimensionsProps;
+};
 
 export class DatasetVectorMapViz extends DatasetViz<FeatureLayer<DatasetVectorFeature>> {
     /** The visualization configuration */
@@ -193,9 +187,6 @@ export class DatasetVectorMapViz extends DatasetViz<FeatureLayer<DatasetVectorFe
      * filter the results based on the current filtering state
      */
     propertyFilters: DataFilters;
-
-    readonly dimensions: DatasetDimensions;
-
     /** The current feature array. Automatically filled from the {@link VectorDataProvider} response */
     protected data_: IObservableArray<DatasetVectorFeature>;
     /** The internal chroma scale used to update the {@link DatasetVectorFeature} color */
@@ -206,6 +197,9 @@ export class DatasetVectorMapViz extends DatasetViz<FeatureLayer<DatasetVectorFe
     constructor(props: Omit<DatasetVectorMapVizProps, 'vizType'>) {
         super({
             ...props,
+            dimensionValues: props.dimensionValues,
+            dimensions: props.config.dimensions,
+            initDimensions: true,
             vizType: VECTOR_VIZ_TYPE
         });
 
@@ -224,13 +218,6 @@ export class DatasetVectorMapViz extends DatasetViz<FeatureLayer<DatasetVectorFe
         if (typeof props.config.featureDescriptor !== 'function') {
             this.featureDescriptor = props.config.featureDescriptor;
         }
-
-        this.dimensions = new DatasetDimensions({
-            dataset: this.dataset,
-            dimensionValues: props.dimensionValues,
-            dimensions: props.config.dimensions,
-            initDimensions: true
-        });
 
         this.subscriptionTracker_ = new SubscriptionTracker();
 
@@ -280,6 +267,7 @@ export class DatasetVectorMapViz extends DatasetViz<FeatureLayer<DatasetVectorFe
     }
 
     dispose() {
+        super.dispose();
         this.subscriptionTracker_.unsubscribe();
     }
 

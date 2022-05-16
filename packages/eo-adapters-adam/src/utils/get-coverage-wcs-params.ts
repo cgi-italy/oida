@@ -7,7 +7,8 @@ export const getCoverageWcsParams = (datasetConfig: AdamWcsDatasetConfig, dimens
     let dimensionSubsets: string[] = [];
     let subdataset: string | undefined;
 
-    const dimensionSubsetsMap = {} as Record<string, string[]>;
+    const dimensionSubsetsMap: Record<string, string[]> = {};
+    const categoricalDimensionRanges: Record<string, string[]> = {};
     if (datasetConfig.dimensions) {
         datasetConfig.dimensions.forEach((dimension) => {
             const value = dimensions.values.get(dimension.id);
@@ -21,6 +22,17 @@ export const getCoverageWcsParams = (datasetConfig: AdamWcsDatasetConfig, dimens
                         dimensionSubsetsMap[dimension.wcsSubset.id] = currentSubset;
                     } else {
                         dimensionSubsetsMap[dimension.wcsSubset.id] = [value.toString()];
+                    }
+                } else if (dimensions.ranges.has(dimension.id)) {
+                    const range = dimensions.ranges.get(dimension.id);
+                    if (Array.isArray(range)) {
+                        // there is no way of subsetting a categorical dimension using multiple values
+                        // just pass the subset range outside and let the caller handle it
+                        categoricalDimensionRanges[dimension.wcsSubset.id] = range.map((value) => {
+                            return value.toString();
+                        });
+                    } else if (range) {
+                        dimensionSubsetsMap[dimension.wcsSubset.id] = [`${range.min},${range.max}`];
                     }
                 } else if (dimension.wcsSubset.idx !== undefined) {
                     const currentSubset = dimensionSubsetsMap[dimension.wcsSubset.id] || [];
@@ -77,7 +89,8 @@ export const getCoverageWcsParams = (datasetConfig: AdamWcsDatasetConfig, dimens
             coverageId: coverage,
             bandSubset,
             dimensionSubsets,
-            subdataset
+            subdataset,
+            categoricalDimensionRanges
         };
     }
 };

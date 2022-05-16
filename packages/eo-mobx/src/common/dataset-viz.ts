@@ -5,6 +5,7 @@ import { createDynamicFactory } from '@oidajs/core';
 import { MapLayer } from '@oidajs/state-mobx';
 
 import { Dataset } from './dataset';
+import { DatasetDimensions, DatasetDimensionsProps, HasDatasetDimensions } from './dataset-dimensions';
 
 const datasetVizFactory = createDynamicFactory<DatasetViz<MapLayer | undefined>>('datasetVizFactory');
 
@@ -14,7 +15,7 @@ export type DatasetVizProps<TYPE extends string = string, CONFIG extends Record<
     config: CONFIG;
     id?: string;
     parent?: DatasetViz<any>;
-};
+} & DatasetDimensionsProps;
 
 export interface DatasetVizDefinitions {}
 export interface DatasetVizTypes {}
@@ -37,7 +38,7 @@ export type DatasetVizConfig<TYPE extends keyof DatasetVizDefinitions = keyof Da
  *
  * @template T the type of MapLayer associated to this visualization
  */
-export abstract class DatasetViz<T extends MapLayer | undefined = undefined> {
+export abstract class DatasetViz<T extends MapLayer | undefined = undefined> implements HasDatasetDimensions {
     static create<TYPE extends keyof DatasetVizTypes>(props: DatasetVizDefinition<TYPE>): DatasetVizType<TYPE> {
         const datasetViz = datasetVizFactory.create(props.vizType, props);
         if (!datasetViz) {
@@ -60,6 +61,7 @@ export abstract class DatasetViz<T extends MapLayer | undefined = undefined> {
     readonly dataset: Dataset;
     readonly parent: DatasetViz<any> | undefined;
     readonly mapLayer: T;
+    readonly dimensions: DatasetDimensions;
     @observable widgetVisible: boolean;
 
     constructor(props: DatasetVizProps) {
@@ -68,6 +70,7 @@ export abstract class DatasetViz<T extends MapLayer | undefined = undefined> {
         this.vizType = props.vizType;
         this.dataset = props.dataset;
         this.mapLayer = this.initMapLayer_(props);
+        this.dimensions = new DatasetDimensions(props);
         this.widgetVisible = true;
 
         makeObservable(this);
@@ -78,8 +81,12 @@ export abstract class DatasetViz<T extends MapLayer | undefined = undefined> {
         this.widgetVisible = widgetVisible;
     }
 
+    get widgetName() {
+        return this.dataset.config.name;
+    }
+
     dispose() {
-        return;
+        this.dimensions.dispose();
     }
 
     protected clone_(specProps?: Record<string, any>) {
@@ -87,6 +94,7 @@ export abstract class DatasetViz<T extends MapLayer | undefined = undefined> {
             parent: this.parent,
             vizType: this.vizType,
             dataset: this.dataset,
+            dimensionValues: this.dimensions.values,
             ...specProps
         });
     }

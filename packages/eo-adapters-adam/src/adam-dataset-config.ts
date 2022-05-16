@@ -1,15 +1,15 @@
 import {
     DatasetDimension,
     ValueDomain,
-    CategoricalDomain,
     RasterBandConfig,
     RasterBandPreset,
     RasterBandGroup,
     ProductSearchRecord,
-    VectorFeaturePropertyDescriptor
+    VectorFeaturePropertyDescriptor,
+    DimensionDomainType
 } from '@oidajs/eo-mobx';
 
-export type AdamDatasetDimension = DatasetDimension<ValueDomain<number | Date> | CategoricalDomain<number | string>> & {
+export type AdamDatasetDimension = DatasetDimension<DimensionDomainType> & {
     wcsSubset: {
         id: string;
         idx?: number;
@@ -17,6 +17,7 @@ export type AdamDatasetDimension = DatasetDimension<ValueDomain<number | Date> |
     wcsResponseKey?: string;
     tarFilenameRegex?: RegExp;
     preventSeries?: boolean;
+    allowRange?: boolean;
 };
 
 export type AdamDatasetSingleBandCoverage = Omit<RasterBandConfig, 'domain'> & {
@@ -93,7 +94,7 @@ export type AdamVectorDatasetConfig = {
     name: string;
     color?: string;
     bbox: number[];
-    dimensions?: DatasetDimension<ValueDomain<number | Date> | CategoricalDomain<number | string>>[];
+    dimensions?: DatasetDimension<DimensionDomainType>[];
     featureProperties?: VectorFeaturePropertyDescriptor[] | Record<string, VectorFeaturePropertyDescriptor[]>;
     fixedTime?: Date | boolean;
     productSearchRecordContent?: (item: ProductSearchRecord) => any;

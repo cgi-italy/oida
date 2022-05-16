@@ -6,7 +6,6 @@ import {
     DatasetViz,
     DatasetVizProps,
     DatasetTimeDistributionConfig,
-    hasDatasetDimensions,
     DataDomainProviderFilters,
     TimeDistributionInstantItem,
     TimeDistributionRangeItem,
@@ -81,12 +80,7 @@ export class DatasetTimeDistributionViz extends DatasetViz<undefined> {
     }
 
     get filters(): TimeDomainProviderFilters {
-        return hasDatasetDimensions(this.parent)
-            ? this.parent.dimensions
-            : {
-                  aoi: this.dataset.aoi,
-                  additionaFilters: this.dataset.additionalFilters.items
-              };
+        return this.parent ? this.parent.dimensions : this.dimensions;
     }
 
     @action
@@ -96,6 +90,7 @@ export class DatasetTimeDistributionViz extends DatasetViz<undefined> {
     }
 
     dispose() {
+        super.dispose();
         this.subscriptionTracker_.unsubscribe();
     }
 

@@ -12,7 +12,12 @@ export const DateQuantity: FormatterQuantity<moment.MomentInput, DateFormatterOp
 
 export const formatDate = (date: moment.MomentInput, options: DateFormatterOptions) => {
     try {
-        return moment.utc(date).format(options.format);
+        const dt = moment.utc(date);
+        if (dt.isValid()) {
+            return dt.format(options.format);
+        } else {
+            return 'N/A';
+        }
     } catch (e) {
         return 'N/A';
     }

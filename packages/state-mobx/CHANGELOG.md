@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.0.3](https://github.com/cgi-italy/oida/compare/@oidajs/state-mobx@2.0.2...@oidajs/state-mobx@2.0.3) (2022-05-16)
+
+
+### Bug Fixes
+
+* return the same promise for AsyncDataFetcher debounced request ([52b2d24](https://github.com/cgi-italy/oida/commit/52b2d2419537d3c01fd66089b721ab59446e42ec))
+
+
+### Reverts
+
+* "fix: return the same promise for AsyncDataFetcher debounced request" ([e5e319f](https://github.com/cgi-italy/oida/commit/e5e319f495c490ee65169ac6022b21a3d0b0ea4a))
+
+
+
+
+
 ## [2.0.2](https://github.com/cgi-italy/oida/compare/@oidajs/state-mobx@2.0.1...@oidajs/state-mobx@2.0.2) (2022-03-09)
 
 

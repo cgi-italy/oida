@@ -95,7 +95,7 @@ export const DatasetAnalysesDashboard = (props: DatasetAnalysesDashboardProps) =
 
                 return {
                     id: mapViz.id,
-                    title: `${mapViz.dataset.config.name}`,
+                    title: `${mapViz.widgetName}`,
                     content: vizWidget,
                     preferredLayout: props.preferredLayout ? props.preferredLayout[mapViz.vizType] : undefined,
                     onClose: () => {

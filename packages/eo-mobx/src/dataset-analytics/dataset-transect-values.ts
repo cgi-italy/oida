@@ -6,27 +6,17 @@ import chroma from 'chroma-js';
 import { Geometry, IFeatureStyle, IndexableGeometry, LoadingState, QueryFilter, SubscriptionTracker } from '@oidajs/core';
 import { AsyncDataFetcher } from '@oidajs/state-mobx';
 
-import {
-    DatasetDimension,
-    DataDomain,
-    TimeSearchDirection,
-    NumericVariable,
-    DatasetDimensions,
-    HasDatasetDimensions,
-    DatasetDimensionsProps
-} from '../common';
+import { DatasetDimension, NumericVariable, DimensionDomainType, CategoricalDimensionValueType } from '../common';
 import { DatasetProcessing, DatasetProcessingProps } from './dataset-processing';
 import { analysisPlaceHolderIcon } from './analysis-placeholder-icon';
 
 export const TRANSECT_VALUES_PROCESSING = 'transect_values_processing';
 
-type TransectDimensionType = string | Date | number;
-
 export type DatasetTransectValuesRequest = {
     variable: string;
     geometry: GeoJSON.LineString;
     numSamples?: number;
-    dimensionValues?: Map<string, TransectDimensionType>;
+    dimensionValues?: Map<string, CategoricalDimensionValueType>;
     additionalDatasetFilters?: Map<string, QueryFilter>;
 };
 
@@ -38,7 +28,7 @@ export type DatasetTransectValuesConfig = {
     supportsNumSamples?: boolean;
     maxNumSamples?: number;
     provider: DatasetTransectValuesProvider;
-    dimensions: DatasetDimension<DataDomain<TransectDimensionType>>[];
+    dimensions: DatasetDimension<DimensionDomainType>[];
 };
 
 export type TransectSeriesItem = {
@@ -47,16 +37,17 @@ export type TransectSeriesItem = {
     coordinates: GeoJSON.Position;
 };
 
-export type DatasetTransectValuesProps = {
+export type DatasetTransectValuesProps = Omit<
+    DatasetProcessingProps<typeof TRANSECT_VALUES_PROCESSING, DatasetTransectValuesConfig>,
+    'dimensions' | 'currentVariable' | 'initDimensions'
+> & {
     seriesVariable?: string;
     numSamples?: number;
     autoUpdate?: boolean;
-} & DatasetProcessingProps<typeof TRANSECT_VALUES_PROCESSING, DatasetTransectValuesConfig> &
-    DatasetDimensionsProps;
+};
 
-export class DatasetTransectValues extends DatasetProcessing<undefined> implements HasDatasetDimensions {
+export class DatasetTransectValues extends DatasetProcessing<undefined> {
     readonly config: DatasetTransectValuesConfig;
-    readonly dimensions: DatasetDimensions;
     @observable.ref seriesVariable: string | undefined;
     @observable.ref data: TransectSeriesItem[];
     @observable.ref numSamples: number | undefined;
@@ -70,17 +61,20 @@ export class DatasetTransectValues extends DatasetProcessing<undefined> implemen
     constructor(props: Omit<DatasetTransectValuesProps, 'vizType'>) {
         super({
             vizType: TRANSECT_VALUES_PROCESSING,
+            dimensionValues: props.dimensionValues || props.parent?.dimensions.values,
+            currentVariable: () => this.seriesVariable,
+            dimensions: props.config.dimensions,
+            initDimensions: true,
             ...props
         });
-
-        const parentDimensions = (props.parent as HasDatasetDimensions | undefined)?.dimensions;
 
         this.config = props.config;
 
         this.seriesVariable = props.seriesVariable;
         if (!this.seriesVariable) {
-            if (parentDimensions?.variable && this.config.variables.find((variable) => variable.id === parentDimensions.variable)) {
-                this.seriesVariable = parentDimensions.variable;
+            const parentVariable = this.parent?.dimensions.variable;
+            if (parentVariable && this.config.variables.find((variable) => variable.id === parentVariable)) {
+                this.seriesVariable = parentVariable;
             }
         }
         this.numSamples = props.numSamples;
@@ -91,14 +85,6 @@ export class DatasetTransectValues extends DatasetProcessing<undefined> implemen
         this.autoUpdate = props.autoUpdate !== undefined ? props.autoUpdate : true;
 
         this.highlightedPosition = undefined;
-
-        this.dimensions = new DatasetDimensions({
-            dimensionValues: props.dimensionValues || parentDimensions?.values,
-            dataset: props.dataset,
-            currentVariable: () => this.seriesVariable,
-            dimensions: props.config.dimensions,
-            initDimensions: true
-        });
 
         this.dataFetcher_ = new AsyncDataFetcher({
             dataFetcher: (params) => {
@@ -303,7 +289,6 @@ export class DatasetTransectValues extends DatasetProcessing<undefined> implemen
         return this.clone_({
             config: this.config,
             seriesVariable: this.seriesVariable,
-            dimensionValues: this.dimensions.values,
             autoUpdate: this.autoUpdate,
             numSamples: this.numSamples
         }) as DatasetTransectValues;
@@ -312,7 +297,6 @@ export class DatasetTransectValues extends DatasetProcessing<undefined> implemen
     dispose() {
         super.dispose();
         this.subscriptionTracker_.unsubscribe();
-        this.dimensions.dispose();
     }
 
     @action
@@ -323,31 +307,6 @@ export class DatasetTransectValues extends DatasetProcessing<undefined> implemen
     protected afterInit_() {
         if (!this.seriesVariable) {
             this.setVariable(this.config.variables[0].id);
-        }
-        if (!this.dimensions.values.has('time')) {
-            //if the time dimension have not been passed in config initialize the time
-            // dimension value to the current dataset selected time
-            const timeDimension = this.config.dimensions.find((dimension) => dimension.id === 'time');
-            if (timeDimension) {
-                const datasetTime = this.dataset.toi;
-                if (datasetTime) {
-                    if (datasetTime instanceof Date) {
-                        this.dimensions.setValue('time', datasetTime);
-                    } else {
-                        //a time range is currently selected. try to find the time nearest to the range end time
-                        const timeProvider = this.dataset.config.timeDistribution?.provider;
-                        if (timeProvider) {
-                            timeProvider.getNearestItem(datasetTime.end, TimeSearchDirection.Backward, this.dimensions).then((dt) => {
-                                if (dt) {
-                                    this.dimensions.setValue('time', dt.start);
-                                }
-                            });
-                        } else {
-                            this.dimensions.setValue('time', datasetTime.end);
-                        }
-                    }
-                }
-            }
         }
 
         const seriesUpdaterDisposer = autorun(() => {

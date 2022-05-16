@@ -131,6 +131,7 @@ export const DatasetAreaSeriesPrcessingFilters = (props: DatasetAreaSeriesPrcess
 
     if (dimension) {
         dimensionRangeField = (
+            //@ts-ignore
             <DatasetDimensionRangeSelector dimension={dimension} value={selectedRange} onChange={(value) => props.series.setRange(value)} />
         );
     }

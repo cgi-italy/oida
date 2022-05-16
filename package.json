@@ -75,6 +75,7 @@
     "lzw-tiff-decoder": "^0.1.1",
     "mobx": "^6.3.10",
     "mobx-react": "^7.2.1",
+    "moment-duration-format": "^2.3.2",
     "nlfurniss-typedoc-plugin-sourcefile-url": "^2.0.0",
     "ol": "^6.2.0",
     "plotty": "^0.4.7",

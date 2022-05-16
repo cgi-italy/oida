@@ -1,18 +1,30 @@
 import { SubscriptionTracker } from '@oidajs/core';
-import { action, makeObservable, observable, ObservableMap, reaction } from 'mobx';
+import { action, makeObservable, observable, ObservableMap, reaction, runInAction } from 'mobx';
 
 import { Dataset } from './dataset';
-import { DataDomain, DataDomainProviderFilters, DatasetDimension, isDomainProvider, isValueDomain } from './dataset-variable';
+import { TimeSearchDirection } from './dataset-time-distribution-provider';
+import {
+    DataDomainProviderFilters,
+    DatasetDimension,
+    DomainRange,
+    isDomainProvider,
+    isValueDomain,
+    ValueDomain,
+    CategoricalDomain
+} from './dataset-variable';
 
-type DimensionValueType = string | number | Date;
+export type ValueDimensionValueType = Date | number;
+export type CategoricalDimensionValueType = ValueDimensionValueType | string;
+export type DimensionDomainType = ValueDomain<number> | ValueDomain<Date, number> | CategoricalDomain<CategoricalDimensionValueType>;
+export type DimensionRangeType = DomainRange<ValueDimensionValueType> | CategoricalDimensionValueType[];
 
 export type DatasetDimensionsProps = {
     /** The dataset object */
     dataset: Dataset;
     /** The dataset dimensions configuration */
-    dimensions?: DatasetDimension<DataDomain<DimensionValueType>>[];
+    dimensions?: DatasetDimension<DimensionDomainType>[];
     /** The initial dimension values */
-    dimensionValues?: Record<string, DimensionValueType> | Map<string, DimensionValueType>;
+    dimensionValues?: Record<string, CategoricalDimensionValueType> | Map<string, CategoricalDimensionValueType>;
     /**
      * An optional getter to retrieve the currently selected dataset variable.
      * Should be specified if any of the dimension domain depends on the selected dataset variable
@@ -23,24 +35,10 @@ export type DatasetDimensionsProps = {
 };
 
 export class DatasetDimensions implements DataDomainProviderFilters {
-    readonly values: ObservableMap<string, DimensionValueType> = observable.map<string, DimensionValueType>(
-        {},
-        {
-            deep: false
-        }
-    );
-    readonly domains = observable.map<string, DataDomain<DimensionValueType> | undefined>(
-        {},
-        {
-            deep: false
-        }
-    );
-    readonly domainRequests = observable.map<string, Promise<DataDomain<DimensionValueType> | undefined>>(
-        {},
-        {
-            deep: false
-        }
-    );
+    readonly values: ObservableMap<string, CategoricalDimensionValueType>;
+    readonly ranges: ObservableMap<string, DimensionRangeType>;
+    readonly domains: ObservableMap<string, DimensionDomainType | undefined>;
+    readonly domainRequests: ObservableMap<string, Promise<DimensionDomainType | undefined>>;
 
     protected readonly variableGetter_: (() => string | undefined) | undefined;
     protected readonly dataset_: Dataset;
@@ -50,9 +48,27 @@ export class DatasetDimensions implements DataDomainProviderFilters {
         this.dataset_ = props.dataset;
 
         this.variableGetter_ = props.currentVariable;
-        this.values = observable.map<string, DimensionValueType>(props.dimensionValues, {
+        this.values = observable.map(props.dimensionValues, {
             deep: false
         });
+        this.ranges = observable.map(
+            {},
+            {
+                deep: false
+            }
+        );
+        this.domains = observable.map(
+            {},
+            {
+                deep: false
+            }
+        );
+        this.domainRequests = observable.map(
+            {},
+            {
+                deep: false
+            }
+        );
 
         this.subscriptionTracker_ = new SubscriptionTracker();
         makeObservable(this);
@@ -81,7 +97,10 @@ export class DatasetDimensions implements DataDomainProviderFilters {
     }
 
     @action
-    setValue(dimension: string, value: DimensionValueType) {
+    setValue(dimension: string, value: CategoricalDimensionValueType) {
+        if (this.ranges.has(dimension)) {
+            this.ranges.delete(dimension);
+        }
         this.values.set(dimension, value);
     }
 
@@ -90,7 +109,46 @@ export class DatasetDimensions implements DataDomainProviderFilters {
         this.values.delete(dimension);
     }
 
-    getDimensionDomain<T extends DataDomain<DimensionValueType> = DataDomain<DimensionValueType>>(dimension: string) {
+    @action
+    setRange(dimension: string, range?: DimensionRangeType) {
+        const currentValue = this.ranges.get(dimension);
+        if (currentValue && range) {
+            // deep equality check
+            if (!Array.isArray(currentValue) && !Array.isArray(range)) {
+                if (currentValue.min === range.min && currentValue.max === range.max) {
+                    return;
+                }
+            } else if (Array.isArray(currentValue) && Array.isArray(range)) {
+                if (
+                    range.length === currentValue.length &&
+                    range.every((value, idx) => {
+                        return value === currentValue[idx];
+                    })
+                ) {
+                    return;
+                }
+            }
+        }
+        if (this.values.has(dimension)) {
+            this.values.delete(dimension);
+        }
+        this.getDomainClampedRange_(dimension, range).then((clampedRange) => {
+            if (clampedRange) {
+                runInAction(() => {
+                    this.ranges.set(dimension, clampedRange);
+                });
+            } else {
+                this.unsetRange(dimension);
+            }
+        });
+    }
+
+    @action
+    unsetRange(dimension: string) {
+        this.ranges.delete(dimension);
+    }
+
+    getDimensionDomain<T extends DimensionDomainType = DimensionDomainType>(dimension: string) {
         return this.domains.get(dimension) as T | undefined;
     }
 
@@ -98,7 +156,7 @@ export class DatasetDimensions implements DataDomainProviderFilters {
         this.subscriptionTracker_.unsubscribe();
     }
 
-    protected afterInit_(dimensions: DatasetDimension<DataDomain<DimensionValueType>>[], initDimensions?: boolean) {
+    protected afterInit_(dimensions: DatasetDimension<DimensionDomainType>[], initDimensions?: boolean) {
         dimensions.forEach((dimension) => {
             const domainConfig = dimension.domain;
             if (domainConfig && isDomainProvider(domainConfig)) {
@@ -132,7 +190,7 @@ export class DatasetDimensions implements DataDomainProviderFilters {
     }
 
     @action
-    protected setDomain_(dimensionId: string, domain: DataDomain<DimensionValueType>) {
+    protected setDomain_(dimensionId: string, domain: DimensionDomainType) {
         this.domains.set(dimensionId, domain);
     }
 
@@ -168,20 +226,102 @@ export class DatasetDimensions implements DataDomainProviderFilters {
     protected initDimensionValue_(dimension: string) {
         const currentValue = this.values.get(dimension);
 
-        if (currentValue === undefined) {
+        if (currentValue === undefined && !this.ranges.has(dimension)) {
             const domain = this.domains.get(dimension);
 
-            if (domain) {
-                if (isValueDomain(domain)) {
-                    if (domain.min !== undefined) {
-                        this.setValue(dimension, domain.min);
-                    }
-                } else {
-                    if (domain.values.length) {
-                        this.setValue(dimension, domain.values[0].value);
+            if (dimension === 'time') {
+                this.initTimeDimensionValue_();
+            } else {
+                if (domain) {
+                    if (isValueDomain(domain)) {
+                        if (domain.min !== undefined) {
+                            this.setValue(dimension, domain.min);
+                        }
+                    } else {
+                        if (domain.values.length) {
+                            this.setValue(dimension, domain.values[0].value);
+                        }
                     }
                 }
             }
+        }
+    }
+
+    protected initTimeDimensionValue_() {
+        const domain = this.domains.get('time');
+        // initialize the time dimension value to the current dataset selected time
+        const datasetTime = this.dataset_.toi;
+        if (datasetTime) {
+            if (datasetTime instanceof Date) {
+                this.setValue('time', datasetTime);
+            } else {
+                //a time range is currently selected. try to find the time nearest to the range end time
+                const timeProvider = this.dataset_.config.timeDistribution?.provider;
+                if (timeProvider) {
+                    timeProvider.getNearestItem(datasetTime.end, TimeSearchDirection.Backward, this).then((dt) => {
+                        if (dt) {
+                            this.setValue('time', dt.start);
+                        }
+                    });
+                } else {
+                    this.setValue('time', datasetTime.end);
+                }
+            }
+        } else if (domain) {
+            if (isValueDomain(domain)) {
+                if (domain.min !== undefined) {
+                    this.setValue('time', domain.min);
+                }
+            } else {
+                if (domain.values.length) {
+                    this.setValue('time', domain.values[0].value);
+                }
+            }
+        }
+    }
+
+    protected getDomainClampedRange_(dimension: string, range?: DimensionRangeType): Promise<DimensionRangeType | undefined> {
+        let domainPromise = this.domainRequests.get(dimension);
+        if (!domainPromise) {
+            const domain = this.domains.get(dimension);
+            if (domain) {
+                domainPromise = Promise.resolve(domain);
+            }
+        }
+        if (domainPromise) {
+            return domainPromise
+                .then((domain) => {
+                    if (domain && isValueDomain(domain) && domain.min !== undefined && domain.max !== undefined) {
+                        // if no range is defined or the current range is outside of the domain extent set the range to the domain extent
+                        if (!range || Array.isArray(range) || range.min >= domain.max || range.max <= domain.min) {
+                            return {
+                                min: domain.min,
+                                max: domain.max
+                            };
+                        } else {
+                            // clamp the range to the domain extent
+                            let min = range.min;
+                            let max = range.max;
+                            if (min < domain.min) {
+                                min = domain.min;
+                            }
+                            if (max > domain.max) {
+                                max = domain.max;
+                            }
+                            return {
+                                min: min,
+                                max: max
+                            };
+                        }
+                    } else {
+                        return range;
+                    }
+                })
+                .catch(() => {
+                    return range;
+                });
+        } else {
+            return Promise.resolve(range);
         }
     }
 }

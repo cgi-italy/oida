@@ -6,22 +6,18 @@ import { AsyncDataFetcher } from '@oidajs/state-mobx';
 import {
     DatasetVariable,
     DatasetDimension,
-    DataDomain,
-    TimeSearchDirection,
     NumericDomain,
     CategoricalDomain,
-    DatasetDimensions,
-    HasDatasetDimensions,
-    DatasetDimensionsProps,
     ColorMapProps,
     DistributionHistogramBin,
-    DistributionPercentile
+    DistributionPercentile,
+    CategoricalDimensionValueType,
+    DimensionDomainType
 } from '../common';
 import { DatasetProcessing, DatasetProcessingProps } from './dataset-processing';
 
 export const DATASET_AREA_VALUES_PROCESSING = 'dataset_area_values_processing';
 
-type DatasetAreaValuesDimensionType = string | Date | number;
 type DatasetAreaValuesImageType = HTMLImageElement | HTMLCanvasElement | string;
 
 export type DatasetAreaValuesDataMask = {
@@ -35,7 +31,7 @@ export type DatasetAreaValuesRequest = {
     geometry: GeoJSON.Polygon | GeoJSON.MultiPolygon | CircleGeometry | BBoxGeometry;
     dataMask: Partial<DatasetAreaValuesDataMask>;
     gridSize?: number[];
-    dimensionValues?: Map<string, DatasetAreaValuesDimensionType>;
+    dimensionValues?: Map<string, CategoricalDimensionValueType>;
     colorMap?: ColorMapProps;
     additionalDatasetFilters?: Map<string, QueryFilter>;
 };
@@ -63,19 +59,20 @@ export type DatasetAreaValuesConfig = {
     supportedGeometries: AoiSupportedGeometry[];
     supportedData: DatasetAreaValuesDataMask;
     provider: DatasetAreaValuesProvider;
-    dimensions: DatasetDimension<DataDomain<DatasetAreaValuesDimensionType>>[];
+    dimensions: DatasetDimension<DimensionDomainType>[];
 };
 
-export type DatasetAreaValuesProps = {
+export type DatasetAreaValuesProps = Omit<
+    DatasetProcessingProps<typeof DATASET_AREA_VALUES_PROCESSING, DatasetAreaValuesConfig>,
+    'dimensions' | 'currentVariable' | 'initDimensions'
+> & {
     variable?: string;
     autoUpdate?: boolean;
     dataMask?: Partial<DatasetAreaValuesDataMask>;
-} & DatasetProcessingProps<typeof DATASET_AREA_VALUES_PROCESSING, DatasetAreaValuesConfig> &
-    DatasetDimensionsProps;
+};
 
-export class DatasetAreaValues extends DatasetProcessing<undefined> implements HasDatasetDimensions {
+export class DatasetAreaValues extends DatasetProcessing<undefined> {
     readonly config: DatasetAreaValuesConfig;
-    readonly dimensions: DatasetDimensions;
     @observable.ref variable: string | undefined;
     @observable.ref data: DatasetAreaValuesData | undefined;
     @observable.ref autoUpdate: boolean;
@@ -88,17 +85,20 @@ export class DatasetAreaValues extends DatasetProcessing<undefined> implements H
     constructor(props: Omit<DatasetAreaValuesProps, 'vizType'>) {
         super({
             vizType: DATASET_AREA_VALUES_PROCESSING,
+            dimensionValues: props.dimensionValues || props.parent?.dimensions.values,
+            currentVariable: () => this.variable,
+            dimensions: props.config.dimensions,
+            initDimensions: true,
             ...props
         });
-
-        const parentDimensions = (props.parent as HasDatasetDimensions | undefined)?.dimensions;
 
         this.config = props.config;
 
         this.variable = props.variable;
         if (!this.variable) {
-            if (parentDimensions?.variable && this.config.variables.find((variable) => variable.id === parentDimensions.variable)) {
-                this.variable = parentDimensions.variable;
+            const parentVariable = this.parent?.dimensions.variable;
+            if (parentVariable && this.config.variables.find((variable) => variable.id === parentVariable)) {
+                this.variable = parentVariable;
             }
         }
         this.data = undefined;
@@ -115,14 +115,6 @@ export class DatasetAreaValues extends DatasetProcessing<undefined> implements H
         });
         this.subscriptionTracker_ = new SubscriptionTracker();
         this.needsUpdate_ = true;
-
-        this.dimensions = new DatasetDimensions({
-            dimensionValues: props.dimensionValues || parentDimensions?.values,
-            dataset: props.dataset,
-            currentVariable: () => this.variable,
-            dimensions: props.config.dimensions,
-            initDimensions: true
-        });
 
         makeObservable(this);
 
@@ -195,7 +187,6 @@ export class DatasetAreaValues extends DatasetProcessing<undefined> implements H
         return this.clone_({
             config: this.config,
             variable: this.variable,
-            dimensionValues: this.dimensions.values,
             autoUpdate: this.autoUpdate
         }) as DatasetAreaValues;
     }
@@ -203,7 +194,6 @@ export class DatasetAreaValues extends DatasetProcessing<undefined> implements H
     dispose() {
         super.dispose();
         this.subscriptionTracker_.unsubscribe();
-        this.dimensions.dispose();
     }
 
     @action
@@ -214,31 +204,6 @@ export class DatasetAreaValues extends DatasetProcessing<undefined> implements H
     protected afterInit_() {
         if (!this.variable) {
             this.setVariable(this.config.variables[0].id);
-        }
-        if (!this.dimensions.values.has('time')) {
-            //if the time dimension have not been passed in config initialize the time
-            // dimension value to the current dataset selected time
-            const timeDimension = this.config.dimensions.find((dimension) => dimension.id === 'time');
-            if (timeDimension) {
-                const datasetTime = this.dataset.toi;
-                if (datasetTime) {
-                    if (datasetTime instanceof Date) {
-                        this.dimensions.setValue('time', datasetTime);
-                    } else {
-                        //a time range is currently selected. try to find the time nearest to the range end time
-                        const timeProvider = this.dataset.config.timeDistribution?.provider;
-                        if (timeProvider) {
-                            timeProvider.getNearestItem(datasetTime.end, TimeSearchDirection.Backward, this.dimensions).then((dt) => {
-                                if (dt) {
-                                    this.dimensions.setValue('time', dt.start);
-                                }
-                            });
-                        } else {
-                            this.dimensions.setValue('time', datasetTime.end);
-                        }
-                    }
-                }
-            }
         }
 
         const statsUpdaterDisposer = autorun(() => {

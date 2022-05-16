@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.2.0](https://github.com/cgi-italy/oida/compare/@oidajs/eo-adapters-ogc@2.1.1...@oidajs/eo-adapters-ogc@2.2.0) (2022-05-16)
+
+
+### Features
+
+* improve dataset dimensions management ([3f1d0d8](https://github.com/cgi-italy/oida/commit/3f1d0d8c1539166694976ea8ba893d826c8ea652))
+
+
+
+
+
 ## [2.1.1](https://github.com/cgi-italy/oida/compare/@oidajs/eo-adapters-ogc@2.1.0...@oidajs/eo-adapters-ogc@2.1.1) (2022-04-14)
 
 **Note:** Version bump only for package @oidajs/eo-adapters-ogc

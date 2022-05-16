@@ -1,6 +1,6 @@
 {
   "name": "@oidajs/eo-adapters-adam",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "description": "oida EO adam adapters",
   "module": "es/index.js",
   "main": "lib/index.js",

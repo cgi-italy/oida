@@ -1,7 +1,6 @@
 import length from '@turf/length';
 
 import { AxiosInstanceWithCancellation, createAxiosInstance } from '@oidajs/core';
-
 import { DatasetAreaSeriesRequest, DatasetAreaSeriesDataItem, DatasetTransectValuesRequest } from '@oidajs/eo-mobx';
 
 import { AdamServiceParamsSerializer } from '../utils';
@@ -36,7 +35,7 @@ export class AdamWpsAnalysisProvider {
             identifier: 'stat_values'
         };
 
-        if (request.geometry.type === 'BBox' && request.range && request.dimension === 'time') {
+        if (request.geometry.type === 'BBox' && request.range && !Array.isArray(request.range) && request.dimension === 'time') {
             const bbox = request.geometry.bbox;
 
             const variable = this.getVariableConfig_(request.variable);
@@ -76,7 +75,7 @@ export class AdamWpsAnalysisProvider {
                     }
                 });
         } else {
-            return Promise.reject();
+            return Promise.reject(new Error('Unsupported request'));
         }
     }
 
