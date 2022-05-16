@@ -30,12 +30,16 @@ export const getWmsTimeSeriesToolConfig = (props: WmsTimeSeriesConfig) => {
             }
         ],
         provider: (request) => {
-            return props.wmsService.getTimeSeries({
-                start: request.range!.min as Date,
-                end: request.range!.max as Date,
-                layer: props.layerName,
-                position: request.location.coordinates
-            });
+            if (request.range && !Array.isArray(request.range)) {
+                return props.wmsService.getTimeSeries({
+                    start: request.range!.min as Date,
+                    end: request.range!.max as Date,
+                    layer: props.layerName,
+                    position: request.location.coordinates
+                });
+            } else {
+                return Promise.reject(new Error('Invalid range provided'));
+            }
         }
     };
 

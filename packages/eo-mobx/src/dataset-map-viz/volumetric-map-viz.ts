@@ -29,10 +29,13 @@ export type VolumetricMapVizConfig = {
     afterInit?: (volumetricViz: DatasetVolumetricViz) => void;
 };
 
-export type DatasetVolumetricVizProps = {
-    bandMode?: RasterBandModeSingleProps | RasterBandModeSingle;
-} & DatasetVizProps<typeof VOLUMETRIC_VIZ_TYPE, VolumetricMapVizConfig> &
-    VerticalScaleProps;
+export type DatasetVolumetricVizProps = Omit<
+    DatasetVizProps<typeof VOLUMETRIC_VIZ_TYPE, VolumetricMapVizConfig>,
+    'dimensions' | 'currentVariable' | 'initDimensions'
+> &
+    VerticalScaleProps & {
+        bandMode?: RasterBandModeSingleProps | RasterBandModeSingle;
+    };
 
 export class DatasetVolumetricViz extends DatasetViz<VolumeLayer> {
     readonly config: VolumetricMapVizConfig;
@@ -78,6 +81,7 @@ export class DatasetVolumetricViz extends DatasetViz<VolumeLayer> {
     }
 
     dispose() {
+        super.dispose();
         this.subscriptionTracker_.unsubscribe();
     }
 

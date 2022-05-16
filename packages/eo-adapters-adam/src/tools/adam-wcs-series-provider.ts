@@ -40,6 +40,9 @@ export class AdamWcsSeriesProvider {
         this.config_.dimensions.forEach((dimension) => {
             if (dimension.id === request.dimension) {
                 if (request.range) {
+                    if (Array.isArray(request.range)) {
+                        return Promise.reject(new Error('Unsupported categorical dimension range'));
+                    }
                     if (dimension.id === 'time') {
                         subsets['unix'] = [`${(request.range.min as Date).toISOString()},${(request.range.max as Date).toISOString()}`];
                     } else {

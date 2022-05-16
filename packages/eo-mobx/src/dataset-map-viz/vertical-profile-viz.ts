@@ -1,4 +1,4 @@
-import { autorun, IObservableArray, observable, makeObservable, runInAction, action } from 'mobx';
+import { autorun, IObservableArray, observable, makeObservable, runInAction, action, computed } from 'mobx';
 
 import { LoadingState, IVerticalProfile, IVerticalProfileStyle, TileSource, SubscriptionTracker } from '@oidajs/core';
 import {
@@ -15,7 +15,7 @@ import {
     AsyncDataFetcher
 } from '@oidajs/state-mobx';
 
-import { DataDomain, DatasetDimension, DatasetDimensions, DatasetDimensionsProps, DatasetViz, DatasetVizProps } from '../common';
+import { DatasetDimension, DatasetViz, DatasetVizProps, DimensionDomainType } from '../common';
 import { DatasetPointSeriesValueItem } from '../dataset-analytics';
 import { RasterBandModeConfig, RasterBandMode, RasterBandModeType } from './raster-band-mode';
 import { getRasterBandModeFromConfig } from '../utils';
@@ -25,6 +25,7 @@ export const VERTICAL_PROFILE_VIZ_TYPE = 'dataset_vertical_profile_viz';
 
 export type VerticalProfileItemProps = {
     id: string;
+    name?: string;
     geometry: IVerticalProfile;
     style: Omit<IVerticalProfileStyle, 'visible'>;
 } & VisibleProps &
@@ -33,6 +34,7 @@ export type VerticalProfileItemProps = {
 
 export class VerticalProfileItem implements HasVisibility, IsSelectable, IsHoverable {
     readonly id: string;
+    readonly name: string | undefined;
     readonly visible: Visible;
     readonly selected: Selected;
     readonly hovered: Hovered;
@@ -41,6 +43,7 @@ export class VerticalProfileItem implements HasVisibility, IsSelectable, IsHover
 
     constructor(props: VerticalProfileItemProps) {
         this.id = props.id;
+        this.name = props.name;
         this.visible = new Visible(props);
         this.selected = new Selected(props);
         this.hovered = new Hovered(props);
@@ -101,12 +104,16 @@ export type VerticalProfileVizConfig = {
         default?: number;
     };
     afterInit?: (verticalProfileViz) => void;
-    dimensions?: DatasetDimension<DataDomain<string | number | Date>>[];
+    dimensions?: (DatasetDimension<DimensionDomainType> & {
+        allowRange?: boolean;
+    })[];
 };
 
-export type DatasetVerticalProfileVizProps = DatasetVizProps<typeof VERTICAL_PROFILE_VIZ_TYPE, VerticalProfileVizConfig> &
-    VerticalScaleProps &
-    DatasetDimensionsProps;
+export type DatasetVerticalProfileVizProps = Omit<
+    DatasetVizProps<typeof VERTICAL_PROFILE_VIZ_TYPE, VerticalProfileVizConfig>,
+    'dimensions' | 'currentVariable' | 'initDimensions'
+> &
+    VerticalScaleProps;
 
 export class DatasetVerticalProfileViz extends DatasetViz<VerticalProfileLayer<VerticalProfileItem>> {
     readonly config: VerticalProfileVizConfig;
@@ -114,14 +121,18 @@ export class DatasetVerticalProfileViz extends DatasetViz<VerticalProfileLayer<V
     @observable tileSourceRevision: number;
     profiles: IObservableArray<VerticalProfileItem>;
     readonly bandMode: RasterBandMode;
-    readonly dimensions: DatasetDimensions;
 
+    @observable protected widgetName_: string;
     protected subscriptionTracker_: SubscriptionTracker;
     protected profileGetter_: AsyncDataFetcher<VerticalProfileItemProps[], undefined>;
 
     constructor(props: Omit<DatasetVerticalProfileVizProps, 'vizType'>) {
         super({
             ...props,
+            dimensions: props.config.dimensions,
+            currentVariable: () => (this.bandMode.value?.type === RasterBandModeType.Single ? this.bandMode.value.band : undefined),
+            initDimensions: true,
+            dimensionValues: props.dimensionValues,
             vizType: VERTICAL_PROFILE_VIZ_TYPE
         });
 
@@ -132,14 +143,6 @@ export class DatasetVerticalProfileViz extends DatasetViz<VerticalProfileLayer<V
         if (verticalScaleConfig && verticalScaleConfig.default) {
             this.verticalScale.setValue(verticalScaleConfig.default);
         }
-
-        this.dimensions = new DatasetDimensions({
-            dataset: this.dataset,
-            dimensionValues: props.dimensionValues,
-            dimensions: props.config.dimensions,
-            currentVariable: () => (this.bandMode.value?.type === RasterBandModeType.Single ? this.bandMode.value.band : undefined),
-            initDimensions: true
-        });
 
         this.tileSourceRevision = 0;
 
@@ -156,6 +159,8 @@ export class DatasetVerticalProfileViz extends DatasetViz<VerticalProfileLayer<V
             }
         });
 
+        this.widgetName_ = this.dataset.config.name;
+
         this.bandMode = new RasterBandMode();
         getRasterBandModeFromConfig({
             config: props.config.bandMode
@@ -166,6 +171,11 @@ export class DatasetVerticalProfileViz extends DatasetViz<VerticalProfileLayer<V
         makeObservable(this);
 
         this.afterInit_();
+    }
+
+    @computed
+    get widgetName() {
+        return this.widgetName_;
     }
 
     @action
@@ -201,7 +211,13 @@ export class DatasetVerticalProfileViz extends DatasetViz<VerticalProfileLayer<V
     }
 
     dispose() {
+        super.dispose();
         this.subscriptionTracker_.unsubscribe();
+    }
+
+    @action
+    setWidgetName_(name: string) {
+        this.widgetName_ = name;
     }
 
     protected afterInit_() {
@@ -232,8 +248,14 @@ export class DatasetVerticalProfileViz extends DatasetViz<VerticalProfileLayer<V
         const widgetVisibilityDisposer = autorun(() => {
             const selectedProfile = this.profiles.find((profile) => profile.selected.value);
             if (selectedProfile) {
+                if (selectedProfile.name) {
+                    this.setWidgetName_(`${this.dataset.config.name}: ${selectedProfile.name}`);
+                } else {
+                    this.setWidgetName_(this.dataset.config.name);
+                }
                 this.setWidgetVisible(true);
             } else {
+                this.setWidgetName_(this.dataset.config.name);
                 this.setWidgetVisible(false);
             }
         });

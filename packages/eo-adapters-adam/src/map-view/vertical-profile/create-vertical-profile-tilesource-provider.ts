@@ -75,7 +75,6 @@ export const createAdamVerticalProfileTileSourceProvider = (
         if (wcsCoverageParams.bandSubset) {
             subsets.push(wcsCoverageParams.bandSubset);
         }
-        subsets.push(...wcsCoverageParams.dimensionSubsets);
 
         let format: string;
         let tileLoadFunction: ((tile, source) => void) | undefined = undefined;
@@ -112,7 +111,7 @@ export const createAdamVerticalProfileTileSourceProvider = (
                 coverage: wcsCoverageParams.coverageId,
                 subdataset: wcsCoverageParams.subdataset,
                 format: format,
-                subsets: [...subsets, timeSubset],
+                subsets: [...subsets, timeSubset, ...(profile.dimensionSubsets || [])],
                 tileGrid: {
                     extent: extent,
                     gridSize: gridSize

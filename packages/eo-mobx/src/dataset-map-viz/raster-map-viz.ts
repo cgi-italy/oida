@@ -1,46 +1,39 @@
 import { autorun } from 'mobx';
 
-import { TileSource, SubscriptionTracker, LoadingState } from '@oidajs/core';
+import { TileSource, SubscriptionTracker, LoadingState, TileSourceTypes } from '@oidajs/core';
 import { GroupLayer, TileLayer } from '@oidajs/state-mobx';
 
-import {
-    DatasetDimension,
-    DataDomain,
-    isValueDomain,
-    DatasetViz,
-    DatasetVizProps,
-    DatasetDimensions,
-    DatasetDimensionsProps,
-    HasDatasetDimensions
-} from '../common';
+import { DatasetDimension, DatasetViz, DatasetVizProps, DimensionDomainType } from '../common';
 import { getRasterBandModeFromConfig } from '../utils';
 import { RasterBandModeConfig, RasterBandMode, RasterBandModeType } from './raster-band-mode';
 
 export const RASTER_VIZ_TYPE = 'dataset_raster_viz';
 
-export type RasterSourceProviderResponseItem = {
-    config: TileSource;
+export type RasterSourceProviderResponseItem<TYPE extends TileSourceTypes = TileSourceTypes> = {
+    config: TileSource<TYPE>;
     geographicExtent?: number[];
     minZoomLevel?: number;
     maxZoomLevel?: number;
 };
 
-export type RasterSourceProvider = (
+export type RasterSourceProvider<TYPE extends TileSourceTypes = TileSourceTypes> = (
     rasterViz: RasterMapViz
-) => Promise<RasterSourceProviderResponseItem | RasterSourceProviderResponseItem[] | undefined>;
+) => Promise<RasterSourceProviderResponseItem<TYPE> | RasterSourceProviderResponseItem<TYPE>[] | undefined>;
 
 export type RasterMapVizConfig = {
     bandMode: RasterBandModeConfig;
-    dimensions?: DatasetDimension<DataDomain<string | number | Date>>[];
+    dimensions?: DatasetDimension<DimensionDomainType>[];
     rasterSourceProvider: RasterSourceProvider;
     afterInit?: (rasterViz: RasterMapViz) => void;
 };
 
-export type RasterMapVizProps = DatasetVizProps<typeof RASTER_VIZ_TYPE, RasterMapVizConfig> & DatasetDimensionsProps;
+export type RasterMapVizProps = Omit<
+    DatasetVizProps<typeof RASTER_VIZ_TYPE, RasterMapVizConfig>,
+    'dimensions' | 'currentVariable' | 'initDimensions'
+>;
 
-export class RasterMapViz extends DatasetViz<GroupLayer> implements HasDatasetDimensions {
+export class RasterMapViz extends DatasetViz<GroupLayer> {
     readonly config: RasterMapVizConfig;
-    readonly dimensions: DatasetDimensions;
     readonly bandMode: RasterBandMode;
 
     protected subscriptionTracker_: SubscriptionTracker;
@@ -48,20 +41,16 @@ export class RasterMapViz extends DatasetViz<GroupLayer> implements HasDatasetDi
     constructor(props: Omit<RasterMapVizProps, 'vizType'>) {
         super({
             ...props,
+            dimensions: props.config.dimensions,
+            currentVariable: () => (this.bandMode.value?.type === RasterBandModeType.Single ? this.bandMode.value.band : undefined),
+            initDimensions: true,
+            dimensionValues: props.dimensionValues,
             vizType: RASTER_VIZ_TYPE
         });
 
         this.config = props.config;
 
         this.bandMode = new RasterBandMode();
-
-        this.dimensions = new DatasetDimensions({
-            dataset: this.dataset,
-            dimensionValues: props.dimensionValues,
-            dimensions: props.config.dimensions,
-            currentVariable: () => (this.bandMode.value?.type === RasterBandModeType.Single ? this.bandMode.value.band : undefined),
-            initDimensions: true
-        });
 
         getRasterBandModeFromConfig({
             config: props.config.bandMode
@@ -75,24 +64,14 @@ export class RasterMapViz extends DatasetViz<GroupLayer> implements HasDatasetDi
     }
 
     dispose() {
+        super.dispose();
         this.subscriptionTracker_.unsubscribe();
-        this.dimensions.dispose();
     }
 
     protected initMapLayer_() {
         return new GroupLayer({
             id: `${this.dataset.id}raster`
         });
-    }
-
-    protected initDimensionValue_(dimensionId: string, domain: DataDomain<string | number | Date>) {
-        if (isValueDomain(domain)) {
-            if (domain.min !== undefined) {
-                this.dimensions.setValue(dimensionId, domain.min);
-            }
-        } else {
-            this.dimensions.setValue(dimensionId, domain.values[0].value);
-        }
     }
 
     protected afterInit_() {

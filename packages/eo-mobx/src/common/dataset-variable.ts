@@ -5,6 +5,11 @@ export type DomainRange<T> = {
     max: T;
 };
 
+export type ValueDomain<TYPE, STEP = TYPE> = Partial<DomainRange<TYPE>> & {
+    step?: STEP;
+    noData?: TYPE;
+};
+
 export type CategoricalDomain<T> = {
     values: Array<{
         value: T;
@@ -12,15 +17,12 @@ export type CategoricalDomain<T> = {
     }>;
 };
 
-export type ValueDomain<T, S = T> = Partial<DomainRange<T>> & {
-    step?: S;
-    noData?: T;
-};
+export type DataDomain<VALUE_TYPE, CATEGORY_TYPE = VALUE_TYPE, VALUE_STEP = VALUE_TYPE> =
+    | ValueDomain<VALUE_TYPE, VALUE_STEP>
+    | CategoricalDomain<CATEGORY_TYPE>;
 
-export type DataDomain<T, S = T> = ValueDomain<T, S> | CategoricalDomain<T>;
-
-export const isValueDomain = <T, S, C>(domain: ValueDomain<T, S> | CategoricalDomain<C>): domain is ValueDomain<T, S> => {
-    return !Array.isArray((domain as CategoricalDomain<C>).values);
+export const isValueDomain = (domain: ValueDomain<unknown> | CategoricalDomain<unknown>): domain is ValueDomain<unknown> => {
+    return !Array.isArray((domain as CategoricalDomain<unknown>).values);
 };
 
 export type DataDomainProviderFilters = {

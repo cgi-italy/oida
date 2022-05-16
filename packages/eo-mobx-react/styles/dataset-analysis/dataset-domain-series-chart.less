@@ -48,8 +48,8 @@
         }
     }
 
-    .dataset-chart-filters,.dataset-chart-form {
-
+    .dataset-chart-filters,
+    .dataset-chart-form {
         .analysis-parameters {
             padding: 0.5rem;
 
@@ -76,26 +76,23 @@
                     }
 
                     .dataset-dimension-value-selector {
-                        >span {
+                        > span {
                             display: none;
                         }
                     }
-                    .dataset-dimension-selector {
-                        >span {
+                    .dataset-dimension-range-selector {
+                        > span {
                             display: none;
                         }
                         .ant-slider {
-                            min-width: 140px;
-                            margin: 0 20px;
+                            min-width: 180px;
+                            margin: 5px 20px;
 
                             .ant-slider-mark-text {
                                 min-width: 40px;
                             }
-
                         }
                     }
-
-
                 }
             }
 
@@ -120,7 +117,6 @@
             background: transparent;
 
             .ant-collapse-item {
-
                 border-bottom: none;
 
                 .ant-collapse-header {
@@ -133,12 +129,11 @@
                         left: 0px;
                         padding: 0;
                         top: 50%;
-                        transform: translateY(-50%)
+                        transform: translateY(-50%);
                     }
                 }
 
                 &.ant-collapse-item-active {
-
                     .ant-collapse-header {
                         pointer-events: none;
 
@@ -155,10 +150,8 @@
                 .ant-collapse-content {
                     margin-top: -25px;
                 }
-
             }
         }
-
     }
 
     .ant-empty {
@@ -169,7 +162,6 @@
     }
 
     .series-chart {
-
         flex-grow: 1;
         flex-shrink: 1;
         overflow-y: auto;
@@ -192,7 +184,6 @@
                     }
 
                     .axis-values {
-
                         .series-item {
                             &.is-area {
                                 .series-value {
