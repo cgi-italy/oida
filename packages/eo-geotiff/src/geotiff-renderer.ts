@@ -216,7 +216,7 @@ export class GeotiffRenderer {
 
                     return this.getImageExtent_(image, params.outputSrs).then((imageExtentData) => {
                         const renderData: GeotiffRendererData = {
-                            values: data[0],
+                            values: data[0] as ArrayBuffer,
                             width: image.getWidth(),
                             height: image.getHeight(),
                             noData: noData,

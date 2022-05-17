@@ -147,7 +147,7 @@ export const getAdamVolumetricMapViewConfig = (factoryConfig: AdamDatasetFactory
                     return fromArrayBuffer(sliceData).then((tiff) => {
                         return tiff.getImage().then((image) => {
                             return image.readRasters().then((data) => {
-                                return data[0];
+                                return data[0] as ArrayBufferView;
                             });
                         });
                     });
