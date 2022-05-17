@@ -19,8 +19,7 @@ export class PlottyRenderer {
         if (!PlottyRenderer.defaultPlottyInstance_) {
             PlottyRenderer.defaultPlottyInstance_ = new plot({
                 canvas: document.createElement('canvas'),
-                //the webgl renderer is not currently able to handle NaN values. Disable it for now
-                useWebGL: false
+                useWebGL: true
             });
         }
         return PlottyRenderer.defaultPlottyInstance_;
