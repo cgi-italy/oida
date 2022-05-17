@@ -25,19 +25,19 @@ export const createGeoTiffLoader = (props: createGeotiffTileLoaderProps): Geotif
     });
 
     // vertical profile rendering needs the image to be rotated by 90 degrees and mirrored
-    let getRotatedImage;
+    let getRotatedImage: ((image: HTMLImageElement) => string) | undefined;
     if (rotateImage) {
         const rotationCanvas = document.createElement('canvas');
         const rotCtx = rotationCanvas.getContext('2d')!;
 
-        getRotatedImage = (canvas) => {
-            rotationCanvas.width = canvas.height;
-            rotationCanvas.height = canvas.width;
+        getRotatedImage = (image: HTMLImageElement) => {
+            rotationCanvas.width = image.height;
+            rotationCanvas.height = image.width;
 
             rotCtx.translate(rotationCanvas.width / 2, rotationCanvas.height / 2);
             rotCtx.rotate(-Math.PI / 2);
             rotCtx.scale(1, -1);
-            rotCtx.drawImage(canvas, -canvas.width / 2, -canvas.height / 2);
+            rotCtx.drawImage(image, -image.width / 2, -image.height / 2);
 
             return rotationCanvas.toDataURL();
         };
@@ -60,9 +60,18 @@ export const createGeoTiffLoader = (props: createGeotiffTileLoaderProps): Geotif
                         register(proj4);
                     }
                     if (getRotatedImage) {
-                        return getRotatedImage(response.canvas);
+                        return new Promise<string>((resolve, reject) => {
+                            const image = new Image();
+                            image.src = response.imageData;
+                            image.addEventListener('load', () => {
+                                resolve(getRotatedImage!(image));
+                            });
+                            image.addEventListener('error', () => {
+                                resolve('');
+                            });
+                        });
                     } else {
-                        return response.canvas.toDataURL();
+                        return response.imageData;
                     }
                 }
             });

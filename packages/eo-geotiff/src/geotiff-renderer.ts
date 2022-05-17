@@ -1,6 +1,6 @@
 import LruCache from 'lru-cache';
 import { plot } from 'plotty';
-import { fromArrayBuffer } from 'geotiff';
+import { fromArrayBuffer, Pool } from 'geotiff';
 import proj4 from 'proj4';
 import axios, { AxiosRequestConfig } from 'axios';
 
@@ -44,13 +44,13 @@ export class GeotiffRenderer {
      * See {@link https://github.com/geotiffjs/geotiff.js/#using-decoder-pools-to-improve-parsing-performance | geotiffjs documentation}
      * @param decoder
      */
-    static setDecoder(decoder) {
+    static setDecoder(decoder: Pool) {
         this.decoder_ = decoder;
     }
 
     protected static srsDefProvider_ = new EpsgIoDefinitionProvider();
     protected static defaultCacheInstance_: LruCache | undefined;
-    protected static decoder_ = undefined;
+    protected static decoder_: Pool | undefined = undefined;
 
     /**
      * Canvas used for post rendering transformations (e.g. extent scaling)
@@ -109,7 +109,7 @@ export class GeotiffRenderer {
         return this.plotty_;
     }
 
-    renderFromUrl(params: RenderFromUrlParams): Promise<{ canvas: HTMLCanvasElement; newSrsDefinition: boolean } | undefined> {
+    renderFromUrl(params: RenderFromUrlParams): Promise<{ imageData: string; newSrsDefinition: boolean } | undefined> {
         const dataRequest: AxiosRequestConfig = {
             url: params.url,
             method: params.postData ? 'POST' : 'GET',
@@ -128,20 +128,12 @@ export class GeotiffRenderer {
                 if (!cachedData.values) {
                     return Promise.resolve(undefined);
                 } else {
-                    return new Promise((resolve, reject) => {
-                        setTimeout(() => {
-                            const canvas = this.renderTiffImage_(cachedData);
-                            resolve({
-                                canvas,
-                                newSrsDefinition: false
-                            });
-                        }, 0);
+                    const canvas = this.renderTiffImage_(cachedData);
+                    return Promise.resolve({
+                        imageData: canvas.toDataURL(),
+                        newSrsDefinition: false
                     });
                 }
-                // return Promise.resolve({
-                //     canvas,
-                //     newSrsDefinition: false
-                // });
             }
         }
 
@@ -159,7 +151,7 @@ export class GeotiffRenderer {
                             this.cache_.set(params.url, renderData);
                         }
                         return {
-                            canvas,
+                            imageData: canvas.toDataURL(),
                             newSrsDefinition
                         };
                     })
@@ -193,7 +185,7 @@ export class GeotiffRenderer {
         return this.renderBuffer_(params).then((response) => {
             const { canvas, newSrsDefinition } = response;
             return {
-                canvas,
+                imageData: canvas.toDataURL(),
                 newSrsDefinition
             };
         });
