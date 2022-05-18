@@ -17,7 +17,6 @@ stages:
   - test
   - docs
   - publish
-  - deploy
   - release
 
 install_dependencies:
@@ -54,7 +53,7 @@ lint:
   stage: test
   script:
     - npm run lint:check
-  dependencies: []
+  needs: []
   only:
     - branches
   except:
@@ -73,15 +72,15 @@ test:
     variables:
       - $CI_COMMIT_TITLE == $RELEASE_MSG
 
-build_docs:
+generate_docs:
   stage: docs
-  artifacts:
-    paths:
-      - 'packages/docs/dist'
-    expire_in: 1 hr
-  script:
-    - npm run typedoc -- --out ./packages/docs/static/typedoc
-    - cd packages/docs && npm ci && DEPLOYMENT_URL=https://${DOCS_DEPLOYMENT_HOST} npm run build:docs
+  needs: [build]
+  trigger:
+    include: packages/docs/.gitlab-ci.yml
+    strategy: depend
+  allow_failure: false
+  variables:
+    PARENT_PIPELINE_ID: $CI_PIPELINE_ID
   only:
     - branches
 
@@ -92,32 +91,13 @@ publish_canary:
     - 'node_modules/.bin/lerna publish --registry https://$NEXUS_REPO/ --canary --force-publish --dist-tag $CI_COMMIT_REF_SLUG --preid $CI_COMMIT_REF_SLUG --yes'
   dependencies:
     - build
+  needs: [build]
   only:
     - branches
   except:
     variables:
       - $CANARY_PUBLISH_DISABLED
       - $CI_COMMIT_TITLE == $RELEASE_MSG
-
-publish_apps:
-  stage: publish
-  image: docker:18.09.9
-  variables:
-    DOCKER_DRIVER: overlay2
-    DOCKER_TLS_CERTDIR: ''
-  services:
-    - docker:18.09.9-dind
-  script:
-    - setup_docker
-    - build_docker_images
-  dependencies:
-    - build
-    - build_docs
-  only:
-    - branches
-  except:
-    variables:
-      - $APPS_PUBLISH_DISABLED
 
 publish_release:
   stage: publish
@@ -160,21 +140,6 @@ npm_publish:
       - branches
     variables:
       - $CI_COMMIT_TITLE == $RELEASE_MSG
-
-deploy_docs:
-  stage: deploy
-  image: dtzar/helm-kubectl
-  script:
-    - kubectl config set-cluster k8s --server="${K8S_CLUSTER_ADDRESS}"
-    - kubectl config set-credentials ${K8S_USER} --token=${K8S_TOKEN}
-    - kubectl config set-context default --cluster=k8s --user=${K8S_USER} --namespace=${K8S_NAMESPACE}
-    - kubectl config use-context default
-    - helm upgrade oida-docs ./deploy/docs --set image.tag=${VERSION_TAG} --set "ingress.hosts[0].host=${DOCS_DEPLOYMENT_HOST},ingress.hosts[0].paths={/}" --set "ingress.tls[0].hosts[0]=${DOCS_DEPLOYMENT_HOST}" --set "gatekeeper.redirect=https://${DOCS_DEPLOYMENT_HOST}" --namespace ${K8S_NAMESPACE} --reuse-values
-  dependencies:
-    - publish_apps
-  only:
-    refs:
-      - master
 
 release:
   stage: release
@@ -255,47 +220,6 @@ release:
        echo 'Commit is not on branch tip. Unable to perform a release'
        exit 1
     fi
-  }
-
-  function setup_docker() {
-    if ! docker info &>/dev/null; then
-      if [ -z "$DOCKER_HOST" -a "$KUBERNETES_PORT" ]; then
-        export DOCKER_HOST='tcp://localhost:2375'
-      fi
-    fi
-  }
-
-
-  function docker_login() {
-    echo "Logging to Docker registry..."
-    docker login -u "$DOCKER_REGISTRY_USERNAME" -p "$DOCKER_REGISTRY_PASSWORD" "$DOCKER_REGISTRY_URL"
-    echo ""
-  }
-
-  function build_docker_images() {
-    docker_login
-
-    for package in packages/*/; do
-        if [[ -f "$package"/Dockerfile ]]; then
-            PACKAGE=`basename "$package"`;
-            DOCKER_TAG=$DOCKER_REGISTRY_URL/oida-$PACKAGE:$VERSION_TAG
-            echo "Building Dockerfile for $PACKAGE application..."
-            docker build \
-                --build-arg HTTP_PROXY="$HTTP_PROXY" \
-                --build-arg http_proxy="$http_proxy" \
-                --build-arg HTTPS_PROXY="$HTTPS_PROXY" \
-                --build-arg https_proxy="$https_proxy" \
-                --build-arg FTP_PROXY="$FTP_PROXY" \
-                --build-arg ftp_proxy="$ftp_proxy" \
-                --build-arg NO_PROXY="$NO_PROXY" \
-                --build-arg no_proxy="$no_proxy" \
-                -t "$DOCKER_TAG" "$package"
-
-            echo "Pushing to Docker Registry..."
-            docker push "$DOCKER_TAG"
-            echo ""
-        fi
-    done
   }
 
 before_script:
