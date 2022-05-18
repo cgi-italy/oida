@@ -3,8 +3,7 @@ import proj4 from 'proj4';
 import { register } from 'ol/proj/proj4';
 
 import { AxiosInstanceWithCancellation } from '@oidajs/core';
-import { GeotiffRenderer } from '@oidajs/eo-geotiff';
-import { PlottyRenderer } from '@oidajs/eo-geotiff';
+import { GeotiffRenderer, PlottyRenderer, GeotiffRendererData } from '@oidajs/eo-geotiff';
 
 export type createGeotiffTileLoaderProps = {
     axiosInstance: AxiosInstanceWithCancellation;
@@ -14,7 +13,7 @@ export type createGeotiffTileLoaderProps = {
 export type GeotiffLoader = {
     load: (source: { url: string; postData?: string; requestExtent?: number[]; requestSrs?: string }) => Promise<string>;
     renderer: PlottyRenderer;
-    dataCache: LruCache;
+    dataCache: LruCache<string, GeotiffRendererData | null>;
 };
 
 export const createGeoTiffLoader = (props: createGeotiffTileLoaderProps): GeotiffLoader => {

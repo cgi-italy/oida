@@ -33,8 +33,7 @@
     "@oidajs/eo-mobx": "file:../eo-mobx",
     "@oidajs/state-mobx": "file:../state-mobx",
     "geotiff": "^2.0.5",
-    "lru-cache": "6.0.0",
-    "lzw-tiff-decoder": "^0.1.1",
+    "lru-cache": "^7.10.1",
     "plotty": "^0.4.9",
     "tslib": "^2.3.1",
     "uuid": "^8.3.2"

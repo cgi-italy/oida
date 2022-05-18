@@ -8,7 +8,7 @@ import { AxiosInstanceWithCancellation, EpsgIoDefinitionProvider } from '@oidajs
 import { PlottyRenderer } from './plotty-renderer';
 
 export type GeotiffRendererConfig = {
-    cache?: LruCache;
+    cache?: LruCache<string, GeotiffRendererData | null>;
     plottyInstance?: plot;
     axiosInstace?: AxiosInstanceWithCancellation;
 };
@@ -28,7 +28,7 @@ export type RenderFromBufferParams = {
     outputSrs?: string;
 };
 
-type GeotiffRendererData = {
+export type GeotiffRendererData = {
     values: ArrayBuffer;
     width: number;
     height: number;
@@ -49,7 +49,7 @@ export class GeotiffRenderer {
     }
 
     protected static srsDefProvider_ = new EpsgIoDefinitionProvider();
-    protected static defaultCacheInstance_: LruCache | undefined;
+    protected static defaultCacheInstance_: LruCache<string, GeotiffRendererData | null> | undefined;
     protected static decoder_: Pool | undefined = undefined;
 
     /**
@@ -66,9 +66,9 @@ export class GeotiffRenderer {
     protected static getDefaultCacheInstance_() {
         if (!GeotiffRenderer.defaultCacheInstance_) {
             GeotiffRenderer.defaultCacheInstance_ = new LruCache({
-                max: 1e8,
-                length: (item, key) => {
-                    return item.values ? item.values.byteLength : 0;
+                maxSize: 1e8,
+                sizeCalculation: (item, key) => {
+                    return item ? item.values.byteLength : 1;
                 }
             });
         }
@@ -87,7 +87,7 @@ export class GeotiffRenderer {
         return [GeotiffRenderer.transformCanvas_, GeotiffRenderer.transformContext_!];
     }
 
-    protected cache_: LruCache;
+    protected cache_: LruCache<string, GeotiffRendererData | null>;
     protected plotty_: PlottyRenderer;
     protected axiosInstance_: AxiosInstanceWithCancellation | undefined;
 
@@ -123,9 +123,9 @@ export class GeotiffRenderer {
         }
 
         if (!params.disableCache) {
-            const cachedData: GeotiffRendererData = this.cache.get(params.url);
-            if (cachedData) {
-                if (!cachedData.values) {
+            const cachedData = this.cache.get(params.url);
+            if (cachedData !== undefined) {
+                if (cachedData === null) {
                     return Promise.resolve(undefined);
                 } else {
                     return new Promise((resolve, reject) => {
@@ -177,9 +177,7 @@ export class GeotiffRenderer {
                     });
                 }
                 if (!params.disableCache) {
-                    this.cache_.set(params.url, {
-                        values: undefined
-                    });
+                    this.cache_.set(params.url, null);
                 }
                 return undefined;
             });
