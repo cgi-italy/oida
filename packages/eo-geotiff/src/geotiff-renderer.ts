@@ -128,10 +128,14 @@ export class GeotiffRenderer {
                 if (!cachedData.values) {
                     return Promise.resolve(undefined);
                 } else {
-                    const canvas = this.renderTiffImage_(cachedData);
-                    return Promise.resolve({
-                        imageData: canvas.toDataURL(),
-                        newSrsDefinition: false
+                    return new Promise((resolve, reject) => {
+                        requestAnimationFrame(() => {
+                            const canvas = this.renderTiffImage_(cachedData);
+                            resolve({
+                                imageData: canvas.toDataURL(),
+                                newSrsDefinition: false
+                            });
+                        });
                     });
                 }
             }
