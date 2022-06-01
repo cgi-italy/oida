@@ -12,7 +12,7 @@ import { antdFormFieldRendererFactory } from './antd-form-field-renderer-factory
 export const DateRangeFieldRenderer = (
     props: FormFieldRendererBaseProps<DateRangeField> & Omit<RangePickerProps, 'value' | 'onChange'>
 ) => {
-    const { value, onChange, title, required, config, autoFocus, ...renderProps } = props;
+    const { value, onChange, title, required, config, autoFocus, readonly, ...renderProps } = props;
 
     const onDateChange = (range) => {
         if (range && range.length === 2) {
@@ -57,7 +57,9 @@ export const DateRangeFieldRenderer = (
             value={value ? [moment.utc(value.start), moment.utc(value.end)] : undefined}
             onChange={onDateChange}
             disabledDate={disabledDates}
-            allowClear={!props.required}
+            allowClear={!required && !readonly}
+            inputReadOnly={readonly}
+            open={readonly ? false : undefined}
             showTime={
                 config.withTime
                     ? {

@@ -89,7 +89,7 @@ export const DropdownEnumRenderer = (props: DropdownEnumRendererProps) => {
             trigger={[]}
             placement='bottomLeft'
             onVisibleChange={(visible) => setDropDownVisible(visible)}
-            visible={dropDownVisible}
+            visible={!props.readonly && dropDownVisible}
             overlay={
                 <React.Fragment>
                     {loadingState === LoadingState.Loading && <LoadingOutlined />}

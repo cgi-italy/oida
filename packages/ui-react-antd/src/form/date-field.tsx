@@ -11,7 +11,7 @@ import { DateField, DATE_FIELD_ID } from '@oidajs/core';
 import { antdFormFieldRendererFactory } from './antd-form-field-renderer-factory';
 
 export const DateFieldRenderer = (props: FormFieldRendererBaseProps<DateField> & Omit<DatePickerProps, 'value' | 'onChange'>) => {
-    const { value, onChange, title, required, config, autoFocus, ...renderProps } = props;
+    const { value, onChange, title, required, config, autoFocus, readonly, ...renderProps } = props;
 
     const [selectableDates, setSelectableDates] = useState<{
         dates?: Set<string>;
@@ -238,12 +238,15 @@ export const DateFieldRenderer = (props: FormFieldRendererBaseProps<DateField> &
                 ref={pickerRef}
                 value={pickerValue}
                 onChange={onDateChange}
-                allowClear={!props.required}
+                allowClear={!required && !readonly}
                 disabledDate={disabledDates}
                 open={open}
                 mode={mode}
                 showToday={false}
                 onOpenChange={(open) => {
+                    if (readonly) {
+                        return;
+                    }
                     if (open) {
                         setMode('date');
                         updateSelectableDates(moment.utc(value), 'date');
@@ -253,6 +256,7 @@ export const DateFieldRenderer = (props: FormFieldRendererBaseProps<DateField> &
                 panelRender={(panel) => {
                     return <Spin spinning={!!selectableDates.pendingRequest}>{panel}</Spin>;
                 }}
+                inputReadOnly={readonly}
                 onPanelChange={(value, mode) => {
                     if (mode === 'date' || mode === 'month') {
                         updateSelectableDates(value, mode);

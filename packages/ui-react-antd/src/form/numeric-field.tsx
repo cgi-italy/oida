@@ -50,7 +50,7 @@ export const NumericFieldRenderer = (props: FormFieldRendererBaseProps<NumericFi
         }
     };
 
-    const { value, onChange, title, required, config, autoFocus, changeDelay, ...renderProps } = props;
+    const { value, onChange, title, required, config, autoFocus, changeDelay, readonly, ...renderProps } = props;
 
     return (
         <InputNumber
@@ -61,6 +61,7 @@ export const NumericFieldRenderer = (props: FormFieldRendererBaseProps<NumericFi
             min={config.min}
             max={config.max}
             step={config.step}
+            readOnly={readonly}
             {...renderProps}
         ></InputNumber>
     );

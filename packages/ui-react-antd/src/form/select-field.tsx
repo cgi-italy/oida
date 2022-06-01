@@ -13,7 +13,7 @@ const Option = Select.Option;
 export const SelectEnumRenderer = (
     props: FormFieldRendererBaseProps<EnumField> & Omit<SelectProps<string | string[]>, 'onChange' | 'value'>
 ) => {
-    const { value, onChange, title, required, config, autoFocus, ...renderProps } = props;
+    const { value, onChange, title, required, config, autoFocus, readonly, ...renderProps } = props;
 
     const [options, setOptions] = useState<JSX.Element[]>([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -64,6 +64,7 @@ export const SelectEnumRenderer = (
             mode={config.multiple ? 'multiple' : undefined}
             loading={isLoading}
             autoFocus={autoFocus}
+            open={readonly ? false : undefined}
             {...renderProps}
         >
             {options}

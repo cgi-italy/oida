@@ -9,13 +9,14 @@ import { FormRendererProps, useFormFieldRenderers } from '@oidajs/ui-react-core'
 import { antdFormFieldRendererFactory } from '../form/antd-form-field-renderer-factory';
 
 export const FieldWrapper = (props) => {
-    const { title, description, children, type, required, rendererId } = props;
+    const { title, description, children, type, required, readonly, hidden, rendererId } = props;
     return (
         <Form.Item
             label={title}
-            rules={[{ required: required }]}
+            rules={[{ required: required && !readonly }]}
             tooltip={description}
-            className={classnames(`${type.toLowerCase()}-field`, `${rendererId}-renderer`, { 'is-required': required })}
+            hidden={hidden}
+            className={classnames(`${type.toLowerCase()}-field`, `${rendererId}-renderer`, { 'is-required': required && !readonly })}
         >
             {children}
         </Form.Item>
@@ -25,8 +26,8 @@ export const FieldWrapper = (props) => {
 export type DataFormProps = FormRendererProps &
     Omit<FormProps, 'form' | 'initialValues' | 'fields' | 'onFieldsChange' | 'onValuesChange' | 'validateTrigger'>;
 
-export const DataFormItems = (props: Pick<DataFormProps, 'onFieldChange' | 'values' | 'fields'>) => {
-    const { onFieldChange, values, fields } = props;
+export const DataFormItems = (props: Pick<DataFormProps, 'onFieldChange' | 'values' | 'fields' | 'readonly'>) => {
+    const { onFieldChange, values, fields, readonly: formReadonly } = props;
 
     const fieldsConfig = useFormFieldRenderers({
         fields: fields,
@@ -36,12 +37,16 @@ export const DataFormItems = (props: Pick<DataFormProps, 'onFieldChange' | 'valu
     const formFields = fieldsConfig.map((config) => {
         if (config) {
             const { FieldRenderer, renderProps } = config;
-            const { rendererId, name, type, ...fieldProps } = renderProps;
+            const { rendererId, name, type, readonly: fieldReadonly, ...fieldProps } = renderProps;
+            const readonly = formReadonly || fieldReadonly;
+            const value = values.get(renderProps.name);
+            const hidden = readonly && (value === undefined || value === '');
             return (
-                <FieldWrapper key={renderProps.name} {...renderProps}>
+                <FieldWrapper key={renderProps.name} readonly={readonly} hidden={hidden} {...renderProps}>
                     <FieldRenderer
                         {...fieldProps}
-                        value={values.get(renderProps.name)}
+                        readonly={readonly}
+                        value={value}
                         onChange={(value) => onFieldChange(renderProps.name, value)}
                     />
                 </FieldWrapper>
@@ -53,11 +58,11 @@ export const DataFormItems = (props: Pick<DataFormProps, 'onFieldChange' | 'valu
 };
 
 export const DataForm = (props: DataFormProps) => {
-    const { onFieldChange, values, fields, className, ...formRenderProps } = props;
+    const { onFieldChange, values, fields, className, readonly, ...formRenderProps } = props;
 
     return (
         <Form className={classnames('antd-form-renderer', className)} layout='vertical' size='small' {...formRenderProps}>
-            <DataFormItems fields={fields} values={values} onFieldChange={onFieldChange} />
+            <DataFormItems fields={fields} values={values} onFieldChange={onFieldChange} readonly={readonly} />
         </Form>
     );
 };

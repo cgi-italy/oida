@@ -42,6 +42,14 @@ export type FormFieldCommon<TYPE extends string> = {
      */
     autoFocus?: boolean;
     /**
+     * Flag indicating if this field should be disabled
+     */
+    disabled?: boolean;
+    /**
+     * Flag indicating if this field is readonly
+     */
+    readonly?: boolean;
+    /**
      * renderer specific configuration
      */
     rendererConfig?: FormFieldRendererConfig;

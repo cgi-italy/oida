@@ -13,6 +13,10 @@ export type FormRendererProps = {
      * Callback invoked when a field values is updated
      */
     onFieldChange: (name: string, value: any) => void;
+    /**
+     * A flag indicating if the form should be readonly
+     */
+    readonly?: boolean;
 };
 
 /** A form renderer component */

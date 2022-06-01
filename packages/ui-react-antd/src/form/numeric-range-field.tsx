@@ -22,7 +22,7 @@ export type NumericRangeFieldRendererProps = FormFieldRendererBaseProps<NumericR
 export const NumericRangeFieldRenderer = (props: NumericRangeFieldRendererProps) => {
     const sliderRef = useRef<any>();
 
-    const { value, onChange, config, sliderProps, numericInputProps } = props;
+    const { value, onChange, config, readonly, disabled, sliderProps, numericInputProps } = props;
 
     const hasLimits = config.min !== undefined && config.max !== undefined;
 
@@ -68,6 +68,7 @@ export const NumericRangeFieldRenderer = (props: NumericRangeFieldRendererProps)
                 tooltipVisible={false}
                 step={config.step || parseFloat(((config.max! - config.min!) / 100).toPrecision(4))}
                 range={true}
+                disabled={disabled || readonly}
                 {...sliderProps}
             />
         );
@@ -88,6 +89,8 @@ export const NumericRangeFieldRenderer = (props: NumericRangeFieldRendererProps)
                             onRangeChange([minValue, value ? value.to : undefined]);
                         }
                     }}
+                    readOnly={readonly}
+                    disabled={disabled}
                     {...numericInputProps}
                 />
                 {props.inputInfraContent}
@@ -103,6 +106,8 @@ export const NumericRangeFieldRenderer = (props: NumericRangeFieldRendererProps)
                             onRangeChange([value ? value.from : undefined, maxValue]);
                         }
                     }}
+                    readOnly={readonly}
+                    disabled={disabled}
                     {...numericInputProps}
                 />
             </div>
