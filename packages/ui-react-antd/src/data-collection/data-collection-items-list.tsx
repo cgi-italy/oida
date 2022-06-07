@@ -24,6 +24,7 @@ type ListItemProps<T> = {
         onDrop: (item: T, files: File[]) => void;
     };
     scrollOnSelection?: boolean;
+    size?: 'small' | 'middle' | 'large';
 };
 
 function ListItem<T>(props: ListItemProps<T>) {
@@ -31,7 +32,7 @@ function ListItem<T>(props: ListItemProps<T>) {
     const actions = props.itemActions ? props.itemActions(props.item) : [];
 
     const itemActions = actions.map((action) => {
-        return <DataCollectionItemActionButton action={action} />;
+        return <DataCollectionItemActionButton action={action} size={props.size} />;
     });
 
     const [{ canDrop, isDropHover }, drop] = useDrop({
@@ -110,6 +111,7 @@ export function DataCollectionItemsList<T>(props: DataCollectionItemsListProps<T
                 onMouseLeave={() => {
                     onHoverAction(item, false);
                 }}
+                size={!props.size || props.size === 'default' ? 'middle' : props.size}
                 onClick={(evt) => {
                     let selectionMode = SelectionMode.Replace;
                     if (multiSelect) {

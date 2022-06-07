@@ -1,7 +1,7 @@
 import React from 'react';
 import classnames from 'classnames';
 
-import { DataCollectionProps, DataPagerRenderer, DataSorterRenderer, DataFiltererRenderer } from '@oidajs/ui-react-core';
+import { DataCollectionProps, DataPagerRenderer, DataSorterRenderer, DataFiltererRenderer, DataPagerProps } from '@oidajs/ui-react-core';
 
 import { DataCollectionItemsList, DataCollectionItemsListProps } from './data-collection-items-list';
 import { DataPager } from './data-pager';
@@ -19,7 +19,21 @@ export type DataCollectionListProps<T> = {
 export const DataCollectionList = <T extends object>(props: DataCollectionListProps<T>) => {
     const { items, paging, sorting, filters, pagerRender, sortRender, filtererRender, className, ...listProps } = props;
 
-    const DataPager = pagerRender!;
+    let dataPager: React.ReactNode;
+    if (paging && paging.total > paging.pageSize) {
+        if (pagerRender) {
+            const Pager = pagerRender;
+            dataPager = <Pager {...paging} />;
+        } else {
+            const size = props.size === 'large' ? undefined : props.size;
+            dataPager = (
+                <div className='ant-list-pagination'>
+                    <DataPager size={size} {...paging} />
+                </div>
+            );
+        }
+    }
+
     const DataFilterer = filtererRender!;
     const DataSorter = sortRender!;
 
@@ -30,17 +44,12 @@ export const DataCollectionList = <T extends object>(props: DataCollectionListPr
                 {sorting && <DataSorter {...sorting} />}
             </div>
             <DataCollectionItemsList<T> {...items} {...listProps}></DataCollectionItemsList>
-            {paging && paging.total > paging.pageSize && <DataPager {...paging} />}
+            {dataPager}
         </div>
     );
 };
 
 DataCollectionList.defaultProps = {
-    pagerRender: (props) => (
-        <div className='ant-list-pagination'>
-            <DataPager {...props}></DataPager>
-        </div>
-    ),
     sortRender: DataSortCombo,
     filtererRender: AdvancedSearchFilterer
 };
