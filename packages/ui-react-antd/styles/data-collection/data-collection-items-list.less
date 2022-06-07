@@ -1,4 +1,3 @@
-
 @import '~@oidajs/ui-react-core/styles/utils/scrollbar';
 
 @data-collection-list-item-bg: lighten(@component-background, 3%);
@@ -9,7 +8,6 @@
 @data-collection-list-item-margin-bottom-sm: 5px;
 
 .data-collection-list-items.ant-list {
-
     .scrollbar(8px, @primary-color, @primary-2);
 
     display: flex;
@@ -29,7 +27,6 @@
     }
 
     .ant-list-item {
-
         cursor: pointer;
         user-select: none;
         border: solid 1px @data-collection-list-item-border-color;
@@ -42,7 +39,6 @@
         }
 
         &.selected {
-
             &:not(.hovered) {
                 background-color: @data-collection-list-item-selected-bg;
             }
@@ -55,7 +51,7 @@
         &.is-drop-hover {
             &.can-drop {
                 border-style: dashed;
-                border-color: @primary-color;;
+                border-color: @primary-color;
             }
         }
 
@@ -72,20 +68,17 @@
         }
 
         .ant-list-item-action {
-
             margin-left: 16px;
 
             .ant-btn {
-                padding: 0 4px;
+                padding: 0 8px;
 
                 .anticon {
-
                     svg {
                         shape-rendering: auto;
                     }
                 }
             }
-
         }
 
         .action-content {
@@ -96,6 +89,12 @@
     &.ant-list-sm {
         .ant-list-item {
             margin-bottom: @data-collection-list-item-margin-bottom-sm;
+
+            .ant-list-item-action {
+                .ant-btn {
+                    padding: 0 4px;
+                }
+            }
         }
     }
 
@@ -109,11 +108,9 @@
                 padding: 0 8px;
 
                 .action-content {
-                    margin-left: 6px;
                     display: inline-block;
                 }
             }
         }
     }
-
 }
