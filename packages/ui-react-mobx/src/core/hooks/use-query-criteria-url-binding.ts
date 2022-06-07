@@ -4,7 +4,7 @@ import { SortOrder, getFormFieldSerializer, QueryFilter } from '@oidajs/core';
 import { QueryParams as QueryParamsState } from '@oidajs/state-mobx';
 
 import { useRouteSearchStateBinding } from './use-route-search-state-binding';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 
 const defaultQueryKeys = {
     page: 'page',
@@ -19,6 +19,7 @@ export type QueryUrlKeys = typeof defaultQueryKeys;
 export type QueryCriteriaUrlBindingProps = {
     criteria: QueryParamsState;
     queryKeys?: QueryUrlKeys;
+    queryKeyPrefix?: string;
 };
 
 export const serializeQueryFilters = (filters: QueryFilter[]): string => {
@@ -39,7 +40,21 @@ export const serializeQueryFilters = (filters: QueryFilter[]): string => {
 };
 
 export const useQueryCriteriaUrlBinding = (props: QueryCriteriaUrlBindingProps) => {
-    const queryUrlKeys = props.queryKeys || defaultQueryKeys;
+    const queryUrlKeys = useMemo(() => {
+        if (props.queryKeys) {
+            return props.queryKeys;
+        } else if (props.queryKeyPrefix) {
+            return {
+                page: `${props.queryKeyPrefix}_${defaultQueryKeys.page}`,
+                pageSize: `${props.queryKeyPrefix}_${defaultQueryKeys.pageSize}`,
+                sortKey: `${props.queryKeyPrefix}_${defaultQueryKeys.sortKey}`,
+                sortOrder: `${props.queryKeyPrefix}_${defaultQueryKeys.sortOrder}`,
+                filters: `${props.queryKeyPrefix}_${defaultQueryKeys.filters}`
+            };
+        } else {
+            return defaultQueryKeys;
+        }
+    }, [props.queryKeys, props.queryKeyPrefix]);
 
     const getUrlParamsFromCriteria = useCallback(() => {
         const { paging, filters, sortBy } = props.criteria.data;

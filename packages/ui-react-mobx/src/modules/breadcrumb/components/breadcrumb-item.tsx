@@ -45,5 +45,5 @@ export const BreadcrumbItemInjector = (props: BreadcrumbItemInjectorProps) => {
 export const BreadcrumbItem = (props: Omit<BreadcrumbItemInjectorProps, 'breadcrumb'> & { breadcrumbModuleId?: string }) => {
     const breadcrumbModule = useBreadcrumbModule(props.breadcrumbModuleId);
 
-    return <BreadcrumbItemInjector breadcrumb={breadcrumbModule.breadcrumb} {...props} />;
+    return <BreadcrumbItemInjector key={props.data.key} breadcrumb={breadcrumbModule.breadcrumb} {...props} />;
 };

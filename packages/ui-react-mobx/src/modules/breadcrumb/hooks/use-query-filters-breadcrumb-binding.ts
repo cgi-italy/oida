@@ -18,7 +18,7 @@ export type QueryFilterBreadcrumbBindingProps = {
 };
 
 export const useQueryFiltersBreadcrumbBinding = (props: QueryFilterBreadcrumbBindingProps) => {
-    const rootPath = useResolvedPath('.');
+    const rootPath = useResolvedPath('./');
 
     useEffect(() => {
         const breadcrumbItems: BreadcrumbItemProps[] = [];

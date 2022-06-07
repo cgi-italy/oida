@@ -1,6 +1,6 @@
-import { useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { reaction, runInAction } from 'mobx';
-import { useSearchParams, useResolvedPath } from 'react-router-dom';
+import { useSearchParams, useNavigate, UNSAFE_NavigationContext as NavigationContext } from 'react-router-dom';
 
 export type RouteSearchStateBindingProps = {
     updateStateFromSearchParams: (searchParams: URLSearchParams) => void;
@@ -10,15 +10,26 @@ export type RouteSearchStateBindingProps = {
 export const useRouteSearchStateBinding = (props: RouteSearchStateBindingProps) => {
     const ignoreNextStateUpdate = useRef(false);
     const componentUnmounted = useRef(false);
-    const [searchParams, setSearchParams] = useSearchParams();
+    const [searchParams] = useSearchParams();
+    const navigate = useNavigate();
 
-    const resolvedPath = useResolvedPath('.');
+    const { basename } = React.useContext(NavigationContext);
 
     useEffect(() => {
         return () => {
             componentUnmounted.current = true;
         };
     }, []);
+
+    const getCurrentPathname = () => {
+        // basename will be automatically added by the navigate function so we strip it from
+        // the current window location pathname
+        if (basename !== '/') {
+            return window.location.pathname.replace(basename, '/');
+        } else {
+            return window.location.pathname;
+        }
+    };
 
     // this is executed once to initialize the missisng url params from state
     useEffect(() => {
@@ -36,11 +47,34 @@ export const useRouteSearchStateBinding = (props: RouteSearchStateBindingProps) 
         });
 
         if (shouldReplaceUrl) {
-            setSearchParams(initialUrlParams, {
-                replace: true
-            });
+            navigate(
+                {
+                    pathname: getCurrentPathname(),
+                    search: initialUrlParams.toString()
+                },
+                {
+                    replace: true
+                }
+            );
         }
-    }, [props.searchParamsStateSelector, resolvedPath.pathname]);
+
+        return () => {
+            //remove the query params from the URL when unmounted
+            const cleanedUrlParams = new URLSearchParams(window.location.search);
+            currentStateParams.forEach((value, key) => {
+                cleanedUrlParams.delete(key);
+            });
+            navigate(
+                {
+                    pathname: getCurrentPathname(),
+                    search: cleanedUrlParams.toString()
+                },
+                {
+                    replace: true
+                }
+            );
+        };
+    }, [props.searchParamsStateSelector]);
 
     useEffect(() => {
         const stateTrackerDisposer = reaction(
@@ -59,7 +93,10 @@ export const useRouteSearchStateBinding = (props: RouteSearchStateBindingProps) 
                         }
                     });
                     if (needsUrlUpdate) {
-                        setSearchParams(updatedSearchParams);
+                        navigate({
+                            pathname: getCurrentPathname(),
+                            search: updatedSearchParams.toString()
+                        });
                     }
                 } else {
                     ignoreNextStateUpdate.current = false;
@@ -70,7 +107,7 @@ export const useRouteSearchStateBinding = (props: RouteSearchStateBindingProps) 
         return () => {
             stateTrackerDisposer();
         };
-    }, [props.searchParamsStateSelector, resolvedPath.pathname]);
+    }, [props.searchParamsStateSelector]);
 
     useEffect(() => {
         if (componentUnmounted.current) {
