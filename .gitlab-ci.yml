@@ -53,7 +53,7 @@ lint:
   stage: test
   script:
     - npm run lint:check
-  needs: []
+  needs: [install_dependencies]
   only:
     - branches
   except:
