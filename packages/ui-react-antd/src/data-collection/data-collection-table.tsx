@@ -24,6 +24,7 @@ export type DataCollectionTableProps<T> = {
     filtererRender?: DataFiltererRenderer;
     fullHeight?: boolean;
     className?: string;
+    expandActions?: boolean;
 } & DataCollectionProps<T>;
 
 export function DataCollectionTable<T extends object>(props: DataCollectionTableProps<T>) {
@@ -69,30 +70,44 @@ export function DataCollectionTable<T extends object>(props: DataCollectionTable
             if (!actions) {
                 return null;
             } else {
-                const actionItems = actions.map((action, idx) => {
-                    return (
-                        <Menu.Item key={idx}>
-                            <DataCollectionItemActionButton
-                                action={{
-                                    ...action,
-                                    primary: false
-                                }}
-                                type='text'
-                            />
-                        </Menu.Item>
-                    );
-                });
+                if (props.expandActions) {
+                    const actionItems = actions.map((action, idx) => {
+                        return <DataCollectionItemActionButton key={idx} action={action} />;
+                    });
 
-                return (
-                    <Dropdown overlay={<Menu>{actionItems}</Menu>} placement='bottomRight' mouseEnterDelay={0.05} mouseLeaveDelay={0.05}>
-                        <a className='ant-dropdown-link' onClick={(e) => e.preventDefault()}>
-                            <EllipsisOutlined />
-                        </a>
-                    </Dropdown>
-                );
+                    return <div className='table-item-actions'>{actionItems}</div>;
+                } else {
+                    const actionItems = actions.map((action, idx) => {
+                        return (
+                            <Menu.Item key={idx}>
+                                <DataCollectionItemActionButton
+                                    action={{
+                                        ...action,
+                                        primary: false
+                                    }}
+                                    type='text'
+                                />
+                            </Menu.Item>
+                        );
+                    });
+
+                    return (
+                        <Dropdown
+                            overlay={<Menu>{actionItems}</Menu>}
+                            placement='bottomRight'
+                            mouseEnterDelay={0.05}
+                            mouseLeaveDelay={0.05}
+                        >
+                            <a className='ant-dropdown-link' onClick={(e) => e.preventDefault()}>
+                                <EllipsisOutlined />
+                            </a>
+                        </Dropdown>
+                    );
+                }
             }
         },
-        width: 40,
+        width: props.expandActions ? undefined : 40,
+        align: 'right',
         sorter: undefined,
         sortOrder: null
     });
