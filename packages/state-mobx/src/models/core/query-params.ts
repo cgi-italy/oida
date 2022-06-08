@@ -56,6 +56,11 @@ export class DataFilters<FILTERS extends QueryFilter = any> {
         });
 
         this.reactionsDisposer_ = {};
+        this.items.forEach((value) => {
+            if (filterTypeReactions[value.type]) {
+                this.reactionsDisposer_[value.key] = filterTypeReactions[value.type](this, value.key);
+            }
+        });
 
         makeObservable(this);
     }
