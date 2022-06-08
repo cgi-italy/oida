@@ -37,3 +37,17 @@ export const formatNumber = (value: number | string, options?: NumberFormatOptio
     }
     return formattedValue;
 };
+
+export const formatPosition = (value: number) => {
+    const stringValue = value.toString();
+    const lastCipher = stringValue.charAt(stringValue.length - 1);
+    let supphix = 'th';
+    if (lastCipher === '1') {
+        supphix = 'st';
+    } else if (lastCipher === '2') {
+        supphix = 'nd';
+    } else if (lastCipher === '3') {
+        supphix = 'rd';
+    }
+    return `${value}${supphix}`;
+};
