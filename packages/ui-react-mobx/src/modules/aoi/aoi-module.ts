@@ -99,8 +99,15 @@ export class AoiModule extends AppModule {
             const filterMapBindingDisposer = bindAoiValueToMap({
                 aois: this.aois,
                 getter: () => filters.get(key)?.value,
-                setter: (value) => filters.set(key, value, AOI_FIELD_ID),
-                map: this.mapModule.map
+                setter: (value) => {
+                    // we delay the execution to avoid that the setter is called
+                    // during the reaction binding
+                    setTimeout(() => {
+                        filters.set(key, value, AOI_FIELD_ID);
+                    }, 0);
+                },
+                map: this.mapModule.map,
+                hidden: true
             });
             return filterMapBindingDisposer;
         });
