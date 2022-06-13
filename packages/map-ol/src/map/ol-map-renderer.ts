@@ -6,7 +6,7 @@ import { register } from 'ol/proj/proj4';
 import proj4 from 'proj4';
 import { getCenter as getExtentCenter } from 'ol/extent';
 
-import { IMapRenderer, IMapRendererProps, IMapViewport, IMapProjection } from '@oidajs/core';
+import { IMapRenderer, IMapRendererProps, IMapViewport, IMapProjection, FitExtentOptions } from '@oidajs/core';
 
 import { olLayersFactory } from '../layers/ol-layers-factory';
 import { olInteractionsFactory } from '../interactions/ol-interactions-factory';
@@ -41,7 +41,7 @@ export class OLMapRenderer implements IMapRenderer {
         return;
     }
 
-    fitExtent(extent, animate?: boolean) {
+    fitExtent(extent, options?: FitExtentOptions) {
         const view = this.viewer_.getView();
         const projection = view.getProjection();
 
@@ -61,8 +61,24 @@ export class OLMapRenderer implements IMapRenderer {
                     return;
                 }
             }
+
+            let padding: number[] | undefined;
+            if (options?.padding) {
+                const size = this.getSize();
+                // when the map has no size (no target?) the fit computation will
+                // assume a size of [100, 100]. We ignore the padding option in this case
+                if (size) {
+                    padding = [
+                        Math.round(options.padding[0] * size[0]),
+                        Math.round(options.padding[1] * size[1]),
+                        Math.round(options.padding[0] * size[0]),
+                        Math.round(options.padding[0] * size[1])
+                    ];
+                }
+            }
             view.fit(extent, {
-                duration: animate ? 1000 : 0
+                duration: options?.animate ? 1000 : 0,
+                padding: padding
             });
         }
     }
