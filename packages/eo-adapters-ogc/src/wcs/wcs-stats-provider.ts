@@ -97,6 +97,7 @@ export const extractStatisticsFromTiffData = (
                         mean: ecStats.statistics.mean(values),
                         median: ecStats.statistics.median(values),
                         variance: ecStats.statistics.sampleVariance(values),
+                        sum: ecStats.statistics.sum(values),
                         histogram: options?.disableHistogram
                             ? undefined
                             : (ecStats.histogram(values, 'sturges').data as DistributionHistogramBin[]),
