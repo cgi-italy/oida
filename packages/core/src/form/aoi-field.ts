@@ -31,27 +31,48 @@ export type AoiSupportedGeometry = {
     };
 };
 
-export type AoiFieldConfig<IMPORT_CONFIG = any> = {
+export type AoiFieldConfig<IMPORT_CONFIG = any, MAP_COMPONENT_TYPE = any> = {
+    /** The list of actions to enable in the form field */
     supportedActions: AoiAction[];
+    /** The list of geometries types to enable for the field*/
     supportedGeometries: AoiSupportedGeometry[];
+    /** The callback to invoke when an action is selected */
     onActiveActionChange: (action: AoiAction) => void;
+    /** The current active action */
     activeAction: AoiAction;
     name: string;
+    /** The color to use to represent the current aoi value */
     color?: string;
+    /** The current aoi state */
     state: {
         hovered: boolean;
         visible: boolean;
         selected: boolean;
     };
+    /** The callback to invoke when the aoi is hovered */
     onHoverAction?: (hovered: boolean) => void;
+    /** The callback to invoke when the aoi is selected */
     onSelectAction?: (selected: boolean) => void;
+    /** The callback to invoke when the aoi visibility is changed */
     onVisibleAction?: (visible: boolean) => void;
+    /** The callback to invoke when the center on map action is selected */
     onCenterAction?: () => void;
+    /** The map import configuration */
     importConfig?: IMPORT_CONFIG;
+    /** An optional map compnent to embed in the form control (e.g. for aoi display/drawing) */
+    embeddedMapComponent?: MAP_COMPONENT_TYPE;
 };
 
-export type AoiFieldDefinition<IMPORT_CONFIG = any> = FormFieldDefinition<typeof AOI_FIELD_ID, AoiValue, AoiFieldConfig<IMPORT_CONFIG>>;
-export type AoiField<IMPORT_CONFIG = any> = FormField<typeof AOI_FIELD_ID, AoiValue, AoiFieldConfig<IMPORT_CONFIG>>;
+export type AoiFieldDefinition<IMPORT_CONFIG = any, MAP_COMPONENT_TYPE = any> = FormFieldDefinition<
+    typeof AOI_FIELD_ID,
+    AoiValue,
+    AoiFieldConfig<IMPORT_CONFIG, MAP_COMPONENT_TYPE>
+>;
+export type AoiField<IMPORT_CONFIG = any, MAP_COMPONENT_TYPE = any> = FormField<
+    typeof AOI_FIELD_ID,
+    AoiValue,
+    AoiFieldConfig<IMPORT_CONFIG, MAP_COMPONENT_TYPE>
+>;
 
 setFormFieldSerializer(AOI_FIELD_ID, {
     toString: (formField) => {
@@ -66,6 +87,7 @@ export type AoiFieldFactoryProps = {
     rendererConfig?: FormFieldRendererConfig;
     supportedActions: AoiAction[];
     supportedGeometries: AoiSupportedGeometry[];
+    embedMap?: boolean;
 };
 
 export type AoiFieldFactory = (props: AoiFieldFactoryProps) => AoiFieldDefinition;

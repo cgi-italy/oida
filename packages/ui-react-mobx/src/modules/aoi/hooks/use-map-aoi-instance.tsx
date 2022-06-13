@@ -40,7 +40,8 @@ export const useMapAoiInstance = (props: MapAoiInstanceProps) => {
         mapSelection.selection.modifySelection(selected ? aoiInstance : undefined, SelectionMode.Replace);
         if (aoiInstance) {
             centerOnMap(aoiInstance.geometry.value, {
-                animate: true
+                animate: true,
+                padding: [0.1, 0.1, 0.1, 0.1]
             });
         }
     };
@@ -54,7 +55,8 @@ export const useMapAoiInstance = (props: MapAoiInstanceProps) => {
     const onAoiCenterOnMap = () => {
         if (aoiInstance) {
             centerOnMap(aoiInstance.geometry.value, {
-                animate: true
+                animate: true,
+                padding: [0.1, 0.1, 0.1, 0.1]
             });
         }
     };

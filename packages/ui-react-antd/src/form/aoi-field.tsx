@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 
-import { Tag, Button, Tooltip, Drawer, Popover } from 'antd';
+import { Tag, Button, Tooltip, Drawer, Popover, Modal } from 'antd';
 
 import { EnvironmentOutlined, LinkOutlined, EditOutlined, ImportOutlined } from '@ant-design/icons';
 
@@ -15,12 +15,13 @@ import { antdFormFieldRendererFactory } from './antd-form-field-renderer-factory
 import { AoiImportRenderer } from './aoi-import';
 import { AoiTextEditor } from './aoi-text-editor';
 
-export type AoiFieldRendererProps = FormFieldRendererBaseProps<AoiField<AoiImportConfig>> & {
+export type AoiFieldRendererProps = FormFieldRendererBaseProps<AoiField<AoiImportConfig, React.ComponentType>> & {
     importDrawerPlacement?: 'left' | 'right';
 };
 
 export const AoiFieldRenderer = (props: AoiFieldRendererProps) => {
     const [editorVisible, setEditorVisible] = useState(false);
+    const [mapVisible, setMapVisible] = useState(false);
 
     const { value, onChange, readonly, config } = props;
     const {
@@ -33,7 +34,8 @@ export const AoiFieldRenderer = (props: AoiFieldRendererProps) => {
         onActiveActionChange,
         onHoverAction,
         onSelectAction,
-        onVisibleAction
+        onVisibleAction,
+        onCenterAction
     } = config;
 
     const aoiControls = useMemo(() => {
@@ -79,17 +81,48 @@ export const AoiFieldRenderer = (props: AoiFieldRendererProps) => {
         };
     }, [supportedGeometries, supportedActions]);
 
-    useEffect(() => {
+    const showEmbeddedMap = () => {
+        setMapVisible(true);
         if (onVisibleAction) {
             onVisibleAction(true);
         }
+        if (onCenterAction) {
+            onCenterAction();
+        }
+    };
 
-        return () => {
+    useEffect(() => {
+        if (!props.config.embeddedMapComponent) {
             if (onVisibleAction) {
-                onVisibleAction(false);
+                onVisibleAction(true);
             }
-        };
-    }, [props.value?.props?.id]);
+
+            return () => {
+                if (onVisibleAction) {
+                    onVisibleAction(false);
+                }
+            };
+        } else {
+            if (onVisibleAction) {
+                onVisibleAction(mapVisible);
+            }
+        }
+    }, [props.value?.props?.id, props.config.embeddedMapComponent]);
+
+    useEffect(() => {
+        if (
+            activeAction === AoiAction.DrawPoint ||
+            activeAction === AoiAction.DrawLine ||
+            activeAction === AoiAction.DrawBBox ||
+            activeAction === AoiAction.DrawPolygon
+        ) {
+            if (props.config.embeddedMapComponent) {
+                showEmbeddedMap();
+            }
+        }
+    }, [activeAction, props.config.embeddedMapComponent]);
+
+    const EmbeddedMapComponent = props.config.embeddedMapComponent;
 
     return (
         <React.Fragment>
@@ -99,7 +132,15 @@ export const AoiFieldRenderer = (props: AoiFieldRendererProps) => {
                     color={color}
                     onMouseOver={onHoverAction ? () => onHoverAction!(true) : undefined}
                     onMouseOut={onHoverAction ? () => onHoverAction!(false) : undefined}
-                    onClick={onSelectAction ? () => onSelectAction!(true) : undefined}
+                    onClick={() => {
+                        if (props.config.embeddedMapComponent) {
+                            showEmbeddedMap();
+                        } else {
+                            if (onSelectAction) {
+                                onSelectAction(true);
+                            }
+                        }
+                    }}
                     onClose={(evt) => {
                         evt.stopPropagation();
                         props.onChange(undefined);
@@ -255,6 +296,27 @@ export const AoiFieldRenderer = (props: AoiFieldRendererProps) => {
                 >
                     <AoiImportRenderer {...importConfig} />
                 </Drawer>
+            )}
+            {EmbeddedMapComponent && (
+                <Modal
+                    className='aoi-embedded-map-dialog'
+                    visible={mapVisible}
+                    footer={null}
+                    centered={true}
+                    destroyOnClose={true}
+                    onCancel={() => {
+                        onActiveActionChange(AoiAction.None);
+                        if (onVisibleAction) {
+                            onVisibleAction(false);
+                        }
+                        if (onSelectAction) {
+                            onSelectAction(false);
+                        }
+                        setMapVisible(false);
+                    }}
+                >
+                    <EmbeddedMapComponent />
+                </Modal>
             )}
         </React.Fragment>
     );
