@@ -359,7 +359,7 @@ export class CesiumMapRenderer implements IMapRenderer {
         const mapProjection = getProjectionFromSRS(projection.code, true);
 
         this.viewer_ = new CesiumWidget(container, {
-            useBrowserRecommendedResolution: false,
+            useBrowserRecommendedResolution: true,
             ...renderProps,
             imageryProvider: false,
             sceneMode: this.getSceneMode_(renderProps),
@@ -455,7 +455,7 @@ export class CesiumMapRenderer implements IMapRenderer {
         }
 
         const center = camera.pickEllipsoid(
-            new Cartesian2(scene.drawingBufferWidth / 2, scene.drawingBufferHeight / 2),
+            new Cartesian2(this.viewer_.canvas.clientWidth / 2, this.viewer_.canvas.clientHeight / 2),
             scene.globe.ellipsoid
         );
         if (center) {
