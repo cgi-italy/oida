@@ -9,7 +9,7 @@ import { MapInteraction, MapInteractionProps } from './interactions';
 export type MapProps = {
     view: MapView | MapViewProps;
     renderer: MapRenderer | MapRendererProps;
-    layers?: GroupLayer | GroupLayerProps;
+    layers?: GroupLayer | Omit<GroupLayerProps, 'layerType'>;
     interactions?: Array<MapInteraction | MapInteractionProps>;
 };
 
