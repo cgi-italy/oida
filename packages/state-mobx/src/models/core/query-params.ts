@@ -292,6 +292,7 @@ export class QueryParams<FILTERS extends QueryFilter = any> {
     }
 
     protected afterInit_() {
+        // automatically reset the page on filters change
         reaction(
             () => this.filters.asArray(),
             () => {

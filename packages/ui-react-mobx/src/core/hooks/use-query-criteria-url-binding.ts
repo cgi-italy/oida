@@ -84,7 +84,12 @@ export const useQueryCriteriaUrlBinding = (props: QueryCriteriaUrlBindingProps) 
         (searchParams: URLSearchParams) => {
             const page = searchParams.get(queryUrlKeys.page);
             if (page) {
-                props.criteria.paging.setPage(parseInt(page));
+                // HACK: we defer the page update, otherwise it will be reset
+                // when filters are set
+                // TODO: to be solved in the QueryParams state
+                setTimeout(() => {
+                    props.criteria.paging.setPage(parseInt(page));
+                }, 0);
             } else {
                 props.criteria.paging.reset();
             }

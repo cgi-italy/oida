@@ -1,6 +1,7 @@
 import { reaction } from 'mobx';
 import React, { useEffect, useRef } from 'react';
-import { PathRouteProps, Route, Routes, useMatch, useNavigate, useResolvedPath, useLocation } from 'react-router-dom';
+import { PathRouteProps, Route, Routes, useMatch, useNavigate, useResolvedPath, useLocation, useParams } from 'react-router-dom';
+import { useSelector } from '../hooks';
 
 type StatePathRouterDefaultRouteProps = {
     defaultRoute?: string | (() => string | undefined) | (() => Promise<string | undefined>);
@@ -10,7 +11,6 @@ type StatePathRouterDefaultRouteProps = {
 
 const StatePathRouterDefaultRoute = (props: StatePathRouterDefaultRouteProps) => {
     const navigate = useNavigate();
-
     const location = useLocation();
 
     const replaceUrlPathName = (pathName) => {
@@ -26,12 +26,17 @@ const StatePathRouterDefaultRoute = (props: StatePathRouterDefaultRouteProps) =>
     };
 
     useEffect(() => {
-        let isMounted = true;
+        let updateStillValid = true;
 
         if (/\/$/.test(window.location.pathname)) {
             // by convention if there is a trailing slash at the end of the url
-            // the state will be reset
-            props.updateStateFromRoutePath(undefined);
+            // the state will be reset. We debounce the update to avoid updating the state during
+            // transitions
+            setTimeout(() => {
+                if (updateStillValid) {
+                    props.updateStateFromRoutePath(undefined);
+                }
+            }, 0);
         } else {
             // otherwise the url param will be filled according to the current state
             const stateRoute = props.routePathStateSelector();
@@ -48,7 +53,7 @@ const StatePathRouterDefaultRoute = (props: StatePathRouterDefaultRouteProps) =>
                             replaceUrlPathName(defaultRoute);
                         } else {
                             defaultRoute.then((path) => {
-                                if (path && isMounted) {
+                                if (path && updateStillValid) {
                                     replaceUrlPathName(path);
                                 }
                             });
@@ -56,13 +61,13 @@ const StatePathRouterDefaultRoute = (props: StatePathRouterDefaultRouteProps) =>
                     }
                 }
             } else {
-                // add a training slash so that back navigation will work properly
+                // add a trailing slash so that back navigation will work properly
                 replaceUrlPathName('./');
             }
         }
 
         return () => {
-            isMounted = false;
+            updateStillValid = false;
         };
     }, [location.pathname]);
 
@@ -77,24 +82,34 @@ type StatePathRouterRootProps = {
 };
 
 const StatePathRouterRoot = (props: StatePathRouterRootProps) => {
-    const ignoreNextStateUpdate = useRef(false);
     const resolvedPath = useResolvedPath(`:${props.pathParamName}/*`);
     const match = useMatch(resolvedPath.pathname);
 
     const navigate = useNavigate();
 
+    // check that the current path is different from the new one before updating the url
+    // this is to avoid messing history navigation
+    const getUrlUpdateFunction = (currentRouteMatch: string | undefined) => {
+        return (statePath) => {
+            if (currentRouteMatch !== statePath) {
+                navigate({
+                    pathname: statePath || './',
+                    search: window.location.search
+                });
+            }
+        };
+    };
+
+    const updateUrlForPath = useRef(getUrlUpdateFunction(match?.params[props.pathParamName]));
+    useEffect(() => {
+        updateUrlForPath.current = getUrlUpdateFunction(match?.params[props.pathParamName]);
+    }, [match]);
+
     useEffect(() => {
         const stateTrackerDisposer = reaction(
             () => props.routePathStateSelector(),
             (path) => {
-                if (!ignoreNextStateUpdate.current) {
-                    navigate({
-                        pathname: path || './',
-                        search: window.location.search
-                    });
-                } else {
-                    ignoreNextStateUpdate.current = false;
-                }
+                updateUrlForPath.current(path);
             }
         );
         return () => {
@@ -106,7 +121,6 @@ const StatePathRouterRoot = (props: StatePathRouterRootProps) => {
         const path = match?.params[props.pathParamName];
         const currentStatePath = props.routePathStateSelector();
         if (path && path !== currentStatePath) {
-            ignoreNextStateUpdate.current = true;
             props.updateStateFromRoutePath(path);
         }
     }, [match]);
@@ -114,7 +128,29 @@ const StatePathRouterRoot = (props: StatePathRouterRootProps) => {
     return <React.Fragment>{props.parentRouteElement}</React.Fragment>;
 };
 
+type StatePathRouterInnerProps = {
+    routePathStateSelector: (forceDefault?: boolean) => string | undefined;
+    pathParamName: string;
+    innerRouteElement: React.ReactNode;
+};
+
+const StatePathRouterInner = (props: StatePathRouterInnerProps) => {
+    const stateRoute = useSelector(() => props.routePathStateSelector(), [props.routePathStateSelector]);
+    const urlParam = useParams()[props.pathParamName];
+    // during transitions the state and url param may be different.
+    // to avoid any inconsistencies do not render the inner element
+    if (stateRoute !== urlParam) {
+        return null;
+    } else {
+        return <React.Fragment>{props.innerRouteElement}</React.Fragment>;
+    }
+};
+
+/**
+ * {@link StatePathRouter} component properties
+ */
 export type StatePathRouterProps = {
+    /** The name to give to the state url parameter (key in the useParams() response) */
     pathParamName: string;
     /**
      * A function to update the state based on the current route parameter
@@ -127,12 +163,12 @@ export type StatePathRouterProps = {
     /**
      * The element used to render the parent route.
      * Make sure it contains an Outlet element where the innerRouteElement will be rendered
-     **/
+     */
     parentRouteElement: React.ReactNode;
     /**
      * The element used to render the inner route.
-     * Current route parameter can be retrieved using useParams(pathParamName) call
-     **/
+     * Current route parameter can be retrieved using useParams()[pathParamName] call
+     */
     innerRouteElement: React.ReactNode;
     /**
      * The element to render when no route parameter is specified (index)
@@ -144,9 +180,17 @@ export type StatePathRouterProps = {
      * This parameter is ignored if an indexRouteElement is specified
      */
     defaultRoute?: string | (() => string) | (() => Promise<string>);
+    /**
+     * An optional list of additional routes
+     */
     additionalRoutes?: PathRouteProps[];
 };
 
+/**
+ * A react component providing a two way binding between a piece of application state and a url path segment
+ * @param props the component props
+ * @returns
+ */
 export const StatePathRouter = (props: StatePathRouterProps) => {
     const additionalRoutes = props.additionalRoutes?.map((routeProps) => {
         return <Route {...routeProps} />;
@@ -178,7 +222,16 @@ export const StatePathRouter = (props: StatePathRouterProps) => {
                         </React.Fragment>
                     }
                 />
-                <Route path={`:${props.pathParamName}/*`} element={props.innerRouteElement} />
+                <Route
+                    path={`:${props.pathParamName}/*`}
+                    element={
+                        <StatePathRouterInner
+                            innerRouteElement={props.innerRouteElement}
+                            pathParamName={props.pathParamName}
+                            routePathStateSelector={props.routePathStateSelector}
+                        />
+                    }
+                />
                 {additionalRoutes}
             </Route>
         </Routes>
