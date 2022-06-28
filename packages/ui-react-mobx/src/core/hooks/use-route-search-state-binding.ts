@@ -77,6 +77,7 @@ export const useRouteSearchStateBinding = (props: RouteSearchStateBindingProps) 
     }, [props.searchParamsStateSelector]);
 
     useEffect(() => {
+        let urlUpdateTimeout;
         const stateTrackerDisposer = reaction(
             () => props.searchParamsStateSelector(),
             (stateParams) => {
@@ -93,10 +94,16 @@ export const useRouteSearchStateBinding = (props: RouteSearchStateBindingProps) 
                         }
                     });
                     if (needsUrlUpdate) {
-                        navigate({
-                            pathname: getCurrentPathname(),
-                            search: updatedSearchParams.toString()
-                        });
+                        if (urlUpdateTimeout) {
+                            clearTimeout(urlUpdateTimeout);
+                        }
+                        urlUpdateTimeout = setTimeout(() => {
+                            urlUpdateTimeout = undefined;
+                            navigate({
+                                pathname: getCurrentPathname(),
+                                search: updatedSearchParams.toString()
+                            });
+                        }, 0);
                     }
                 } else {
                     ignoreNextStateUpdate.current = false;

@@ -11,7 +11,6 @@ type StatePathRouterDefaultRouteProps = {
 
 const StatePathRouterDefaultRoute = (props: StatePathRouterDefaultRouteProps) => {
     const navigate = useNavigate();
-    const location = useLocation();
 
     const replaceUrlPathName = (pathName) => {
         navigate(
@@ -69,7 +68,7 @@ const StatePathRouterDefaultRoute = (props: StatePathRouterDefaultRouteProps) =>
         return () => {
             updateStillValid = false;
         };
-    }, [location.pathname]);
+    }, [window.location.pathname]);
 
     return null;
 };
@@ -103,7 +102,9 @@ const StatePathRouterRoot = (props: StatePathRouterRootProps) => {
     const updateUrlForPath = useRef(getUrlUpdateFunction(match?.params[props.pathParamName]));
     useEffect(() => {
         updateUrlForPath.current = getUrlUpdateFunction(match?.params[props.pathParamName]);
-    }, [match]);
+        // rerun also on location changes in order for the navigate function to reflect
+        // potentials changes to parent routes
+    }, [match, window.location.pathname]);
 
     useEffect(() => {
         const stateTrackerDisposer = reaction(
