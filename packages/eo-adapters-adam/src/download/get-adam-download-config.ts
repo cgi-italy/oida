@@ -1,12 +1,12 @@
 import download from 'downloadjs';
 
-import { AxiosInstanceWithCancellation } from '@oidajs/core';
+import { AxiosInstanceWithCancellation, NUMERIC_FIELD_ID } from '@oidajs/core';
 import { DatasetDownloadConfig, DownloaMapVizRequest, RasterMapViz } from '@oidajs/eo-mobx';
 
 import { AdamDatasetConfig } from '../adam-dataset-config';
 import { AdamDatasetFactoryConfig } from '../get-adam-dataset-factory';
-import { downloadAdamWcsRaster } from './download-adam-wcs-raster';
 import { AdamServiceParamsSerializer, getColormapWcsParams } from '../utils';
+import { downloadAdamWcsRaster } from './download-adam-wcs-raster';
 
 export type AdamDatasetDownloadConfig = DatasetDownloadConfig & {
     downloadUrlProvider: (request: DownloaMapVizRequest) => Promise<{
@@ -37,7 +37,7 @@ export const getAdamDatasetDownloadConfig = (
                     coverageId: rasterParams.coverageId,
                     subdataset: rasterParams.subdataset,
                     format: request.format,
-                    scale: request.scale
+                    scale: request.options?.scale
                 };
 
                 const subsets = rasterParams.subsets;
@@ -110,7 +110,30 @@ export const getAdamDatasetDownloadConfig = (
             { id: 'image/png', name: 'PNG' },
             { id: 'image/jp2', name: 'Jpeg2000' },
             { id: 'image/gif', name: 'Animated GIF' }
-        ]
+        ],
+        supportedOptions: {
+            fields: [
+                {
+                    name: 'scale',
+                    title: 'Scale',
+                    type: NUMERIC_FIELD_ID,
+                    required: true,
+                    config: {
+                        min: 0.05,
+                        max: 1,
+                        step: 0.05
+                    },
+                    rendererConfig: {
+                        props: {
+                            useSlider: true
+                        }
+                    }
+                }
+            ],
+            defaultValues: {
+                scale: 1
+            }
+        }
     };
 
     return downloadConfig;

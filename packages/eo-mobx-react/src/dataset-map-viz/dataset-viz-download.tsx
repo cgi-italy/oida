@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { Select, Slider, Form, InputNumber, Modal, Typography, FormInstance } from 'antd';
+import { Select, Form, Modal, Typography, FormInstance } from 'antd';
+import { useForm } from 'antd/lib/form/Form';
 import { CloseCircleOutlined } from '@ant-design/icons';
 
+import { IFormFieldDefinition } from '@oidajs/core';
+import { FormFields } from '@oidajs/ui-react-antd';
 import { DatasetViz } from '@oidajs/eo-mobx';
-import { useForm } from 'antd/lib/form/Form';
 
 export enum DatasetDownloadFormSubmitState {
     Ready = 'Ready',
@@ -18,17 +20,16 @@ export type DatasetDownloadProps = {
     onSubmitStateChange: (submitState: DatasetDownloadFormSubmitState) => void;
     formId?: string;
     formInstance?: FormInstance;
+    downloadOptions?: {
+        fields: IFormFieldDefinition[];
+        defaultValues: Record<string, any>;
+    };
 };
 
 export const DatasetVizDownload = (props: DatasetDownloadProps) => {
     const downloadConfig = props.datasetViz.dataset.config!.download!;
 
     const [formInstance] = useForm(props.formInstance);
-
-    formInstance.setFieldsValue({
-        format: downloadConfig!.supportedFormats[0].id,
-        scale: 1
-    });
 
     const [downloadError, setDownloadError] = useState('');
     const formatOptions = downloadConfig!.supportedFormats.map((format) => {
@@ -39,11 +40,26 @@ export const DatasetVizDownload = (props: DatasetDownloadProps) => {
         );
     });
 
+    const downloadOptions = props.downloadOptions ? (
+        <FormFields
+            fields={props.downloadOptions.fields.map((field) => {
+                return {
+                    ...field,
+                    name: `options.${field.name}`
+                };
+            })}
+        />
+    ) : undefined;
+
     return (
         <div className='dataset-viz-download'>
             <Form
                 id={props.formId || 'dataset-viz-download-form'}
                 form={formInstance}
+                initialValues={{
+                    format: downloadConfig!.supportedFormats[0].id,
+                    options: props.downloadOptions?.defaultValues
+                }}
                 layout='vertical'
                 onValuesChange={(changedValues, values) => {
                     formInstance
@@ -80,19 +96,7 @@ export const DatasetVizDownload = (props: DatasetDownloadProps) => {
                 <Form.Item label='Format' name='format' rules={[{ required: true }]}>
                     <Select size='small'>{formatOptions}</Select>
                 </Form.Item>
-                <Form.Item
-                    name='scale'
-                    label='Scale'
-                    className='download-scale-item'
-                    rules={[{ required: true, message: 'Scale should be a number > 0 and <= 1' }]}
-                >
-                    <Form.Item name='scale' className='download-scale-slider'>
-                        <Slider min={0.05} max={1.0} step={0.05} />
-                    </Form.Item>
-                    <Form.Item name='scale' className='download-scale-input'>
-                        <InputNumber min={0.05} max={1} step={0.05} />
-                    </Form.Item>
-                </Form.Item>
+                {downloadOptions}
             </Form>
             {downloadError && (
                 <Typography.Paragraph type='danger' className='download-error-message'>

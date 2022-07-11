@@ -209,7 +209,13 @@ export const DatasetVizListItem = (props: DatasetVizListItemProps) => {
                         </div>
                     );
                 })}
-            {downloadVisible && <DownloadComponent onClose={() => setDownloadVisible(false)} datasetViz={props.datasetViz} />}
+            {downloadVisible && (
+                <DownloadComponent
+                    onClose={() => setDownloadVisible(false)}
+                    datasetViz={props.datasetViz}
+                    downloadOptions={props.datasetViz.dataset.config.download?.supportedOptions}
+                />
+            )}
         </List.Item>
     );
 };
