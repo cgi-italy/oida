@@ -12,4 +12,5 @@ export * from './date-range-field';
 export * from './numeric-field';
 export * from './numeric-range-field';
 export * from './boolean-field';
+export * from './form-fields';
 export * from './data-form';
