@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-import { InputNumber } from 'antd';
+import { InputNumber, Slider } from 'antd';
 import { InputNumberProps } from 'antd/lib/input-number';
 
 import { NumericField, NUMERIC_FIELD_ID } from '@oidajs/core';
@@ -10,6 +10,7 @@ import { antdFormFieldRendererFactory } from './antd-form-field-renderer-factory
 
 export type NumericFieldRendererProps = {
     changeDelay?: number;
+    useSlider?: boolean;
 } & Omit<InputNumberProps, 'onChange' | 'onPressEnter' | 'value'>;
 
 export const NumericFieldRenderer = (props: FormFieldRendererBaseProps<NumericField> & NumericFieldRendererProps) => {
@@ -50,20 +51,26 @@ export const NumericFieldRenderer = (props: FormFieldRendererBaseProps<NumericFi
         }
     };
 
-    const { value, onChange, title, required, config, autoFocus, changeDelay, readonly, ...renderProps } = props;
+    const { value, onChange, title, required, config, autoFocus, changeDelay, readonly, useSlider, ...renderProps } = props;
+
+    const showSlider = useSlider && config.min !== undefined && config.max !== undefined && !readonly;
 
     return (
-        <InputNumber
-            value={inputValue}
-            onPressEnter={onEnterPress}
-            onChange={onInputChange}
-            autoFocus={autoFocus}
-            min={config.min}
-            max={config.max}
-            step={config.step}
-            readOnly={readonly}
-            {...renderProps}
-        ></InputNumber>
+        <div className='numeric-field'>
+            {showSlider && <Slider value={props.value} onChange={props.onChange} min={config.min} max={config.max} step={config.step} />}
+            <InputNumber
+                value={inputValue}
+                onPressEnter={onEnterPress}
+                onBlur={onEnterPress}
+                onChange={onInputChange}
+                autoFocus={autoFocus}
+                min={config.min}
+                max={config.max}
+                step={config.step}
+                readOnly={readonly}
+                {...renderProps}
+            ></InputNumber>
+        </div>
     );
 };
 
