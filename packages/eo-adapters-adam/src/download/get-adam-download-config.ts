@@ -5,8 +5,10 @@ import { DatasetDownloadConfig, DownloaMapVizRequest, RasterMapViz } from '@oida
 
 import { AdamDatasetConfig } from '../adam-dataset-config';
 import { AdamDatasetFactoryConfig } from '../get-adam-dataset-factory';
-import { AdamServiceParamsSerializer, getColormapWcsParams } from '../utils';
 import { downloadAdamWcsRaster } from './download-adam-wcs-raster';
+import { AdamServiceParamsSerializer, getColormapWcsParams } from '../utils';
+import { AdamOpenSearchClient } from '../common';
+import { getAdamVectorDownloadConfig } from './get-adam-vector-download-config';
 
 export type AdamDatasetDownloadConfig = DatasetDownloadConfig & {
     downloadUrlProvider: (request: DownloaMapVizRequest) => Promise<{
@@ -21,7 +23,20 @@ export const getAdamDatasetDownloadConfig = (
     datasetConfig: AdamDatasetConfig
 ) => {
     if (datasetConfig.type === 'vector') {
-        return undefined;
+        if (factoryConfig.opensearchUrl) {
+            const opensearchClient = new AdamOpenSearchClient({
+                serviceUrl: factoryConfig.opensearchUrl,
+                axiosInstance: axiosInstance
+            });
+
+            return getAdamVectorDownloadConfig({
+                datasetId: datasetConfig.id,
+                opensearchClient: opensearchClient,
+                fixedTime: datasetConfig.fixedTime
+            });
+        } else {
+            return undefined;
+        }
     }
 
     const getDownloadRequestConfig = (request: DownloaMapVizRequest) => {

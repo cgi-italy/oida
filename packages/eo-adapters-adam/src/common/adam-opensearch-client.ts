@@ -137,6 +137,25 @@ export type AdamOpenSearchClientConfig = {
 };
 
 export class AdamOpenSearchClient {
+    protected static searchParamsSerializer_ = (params) => {
+        // axios by default encode spaces in params with '+' char
+        // adam opensearch endpoint doesn't support this encoding so
+        // we override the default serializer here
+        const urlParams: string[] = [];
+        for (const key in params) {
+            if (Array.isArray(params[key])) {
+                params[key].forEach((param) => {
+                    urlParams.push(`${key}=${param}`);
+                });
+            } else {
+                if (params[key] !== undefined) {
+                    urlParams.push(`${key}=${params[key]}`);
+                }
+            }
+        }
+        return urlParams.join('&');
+    };
+
     protected axiosInstance_: AxiosInstanceWithCancellation;
     protected serviceUrl_: string;
     protected metadataModelVersion_: AdamOpensearchMetadataModelVersion;
@@ -187,6 +206,49 @@ export class AdamOpenSearchClient {
     }
 
     searchProducts(queryParams: QueryParams) {
+        const params = this.getProductSearchParams_(queryParams);
+
+        return this.axiosInstance_
+            .request<AdamOpensearchProductSearchResponse>({
+                url: `${this.serviceUrl_}/search`,
+                params: params,
+                paramsSerializer: AdamOpenSearchClient.searchParamsSerializer_
+            })
+            .then((response) => {
+                return response.data;
+            });
+    }
+
+    getProductSearchUrls(queryParams: QueryParams) {
+        return this.searchProducts({
+            ...queryParams,
+            paging: {
+                offset: 0,
+                pageSize: 1,
+                page: 0
+            }
+        }).then((response) => {
+            const total = response.properties.totalResults;
+            const pageSize = 100;
+            const numPages = total ? Math.ceil(total / pageSize) : 1;
+            const searchUrls: string[] = [];
+
+            for (let page = 0; page < numPages; ++page) {
+                const searchParams = this.getProductSearchParams_({
+                    ...queryParams,
+                    paging: {
+                        offset: 0 + pageSize * page,
+                        pageSize: pageSize,
+                        page: page
+                    }
+                });
+                searchUrls.push(`${this.serviceUrl_}/search?${AdamOpenSearchClient.searchParamsSerializer_(searchParams)}`);
+            }
+            return searchUrls;
+        });
+    }
+
+    protected getProductSearchParams_(queryParams: QueryParams) {
         const params: AdamDatasetDiscoveryRequest = {};
         if (queryParams.paging) {
             params.maxRecords = queryParams.paging.pageSize;
@@ -245,31 +307,6 @@ export class AdamOpenSearchClient {
             }
         }
 
-        return this.axiosInstance_
-            .request<AdamOpensearchProductSearchResponse>({
-                url: `${this.serviceUrl_}/search`,
-                params: params,
-                paramsSerializer: (params) => {
-                    // axios by default encode spaces in params with '+' char
-                    // adam opensearch endpoint doesn't support this encoding so
-                    // we override the default serializer here
-                    const urlParams: string[] = [];
-                    for (const key in params) {
-                        if (Array.isArray(params[key])) {
-                            params[key].forEach((param) => {
-                                urlParams.push(`${key}=${param}`);
-                            });
-                        } else {
-                            if (params[key] !== undefined) {
-                                urlParams.push(`${key}=${params[key]}`);
-                            }
-                        }
-                    }
-                    return urlParams.join('&');
-                }
-            })
-            .then((response) => {
-                return response.data;
-            });
+        return params;
     }
 }
