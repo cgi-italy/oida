@@ -92,17 +92,17 @@ export class AsyncDataFetcher<RESPONSE = any, PARAMS = any> implements HasLoadin
                     .then(
                         (data) => {
                             if (!requestWrapper.isCanceled) {
-                                this.loadingStatus.setValue(LoadingState.Success);
                                 resolve(data);
+                                this.loadingStatus.setValue(LoadingState.Success);
                             }
                         },
                         (error) => {
                             if (!requestWrapper.isCanceled) {
+                                reject(error);
                                 this.loadingStatus.update({
                                     value: LoadingState.Error,
                                     message: error.message
                                 });
-                                reject(error);
                             }
                         }
                     )

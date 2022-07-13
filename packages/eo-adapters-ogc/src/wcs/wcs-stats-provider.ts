@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { fromArrayBuffer } from 'geotiff';
+import { fromArrayBuffer, TypedArray } from 'geotiff';
 import ecStats from 'echarts-stat';
 import getBBox from '@turf/bbox';
 
@@ -7,6 +7,8 @@ import { AxiosInstanceWithCancellation, NUMERIC_FIELD_ID, STRING_FIELD_ID, urlPa
 import {
     DatasetAreaValuesData,
     DatasetAreaValuesProvider,
+    DistributionHistogramBin,
+    DistributionPercentile,
     isDomainProvider,
     isValueDomain,
     NumericDomain,
@@ -58,7 +60,7 @@ export const extractStatisticsFromTiffData = (
 
                 const bandIndex = options?.bandIndex || 0;
                 if (bandIndex >= data.length) {
-                    return undefined;
+                    throw new Error(`Band index out of bounds. Number of bands: ${data.length}. Requested band: ${bandIndex}`);
                 }
 
                 let domainPromise: Promise<NumericDomain | undefined>;
@@ -86,7 +88,7 @@ export const extractStatisticsFromTiffData = (
                         .sort((a, b) => a - b);
 
                     if (!values.length) {
-                        return undefined;
+                        throw new Error('No valid data found');
                     }
 
                     const stats = {
@@ -95,10 +97,13 @@ export const extractStatisticsFromTiffData = (
                         mean: ecStats.statistics.mean(values),
                         median: ecStats.statistics.median(values),
                         variance: ecStats.statistics.sampleVariance(values),
-                        histogram: options?.disableHistogram ? undefined : ecStats.histogram(values, 'sturges').data,
+                        sum: ecStats.statistics.sum(values),
+                        histogram: options?.disableHistogram
+                            ? undefined
+                            : (ecStats.histogram(values, 'sturges').data as DistributionHistogramBin[]),
                         percentiles: options?.disablePercentiles
                             ? undefined
-                            : [
+                            : ([
                                   [1, ecStats.statistics.quantile(values, 0.01)],
                                   [5, ecStats.statistics.quantile(values, 0.05)],
                                   [10, ecStats.statistics.quantile(values, 0.1)],
@@ -120,12 +125,12 @@ export const extractStatisticsFromTiffData = (
                                   [90, ecStats.statistics.quantile(values, 0.9)],
                                   [95, ecStats.statistics.quantile(values, 0.95)],
                                   [99, ecStats.statistics.quantile(values, 0.99)]
-                              ]
+                              ] as DistributionPercentile[])
                     };
 
                     return {
                         stats: stats,
-                        gridValues: Array.from(data[bandIndex])
+                        gridValues: Array.from(data[bandIndex] as TypedArray)
                     };
                 });
             });

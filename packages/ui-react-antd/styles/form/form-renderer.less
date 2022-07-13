@@ -21,11 +21,14 @@
 
         margin-bottom: @form-item-small-margin-bottom;
     }
-
 }
 
 .antd-form-renderer {
     .ant-form-item {
+        label {
+            text-transform: uppercase;
+            font-weight: bold;
+        }
 
         &.boolean-field.checkbox-renderer {
             .ant-form-item-label {
@@ -49,6 +52,4 @@
             }
         }
     }
-
 }
-

@@ -1,0 +1,92 @@
+.split-resizer {
+    .split-resizer-ghost {
+        position: absolute;
+        background: transparent;
+        pointer-events: none;
+    }
+
+    .split-resizer-handler {
+        position: absolute;
+        z-index: 2;
+        background: transparent;
+        pointer-events: all;
+
+        &:hover {
+            background: @primary-color;
+        }
+    }
+
+    &.is-right {
+        .split-resizer-ghost {
+            top: 0px;
+            right: 0px;
+            height: 100%;
+        }
+
+        .split-resizer-handler {
+            top: 0px;
+            right: -2px;
+            width: 4px;
+            height: 100%;
+            cursor: col-resize;
+        }
+    }
+
+    &.is-left {
+        .split-resizer-ghost {
+            top: 0px;
+            left: 0px;
+            height: 100%;
+        }
+
+        .split-resizer-handler {
+            top: 0px;
+            left: -2px;
+            width: 4px;
+            height: 100%;
+            cursor: col-resize;
+        }
+    }
+
+    &.is-top {
+        .split-resizer-ghost {
+            top: 0px;
+            left: 0px;
+            width: 100%;
+        }
+
+        .split-resizer-handler {
+            top: -2px;
+            left: 0px;
+            height: 4px;
+            width: 100%;
+            cursor: row-resize;
+        }
+    }
+
+    &.is-bottom {
+        .split-resizer-ghost {
+            bottom: 0px;
+            left: 0px;
+            width: 100%;
+        }
+
+        .split-resizer-handler {
+            bottom: 2px;
+            left: 0px;
+            height: 4px;
+            width: 100%;
+            cursor: row-resize;
+        }
+    }
+
+    &.is-resizing {
+        .split-resizer-ghost {
+            z-index: 1;
+            background: rgba(@primary-color, 0.3);
+        }
+        .split-resizer-handler {
+            background: @primary-color;
+        }
+    }
+}

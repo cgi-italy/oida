@@ -5,3 +5,4 @@ export * from './draw-polygon';
 export * from './focus';
 export * from './layer-group-solid';
 export * from './layer-group';
+export * from './map';

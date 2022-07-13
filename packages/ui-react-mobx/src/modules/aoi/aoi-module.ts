@@ -3,7 +3,7 @@ import { AOI_FIELD_ID, setAoiFieldFactory, FormFieldState, AoiValue } from '@oid
 import { IndexedCollection, FeatureLayer, setReactionForFilterType, FeatureStyleGetter } from '@oidajs/state-mobx';
 
 import { AppModule } from '../app-module';
-import { MapModule } from '../map';
+import { MapComponentFromModule, MapModule } from '../map';
 import { defaultAoiStyleGetter, bindAoiValueToMap } from './utils';
 import { Aoi, AoiProps, AoiSource } from './models';
 import { useMapAoiFieldFromModule } from './hooks/use-map-aoi-field';
@@ -99,8 +99,15 @@ export class AoiModule extends AppModule {
             const filterMapBindingDisposer = bindAoiValueToMap({
                 aois: this.aois,
                 getter: () => filters.get(key)?.value,
-                setter: (value) => filters.set(key, value, AOI_FIELD_ID),
-                map: this.mapModule.map
+                setter: (value) => {
+                    // we delay the execution to avoid that the setter is called
+                    // during the reaction binding
+                    setTimeout(() => {
+                        filters.set(key, value, AOI_FIELD_ID);
+                    }, 0);
+                },
+                map: this.mapModule.map,
+                hidden: true
             });
             return filterMapBindingDisposer;
         });
@@ -124,6 +131,7 @@ export class AoiModule extends AppModule {
                     return {
                         supportedGeometries: props.supportedGeometries,
                         supportedActions: props.supportedActions,
+                        embeddedMapComponent: props.embedMap ? MapComponentFromModule : undefined,
                         ...aoiFieldConfig,
                         name: aoiFieldConfig.name || filterState.value?.geometry.type || 'Aoi'
                     };

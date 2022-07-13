@@ -9,3 +9,27 @@
         pointer-events: all;
     }
 }
+
+.aoi-embedded-map-dialog {
+    height: 50vh;
+
+    .ant-modal-content {
+        height: 100%;
+        .ant-modal-close-x {
+            background: @component-background;
+            color: @text-color;
+            width: 32px;
+            height: 32px;
+            line-height: 32px;
+            margin: 5px 5px 0 0;
+            border: solid 1px @border-color-base;
+        }
+        .ant-modal-body {
+            height: 100%;
+            padding: 0;
+            .map-widget {
+                height: 100%;
+            }
+        }
+    }
+}

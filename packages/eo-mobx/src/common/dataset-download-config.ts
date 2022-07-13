@@ -1,3 +1,5 @@
+import { IFormFieldDefinition } from '@oidajs/core';
+
 import { DatasetViz } from './dataset-viz';
 
 export type DownloadFormat = {
@@ -5,13 +7,17 @@ export type DownloadFormat = {
     name?: string;
 };
 
-export type DownloaMapVizRequest = {
-    datasetViz: DatasetViz<any>;
+export type DownloaMapVizRequest<T extends DatasetViz<any> = DatasetViz<any>> = {
+    datasetViz: T;
     format: string;
-    scale?: number;
+    options?: Record<string, any>;
 };
 
 export type DatasetDownloadConfig = {
     downloadProvider: (request: DownloaMapVizRequest) => Promise<void>;
     supportedFormats: DownloadFormat[];
+    supportedOptions?: {
+        fields: IFormFieldDefinition[];
+        defaultValues: Record<string, any>;
+    };
 };

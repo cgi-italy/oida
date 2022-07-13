@@ -1,6 +1,6 @@
 import LruCache from 'lru-cache';
 import { plot } from 'plotty';
-import { fromArrayBuffer } from 'geotiff';
+import { fromArrayBuffer, Pool } from 'geotiff';
 import proj4 from 'proj4';
 import axios, { AxiosRequestConfig } from 'axios';
 
@@ -8,7 +8,7 @@ import { AxiosInstanceWithCancellation, EpsgIoDefinitionProvider } from '@oidajs
 import { PlottyRenderer } from './plotty-renderer';
 
 export type GeotiffRendererConfig = {
-    cache?: LruCache;
+    cache?: LruCache<string, GeotiffRendererData | null>;
     plottyInstance?: plot;
     axiosInstace?: AxiosInstanceWithCancellation;
 };
@@ -28,7 +28,7 @@ export type RenderFromBufferParams = {
     outputSrs?: string;
 };
 
-type GeotiffRendererData = {
+export type GeotiffRendererData = {
     values: ArrayBuffer;
     width: number;
     height: number;
@@ -44,13 +44,13 @@ export class GeotiffRenderer {
      * See {@link https://github.com/geotiffjs/geotiff.js/#using-decoder-pools-to-improve-parsing-performance | geotiffjs documentation}
      * @param decoder
      */
-    static setDecoder(decoder) {
+    static setDecoder(decoder: Pool) {
         this.decoder_ = decoder;
     }
 
     protected static srsDefProvider_ = new EpsgIoDefinitionProvider();
-    protected static defaultCacheInstance_: LruCache | undefined;
-    protected static decoder_ = undefined;
+    protected static defaultCacheInstance_: LruCache<string, GeotiffRendererData | null> | undefined;
+    protected static decoder_: Pool | undefined = undefined;
 
     /**
      * Canvas used for post rendering transformations (e.g. extent scaling)
@@ -66,9 +66,9 @@ export class GeotiffRenderer {
     protected static getDefaultCacheInstance_() {
         if (!GeotiffRenderer.defaultCacheInstance_) {
             GeotiffRenderer.defaultCacheInstance_ = new LruCache({
-                max: 1e8,
-                length: (item, key) => {
-                    return item.values ? item.values.byteLength : 0;
+                maxSize: 1e8,
+                sizeCalculation: (item, key) => {
+                    return item ? item.values.byteLength : 1;
                 }
             });
         }
@@ -87,7 +87,7 @@ export class GeotiffRenderer {
         return [GeotiffRenderer.transformCanvas_, GeotiffRenderer.transformContext_!];
     }
 
-    protected cache_: LruCache;
+    protected cache_: LruCache<string, GeotiffRendererData | null>;
     protected plotty_: PlottyRenderer;
     protected axiosInstance_: AxiosInstanceWithCancellation | undefined;
 
@@ -109,7 +109,7 @@ export class GeotiffRenderer {
         return this.plotty_;
     }
 
-    renderFromUrl(params: RenderFromUrlParams): Promise<{ canvas: HTMLCanvasElement; newSrsDefinition: boolean } | undefined> {
+    renderFromUrl(params: RenderFromUrlParams): Promise<{ imageData: string; newSrsDefinition: boolean } | undefined> {
         const dataRequest: AxiosRequestConfig = {
             url: params.url,
             method: params.postData ? 'POST' : 'GET',
@@ -123,25 +123,21 @@ export class GeotiffRenderer {
         }
 
         if (!params.disableCache) {
-            const cachedData: GeotiffRendererData = this.cache.get(params.url);
-            if (cachedData) {
-                if (!cachedData.values) {
+            const cachedData = this.cache.get(params.url);
+            if (cachedData !== undefined) {
+                if (cachedData === null) {
                     return Promise.resolve(undefined);
                 } else {
                     return new Promise((resolve, reject) => {
-                        setTimeout(() => {
+                        requestAnimationFrame(() => {
                             const canvas = this.renderTiffImage_(cachedData);
                             resolve({
-                                canvas,
+                                imageData: canvas.toDataURL(),
                                 newSrsDefinition: false
                             });
-                        }, 0);
+                        });
                     });
                 }
-                // return Promise.resolve({
-                //     canvas,
-                //     newSrsDefinition: false
-                // });
             }
         }
 
@@ -159,7 +155,7 @@ export class GeotiffRenderer {
                             this.cache_.set(params.url, renderData);
                         }
                         return {
-                            canvas,
+                            imageData: canvas.toDataURL(),
                             newSrsDefinition
                         };
                     })
@@ -181,9 +177,7 @@ export class GeotiffRenderer {
                     });
                 }
                 if (!params.disableCache) {
-                    this.cache_.set(params.url, {
-                        values: undefined
-                    });
+                    this.cache_.set(params.url, null);
                 }
                 return undefined;
             });
@@ -193,7 +187,7 @@ export class GeotiffRenderer {
         return this.renderBuffer_(params).then((response) => {
             const { canvas, newSrsDefinition } = response;
             return {
-                canvas,
+                imageData: canvas.toDataURL(),
                 newSrsDefinition
             };
         });
@@ -216,7 +210,7 @@ export class GeotiffRenderer {
 
                     return this.getImageExtent_(image, params.outputSrs).then((imageExtentData) => {
                         const renderData: GeotiffRendererData = {
-                            values: data[0],
+                            values: data[0] as ArrayBuffer,
                             width: image.getWidth(),
                             height: image.getHeight(),
                             noData: noData,

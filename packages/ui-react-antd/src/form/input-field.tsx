@@ -44,15 +44,16 @@ export const InputFieldRenderer = (props: FormFieldRendererBaseProps<StringField
         props.onChange(inputValue || undefined);
     };
 
-    const { value, onChange, title, required, config, autoFocus, changeDelay, ...renderProps } = props;
+    const { value, onChange, title, required, config, autoFocus, changeDelay, readonly, ...renderProps } = props;
 
     return (
         <Input
             value={inputValue}
             onPressEnter={onEnterPress}
             onChange={onInputChange}
-            onBlur={() => props.onChange(inputValue || undefined)}
-            autoFocus={props.autoFocus}
+            onBlur={onEnterPress}
+            autoFocus={autoFocus}
+            readOnly={readonly}
             {...renderProps}
         ></Input>
     );

@@ -11,11 +11,11 @@ import { antdFormFieldRendererFactory } from './antd-form-field-renderer-factory
 export const BooleanCheckboxFieldRenderer = (
     props: FormFieldRendererBaseProps<BooleanField> & Omit<CheckboxProps, 'onChange' | 'value'>
 ) => {
-    const { value, onChange, title, required, config, autoFocus, ...renderProps } = props;
+    const { value, onChange, title, required, config, autoFocus, readonly, disabled, ...renderProps } = props;
 
     const onCheckboxChange = (evt) => onChange(evt.target.checked);
     return (
-        <Checkbox checked={value} onChange={onCheckboxChange} {...renderProps}>
+        <Checkbox checked={value} onChange={onCheckboxChange} disabled={readonly || disabled} {...renderProps}>
             {props.title}
         </Checkbox>
     );

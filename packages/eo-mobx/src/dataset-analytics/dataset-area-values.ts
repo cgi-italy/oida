@@ -42,6 +42,7 @@ export type DatasetAreaStatistics = {
     mean?: number;
     median?: number;
     variance?: number;
+    sum?: number;
     histogram?: DistributionHistogramBin[];
     percentiles?: DistributionPercentile[];
 };

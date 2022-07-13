@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.2.0](https://github.com/cgi-italy/oida/compare/@oidajs/map-ol@3.1.1...@oidajs/map-ol@3.2.0) (2022-07-13)
+
+
+### Features
+
+* add more options to centerOnMap operation ([265bede](https://github.com/cgi-italy/oida/commit/265bede4c3146b27a218cd019595380691a663e8))
+
+
+
+
+
 ## [3.1.1](https://github.com/cgi-italy/oida/compare/@oidajs/map-ol@3.1.0...@oidajs/map-ol@3.1.1) (2022-05-16)
 
 **Note:** Version bump only for package @oidajs/map-ol

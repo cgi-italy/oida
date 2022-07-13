@@ -13,6 +13,7 @@ export type bindAoiValueToMapProps = {
     map: Map;
     viewportChangeDebounce?: number;
     color?: string;
+    hidden?: boolean;
 };
 
 let nextAoiId = 1;
@@ -50,7 +51,7 @@ export const bindAoiValueToMap = (props: bindAoiValueToMapProps) => {
                         name: valueProps.name ? valueProps.name : value.geometry.type,
                         geometry: value.geometry,
                         color: color,
-                        visible: true
+                        visible: props.hidden ? false : true
                     });
 
                     props.aois.add(aoiInstance);

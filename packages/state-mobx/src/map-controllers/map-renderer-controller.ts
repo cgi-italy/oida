@@ -44,6 +44,7 @@ export class MapRendererController {
             this.layersController_.destroy();
             this.interactionsController_.destroy();
             this.mapRenderer_.destroy();
+            this.mapState_.renderer.setImplementation(undefined);
         }
     }
 

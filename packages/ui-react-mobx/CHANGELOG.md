@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.2.0](https://github.com/cgi-italy/oida/compare/@oidajs/ui-react-mobx@4.1.1...@oidajs/ui-react-mobx@4.2.0) (2022-07-13)
+
+
+### Bug Fixes
+
+* solve a few issues with history back/forward navigation in StatePathRouter ([4df7bb5](https://github.com/cgi-italy/oida/commit/4df7bb557da5e4cc513c2a70c66e11641df2f0c7))
+* solve some state routing issue ([35707e9](https://github.com/cgi-italy/oida/commit/35707e916543eb5dd1e88c06ec3b16ad11676f67))
+
+
+### Features
+
+* add support for embedding a map into an aoi field ([6def987](https://github.com/cgi-italy/oida/commit/6def9877e6071d108883527eb66cde78186b8acb))
+* improve state path routing components ([94033e2](https://github.com/cgi-italy/oida/commit/94033e23a08e29390d2654042053ac041aae601c))
+
+
+
+
+
 ## [4.1.1](https://github.com/cgi-italy/oida/compare/@oidajs/ui-react-mobx@4.1.0...@oidajs/ui-react-mobx@4.1.1) (2022-05-16)
 
 **Note:** Version bump only for package @oidajs/ui-react-mobx

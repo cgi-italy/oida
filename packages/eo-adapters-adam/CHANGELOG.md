@@ -3,6 +3,29 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.0.0](https://github.com/cgi-italy/oida/compare/@oidajs/eo-adapters-adam@2.3.0...@oidajs/eo-adapters-adam@3.0.0) (2022-07-13)
+
+
+### Bug Fixes
+
+* return image data instead of canvas in GeoTiffRenderer rendering methods ([e70a0cc](https://github.com/cgi-italy/oida/commit/e70a0cc28e17a98b96b2d45bac0de766435797b6))
+
+
+### Features
+
+* add support for adam opensearch vector data download ([2030337](https://github.com/cgi-italy/oida/commit/2030337fb2ab5ba49eb4cc9e0d4b9da672e0c6b0))
+* add support for setting download options in dataset download config ([16f9b64](https://github.com/cgi-italy/oida/commit/16f9b64c59448690f31aaa9c44ddd4d4be88a629))
+
+
+### BREAKING CHANGES
+
+* The GeotiffRenderer renderFromUrl and renderFromBuffer methods now return an image
+data string instead of a canvas instance
+
+
+
+
+
 # [2.3.0](https://github.com/cgi-italy/oida/compare/@oidajs/eo-adapters-adam@2.2.0...@oidajs/eo-adapters-adam@2.3.0) (2022-05-16)
 
 

@@ -13,7 +13,6 @@
         flex-shrink: 1;
 
         .ant-table-row {
-
             user-select: none;
             cursor: pointer;
 
@@ -45,9 +44,7 @@
 
             &.can-drop {
                 &.is-drop-hover {
-
                     .ant-table-cell {
-
                         border-bottom-style: dashed;
                         border-color: @primary-color;
 
@@ -58,11 +55,16 @@
                             border-right-style: dashed;
                         }
                     }
+                }
+            }
 
+            .table-item-actions {
+                white-space: nowrap;
+                .action-content {
+                    display: none;
                 }
             }
         }
-
     }
 
     .ant-table-pagination {
@@ -71,7 +73,6 @@
     }
 
     &.full-height {
-
         height: 100%;
         overflow: hidden;
 
@@ -85,6 +86,5 @@
                 .scrollbar(8px, @primary-color, @primary-2);
             }
         }
-
     }
 }

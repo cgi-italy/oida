@@ -1,4 +1,4 @@
-import { makeObservable, observable, action, computed, reaction, ObservableMap } from 'mobx';
+import { makeObservable, observable, action, computed, reaction, ObservableMap, IObservableMapInitialValues } from 'mobx';
 
 import { SortOrder, QueryFilter, QueryParams as QueryCriteria } from '@oidajs/core';
 
@@ -13,7 +13,7 @@ export const setReactionForFilterType = (type: string, reaction: FilterTypeReact
 /** {@Link DataFilters} props */
 export type DataFiltersProps<FILTER extends QueryFilter = any> = {
     /** The initial filter values */
-    values?: Record<string, FILTER>;
+    values?: IObservableMapInitialValues<string, FILTER>;
 };
 
 type FindByKey<Union, Key> = Union extends { key: Key } ? Union : never;
@@ -56,6 +56,11 @@ export class DataFilters<FILTERS extends QueryFilter = any> {
         });
 
         this.reactionsDisposer_ = {};
+        this.items.forEach((value) => {
+            if (filterTypeReactions[value.type]) {
+                this.reactionsDisposer_[value.key] = filterTypeReactions[value.type](this, value.key);
+            }
+        });
 
         makeObservable(this);
     }
@@ -287,6 +292,7 @@ export class QueryParams<FILTERS extends QueryFilter = any> {
     }
 
     protected afterInit_() {
+        // automatically reset the page on filters change
         reaction(
             () => this.filters.asArray(),
             () => {

@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 
-import { Tag, Button, Tooltip, Drawer, Popover } from 'antd';
+import { Tag, Button, Tooltip, Drawer, Popover, Modal } from 'antd';
 
 import { EnvironmentOutlined, LinkOutlined, EditOutlined, ImportOutlined } from '@ant-design/icons';
 
@@ -15,14 +15,15 @@ import { antdFormFieldRendererFactory } from './antd-form-field-renderer-factory
 import { AoiImportRenderer } from './aoi-import';
 import { AoiTextEditor } from './aoi-text-editor';
 
-export type AoiFieldRendererProps = FormFieldRendererBaseProps<AoiField<AoiImportConfig>> & {
+export type AoiFieldRendererProps = FormFieldRendererBaseProps<AoiField<AoiImportConfig, React.ComponentType>> & {
     importDrawerPlacement?: 'left' | 'right';
 };
 
 export const AoiFieldRenderer = (props: AoiFieldRendererProps) => {
     const [editorVisible, setEditorVisible] = useState(false);
+    const [mapVisible, setMapVisible] = useState(false);
 
-    const { value, onChange, config } = props;
+    const { value, onChange, readonly, config } = props;
     const {
         supportedActions,
         supportedGeometries,
@@ -33,7 +34,8 @@ export const AoiFieldRenderer = (props: AoiFieldRendererProps) => {
         onActiveActionChange,
         onHoverAction,
         onSelectAction,
-        onVisibleAction
+        onVisibleAction,
+        onCenterAction
     } = config;
 
     const aoiControls = useMemo(() => {
@@ -79,27 +81,66 @@ export const AoiFieldRenderer = (props: AoiFieldRendererProps) => {
         };
     }, [supportedGeometries, supportedActions]);
 
-    useEffect(() => {
+    const showEmbeddedMap = () => {
+        setMapVisible(true);
         if (onVisibleAction) {
             onVisibleAction(true);
         }
+        if (onCenterAction) {
+            onCenterAction();
+        }
+    };
 
-        return () => {
+    useEffect(() => {
+        if (!props.config.embeddedMapComponent) {
             if (onVisibleAction) {
-                onVisibleAction(false);
+                onVisibleAction(true);
             }
-        };
-    }, []);
+
+            return () => {
+                if (onVisibleAction) {
+                    onVisibleAction(false);
+                }
+            };
+        } else {
+            if (onVisibleAction) {
+                onVisibleAction(mapVisible);
+            }
+        }
+    }, [props.value?.props?.id, props.config.embeddedMapComponent]);
+
+    useEffect(() => {
+        if (
+            activeAction === AoiAction.DrawPoint ||
+            activeAction === AoiAction.DrawLine ||
+            activeAction === AoiAction.DrawBBox ||
+            activeAction === AoiAction.DrawPolygon
+        ) {
+            if (props.config.embeddedMapComponent) {
+                showEmbeddedMap();
+            }
+        }
+    }, [activeAction, props.config.embeddedMapComponent]);
+
+    const EmbeddedMapComponent = props.config.embeddedMapComponent;
 
     return (
         <React.Fragment>
             {value && (
                 <Tag
-                    closable
+                    closable={!readonly}
                     color={color}
                     onMouseOver={onHoverAction ? () => onHoverAction!(true) : undefined}
                     onMouseOut={onHoverAction ? () => onHoverAction!(false) : undefined}
-                    onClick={onSelectAction ? () => onSelectAction!(true) : undefined}
+                    onClick={() => {
+                        if (props.config.embeddedMapComponent) {
+                            showEmbeddedMap();
+                        } else {
+                            if (onSelectAction) {
+                                onSelectAction(true);
+                            }
+                        }
+                    }}
                     onClose={(evt) => {
                         evt.stopPropagation();
                         props.onChange(undefined);
@@ -109,125 +150,129 @@ export const AoiFieldRenderer = (props: AoiFieldRendererProps) => {
                 </Tag>
             )}
             {!value && <Tag color='#dddddd'>No area specified</Tag>}
-            <Button.Group size='small' className='aoi-draw-actions'>
-                {aoiControls.point && (
-                    <Tooltip title='Select coordinate'>
-                        <Button
-                            type={activeAction === AoiAction.DrawPoint ? 'primary' : 'default'}
-                            onClick={() => {
-                                if (activeAction === AoiAction.DrawPoint) {
-                                    onActiveActionChange(AoiAction.None);
-                                } else {
-                                    onActiveActionChange(AoiAction.DrawPoint);
-                                }
-                            }}
-                        >
-                            <EnvironmentOutlined />
-                        </Button>
-                    </Tooltip>
-                )}
-                {aoiControls.line && (
-                    <Tooltip title='Draw line'>
-                        <Button
-                            type={activeAction === AoiAction.DrawLine ? 'primary' : 'default'}
-                            onClick={() => {
-                                if (activeAction === AoiAction.DrawLine) {
-                                    onActiveActionChange(AoiAction.None);
-                                } else {
-                                    onActiveActionChange(AoiAction.DrawLine);
-                                }
-                            }}
-                        >
-                            <DrawLineIcon />
-                        </Button>
-                    </Tooltip>
-                )}
-                {aoiControls.bbox && (
-                    <Tooltip title='Draw bbox'>
-                        <Button
-                            type={activeAction === AoiAction.DrawBBox ? 'primary' : 'default'}
-                            onClick={() => {
-                                if (activeAction === AoiAction.DrawBBox) {
-                                    onActiveActionChange(AoiAction.None);
-                                } else {
-                                    onActiveActionChange(AoiAction.DrawBBox);
-                                }
-                            }}
-                        >
-                            <DrawBboxIcon />
-                        </Button>
-                    </Tooltip>
-                )}
-                {aoiControls.polygon && (
-                    <Tooltip title='Draw polygon'>
-                        <Button
-                            type={activeAction === AoiAction.DrawPolygon ? 'primary' : 'default'}
-                            onClick={() => {
-                                if (activeAction === AoiAction.DrawPolygon) {
-                                    onActiveActionChange(AoiAction.None);
-                                } else {
-                                    onActiveActionChange(AoiAction.DrawPolygon);
-                                }
-                            }}
-                        >
-                            <DrawPolygonIcon />
-                        </Button>
-                    </Tooltip>
-                )}
-                {aoiControls.linkToViewport && (
-                    <Tooltip title='Link to map viewport'>
-                        <Button
-                            type={activeAction === AoiAction.LinkToMapViewport ? 'primary' : 'default'}
-                            onClick={() => {
-                                if (activeAction === AoiAction.LinkToMapViewport) {
-                                    onChange(undefined);
-                                } else {
-                                    onActiveActionChange(AoiAction.LinkToMapViewport);
-                                }
-                            }}
-                        >
-                            <LinkOutlined />
-                        </Button>
-                    </Tooltip>
-                )}
-            </Button.Group>
-            <Button.Group className='aoi-edit-actions' size='small'>
-                {
-                    <Tooltip title='Edit aoi'>
-                        <Popover
-                            className='aoi-editor-popover'
-                            content={<AoiTextEditor value={value} onChange={onChange} supportedGeometries={supportedGeometries} />}
-                            destroyTooltipOnHide={true}
-                            title='Edit area'
-                            visible={editorVisible}
-                            onVisibleChange={(visible) => setEditorVisible(visible)}
-                            trigger='click'
-                            zIndex={1050}
-                        >
-                            <Button type={editorVisible ? 'primary' : 'default'}>
-                                <EditOutlined />
+            {!readonly && (
+                <Button.Group size='small' className='aoi-draw-actions'>
+                    {aoiControls.point && (
+                        <Tooltip title='Select coordinate'>
+                            <Button
+                                type={activeAction === AoiAction.DrawPoint ? 'primary' : 'default'}
+                                onClick={() => {
+                                    if (activeAction === AoiAction.DrawPoint) {
+                                        onActiveActionChange(AoiAction.None);
+                                    } else {
+                                        onActiveActionChange(AoiAction.DrawPoint);
+                                    }
+                                }}
+                            >
+                                <EnvironmentOutlined />
                             </Button>
-                        </Popover>
-                    </Tooltip>
-                }
-                {aoiControls.import && (
-                    <Tooltip title='Import area'>
-                        <Button
-                            type={activeAction === AoiAction.Import ? 'primary' : 'default'}
-                            onClick={() => {
-                                if (activeAction === AoiAction.Import) {
-                                    onActiveActionChange(AoiAction.None);
-                                } else {
-                                    onActiveActionChange(AoiAction.Import);
-                                }
-                            }}
-                        >
-                            <ImportOutlined />
-                        </Button>
-                    </Tooltip>
-                )}
-            </Button.Group>
-            {aoiControls.import && importConfig && (
+                        </Tooltip>
+                    )}
+                    {aoiControls.line && (
+                        <Tooltip title='Draw line'>
+                            <Button
+                                type={activeAction === AoiAction.DrawLine ? 'primary' : 'default'}
+                                onClick={() => {
+                                    if (activeAction === AoiAction.DrawLine) {
+                                        onActiveActionChange(AoiAction.None);
+                                    } else {
+                                        onActiveActionChange(AoiAction.DrawLine);
+                                    }
+                                }}
+                            >
+                                <DrawLineIcon />
+                            </Button>
+                        </Tooltip>
+                    )}
+                    {aoiControls.bbox && (
+                        <Tooltip title='Draw bbox'>
+                            <Button
+                                type={activeAction === AoiAction.DrawBBox ? 'primary' : 'default'}
+                                onClick={() => {
+                                    if (activeAction === AoiAction.DrawBBox) {
+                                        onActiveActionChange(AoiAction.None);
+                                    } else {
+                                        onActiveActionChange(AoiAction.DrawBBox);
+                                    }
+                                }}
+                            >
+                                <DrawBboxIcon />
+                            </Button>
+                        </Tooltip>
+                    )}
+                    {aoiControls.polygon && (
+                        <Tooltip title='Draw polygon'>
+                            <Button
+                                type={activeAction === AoiAction.DrawPolygon ? 'primary' : 'default'}
+                                onClick={() => {
+                                    if (activeAction === AoiAction.DrawPolygon) {
+                                        onActiveActionChange(AoiAction.None);
+                                    } else {
+                                        onActiveActionChange(AoiAction.DrawPolygon);
+                                    }
+                                }}
+                            >
+                                <DrawPolygonIcon />
+                            </Button>
+                        </Tooltip>
+                    )}
+                    {aoiControls.linkToViewport && (
+                        <Tooltip title='Link to map viewport'>
+                            <Button
+                                type={activeAction === AoiAction.LinkToMapViewport ? 'primary' : 'default'}
+                                onClick={() => {
+                                    if (activeAction === AoiAction.LinkToMapViewport) {
+                                        onChange(undefined);
+                                    } else {
+                                        onActiveActionChange(AoiAction.LinkToMapViewport);
+                                    }
+                                }}
+                            >
+                                <LinkOutlined />
+                            </Button>
+                        </Tooltip>
+                    )}
+                </Button.Group>
+            )}
+            {!readonly && (
+                <Button.Group className='aoi-edit-actions' size='small'>
+                    {
+                        <Tooltip title='Edit aoi'>
+                            <Popover
+                                className='aoi-editor-popover'
+                                content={<AoiTextEditor value={value} onChange={onChange} supportedGeometries={supportedGeometries} />}
+                                destroyTooltipOnHide={true}
+                                title='Edit area'
+                                visible={editorVisible}
+                                onVisibleChange={(visible) => setEditorVisible(visible)}
+                                trigger='click'
+                                zIndex={1050}
+                            >
+                                <Button type={editorVisible ? 'primary' : 'default'}>
+                                    <EditOutlined />
+                                </Button>
+                            </Popover>
+                        </Tooltip>
+                    }
+                    {aoiControls.import && (
+                        <Tooltip title='Import area'>
+                            <Button
+                                type={activeAction === AoiAction.Import ? 'primary' : 'default'}
+                                onClick={() => {
+                                    if (activeAction === AoiAction.Import) {
+                                        onActiveActionChange(AoiAction.None);
+                                    } else {
+                                        onActiveActionChange(AoiAction.Import);
+                                    }
+                                }}
+                            >
+                                <ImportOutlined />
+                            </Button>
+                        </Tooltip>
+                    )}
+                </Button.Group>
+            )}
+            {aoiControls.import && importConfig && !readonly && (
                 <Drawer
                     push={false}
                     className='aoi-import-drawer'
@@ -251,6 +296,27 @@ export const AoiFieldRenderer = (props: AoiFieldRendererProps) => {
                 >
                     <AoiImportRenderer {...importConfig} />
                 </Drawer>
+            )}
+            {EmbeddedMapComponent && (
+                <Modal
+                    className='aoi-embedded-map-dialog'
+                    visible={mapVisible}
+                    footer={null}
+                    centered={true}
+                    destroyOnClose={true}
+                    onCancel={() => {
+                        onActiveActionChange(AoiAction.None);
+                        if (onVisibleAction) {
+                            onVisibleAction(false);
+                        }
+                        if (onSelectAction) {
+                            onSelectAction(false);
+                        }
+                        setMapVisible(false);
+                    }}
+                >
+                    <EmbeddedMapComponent />
+                </Modal>
             )}
         </React.Fragment>
     );

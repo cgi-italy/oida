@@ -36,7 +36,9 @@ export const CesiumOLImageryProvider = function (this: any, olSource, options) {
     this.emptyCanvas_.width = 1;
     this.emptyCanvas_.height = 1;
 
-    this.source_.on('change', this.handleSourceChanged_, this);
+    this.source_.on('change', (evt) => {
+        this.handleSourceChanged_();
+    });
 
     this.handleSourceChanged_();
 };

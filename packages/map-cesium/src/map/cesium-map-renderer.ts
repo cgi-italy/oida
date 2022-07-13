@@ -5,7 +5,9 @@ import Rectangle from 'cesium/Source/Core/Rectangle';
 import Cartesian2 from 'cesium/Source/Core/Cartesian2';
 import Cartesian3 from 'cesium/Source/Core/Cartesian3';
 import Cartographic from 'cesium/Source/Core/Cartographic';
+import BoundingSphere from 'cesium/Source/Core/BoundingSphere';
 import CesiumMath from 'cesium/Source/Core/Math';
+import HeadingPitchRange from 'cesium/Source/Core/HeadingPitchRange';
 import Ray from 'cesium/Source/Core/Ray';
 import IntersectionTests from 'cesium/Source/Core/IntersectionTests';
 import Plane from 'cesium/Source/Core/Plane';
@@ -16,7 +18,7 @@ import DataSourceDisplay from 'cesium/Source/DataSources/DataSourceDisplay';
 
 import 'cesium/Source/Widgets/CesiumWidget/CesiumWidget.css';
 
-import { IMapRenderer, IMapRendererProps, IMapViewport, BBox, Size } from '@oidajs/core';
+import { IMapRenderer, IMapRendererProps, IMapViewport, BBox, Size, FitExtentOptions } from '@oidajs/core';
 
 import { cesiumLayersFactory } from '../layers/cesium-layers-factory';
 import { cesiumInteractionsFactory } from '../interactions/cesium-interactions-factory';
@@ -83,22 +85,31 @@ export class CesiumMapRenderer implements IMapRenderer {
         }
     }
 
-    fitExtent(extent, animate?: boolean) {
-        const eps = 0.0001;
+    fitExtent(extent, options?: FitExtentOptions) {
+        const destination = Rectangle.fromDegrees(...extent);
+        const boundingSphere = BoundingSphere.fromRectangle3D(destination);
 
-        let destination;
-        if (extent[2] - extent[0] <= eps || extent[3] - extent[1] <= eps) {
-            destination = Cartesian3.fromDegrees(extent[0], extent[1], this.viewer_.camera.positionCartographic.height);
-        } else {
-            destination = Rectangle.fromDegrees(...extent);
+        if (options?.padding) {
+            // TODO: add support for non uniform padding
+            const padding = (options.padding[0] + options.padding[1] + options.padding[2] + options.padding[3]) / 4;
+            boundingSphere.radius = boundingSphere.radius * (1 + padding);
         }
-        if (animate) {
-            this.viewer_.camera.flyTo({
-                destination: destination
+
+        const hpr = new HeadingPitchRange(
+            CesiumMath.toRadians(options?.rotation || 0),
+            CesiumMath.toRadians((options?.pitch || 0) - 90),
+            boundingSphere.radius ? 0 : this.viewer_.camera.positionCartographic.height
+        );
+        if (options?.animate) {
+            this.viewer_.camera.flyToBoundingSphere(boundingSphere, {
+                offset: hpr
             });
         } else {
-            this.viewer_.camera.setView({
-                destination: destination
+            // we use the flyToBoundingSphere method with a 0 duration as the viewBoundingSphere method
+            // will set a camera transform (camera view locked to the target center) and that's not what we want
+            this.viewer_.camera.flyToBoundingSphere(boundingSphere, {
+                offset: hpr,
+                duration: 0
             });
         }
     }
@@ -348,7 +359,7 @@ export class CesiumMapRenderer implements IMapRenderer {
         const mapProjection = getProjectionFromSRS(projection.code, true);
 
         this.viewer_ = new CesiumWidget(container, {
-            useBrowserRecommendedResolution: false,
+            useBrowserRecommendedResolution: true,
             ...renderProps,
             imageryProvider: false,
             sceneMode: this.getSceneMode_(renderProps),
@@ -444,7 +455,7 @@ export class CesiumMapRenderer implements IMapRenderer {
         }
 
         const center = camera.pickEllipsoid(
-            new Cartesian2(scene.drawingBufferWidth / 2, scene.drawingBufferHeight / 2),
+            new Cartesian2(this.viewer_.canvas.clientWidth / 2, this.viewer_.canvas.clientHeight / 2),
             scene.globe.ellipsoid
         );
         if (center) {

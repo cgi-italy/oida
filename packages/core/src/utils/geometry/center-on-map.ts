@@ -8,6 +8,9 @@ import { getGeometryExtent } from './get-geometry-extent';
 export type CenterOnMapOptions = {
     notIfInViewport?: boolean;
     animate?: boolean;
+    pitch?: number;
+    rotation?: number;
+    padding?: number[];
 };
 
 export const centerOnMap = (renderer: IMapRenderer, geometry: Geometry, options: CenterOnMapOptions = {}) => {
@@ -23,5 +26,5 @@ export const centerOnMap = (renderer: IMapRenderer, geometry: Geometry, options:
         }
     }
 
-    renderer.fitExtent(extent as BBox, options.animate);
+    renderer.fitExtent(extent as BBox, options);
 };

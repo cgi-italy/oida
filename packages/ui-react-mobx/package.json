@@ -1,6 +1,6 @@
 {
   "name": "@oidajs/ui-react-mobx",
-  "version": "4.1.1",
+  "version": "4.2.0",
   "description": "react hooks and components for state-mobx",
   "module": "es/index.js",
   "main": "lib/index.js",

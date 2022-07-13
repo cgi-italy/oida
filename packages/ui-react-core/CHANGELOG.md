@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.2.0](https://github.com/cgi-italy/oida/compare/@oidajs/ui-react-core@6.1.1...@oidajs/ui-react-core@6.2.0) (2022-07-13)
+
+
+### Features
+
+* add split resizer component ([fa18fef](https://github.com/cgi-italy/oida/commit/fa18feff9247bd6f40ff0da65c390853e87039d9))
+* add support for readonly forms and form fields ([8f473ec](https://github.com/cgi-italy/oida/commit/8f473ec9678b0ebae0dc8b45f9dd7d8ce3ac621f))
+
+
+
+
+
 ## [6.1.1](https://github.com/cgi-italy/oida/compare/@oidajs/ui-react-core@6.1.0...@oidajs/ui-react-core@6.1.1) (2022-05-16)
 
 **Note:** Version bump only for package @oidajs/ui-react-core

@@ -31,12 +31,22 @@ export interface IMapRendererProps {
 
 export type Size = [number, number];
 
+export type FitExtentOptions = {
+    animate?: boolean;
+    /** rotation angle in degrees with respect to north direction (when applicable) */
+    rotation?: number;
+    /** the pitch angle in degrees to apply relatively to a down looking vector (when applicable) */
+    pitch?: number;
+    /** The padding to apply around the extent as a map size percentage */
+    padding?: number[];
+};
+
 export interface IMapRenderer {
     id: string;
     setTarget(target: HTMLElement): void;
     setViewport(viewport: IMapViewport, animate?: boolean): void;
     updateRendererProps(props: Record<string, any>): void;
-    fitExtent(extent: BBox, animate?: boolean): void;
+    fitExtent(extent: BBox, options?: FitExtentOptions): void;
     getViewportExtent(): BBox;
     getLayersFactory(): IDynamicFactory<IMapLayerRenderer, IMapLayerRendererConfigDefinitions>;
     getInteractionsFactory(): IDynamicFactory<IMapInteractionImplementation>;

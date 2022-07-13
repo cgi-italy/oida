@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.4.0](https://github.com/cgi-italy/oida/compare/@oidajs/eo-mobx@2.3.0...@oidajs/eo-mobx@2.4.0) (2022-07-13)
+
+
+### Bug Fixes
+
+* solve some typings issues ([b7b9706](https://github.com/cgi-italy/oida/commit/b7b9706dfff6f1b283eda129bc9a5218f9b475ef))
+
+
+### Features
+
+* add missing sum in dataset area statistics ([d48b007](https://github.com/cgi-italy/oida/commit/d48b007c22eedfaf7e942e7f48b8cdc095176666))
+* add support for setting download options in dataset download config ([16f9b64](https://github.com/cgi-italy/oida/commit/16f9b64c59448690f31aaa9c44ddd4d4be88a629))
+
+
+
+
+
 # [2.3.0](https://github.com/cgi-italy/oida/compare/@oidajs/eo-mobx@2.2.0...@oidajs/eo-mobx@2.3.0) (2022-05-16)
 
 
