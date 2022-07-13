@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.2.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/map-cesium@3.1.2...@oidajs/map-cesium@3.2.0) (2022-07-13)
+
+
+### Bug Fixes
+
+* account for window device pixel ratio in cesium map renderer view center computation ([dcc5553](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/dcc5553c9d78b6993e7706a385399894c19179f5))
+
+
+### Features
+
+* add more options to centerOnMap operation ([265bede](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/265bede4c3146b27a218cd019595380691a663e8))
+
+
+
+
+
 ## [3.1.2](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/map-cesium@3.1.1...@oidajs/map-cesium@3.1.2) (2022-05-16)
 
 **Note:** Version bump only for package @oidajs/map-cesium

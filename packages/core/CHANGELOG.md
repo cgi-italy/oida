@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.3.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/core@4.2.0...@oidajs/core@4.3.0) (2022-07-13)
+
+
+### Features
+
+* add an utility function to format positions ([c7a8800](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/c7a88009126b2f993cddff288e83c149887b4467))
+* add more options to centerOnMap operation ([265bede](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/265bede4c3146b27a218cd019595380691a663e8))
+* add support for embedding a map into an aoi field ([6def987](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/6def9877e6071d108883527eb66cde78186b8acb))
+* add support for readonly forms and form fields ([8f473ec](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/8f473ec9678b0ebae0dc8b45f9dd7d8ce3ac621f))
+
+
+
+
+
 # [4.2.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/core@4.1.0...@oidajs/core@4.2.0) (2022-05-16)
 
 

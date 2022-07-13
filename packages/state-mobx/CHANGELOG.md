@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.0.4](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/state-mobx@2.0.3...@oidajs/state-mobx@2.0.4) (2022-07-13)
+
+
+### Bug Fixes
+
+* init filter reactions in DataFilters constructor ([93bb206](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/93bb20613b5a84616b87cf33a3666a29e972eff3))
+* propagate new data before updating loading state in AsyncDataFetcher ([948428c](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/948428c1a0e8a589a006270957916beeba3c5275))
+* solve a few issues with history back/forward navigation in StatePathRouter ([4df7bb5](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/4df7bb557da5e4cc513c2a70c66e11641df2f0c7))
+* solve some typings issues ([b7b9706](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/b7b9706dfff6f1b283eda129bc9a5218f9b475ef))
+* unset map renderer implementation from state on controller destroy ([eeb2c71](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/eeb2c7113289c36e6f6bf89b9952b90f323ffc9c))
+
+
+
+
+
 ## [2.0.3](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/state-mobx@2.0.2...@oidajs/state-mobx@2.0.3) (2022-05-16)
 
 

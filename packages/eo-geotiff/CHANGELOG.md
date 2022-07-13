@@ -3,6 +3,29 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.0.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-geotiff@2.0.4...@oidajs/eo-geotiff@3.0.0) (2022-07-13)
+
+
+### Bug Fixes
+
+* return image data instead of canvas in GeoTiffRenderer rendering methods ([e70a0cc](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/e70a0cc28e17a98b96b2d45bac0de766435797b6))
+
+
+### Performance Improvements
+
+* delay cached data rendering to next animation frame in GeotiffRenderer ([092f3b1](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/092f3b18b4abf305b05dd92297d950e282fad1cd))
+* enable webgl by default in PlottyRenderer ([a54ce3d](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/a54ce3d30f7b32eb238c18bb4f173d10b8c3a2d5))
+
+
+### BREAKING CHANGES
+
+* The GeotiffRenderer renderFromUrl and renderFromBuffer methods now return an image
+data string instead of a canvas instance
+
+
+
+
+
 ## [2.0.4](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-geotiff@2.0.3...@oidajs/eo-geotiff@2.0.4) (2022-05-16)
 
 **Note:** Version bump only for package @oidajs/eo-geotiff

@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.3.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-adapters-ogc@2.2.0...@oidajs/eo-adapters-ogc@2.3.0) (2022-07-13)
+
+
+### Features
+
+* add missing sum in dataset area statistics ([d48b007](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/d48b007c22eedfaf7e942e7f48b8cdc095176666))
+
+
+
+
+
 # [2.2.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-adapters-ogc@2.1.1...@oidajs/eo-adapters-ogc@2.2.0) (2022-05-16)
 
 

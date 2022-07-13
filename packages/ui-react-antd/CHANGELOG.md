@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.2.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/ui-react-antd@6.1.1...@oidajs/ui-react-antd@6.2.0) (2022-07-13)
+
+
+### Bug Fixes
+
+* propagate size input prop to pager and action elements in data collection list ([c13b0ff](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/c13b0ff9c95611fd3a2a0b0fc9e17e6eab9e3621))
+
+
+### Features
+
+* add a component for antd form items rendering from a fields config object ([1b6ff25](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/1b6ff2535c44f911f505c4f2ff084361095d45d6))
+* add map icon ([78af3d3](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/78af3d3bbdfe83717848db5b2d9a38c8beea0cd7))
+* add optional slider rendering in numeric form field ([abc0612](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/abc061254859008b4472b9ef0073d7fb4ccf9982))
+* add support for embedding a map into an aoi field ([6def987](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/6def9877e6071d108883527eb66cde78186b8acb))
+* add support for readonly forms and form fields ([8f473ec](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/8f473ec9678b0ebae0dc8b45f9dd7d8ce3ac621f))
+* add tooltip icon component ([c0851ca](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/c0851cafafb7aa4595a144052c923173c9f6043c))
+* allow to expand actions menu in data table ([c6d679c](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/c6d679c2aa7a4024e0a19eadbad95a40af3eb9ac))
+
+
+
+
+
 ## [6.1.1](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/ui-react-antd@6.1.0...@oidajs/ui-react-antd@6.1.1) (2022-05-16)
 
 **Note:** Version bump only for package @oidajs/ui-react-antd

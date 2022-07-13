@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.4.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-mobx-react@3.3.0...@oidajs/eo-mobx-react@3.4.0) (2022-07-13)
+
+
+### Features
+
+* add support for setting download options in dataset download config ([16f9b64](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/16f9b64c59448690f31aaa9c44ddd4d4be88a629))
+
+
+
+
+
 # [3.3.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-mobx-react@3.2.0...@oidajs/eo-mobx-react@3.3.0) (2022-05-16)
 
 
