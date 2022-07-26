@@ -51,3 +51,7 @@ export const formatPosition = (value: number) => {
     }
     return `${value}${supphix}`;
 };
+
+export const capitalizeString = (input: string) => {
+    return input.substring(0, 1).toUpperCase() + input.substring(1);
+};
