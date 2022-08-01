@@ -77,6 +77,7 @@ function ListItem<T>(props: ListItemProps<T>) {
 }
 
 export type DataCollectionItemsListProps<T> = {
+    disableSelection?: boolean;
     autoScrollOnSelection?: boolean;
     content: (item: T) => React.ReactNode;
     itemLayout?: 'horizontal' | 'vertical';
@@ -85,6 +86,7 @@ export type DataCollectionItemsListProps<T> = {
 export function DataCollectionItemsList<T>(props: DataCollectionItemsListProps<T> & DataCollectionItemsProps<T>) {
     const {
         autoScrollOnSelection,
+        disableSelection,
         content,
         itemState,
         onHoverAction,
@@ -112,29 +114,33 @@ export function DataCollectionItemsList<T>(props: DataCollectionItemsListProps<T
                     onHoverAction(item, false);
                 }}
                 size={!props.size || props.size === 'default' ? 'middle' : props.size}
-                onClick={(evt) => {
-                    let selectionMode = SelectionMode.Replace;
-                    if (multiSelect) {
-                        if (evt.ctrlKey) {
-                            selectionMode = SelectionMode.Toggle;
-                        }
-                        if (evt.shiftKey) {
-                            selectionMode = SelectionMode.Add;
-                            if (lastClickedRowIndex !== -1) {
-                                const startIdx = lastClickedRowIndex < listIndex ? lastClickedRowIndex : listIndex;
-                                const endIdx = lastClickedRowIndex < listIndex ? listIndex + 1 : lastClickedRowIndex + 1;
-                                const items = data.slice(startIdx, endIdx);
-                                items.forEach((item) => {
-                                    onSelectAction(item, selectionMode);
-                                });
-                                return;
-                            }
-                        } else {
-                            lastClickedRowIndex = listIndex;
-                        }
-                    }
-                    onSelectAction(item, selectionMode);
-                }}
+                onClick={
+                    !disableSelection
+                        ? (evt) => {
+                              let selectionMode = SelectionMode.Replace;
+                              if (multiSelect) {
+                                  if (evt.ctrlKey) {
+                                      selectionMode = SelectionMode.Toggle;
+                                  }
+                                  if (evt.shiftKey) {
+                                      selectionMode = SelectionMode.Add;
+                                      if (lastClickedRowIndex !== -1) {
+                                          const startIdx = lastClickedRowIndex < listIndex ? lastClickedRowIndex : listIndex;
+                                          const endIdx = lastClickedRowIndex < listIndex ? listIndex + 1 : lastClickedRowIndex + 1;
+                                          const items = data.slice(startIdx, endIdx);
+                                          items.forEach((item) => {
+                                              onSelectAction(item, selectionMode);
+                                          });
+                                          return;
+                                      }
+                                  } else {
+                                      lastClickedRowIndex = listIndex;
+                                  }
+                              }
+                              onSelectAction(item, selectionMode);
+                          }
+                        : undefined
+                }
                 onDoubleClick={(evt) => {
                     if (onDefaultAction) {
                         onDefaultAction(item);
