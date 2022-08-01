@@ -1,0 +1,55 @@
+@is-bg-dark: boolean(luma(@component-background) < 50%);
+
+@ant-drawer-header-bg: @modal-header-bg;
+@ant-drawer-header-color: @modal-heading-color;
+@ant-drawer-header-border: @modal-header-border-width @modal-header-border-style @modal-header-border-color-split;
+
+@ant-icon-btn-border-radius: @btn-border-radius-base;
+
+@app-side-nav-collapsed-width: @menu-collapsed-width;
+@app-side-nav-bg: @menu-bg;
+@app-side-nav-shadow: 0 2px 8px @shadow-color;
+@app-side-nav-top-margin: @margin-md;
+@app-side-nav-top-border: @border-color-base;
+@app-side-nav-item-font-size: @menu-item-font-size;
+@app-side-nav-item-icon-size: @menu-icon-size;
+@app-side-nav-item-icon-size-lg: @menu-icon-size-lg;
+@app-side-nav-item-color: @menu-item-color;
+@app-side-nav-item-active-color: @menu-highlight-color;
+@app-side-nav-item-height: @menu-item-height * 1.5;
+@app-side-nav-item-hover-bg: @item-hover-bg;
+@app-side-nav-item-hover-color: @menu-highlight-color;
+@app-side-nav-item-active-color: @menu-highlight-color;
+@app-side-nav-item-active-bg: @menu-item-active-bg;
+@app-side-nav-item-active-border: @menu-item-active-border-width solid @menu-highlight-color;
+@app-side-nav-item-border-color: transparent;
+
+@app-header-background: @menu-bg;
+@app-header-height: 55px;
+@app-header-padding: 0 15px;
+@app-header-shadow: 0 1px 6px @shadow-color;
+@app-header-logo-padding: @padding-xss @padding-md @padding-xss @padding-xss;
+@app-header-title-font: @heading-4-size @font-family;
+@app-header-divider-color: @border-color-base;
+@app-header-menu-left-margin: @margin-md;
+@app-header-menu-margin: 0 0 0 @margin-lg;
+@app-header-menu-item-font-size: @menu-item-font-size;
+@app-header-menu-item-font-weight: normal;
+@app-header-menu-item-icon-size: @menu-icon-size-lg;
+@app-header-menu-item-color: @menu-item-color;
+@app-header-menu-item-height: @menu-item-height;
+@app-header-menu-item-horiz-margin: 0;
+@app-header-menu-item-hover-bg: @item-hover-bg;
+@app-header-menu-item-hover-color: @menu-item-color;
+@app-header-menu-item-active-bg: @menu-item-active-bg;
+@app-header-menu-item-active-color: @menu-highlight-color;
+@app-header-menu-item-active-border: @menu-item-active-border-width solid @menu-highlight-color;
+@app-header-menu-item-active-border-margin: 0;
+@app-header-menu-item-separator-color: @border-color-base;
+
+@data-collection-list-item-bg: if(@is-bg-dark, lighten(@component-background, 3%), darken(@component-background, 2%));
+@data-collection-list-item-border-color: if(@is-bg-dark, lighten(@component-background, 10%), darken(@component-background, 10%));
+@data-collection-list-item-hover-bg: @table-row-hover-bg;
+@data-collection-list-item-selected-bg: @table-selected-row-bg;
+@data-collection-list-item-margin-bottom-md: 10px;
+@data-collection-list-item-margin-bottom-sm: 5px;

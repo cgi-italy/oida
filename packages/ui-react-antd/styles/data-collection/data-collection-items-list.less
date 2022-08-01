@@ -1,11 +1,5 @@
+@import '../variables.less';
 @import '~@oidajs/ui-react-core/styles/utils/scrollbar';
-
-@data-collection-list-item-bg: lighten(@component-background, 3%);
-@data-collection-list-item-border-color: lighten(@component-background, 10%);
-@data-collection-list-item-hover-bg: @table-row-hover-bg;
-@data-collection-list-item-selected-bg: @table-selected-row-bg;
-@data-collection-list-item-margin-bottom-md: 10px;
-@data-collection-list-item-margin-bottom-sm: 5px;
 
 .data-collection-list-items.ant-list {
     .scrollbar(8px, @primary-color, @primary-2);
@@ -44,7 +38,7 @@
             }
 
             &.hovered {
-                background-color: lighten(@data-collection-list-item-selected-bg, 10%);
+                background-color: lighten(@data-collection-list-item-selected-bg, 3%);
             }
         }
 
