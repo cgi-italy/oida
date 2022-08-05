@@ -1,0 +1,100 @@
+@import '../variables.less';
+
+.card-link {
+    .ant-card-cover {
+        height: @card-link-image-height;
+        overflow: hidden;
+        img {
+            height: 100%;
+            width: 100%;
+            object-fit: cover;
+            object-position: center center;
+        }
+    }
+    .ant-card-body {
+        flex-grow: 1;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        overflow: auto;
+
+        .card-link-body {
+            flex-grow: 1;
+            padding: @card-link-body-padding;
+            .card-link-title {
+                color: @card-link-head-color;
+                font: @card-link-head-font;
+                background: @card-link-head-bg;
+                padding: @card-link-head-padding;
+            }
+
+            .card-link-content {
+            }
+        }
+
+        .card-link-action {
+            flex-grow: 0;
+            flex-shrink: 0;
+            border-top: @card-link-action-border;
+
+            .ant-btn {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                color: @card-link-action-color;
+                padding: @card-link-action-padding;
+                background: @card-link-action-bg;
+                border-radius: 0px;
+                height: @card-link-action-height;
+                font: @card-link-action-font;
+
+                &:hover {
+                    color: @card-link-action-hover-color;
+                    background: @card-link-action-hover-bg;
+                }
+            }
+        }
+    }
+
+    &.card-link-horizontal {
+        display: flex;
+        .ant-card-cover {
+            flex-grow: 0;
+            flex-shrink: 0;
+        }
+    }
+
+    &.card-link-vertical {
+        display: flex;
+        flex-direction: column;
+        .ant-card-cover {
+            flex-grow: 0;
+            flex-shrink: 0;
+        }
+    }
+
+    &.ant-card-small {
+        .ant-card-cover {
+            height: @card-link-image-height-sm;
+        }
+
+        .ant-card-body {
+            .card-link-body {
+                padding: @card-link-body-padding-sm;
+                .card-link-title {
+                    color: @card-link-head-color;
+                    font: @card-link-head-font-sm;
+                    padding: @card-link-head-padding-sm;
+                }
+            }
+
+            .card-link-action {
+                .ant-btn {
+                    height: @card-link-action-height-sm;
+                    padding: @card-link-action-padding-sm;
+                    font: @card-link-action-font-sm;
+                }
+            }
+        }
+    }
+}

@@ -16,3 +16,38 @@
         }
     }
 }
+
+.ant-carousel {
+    .slick-dots {
+        position: unset;
+
+        li {
+            button {
+                border-radius: 50%;
+                background: @ant-carousel-dots-color;
+                opacity: 1;
+
+                &:hover {
+                    background: @ant-carousel-dots-color-hover;
+                }
+            }
+
+            &.slick-active {
+                button {
+                    background: @ant-carousel-dots-color-active;
+                }
+            }
+        }
+    }
+
+    .slick-next,
+    .slick-prev {
+        color: @ant-carousel-arrow-color;
+        font-size: @ant-carousel-arrow-size;
+
+        &:hover,
+        &:focus {
+            color: @ant-carousel-arrow-color-hover;
+        }
+    }
+}
