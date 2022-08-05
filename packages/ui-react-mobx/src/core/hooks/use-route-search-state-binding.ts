@@ -42,8 +42,8 @@ export const useRouteSearchStateBinding = (props: RouteSearchStateBindingProps) 
         currentStateParams.forEach((value, key) => {
             if (!initialUrlParams.has(key)) {
                 shouldReplaceUrl = true;
+                initialUrlParams.set(key, value);
             }
-            initialUrlParams.set(key, value);
         });
 
         if (shouldReplaceUrl) {
