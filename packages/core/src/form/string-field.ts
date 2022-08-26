@@ -11,7 +11,7 @@ export type StringField = FormField<typeof STRING_FIELD_ID, string, StringFieldC
 
 setFormFieldSerializer(STRING_FIELD_ID, {
     toString: (formField) => {
-        return `${formField.value}`;
+        return `"${formField.value}"`;
     }
 });
 

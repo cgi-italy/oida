@@ -77,6 +77,15 @@ export type AoiField<IMPORT_CONFIG = any, MAP_COMPONENT_TYPE = any> = FormField<
 setFormFieldSerializer(AOI_FIELD_ID, {
     toString: (formField) => {
         return formField.value?.props?.name || formField.value?.geometry.type || 'unspecified';
+    },
+    toJSON: (value) => {
+        return {
+            geometry: value.geometry,
+            props: {
+                name: value.props?.name,
+                fromMapViewport: value.props?.fromMapViewport
+            }
+        };
     }
 });
 
