@@ -67,7 +67,7 @@ export const bindAoiValueToMap = (props: bindAoiValueToMapProps) => {
                     aoiInstance.geometry.setValue(value.geometry);
                     aoiInstance.setName(valueProps.name ? valueProps.name : value.geometry.type);
 
-                    if (!valueProps.id) {
+                    if (valueProps.id !== aoiInstance.id.toString()) {
                         props.setter({
                             geometry: value.geometry,
                             props: {
