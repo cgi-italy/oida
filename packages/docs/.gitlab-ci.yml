@@ -48,7 +48,7 @@ deploy_docs:
   stage: deploy
   image: dtzar/helm-kubectl
   script:
-    - kubectl config set-cluster k8s --server="${K8S_CLUSTER_ADDRESS}"
+    - kubectl config set-cluster k8s --server="${K8S_CLUSTER_ADDRESS}" --insecure-skip-tls-verify=true
     - kubectl config set-credentials ${K8S_USER} --token=${K8S_TOKEN}
     - kubectl config set-context default --cluster=k8s --user=${K8S_USER} --namespace=${K8S_NAMESPACE}
     - kubectl config use-context default
