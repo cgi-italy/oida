@@ -1,8 +1,10 @@
 import React, { useEffect, useRef } from 'react';
+import { reaction } from 'mobx';
 import classNames from 'classnames';
 import useResizeAware from 'react-resize-aware';
 
 import { Map, MapRendererController } from '@oidajs/state-mobx';
+
 import { useMapModule } from '../hooks';
 
 export type MapComponentProps = {
@@ -17,39 +19,47 @@ export const MapComponent = (props: MapComponentProps) => {
     const [resizeListener, size] = useResizeAware();
 
     const mapContainer = useRef<HTMLDivElement>(null);
-    let rendererController: MapRendererController;
 
     useEffect(() => {
-        if (size && size.width && size.height) {
-            mapState.view.setDomTarget(mapContainer.current || undefined);
-        } else {
-            mapState.view.setDomTarget(undefined);
+        const currentContainer = mapContainer.current;
+        if (currentContainer) {
+            mapState.view.setDomTarget(currentContainer);
+            let rendererController: MapRendererController | undefined = new MapRendererController({
+                state: mapState
+            });
+            // currently we don't support multiple renderer controllers for the same map state
+            // when the map target changes, we destroy the map renderer controller and we wait
+            // for the map target to become undefined (i.e. the other map component is destroyed) to reinitialize it
+            const targetStolenReactionDisposer = reaction(
+                () => mapState.view.target,
+                (target) => {
+                    if (!target) {
+                        // the map state is again available. we restart the map rendering controller
+                        mapState.view.setDomTarget(currentContainer);
+                        rendererController = new MapRendererController({
+                            state: mapState
+                        });
+                    } else if (target !== currentContainer && rendererController) {
+                        // someone stole our map state. we stop map rendering in our component
+                        rendererController.destroy();
+                        rendererController = undefined;
+                    }
+                }
+            );
+
+            return () => {
+                targetStolenReactionDisposer();
+                if (rendererController) {
+                    rendererController.destroy();
+                }
+                mapState.view.setDomTarget(undefined);
+            };
         }
-
-        return () => {
-            mapState.view.setDomTarget(undefined);
-        };
-    }, [mapState, mapContainer]);
-
-    useEffect(() => {
-        rendererController = new MapRendererController({
-            state: mapState
-        });
-
-        return () => {
-            rendererController.destroy();
-        };
     }, [mapState]);
 
     useEffect(() => {
         if (size && size.width && size.height) {
-            if (!mapState.view.target) {
-                mapState.view.setDomTarget(mapContainer.current || undefined);
-            } else {
-                mapState.renderer.implementation?.updateSize();
-            }
-        } else {
-            mapState.view.setDomTarget(undefined);
+            mapState.renderer.implementation?.updateSize();
         }
     }, [size]);
 
