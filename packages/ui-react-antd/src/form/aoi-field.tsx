@@ -1,16 +1,13 @@
 import React, { useState, useMemo, useEffect } from 'react';
-
 import { Tag, Button, Tooltip, Drawer, Popover, Modal } from 'antd';
+import { EnvironmentOutlined, LinkOutlined, EditOutlined, ImportOutlined, CloseOutlined } from '@ant-design/icons';
 
-import { EnvironmentOutlined, LinkOutlined, EditOutlined, ImportOutlined } from '@ant-design/icons';
-
-import { AoiField, AoiAction, AOI_FIELD_ID } from '@oidajs/core';
+import { AoiField, AoiAction, AOI_FIELD_ID, getTextColorForBackground } from '@oidajs/core';
 import { AoiImportConfig, FormFieldRendererBaseProps } from '@oidajs/ui-react-core';
 
 import { DrawLineIcon } from '../icons/draw-line';
 import { DrawBboxIcon } from '../icons/draw-bbox';
 import { DrawPolygonIcon } from '../icons/draw-polygon';
-
 import { antdFormFieldRendererFactory } from './antd-form-field-renderer-factory';
 import { AoiImportRenderer } from './aoi-import';
 import { AoiTextEditor } from './aoi-text-editor';
@@ -124,6 +121,7 @@ export const AoiFieldRenderer = (props: AoiFieldRendererProps) => {
 
     const EmbeddedMapComponent = props.config.embeddedMapComponent;
 
+    const tagTextColor = color ? getTextColorForBackground(color) : undefined;
     return (
         <React.Fragment>
             {value && (
@@ -145,11 +143,19 @@ export const AoiFieldRenderer = (props: AoiFieldRendererProps) => {
                         evt.stopPropagation();
                         props.onChange(undefined);
                     }}
+                    style={{
+                        color: tagTextColor
+                    }}
+                    closeIcon={<CloseOutlined style={{ color: tagTextColor }} />}
                 >
                     {name}
                 </Tag>
             )}
-            {!value && <Tag color='#dddddd'>No area specified</Tag>}
+            {!value && (
+                <Tag color='#dddddd' style={{ color: 'black' }}>
+                    No area specified
+                </Tag>
+            )}
             {!readonly && (
                 <Button.Group size='small' className='aoi-draw-actions'>
                     {aoiControls.point && (
@@ -234,44 +240,49 @@ export const AoiFieldRenderer = (props: AoiFieldRendererProps) => {
                     )}
                 </Button.Group>
             )}
-            {!readonly && (
-                <Button.Group className='aoi-edit-actions' size='small'>
-                    {
-                        <Tooltip title='Edit aoi'>
-                            <Popover
-                                className='aoi-editor-popover'
-                                content={<AoiTextEditor value={value} onChange={onChange} supportedGeometries={supportedGeometries} />}
-                                destroyTooltipOnHide={true}
-                                title='Edit area'
-                                visible={editorVisible}
-                                onVisibleChange={(visible) => setEditorVisible(visible)}
-                                trigger='click'
-                                zIndex={1050}
-                            >
-                                <Button type={editorVisible ? 'primary' : 'default'}>
-                                    <EditOutlined />
-                                </Button>
-                            </Popover>
-                        </Tooltip>
-                    }
-                    {aoiControls.import && (
-                        <Tooltip title='Import area'>
-                            <Button
-                                type={activeAction === AoiAction.Import ? 'primary' : 'default'}
-                                onClick={() => {
-                                    if (activeAction === AoiAction.Import) {
-                                        onActiveActionChange(AoiAction.None);
-                                    } else {
-                                        onActiveActionChange(AoiAction.Import);
-                                    }
-                                }}
-                            >
-                                <ImportOutlined />
+            <Button.Group className='aoi-edit-actions' size='small'>
+                {(value || !readonly) && (
+                    <Tooltip title={readonly ? 'View aoi' : 'Edit aoi'}>
+                        <Popover
+                            className='aoi-editor-popover'
+                            content={
+                                <AoiTextEditor
+                                    value={value}
+                                    onChange={onChange}
+                                    supportedGeometries={supportedGeometries}
+                                    readonly={readonly}
+                                />
+                            }
+                            destroyTooltipOnHide={true}
+                            title={readonly ? 'Area' : 'Edit area'}
+                            visible={editorVisible}
+                            onVisibleChange={(visible) => setEditorVisible(visible)}
+                            trigger='click'
+                            zIndex={1050}
+                        >
+                            <Button type={editorVisible ? 'primary' : 'default'}>
+                                <EditOutlined />
                             </Button>
-                        </Tooltip>
-                    )}
-                </Button.Group>
-            )}
+                        </Popover>
+                    </Tooltip>
+                )}
+                {!readonly && aoiControls.import && (
+                    <Tooltip title='Import area'>
+                        <Button
+                            type={activeAction === AoiAction.Import ? 'primary' : 'default'}
+                            onClick={() => {
+                                if (activeAction === AoiAction.Import) {
+                                    onActiveActionChange(AoiAction.None);
+                                } else {
+                                    onActiveActionChange(AoiAction.Import);
+                                }
+                            }}
+                        >
+                            <ImportOutlined />
+                        </Button>
+                    </Tooltip>
+                )}
+            </Button.Group>
             {aoiControls.import && importConfig && !readonly && (
                 <Drawer
                     push={false}

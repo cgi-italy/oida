@@ -93,6 +93,7 @@ export type AoiFieldFactoryProps = {
     name: string;
     title?: string;
     required?: boolean;
+    readonly?: boolean;
     rendererConfig?: FormFieldRendererConfig;
     supportedActions: AoiAction[];
     supportedGeometries: AoiSupportedGeometry[];

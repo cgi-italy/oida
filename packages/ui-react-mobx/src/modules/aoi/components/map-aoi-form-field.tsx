@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useLocalObservable } from 'mobx-react';
 
 import { getAoiFieldFactory, AoiFieldFactoryProps, AoiValue, AoiField } from '@oidajs/core';
 import { FormFieldRendererFactory, getDefaultFormFieldRendererFactory, AoiImportConfig } from '@oidajs/ui-react-core';
-import { useEffect } from 'react';
+
 import { useAoiModule } from '../hooks';
 import { bindAoiValueToMap } from '../utils/bind-aoi-value-to-map';
-import { useLocalObservable } from 'mobx-react';
 import { useSelector } from '../../../core/hooks/use-selector';
 
 export type MapAoiFormFieldProps = AoiFieldFactoryProps & {

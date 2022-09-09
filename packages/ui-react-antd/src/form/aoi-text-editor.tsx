@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import copyToClipboard from 'copy-to-clipboard';
 import { Input, Button, message, Tooltip, Select, Typography } from 'antd';
-import { CopyOutlined, CheckOutlined, CloseOutlined, UndoOutlined } from '@ant-design/icons';
+import { CopyOutlined, CheckOutlined, UndoOutlined } from '@ant-design/icons';
 
 import { AoiSupportedGeometry, AoiValue, FormFieldState } from '@oidajs/core';
 import { AoiTextFormat, bboxAoiFormat, wktAoiFormat, geoJsonAoiFormat } from './aoi-text-format';
@@ -9,6 +9,7 @@ import { AoiTextFormat, bboxAoiFormat, wktAoiFormat, geoJsonAoiFormat } from './
 export type AoiTextEditorProps = {
     supportedGeometries: AoiSupportedGeometry[];
     formats?: AoiTextFormat[];
+    readonly?: boolean;
 } & FormFieldState<AoiValue>;
 
 export const AoiTextEditor = (props: AoiTextEditorProps) => {
@@ -113,6 +114,7 @@ export const AoiTextEditor = (props: AoiTextEditorProps) => {
                         setTextAreaValue(evt.target.value);
                         setInputChanged(true);
                     }}
+                    readOnly={props.readonly}
                     placeholder={`Paste a ${props.formats?.map((format) => format.name).join(', ')} string`}
                     autoSize={{ minRows: 2, maxRows: 5 }}
                 />
