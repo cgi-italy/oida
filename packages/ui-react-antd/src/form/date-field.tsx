@@ -243,6 +243,8 @@ export const DateFieldRenderer = (props: FormFieldRendererBaseProps<DateField> &
                 open={open}
                 mode={mode}
                 showToday={false}
+                // update the value on calendar select, without the need to press the "OK" button
+                onSelect={config.withTime ? onDateChange : undefined}
                 onOpenChange={(open) => {
                     if (readonly) {
                         return;
