@@ -17,9 +17,6 @@ export type AoiFieldRendererProps = FormFieldRendererBaseProps<AoiField<AoiImpor
 };
 
 export const AoiFieldRenderer = (props: AoiFieldRendererProps) => {
-    const [editorVisible, setEditorVisible] = useState(false);
-    const [mapVisible, setMapVisible] = useState(false);
-
     const { value, onChange, readonly, config } = props;
     const {
         supportedActions,
@@ -34,6 +31,20 @@ export const AoiFieldRenderer = (props: AoiFieldRendererProps) => {
         onVisibleAction,
         onCenterAction
     } = config;
+
+    const [editorVisible, setEditorVisible] = useState(false);
+    const [mapVisible, setMapVisible] = useState(() => {
+        if (
+            activeAction === AoiAction.DrawPoint ||
+            activeAction === AoiAction.DrawLine ||
+            activeAction === AoiAction.DrawBBox ||
+            activeAction === AoiAction.DrawPolygon
+        ) {
+            return true;
+        } else {
+            return false;
+        }
+    });
 
     const aoiControls = useMemo(() => {
         const point =

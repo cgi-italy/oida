@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useLocalObservable } from 'mobx-react';
 
 import { getAoiFieldFactory, AoiFieldFactoryProps, AoiValue, AoiField } from '@oidajs/core';
@@ -24,14 +24,16 @@ export const MapAoiFormField = (props: MapAoiFormFieldProps) => {
     }));
 
     const aoiFieldFactory = getAoiFieldFactory();
-    const aoiFieldConfig = aoiFieldFactory(props);
+    const aoiFieldConfig = useMemo(() => {
+        return aoiFieldFactory(props);
+    }, []);
 
     const formFieldRendererFactory = props.fieldRendererFactory || getDefaultFormFieldRendererFactory();
 
-    const AoiField = formFieldRendererFactory.getRenderer<AoiField<AoiImportConfig>>(aoiFieldConfig)?.FormFieldRenderer;
-    if (!AoiField) {
-        return null;
-    }
+    // NB: without the memo the AoiField is recreated every time the dom tree is updated
+    const AoiField = useMemo(() => {
+        return formFieldRendererFactory.getRenderer<AoiField<AoiImportConfig>>(aoiFieldConfig)?.FormFieldRenderer;
+    }, []);
 
     const aoiModule = useAoiModule(props.aoiModuleId);
 
@@ -49,6 +51,10 @@ export const MapAoiFormField = (props: MapAoiFormFieldProps) => {
     }, []);
 
     const aoiValue = useSelector(() => aoi.value);
+
+    if (!AoiField) {
+        return null;
+    }
 
     return (
         <AoiField
