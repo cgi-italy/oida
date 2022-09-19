@@ -5,10 +5,14 @@ import classnames from 'classnames';
 
 export type AppHeaderNavItem = {
     id: string;
-    title: string;
+    title: React.ReactNode;
     icon?: React.ReactNode;
     onClick?: () => void;
     subitems?: AppHeaderNavItem[];
+    href?: {
+        src: string;
+        target?: string;
+    };
 };
 
 export type AppHeaderProps = {
@@ -25,6 +29,15 @@ const getMenuElement = (item: AppHeaderNavItem) => {
         const subItems = item.subitems.map((item) => {
             return getMenuElement(item);
         });
+
+        const content = item.href ? (
+            <a href={item.href.src} target={item.href.target || '_blank'}>
+                {item.title}
+            </a>
+        ) : (
+            <span>{item.title}</span>
+        );
+
         return (
             <Menu.SubMenu
                 key={item.id}
@@ -32,7 +45,7 @@ const getMenuElement = (item: AppHeaderNavItem) => {
                 onTitleClick={item.onClick}
                 title={
                     <React.Fragment>
-                        <span>{item.title}</span>
+                        <span>{content}</span>
                         <DownOutlined />
                     </React.Fragment>
                 }
@@ -42,9 +55,16 @@ const getMenuElement = (item: AppHeaderNavItem) => {
             </Menu.SubMenu>
         );
     } else {
+        const content = item.href ? (
+            <a href={item.href.src} target={item.href.target || '_blank'}>
+                {item.title}
+            </a>
+        ) : (
+            item.title
+        );
         return (
             <Menu.Item key={item.id} icon={item.icon} onClick={item.onClick}>
-                {item.title}
+                {content}
             </Menu.Item>
         );
     }
