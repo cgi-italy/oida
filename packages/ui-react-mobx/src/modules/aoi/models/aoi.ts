@@ -10,12 +10,14 @@ export type AoiProps = {
     name: string;
     color?: string;
     properties?: Record<string, any>;
+    pickable?: boolean;
 } & Omit<EntityProps, 'entityType'> &
     GeometryProps;
 
 export class Aoi extends Entity implements HasGeometry {
     @observable.ref name: string;
     @observable.ref geometry: GeometryState;
+    @observable.ref pickable: boolean;
     readonly properties: Record<string, any> | undefined;
     @observable.ref protected baseColor_: string;
 
@@ -27,6 +29,7 @@ export class Aoi extends Entity implements HasGeometry {
         this.baseColor_ = props.color || generateAoiColor();
         this.name = props.name;
         this.geometry = new GeometryState(props);
+        this.pickable = typeof props.pickable === 'boolean' ? props.pickable : true;
         this.properties = props.properties;
 
         makeObservable(this);
@@ -46,5 +49,10 @@ export class Aoi extends Entity implements HasGeometry {
     @action
     setName(name: string) {
         this.name = name;
+    }
+
+    @action
+    setPickable(pickable: boolean) {
+        this.pickable = pickable;
     }
 }
