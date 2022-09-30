@@ -45,6 +45,7 @@ export const bindAoiValueToMap = (props: bindAoiValueToMapProps) => {
                     debouncedAoiUpdate.cancel();
                 }
 
+                aoiInstance = aoiInstance || (valueProps.id ? props.aois.itemWithId(valueProps.id) : undefined);
                 if (!aoiInstance) {
                     aoiInstance = new Aoi({
                         id: `filterAoi${nextAoiId++}`,
