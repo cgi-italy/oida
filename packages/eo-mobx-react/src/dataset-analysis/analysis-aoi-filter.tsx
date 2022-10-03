@@ -66,10 +66,12 @@ export const AnalysisAoiFilter = (props: AnalysisAoiFilterProps) => {
 
     const isLinked = useSelector(() => props.analysis.aoi?.shared || false, [props.analysis]);
 
-    const value = geometryValue
+    const value: AoiValue | undefined = geometryValue
         ? {
               geometry: geometryValue,
-              name: aoi?.name
+              props: {
+                  name: aoi?.name
+              }
           }
         : undefined;
 
@@ -134,20 +136,7 @@ export const AnalysisAoiFilter = (props: AnalysisAoiFilterProps) => {
                 </Tooltip>
             )}
             <div className='aoi-field-container' ref={drop}>
-                <AoiFieldRenderer
-                    config={aoiFilterConfig}
-                    value={
-                        geometryValue
-                            ? {
-                                  geometry: geometryValue,
-                                  props: {
-                                      name: aoi?.name
-                                  }
-                              }
-                            : undefined
-                    }
-                    onChange={onChange}
-                />
+                <AoiFieldRenderer config={aoiFilterConfig} value={value} onChange={onChange} />
             </div>
             {isLinked && (
                 <Tooltip title='Unlink'>
