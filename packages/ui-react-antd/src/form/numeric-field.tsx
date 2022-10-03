@@ -11,7 +11,8 @@ import { antdFormFieldRendererFactory } from './antd-form-field-renderer-factory
 export type NumericFieldRendererProps = {
     changeDelay?: number;
     useSlider?: boolean;
-} & Omit<InputNumberProps, 'onChange' | 'onPressEnter' | 'value'>;
+    formatter?: (value: number) => string;
+} & Omit<InputNumberProps, 'onChange' | 'onPressEnter' | 'value' | 'formatter'>;
 
 export const NumericFieldRenderer = (props: FormFieldRendererBaseProps<NumericField> & NumericFieldRendererProps) => {
     const [inputValue, setInputValue] = useState(props.value);
@@ -42,7 +43,7 @@ export const NumericFieldRenderer = (props: FormFieldRendererBaseProps<NumericFi
     }, [inputValue]);
 
     const onInputChange = (value) => {
-        setInputValue(value || undefined);
+        setInputValue(typeof value === 'number' ? value : undefined);
     };
 
     const onEnterPress = () => {
@@ -51,13 +52,26 @@ export const NumericFieldRenderer = (props: FormFieldRendererBaseProps<NumericFi
         }
     };
 
-    const { value, onChange, title, required, config, autoFocus, changeDelay, readonly, useSlider, ...renderProps } = props;
+    const { value, onChange, title, required, config, autoFocus, changeDelay, readonly, useSlider, formatter, ...renderProps } = props;
 
     const showSlider = useSlider && config.min !== undefined && config.max !== undefined && !readonly;
 
     return (
         <div className='numeric-field'>
-            {showSlider && <Slider value={props.value} onChange={props.onChange} min={config.min} max={config.max} step={config.step} />}
+            {showSlider && (
+                <Slider
+                    value={inputValue}
+                    onChange={onInputChange}
+                    min={config.min}
+                    max={config.max}
+                    step={config.step}
+                    marks={{
+                        [config.min!]: formatter ? formatter(config.min!) : config.min,
+                        [config.max!]: formatter ? formatter(config.max!) : config.max
+                    }}
+                    included={false}
+                />
+            )}
             <InputNumber
                 value={inputValue}
                 onPressEnter={onEnterPress}
@@ -68,6 +82,7 @@ export const NumericFieldRenderer = (props: FormFieldRendererBaseProps<NumericFi
                 max={config.max}
                 step={config.step}
                 readOnly={readonly}
+                formatter={formatter ? (value) => formatter(value as number) : undefined}
                 {...renderProps}
             ></InputNumber>
         </div>
