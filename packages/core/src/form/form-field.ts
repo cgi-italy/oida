@@ -38,6 +38,10 @@ export type FormFieldCommon<TYPE extends string> = {
      */
     required?: boolean;
     /**
+     * When set the field will not be visible
+     */
+    hidden?: boolean;
+    /**
      * Flag indicating if the field should be focused on form creation
      */
     autoFocus?: boolean;
@@ -94,3 +98,8 @@ export type IFormField<TYPE extends IFormFieldType = IFormFieldType> = IFormFiel
     FormFieldState<IFormFieldValueTypes[TYPE]>;
 
 export type FormFieldValues = Map<string, any>;
+
+// utility types
+export type ExtractFormFieldType<IT extends FormField<any, any, any>> = IT extends FormField<infer TYPE, any, any> ? TYPE : never;
+export type ExtractFormFieldValue<IT extends FormField<any, any, any>> = IT extends FormField<any, infer T, any> ? T : never;
+export type ExtractFormFieldConfig<IT extends FormField<any, any, any>> = IT extends FormField<any, any, infer CONFIG> ? CONFIG : never;
