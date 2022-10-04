@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { reaction } from 'mobx';
 import { Button, Select, Space, Tooltip } from 'antd';
 import { UpOutlined, DownOutlined, FilterOutlined, SearchOutlined } from '@ant-design/icons';
 import classnames from 'classnames';
@@ -110,7 +109,6 @@ export const DropdownFilterer = (props: DropdownFiltererProps) => {
                     <Select
                         mode='tags'
                         value={tags.map((option) => option.value)}
-                        bordered={!!props.mainFilter}
                         onSearch={(value) => {
                             if (!formVisible) {
                                 setSearchValue(value);
@@ -120,12 +118,14 @@ export const DropdownFilterer = (props: DropdownFiltererProps) => {
                             }
                         }}
                         onMouseDown={(evt) => {
-                            ignoreNextDocumentClick.current = true;
+                            if (formVisible) {
+                                ignoreNextDocumentClick.current = true;
+                            }
                             const target = evt.target as HTMLElement;
                             if (target.closest('.dropdown-filterer') === elementRef.current) {
                                 if (props.mainFilter) {
                                     if (target.className === 'ant-select-selection-item-content') {
-                                        setFormVisible(true);
+                                        setFormVisible(!formVisible);
                                     } else {
                                         if (target.className === 'ant-select-selection-overflow') {
                                             const input: HTMLInputElement = target.getElementsByTagName('input')[0];
@@ -141,7 +141,7 @@ export const DropdownFilterer = (props: DropdownFiltererProps) => {
                                         setFormVisible(false);
                                     }
                                 } else {
-                                    setFormVisible(true);
+                                    setFormVisible(!formVisible);
                                 }
                             } else {
                                 setTimeout(() => {
@@ -181,7 +181,12 @@ export const DropdownFilterer = (props: DropdownFiltererProps) => {
                     <Tooltip title='Filtering options'>
                         <Button
                             size='small'
-                            onClick={() => {
+                            onMouseDown={() => {
+                                if (formVisible) {
+                                    ignoreNextDocumentClick.current = true;
+                                }
+                            }}
+                            onClick={(evt) => {
                                 setFormVisible(!formVisible);
                             }}
                         >
