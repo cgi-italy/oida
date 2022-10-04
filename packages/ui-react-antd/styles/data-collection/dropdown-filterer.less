@@ -1,0 +1,67 @@
+.dropdown-filterer {
+    overflow: hidden;
+    display: flex;
+    align-items: stretch;
+    position: relative;
+    width: 100%;
+
+    > .anticon {
+        position: absolute;
+        z-index: 10;
+        top: 8px;
+        left: 8px;
+    }
+    .ant-select {
+        flex-grow: 1;
+        flex-shrink: 1;
+        overflow: hidden;
+        .ant-select-selector {
+            padding: 1px 28px;
+            .ant-select-selection-overflow {
+                padding-right: 10px;
+                .ant-select-selection-overflow-item-suffix {
+                    flex-grow: 1;
+                    display: flex;
+                    .ant-select-selection-search {
+                        flex-grow: 1;
+                    }
+                }
+            }
+        }
+    }
+
+    .ant-btn {
+        position: absolute;
+        top: 1px;
+        bottom: 1px;
+        right: 1px;
+        height: auto;
+        z-index: 10;
+
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+
+        &:not(:hover) {
+            &:not(:focus) {
+                border-top-color: transparent;
+                border-right-color: transparent;
+                border-bottom-color: transparent;
+            }
+        }
+    }
+
+    &:not(.is-searchable) {
+        .ant-select-selection-search {
+            display: none;
+        }
+    }
+}
+
+.dropdown-filterer-form {
+    padding: 10px 20px 10px 10px;
+
+    .dropdown-filterer-form-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+}

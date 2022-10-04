@@ -22,7 +22,9 @@ export const InputFieldRenderer = (props: FormFieldRendererBaseProps<StringField
     useEffect(() => {
         if (props.changeDelay) {
             let debounceTimeout: number | undefined = window.setTimeout(() => {
-                props.onChange(inputValue);
+                if (inputValue !== props.value) {
+                    props.onChange(inputValue);
+                }
                 debounceTimeout = undefined;
             }, props.changeDelay);
 
@@ -32,7 +34,9 @@ export const InputFieldRenderer = (props: FormFieldRendererBaseProps<StringField
                 }
             };
         } else {
-            props.onChange(inputValue);
+            if (inputValue !== props.value) {
+                props.onChange(inputValue);
+            }
         }
     }, [inputValue]);
 
@@ -41,7 +45,9 @@ export const InputFieldRenderer = (props: FormFieldRendererBaseProps<StringField
     };
 
     const onEnterPress = () => {
-        props.onChange(inputValue || undefined);
+        if (inputValue !== props.value) {
+            props.onChange(inputValue || undefined);
+        }
     };
 
     const { value, onChange, title, required, config, autoFocus, changeDelay, readonly, ...renderProps } = props;

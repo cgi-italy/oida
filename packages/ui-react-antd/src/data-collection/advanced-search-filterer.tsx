@@ -43,6 +43,10 @@ export type AdvancedSearchFiltererProps = {
     searchIcon?: React.ReactNode;
     expandButtonIcon?: React.ReactNode;
 } & DataFiltererProps;
+
+/**
+ * @deprecated Use {@link DropdownFilterer} instead
+ */
 export const AdvancedSearchFilterer = (props: AdvancedSearchFiltererProps) => {
     const { mainFilter, expandButtonTooltip, expandButtonIcon, searchIcon, ...formProps } = props;
     const [advancedSearchVisible, setAdvancedSearchVisible] = useState(false);

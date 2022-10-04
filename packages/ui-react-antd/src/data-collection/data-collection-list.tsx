@@ -1,12 +1,12 @@
 import React from 'react';
 import classnames from 'classnames';
 
-import { DataCollectionProps, DataPagerRenderer, DataSorterRenderer, DataFiltererRenderer, DataPagerProps } from '@oidajs/ui-react-core';
+import { DataCollectionProps, DataPagerRenderer, DataSorterRenderer, DataFiltererRenderer } from '@oidajs/ui-react-core';
 
 import { DataCollectionItemsList, DataCollectionItemsListProps } from './data-collection-items-list';
 import { DataPager } from './data-pager';
 import { DataSortCombo } from './data-sort-combo';
-import { AdvancedSearchFilterer } from './advanced-search-filterer';
+import { DropdownFilterer } from './dropdown-filterer';
 
 export type DataCollectionListProps<T> = {
     pagerRender?: DataPagerRenderer;
@@ -51,5 +51,5 @@ export const DataCollectionList = <T extends object>(props: DataCollectionListPr
 
 DataCollectionList.defaultProps = {
     sortRender: DataSortCombo,
-    filtererRender: AdvancedSearchFilterer
+    filtererRender: DropdownFilterer
 };
