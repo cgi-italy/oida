@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-import { InputNumber, Slider } from 'antd';
+import { InputNumber, Slider, SliderSingleProps } from 'antd';
 import { InputNumberProps } from 'antd/lib/input-number';
 
 import { NumericField, NUMERIC_FIELD_ID } from '@oidajs/core';
@@ -12,6 +12,7 @@ export type NumericFieldRendererProps = {
     changeDelay?: number;
     useSlider?: boolean;
     formatter?: (value: number) => string;
+    sliderProps?: Omit<Partial<SliderSingleProps>, 'value' | 'onChange' | 'min' | 'max' | 'step'>;
 } & Omit<InputNumberProps, 'onChange' | 'onPressEnter' | 'value' | 'formatter'>;
 
 export const NumericFieldRenderer = (props: FormFieldRendererBaseProps<NumericField> & NumericFieldRendererProps) => {
@@ -52,7 +53,8 @@ export const NumericFieldRenderer = (props: FormFieldRendererBaseProps<NumericFi
         }
     };
 
-    const { value, onChange, title, required, config, autoFocus, changeDelay, readonly, useSlider, formatter, ...renderProps } = props;
+    const { value, onChange, title, required, config, autoFocus, changeDelay, readonly, useSlider, formatter, sliderProps, ...inputProps } =
+        props;
 
     const showSlider = useSlider && config.min !== undefined && config.max !== undefined && !readonly;
 
@@ -70,6 +72,7 @@ export const NumericFieldRenderer = (props: FormFieldRendererBaseProps<NumericFi
                         [config.max!]: formatter ? formatter(config.max!) : config.max
                     }}
                     included={false}
+                    {...sliderProps}
                 />
             )}
             <InputNumber
@@ -83,7 +86,7 @@ export const NumericFieldRenderer = (props: FormFieldRendererBaseProps<NumericFi
                 step={config.step}
                 readOnly={readonly}
                 formatter={formatter ? (value) => formatter(value as number) : undefined}
-                {...renderProps}
+                {...inputProps}
             ></InputNumber>
         </div>
     );
