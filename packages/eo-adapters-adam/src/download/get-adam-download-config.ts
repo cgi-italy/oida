@@ -140,7 +140,10 @@ export const getAdamDatasetDownloadConfig = (
                     },
                     rendererConfig: {
                         props: {
-                            useSlider: true
+                            useSlider: true,
+                            sliderProps: {
+                                included: true
+                            }
                         }
                     }
                 }

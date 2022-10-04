@@ -84,6 +84,11 @@ export const createAdamRasterTileSourceProvider = (
             } else {
                 subsets.push(timeSubset);
             }
+        } else if (datasetConfig.fixedTime instanceof Date) {
+            const timeSubset = getWcsTimeFilterSubset(datasetConfig.fixedTime);
+            if (timeSubset) {
+                subsets.push(timeSubset);
+            }
         }
 
         const bandMode = rasterView.bandMode;

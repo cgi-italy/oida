@@ -13,6 +13,11 @@ export const downloadAdamWcsRaster = (datasetConfig: AdamWcsDatasetConfig, raste
         } else {
             subsets.push(timeSubset);
         }
+    } else if (datasetConfig.fixedTime instanceof Date) {
+        const timeSubset = getWcsTimeFilterSubset(datasetConfig.fixedTime);
+        if (timeSubset) {
+            subsets.push(timeSubset);
+        }
     }
 
     const aoiParams = getAoiWcsParams(datasetConfig, rasterView.dataset.aoi);
