@@ -78,7 +78,7 @@ generate_docs:
   trigger:
     include: packages/docs/.gitlab-ci.yml
     strategy: depend
-  allow_failure: false
+  allow_failure: true
   variables:
     PARENT_PIPELINE_ID: $CI_PIPELINE_ID
   only:
