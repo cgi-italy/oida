@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.4.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/core@4.3.0...@oidajs/core@4.4.0) (2022-10-05)
+
+
+### Bug Fixes
+
+* add readonly support in aoi field ([14b0ee6](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/14b0ee6b239ac8bb585ecd6c5a1cf1071281118d))
+* omit id in aoi field serialization ([5b2e3f4](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/5b2e3f48ad2d10c74bf2f4290fce661df3531937))
+
+
+### Features
+
+* add support for field label with checkbox in antd form renderer ([fcd21c9](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/fcd21c953c1f619f39c0d612c8e154de844de5eb))
+* add util for date extraction from string (e.g. filename) ([d08b1c2](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/d08b1c2342ad0725e1b087e75ed0c0c6fd37aae0))
+* add util to transform a geometry into a GeoJSON geometry ([f8fb189](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/f8fb189af8954ac8b9521d057e34d57fe4729167))
+* add utility for string capitalization ([cba4ebe](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/cba4ebe38f65b6bb4f857f5c1dd29b47fa4f6154))
+
+
+
+
+
 # [4.3.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/core@4.2.0...@oidajs/core@4.3.0) (2022-07-13)
 
 

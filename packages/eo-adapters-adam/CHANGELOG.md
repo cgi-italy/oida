@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.0.1](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-adapters-adam@3.0.0...@oidajs/eo-adapters-adam@3.0.1) (2022-10-05)
+
+
+### Bug Fixes
+
+* force specify time subsetting parameter for fixed date datasets ([5141e72](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/5141e72ac165540814f7131316a6c0346b223d5c))
+
+
+
+
+
 # [3.0.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-adapters-adam@2.3.0...@oidajs/eo-adapters-adam@3.0.0) (2022-07-13)
 
 

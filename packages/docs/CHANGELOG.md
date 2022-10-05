@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.0.4](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/docs@2.0.3...@oidajs/docs@2.0.4) (2022-10-05)
+
+**Note:** Version bump only for package @oidajs/docs
+
+
+
+
+
 ## [2.0.3](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/docs@2.0.2...@oidajs/docs@2.0.3) (2022-07-13)
 
 **Note:** Version bump only for package @oidajs/docs

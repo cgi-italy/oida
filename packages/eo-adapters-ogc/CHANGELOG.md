@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.3.1](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-adapters-ogc@2.3.0...@oidajs/eo-adapters-ogc@2.3.1) (2022-10-05)
+
+
+### Bug Fixes
+
+* handle geoserver getFeatureInfo exception ([c6ae252](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/c6ae252e824f92c81c0fa6c0510226bedf66650f))
+* handle WMS getTimeSeries service exception ([c06d22a](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/c06d22a75b153c96368d30f006d8abf2d0fa1efd))
+* set mandatory "styles" parameter in wms preview url generation ([535f35c](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/535f35c1ff9391b641968acc11a62beb715f6d2b))
+* solve wms time distribution string parsing error ([4387a22](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/4387a229143c1c50d34d2787105b687f108680bb))
+
+
+
+
+
 # [2.3.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-adapters-ogc@2.2.0...@oidajs/eo-adapters-ogc@2.3.0) (2022-07-13)
 
 

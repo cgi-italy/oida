@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.3.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/ui-react-mobx@4.2.0...@oidajs/ui-react-mobx@4.3.0) (2022-10-05)
+
+
+### Bug Fixes
+
+* add readonly support in aoi field ([14b0ee6](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/14b0ee6b239ac8bb585ecd6c5a1cf1071281118d))
+* check if an aoi have already been instantiated before creating a new one in bindAoiValueToMap ([9a3aef2](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/9a3aef20da0c9786e3b8152b41d4f95e27f6ed22))
+* force setting aoi field instance id on disequality in bindAoiValueToMap util ([145941c](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/145941ce3d8988dca18c6813c3e78fbc45a15cca))
+* implement workaround for multiple map components target stealing ([511aca1](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/511aca14d41295dd933b9a95f973743c80688d33))
+* prevent url param override in useRouteSearchStateBinding ([005938d](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/005938daf2529198346684e84d3a0cf212fcb831))
+* solve issue with aoi field re-created at each rendering cycle ([bfd97a4](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/bfd97a4434089bd29adec7ec619fdd3881c426b4))
+* sync url params with state on missing param in useRouteSearchStateBinding ([6af392d](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/6af392dba36ba2b5aa8a3355e53399c63cb643a1))
+
+
+### Features
+
+* add utility for string capitalization ([cba4ebe](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/cba4ebe38f65b6bb4f857f5c1dd29b47fa4f6154))
+* allow disabling aoi map picking ([2211164](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/2211164e4af67e09bdd499167a86aa0eec292b27))
+* allow usage of non observable arrays in UseEntityCollectionList hook ([f5ee000](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/f5ee0001983dd346dbad43ac14c16a78ff7bfc89))
+
+
+
+
+
 # [4.2.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/ui-react-mobx@4.1.1...@oidajs/ui-react-mobx@4.2.0) (2022-07-13)
 
 
