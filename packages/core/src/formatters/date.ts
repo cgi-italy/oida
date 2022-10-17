@@ -10,11 +10,11 @@ export const DateQuantity: FormatterQuantity<moment.MomentInput, DateFormatterOp
     id: 'date'
 };
 
-export const formatDate = (date: moment.MomentInput, options: DateFormatterOptions) => {
+export const formatDate = (date: moment.MomentInput, options?: DateFormatterOptions) => {
     try {
         const dt = moment.utc(date);
         if (dt.isValid()) {
-            return dt.format(options.format);
+            return dt.format(options?.format);
         } else {
             return 'N/A';
         }

@@ -175,6 +175,11 @@ export const getAdamDatasetSpatialCoverageProvider = (
                     if (timeSubset) {
                         subsets.push(timeSubset);
                     }
+                } else if (datasetConfig.fixedTime instanceof Date) {
+                    const timeSubset = getWcsTimeFilterSubset(datasetConfig.fixedTime);
+                    if (timeSubset) {
+                        subsets.push(timeSubset);
+                    }
                 }
 
                 const wcsCoverage = getCoverageWcsParams(datasetConfig, mapView.dimensions, mapView.bandMode);

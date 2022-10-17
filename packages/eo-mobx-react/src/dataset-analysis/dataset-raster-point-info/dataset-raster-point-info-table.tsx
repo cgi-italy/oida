@@ -16,6 +16,8 @@ export const DatasetRasterPointInfoTable = observer((props: DatasetRasterPointIn
 
     if (props.pointInfo.loadingState.value === LoadingState.Loading) {
         return <SyncOutlined spin />;
+    } else if (props.pointInfo.loadingState.value === LoadingState.Error) {
+        return <div>Error: {props.pointInfo.loadingState.message}</div>;
     } else {
         if (props.pointInfo.data) {
             const dimensionValues: JSX.Element[] = [];

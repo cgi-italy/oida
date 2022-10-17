@@ -3,6 +3,32 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.3.0](https://github.com/cgi-italy/oida/compare/@oidajs/ui-react-antd@6.2.0...@oidajs/ui-react-antd@6.3.0) (2022-10-05)
+
+
+### Bug Fixes
+
+* add readonly support in aoi field ([14b0ee6](https://github.com/cgi-italy/oida/commit/14b0ee6b239ac8bb585ecd6c5a1cf1071281118d))
+* solve issue with aoi field re-created at each rendering cycle ([bfd97a4](https://github.com/cgi-italy/oida/commit/bfd97a4434089bd29adec7ec619fdd3881c426b4))
+* solve some minor issues with dropdown filterer open/close behaviour ([55d1274](https://github.com/cgi-italy/oida/commit/55d127404884284c156678f0c24abd17dc7957ea))
+* use calendar event for date selection when time enabled (no need to press "OK") ([f921806](https://github.com/cgi-italy/oida/commit/f921806bc43750a5b3bc9cc0ad7064713f15bb16))
+
+
+### Features
+
+* add CardLink component ([214e4dc](https://github.com/cgi-italy/oida/commit/214e4dc1eb59d50bd817d0e9ad6ec62d76d0157b))
+* add components for content and card sections ([0ded2fd](https://github.com/cgi-italy/oida/commit/0ded2fd95c842ef97863550d8d652127865eccd6))
+* add DropdownFilterer component ([5bd4564](https://github.com/cgi-italy/oida/commit/5bd45647ced9774430b3ebc2e9840884d65f797f))
+* add presentational app header and app sidebar components ([1a5ce67](https://github.com/cgi-italy/oida/commit/1a5ce67fafb48aa0826656254c89c393d64f0ecc))
+* add support for external links in app header ([999de73](https://github.com/cgi-italy/oida/commit/999de738894e90f287ea76773554ec20eff02803))
+* add support for field label with checkbox in antd form renderer ([fcd21c9](https://github.com/cgi-italy/oida/commit/fcd21c953c1f619f39c0d612c8e154de844de5eb))
+* allow disabling item selection in data collection list ([74b8a38](https://github.com/cgi-italy/oida/commit/74b8a385b0a630bf0391539a896f805677985799))
+* support debounce in numeric range field ([acb0226](https://github.com/cgi-italy/oida/commit/acb0226c8a44d1df32acddd22cee94ca8e8c96ac))
+
+
+
+
+
 # [6.2.0](https://github.com/cgi-italy/oida/compare/@oidajs/ui-react-antd@6.1.1...@oidajs/ui-react-antd@6.2.0) (2022-07-13)
 
 

@@ -258,8 +258,13 @@ cesiumTileSourcesFactory.register(ADAM_WCS_SOURCE_ID, (config) => {
                     });
                 });
             };
+        } else {
+            tileSource.errorEvent.addEventListener((error) => {
+                if (error.timesRetried < 1) {
+                    error.retry = true;
+                }
+            });
         }
-
         return tileSource;
     }
 });

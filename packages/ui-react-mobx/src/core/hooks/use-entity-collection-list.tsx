@@ -53,8 +53,12 @@ export const useDataCollectionActions = <T,>(props: UseDataCollectionActionsProp
  * {@Link useEntityCollectionList} input props
  */
 export type UseEntityCollectionListProps<T extends IsEntity> = {
-    /** The entity array */
-    items?: IObservableArray<T>;
+    /**
+     * The entity array.
+     * If the array is not observable changes that affect
+     * the number of items (e.g. push, pop, splice, unshift) will not be tracked
+     */
+    items?: IObservableArray<T> | Array<T>;
     /** The collection actions */
     actions?: DataCollectionAction<T>[];
     /**

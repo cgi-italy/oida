@@ -1,7 +1,9 @@
-import { AxiosInstanceWithCancellation, createAxiosInstance } from '@oidajs/core';
+import { AxiosResponse } from 'axios';
 import WmsCapabilitiesParser from 'ol/format/WMSCapabilities';
 import WmsFeatureInfoParser from 'ol/format/WMSGetFeatureInfo';
 import GeoJsonParser from 'ol/format/GeoJSON';
+
+import { AxiosInstanceWithCancellation, createAxiosInstance, getXmlStringNodeValue } from '@oidajs/core';
 
 export type WmsClientConfig = {
     axiosInstance?: AxiosInstanceWithCancellation;
@@ -155,6 +157,8 @@ export class WmsClient {
                 responseType: 'text'
             })
             .then((response) => {
+                this.throwOnServiceException_(response);
+
                 try {
                     switch (format) {
                         case 'text/plain':
@@ -223,7 +227,27 @@ export class WmsClient {
                 params: requestParams
             })
             .then((response) => {
+                this.throwOnServiceException_(response);
                 return response.data;
             });
+    }
+
+    protected throwOnServiceException_(response: AxiosResponse) {
+        //Sometimes geoserver returns a service exception XML with a 200 status code
+        if (/xml/.test(response.headers['content-type'])) {
+            const parser = new DOMParser();
+            let errorMessage = 'Service error';
+            try {
+                const responseXml = parser.parseFromString(response.data, 'application/xml');
+                const exceptionNode = responseXml.getElementsByTagName('ServiceException')[0];
+                const error = getXmlStringNodeValue(exceptionNode);
+                if (error) {
+                    errorMessage = error;
+                }
+            } catch (error) {
+                // do nothing
+            }
+            throw new Error(errorMessage);
+        }
     }
 }

@@ -42,8 +42,8 @@ export const useRouteSearchStateBinding = (props: RouteSearchStateBindingProps) 
         currentStateParams.forEach((value, key) => {
             if (!initialUrlParams.has(key)) {
                 shouldReplaceUrl = true;
+                initialUrlParams.set(key, value);
             }
-            initialUrlParams.set(key, value);
         });
 
         if (shouldReplaceUrl) {
@@ -84,30 +84,33 @@ export const useRouteSearchStateBinding = (props: RouteSearchStateBindingProps) 
                 if (componentUnmounted.current) {
                     return;
                 }
-                if (!ignoreNextStateUpdate.current) {
-                    let needsUrlUpdate = false;
-                    const updatedSearchParams = new URLSearchParams(window.location.search);
-                    stateParams.forEach((value, key) => {
-                        if (value !== updatedSearchParams.get(key)) {
-                            needsUrlUpdate = true;
-                            updatedSearchParams.set(key, value);
-                        }
-                    });
-                    if (needsUrlUpdate) {
-                        if (urlUpdateTimeout) {
-                            clearTimeout(urlUpdateTimeout);
-                        }
-                        urlUpdateTimeout = setTimeout(() => {
-                            urlUpdateTimeout = undefined;
-                            navigate({
+                const shouldReplaceUrl = ignoreNextStateUpdate.current;
+                let needsUrlUpdate = false;
+                const updatedSearchParams = new URLSearchParams(window.location.search);
+                stateParams.forEach((value, key) => {
+                    if (value !== updatedSearchParams.get(key)) {
+                        needsUrlUpdate = true;
+                        updatedSearchParams.set(key, value);
+                    }
+                });
+                if (needsUrlUpdate) {
+                    if (urlUpdateTimeout) {
+                        clearTimeout(urlUpdateTimeout);
+                    }
+                    urlUpdateTimeout = setTimeout(() => {
+                        urlUpdateTimeout = undefined;
+                        navigate(
+                            {
                                 pathname: getCurrentPathname(),
                                 search: updatedSearchParams.toString()
-                            });
-                        }, 0);
-                    }
-                } else {
-                    ignoreNextStateUpdate.current = false;
+                            },
+                            {
+                                replace: shouldReplaceUrl
+                            }
+                        );
+                    }, 0);
                 }
+                ignoreNextStateUpdate.current = false;
             }
         );
 

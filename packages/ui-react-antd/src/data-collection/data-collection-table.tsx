@@ -11,7 +11,7 @@ import { LoadingState, SortOrder, SelectionMode } from '@oidajs/core';
 import { DataCollectionProps, DataPagerRenderer, DataFiltererRenderer, useScrollIntoView } from '@oidajs/ui-react-core';
 
 import { DataPager } from './data-pager';
-import { AdvancedSearchFilterer } from './advanced-search-filterer';
+import { DropdownFilterer } from './dropdown-filterer';
 import { DataCollectionItemActionButton } from './data-collection-item-action-button';
 
 export type DataCollectionTableColumn<T> = ColumnType<T> & {
@@ -290,5 +290,5 @@ DataCollectionTable.defaultProps = {
             <DataPager {...props}></DataPager>
         </div>
     ),
-    filtererRender: AdvancedSearchFilterer
+    filtererRender: DropdownFilterer
 };

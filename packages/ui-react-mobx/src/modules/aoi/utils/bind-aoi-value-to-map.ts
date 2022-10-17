@@ -45,6 +45,7 @@ export const bindAoiValueToMap = (props: bindAoiValueToMapProps) => {
                     debouncedAoiUpdate.cancel();
                 }
 
+                aoiInstance = aoiInstance || (valueProps.id ? props.aois.itemWithId(valueProps.id) : undefined);
                 if (!aoiInstance) {
                     aoiInstance = new Aoi({
                         id: `filterAoi${nextAoiId++}`,
@@ -67,7 +68,7 @@ export const bindAoiValueToMap = (props: bindAoiValueToMapProps) => {
                     aoiInstance.geometry.setValue(value.geometry);
                     aoiInstance.setName(valueProps.name ? valueProps.name : value.geometry.type);
 
-                    if (!valueProps.id) {
+                    if (valueProps.id !== aoiInstance.id.toString()) {
                         props.setter({
                             geometry: value.geometry,
                             props: {

@@ -77,6 +77,15 @@ export type AoiField<IMPORT_CONFIG = any, MAP_COMPONENT_TYPE = any> = FormField<
 setFormFieldSerializer(AOI_FIELD_ID, {
     toString: (formField) => {
         return formField.value?.props?.name || formField.value?.geometry.type || 'unspecified';
+    },
+    toJSON: (value) => {
+        return {
+            geometry: value.geometry,
+            props: {
+                name: value.props?.name,
+                fromMapViewport: value.props?.fromMapViewport
+            }
+        };
     }
 });
 
@@ -84,6 +93,7 @@ export type AoiFieldFactoryProps = {
     name: string;
     title?: string;
     required?: boolean;
+    readonly?: boolean;
     rendererConfig?: FormFieldRendererConfig;
     supportedActions: AoiAction[];
     supportedGeometries: AoiSupportedGeometry[];

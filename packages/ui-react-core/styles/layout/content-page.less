@@ -1,0 +1,21 @@
+@import '../variables.less';
+
+.content-page {
+    height: 100%;
+    width: 100%;
+    overflow: auto;
+
+    .content-page-section {
+        background: @content-page-section-odd-bg;
+
+        &:nth-child(even) {
+            background: @content-page-section-even-bg;
+        }
+
+        .content-page-section-wrapper {
+            max-width: 1240px;
+            margin: auto;
+            padding: 30px 20px;
+        }
+    }
+}

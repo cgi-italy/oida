@@ -1,6 +1,6 @@
 export const plottyToAdamWcsColormap = {
     viridis: 'MPL_viridis',
-    inferno: 'cmocean_thermal',
+    inferno: 'MPL_gnuplot',
     turbo: 'MPL_rainbow',
     rainbow: 'rainbow',
     jet: 'MPL_jet',
@@ -13,7 +13,7 @@ export const plottyToAdamWcsColormap = {
     winter: 'MPL_winter',
     bone: 'MPL_bone',
     copper: 'MPL_copper',
-    greys: 'MPL_Greys',
+    greys: 'MPL_gist_gray',
     greens: 'MPL_summer',
     bluered: 'BlueRed',
     rdbu: 'MPL_RdBu',

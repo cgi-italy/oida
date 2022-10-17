@@ -12,7 +12,7 @@ export type FormFieldWrapperProps = {
     rendererId: string;
     children: React.ReactNode;
     name?: string;
-    title?: string;
+    title?: React.ReactNode;
     description?: string;
     required?: boolean;
     readonly?: boolean;

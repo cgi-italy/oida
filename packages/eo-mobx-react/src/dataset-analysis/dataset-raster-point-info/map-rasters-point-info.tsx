@@ -20,7 +20,11 @@ const MapRastersPointInfoWidget = observer((props: MapRastersPointInfoWidgetProp
 
     const rastersData = props.combinedAnalysis.processings
         .filter((processing) => {
-            return processing.loadingState.value === LoadingState.Loading || processing.data !== undefined;
+            return (
+                processing.loadingState.value === LoadingState.Loading ||
+                processing.loadingState.value === LoadingState.Error ||
+                processing.data !== undefined
+            );
         })
         .map((analysis) => {
             return (

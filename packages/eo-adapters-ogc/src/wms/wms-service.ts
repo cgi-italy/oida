@@ -32,6 +32,7 @@ export type WmsLayerPreviewOptions = {
     width?: number;
     height?: number;
     transparent?: boolean;
+    style?: string;
 };
 
 export type WmsFeatureInfoParams = {
@@ -254,7 +255,9 @@ export class WmsService {
                 const wmsVersion = this.config_.version || '1.3.0';
                 const format = options.transparent ? 'image/png' : 'image/jpeg';
 
-                return `${this.config_.url}?service=WMS&version=${wmsVersion}&request=GetMap&layers=${layerName}&format=${format}&${
+                return `${this.config_.url}?service=WMS&version=${wmsVersion}&request=GetMap&layers=${layerName}&styles=${
+                    options.style || ''
+                }&format=${format}&${
                     wmsVersion === '1.3.0' ? 'crs' : 'srs'
                 }=${crs}&width=${width}&height=${height}&bbox=${minx},${miny},${maxx},${maxy}&transparent=${
                     options.transparent ? 'true' : 'false'

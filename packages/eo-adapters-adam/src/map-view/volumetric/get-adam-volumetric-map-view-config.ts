@@ -78,6 +78,11 @@ export const getAdamVolumetricMapViewConfig = (factoryConfig: AdamDatasetFactory
                 if (timeSubset) {
                     sourceSubsets.push(timeSubset);
                 }
+            } else if (datasetConfig.fixedTime instanceof Date) {
+                const timeSubset = getWcsTimeFilterSubset(datasetConfig.fixedTime);
+                if (timeSubset) {
+                    sourceSubsets.push(timeSubset);
+                }
             }
 
             const aoiFilter = volumetricViz.dataset.aoi;

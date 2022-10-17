@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.5.0](https://github.com/cgi-italy/oida/compare/@oidajs/eo-mobx-react@3.4.0...@oidajs/eo-mobx-react@3.5.0) (2022-10-05)
+
+
+### Bug Fixes
+
+* handle geoserver getFeatureInfo exception ([c6ae252](https://github.com/cgi-italy/oida/commit/c6ae252e824f92c81c0fa6c0510226bedf66650f))
+* solve issue in aoi value initialization in AnalysisAoiFilter ([2626007](https://github.com/cgi-italy/oida/commit/26260077f7f0e14ec113aff818ec3024d11c0359))
+
+
+### Features
+
+* add point series dimension sync with parent visualization on click ([8022433](https://github.com/cgi-italy/oida/commit/802243310fbbc1c623783ab6ccef8065d2e44e25))
+
+
+
+
+
 # [3.4.0](https://github.com/cgi-italy/oida/compare/@oidajs/eo-mobx-react@3.3.0...@oidajs/eo-mobx-react@3.4.0) (2022-07-13)
 
 

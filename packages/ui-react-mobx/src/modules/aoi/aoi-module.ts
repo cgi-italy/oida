@@ -119,6 +119,7 @@ export class AoiModule extends AppModule {
                 title: props.title || 'Area of interest',
                 rendererConfig: props.rendererConfig,
                 required: props.required,
+                readonly: props.readonly,
                 config: (filterState: FormFieldState<AoiValue>) => {
                     const aoiFieldConfig = useMapAoiFieldFromModule(
                         {

@@ -114,7 +114,7 @@ export function DatasetPointSeriesChart(props: DatasetPointSeriesChartProps) {
                 loadingState = LoadingState.Success;
             } else if (series.loadingState.value === LoadingState.Error && loadingState !== LoadingState.Success) {
                 loadingState = LoadingState.Error;
-                errorMessage = series.loadingState.message;
+                errorMessage = `Error retrieving data: ${series.loadingState.message}`;
             }
 
             let description = `
@@ -343,6 +343,33 @@ export function DatasetPointSeriesChart(props: DatasetPointSeriesChartProps) {
                         if (series) {
                             series.hovered.setValue(highlighted || false);
                         }
+                    }
+                }}
+                onItemClick={(item) => {
+                    try {
+                        const series = props.series[item.seriesIndex];
+                        // sync all parent dimensions with series dimensions
+                        series.dimensions.values.forEach((value, key) => {
+                            if (key !== series.seriesDimension) {
+                                if (key === 'time') {
+                                    series.parent?.dataset.setToi(value as Date);
+                                } else {
+                                    series.parent?.dimensions.setValue(key, value);
+                                }
+                            }
+                        });
+
+                        // set the value of selected point for the series dimension
+                        if (series.seriesDimension === 'time') {
+                            const dt = item.value[0];
+                            if (dt instanceof Date) {
+                                series.parent?.dataset.setToi(dt);
+                            }
+                        } else if (series.seriesDimension) {
+                            series.parent?.dimensions.setValue(series.seriesDimension, item.value[0]);
+                        }
+                    } catch (error) {
+                        //do nothing
                     }
                 }}
                 onLegendItemSelection={(evt) => {

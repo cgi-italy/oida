@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.2.1](https://github.com/cgi-italy/oida/compare/@oidajs/map-cesium@3.2.0...@oidajs/map-cesium@3.2.1) (2022-10-05)
+
+**Note:** Version bump only for package @oidajs/map-cesium
+
+
+
+
+
 # [3.2.0](https://github.com/cgi-italy/oida/compare/@oidajs/map-cesium@3.1.2...@oidajs/map-cesium@3.2.0) (2022-07-13)
 
 

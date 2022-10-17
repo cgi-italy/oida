@@ -29,5 +29,5 @@ export const AntdBreadcrumb = (props: BreadcrumbProps) => {
         );
     });
 
-    return <Breadcrumb>{breadcrumbItems}</Breadcrumb>;
+    return <Breadcrumb className='app-breadcrumb'>{breadcrumbItems}</Breadcrumb>;
 };

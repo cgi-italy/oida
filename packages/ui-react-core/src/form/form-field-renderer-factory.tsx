@@ -1,10 +1,13 @@
 import React from 'react';
 
-import { FormField, FormFieldConfig, FormFieldDefinition } from '@oidajs/core';
-
-type ExtractType<IT extends FormField<any, any, any>> = IT extends FormField<infer TYPE, any, any> ? TYPE : never;
-type ExtractValue<IT extends FormField<any, any, any>> = IT extends FormField<any, infer T, any> ? T : never;
-type ExtractConfig<IT extends FormField<any, any, any>> = IT extends FormField<any, any, infer CONFIG> ? CONFIG : never;
+import {
+    ExtractFormFieldConfig,
+    ExtractFormFieldType,
+    ExtractFormFieldValue,
+    FormField,
+    FormFieldConfig,
+    FormFieldDefinition
+} from '@oidajs/core';
 
 export type FormFieldRendererBaseProps<F extends FormField<any, any, any>> = Omit<F, 'type' | 'name' | 'rendererConfig'>;
 export type FormFieldRenderer<T extends FormField<any, any, any>> = (
@@ -12,10 +15,9 @@ export type FormFieldRenderer<T extends FormField<any, any, any>> = (
 ) => JSX.Element | null;
 
 export type FormFieldRendererWrapper<T extends FormField<any, any, any>> = (
-    props: Omit<FormFieldRendererBaseProps<T>, 'config'> & { config: FormFieldConfig<ExtractConfig<T>, ExtractValue<T>> } & Record<
-            string,
-            any
-        >
+    props: Omit<FormFieldRendererBaseProps<T>, 'config'> & {
+        config: FormFieldConfig<ExtractFormFieldConfig<T>, ExtractFormFieldValue<T>>;
+    } & Record<string, any>
 ) => JSX.Element | null;
 
 /** Create a new form field renderer factory */
@@ -31,7 +33,11 @@ export const formFieldRendererFactory = () => {
      * @param renderer The form field renderer component
      *
      */
-    const register = <T extends FormField<any, any, any>>(fieldId: ExtractType<T>, rendererId: string, renderer: FormFieldRenderer<T>) => {
+    const register = <T extends FormField<any, any, any>>(
+        fieldId: ExtractFormFieldType<T>,
+        rendererId: string,
+        renderer: FormFieldRenderer<T>
+    ) => {
         if (!REGISTERED_RENDERERS.has(fieldId)) {
             REGISTERED_RENDERERS.set(fieldId, new Map());
         }
@@ -47,7 +53,7 @@ export const formFieldRendererFactory = () => {
      * @returns the renderer id and the registered renderer React component
      **/
     const getRenderer = <T extends FormField<any, any, any>>(
-        definition: FormFieldDefinition<ExtractType<T>, ExtractValue<T>, ExtractConfig<T>>
+        definition: FormFieldDefinition<ExtractFormFieldType<T>, ExtractFormFieldValue<T>, ExtractFormFieldConfig<T>>
     ) => {
         const renderers = REGISTERED_RENDERERS.get(definition.type);
         if (!renderers) {

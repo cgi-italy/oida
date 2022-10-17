@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.3.0](https://github.com/cgi-italy/oida/compare/@oidajs/ui-react-core@6.2.0...@oidajs/ui-react-core@6.3.0) (2022-10-05)
+
+
+### Features
+
+* add components for content and card sections ([0ded2fd](https://github.com/cgi-italy/oida/commit/0ded2fd95c842ef97863550d8d652127865eccd6))
+* add hook for autocompletion item selection implementation ([de0ce55](https://github.com/cgi-italy/oida/commit/de0ce5563db397b709eee59bacc839ba19a4f3f5))
+* add support for field label with checkbox in antd form renderer ([fcd21c9](https://github.com/cgi-italy/oida/commit/fcd21c953c1f619f39c0d612c8e154de844de5eb))
+
+
+
+
+
 # [6.2.0](https://github.com/cgi-italy/oida/compare/@oidajs/ui-react-core@6.1.1...@oidajs/ui-react-core@6.2.0) (2022-07-13)
 
 

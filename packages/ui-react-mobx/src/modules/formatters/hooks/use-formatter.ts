@@ -14,7 +14,7 @@ export type FormatterProps<VALUE_TYPE, FORMATTER_OPTIONS> = {
 const useFormatterBase = <VALUE_TYPE, FORMATTER_OPTIONS>(props: FormatterProps<VALUE_TYPE, FORMATTER_OPTIONS>) => {
     const { quantity, formattersModule } = props;
 
-    const [formatter, setFormatter] = useState<(value: VALUE_TYPE, options: Partial<FORMATTER_OPTIONS>) => any>(() =>
+    const [formatter, setFormatter] = useState<(value: VALUE_TYPE, options?: Partial<FORMATTER_OPTIONS>) => any>(() =>
         formattersModule.format.bind(formattersModule, quantity)
     );
 

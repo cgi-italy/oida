@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.2.1](https://github.com/cgi-italy/oida/compare/@oidajs/map-ol@3.2.0...@oidajs/map-ol@3.2.1) (2022-10-05)
+
+
+### Bug Fixes
+
+* use uppercase param names in OL WMS source initialization ([b59a1db](https://github.com/cgi-italy/oida/commit/b59a1db531c6f827715173c12ebe29a3d41772f6))
+
+
+
+
+
 # [3.2.0](https://github.com/cgi-italy/oida/compare/@oidajs/map-ol@3.1.1...@oidajs/map-ol@3.2.0) (2022-07-13)
 
 

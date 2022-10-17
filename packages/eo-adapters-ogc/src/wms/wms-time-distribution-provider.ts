@@ -187,7 +187,7 @@ export class WmsTimeDistributionProvider implements DatasetTimeDistributionProvi
             const values = timeRange.split(',');
             values.forEach((value) => {
                 if (value.search('/') !== -1) {
-                    const startEndStep = timeRange.split('/');
+                    const startEndStep = value.split('/');
                     this.timeDistribution_.push({
                         start: moment.utc(startEndStep[0]).toDate(),
                         end: moment.utc(startEndStep[1]).toDate(),
