@@ -1,8 +1,8 @@
 import React from 'react';
-
+import { message } from 'antd';
 import { SearchOutlined, PlusOutlined } from '@ant-design/icons';
-import { STRING_FIELD_ID, IFormFieldDefinition } from '@oidajs/core';
 
+import { STRING_FIELD_ID, IFormFieldDefinition } from '@oidajs/core';
 import { useEntityCollection, useQueryCriteriaUrlBinding, useQueryFiltersBreadcrumbBindingFromModule } from '@oidajs/ui-react-mobx';
 import { DataCollectionList } from '@oidajs/ui-react-antd';
 import { DatasetExplorer } from '@oidajs/eo-mobx';
@@ -35,11 +35,14 @@ export const WmsDiscoveryProviderResults = (props: WmsDiscoveryProviderResultsPr
             content: 'Add to map',
             icon: <PlusOutlined />,
             callback: (item: WmsDatasetDiscoveryProviderItem) => {
-                return props.provider.createDataset(item).then((datasetConfig) => {
-                    if (datasetConfig) {
+                return props.provider
+                    .createDataset(item)
+                    .then((datasetConfig) => {
                         props.datasetExplorer.addDataset(datasetConfig);
-                    }
-                });
+                    })
+                    .catch((error) => {
+                        message.error(`Unable to initialize map layer: ${error}`);
+                    });
             }
         }
     ];

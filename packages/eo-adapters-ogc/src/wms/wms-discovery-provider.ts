@@ -1,19 +1,19 @@
+import { IObservableArray, observable, action, makeObservable, autorun } from 'mobx';
 import { v4 as uuid } from 'uuid';
 
-import { QueryParams as QueryCriteria } from '@oidajs/core';
-import { DatasetDiscoveryProvider, DatasetDiscoveryProviderProps, DatasetConfig } from '@oidajs/eo-mobx';
+import { QueryParams as QueryCriteria, SubscriptionTracker } from '@oidajs/core';
+import { DatasetDiscoveryProvider, DatasetDiscoveryProviderProps, DatasetConfig, DatasetConfigJSON } from '@oidajs/eo-mobx';
 import { Entity, QueryParams, QueryParamsProps, AsyncDataFetcher } from '@oidajs/state-mobx';
-import { IObservableArray, observable, action, makeObservable, autorun } from 'mobx';
 
 import { WmsServiceConfig, WmsService } from './wms-service';
 import { WmsLayer } from './wms-client';
-import { SubscriptionTracker } from '@oidajs/core';
 import { getWmsDatasetConfig } from './wms-dataset-config';
 
 export const WMS_DATASET_DISCOVERY_ITEM_TYPE = 'wms-discovery-provider-item';
 
-export type WmsDatasetFactory = (item: WmsDatasetDiscoveryProviderItem) => Promise<DatasetConfig | undefined>;
+export type WmsDatasetFactory = (item: WmsDatasetDiscoveryProviderItem) => Promise<DatasetConfig>;
 export type WmsDatasetDiscoveryProviderItemProps = {
+    serviceId: string;
     service: WmsService;
     layer: WmsLayer;
     disablePreview?: boolean;
@@ -21,6 +21,7 @@ export type WmsDatasetDiscoveryProviderItemProps = {
 };
 
 export class WmsDatasetDiscoveryProviderItem extends Entity {
+    readonly serviceId: string;
     readonly service: WmsService;
     readonly layer: WmsLayer;
     readonly disablePreview: boolean;
@@ -32,6 +33,7 @@ export class WmsDatasetDiscoveryProviderItem extends Entity {
             id: props.layer.Name || uuid()
         });
 
+        this.serviceId = props.serviceId;
         this.service = props.service;
         this.layer = props.layer;
         this.disablePreview = props.disablePreview || false;
@@ -62,7 +64,12 @@ export type WmsDatasetDiscoveryProviderProps = {
     queryParams?: QueryParamsProps;
 } & DatasetDiscoveryProviderProps<typeof WMS_DATASET_DISCOVERY_PROVIDER_TYPE>;
 
-export class WmsDatasetDiscoveryProvider extends DatasetDiscoveryProvider<WmsDatasetDiscoveryProviderItem> {
+export type WmsDatasetDiscoveryJsonSchema = {
+    serviceId: string;
+    layerName: string;
+};
+
+export class WmsDatasetDiscoveryProvider extends DatasetDiscoveryProvider<WmsDatasetDiscoveryProviderItem, WmsDatasetDiscoveryJsonSchema> {
     readonly criteria: QueryParams;
     readonly services: IObservableArray<WmsItem>;
     @observable.ref selectedService: WmsItem | undefined;
@@ -138,19 +145,54 @@ export class WmsDatasetDiscoveryProvider extends DatasetDiscoveryProvider<WmsDat
         this.selectedService = selectedService;
     }
 
-    createDataset(item: WmsDatasetDiscoveryProviderItem): Promise<DatasetConfig | undefined> {
+    createDataset(item: WmsDatasetDiscoveryProviderItem): Promise<DatasetConfig> {
         if (item.layer.Name) {
+            let datasetConfigPromise: Promise<DatasetConfig>;
+            const factoryInit: DatasetConfigJSON<WmsDatasetDiscoveryJsonSchema> = {
+                factoryType: this.getFactoryId_(),
+                initConfig: {
+                    serviceId: item.serviceId,
+                    layerName: item.layer.Name
+                }
+            };
             if (item.datasetFactory) {
-                return item.datasetFactory(item);
+                datasetConfigPromise = item.datasetFactory(item);
             } else {
-                return getWmsDatasetConfig({
+                datasetConfigPromise = getWmsDatasetConfig({
                     layerName: item.layer.Name,
                     service: item.service
                 });
             }
+            return datasetConfigPromise.then((config) => {
+                return {
+                    ...config,
+                    factoryInit: factoryInit
+                };
+            });
         } else {
-            return Promise.resolve(undefined);
+            return Promise.reject(new Error('Layer has no name'));
         }
+    }
+
+    createDatasetFromConfig(config: WmsDatasetDiscoveryJsonSchema) {
+        const serviceItem = this.services.find((service) => service.id === config.serviceId);
+        if (!serviceItem) {
+            throw new Error(`No service with id ${config.serviceId} found`);
+        }
+        return serviceItem.service.getLayerCapabilities(config.layerName).then((layer) => {
+            if (!layer) {
+                throw new Error(`Error retrieving layer ${config.layerName} from ${config.serviceId} service`);
+            }
+            return this.createDataset(
+                new WmsDatasetDiscoveryProviderItem({
+                    serviceId: serviceItem.id,
+                    service: serviceItem.service,
+                    layer: layer,
+                    disablePreview: serviceItem.disablePreview,
+                    datasetFactory: serviceItem.datasetFactory
+                })
+            );
+        });
     }
 
     protected afterInit_() {
@@ -167,6 +209,7 @@ export class WmsDatasetDiscoveryProvider extends DatasetDiscoveryProvider<WmsDat
                             data.map(
                                 (item) =>
                                     new WmsDatasetDiscoveryProviderItem({
+                                        serviceId: wmsService.id,
                                         service: wmsService.service,
                                         layer: item,
                                         disablePreview: wmsService.disablePreview,

@@ -12,6 +12,12 @@ export type DatasetMapViewConfig<MAP_VIEW_TYPE extends keyof DatasetVizDefinitio
     config: DatasetVizConfig<MAP_VIEW_TYPE>;
 };
 
+export type DatasetConfigJSONSchema = Record<string, any>;
+export type DatasetConfigJSON<T extends DatasetConfigJSONSchema = DatasetConfigJSONSchema> = {
+    factoryType: string;
+    initConfig: T;
+};
+
 /**
  * EO Dataset configuration object. A dataset is a collection of homogeneous EO products
  * (e.g. a series of Satellite images collected over time and space, a collection of in-situ data, etc. )
@@ -51,4 +57,6 @@ export type DatasetConfig<MAP_VIEW_TYPE extends keyof DatasetVizDefinitions = ke
     tools?: DatasetToolConfig[];
     /** Dataset download configuration */
     download?: DatasetDownloadConfig;
+    /** An object that can be used to create this config from {@link datasetConfigFactory} */
+    factoryInit?: DatasetConfigJSON;
 };

@@ -23,6 +23,10 @@ export class AdamFeaturedDatasetDiscoveryProviderItem extends Entity {
     }
 }
 
+export type AdamFeaturedDatasetDiscoveryJsonSchema = {
+    datasetId: string;
+};
+
 export const ADAM_FEATURED_DATASET_DISCOVERY_PROVIDER_TYPE = 'adam_featured';
 
 export type AdamFeaturedDatasetDiscoveryProviderProps = {
@@ -31,7 +35,10 @@ export type AdamFeaturedDatasetDiscoveryProviderProps = {
     queryParams?: QueryParamsProps;
 } & DatasetDiscoveryProviderProps<typeof ADAM_FEATURED_DATASET_DISCOVERY_PROVIDER_TYPE>;
 
-export class AdamFeaturedDatasetDiscoveryProvider extends DatasetDiscoveryProvider<AdamFeaturedDatasetDiscoveryProviderItem> {
+export class AdamFeaturedDatasetDiscoveryProvider extends DatasetDiscoveryProvider<
+    AdamFeaturedDatasetDiscoveryProviderItem,
+    AdamFeaturedDatasetDiscoveryJsonSchema
+> {
     readonly criteria: QueryParams;
     readonly searchClient: AdamFeaturedDatasetDiscoveryClient;
     protected datasetFactory_: AdamDatasetFactory;
@@ -62,8 +69,28 @@ export class AdamFeaturedDatasetDiscoveryProvider extends DatasetDiscoveryProvid
 
     createDataset(item: AdamFeaturedDatasetDiscoveryProviderItem) {
         return this.searchClient.getAdamDatasetConfig(item.dataset).then((config) => {
-            return this.datasetFactory_(config);
+            return {
+                ...this.datasetFactory_(config),
+                factoryInit: {
+                    factoryType: this.getFactoryId_(),
+                    initConfig: {
+                        datasetId: item.id
+                    }
+                }
+            };
         });
+    }
+
+    createDatasetFromConfig(config: AdamFeaturedDatasetDiscoveryJsonSchema) {
+        const featuredDataset = this.searchClient.getDataset(config.datasetId);
+        if (!featuredDataset) {
+            throw new Error(`No dataset with id ${config.datasetId} found`);
+        }
+        return this.createDataset(
+            new AdamFeaturedDatasetDiscoveryProviderItem({
+                dataset: featuredDataset
+            })
+        );
     }
 
     protected afterInit_() {

@@ -67,6 +67,10 @@ export class AdamFeaturedDatasetDiscoveryClient {
         });
     }
 
+    getDataset(id: string) {
+        return this.datasets_.find((dataset) => dataset.id === id);
+    }
+
     getAdamDatasetConfig(config: AdamFeaturedDataset): Promise<AdamWcsDatasetConfig> {
         let coverageId: string;
         if (isMultiBandCoverage(config.coverages)) {

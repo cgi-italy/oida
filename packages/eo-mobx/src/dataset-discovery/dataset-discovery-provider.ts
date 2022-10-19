@@ -3,8 +3,9 @@ import { IObservableArray, observable, action, makeObservable } from 'mobx';
 import { Active, ActiveProps, FeatureStyleGetter, IsActivable, IsEntity } from '@oidajs/state-mobx';
 import { Geometry, createDynamicFactory } from '@oidajs/core';
 
-import { DatasetConfig } from '../common';
+import { DatasetConfig, DatasetConfigJSONSchema } from '../common';
 import { DatasetExplorerItemInitialState } from '../dataset-explorer';
+import { datasetConfigFactory } from '../utils';
 
 export interface DatasetDiscoveryProviderItem extends IsEntity {
     geometry?: Geometry;
@@ -86,9 +87,12 @@ const discoveryProviderFactory = createDynamicFactory<DatasetDiscoveryProvider>(
  * ```
  *
  * @template T the provider dataset record type
+ * @template J the provider json configuration schema
  */
-export abstract class DatasetDiscoveryProvider<T extends DatasetDiscoveryProviderItem = DatasetDiscoveryProviderItem>
-    implements IsActivable
+export abstract class DatasetDiscoveryProvider<
+    T extends DatasetDiscoveryProviderItem = DatasetDiscoveryProviderItem,
+    J extends DatasetConfigJSONSchema = DatasetConfigJSONSchema
+> implements IsActivable
 {
     /**
      * Create a dataset discovery provider instance given a configuration object
@@ -159,13 +163,24 @@ export abstract class DatasetDiscoveryProvider<T extends DatasetDiscoveryProvide
         });
         this.mapFeatureStyler_ = undefined;
 
+        datasetConfigFactory.register(this.getFactoryId_(), (config) => {
+            return this.createDatasetFromConfig(config);
+        });
+
         makeObservable(this);
     }
 
     /**
      * create the dataset configuration for a specific item
      */
-    abstract createDataset(item: T): Promise<(DatasetConfig & { initialState?: DatasetExplorerItemInitialState }) | undefined>;
+    abstract createDataset(item: T): Promise<DatasetConfig & { initialState?: DatasetExplorerItemInitialState }>;
+
+    /**
+     * create a dataset configuration from json config.
+     * usually not called directly but from the {@link datasetConfigFactory}
+     * @param config the input configuration
+     */
+    abstract createDatasetFromConfig(config: J): Promise<DatasetConfig & { initialState?: DatasetExplorerItemInitialState }>;
 
     @action
     setDisabled(disabled: boolean) {
@@ -183,5 +198,9 @@ export abstract class DatasetDiscoveryProvider<T extends DatasetDiscoveryProvide
     @action
     protected setResults_(results: T[]) {
         this.results.replace(results);
+    }
+
+    protected getFactoryId_() {
+        return `discovery.${this.id}`;
     }
 }
