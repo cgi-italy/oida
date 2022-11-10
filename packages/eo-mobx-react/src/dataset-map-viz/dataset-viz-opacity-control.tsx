@@ -7,7 +7,7 @@ import { useSelector } from '@oidajs/ui-react-mobx';
 import { DatasetViz } from '@oidajs/eo-mobx';
 
 export type DatasetVizOpacityControlProps = {
-    datasetViz: DatasetViz<MapLayer>;
+    datasetViz: DatasetViz<string, MapLayer>;
 };
 
 export const DatasetVizOpacityControl = (props: DatasetVizOpacityControlProps) => {

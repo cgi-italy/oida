@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { IObservableArray } from 'mobx';
 import { Form, Button, Checkbox } from 'antd';
 import { LeftOutlined } from '@ant-design/icons';
@@ -85,6 +85,13 @@ export const DatasetPointSeriesAnalysis = (props: DatasetAnalysisWidgetFactoryCo
     const canRunQuery = useSelector(() => {
         return series.every((item) => item.canRunQuery);
     });
+
+    useEffect(() => {
+        if (canRunQuery) {
+            series.forEach((item) => item.retrieveData());
+            setFiltersVisible(false);
+        }
+    }, []);
 
     const [smooth, setSmooth] = useState(false);
 

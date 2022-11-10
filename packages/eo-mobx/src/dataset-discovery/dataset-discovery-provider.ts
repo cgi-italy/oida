@@ -19,6 +19,8 @@ export type DatasetDiscoveryProviderProps<TYPE extends string = string> = {
     disabled?: boolean;
 } & ActiveProps;
 
+export type DatasetExplorerItemConfig = DatasetConfig & { initialState?: DatasetExplorerItemInitialState };
+
 export interface DatasetDiscoveryProviderDefinitions {}
 export interface DatasetDiscoveryProviderTypes {}
 
@@ -173,14 +175,14 @@ export abstract class DatasetDiscoveryProvider<
     /**
      * create the dataset configuration for a specific item
      */
-    abstract createDataset(item: T): Promise<DatasetConfig & { initialState?: DatasetExplorerItemInitialState }>;
+    abstract createDataset(item: T, id?: string): Promise<DatasetExplorerItemConfig>;
 
     /**
      * create a dataset configuration from json config.
      * usually not called directly but from the {@link datasetConfigFactory}
      * @param config the input configuration
      */
-    abstract createDatasetFromConfig(config: J): Promise<DatasetConfig & { initialState?: DatasetExplorerItemInitialState }>;
+    abstract createDatasetFromConfig(config: J): Promise<DatasetExplorerItemConfig>;
 
     @action
     setDisabled(disabled: boolean) {

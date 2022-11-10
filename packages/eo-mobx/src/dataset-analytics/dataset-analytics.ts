@@ -9,7 +9,7 @@ import { DatasetProcessing } from './dataset-processing';
 
 import { analysisPlaceHolderIcon } from './analysis-placeholder-icon';
 
-const defaultAnalysisStyleGetter = (processing: DatasetProcessing<any>): IFeatureStyle | IFeatureStyle[] => {
+const defaultAnalysisStyleGetter = (processing: DatasetProcessing<string, any>): IFeatureStyle | IFeatureStyle[] => {
     if (processing.style) {
         return processing.style;
     }
@@ -54,20 +54,20 @@ const defaultAnalysisStyleGetter = (processing: DatasetProcessing<any>): IFeatur
 };
 
 export type DatasetAnalyticsProps = {
-    analysisGeometryStyle?: FeatureStyleGetter<DatasetProcessing<any>>;
+    analysisGeometryStyle?: FeatureStyleGetter<DatasetProcessing<string, any>>;
     active?: boolean;
 };
 
 export class DatasetAnalytics {
     @observable.ref active: boolean;
-    geometryLayer: FeatureLayer<DatasetProcessing<any>>;
+    geometryLayer: FeatureLayer<DatasetProcessing<string, any>>;
     analyses: ObservableMap<string, DatasetAnalysis>;
     /**
      * Contains references to the combo analyses items. This array is used as source
      * for the analyses geometry layer
      */
-    protected items_: IObservableArray<DatasetProcessing<any>>;
-    protected analysisTrackers_: Map<string, ArrayTracker<DatasetProcessing<any>, DatasetProcessing<any>>>;
+    protected items_: IObservableArray<DatasetProcessing<string, any>>;
+    protected analysisTrackers_: Map<string, ArrayTracker<DatasetProcessing<string, any>, DatasetProcessing<string, any>>>;
 
     constructor(props?: DatasetAnalyticsProps) {
         this.active = props?.active || false;
@@ -114,8 +114,16 @@ export class DatasetAnalytics {
                     this.items_.push(item);
                     return item;
                 },
-                onItemRemove: (item: DatasetProcessing<any>) => {
+                onItemRemove: (item: DatasetProcessing<string, any>) => {
                     this.items_.remove(item);
+                    // automatically remove the analysis if empty
+                    if (analysis.destroyOnClose) {
+                        setTimeout(() => {
+                            if (!analysis.processings.length) {
+                                this.removeAnalysis(analysis);
+                            }
+                        }, 0);
+                    }
                 }
             });
 
@@ -131,5 +139,13 @@ export class DatasetAnalytics {
         }
         this.analyses.delete(analysis.id);
         analysis.dispose();
+    }
+
+    getSnapshot() {
+        return {
+            analyses: Array.from(this.analyses.values()).map((analysis) => {
+                return analysis.getSnapshot();
+            })
+        };
     }
 }

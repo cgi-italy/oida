@@ -37,7 +37,7 @@ export type DatasetVolumetricVizProps = Omit<
         bandMode?: RasterBandModeSingleProps | RasterBandModeSingle;
     };
 
-export class DatasetVolumetricViz extends DatasetViz<VolumeLayer> {
+export class DatasetVolumetricViz extends DatasetViz<typeof VOLUMETRIC_VIZ_TYPE, VolumeLayer> {
     readonly config: VolumetricMapVizConfig;
     @observable verticalScale: VerticalScale;
     @observable.ref bandMode: RasterBandModeSingle | undefined;

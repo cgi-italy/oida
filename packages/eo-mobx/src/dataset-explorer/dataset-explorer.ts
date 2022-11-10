@@ -14,6 +14,7 @@ export type DatasetExplorerItemInitialState = {
     aoi?: AoiValue;
     toi?: Date | DateRangeValue;
     additionalFilters?: IObservableMapInitialValues<string, QueryFilter>;
+    mapViz?: any;
 };
 
 export type DatasetExplorerItemProps = {
@@ -36,7 +37,7 @@ export type DatasetExplorerItemProps = {
  */
 export class DatasetExplorerItem {
     readonly dataset: Dataset;
-    readonly mapViz: DatasetViz<MapLayer | undefined> | undefined;
+    readonly mapViz: DatasetViz<string, MapLayer | undefined> | undefined;
     readonly timeDistributionViz: DatasetTimeDistributionViz | undefined;
     readonly explorer: DatasetExplorer;
     @observable.ref toiSyncDisabled: boolean;
@@ -64,7 +65,8 @@ export class DatasetExplorerItem {
             this.mapViz = DatasetViz.create<any>({
                 dataset: this.dataset,
                 vizType: props.datasetConfig.mapView.type,
-                config: props.datasetConfig.mapView.config
+                config: props.datasetConfig.mapView.config,
+                ...props.initialState?.mapViz
             });
         }
 
@@ -362,12 +364,8 @@ export class DatasetExplorer {
     removeDataset(datasetId: string) {
         const item = this.items.find((item) => item.dataset.id === datasetId);
         if (item) {
-            item.dispose();
+            this.destroyDataset_(item);
             this.items.remove(item);
-
-            if (this.mapExplorer && item.mapViz?.mapLayer) {
-                this.mapExplorer.mapLayer.children.remove(item.mapViz.mapLayer);
-            }
         }
     }
 
@@ -384,14 +382,19 @@ export class DatasetExplorer {
         }
     }
 
+    @action
+    clearDatasets() {
+        this.items.forEach((item) => this.destroyDataset_(item));
+        this.items.clear();
+    }
+
     getDataset(datasetId: string) {
         return this.items.find((item) => item.dataset.id === datasetId);
     }
 
     dispose() {
         this.subscriptionTracker_.unsubscribe();
-        this.items.forEach((item) => item.dispose());
-        this.items.clear();
+        this.clearDatasets();
 
         if (this.mapExplorer) {
             this.mapLayer.children.remove(this.mapExplorer.mapLayer);
@@ -422,6 +425,15 @@ export class DatasetExplorer {
             });
 
             this.subscriptionTracker_.addSubscription(autoTimeZoomDisposer);
+        }
+    }
+
+    @action
+    protected destroyDataset_(dataset: DatasetExplorerItem) {
+        dataset.dispose();
+
+        if (this.mapExplorer && dataset.mapViz?.mapLayer) {
+            this.mapExplorer.mapLayer.children.remove(dataset.mapViz.mapLayer);
         }
     }
 }

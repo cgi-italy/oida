@@ -6,6 +6,7 @@ export type LayoutSectionItem = {
     icon?: React.ReactNode;
     content: React.ReactNode;
     onClose?: () => void;
+    onRename?: (name: string) => void;
 };
 
 export type LayoutSectionProps = {

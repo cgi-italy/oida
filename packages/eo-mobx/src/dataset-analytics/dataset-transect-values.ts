@@ -46,7 +46,7 @@ export type DatasetTransectValuesProps = Omit<
     autoUpdate?: boolean;
 };
 
-export class DatasetTransectValues extends DatasetProcessing<undefined> {
+export class DatasetTransectValues extends DatasetProcessing<typeof TRANSECT_VALUES_PROCESSING, undefined> {
     readonly config: DatasetTransectValuesConfig;
     @observable.ref seriesVariable: string | undefined;
     @observable.ref data: TransectSeriesItem[];
@@ -291,7 +291,7 @@ export class DatasetTransectValues extends DatasetProcessing<undefined> {
             seriesVariable: this.seriesVariable,
             autoUpdate: this.autoUpdate,
             numSamples: this.numSamples
-        }) as DatasetTransectValues;
+        });
     }
 
     dispose() {

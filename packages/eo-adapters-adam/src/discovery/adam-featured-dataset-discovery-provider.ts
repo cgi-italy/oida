@@ -24,6 +24,7 @@ export class AdamFeaturedDatasetDiscoveryProviderItem extends Entity {
 }
 
 export type AdamFeaturedDatasetDiscoveryJsonSchema = {
+    id: string;
     datasetId: string;
 };
 
@@ -67,13 +68,18 @@ export class AdamFeaturedDatasetDiscoveryProvider extends DatasetDiscoveryProvid
         this.afterInit_();
     }
 
-    createDataset(item: AdamFeaturedDatasetDiscoveryProviderItem) {
-        return this.searchClient.getAdamDatasetConfig(item.dataset).then((config) => {
+    createDataset(item: AdamFeaturedDatasetDiscoveryProviderItem, id?: string) {
+        return this.searchClient.getAdamDatasetConfig(item.dataset).then((adamDatasetConfig) => {
+            const datasetConfig = this.datasetFactory_(adamDatasetConfig);
+            if (id) {
+                datasetConfig.id = id;
+            }
             return {
-                ...this.datasetFactory_(config),
+                ...datasetConfig,
                 factoryInit: {
                     factoryType: this.getFactoryId_(),
                     initConfig: {
+                        id: datasetConfig.id,
                         datasetId: item.id
                     }
                 }
@@ -89,7 +95,8 @@ export class AdamFeaturedDatasetDiscoveryProvider extends DatasetDiscoveryProvid
         return this.createDataset(
             new AdamFeaturedDatasetDiscoveryProviderItem({
                 dataset: featuredDataset
-            })
+            }),
+            config.id
         );
     }
 

@@ -46,7 +46,7 @@ export type DatasetPointSeriesProps = Omit<
     autoUpdate?: boolean;
 };
 
-export class DatasetPointSeries extends DatasetProcessing<undefined> {
+export class DatasetPointSeries extends DatasetProcessing<typeof POINT_SERIES_PROCESSING, undefined> {
     readonly config: DatasetPointSeriesConfig;
     @observable.ref seriesDimension: string | undefined;
     @observable.ref seriesVariable: string | undefined;
@@ -192,7 +192,15 @@ export class DatasetPointSeries extends DatasetProcessing<undefined> {
             seriesVariable: this.seriesVariable,
             seriesRange: this.seriesRange,
             autoUpdate: this.autoUpdate
-        }) as DatasetPointSeries;
+        });
+    }
+
+    getSnapshot() {
+        return {
+            ...super.getSnapshot(),
+            seriesDimension: this.seriesDimension,
+            seriesVariable: this.seriesVariable
+        };
     }
 
     dispose() {
@@ -242,8 +250,8 @@ export class DatasetPointSeries extends DatasetProcessing<undefined> {
     }
 }
 
-export class DatasetPointSeriesAnalysis extends DatasetAnalysis<DatasetPointSeries> {
-    constructor(props: Omit<DatasetAnalysisProps<DatasetPointSeries>, 'type'>) {
+export class DatasetPointSeriesAnalysis extends DatasetAnalysis<typeof POINT_SERIES_PROCESSING, DatasetPointSeries> {
+    constructor(props: Omit<DatasetAnalysisProps<typeof POINT_SERIES_PROCESSING, DatasetPointSeries>, 'type'>) {
         super({
             type: POINT_SERIES_PROCESSING,
             ...props

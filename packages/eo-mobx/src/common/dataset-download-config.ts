@@ -7,7 +7,7 @@ export type DownloadFormat = {
     name?: string;
 };
 
-export type DownloaMapVizRequest<T extends DatasetViz<any> = DatasetViz<any>> = {
+export type DownloaMapVizRequest<T extends DatasetViz<string, any> = DatasetViz<string, any>> = {
     datasetViz: T;
     format: string;
     options?: Record<string, any>;

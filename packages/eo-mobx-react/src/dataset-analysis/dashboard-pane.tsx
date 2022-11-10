@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import GridLayout from 'react-grid-layout';
 import useResizeAware from 'react-resize-aware';
 
-import { Button } from 'antd';
+import { Button, Typography } from 'antd';
 import { DragOutlined, CloseOutlined } from '@ant-design/icons';
 
 import { LayoutSectionItem, LayoutSectionProps } from '@oidajs/ui-react-core';
@@ -155,7 +155,24 @@ export const DashboardPane = (props: LayoutSectionProps & DashboardPaneProps) =>
                     <Button type='link' className='widget-drag-btn'>
                         <DragOutlined />
                     </Button>
-                    {component.title}
+                    <div className='widget-title' title={component.title?.toString()}>
+                        {component.onRename ? (
+                            <Typography.Paragraph
+                                editable={{
+                                    onChange: (value) => {
+                                        if (value) {
+                                            component.onRename!(value);
+                                        }
+                                    },
+                                    triggerType: ['text']
+                                }}
+                            >
+                                {component.title}
+                            </Typography.Paragraph>
+                        ) : (
+                            <React.Fragment>{component.title}</React.Fragment>
+                        )}
+                    </div>
                     {component.onClose && (
                         <Button
                             type='link'

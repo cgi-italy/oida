@@ -22,7 +22,7 @@ export const getWmtsDomainSpatialCoverageProvider = (props: WmtsDomainSpatialCov
 
     const srsDefProvider = new EpsgIoDefinitionProvider();
 
-    const spatialCoverageProvider: DatasetSpatialCoverageProvider = (datasetViz: DatasetViz) => {
+    const spatialCoverageProvider: DatasetSpatialCoverageProvider = (datasetViz: DatasetViz<string, any>) => {
         // retrieve the layer extent for the current dataset selected time
         const toi = datasetViz.dataset.toi;
         let timeRestriction: undefined | string;

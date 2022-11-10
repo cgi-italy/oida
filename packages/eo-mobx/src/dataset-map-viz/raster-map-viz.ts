@@ -5,7 +5,7 @@ import { GroupLayer, TileLayer } from '@oidajs/state-mobx';
 
 import { DatasetDimension, DatasetViz, DatasetVizProps, DimensionDomainType } from '../common';
 import { getRasterBandModeFromConfig } from '../utils';
-import { RasterBandModeConfig, RasterBandMode, RasterBandModeType } from './raster-band-mode';
+import { RasterBandModeConfig, RasterBandMode, RasterBandModeType, RasterBandModeProps } from './raster-band-mode';
 
 export const RASTER_VIZ_TYPE = 'dataset_raster_viz';
 
@@ -30,9 +30,10 @@ export type RasterMapVizConfig = {
 export type RasterMapVizProps = Omit<
     DatasetVizProps<typeof RASTER_VIZ_TYPE, RasterMapVizConfig>,
     'dimensions' | 'currentVariable' | 'initDimensions'
->;
+> &
+    RasterBandModeProps;
 
-export class RasterMapViz extends DatasetViz<GroupLayer> {
+export class RasterMapViz extends DatasetViz<typeof RASTER_VIZ_TYPE, GroupLayer> {
     readonly config: RasterMapVizConfig;
     readonly bandMode: RasterBandMode;
 
@@ -50,17 +51,30 @@ export class RasterMapViz extends DatasetViz<GroupLayer> {
 
         this.config = props.config;
 
-        this.bandMode = new RasterBandMode();
-
-        getRasterBandModeFromConfig({
+        this.bandMode = new RasterBandMode({
             config: props.config.bandMode
-        }).then((bandModeProps) => {
-            this.bandMode.setValue(bandModeProps);
         });
+
+        if (props.bandMode) {
+            this.bandMode.setValue(props.bandMode);
+        } else {
+            getRasterBandModeFromConfig({
+                config: props.config.bandMode
+            }).then((bandModeProps) => {
+                this.bandMode.setValue(bandModeProps);
+            });
+        }
 
         this.subscriptionTracker_ = new SubscriptionTracker();
 
         this.afterInit_();
+    }
+
+    getSnapshot() {
+        return {
+            bandMode: this.bandMode.getSnapshot(),
+            ...super.getSnapshot()
+        };
     }
 
     dispose() {

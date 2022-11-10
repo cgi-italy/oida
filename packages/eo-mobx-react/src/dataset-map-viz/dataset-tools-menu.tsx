@@ -7,7 +7,7 @@ import { ComboToolConfig, useDatasetExplorerTools } from '../hooks';
 export type DatasetToolsMenuProps = {
     datasetExplorer: DatasetExplorer;
     analyticsTools: ComboToolConfig[];
-    datasetViz: DatasetViz<any>;
+    datasetViz: DatasetViz<string, any>;
     icon: React.ReactNode;
 };
 

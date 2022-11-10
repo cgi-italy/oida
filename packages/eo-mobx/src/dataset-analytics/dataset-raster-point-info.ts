@@ -41,7 +41,7 @@ export type DatasetRasterPointInfoProps = Omit<
 /**
  * An tool to extract the value on a point location of a raster dataset
  */
-export class DatasetRasterPointInfo extends DatasetProcessing<undefined> {
+export class DatasetRasterPointInfo extends DatasetProcessing<typeof RASTER_POINT_INFO_PRCESSING, undefined> {
     readonly config: DatasetRasterPointInfoConfig;
     @observable.ref data: DatasetRasterPointData | undefined;
     @observable.ref autoUpdate: boolean;
@@ -122,7 +122,14 @@ export class DatasetRasterPointInfo extends DatasetProcessing<undefined> {
     clone() {
         return this.clone_({
             config: this.config
-        }) as DatasetRasterPointInfo;
+        });
+    }
+
+    getSnapshot() {
+        return {
+            autoupdate: this.autoUpdate,
+            ...super.getSnapshot()
+        };
     }
 
     dispose() {

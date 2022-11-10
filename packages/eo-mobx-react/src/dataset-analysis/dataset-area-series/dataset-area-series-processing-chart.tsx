@@ -77,7 +77,7 @@ export const DatasetAreaSeriesProcessingChart = (props: DatasetAreaSeriesProcess
         }, 1000);
 
         const colorMapTrackerDisposer = reaction(
-            () => props.series.colorMap?.asProps(),
+            () => props.series.colorMap?.getSnapshot(),
             (colorMap) => {
                 updateSeriesData();
             }

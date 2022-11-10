@@ -8,7 +8,7 @@ import { useSelector } from '@oidajs/ui-react-mobx';
 import { DatasetViz } from '@oidajs/eo-mobx';
 
 export type DatasetVizProgressControlProps = {
-    datasetViz: DatasetViz<MapLayer>;
+    datasetViz: DatasetViz<string, MapLayer>;
 };
 
 export const DatasetVizProgressControl = (props: DatasetVizProgressControlProps) => {

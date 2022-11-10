@@ -175,7 +175,11 @@ export const DatasetDiscoveryTimeline = (props: DatasetExplorerTimelineProps) =>
     );
     const [editableRanges, setEditableRanges] = useState<any>([]);
     const [groupLabelsMode, setGroupLabelsMode] = useState(TimelineGroupLabelsMode.Block);
-    const [timeSelectionMode, setTimeSelectionMode] = useState(DatasetTimelineTimeSelectionMode.Instant);
+    const [timeSelectionMode, setTimeSelectionMode] = useState(
+        !props.explorerState.toi || props.explorerState.toi instanceof Date
+            ? DatasetTimelineTimeSelectionMode.Instant
+            : DatasetTimelineTimeSelectionMode.Range
+    );
     const [isCompressed, setIsCompressed] = useState(false);
 
     const selectedToi = useSelector(() => props.explorerState.toi);
@@ -457,10 +461,6 @@ export const DatasetDiscoveryTimeline = (props: DatasetExplorerTimelineProps) =>
             } else {
                 onSelectedDateChange(new Date());
             }
-
-            return () => {
-                props.explorerState.setToi(undefined);
-            };
         }
     }, [timeSelectionMode]);
 

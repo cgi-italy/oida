@@ -9,7 +9,7 @@ import { useSelector } from '@oidajs/ui-react-mobx';
 
 export type AnalysisDatasetActions = {
     combinedAnalysis: DatasetAnalysis;
-    analysis: DatasetProcessing<any>;
+    analysis: DatasetProcessing<string, any>;
     idx: number;
     availableTargets: Array<DatasetAnalysis>;
     disableMove?: boolean;

@@ -1,7 +1,7 @@
 import { computed, makeObservable, observable, action } from 'mobx';
 import chroma from 'chroma-js';
 
-import { IFeatureStyle, randomColorFactory } from '@oidajs/core';
+import { IFeatureStyle, randomColorFactory, Geometry } from '@oidajs/core';
 import {
     MapLayer,
     HasVisibility,
@@ -15,7 +15,7 @@ import {
     SelectedProps
 } from '@oidajs/state-mobx';
 
-import { DatasetViz, DatasetVizProps, SharedAoi, SharedAoiProps } from '../common';
+import { DatasetViz, DatasetVizProps, DatasetVizSnapshot, SharedAoi, SharedAoiProps } from '../common';
 
 const randomColorGenerator = randomColorFactory();
 
@@ -27,12 +27,20 @@ export type DatasetProcessingProps<TYPE extends string = string, CONFIG extends 
     SelectedProps &
     HoveredProps;
 
+export type DatasetProcessingSnapshot<TYPE extends string = string> = DatasetVizSnapshot<TYPE> & {
+    color: string;
+    aoi?: {
+        name: string;
+        geometry: Geometry;
+    };
+};
+
 /**
  * A base class for a dataset processing operation.
  * It manages the logic to perform some processing on a single dataset: inputs, outputs and data retrieval logic
  */
-export abstract class DatasetProcessing<T extends MapLayer | undefined>
-    extends DatasetViz<T>
+export abstract class DatasetProcessing<T extends string, M extends MapLayer | undefined>
+    extends DatasetViz<T, M>
     implements HasVisibility, IsHoverable, IsSelectable
 {
     readonly visible: Visible;
@@ -41,7 +49,7 @@ export abstract class DatasetProcessing<T extends MapLayer | undefined>
     readonly defaultColor: string;
     @observable.ref aoi: SharedAoi | undefined;
 
-    constructor(props: DatasetProcessingProps) {
+    constructor(props: DatasetProcessingProps<T>) {
         super(props);
 
         this.visible = new Visible(props);
@@ -98,6 +106,19 @@ export abstract class DatasetProcessing<T extends MapLayer | undefined>
         return;
     }
 
+    getSnapshot(): DatasetProcessingSnapshot<T> {
+        return {
+            ...super.getSnapshot(),
+            aoi: this.aoi
+                ? {
+                      name: this.aoi.name,
+                      geometry: this.aoi.geometry.value
+                  }
+                : undefined,
+            color: this.defaultColor
+        };
+    }
+
     dispose() {
         if (this.aoi) {
             this.aoi.unref();
@@ -105,7 +126,7 @@ export abstract class DatasetProcessing<T extends MapLayer | undefined>
         super.dispose();
     }
 
-    abstract clone(): DatasetProcessing<T>;
+    abstract clone(): this;
 
     protected clone_(specProps?: Record<string, any>) {
         return super.clone_({

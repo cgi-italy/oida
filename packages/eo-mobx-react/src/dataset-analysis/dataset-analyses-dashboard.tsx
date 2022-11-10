@@ -75,6 +75,9 @@ export const DatasetAnalysesDashboard = (props: DatasetAnalysesDashboardProps) =
                             } else {
                                 analysis.visible.setValue(false);
                             }
+                        },
+                        onRename: (name) => {
+                            analysis.setName(name);
                         }
                     };
                 }

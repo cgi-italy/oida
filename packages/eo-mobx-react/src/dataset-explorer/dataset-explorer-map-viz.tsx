@@ -38,7 +38,7 @@ export const DatasetExplorerMapViz = (props: DatasetExplorerMapVizProps) => {
                 index={idx}
                 datasetExplorer={props.explorerState}
                 analyticsTools={props.analyticsTools}
-                datasetViz={view.mapViz as DatasetViz<MapLayer>}
+                datasetViz={view.mapViz as DatasetViz<string, MapLayer>}
                 mapState={props.mapState}
                 onRemove={() => props.explorerState.removeDataset(view.id)}
                 downloadComponent={props.datasetDownloadComponent}

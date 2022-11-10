@@ -9,6 +9,7 @@ import { AdamOpensearchDatasetDiscoveryClient } from './adam-opensearch-dataset-
 export const ADAM_OPENSEARCH_DATASET_DISCOVERY_ITEM_TYPE = 'adam_opensearch_discovery_item';
 
 export type AdamOpensearchDatasetDiscoveryJsonSchema = {
+    id: string;
     datasetId: string;
 };
 
@@ -75,13 +76,18 @@ export class AdamOpensearchDatasetDiscoveryProvider extends DatasetDiscoveryProv
         return this.asyncDataFetcher_.loadingStatus;
     }
 
-    createDataset(item: AdamOpensearchDatasetDiscoveryProviderItem) {
-        return this.searchClient.getAdamDatasetConfig(item.metadata).then((datasetConfig) => {
+    createDataset(item: AdamOpensearchDatasetDiscoveryProviderItem, id?: string) {
+        return this.searchClient.getAdamDatasetConfig(item.metadata).then((adamDatasetConfig) => {
+            const datasetConfig = this.datasetFactory_(adamDatasetConfig);
+            if (id) {
+                datasetConfig.id = id;
+            }
             return {
-                ...this.datasetFactory_(datasetConfig),
+                ...datasetConfig,
                 factoryInit: {
                     factoryType: this.getFactoryId_(),
                     initConfig: {
+                        id: datasetConfig.id,
                         datasetId: item.id
                     }
                 }
@@ -108,7 +114,8 @@ export class AdamOpensearchDatasetDiscoveryProvider extends DatasetDiscoveryProv
                 return this.createDataset(
                     new AdamOpensearchDatasetDiscoveryProviderItem({
                         metadata: dataset
-                    })
+                    }),
+                    config.id
                 );
             });
     }

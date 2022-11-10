@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { DatePicker, Select, Spin } from 'antd';
 import { DatePickerProps } from 'antd/lib/date-picker';
-import { PanelMode } from 'rc-picker/lib/interface';
 import moment from 'moment';
 
 import { FormFieldRendererBaseProps } from '@oidajs/ui-react-core';
@@ -28,7 +27,7 @@ export const DateFieldRenderer = (props: FormFieldRendererBaseProps<DateField> &
     }>();
 
     const [open, setOpen] = useState(false);
-    const [mode, setMode] = useState<PanelMode>('date');
+    const [mode, setMode] = useState<DatePickerProps['mode']>('date');
 
     const pickerValue = useMemo(() => (value ? moment.utc(value) : undefined), [value, open]);
 

@@ -1,6 +1,6 @@
-import { DatasetVizConfig, DatasetVizDefinition, DatasetVizDefinitions, DatasetVizProps } from './dataset-viz';
+import { DatasetVizConfig, DatasetVizDefinition, DatasetVizProps } from './dataset-viz';
 
-export type DatasetToolConfig<TOOL_TYPE extends keyof DatasetVizDefinitions = keyof DatasetVizDefinitions> = {
+export type DatasetToolConfig<TOOL_TYPE extends string = string> = {
     type: TOOL_TYPE;
     name: string;
     config: DatasetVizConfig<TOOL_TYPE>;

@@ -1,6 +1,6 @@
 import { action, makeObservable, observable, reaction } from 'mobx';
 
-import { SubscriptionTracker, MouseCoords, FeatureDrawMode } from '@oidajs/core';
+import { SubscriptionTracker, MouseCoords, FeatureDrawMode, Geometry } from '@oidajs/core';
 import { ArrayTracker, FeatureDrawInteraction, MouseCoordsInteraction, SelectionManager } from '@oidajs/state-mobx';
 
 import { DatasetToolConfig } from '../common';
@@ -14,6 +14,7 @@ export const MAP_RASTERS_POINT_INFO_ANALYSIS = 'map_rasters_point_info_analysis'
  * The {@link MapRastersPointInfo} configuration
  */
 export type MapRasterInfoProps = {
+    id?: string;
     name: string;
     datasetExplorer: DatasetExplorer;
     mouseCoordsInteraction: MouseCoordsInteraction;
@@ -28,7 +29,7 @@ export type MapRasterInfoProps = {
  * every time the user clicks on a map location. A dataset shall have a
  * {@link DatasetRasterPointInfo} amongst its tools to be queried through this analysis.
  */
-export class MapRastersPointInfo extends DatasetAnalysis<DatasetRasterPointInfo> {
+export class MapRastersPointInfo extends DatasetAnalysis<typeof MAP_RASTERS_POINT_INFO_ANALYSIS, DatasetRasterPointInfo> {
     @observable.ref location: MouseCoords | undefined;
 
     protected datasetExplorer_: DatasetExplorer;
@@ -141,6 +142,17 @@ export class MapRastersPointInfo extends DatasetAnalysis<DatasetRasterPointInfo>
         } else {
             this.visible.setValue(false);
         }
+    }
+
+    getSnapshot() {
+        return {
+            ...super.getSnapshot(),
+            location: this.location
+        };
+    }
+
+    applySnapshot(snapshot) {
+        this.setLocation(snapshot.location);
     }
 
     dispose() {

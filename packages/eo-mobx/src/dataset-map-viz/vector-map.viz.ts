@@ -173,7 +173,7 @@ export type DatasetVectorMapVizProps = Omit<
     propertyFilters?: DataFiltersProps | DataFilters;
 };
 
-export class DatasetVectorMapViz extends DatasetViz<FeatureLayer<DatasetVectorFeature>> {
+export class DatasetVectorMapViz extends DatasetViz<typeof VECTOR_VIZ_TYPE, FeatureLayer<DatasetVectorFeature>> {
     /** The visualization configuration */
     readonly config: DatasetVectorMapVizConfig;
     /** The feature descriptor */

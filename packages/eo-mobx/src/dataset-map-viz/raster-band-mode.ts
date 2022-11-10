@@ -1,6 +1,6 @@
 import { observable, action, makeObservable } from 'mobx';
 
-import { ColorScale, ColorMap, ColorMapProps, NumericVariable, DomainRange } from '../common';
+import { ColorScale, ColorMap, ColorMapProps, NumericVariable, DomainRange, ColorMapSnapshot } from '../common';
 
 export type RasterBandConfig = NumericVariable & {
     colorScales?: ColorScale[];
@@ -38,10 +38,12 @@ export type RasterBandGroup = {
 export type RasterBandModeChoice =
     | {
           type: RasterBandModeType.Single;
+          config?: undefined;
           default?: Omit<RasterBandModeSingleProps, 'type' | 'colorMap'>;
       }
     | {
           type: RasterBandModeType.Preset;
+          config?: undefined;
           default?: Omit<RasterBandModePresetProps, 'type'>;
       }
     | {
@@ -85,6 +87,14 @@ export class RasterBandModeSingle {
     setColorMap(colorMap: ColorMap | ColorMapProps) {
         this.colorMap = colorMap instanceof ColorMap ? colorMap : new ColorMap(colorMap);
     }
+
+    getSnapshot(): Omit<RasterBandModeSingleProps, 'colorMap'> & { colorMap: ColorMapSnapshot } {
+        return {
+            type: RasterBandModeType.Single,
+            band: this.band,
+            colorMap: this.colorMap.getSnapshot()
+        };
+    }
 }
 
 export type RasterBandModePresetProps = {
@@ -105,6 +115,13 @@ export class RasterBandModePreset {
     @action
     setPreset(preset: string) {
         this.preset = preset;
+    }
+
+    getSnapshot(): RasterBandModePresetProps {
+        return {
+            type: RasterBandModeType.Preset,
+            preset: this.preset
+        };
     }
 }
 
@@ -197,16 +214,33 @@ export class RasterBandModeCombination {
             this.blueRange = range;
         }
     }
+
+    getSnapshot(): RasterBandModeCombinationProps {
+        return {
+            type: RasterBandModeType.Combination,
+            red: this.red,
+            blue: this.blue,
+            green: this.green,
+            bandScalingMode: this.bandScalingMode,
+            dataRange: this.dataRange,
+            blueRange: this.blueRange,
+            redRange: this.redRange,
+            greenRange: this.greenRange
+        };
+    }
 }
 
 export type RasterBandModeProps = {
+    config: RasterBandModeConfig;
     bandMode?: RasterBandModeSingleProps | RasterBandModePresetProps | RasterBandModeCombinationProps;
 };
 
 export class RasterBandMode {
+    readonly config: RasterBandModeConfig;
     @observable.ref value: RasterBandModeSingle | RasterBandModePreset | RasterBandModeCombination | undefined;
 
-    constructor(props?: RasterBandModeProps) {
+    constructor(props: RasterBandModeProps) {
+        this.config = props.config;
         this.setValue(props?.bandMode);
         makeObservable(this);
     }
@@ -215,13 +249,26 @@ export class RasterBandMode {
     setValue(mode: RasterBandModeSingleProps | RasterBandModePresetProps | RasterBandModeCombinationProps | undefined) {
         if (!mode) {
             this.value = undefined;
-        } else if (mode.type === RasterBandModeType.Single) {
-            this.value = new RasterBandModeSingle(mode);
-        } else if (mode.type === RasterBandModeType.Preset) {
-            this.value = new RasterBandModePreset(mode);
-        } else if (mode.type === RasterBandModeType.Combination) {
-            this.value = new RasterBandModeCombination(mode);
+        } else {
+            const modeConfig = this.config.supportedModes.find((supportedMode) => supportedMode.type === mode.type);
+            if (!modeConfig) {
+                throw new Error(`Unsupported band mode ${mode.type} specified`);
+            }
+            if (mode.type === RasterBandModeType.Single) {
+                this.value = new RasterBandModeSingle(mode);
+            } else if (mode.type === RasterBandModeType.Preset) {
+                this.value = new RasterBandModePreset(mode);
+            } else if (mode.type === RasterBandModeType.Combination) {
+                this.value = new RasterBandModeCombination({
+                    ...mode,
+                    config: modeConfig.config
+                });
+            }
         }
+    }
+
+    getSnapshot() {
+        return this.value?.getSnapshot();
     }
 }
 

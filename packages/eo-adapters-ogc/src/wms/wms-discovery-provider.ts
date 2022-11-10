@@ -65,6 +65,7 @@ export type WmsDatasetDiscoveryProviderProps = {
 } & DatasetDiscoveryProviderProps<typeof WMS_DATASET_DISCOVERY_PROVIDER_TYPE>;
 
 export type WmsDatasetDiscoveryJsonSchema = {
+    id: string;
     serviceId: string;
     layerName: string;
 };
@@ -145,25 +146,32 @@ export class WmsDatasetDiscoveryProvider extends DatasetDiscoveryProvider<WmsDat
         this.selectedService = selectedService;
     }
 
-    createDataset(item: WmsDatasetDiscoveryProviderItem): Promise<DatasetConfig> {
-        if (item.layer.Name) {
+    createDataset(item: WmsDatasetDiscoveryProviderItem, id?: string): Promise<DatasetConfig> {
+        const layerName = item.layer.Name;
+
+        if (layerName) {
             let datasetConfigPromise: Promise<DatasetConfig>;
-            const factoryInit: DatasetConfigJSON<WmsDatasetDiscoveryJsonSchema> = {
-                factoryType: this.getFactoryId_(),
-                initConfig: {
-                    serviceId: item.serviceId,
-                    layerName: item.layer.Name
-                }
-            };
+
             if (item.datasetFactory) {
                 datasetConfigPromise = item.datasetFactory(item);
             } else {
                 datasetConfigPromise = getWmsDatasetConfig({
-                    layerName: item.layer.Name,
+                    layerName: layerName,
                     service: item.service
                 });
             }
             return datasetConfigPromise.then((config) => {
+                if (id) {
+                    config.id = id;
+                }
+                const factoryInit: DatasetConfigJSON<WmsDatasetDiscoveryJsonSchema> = {
+                    factoryType: this.getFactoryId_(),
+                    initConfig: {
+                        id: config.id,
+                        serviceId: item.serviceId,
+                        layerName: layerName
+                    }
+                };
                 return {
                     ...config,
                     factoryInit: factoryInit

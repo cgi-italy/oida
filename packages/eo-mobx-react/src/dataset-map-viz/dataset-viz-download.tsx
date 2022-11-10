@@ -16,7 +16,7 @@ export enum DatasetDownloadFormSubmitState {
 }
 
 export type DatasetDownloadProps = {
-    datasetViz: DatasetViz<any>;
+    datasetViz: DatasetViz<string, any>;
     onSubmitStateChange: (submitState: DatasetDownloadFormSubmitState) => void;
     formId?: string;
     formInstance?: FormInstance;
