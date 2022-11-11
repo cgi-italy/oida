@@ -18,7 +18,7 @@ import DataSourceDisplay from 'cesium/Source/DataSources/DataSourceDisplay';
 
 import 'cesium/Source/Widgets/CesiumWidget/CesiumWidget.css';
 
-import { IMapRenderer, IMapRendererProps, IMapViewport, BBox, Size, FitExtentOptions } from '@oidajs/core';
+import { IMapRenderer, IMapRendererProps, IMapViewport, BBox, Size, FitExtentOptions, exportImage } from '@oidajs/core';
 
 import { cesiumLayersFactory } from '../layers/cesium-layers-factory';
 import { cesiumInteractionsFactory } from '../interactions/cesium-interactions-factory';
@@ -153,6 +153,15 @@ export class CesiumMapRenderer implements IMapRenderer {
         if (this.viewer_ && this.viewer_.scene) {
             this.viewer_.scene.requestRender();
         }
+    }
+
+    export(options) {
+        const canvas: HTMLCanvasElement = this.viewer_.canvas;
+        if (canvas) {
+            this.viewer_.scene.render();
+            return Promise.resolve(exportImage(canvas, options));
+        }
+        return Promise.resolve(undefined);
     }
 
     refreshImageries() {

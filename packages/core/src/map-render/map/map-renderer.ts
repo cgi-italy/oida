@@ -1,4 +1,5 @@
 import { IDynamicFactory } from '../../utils/dynamic-factory';
+import { ImageExportOptions } from '../../utils/image-utils';
 import { IMapInteractionImplementation } from '../interactions/map-interaction-implementation';
 import { IMapLayerRenderer, IMapLayerRendererConfigDefinitions } from '../layers/map-layer-renderer';
 import { IGroupLayerRenderer } from '../layers/group-layer-renderer';
@@ -53,6 +54,7 @@ export interface IMapRenderer {
     setLayerGroup(group: IGroupLayerRenderer);
     getSize(): Size;
     updateSize(): void;
+    export(options: ImageExportOptions): Promise<string | undefined>;
     destroy(): void;
 }
 

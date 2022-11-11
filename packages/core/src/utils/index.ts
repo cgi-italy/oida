@@ -14,5 +14,6 @@ export * from './color';
 export * from './xml-utils';
 export * from './url-utils';
 export * from './array-utils';
+export * from './image-utils';
 export * from './spatial-reference-org-definition-provider';
 export * from './epsg-io-definition-provider';
