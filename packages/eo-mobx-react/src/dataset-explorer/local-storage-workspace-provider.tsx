@@ -71,7 +71,18 @@ export const LocalStorageWorkspaceProvider = (props: DatasetExplorerWorkspacePro
                     <DataCollectionDetailedListItem
                         title={item.metadata.name}
                         description={item.metadata.description}
+                        metadata={[
+                            {
+                                label: 'Datasets',
+                                value: item.metadata.config.datasets
+                                    .map((dataset) => {
+                                        return dataset.mapViewSnapshot?.name || '';
+                                    })
+                                    .join(', ')
+                            }
+                        ]}
                         icon={<PictureOutlined />}
+                        preview={item.metadata.preview}
                     />
                 );
             }}

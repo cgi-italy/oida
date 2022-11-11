@@ -31,12 +31,46 @@ export const DatasetExplorerWorkspaceSaveForm = (props: DatasetExplorerWorkspace
                             id: loadedView.id,
                             config: currentViewConfig
                         };
-                        return viewProvider
-                            .updateWorkspace(workspace)
-                            .then((id) => {
+
+                        return workspaceHandler.getCurrentWorkspacePreview().then((preview) => {
+                            return viewProvider
+                                .updateWorkspace(workspace)
+                                .then((id) => {
+                                    const workspaceMetadata = {
+                                        ...workspace,
+                                        preview: preview,
+                                        provider: viewProvider.id
+                                    };
+                                    workspaceHandler.setCurrentWorkspace(workspaceMetadata);
+                                    if (onSuccess) {
+                                        onSuccess(workspaceMetadata);
+                                    }
+                                })
+                                .catch((error) => {
+                                    setSubmitErrorMessage(error.message);
+                                    if (onError) {
+                                        onError(error);
+                                    }
+                                });
+                        });
+                    }
+                }
+                const storageProvider = workspaceHandler.storageProviders[0];
+                if (storageProvider) {
+                    const workspace = {
+                        ...values,
+                        config: currentViewConfig
+                    };
+
+                    return workspaceHandler.getCurrentWorkspacePreview().then((preview) => {
+                        return storageProvider
+                            .saveWorkspace(workspace)
+                            .then((workspaceId) => {
                                 const workspaceMetadata = {
                                     ...workspace,
-                                    provider: viewProvider.id
+                                    id: workspaceId,
+                                    preview: preview,
+                                    provider: storageProvider.id
                                 };
                                 workspaceHandler.setCurrentWorkspace(workspaceMetadata);
                                 if (onSuccess) {
@@ -49,32 +83,7 @@ export const DatasetExplorerWorkspaceSaveForm = (props: DatasetExplorerWorkspace
                                     onError(error);
                                 }
                             });
-                    }
-                }
-                const storageProvider = workspaceHandler.storageProviders[0];
-                if (storageProvider) {
-                    const workspace = {
-                        ...values,
-                        config: currentViewConfig
-                    };
-                    storageProvider
-                        .saveWorkspace(workspace)
-                        .then(() => {
-                            const workspaceMetadata = {
-                                ...workspace,
-                                provider: storageProvider.id
-                            };
-                            workspaceHandler.setCurrentWorkspace(workspaceMetadata);
-                            if (onSuccess) {
-                                onSuccess(workspaceMetadata);
-                            }
-                        })
-                        .catch((error) => {
-                            setSubmitErrorMessage(error.message);
-                            if (onError) {
-                                onError(error);
-                            }
-                        });
+                    });
                 }
             }}
             onFinishFailed={() => {

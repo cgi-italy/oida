@@ -1,6 +1,6 @@
 import { action, makeObservable, observable } from 'mobx';
 
-import { AoiValue, DateRangeValue, IMapProjection, TileSource } from '@oidajs/core';
+import { AoiValue, DateRangeValue, ImageExportOptions, IMapProjection, TileSource } from '@oidajs/core';
 import { Map, MapViewportProps, TileLayer } from '@oidajs/state-mobx';
 
 import { DatasetConfig, DatasetConfigJSON } from '../common';
@@ -12,6 +12,7 @@ import { DatasetAnalysis, DatasetAnalysisSnapshot } from '../dataset-analytics';
 export type DatasetExplorerWorkspaceConfig = {
     projection: string;
     baseLayer: string;
+    renderer: string;
     viewport: MapViewportProps;
     datasets: {
         config: DatasetConfigJSON;
@@ -39,6 +40,7 @@ export type DatasetExplorerWorkspaceHandlerConfig = {
     providers: DatasetExplorerWorkspaceProvider[];
     mapBaseLayers: Array<{ id: string; source: TileSource }>;
     mapProjections: IMapProjection[];
+    mapRenderers: Array<{ id: string; options?: any }>;
 };
 
 export class DatasetExplorerWorkspaceHandler {
@@ -50,6 +52,7 @@ export class DatasetExplorerWorkspaceHandler {
 
     protected readonly mapBaseLayers_: Array<{ id: string; source: TileSource }>;
     protected readonly mapProjections_: IMapProjection[];
+    protected readonly mapRenderers_: Array<{ id: string; options?: any }>;
 
     constructor(config: DatasetExplorerWorkspaceHandlerConfig) {
         this.datasetExplorer = config.datasetExplorer;
@@ -60,6 +63,7 @@ export class DatasetExplorerWorkspaceHandler {
 
         this.mapBaseLayers_ = config.mapBaseLayers;
         this.mapProjections_ = config.mapProjections;
+        this.mapRenderers_ = config.mapRenderers;
 
         makeObservable(this);
     }
@@ -116,8 +120,11 @@ export class DatasetExplorerWorkspaceHandler {
             config: this.getCurrentWorkspaceConfig()
         };
 
-        return provider.updateWorkspace(updatedWorkspace).then(() => {
-            this.setCurrentWorkspace(updatedWorkspace);
+        return this.getCurrentWorkspacePreview().then((preview) => {
+            updatedWorkspace.preview = preview;
+            return provider.updateWorkspace(updatedWorkspace).then(() => {
+                this.setCurrentWorkspace(updatedWorkspace);
+            });
         });
     }
 
@@ -155,11 +162,26 @@ export class DatasetExplorerWorkspaceHandler {
             aoi: this.datasetExplorer.aoi,
             baseLayer: this.map.layers.children.itemAt(0).name,
             projection: this.map.view.projection.code,
+            renderer: this.map.renderer.id,
             viewport: {
                 center: this.map.view.viewport.center,
-                resolution: this.map.view.viewport.resolution
+                resolution: this.map.view.viewport.resolution,
+                pitch: this.map.view.viewport.pitch,
+                rotation: this.map.view.viewport.rotation
             }
         };
+    }
+
+    getCurrentWorkspacePreview(options?: ImageExportOptions) {
+        return (
+            this.map.renderer.implementation?.export(
+                options || {
+                    width: 128,
+                    format: 'image/jpeg',
+                    quality: 0.5
+                }
+            ) || Promise.resolve(undefined)
+        );
     }
 
     setWorkspaceConfig(config: DatasetExplorerWorkspaceConfig) {
@@ -175,7 +197,10 @@ export class DatasetExplorerWorkspaceHandler {
             const datasetConfigPromise = datasetConfigFactory.create(factoryType, initConfig)?.then((datasetConfig) => {
                 const { initialState, ...config } = datasetConfig;
                 return {
-                    datasetConfig: config,
+                    datasetConfig: {
+                        ...config,
+                        name: mapViewSnapshot.name
+                    },
                     initialState: {
                         ...initialState,
                         mapViz: mapViewSnapshot
@@ -191,6 +216,10 @@ export class DatasetExplorerWorkspaceHandler {
             this.datasetExplorer.setToi(config.toi);
             this.datasetExplorer.setAoi(config.aoi);
 
+            const renderer = this.mapRenderers_.find((renderer) => renderer.id === config.renderer);
+            if (renderer) {
+                this.map.setRenderer(renderer);
+            }
             const projection = this.mapProjections_.find((projection) => projection.code === config.projection);
             if (projection) {
                 this.map.view.setProjection(projection);
