@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.0.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-mobx@2.4.1...@oidajs/eo-mobx@3.0.0) (2022-12-22)
+
+
+### Code Refactoring
+
+* remove seriesRange parameter from DatasetPointSeries props ([aac32bf](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/aac32bf797fb12d616bddf2394d2f1e32d2fa69c))
+
+
+### Features
+
+* add factory for dataset config generation from json object ([508829e](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/508829e70a216c6772197f642117bb3f1947e3ea))
+* add preliminary workspace save/load support ([508f00a](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/508f00a7b360c0e4283a5d472750c8ee54fd1a58))
+* add preview support in explorer workspaces ([5bce458](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/5bce45857c02aabae08ca97fa9d4224ba06bab57))
+
+
+### BREAKING CHANGES
+
+* DatasetPointSeries doesn't take a seriesRange parameter anymore. Use rangeValues
+parameters from DatasetDimensionProps instead
+
+
+
+
+
 ## [2.4.1](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-mobx@2.4.0...@oidajs/eo-mobx@2.4.1) (2022-10-05)
 
 **Note:** Version bump only for package @oidajs/eo-mobx

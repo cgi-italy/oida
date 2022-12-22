@@ -1,6 +1,6 @@
 {
   "name": "@oidajs/eo-geotiff",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "description": "oida EO geotiff library",
   "module": "es/index.js",
   "main": "lib/index.js",

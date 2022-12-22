@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.1.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-adapters-adam@3.0.1...@oidajs/eo-adapters-adam@3.1.0) (2022-12-22)
+
+
+### Features
+
+* add factory for dataset config generation from json object ([508829e](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/508829e70a216c6772197f642117bb3f1947e3ea))
+* add preliminary workspace save/load support ([508f00a](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/508f00a7b360c0e4283a5d472750c8ee54fd1a58))
+
+
+
+
+
 ## [3.0.1](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-adapters-adam@3.0.0...@oidajs/eo-adapters-adam@3.0.1) (2022-10-05)
 
 

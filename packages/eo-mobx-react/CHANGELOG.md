@@ -3,6 +3,35 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.0.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-mobx-react@3.5.0...@oidajs/eo-mobx-react@4.0.0) (2022-12-22)
+
+
+### Bug Fixes
+
+* solve issue with workspace preview saving ([be4c558](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/be4c5582a2bdfc47ee296ec7b31d9cc8ab1059fc))
+* use tabs in DatasetExplorerWorkspacesModal when more than one provider is available ([cb37a7d](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/cb37a7d1ea1185b998e33eb91bb12abded21e6fb))
+
+
+### Code Refactoring
+
+* remove seriesRange parameter from DatasetPointSeries props ([aac32bf](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/aac32bf797fb12d616bddf2394d2f1e32d2fa69c))
+
+
+### Features
+
+* add preliminary workspace save/load support ([508f00a](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/508f00a7b360c0e4283a5d472750c8ee54fd1a58))
+* add preview support in explorer workspaces ([5bce458](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/5bce45857c02aabae08ca97fa9d4224ba06bab57))
+
+
+### BREAKING CHANGES
+
+* DatasetPointSeries doesn't take a seriesRange parameter anymore. Use rangeValues
+parameters from DatasetDimensionProps instead
+
+
+
+
+
 # [3.5.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-mobx-react@3.4.0...@oidajs/eo-mobx-react@3.5.0) (2022-10-05)
 
 

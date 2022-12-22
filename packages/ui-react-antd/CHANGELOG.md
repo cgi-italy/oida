@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.4.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/ui-react-antd@6.3.0...@oidajs/ui-react-antd@6.4.0) (2022-12-22)
+
+
+### Features
+
+* add preliminary workspace save/load support ([508f00a](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/508f00a7b360c0e4283a5d472750c8ee54fd1a58))
+
+
+
+
+
 # [6.3.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/ui-react-antd@6.2.0...@oidajs/ui-react-antd@6.3.0) (2022-10-05)
 
 

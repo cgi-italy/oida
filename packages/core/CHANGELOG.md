@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.5.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/core@4.4.0...@oidajs/core@4.5.0) (2022-12-22)
+
+
+### Features
+
+* add support for map export as image in map renderer ([fea5e44](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/fea5e442db2ac138376d86c8efe818fe48fac6e4))
+
+
+
+
+
 # [4.4.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/core@4.3.0...@oidajs/core@4.4.0) (2022-10-05)
 
 

@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.2.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-adapters-ogc-react@2.1.4...@oidajs/eo-adapters-ogc-react@2.2.0) (2022-12-22)
+
+
+### Features
+
+* add factory for dataset config generation from json object ([508829e](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/508829e70a216c6772197f642117bb3f1947e3ea))
+
+
+
+
+
 ## [2.1.4](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-adapters-ogc-react@2.1.3...@oidajs/eo-adapters-ogc-react@2.1.4) (2022-10-05)
 
 **Note:** Version bump only for package @oidajs/eo-adapters-ogc-react

@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.3.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/map-cesium@3.2.1...@oidajs/map-cesium@3.3.0) (2022-12-22)
+
+
+### Features
+
+* add support for map export as image in map renderer ([fea5e44](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/fea5e442db2ac138376d86c8efe818fe48fac6e4))
+
+
+
+
+
 ## [3.2.1](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/map-cesium@3.2.0...@oidajs/map-cesium@3.2.1) (2022-10-05)
 
 **Note:** Version bump only for package @oidajs/map-cesium
