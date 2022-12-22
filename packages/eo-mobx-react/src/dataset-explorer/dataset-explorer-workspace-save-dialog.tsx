@@ -26,19 +26,19 @@ export const DatasetExplorerWorkspaceSaveForm = (props: DatasetExplorerWorkspace
                 if (loadedView?.id) {
                     const viewProvider = workspaceHandler.getProvider(loadedView.provider);
                     if (viewProvider?.isSaveSupported()) {
-                        const workspace = {
-                            ...values,
-                            id: loadedView.id,
-                            config: currentViewConfig
-                        };
-
                         return workspaceHandler.getCurrentWorkspacePreview().then((preview) => {
+                            const workspace = {
+                                ...values,
+                                id: loadedView.id,
+                                config: currentViewConfig,
+                                preview: preview
+                            };
+
                             return viewProvider
                                 .updateWorkspace(workspace)
                                 .then((id) => {
                                     const workspaceMetadata = {
                                         ...workspace,
-                                        preview: preview,
                                         provider: viewProvider.id
                                     };
                                     workspaceHandler.setCurrentWorkspace(workspaceMetadata);
@@ -54,36 +54,36 @@ export const DatasetExplorerWorkspaceSaveForm = (props: DatasetExplorerWorkspace
                                 });
                         });
                     }
-                }
-                const storageProvider = workspaceHandler.storageProviders[0];
-                if (storageProvider) {
-                    const workspace = {
-                        ...values,
-                        config: currentViewConfig
-                    };
-
-                    return workspaceHandler.getCurrentWorkspacePreview().then((preview) => {
-                        return storageProvider
-                            .saveWorkspace(workspace)
-                            .then((workspaceId) => {
-                                const workspaceMetadata = {
-                                    ...workspace,
-                                    id: workspaceId,
-                                    preview: preview,
-                                    provider: storageProvider.id
-                                };
-                                workspaceHandler.setCurrentWorkspace(workspaceMetadata);
-                                if (onSuccess) {
-                                    onSuccess(workspaceMetadata);
-                                }
-                            })
-                            .catch((error) => {
-                                setSubmitErrorMessage(error.message);
-                                if (onError) {
-                                    onError(error);
-                                }
-                            });
-                    });
+                } else {
+                    const storageProvider = workspaceHandler.storageProviders[0];
+                    if (storageProvider) {
+                        return workspaceHandler.getCurrentWorkspacePreview().then((preview) => {
+                            const workspace = {
+                                ...values,
+                                preview: preview,
+                                config: currentViewConfig
+                            };
+                            return storageProvider
+                                .saveWorkspace(workspace)
+                                .then((workspaceId) => {
+                                    const workspaceMetadata = {
+                                        ...workspace,
+                                        id: workspaceId,
+                                        provider: storageProvider.id
+                                    };
+                                    workspaceHandler.setCurrentWorkspace(workspaceMetadata);
+                                    if (onSuccess) {
+                                        onSuccess(workspaceMetadata);
+                                    }
+                                })
+                                .catch((error) => {
+                                    setSubmitErrorMessage(error.message);
+                                    if (onError) {
+                                        onError(error);
+                                    }
+                                });
+                        });
+                    }
                 }
             }}
             onFinishFailed={() => {
