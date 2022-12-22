@@ -42,7 +42,6 @@ export type DatasetPointSeriesProps = Omit<
 > & {
     seriesDimension?: string;
     seriesVariable?: string;
-    seriesRange?: DimensionRangeType;
     autoUpdate?: boolean;
 };
 
@@ -69,7 +68,7 @@ export class DatasetPointSeries extends DatasetProcessing<typeof POINT_SERIES_PR
 
         this.config = props.config;
 
-        this.seriesDimension = undefined;
+        this.seriesDimension = props.seriesDimension;
         this.seriesVariable = props.seriesVariable;
 
         this.data = [];
@@ -81,8 +80,6 @@ export class DatasetPointSeries extends DatasetProcessing<typeof POINT_SERIES_PR
                 this.seriesVariable = parentVariable;
             }
         }
-
-        this.setDimension(props.seriesDimension, props.seriesRange);
 
         this.dataFetcher_ = new AsyncDataFetcher({
             dataFetcher: (params) => {

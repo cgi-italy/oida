@@ -166,6 +166,11 @@ export const DatasetVizListItem = (props: DatasetVizListItemProps) => {
                             onChange: (value) => {
                                 if (value) {
                                     props.datasetViz.setName(value);
+
+                                    // this is to propagate the name change also to analytics charts
+                                    // TODO: analytics should probably use the parent DatasetViz
+                                    // name instead
+                                    props.datasetViz.dataset.config.name = value;
                                 }
                             },
                             triggerType: ['text']
