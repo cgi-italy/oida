@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Modal, ModalProps, Button } from 'antd';
+import { Modal, ModalProps, Button, Tabs } from 'antd';
 import { Outlet } from 'react-router-dom';
 
 import { DatasetExplorerWorkspaceHandler } from '@oidajs/eo-mobx';
-import { StatePathRouter } from '@oidajs/ui-react-mobx';
+import { StatePathRouter, useSelector } from '@oidajs/ui-react-mobx';
 import { DatasetExplorerWorkspaceProviderComponent } from './dataset-explorer-workspace-provider';
 
 export type DatasetExplorerWorkspacesModalProps = {
@@ -16,6 +16,26 @@ export const DatasetExplorerWorkspacesModal = (props: DatasetExplorerWorkspacesM
     const [visible, setVisible] = useState(true);
 
     const title = workspaceHandler.providers.length === 1 ? workspaceHandler.providers[0].name : 'Map views';
+
+    const tabs = useSelector(() => {
+        if (workspaceHandler.providers.length > 1) {
+            const tabs = workspaceHandler.providers.map((provider) => {
+                return <Tabs.TabPane tab={provider.name} key={provider.id} />;
+            });
+            return (
+                <Tabs
+                    activeKey={props.workspaceHandler.selectedProvider?.id}
+                    onChange={(tab) => {
+                        props.workspaceHandler.selectProvider(tab);
+                    }}
+                >
+                    {tabs}
+                </Tabs>
+            );
+        } else {
+            return undefined;
+        }
+    }, []);
 
     return (
         <StatePathRouter
@@ -31,6 +51,7 @@ export const DatasetExplorerWorkspacesModal = (props: DatasetExplorerWorkspacesM
                     footer={<Button onClick={() => setVisible(false)}>Close</Button>}
                     {...modalProps}
                 >
+                    {tabs}
                     <Outlet />
                 </Modal>
             }
