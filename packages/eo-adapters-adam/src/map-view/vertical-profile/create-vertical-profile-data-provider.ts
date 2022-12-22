@@ -40,7 +40,7 @@ export const createVerticalProfileDataProvider = (
             profile.dimensionSubsets?.forEach((subset: string) => {
                 const matches = subset.match(/([^(]*)\(([^)]*)\)/);
                 if (matches) {
-                    const [_, id, value] = matches;
+                    const [, id, value] = matches;
                     const dimensionConfig = dimensionsSubsetMap[id];
                     if (dimensionConfig) {
                         profileName += `, ${dimensionConfig.name} ${value}`;

@@ -6,7 +6,6 @@ import {
     QueryParams,
     getGeometryExtent,
     isValidExtent,
-    BOOLEAN_FIELD_ID,
     STRING_FIELD_ID
 } from '@oidajs/core';
 
