@@ -167,7 +167,7 @@ export class WmsClient {
                         case 'application/json':
                             return response.data;
                         default: {
-                            const features = this.featureInfoParser_.read(response.data);
+                            const features = this.featureInfoParser_.readFeatures(response.data);
                             return this.geoJsonParser_.writeFeaturesObject(features);
                         }
                     }

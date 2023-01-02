@@ -1,23 +1,27 @@
 import { transform } from 'ol/proj';
+import Map from 'ol/Map';
 
 import {
     IFeatureSelectInteractionProps,
     FEATURE_SELECT_INTERACTION_ID,
     IFeatureSelectInteractionImplementation,
-    SelectionMode
+    SelectionMode,
+    IFeature,
+    FeatureSelectCallback
 } from '@oidajs/core';
 
-import { OLSelectInteraction } from '../utils/ol-select-interaction';
+import { OLSelectInteraction, OLSelectEvent } from '../utils/ol-select-interaction';
 import { click, platformModifierKeyOnly, shiftKeyOnly } from 'ol/events/condition';
 
 import { olInteractionsFactory } from './ol-interactions-factory';
 import { OLMapRenderer } from '../map/ol-map-renderer';
 import { OLFeatureLayer } from '../layers/ol-feature-layer';
 import { OLMapLayer } from '../layers/ol-map-layer';
+import { FeatureLike } from 'ol/Feature';
 
 export class OLFeatureSelectInteraction implements IFeatureSelectInteractionImplementation {
-    private viewer_;
-    private olInteraction_: OLSelectInteraction | undefined;
+    private viewer_: Map;
+    private olInteraction_!: OLSelectInteraction;
     private multiple_: boolean;
 
     constructor(config: IFeatureSelectInteractionProps<OLMapRenderer>) {
@@ -40,10 +44,10 @@ export class OLFeatureSelectInteraction implements IFeatureSelectInteractionImpl
 
     destroy() {
         this.viewer_.removeInteraction(this.olInteraction_);
-        delete this.olInteraction_;
+        this.olInteraction_.dispose();
     }
 
-    initInteraction_(onFeatureSelect) {
+    protected initInteraction_(onFeatureSelect: FeatureSelectCallback) {
         this.olInteraction_ = new OLSelectInteraction({
             condition: click,
             hitTolerance: 5,
@@ -52,8 +56,8 @@ export class OLFeatureSelectInteraction implements IFeatureSelectInteractionImpl
 
         let lastSelectedFeatureIdx = -1;
 
-        // @ts-ignore
-        this.olInteraction_.on('select', (evt) => {
+        //@ts-ignore
+        this.olInteraction_.on('select', (evt: OLSelectEvent) => {
             const features = evt.selected;
 
             let selectionMode = SelectionMode.Replace;
@@ -70,13 +74,8 @@ export class OLFeatureSelectInteraction implements IFeatureSelectInteractionImpl
                     // will cycle through the features under the cursor
                     lastSelectedFeatureIdx = (lastSelectedFeatureIdx + 1) % features.length;
                     const selected = features[lastSelectedFeatureIdx];
-
-                    const feature = {
-                        id: selected.getId(),
-                        data: selected.get(OLFeatureLayer.FEATURE_DATA_KEY)
-                    };
-
-                    if (feature.data) {
+                    const feature = this.getFeatureForSelection_(selected);
+                    if (feature) {
                         onFeatureSelect({
                             feature: feature,
                             mode: selectionMode
@@ -100,13 +99,10 @@ export class OLFeatureSelectInteraction implements IFeatureSelectInteractionImpl
                 } else {
                     lastSelectedFeatureIdx = -1;
                     features.forEach((selected) => {
-                        const feature = {
-                            id: selected.getId(),
-                            data: selected.get(OLFeatureLayer.FEATURE_DATA_KEY)
-                        };
-                        if (feature.data) {
+                        const feature = this.getFeatureForSelection_(selected);
+                        if (feature) {
                             onFeatureSelect({
-                                feature: feature.data ? feature : undefined,
+                                feature: feature,
                                 mode: selectionMode
                             });
                         }
@@ -115,11 +111,24 @@ export class OLFeatureSelectInteraction implements IFeatureSelectInteractionImpl
             } else {
                 lastSelectedFeatureIdx = -1;
                 onFeatureSelect({
-                    featureId: undefined,
+                    feature: undefined,
                     mode: selectionMode
                 });
             }
         });
+    }
+
+    protected getFeatureForSelection_(selection: FeatureLike): IFeature | undefined {
+        const featureId = selection.getId();
+        const featureData = selection.get(OLFeatureLayer.FEATURE_DATA_KEY);
+        if (typeof featureId === 'string' && featureData) {
+            return {
+                id: featureId,
+                data: featureData
+            };
+        } else {
+            return undefined;
+        }
     }
 }
 

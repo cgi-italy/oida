@@ -13,7 +13,9 @@ import {
     IMapProjection,
     FitExtentOptions,
     exportImage,
-    ImageExportOptions
+    ImageExportOptions,
+    BBox,
+    Size
 } from '@oidajs/core';
 
 import { olLayersFactory } from '../layers/ol-layers-factory';
@@ -26,8 +28,7 @@ import 'ol/ol.css';
 export const OL_RENDERER_ID = 'ol';
 
 export class OLMapRenderer implements IMapRenderer {
-    private viewer_: Map;
-    private layerGroup_: OLGroupLayer | undefined;
+    private viewer_!: Map;
 
     constructor(props: IMapRendererProps) {
         this.initRenderer_(props);
@@ -100,15 +101,14 @@ export class OLMapRenderer implements IMapRenderer {
         if (projection.getCode() !== 'EPSG:4326') {
             extent = transformExtent(extent, projection, 'EPSG:4326');
             if (isNaN(extent[0]) || isNaN(extent[1]) || isNaN(extent[2]) || isNaN(extent[3])) {
-                return null;
+                return undefined;
             }
         }
 
-        return extent;
+        return extent as BBox;
     }
 
     setLayerGroup(group: OLGroupLayer) {
-        this.layerGroup_ = group;
         this.viewer_.setLayerGroup(group.getOLObject());
     }
 
@@ -125,7 +125,7 @@ export class OLMapRenderer implements IMapRenderer {
     }
 
     getSize() {
-        return this.viewer_.getSize();
+        return this.viewer_.getSize() as Size;
     }
 
     updateSize() {
@@ -139,7 +139,7 @@ export class OLMapRenderer implements IMapRenderer {
             // extracted from https://openlayers.org/en/latest/examples/export-map.html
             this.viewer_.once('rendercomplete', () => {
                 const mapCanvas = document.createElement('canvas');
-                const size = this.viewer_.getSize();
+                const size = this.viewer_.getSize() || [options.width || 1024, options.height || 1024];
                 mapCanvas.width = size[0];
                 mapCanvas.height = size[1];
                 const mapContext = mapCanvas.getContext('2d');
@@ -189,7 +189,7 @@ export class OLMapRenderer implements IMapRenderer {
     }
 
     destroy() {
-        this.viewer_.setTarget(null);
+        this.viewer_.setTarget(undefined);
     }
 
     private initRenderer_(props: IMapRendererProps) {
@@ -225,14 +225,28 @@ export class OLMapRenderer implements IMapRenderer {
         }
     }
 
-    private computeCurrentView_(): IMapViewport {
+    private computeCurrentView_(): IMapViewport | undefined {
         const view = this.viewer_.getView();
         let center = view.getCenter();
-        const resolution = view.getResolution() * view.getProjection().getMetersPerUnit();
+        if (!center) {
+            return undefined;
+        }
+        let resolution = view.getResolution();
+        if (!resolution) {
+            return undefined;
+        }
+        const viewMetersPerUnit = view.getProjection().getMetersPerUnit();
+        if (viewMetersPerUnit) {
+            resolution *= viewMetersPerUnit;
+        }
+
         const rotation = view.getRotation();
 
         if (view.getProjection().getCode() !== 'EPSG:4326') {
             center = transform(center, view.getProjection(), 'EPSG:4326');
+        }
+        if (!center) {
+            return undefined;
         }
 
         return {
@@ -240,7 +254,7 @@ export class OLMapRenderer implements IMapRenderer {
             resolution,
             rotation,
             pitch: 0
-        };
+        } as IMapViewport;
     }
 
     private createViewFromProps_(viewProps: IMapViewport, projProps: IMapProjection) {
@@ -253,10 +267,12 @@ export class OLMapRenderer implements IMapRenderer {
             }
         }
 
-        const projection = getProj(projProps.code);
+        const projection = getProj(projProps.code) || undefined;
         const extent = projProps.extent || undefined;
-        if (extent) {
-            projection.setExtent(projProps.extent);
+        if (projection && extent) {
+            // TODO: check if this is required and if it affects subsequent usage of the same projection
+            // without an extent (side effect on projection object?)
+            projection.setExtent(extent);
         }
         const view = new View({
             projection,

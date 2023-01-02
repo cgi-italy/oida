@@ -1,6 +1,5 @@
 import proj4 from 'proj4';
 import { register } from 'ol/proj/proj4';
-import { transformExtent } from 'ol/proj';
 import { getIntersection } from 'ol/extent';
 import { fromArrayBuffer } from 'geotiff';
 

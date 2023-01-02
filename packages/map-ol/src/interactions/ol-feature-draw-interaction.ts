@@ -2,6 +2,7 @@ import DrawInteraction from 'ol/interaction/Draw';
 import Polygon from 'ol/geom/Polygon';
 import LineString from 'ol/geom/LineString';
 import GeoJSON from 'ol/format/GeoJSON';
+import Map from 'ol/Map';
 
 import { createBox } from 'ol/interaction/Draw';
 
@@ -19,9 +20,9 @@ import { OLMapRenderer } from '../map/ol-map-renderer';
 import { olInteractionsFactory } from './ol-interactions-factory';
 
 export class OLFeatureDrawInteraction implements IFeatureDrawInteractionImplementation {
-    private viewer_;
-    private olInteraction_;
-    private geoJsonParser_;
+    private viewer_: Map;
+    private olInteraction_: DrawInteraction | undefined;
+    private geoJsonParser_: GeoJSON;
 
     constructor(props: IFeatureDrawInteractionProps<OLMapRenderer>) {
         this.viewer_ = props.mapRenderer.getViewer();
@@ -30,7 +31,7 @@ export class OLFeatureDrawInteraction implements IFeatureDrawInteractionImplemen
 
     setActive(active) {
         if (this.olInteraction_) {
-            this.viewer_.olInteraction_.setActive(active);
+            this.olInteraction_.setActive(active);
         }
     }
 
@@ -79,12 +80,19 @@ export class OLFeatureDrawInteraction implements IFeatureDrawInteractionImplemen
             if (options.onDrawStart || options.onDrawChange) {
                 this.olInteraction_.on('drawstart', (evt) => {
                     if (options.onDrawChange) {
-                        evt.feature.getGeometry().on('change', (evt) => {
-                            options.onDrawChange!(evt);
-                        });
+                        const geometry = evt.feature.getGeometry();
+                        if (geometry) {
+                            geometry.on('change', (evt) => {
+                                options.onDrawChange!({
+                                    geometry: geometry
+                                });
+                            });
+                        }
                     }
                     if (options.onDrawStart) {
-                        options.onDrawStart(evt);
+                        options.onDrawStart({
+                            geometry: evt.feature.getGeometry()
+                        });
                     }
                 });
             }
@@ -106,6 +114,7 @@ export class OLFeatureDrawInteraction implements IFeatureDrawInteractionImplemen
     destroy() {
         if (this.olInteraction_) {
             this.viewer_.removeInteraction(this.olInteraction_);
+            this.olInteraction_.dispose();
             delete this.olInteraction_;
         }
     }

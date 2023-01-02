@@ -1,8 +1,7 @@
 import { transformExtent } from 'ol/proj';
 import { getIntersection, isEmpty } from 'ol/extent';
 
-import { getGeometryExtent } from '@oidajs/core';
-import { AoiValue } from '@oidajs/core';
+import { BBox, getGeometryExtent, AoiValue } from '@oidajs/core';
 
 import { AdamWcsDatasetConfig } from '../adam-dataset-config';
 
@@ -28,7 +27,7 @@ export const getAoiWcsParams = (
         let filterExtent = getGeometryExtent(geometry);
         if (filterExtent) {
             if (extent) {
-                filterExtent = transformExtent(filterExtent, 'EPSG:4326', extent.srs);
+                filterExtent = transformExtent(filterExtent, 'EPSG:4326', extent.srs) as BBox;
                 extent.bbox = getIntersection(extent.bbox, filterExtent);
             } else {
                 extent = {

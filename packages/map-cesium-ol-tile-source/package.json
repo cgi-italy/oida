@@ -30,6 +30,6 @@
   },
   "peerDependencies": {
     "cesium": "^1.88.0",
-    "ol": "^6.2.0"
+    "ol": "^7.x"
   }
 }

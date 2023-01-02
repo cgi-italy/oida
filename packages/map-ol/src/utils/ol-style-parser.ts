@@ -6,9 +6,10 @@ import Fill from 'ol/style/Fill';
 
 import { GeometryTypes, IFeatureStyle, IPointStyle, isIcon, ILineStyle, IPolygonStyle } from '@oidajs/core';
 
+export type OLStyle = Style & { pickingDisabled?: boolean };
 export class OLStyleParser {
-    getStyleForGeometry(geometryType: GeometryTypes, style: IFeatureStyle) {
-        let olStyle: Style = null;
+    getStyleForGeometry(geometryType: GeometryTypes | 'LinearRing', style: IFeatureStyle): OLStyle | undefined {
+        let olStyle: OLStyle | undefined;
         let pickingDisabled = false;
         if (style) {
             switch (geometryType) {
@@ -52,7 +53,7 @@ export class OLStyleParser {
 
     protected getPointStyle_(pointStyle: IPointStyle | undefined) {
         if (!pointStyle || !pointStyle.visible) {
-            return null;
+            return undefined;
         }
 
         const style = new Style();
@@ -68,7 +69,7 @@ export class OLStyleParser {
         } else {
             style.setImage(
                 new Circle({
-                    radius: pointStyle.radius,
+                    radius: pointStyle.radius || 8,
                     fill: pointStyle.fillColor ? new Fill({ color: this.parseColor_(pointStyle.fillColor) }) : undefined,
                     stroke: pointStyle.strokeColor ? new Stroke({ color: this.parseColor_(pointStyle.strokeColor) }) : undefined
                 })
@@ -84,7 +85,7 @@ export class OLStyleParser {
 
     protected getLineStyle_(lineStyle: ILineStyle | undefined) {
         if (!lineStyle || !lineStyle.visible) {
-            return null;
+            return undefined;
         }
 
         const style = new Style();
@@ -105,7 +106,7 @@ export class OLStyleParser {
 
     protected getPolygonStyle_(polygonStyle: IPolygonStyle | undefined) {
         if (!polygonStyle || !polygonStyle.visible) {
-            return null;
+            return undefined;
         }
 
         const style = new Style();

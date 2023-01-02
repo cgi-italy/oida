@@ -1,10 +1,10 @@
-import TileImage from 'ol/source/TileImage';
+import TileSource from 'ol/source/Tile';
 
 import { createDynamicFactory, IDynamicFactory, ITileSourceDefinitions } from '@oidajs/core';
 
-const factory = createDynamicFactory<TileImage, ITileSourceDefinitions, { wrapX?: boolean }>('ol-tile-sources');
+const factory = createDynamicFactory<TileSource, ITileSourceDefinitions, { wrapX?: boolean }>('ol-tile-sources');
 
-export const olTileSourcesFactory: IDynamicFactory<TileImage, ITileSourceDefinitions, { wrapX?: boolean }> = {
+export const olTileSourcesFactory: IDynamicFactory<TileSource, ITileSourceDefinitions, { wrapX?: boolean }> = {
     ...factory,
     create: (id, config) => {
         return factory.create(id, {

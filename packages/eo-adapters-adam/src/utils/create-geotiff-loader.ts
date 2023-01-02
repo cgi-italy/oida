@@ -5,13 +5,15 @@ import { register } from 'ol/proj/proj4';
 import { AxiosInstanceWithCancellation } from '@oidajs/core';
 import { GeotiffRenderer, PlottyRenderer, GeotiffRendererData } from '@oidajs/eo-geotiff';
 
+import { AdamWcsTileLoadFunctionSource } from '../map-view/adam-wcs-tile-source';
+
 export type createGeotiffTileLoaderProps = {
     axiosInstance: AxiosInstanceWithCancellation;
     rotateImage?: boolean;
 };
 
 export type GeotiffLoader = {
-    load: (source: { url: string; postData?: string; requestExtent?: number[]; requestSrs?: string }) => Promise<string>;
+    load: (source: AdamWcsTileLoadFunctionSource) => Promise<string>;
     renderer: PlottyRenderer;
     dataCache: LruCache<string, GeotiffRendererData | null>;
 };
@@ -42,7 +44,7 @@ export const createGeoTiffLoader = (props: createGeotiffTileLoaderProps): Geotif
         };
     }
 
-    const load = (source: { url: string; data?: any; requestExtent?: number[]; requestSrs?: string }) => {
+    const load = (source: AdamWcsTileLoadFunctionSource) => {
         return geotiffRenderer
             .renderFromUrl({
                 url: source.url,

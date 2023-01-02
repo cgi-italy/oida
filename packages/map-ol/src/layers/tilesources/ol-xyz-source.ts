@@ -6,7 +6,7 @@ import { getTileGridFromConfig, getUrlFromConfig } from './ol-tilesource-utils';
 olTileSourcesFactory.register('xyz', function (config) {
     return new XYZSource({
         ...getUrlFromConfig(config),
-        tileGrid: config.tileGrid ? getTileGridFromConfig(config.srs, config.tileGrid) : null,
+        tileGrid: config.tileGrid ? getTileGridFromConfig(config.srs, config.tileGrid) : undefined,
         projection: config.srs,
         wrapX: config.wrapX
     });

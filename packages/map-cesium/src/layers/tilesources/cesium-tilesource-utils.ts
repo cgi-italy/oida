@@ -3,7 +3,7 @@ import WebMercatorTilingScheme from 'cesium/Source/Core/WebMercatorTilingScheme.
 import Cartesian2 from 'cesium/Source/Core/Cartesian2';
 import Rectangle from 'cesium/Source/Core/Rectangle';
 
-import { TileGridConfig, computeTileGridParams } from '@oidajs/core';
+import { TileGridConfig, computeTileGridParams, WmtsTileGridConfig } from '@oidajs/core';
 
 import { ProjectionType, getProjectionType } from '../../utils/projection';
 
@@ -54,7 +54,7 @@ export const getTileGridFromSRS = (srs: string, tileGridConfig?: TileGridConfig)
         tileWidth: tileSize[0],
         tileHeight: tileSize[1],
         minimumLevel: tileGridConfig.minZoom || 0,
-        tileMatrixLabels: tileGridConfig.matrixIds
+        tileMatrixLabels: (tileGridConfig as WmtsTileGridConfig).matrixIds
     };
 
     if (tileGridConfig.maxZoom) {

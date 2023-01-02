@@ -1,5 +1,5 @@
 import XYZSource from 'ol/source/XYZ';
-
+import ImageTile from 'ol/ImageTile';
 import UrlTemplateImageryProvider from 'cesium/Source/Scene/UrlTemplateImageryProvider';
 
 import { TileGridConfig } from '@oidajs/core';
@@ -9,6 +9,13 @@ import { cesiumTileSourcesFactory, getTileGridFromSRS } from '@oidajs/map-cesium
 import { AdamServiceParamsSerializer } from '../utils';
 
 export const ADAM_WCS_SOURCE_ID = 'adam_wcs';
+
+export type AdamWcsTileLoadFunctionSource = {
+    url: string;
+    data?: string;
+    requestExtent?: number[];
+    requestSrs?: string;
+};
 
 export type AdamWcsTileSource = {
     id: typeof ADAM_WCS_SOURCE_ID;
@@ -22,15 +29,7 @@ export type AdamWcsTileSource = {
     minZoomLevel?: number;
     crossOrigin?: 'anonymous' | 'use-credentials';
     wktFilter?: string;
-    tileLoadFunction?: (
-        source: {
-            url: string;
-            data?: string;
-            requestExtent?: number[];
-            requestSrs?: string;
-        },
-        flip?: boolean
-    ) => Promise<string>;
+    tileLoadFunction?: (source: AdamWcsTileLoadFunctionSource, flip?: boolean) => Promise<string>;
     colortable?: string;
     colorrange?: string;
     requestExtentOffset?: number[];
@@ -44,7 +43,7 @@ declare module '@oidajs/core' {
 
 olTileSourcesFactory.register(ADAM_WCS_SOURCE_ID, (config) => {
     const tileGrid = getTileGridFromConfig(config.srs, config.tileGrid);
-    const tileSize = tileGrid.getTileSize();
+    const tileSize = tileGrid.getTileSize(0);
 
     const wcsParams = {
         service: 'WCS',
@@ -59,6 +58,7 @@ olTileSourcesFactory.register(ADAM_WCS_SOURCE_ID, (config) => {
     };
 
     return new XYZSource({
+        // @ts-ignore
         tileUrlFunction: (tileCoord, ratio, projection) => {
             const tileExtent = tileGrid.getTileCoordExtent(tileCoord);
 
@@ -90,17 +90,19 @@ olTileSourcesFactory.register(ADAM_WCS_SOURCE_ID, (config) => {
                 data: config.wktFilter
             };
         },
-        tileLoadFunction: (tile, source) => {
+        // @ts-ignore
+        tileLoadFunction: (tile: ImageTile, source: { url: string; data?: string }) => {
             if (config.tileLoadFunction) {
-                const tileLoadParams = source;
+                const tileLoadParams: AdamWcsTileLoadFunctionSource = source;
                 if (config.srs !== 'unprojected') {
                     tileLoadParams.requestExtent = tileGrid.getTileCoordExtent(tile.getTileCoord());
-                    tileLoadParams.srs = config.srs || 'EPSG:4326';
+                    tileLoadParams.requestSrs = config.srs || 'EPSG:4326';
                 }
                 config.tileLoadFunction(tileLoadParams).then((sourceDataUrl) => {
                     if (sourceDataUrl) {
-                        tile.getImage().src = sourceDataUrl;
+                        (tile.getImage() as HTMLImageElement).src = sourceDataUrl;
                     } else {
+                        // @ts-ignore
                         tile.handleImageError_();
                     }
                 });
@@ -116,6 +118,7 @@ olTileSourcesFactory.register(ADAM_WCS_SOURCE_ID, (config) => {
                                 tryImageLoad();
                             }, 1000 + Math.round(Math.random() * 2000));
                         } else {
+                            // @ts-ignore
                             tile.handleImageError_();
                         }
                     };
@@ -132,7 +135,7 @@ olTileSourcesFactory.register(ADAM_WCS_SOURCE_ID, (config) => {
                                         if (!dataUri) {
                                             onLoadError();
                                         } else {
-                                            tile.getImage().src = dataUri;
+                                            (tile.getImage() as HTMLImageElement).src = dataUri;
                                         }
                                     })
                                     .catch(() => {

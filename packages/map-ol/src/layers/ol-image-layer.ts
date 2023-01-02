@@ -1,4 +1,5 @@
 import ImageLayer from 'ol/layer/Image';
+import ImageSource from 'ol/source/Image';
 
 import { IMAGE_LAYER_ID, IImageLayerRenderer, ImageLayerRendererConfig, ImageSourceConfig } from '@oidajs/core';
 
@@ -7,7 +8,7 @@ import { olImageSourceFactory } from './image-sources/ol-image-source-factory';
 import { olLayersFactory } from './ol-layers-factory';
 import { OLMapLayer } from './ol-map-layer';
 
-export class OLImageLayer extends OLMapLayer<ImageLayer> implements IImageLayerRenderer {
+export class OLImageLayer extends OLMapLayer<ImageLayer<ImageSource>> implements IImageLayerRenderer {
     protected onImageLoadStart_;
     protected onImageLoadEnd_;
 

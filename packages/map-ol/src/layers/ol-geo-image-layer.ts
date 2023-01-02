@@ -13,7 +13,7 @@ import { GLGeoImageProjector } from '../utils';
 import { olLayersFactory } from './ol-layers-factory';
 import { OLMapLayer } from './ol-map-layer';
 
-export class OLGeoImageLayer extends OLMapLayer<ImageLayer> implements IGeoImageLayerRenderer {
+export class OLGeoImageLayer extends OLMapLayer<ImageLayer<CanvasSource>> implements IGeoImageLayerRenderer {
     protected source_: GeoImageLayerSource | undefined;
     protected footprint_: GeoImageLayerFootprint;
     protected imageProjector_: GLGeoImageProjector;
@@ -43,7 +43,7 @@ export class OLGeoImageLayer extends OLMapLayer<ImageLayer> implements IGeoImage
                       ratio: 1,
                       projection: 'EPSG:4326'
                   })
-                : undefined
+                : null
         );
         this.forceRefresh();
     }
@@ -51,12 +51,12 @@ export class OLGeoImageLayer extends OLMapLayer<ImageLayer> implements IGeoImage
     updateFootprint(footprint: GeoImageLayerFootprint) {
         this.footprint_ = footprint;
         this.imageProjector_.setFootprint(footprint);
-        this.olImpl_.getSource().refresh();
+        this.olImpl_.getSource()?.refresh();
     }
 
     forceRefresh() {
         this.imageProjector_.refreshSource();
-        this.olImpl_.getSource().refresh();
+        this.olImpl_.getSource()?.refresh();
     }
 
     protected createOLObject_(config: GeoImageLayerRendererConfig) {
@@ -86,7 +86,7 @@ export class OLGeoImageLayer extends OLMapLayer<ImageLayer> implements IGeoImage
         return;
     }
 
-    protected allowContinousUpdate_(layer: ImageLayer) {
+    protected allowContinousUpdate_(layer: ImageLayer<CanvasSource>) {
         const olLayerRenderer = this.olImpl_.getRenderer();
         if (olLayerRenderer) {
             const prototypePrepareFrame = olLayerRenderer.prepareFrame;
