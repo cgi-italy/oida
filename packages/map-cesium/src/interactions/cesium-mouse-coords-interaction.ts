@@ -1,7 +1,4 @@
-import ScreenSpaceEventHandler from 'cesium/Source/Core/ScreenSpaceEventHandler';
-import ScreenSpaceEventType from 'cesium/Source/Core/ScreenSpaceEventType';
-import Cartographic from 'cesium/Source/Core/Cartographic';
-import CesiumMath from 'cesium/Source/Core/Math';
+import { ScreenSpaceEventHandler, ScreenSpaceEventType, Cartographic, Math as CesiumMath, CesiumWidget } from 'cesium';
 
 import { IMouseCoordsInteraction, IMouseCoordsInteractionProps, MouseCoords, MOUSE_COORDS_INTERACTION_ID } from '@oidajs/core';
 
@@ -9,8 +6,8 @@ import { cesiumInteractionsFactory } from './cesium-interactions-factory';
 import { CesiumMapRenderer } from '../map/cesium-map-renderer';
 
 export class CesiumMouseCoordsInteraction implements IMouseCoordsInteraction {
-    protected viewer_;
-    protected handler_;
+    protected viewer_: CesiumWidget;
+    protected handler_: ScreenSpaceEventHandler | undefined;
     protected onMouseCoords_: (coords: MouseCoords | undefined) => void;
     protected onMouseClick_: (coords: MouseCoords | undefined) => void;
     protected mouseLeaveHandler_: () => void;
@@ -48,6 +45,12 @@ export class CesiumMouseCoordsInteraction implements IMouseCoordsInteraction {
         this.handler_ = new ScreenSpaceEventHandler(this.viewer_.scene.canvas);
 
         this.handler_.setInputAction((movement) => {
+            // do not compute mouse coordinates when the camera is moving (reduce lagging)
+            // @ts-ignore: need access to camera private member
+            if (this.viewer_.scene.camera.timeSinceMoved < 0.2) {
+                onMouseCoords(undefined);
+                return;
+            }
             const cartesian = this.viewer_.camera.pickEllipsoid(movement.endPosition, this.viewer_.scene.globe.ellipsoid);
             if (cartesian) {
                 onMouseCoords(this.getGeographicCoord_(cartesian));

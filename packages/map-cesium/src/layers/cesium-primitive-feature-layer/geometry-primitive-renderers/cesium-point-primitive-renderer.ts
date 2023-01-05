@@ -1,13 +1,15 @@
-import PrimitiveCollection from 'cesium/Source/Scene/PrimitiveCollection';
-import Cartesian3 from 'cesium/Source/Core/Cartesian3';
-import Color from 'cesium/Source/Core/Color';
-import HeightReference from 'cesium/Source/Scene/HeightReference';
-import BillboardCollection from 'cesium/Source/Scene/BillboardCollection';
-import PointPrimitiveCollection from 'cesium/Source/Scene/PointPrimitiveCollection';
-import Billboard from 'cesium/Source/Scene/Billboard';
-import PointPrimitive from 'cesium/Source/Scene/PointPrimitive';
+import {
+    PrimitiveCollection,
+    Cartesian3,
+    Color,
+    HeightReference,
+    BillboardCollection,
+    PointPrimitiveCollection,
+    Billboard,
+    PointPrimitive
+} from 'cesium';
 
-import { IPointStyle, IIconStyle, ICircleStyle, isIcon } from '@oidajs/core';
+import { IPointStyle, IIconStyle, ICircleStyle, isIcon, MapCoord } from '@oidajs/core';
 
 import { PICK_INFO_KEY, PickInfo } from '../../../utils/picking';
 import { CesiumGeometryPrimitiveFeature, CesiumGeometryPrimitiveRenderer } from './cesium-geometry-primitive-renderer';
@@ -102,8 +104,8 @@ export class CesiumPointPrimitiveRenderer implements CesiumGeometryPrimitiveRend
         for (i = 0; i < primitives.length; ++i) {
             if (coordinates[i]) this.updatePrimitivedGeometry_(primitives[i], coordinates[i]);
             else {
-                this.billboards_.remove(primitives[i]);
-                this.points_.remove(primitives[i]);
+                this.billboards_.remove(primitives[i] as Billboard);
+                this.points_.remove(primitives[i] as PointPrimitive);
             }
         }
         for (let j = i; j < coordinates.length; ++j) {
@@ -131,9 +133,9 @@ export class CesiumPointPrimitiveRenderer implements CesiumGeometryPrimitiveRend
     updateStyle(feature: CesiumPointPrimitiveFeature, style: IPointStyle) {
         feature.renderProps.primitives.forEach((primitive) => {
             if (isIcon(style)) {
-                this.updateBillboardStyle_(primitive, style);
+                this.updateBillboardStyle_(primitive as Billboard, style);
             } else {
-                this.updatePointStyle_(primitive, style);
+                this.updatePointStyle_(primitive as PointPrimitive, style);
             }
             primitive[PICK_INFO_KEY].pickable = !style.pickingDisabled;
         });
@@ -156,10 +158,10 @@ export class CesiumPointPrimitiveRenderer implements CesiumGeometryPrimitiveRend
         this.primitives_.destroy();
     }
 
-    protected createBillboard_(id, coordinates, style) {
+    protected createBillboard_(id: string, coordinates: GeoJSON.Position, style: IIconStyle) {
         const billboard = this.billboards_.add({
             id: id,
-            position: Cartesian3.fromDegrees(...coordinates),
+            position: Cartesian3.fromDegrees(...(coordinates as MapCoord)),
             color: style.color ? new Color(...style.color) : undefined,
             show: style.visible,
             image: style.url,
@@ -203,7 +205,7 @@ export class CesiumPointPrimitiveRenderer implements CesiumGeometryPrimitiveRend
         return this.points_.add({
             id: id,
             show: style.visible,
-            position: Cartesian3.fromDegrees(...coordinates),
+            position: Cartesian3.fromDegrees(...(coordinates as MapCoord)),
             pixelSize: style.radius ? style.radius * 2 : 1,
             color: style.fillColor ? new Color(...style.fillColor) : undefined,
             outlineColor: style.strokeColor ? new Color(...style.strokeColor) : undefined
@@ -228,6 +230,6 @@ export class CesiumPointPrimitiveRenderer implements CesiumGeometryPrimitiveRend
     }
 
     protected updatePrimitivedGeometry_(primitive: Billboard | PointPrimitive, coordinates: GeoJSON.Position) {
-        primitive.position = Cartesian3.fromDegrees(...coordinates);
+        primitive.position = Cartesian3.fromDegrees(...(coordinates as MapCoord));
     }
 }

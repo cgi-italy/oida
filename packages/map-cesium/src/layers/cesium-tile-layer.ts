@@ -1,10 +1,8 @@
-import ImageryLayer from 'cesium/Source/Scene/ImageryLayer';
-import Rectangle from 'cesium/Source/Core/Rectangle';
-import Event from 'cesium/Source/Core/Event';
+import { ImageryLayer, Rectangle } from 'cesium';
 
 import { ITileLayerRenderer, TileLayerRendererConfig, TileSource } from '@oidajs/core';
 
-import { cesiumTileSourcesFactory } from './tilesources/cesium-tilesources-factory';
+import { CesiumTileSource, cesiumTileSourcesFactory } from './tilesources';
 import { CesiumMapLayer } from './cesium-map-layer';
 
 export class CesiumTileLayer extends CesiumMapLayer implements ITileLayerRenderer {
@@ -15,7 +13,7 @@ export class CesiumTileLayer extends CesiumMapLayer implements ITileLayerRendere
     protected maxZoomLevel_: number | undefined;
     protected sourceConfig_: TileSource | undefined;
 
-    protected source_;
+    protected source_: CesiumTileSource | undefined;
 
     constructor(config: TileLayerRendererConfig) {
         super(config);
@@ -32,8 +30,12 @@ export class CesiumTileLayer extends CesiumMapLayer implements ITileLayerRendere
 
     updateSource(sourceConfig: TileSource | undefined) {
         if (this.source_) {
-            this.source_.tileLoadStartEvent.removeEventListener(this.onTileLoadStart_, this);
-            this.source_.tileLoadEndEvent.removeEventListener(this.onTileLoadEnd_, this);
+            if (this.onTileLoadStart_) {
+                this.source_.tileLoadStartEvent.removeEventListener(this.onTileLoadStart_, this);
+            }
+            if (this.onTileLoadEnd_) {
+                this.source_.tileLoadEndEvent.removeEventListener(this.onTileLoadEnd_, this);
+            }
         }
 
         this.imageries_.removeAll(false);
@@ -42,29 +44,12 @@ export class CesiumTileLayer extends CesiumMapLayer implements ITileLayerRendere
         try {
             const source = sourceConfig ? cesiumTileSourcesFactory.create(sourceConfig.id, sourceConfig) : undefined;
             if (source) {
-                source.tileLoadStartEvent = new Event();
-                source.tileLoadEndEvent = new Event();
-
-                // wrap source requestImage to track tile requests
-                const originalRequestImage = source.requestImage;
-                source.requestImage = function (...args) {
-                    const request = originalRequestImage.apply(this, args);
-                    if (request) {
-                        this.tileLoadStartEvent.raiseEvent();
-                        request.then(
-                            () => {
-                                this.tileLoadEndEvent.raiseEvent();
-                            },
-                            () => {
-                                this.tileLoadEndEvent.raiseEvent();
-                            }
-                        );
-                    }
-                    return request;
-                };
-                source.tileLoadStartEvent.addEventListener(this.onTileLoadStart_, this);
-                source.tileLoadEndEvent.addEventListener(this.onTileLoadEnd_, this);
-
+                if (this.onTileLoadStart_) {
+                    source.tileLoadStartEvent.addEventListener(this.onTileLoadStart_, this);
+                }
+                if (this.onTileLoadEnd_) {
+                    source.tileLoadEndEvent.addEventListener(this.onTileLoadEnd_, this);
+                }
                 this.imageries_.add(new ImageryLayer(source, this.getLayerOptions_()));
             }
 
@@ -77,9 +62,13 @@ export class CesiumTileLayer extends CesiumMapLayer implements ITileLayerRendere
     }
 
     forceRefresh() {
-        //TODO: check how to refresh the images without recreating the imagerylayer
-        //investigate about this.source_._reload() defined in GlobeSurfaceTileProvider.prototype._onLayerAdded
+        // TODO: we reset the source and recreate the imagery layer. The reload method appears to have some issues
+        // and some of the tiles are not updated correctly, so we disable it for now
         this.updateSource(this.sourceConfig_);
+        // if (this.source_) {
+        //     this.source_.reload();
+        //     this.mapRenderer_.getViewer().scene.requestRender();
+        // }
     }
 
     setExtent(extent: number[] | undefined) {

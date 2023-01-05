@@ -1,7 +1,4 @@
-import ScreenSpaceEventHandler from 'cesium/Source/Core/ScreenSpaceEventHandler';
-import ScreenSpaceEventType from 'cesium/Source/Core/ScreenSpaceEventType';
-import KeyboardEventModifier from 'cesium/Source/Core/KeyboardEventModifier';
-import Cartesian3 from 'cesium/Source/Core/Cartesian3';
+import { ScreenSpaceEventHandler, ScreenSpaceEventType, KeyboardEventModifier, CesiumWidget } from 'cesium';
 
 import {
     IFeatureHoverInteractionImplementation,
@@ -12,11 +9,11 @@ import {
 
 import { cesiumInteractionsFactory } from './cesium-interactions-factory';
 import { CesiumMapRenderer } from '../map/cesium-map-renderer';
-import { getPickInfo, PickInfo, setNonPickableFeaturesVisibility, CesiumFeatureCoordPickMode } from '../utils';
+import { getPickInfo, PickInfo, pickCoordinate } from '../utils';
 
 export class CesiumFeatureHoverInteraction implements IFeatureHoverInteractionImplementation {
-    private viewer_;
-    private handler_;
+    private viewer_: CesiumWidget;
+    private handler_: ScreenSpaceEventHandler | undefined;
     private onFeatureHover_: (hovered: IFeature<any> | undefined) => void;
 
     constructor(props: IFeatureHoverInteractionProps<CesiumMapRenderer>) {
@@ -47,6 +44,13 @@ export class CesiumFeatureHoverInteraction implements IFeatureHoverInteractionIm
 
         let lastPickTime = performance.now();
         const onMouseMove = (movement) => {
+            // to reduce lagging disable feature hovering if the camera is moving
+            // @ts-ignore: need access to camera private member
+            if (this.viewer_.scene.camera.timeSinceMoved < 0.2) {
+                return;
+            }
+
+            // avoid computation at each frame on mouse move
             const now = performance.now();
             if (now - lastPickTime < 30) {
                 return;
@@ -54,25 +58,19 @@ export class CesiumFeatureHoverInteraction implements IFeatureHoverInteractionIm
             lastPickTime = now;
             const pickedObjects = this.viewer_.scene.drillPick(movement.endPosition, 10);
 
-            const pickInfo: PickInfo = pickedObjects
+            const pickInfo: PickInfo | undefined = pickedObjects
                 .map((pickedObject) => getPickInfo(pickedObject))
                 .find((pickInfo) => !!pickInfo && pickInfo.pickable);
 
             if (pickInfo) {
-                this.viewer_.container.style.cursor = 'pointer';
+                (this.viewer_.container as HTMLDivElement).style.cursor = 'pointer';
 
                 const layer = pickInfo.layer;
-                if (layer.shouldReceiveFeatureHoverEvents()) {
-                    let coordinate: Cartesian3;
-                    if (layer.getFeaturePickMode() === CesiumFeatureCoordPickMode.Ellipsoid) {
-                        coordinate = this.viewer_.camera.pickEllipsoid(movement.endPosition, this.viewer_.scene.globe.ellipsoid);
-                    } else {
-                        setNonPickableFeaturesVisibility(pickedObjects, false);
-                        this.viewer_.scene.render();
-                        coordinate = this.viewer_.scene.pickPosition(movement.endPosition);
-                        setNonPickableFeaturesVisibility(pickedObjects, true);
+                if (layer && layer.shouldReceiveFeatureHoverEvents()) {
+                    const coordinate = pickCoordinate(this.viewer_, movement.endPosition, layer.getFeaturePickMode(), pickedObjects);
+                    if (coordinate) {
+                        layer.onFeatureHover(coordinate, pickInfo);
                     }
-                    layer.onFeatureHover(coordinate, pickInfo);
                 }
 
                 if (pickInfo.id !== hoveredFeature) {
@@ -83,7 +81,7 @@ export class CesiumFeatureHoverInteraction implements IFeatureHoverInteractionIm
                     hoveredFeature = pickInfo.id;
                 }
             } else {
-                this.viewer_.container.style.cursor = '';
+                (this.viewer_.container as HTMLDivElement).style.cursor = '';
                 if (hoveredFeature) {
                     onFeatureHover(undefined);
                     hoveredFeature = undefined;

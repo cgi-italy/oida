@@ -1,13 +1,11 @@
-import Cartesian3 from 'cesium/Source/Core/Cartesian3';
-import Color from 'cesium/Source/Core/Color';
-import Entity from 'cesium/Source/DataSources/Entity';
-import HeightReference from 'cesium/Source/Scene/HeightReference';
-import BillboardGraphics from 'cesium/Source/DataSources/BillboardGraphics';
-import PointGraphics from 'cesium/Source/DataSources/PointGraphics';
+import { Cartesian3, Color, Entity, HeightReference, BillboardGraphics, PointGraphics } from 'cesium';
 
-import { IFeatureStyle, isIcon } from '@oidajs/core';
+import { IFeatureStyle, isIcon, MapCoord } from '@oidajs/core';
 
 import { CesiumGeometryEntityRenderer } from './cesium-geometry-entity-renderer-factory';
+
+const FEATURE_STYLE_KEY = 'featureStyle';
+const LAYER_OPTIONS_KEY = 'layerOptions';
 
 export const createPointEntity = (id: string, geometry: GeoJSON.Point, featureStyle: IFeatureStyle, layerOptions?) => {
     const style = featureStyle.point;
@@ -17,11 +15,11 @@ export const createPointEntity = (id: string, geometry: GeoJSON.Point, featureSt
 
     const pointEntity = new Entity({
         id: id,
-        position: Cartesian3.fromDegrees(...geometry.coordinates),
+        position: Cartesian3.fromDegrees(...(geometry.coordinates as MapCoord)),
         show: style.visible
     });
 
-    let heightReference = HeightReference.None;
+    let heightReference = HeightReference.NONE;
     if (layerOptions && layerOptions.clampToGround) {
         heightReference = geometry.coordinates.length === 2 ? HeightReference.CLAMP_TO_GROUND : HeightReference.RELATIVE_TO_GROUND;
     }
@@ -49,7 +47,7 @@ export const createPointEntity = (id: string, geometry: GeoJSON.Point, featureSt
 };
 
 export const updatePointEntityGeometry = (pointEntity, geometry: GeoJSON.Point) => {
-    pointEntity.position = Cartesian3.fromDegrees(...geometry.coordinates);
+    pointEntity.position = Cartesian3.fromDegrees(...(geometry.coordinates as MapCoord));
 };
 
 export const updatePointEntityStyle = (pointEntity, featureStyle: IFeatureStyle) => {
@@ -108,18 +106,19 @@ export const createMultiPointEntity = (id, geometry: GeoJSON.MultiPoint, feature
         show: pointStyle.visible
     });
 
-    multiPointEntity.featureStyle = featureStyle;
-    multiPointEntity.layerOptions = layerOptions;
+    multiPointEntity[FEATURE_STYLE_KEY] = featureStyle;
+    multiPointEntity[LAYER_OPTIONS_KEY] = layerOptions;
 
     geometry.coordinates.forEach((pointCoords, idx) => {
         const pointEntity = createPointEntity(`${id}_${idx}`, { type: 'Point', coordinates: pointCoords }, featureStyle, layerOptions);
-        pointEntity.parent = multiPointEntity;
+        pointEntity!.parent = multiPointEntity;
     });
 
     return multiPointEntity;
 };
 
-export const updateMultiPointEntityGeometry = (multiPointEntity, geometry: GeoJSON.MultiPoint) => {
+export const updateMultiPointEntityGeometry = (multiPointEntity: Entity, geometry: GeoJSON.MultiPoint) => {
+    // @ts-ignore: need access to private entity children
     const pointEntities = multiPointEntity._children;
     const coordinates = geometry.coordinates;
 
@@ -130,10 +129,10 @@ export const updateMultiPointEntityGeometry = (multiPointEntity, geometry: GeoJS
             const pointEntity = createPointEntity(
                 `${multiPointEntity.id}_${i}`,
                 { type: 'Point', coordinates: coordinates[i] },
-                multiPointEntity.featureStyle,
-                multiPointEntity.layerOptions
+                multiPointEntity[FEATURE_STYLE_KEY],
+                multiPointEntity[LAYER_OPTIONS_KEY]
             );
-            pointEntity.parent = multiPointEntity;
+            pointEntity!.parent = multiPointEntity;
         }
     }
 
@@ -146,8 +145,9 @@ export const updateMultiPointEntityGeometry = (multiPointEntity, geometry: GeoJS
     });
 };
 
-export const updateMultiPointEntityStyle = (multiPointEntity, featureStyle: IFeatureStyle) => {
-    multiPointEntity.featureStyle = featureStyle;
+export const updateMultiPointEntityStyle = (multiPointEntity: Entity, featureStyle: IFeatureStyle) => {
+    multiPointEntity[FEATURE_STYLE_KEY] = featureStyle;
+    // @ts-ignore: need access to private entity children
     const pointEntities = multiPointEntity._children;
     pointEntities.forEach((pointEntity) => {
         updatePointEntityStyle(pointEntity, featureStyle);

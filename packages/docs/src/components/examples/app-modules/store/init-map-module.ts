@@ -1,4 +1,4 @@
-import { MapModule } from '@oidajs/ui-react-mobx';
+import { MapBaseLayerConfig, MapModule } from '@oidajs/ui-react-mobx';
 
 export const initMapModule = () => {
     const mapProjections = [
@@ -6,22 +6,21 @@ export const initMapModule = () => {
         { name: 'Mercator', code: 'EPSG:900913' }
     ];
 
-    const baseLayers = [
+    const baseLayers: MapBaseLayerConfig[] = [
         {
             id: 'osm',
             name: 'OSM',
-            config: {
+            source: {
                 id: 'osm'
             }
         },
         {
             id: 'bing',
             name: 'Bing',
-            config: {
+            source: {
                 id: 'bing',
                 imagerySet: 'Aerial',
-                key: 'AmEV-s101vB0DGqgW8Y9rjCWBg3ZinPm_y-QM6RXHmds_mSiZDbYxeEFcugx10rr',
-                maxZoom: 19
+                key: 'AmEV-s101vB0DGqgW8Y9rjCWBg3ZinPm_y-QM6RXHmds_mSiZDbYxeEFcugx10rr'
             }
         }
     ];

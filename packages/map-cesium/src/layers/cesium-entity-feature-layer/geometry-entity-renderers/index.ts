@@ -13,3 +13,4 @@ geometryEntityRendererFactory.register('MultiPolygon', () => multiPolygonEntityR
 geometryEntityRendererFactory.register('BBox', () => bboxEntityRenderer);
 
 export { geometryEntityRendererFactory };
+export { CesiumGeometryEntityRenderer } from './cesium-geometry-entity-renderer-factory';

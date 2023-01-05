@@ -1,30 +1,31 @@
-import Cartesian3 from 'cesium/Source/Core/Cartesian3';
-import Cartographic from 'cesium/Source/Core/Cartographic';
-import CesiumMath from 'cesium/Source/Core/Math';
-
-import CallbackProperty from 'cesium/Source/DataSources/CallbackProperty';
-import Color from 'cesium/Source/Core/Color';
-import Entity from 'cesium/Source/DataSources/Entity';
-import ImageMaterialProperty from 'cesium/Source/DataSources/ImageMaterialProperty';
-import CustomDataSource from 'cesium/Source/DataSources/CustomDataSource';
-
-import { CesiumMapLayer } from './cesium-map-layer';
+import {
+    Cartesian3,
+    Cartographic,
+    Math as CesiumMath,
+    CallbackProperty,
+    Color,
+    Entity,
+    ImageMaterialProperty,
+    CustomDataSource
+} from 'cesium';
 
 import {
     IVerticalProfileLayerRenderer,
     VerticalProfileLayerRendererConfig,
     IVerticalProfile,
     IVerticalProfileStyle,
-    VerticalProfileCoordinate
+    VerticalProfileCoordinate,
+    MapCoord
 } from '@oidajs/core';
 
+import { CesiumMapLayer } from './cesium-map-layer';
 import { PickInfo, PICK_INFO_KEY, updateDataSource } from '../utils';
 
 const cursor =
     'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAADsQAAA7EB9YPtSQAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAF6SURBVDiNnZO9TgJBEMf/7NGcJFMsXCWKxo+EHA8gak8N9xDG5+HjMDwDodWWcOEFIBRiocT2riBhi729tYAjeh4R/HW72d/MzuxOBumcAqiZpnkBAEKINwDPABbJg5nE+oxz/mQYxq3jOEa5XDYBYDabiX6/r5RSnu/7DwDe07LeEVHguq4Kw1AnkVLqTqejiCgAUE3K50QUjMfjX2ISz/P0Jkhpa3POX1zXVX/aG9rttsrn88/bhlmWtUy79i6klLpQKCwBFBmAmuM4hmEYOx7kN9lsFo1GgwGosVwud23btrm3vcG27SPTNK9YtOZQH1prANBMCDGfTqerQwNMJpOVEGIOACeWZS2llP9p4jEDsFBKeb1eb+86ut2uiqJoCOAz3isRUeB53p/ZR6ORJiIf63n5QZWIglarFaaVI6XUzWYz3PzCm1hKDlOJc95ljN3X63VWqVSO4oYNBoMoiqKh7/uPAD52BYgpYj3OlwAghHgF8PK95pgvLpeADirdFxkAAAAASUVORK5CYII=';
 
 export class CesiumVerticalProfileLayer extends CesiumMapLayer implements IVerticalProfileLayerRenderer {
-    protected dataSource_;
+    protected dataSource_: CustomDataSource;
     protected onCoordinateSelect_: ((selected?: { profileId: string; coordinate: number[] }) => void) | undefined;
     protected onCoordinateHover_: ((selected?: { profileId: string; coordinate: number[] }) => void) | undefined;
 
@@ -87,7 +88,8 @@ export class CesiumVerticalProfileLayer extends CesiumMapLayer implements IVerti
     updateProfile(id: string, profile: IVerticalProfile) {
         const entity = this.dataSource_.entities.getById(id);
         if (entity) {
-            const wall = entity.wall;
+            // TODO: cesium typings are wrong so we cast to any
+            const wall = entity.wall as any;
 
             wall.positions = Cartesian3.fromDegreesArray(([] as any[]).concat(...profile.bottomCoords.coordinates));
             wall.maximumHeights = this.expandProfileHeight_(profile.height, profile.bottomCoords.coordinates.length);
@@ -106,16 +108,19 @@ export class CesiumVerticalProfileLayer extends CesiumMapLayer implements IVerti
         if (entity) {
             entity.show = style.visible;
             const wall = entity.wall;
-            if (style.fillImage) {
-                wall.material = new ImageMaterialProperty({
-                    image: style.fillImage,
-                    transparent: true,
-                    color: style.fillColor ? new Color(...style.fillColor) : undefined
-                });
-            } else if (style.fillColor) {
-                wall.material = new Color(...style.fillColor);
+            if (wall) {
+                if (style.fillImage) {
+                    wall.material = new ImageMaterialProperty({
+                        image: style.fillImage,
+                        transparent: true,
+                        color: style.fillColor ? new Color(...style.fillColor) : undefined
+                    });
+                } else if (style.fillColor) {
+                    // @ts-ignore: wrong cesium typings
+                    wall.material = new Color(...style.fillColor);
+                }
+                this.updateDataSource_();
             }
-            this.updateDataSource_();
         }
     }
 
@@ -145,9 +150,9 @@ export class CesiumVerticalProfileLayer extends CesiumMapLayer implements IVerti
 
         if (coord && coord.geographic) {
             pointHighlight.parent = this.getProfile(coord.profileId);
-            pointHighlight.position_ = Cartesian3.fromDegrees(...coord.geographic);
+            pointHighlight['position_'] = Cartesian3.fromDegrees(...(coord.geographic as MapCoord));
         } else {
-            pointHighlight.position_ = undefined;
+            pointHighlight['position_'] = undefined;
         }
         this.updateDataSource_();
     }
@@ -160,9 +165,9 @@ export class CesiumVerticalProfileLayer extends CesiumMapLayer implements IVerti
 
         if (coord && coord.geographic) {
             pointSelect.parent = this.getProfile(coord.profileId);
-            pointSelect.position_ = Cartesian3.fromDegrees(...coord.geographic);
+            pointSelect['position_'] = Cartesian3.fromDegrees(...(coord.geographic as MapCoord));
         } else {
-            pointSelect.position_ = undefined;
+            pointSelect['position_'] = undefined;
         }
 
         this.updateDataSource_();
@@ -243,9 +248,10 @@ export class CesiumVerticalProfileLayer extends CesiumMapLayer implements IVerti
                 }
             });
 
-            entity.position_ = Cartesian3.fromDegrees(0, 0, 0);
+            entity['position_'] = Cartesian3.fromDegrees(0, 0, 0);
 
-            entity.position = new CallbackProperty(() => entity.position_, false);
+            // @ts-ignore: wrong cesium typings
+            entity.position = new CallbackProperty(() => entity!['position_'], false);
 
             entity[PICK_INFO_KEY] = {
                 pickable: false
@@ -267,9 +273,10 @@ export class CesiumVerticalProfileLayer extends CesiumMapLayer implements IVerti
                 }
             });
 
-            entity.position_ = Cartesian3.fromDegrees(0, 0, 0);
+            entity['position_'] = Cartesian3.fromDegrees(0, 0, 0);
 
-            entity.position = new CallbackProperty(() => entity.position_, false);
+            // @ts-ignore: wrong cesium typings
+            entity.position = new CallbackProperty(() => entity!['position_'], false);
 
             entity[PICK_INFO_KEY] = {
                 pickable: false

@@ -1,20 +1,22 @@
-import CesiumWidget from 'cesium/Source/Widgets/CesiumWidget/CesiumWidget';
-import SceneMode from 'cesium/Source/Scene/SceneMode';
-import MapMode2D from 'cesium/Source/Scene/MapMode2D';
-import Rectangle from 'cesium/Source/Core/Rectangle';
-import Cartesian2 from 'cesium/Source/Core/Cartesian2';
-import Cartesian3 from 'cesium/Source/Core/Cartesian3';
-import Cartographic from 'cesium/Source/Core/Cartographic';
-import BoundingSphere from 'cesium/Source/Core/BoundingSphere';
-import CesiumMath from 'cesium/Source/Core/Math';
-import HeadingPitchRange from 'cesium/Source/Core/HeadingPitchRange';
-import Ray from 'cesium/Source/Core/Ray';
-import IntersectionTests from 'cesium/Source/Core/IntersectionTests';
-import Plane from 'cesium/Source/Core/Plane';
-import ImageryLayer from 'cesium/Source/Scene/ImageryLayer';
-import CustomDataSource from 'cesium/Source/DataSources/CustomDataSource';
-import DataSourceCollection from 'cesium/Source/DataSources/DataSourceCollection';
-import DataSourceDisplay from 'cesium/Source/DataSources/DataSourceDisplay';
+import {
+    CesiumWidget,
+    SceneMode,
+    MapMode2D,
+    Rectangle,
+    Cartesian2,
+    Cartesian3,
+    Cartographic,
+    BoundingSphere,
+    Math as CesiumMath,
+    HeadingPitchRange,
+    Ray,
+    IntersectionTests,
+    Plane,
+    ImageryLayer,
+    CustomDataSource,
+    DataSourceCollection,
+    DataSourceDisplay
+} from 'cesium';
 
 import 'cesium/Source/Widgets/CesiumWidget/CesiumWidget.css';
 
@@ -34,12 +36,14 @@ export type CesiumMapRendererProps = IMapRendererProps & {
 };
 
 export class CesiumMapRenderer implements IMapRenderer {
-    private viewer_: CesiumWidget;
+    private viewer_!: CesiumWidget;
     private layerGroup_: CesiumGroupLayer | undefined;
-    private dataSourceCollection_;
-    private dataSourceDisplay_;
+    private dataSourceCollection_!: DataSourceCollection;
+    private dataSourceDisplay_!: DataSourceDisplay;
+    private pendingViewport_: IMapViewport | undefined;
 
     constructor(props: CesiumMapRendererProps) {
+        this.pendingViewport_ = undefined;
         this.initRenderer_(props);
     }
 
@@ -54,10 +58,10 @@ export class CesiumMapRenderer implements IMapRenderer {
         }
         if (target) {
             target.appendChild(this.viewer_.container);
-            if (this.viewer_.pendingViewport_) {
+            if (this.pendingViewport_) {
                 this.viewer_.resize();
-                this.viewer_.camera.setView(this.getViewFromProps_(this.viewer_.pendingViewport_));
-                delete this.viewer_.pendingViewport_;
+                this.viewer_.camera.setView(this.getViewFromProps_(this.pendingViewport_));
+                this.pendingViewport_ = undefined;
             }
         }
     }
@@ -80,7 +84,8 @@ export class CesiumMapRenderer implements IMapRenderer {
             this.viewer_.scene.mode = sceneMode;
         }
         if (props.allowFreeCameraRotation !== undefined) {
-            const contrainedAxis = props.allowFreeCameraRotation ? undefined : new Cartesian3(0, 0, 1);
+            const contrainedAxis = props.allowFreeCameraRotation ? undefined : Cartesian3.UNIT_Z;
+            // @ts-ignore: wrong cesium typings (constrainedAxis can be undefined)
             this.viewer_.camera.constrainedAxis = contrainedAxis;
         }
     }
@@ -116,6 +121,9 @@ export class CesiumMapRenderer implements IMapRenderer {
 
     getViewportExtent() {
         const rectangle = this.viewer_.camera.computeViewRectangle();
+        if (!rectangle) {
+            return undefined;
+        }
         return <BBox>[
             CesiumMath.toDegrees(rectangle.west),
             CesiumMath.toDegrees(rectangle.south),
@@ -259,28 +267,28 @@ export class CesiumMapRenderer implements IMapRenderer {
             return;
         }
 
-        const { type, collection, item, idx } = evt;
+        const { type, item } = evt;
 
         if (type === 'add') {
             let globalindexFound = false;
 
-            const rootCollection = this.layerGroup_.getDataSources()._dataSources;
+            const rootCollection = this.layerGroup_.getDataSources();
 
-            const reduceFunction = (globalIndex, item) => {
+            const reduceFunction = (globalIndex: number, element) => {
                 if (globalindexFound) {
                     return globalIndex;
                 }
-                if (item === collection) {
+                if (element === item) {
                     globalindexFound = true;
-                    return globalIndex + idx;
-                } else if (item instanceof CustomDataSource) {
+                    return globalIndex;
+                } else if (element instanceof CustomDataSource) {
                     return globalIndex + 1;
                 } else {
-                    return item._dataSources.reduce(reduceFunction, globalIndex);
+                    return element._dataSources.reduce(reduceFunction, globalIndex);
                 }
             };
 
-            let globalIndex = rootCollection.reduce(reduceFunction, 0);
+            const globalIndex = rootCollection._dataSources.reduce(reduceFunction, 0);
             if (!globalindexFound) {
                 return;
             }
@@ -288,7 +296,15 @@ export class CesiumMapRenderer implements IMapRenderer {
             const dataSourcesToAdd = this.getDataSources_(item);
 
             dataSourcesToAdd.forEach((dataSource) => {
-                this.dataSourceCollection_.add(dataSource, globalIndex++);
+                this.dataSourceCollection_.add(dataSource).then(() => {
+                    //TODO: very inefficient. there is no way to add the datasource to a
+                    // specific index. so we push it to the collection and then lower it one
+                    // by one until we reach the desired index
+                    const currentIdx = this.dataSourceCollection_.indexOf(dataSource);
+                    for (let i = 0; i < currentIdx - globalIndex; ++i) {
+                        this.dataSourceCollection_.lower(dataSource);
+                    }
+                });
             });
         } else if (type === 'remove') {
             const dataSourcesToRemove = this.getDataSources_(item);
@@ -378,15 +394,19 @@ export class CesiumMapRenderer implements IMapRenderer {
         });
 
         this.viewer_.scene.primitives.destroyPrimitives = false;
-        this.viewer_.scene.pickTranslucentDepth = true;
+        // when enabled some random crashes occurs on imagery tile load/unload
+        // we disable it here (the default in cesium) and enable it only when required
+        // during picking rendering pass
+        this.viewer_.scene.pickTranslucentDepth = false;
 
         if (props.target) {
             this.viewer_.camera.setView(this.getViewFromProps_(viewport));
         } else {
-            this.viewer_.pendingViewport_ = viewport;
+            this.pendingViewport_ = viewport;
         }
 
         if (renderProps.allowFreeCameraRotation) {
+            // @ts-ignore: wrong cesium typings (constrainedAxis can be undefined)
             this.viewer_.camera.constrainedAxis = undefined;
         }
 
@@ -436,6 +456,9 @@ export class CesiumMapRenderer implements IMapRenderer {
         const camera = this.viewer_.camera;
         const scene = this.viewer_.scene;
 
+        // @ts-ignore: member is private but we need access to it
+        const pixelRatio = scene.pixelRatio;
+
         if (scene.mode === SceneMode.COLUMBUS_VIEW) {
             const distance = camera.position.z / Math.cos(Math.PI / 2 + camera.pitch);
 
@@ -445,13 +468,13 @@ export class CesiumMapRenderer implements IMapRenderer {
             let center;
 
             if (intersection) {
-                center = camera._projection.unproject(intersection);
+                center = scene.mapProjection.unproject(intersection);
             } else {
                 center = camera.positionCartographic;
             }
 
             const pixelSize = new Cartesian2();
-            camera.frustum.getPixelDimensions(scene.drawingBufferWidth, scene.drawingBufferHeight, distance, scene.pixelRatio, pixelSize);
+            camera.frustum.getPixelDimensions(scene.drawingBufferWidth, scene.drawingBufferHeight, distance, pixelRatio, pixelSize);
 
             const resolution = Math.max(pixelSize.x, pixelSize.y);
 
@@ -470,7 +493,7 @@ export class CesiumMapRenderer implements IMapRenderer {
         if (center) {
             const distance = Cartesian3.distance(camera.positionWC, center);
             const pixelSize = new Cartesian2();
-            camera.frustum.getPixelDimensions(scene.drawingBufferWidth, scene.drawingBufferHeight, distance, scene.pixelRatio, pixelSize);
+            camera.frustum.getPixelDimensions(scene.drawingBufferWidth, scene.drawingBufferHeight, distance, pixelRatio, pixelSize);
 
             const cartographicCenter = Cartographic.fromCartesian(center, scene.globe.ellipsoid);
 
@@ -488,7 +511,7 @@ export class CesiumMapRenderer implements IMapRenderer {
                 scene.drawingBufferWidth,
                 scene.drawingBufferHeight,
                 camera.positionCartographic.height,
-                scene.pixelRatio,
+                pixelRatio,
                 pixelSize
             );
 
@@ -501,15 +524,18 @@ export class CesiumMapRenderer implements IMapRenderer {
         }
     }
 
-    protected getViewFromProps_(viewProps) {
-        let distance;
+    protected getViewFromProps_(viewProps: IMapViewport) {
+        let distance: number;
         if (this.viewer_.scene.mode !== SceneMode.SCENE2D) {
+            // @ts-ignore: member is private but we need access to it
+            const pixelRatio = this.viewer_.scene.pixelRatio;
+
             const pixelSize = new Cartesian2();
             this.viewer_.camera.frustum.getPixelDimensions(
                 this.viewer_.scene.drawingBufferWidth,
                 this.viewer_.scene.drawingBufferHeight,
                 1,
-                this.viewer_.scene.pixelRatio,
+                pixelRatio,
                 pixelSize
             );
             distance = viewProps.resolution / Math.max(pixelSize.x, pixelSize.y);
@@ -517,7 +543,7 @@ export class CesiumMapRenderer implements IMapRenderer {
             distance = viewProps.resolution * Math.max(this.viewer_.scene.drawingBufferWidth, this.viewer_.scene.drawingBufferHeight);
         }
         return {
-            destination: Cartesian3.fromDegrees(...viewProps.center, distance)
+            destination: Cartesian3.fromDegrees(viewProps.center[0], viewProps.center[1], distance)
         };
     }
 }

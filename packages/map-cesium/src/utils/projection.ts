@@ -1,5 +1,4 @@
-import GeographicProjection from 'cesium/Source/Core/GeographicProjection';
-import WebMercatorProjection from 'cesium/Source/Core/WebMercatorProjection';
+import { GeographicProjection, WebMercatorProjection } from 'cesium';
 
 export enum ProjectionType {
     GlobalGeodetic,
@@ -38,6 +37,6 @@ export const getProjectionFromSRS = (srs: string, defaultGeographic = false) => 
     } else if (projection === ProjectionType.GlobalMercator) {
         return new WebMercatorProjection();
     } else {
-        return defaultGeographic ? new GeographicProjection() : null;
+        return defaultGeographic ? new GeographicProjection() : undefined;
     }
 };

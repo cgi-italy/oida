@@ -1,4 +1,4 @@
-import OpenStreetMapImageryProvider from 'cesium/Source/Scene/OpenStreetMapImageryProvider';
+import { OpenStreetMapImageryProvider } from 'cesium';
 
 import { cesiumTileSourcesFactory } from './cesium-tilesources-factory';
 

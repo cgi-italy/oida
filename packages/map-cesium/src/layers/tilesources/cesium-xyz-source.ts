@@ -1,4 +1,4 @@
-import UrlTemplateImageryProvider from 'cesium/Source/Scene/UrlTemplateImageryProvider';
+import { UrlTemplateImageryProvider } from 'cesium';
 
 import { cesiumTileSourcesFactory } from './cesium-tilesources-factory';
 

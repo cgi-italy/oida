@@ -1,6 +1,4 @@
-import Cartesian3 from 'cesium/Source/Core/Cartesian3';
-import Cartographic from 'cesium/Source/Core/Cartographic';
-import CesiumMath from 'cesium/Source/Core/Math';
+import { Cartesian3, Cartographic, Math as CesiumMath } from 'cesium';
 
 import { IFeatureLayerRenderer, IFeatureStyle, FeatureLayerRendererConfig, FeatureGeometry, IFeature } from '@oidajs/core';
 

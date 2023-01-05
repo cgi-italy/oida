@@ -1,27 +1,29 @@
-import Cartesian3 from 'cesium/Source/Core/Cartesian3';
-import Color from 'cesium/Source/Core/Color';
-import PrimitiveCollection from 'cesium/Source/Scene/PrimitiveCollection';
-import GeometryInstance from 'cesium/Source/Core/GeometryInstance';
-import PolygonGeometry from 'cesium/Source/Core/PolygonGeometry';
-import PolygonOutlineGeometry from 'cesium/Source/Core/PolygonOutlineGeometry';
-import PolygonHierarchy from 'cesium/Source/Core/PolygonHierarchy';
-import RectangleGeometry from 'cesium/Source/Core/RectangleGeometry';
-import RectangleOutlineGeometry from 'cesium/Source/Core/RectangleOutlineGeometry';
-import Rectangle from 'cesium/Source/Core/Rectangle';
-import CesiumCircleGeometry from 'cesium/Source/Core/CircleGeometry';
-import CircleOutlineGeometry from 'cesium/Source/Core/CircleOutlineGeometry';
-import ColorGeometryInstanceAttribute from 'cesium/Source/Core/ColorGeometryInstanceAttribute';
-import GroundPrimitive from 'cesium/Source/Scene/GroundPrimitive';
-import Primitive from 'cesium/Source/Scene/Primitive';
-import PerInstanceColorAppearance from 'cesium/Source/Scene/PerInstanceColorAppearance';
+import {
+    Cartesian3,
+    Color,
+    PrimitiveCollection,
+    GeometryInstance,
+    PolygonGeometry,
+    PolygonOutlineGeometry,
+    PolygonHierarchy,
+    RectangleGeometry,
+    RectangleOutlineGeometry,
+    Rectangle,
+    CircleGeometry as CesiumCircleGeometry,
+    CircleOutlineGeometry,
+    ColorGeometryInstanceAttribute,
+    GroundPrimitive,
+    Primitive,
+    PerInstanceColorAppearance
+} from 'cesium';
 
-import { BBoxGeometry, CircleGeometry, getGeometryExtent, IPolygonStyle } from '@oidajs/core';
+import { BBoxGeometry, CircleGeometry, getGeometryExtent, IPolygonStyle, MapCoord } from '@oidajs/core';
 
 import { PICK_INFO_KEY, PickInfo } from '../../../utils/picking';
 import { CesiumPrimitiveFeatureLayer } from '../cesium-primitive-feature-layer';
 import { CesiumGeometryPrimitiveFeature, CesiumGeometryPrimitiveRenderer } from './cesium-geometry-primitive-renderer';
 
-type PolygonGeometry = GeoJSON.Polygon | GeoJSON.MultiPolygon | BBoxGeometry | CircleGeometry;
+type PolygonInputGeometry = GeoJSON.Polygon | GeoJSON.MultiPolygon | BBoxGeometry | CircleGeometry;
 export type CesiumPolygonPrimitiveRenderProps = {
     fillPrimitive: Primitive | GroundPrimitive;
     strokePrimitive: Primitive;
@@ -48,7 +50,7 @@ export class CesiumPolygonPrimitiveRenderer implements CesiumGeometryPrimitiveRe
         return this.polygons_;
     }
 
-    addFeature(id: string, geometry: PolygonGeometry, style: IPolygonStyle, data: any) {
+    addFeature(id: string, geometry: PolygonInputGeometry, style: IPolygonStyle, data: any) {
         let fillInstances: any = null;
         let outlineInstances: any = null;
 
@@ -144,7 +146,7 @@ export class CesiumPolygonPrimitiveRenderer implements CesiumGeometryPrimitiveRe
         return feature;
     }
 
-    updateGeometry(feature: CesiumPolygonPrimitiveFeature, geometry: PolygonGeometry) {
+    updateGeometry(feature: CesiumPolygonPrimitiveFeature, geometry: PolygonInputGeometry) {
         this.removeFeature(feature);
 
         const updatedFeature = this.addFeature(feature.id, geometry, feature.style, feature.data);
@@ -234,8 +236,7 @@ export class CesiumPolygonPrimitiveRenderer implements CesiumGeometryPrimitiveRe
 
         const outlineInstance = new GeometryInstance({
             geometry: new RectangleOutlineGeometry({
-                rectangle: Rectangle.fromDegrees(...extent),
-                vertexFormat: PerInstanceColorAppearance.VERTEX_FORMAT
+                rectangle: Rectangle.fromDegrees(...extent)
             }),
             attributes: {
                 color: new ColorGeometryInstanceAttribute(...style.strokeColor!)
@@ -252,7 +253,7 @@ export class CesiumPolygonPrimitiveRenderer implements CesiumGeometryPrimitiveRe
     protected createCircleInstance_(id: string, center: GeoJSON.Position, radius: number, style: IPolygonStyle) {
         const circleInstance = new GeometryInstance({
             geometry: new CesiumCircleGeometry({
-                center: Cartesian3.fromDegrees(...center),
+                center: Cartesian3.fromDegrees(...(center as MapCoord)),
                 radius: radius,
                 vertexFormat: PerInstanceColorAppearance.VERTEX_FORMAT
             }),
@@ -264,9 +265,8 @@ export class CesiumPolygonPrimitiveRenderer implements CesiumGeometryPrimitiveRe
 
         const outlineInstance = new GeometryInstance({
             geometry: new CircleOutlineGeometry({
-                center: Cartesian3.fromDegrees(...center),
-                radius: radius,
-                vertexFormat: PerInstanceColorAppearance.VERTEX_FORMAT
+                center: Cartesian3.fromDegrees(...(center as MapCoord)),
+                radius: radius
             }),
             attributes: {
                 color: new ColorGeometryInstanceAttribute(...style.strokeColor!)
@@ -280,8 +280,9 @@ export class CesiumPolygonPrimitiveRenderer implements CesiumGeometryPrimitiveRe
         };
     }
 
-    protected updatePrimitiveColor_(primitive: Primitive, color) {
+    protected updatePrimitiveColor_(primitive: Primitive | GroundPrimitive, color) {
         if (primitive.ready) {
+            // @ts-ignore: private member access
             const instanceIds = primitive._instanceIds;
             instanceIds.forEach((id) => {
                 const attributes = primitive.getGeometryInstanceAttributes(id);

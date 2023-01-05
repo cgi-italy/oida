@@ -1,8 +1,4 @@
-import Color from 'cesium/Source/Core/Color';
-import Entity from 'cesium/Source/DataSources/Entity';
-import Rectangle from 'cesium/Source/Core/Rectangle';
-import RectangleGraphics from 'cesium/Source/DataSources/RectangleGraphics';
-import HeightReference from 'cesium/Source/Scene/HeightReference';
+import { Color, Entity, Rectangle, RectangleGraphics, HeightReference } from 'cesium';
 
 import { IFeatureStyle, BBoxGeometry } from '@oidajs/core';
 
@@ -19,7 +15,7 @@ export const createBBoxEntity = (id: string, geometry: BBoxGeometry, featureStyl
         show: style.visible
     });
 
-    let heightReference = HeightReference.None;
+    let heightReference = HeightReference.NONE;
     if (layerOptions && layerOptions.clampToGround) {
         heightReference = HeightReference.CLAMP_TO_GROUND;
     }

@@ -1,6 +1,6 @@
 import XYZSource from 'ol/source/XYZ';
 import ImageTile from 'ol/ImageTile';
-import UrlTemplateImageryProvider from 'cesium/Source/Scene/UrlTemplateImageryProvider';
+import { UrlTemplateImageryProvider } from 'cesium';
 
 import { TileGridConfig } from '@oidajs/core';
 import { olTileSourcesFactory, getTileGridFromConfig } from '@oidajs/map-ol';
@@ -58,7 +58,8 @@ olTileSourcesFactory.register(ADAM_WCS_SOURCE_ID, (config) => {
     };
 
     return new XYZSource({
-        // @ts-ignore
+        // @ts-ignore: the return type should be a string, but since we handle it
+        // in the tileLoadFunction we can use a different type
         tileUrlFunction: (tileCoord, ratio, projection) => {
             const tileExtent = tileGrid.getTileCoordExtent(tileCoord);
 
@@ -90,7 +91,7 @@ olTileSourcesFactory.register(ADAM_WCS_SOURCE_ID, (config) => {
                 data: config.wktFilter
             };
         },
-        // @ts-ignore
+        // @ts-ignore: the source is of type returned by the tileUrlFunction instead of a being a string
         tileLoadFunction: (tile: ImageTile, source: { url: string; data?: string }) => {
             if (config.tileLoadFunction) {
                 const tileLoadParams: AdamWcsTileLoadFunctionSource = source;
@@ -102,7 +103,7 @@ olTileSourcesFactory.register(ADAM_WCS_SOURCE_ID, (config) => {
                     if (sourceDataUrl) {
                         (tile.getImage() as HTMLImageElement).src = sourceDataUrl;
                     } else {
-                        // @ts-ignore
+                        // @ts-ignore: need access to private method
                         tile.handleImageError_();
                     }
                 });
@@ -118,7 +119,7 @@ olTileSourcesFactory.register(ADAM_WCS_SOURCE_ID, (config) => {
                                 tryImageLoad();
                             }, 1000 + Math.round(Math.random() * 2000));
                         } else {
-                            // @ts-ignore
+                            // @ts-ignore: need access to private method
                             tile.handleImageError_();
                         }
                     };

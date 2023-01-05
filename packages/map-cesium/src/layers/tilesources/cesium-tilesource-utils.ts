@@ -1,7 +1,4 @@
-import GeographicTilingScheme from 'cesium/Source/Core/GeographicTilingScheme.js';
-import WebMercatorTilingScheme from 'cesium/Source/Core/WebMercatorTilingScheme.js';
-import Cartesian2 from 'cesium/Source/Core/Cartesian2';
-import Rectangle from 'cesium/Source/Core/Rectangle';
+import { GeographicTilingScheme, WebMercatorTilingScheme, Cartesian2, Rectangle, ImageryProvider, Event } from 'cesium';
 
 import { TileGridConfig, computeTileGridParams, WmtsTileGridConfig } from '@oidajs/core';
 
@@ -82,7 +79,7 @@ export const getTileGridFromSRS = (srs: string, tileGridConfig?: TileGridConfig)
             tileSchemeConfig.rectangle = Rectangle.fromDegrees(...extent);
         }
         tilingScheme = new GeographicTilingScheme(tileSchemeConfig);
-    } else if (projection === ProjectionType.GlobalMercator) {
+    } else {
         if (extent) {
             tileSchemeConfig.rectangleSouthwestInMeters = new Cartesian2(extent[0], extent[1]);
             tileSchemeConfig.rectangleNortheastInMeters = new Cartesian2(extent[2], extent[3]);
@@ -103,4 +100,39 @@ export const getUrlFromTemplate = (sourceConfig) => {
     }
     url = url.replace(/\{-y\}/, '{reverseY}');
     return url;
+};
+
+export type CesiumTileSource = ImageryProvider & {
+    reload: () => void;
+    tileLoadStartEvent: Event;
+    tileLoadEndEvent: Event;
+};
+
+export const extendImageryProvider = (imageryProvider: ImageryProvider, beforeSourceReload?: () => void) => {
+    const source = imageryProvider as CesiumTileSource;
+    source.reload = () => {
+        if (beforeSourceReload) {
+            beforeSourceReload();
+        }
+        // this is automatically defined by Cesium on the source when the corresponding
+        // imagery layer is added to the map (see GlobeSurfaceTileProvider.prototype._onLayerAdded)
+        // @ts-ignore
+        if (source._reload) {
+            // @ts-ignore
+            source._reload();
+        }
+    };
+    source.tileLoadStartEvent = new Event();
+    source.tileLoadEndEvent = new Event();
+    // wrap source requestImage to track tile requests
+    const originalRequestImage = source.requestImage;
+    source.requestImage = function (...args) {
+        const request = originalRequestImage.apply(this, args);
+        if (request) {
+            this.tileLoadStartEvent.raiseEvent();
+            request.finally(() => this.tileLoadEndEvent.raiseEvent());
+        }
+        return request;
+    };
+    return source;
 };

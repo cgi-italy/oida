@@ -1,7 +1,4 @@
-import Cartesian3 from 'cesium/Source/Core/Cartesian3';
-import ScreenSpaceEventHandler from 'cesium/Source/Core/ScreenSpaceEventHandler';
-import ScreenSpaceEventType from 'cesium/Source/Core/ScreenSpaceEventType';
-import KeyboardEventModifier from 'cesium/Source/Core/KeyboardEventModifier';
+import { ScreenSpaceEventHandler, ScreenSpaceEventType, KeyboardEventModifier, CesiumWidget } from 'cesium';
 
 import {
     IFeatureSelectInteractionImplementation,
@@ -14,11 +11,11 @@ import {
 import { cesiumInteractionsFactory } from './cesium-interactions-factory';
 import { CesiumMapRenderer } from '../map/cesium-map-renderer';
 
-import { getPickInfo, PickInfo, setNonPickableFeaturesVisibility, CesiumFeatureCoordPickMode } from '../utils';
+import { getPickInfo, PickInfo, pickCoordinate } from '../utils';
 
 export class CesiumFeatureSelectInteraction implements IFeatureSelectInteractionImplementation {
-    private viewer_;
-    private handler_;
+    private viewer_: CesiumWidget;
+    private handler_: ScreenSpaceEventHandler | undefined;
     private onFeatureSelect_: FeatureSelectCallback;
     private multiple_: boolean;
     private lastSelectedFeatureIdx_ = -1;
@@ -80,7 +77,7 @@ export class CesiumFeatureSelectInteraction implements IFeatureSelectInteraction
 
         const pickInfos: PickInfo[] = pickedObjects
             .map((pickedObject) => getPickInfo(pickedObject))
-            .filter((pickInfo) => !!pickInfo && pickInfo.pickable);
+            .filter((pickInfo) => !!pickInfo && pickInfo.pickable) as PickInfo[];
 
         if (pickInfos.length) {
             if (selectionMode === SelectionMode.Replace) {
@@ -89,16 +86,10 @@ export class CesiumFeatureSelectInteraction implements IFeatureSelectInteraction
 
                 const layer = pickInfo.layer;
                 if (layer && layer.shouldReceiveFeatureSelectEvents()) {
-                    let coordinate: Cartesian3;
-                    if (layer.getFeaturePickMode() === CesiumFeatureCoordPickMode.Ellipsoid) {
-                        coordinate = this.viewer_.camera.pickEllipsoid(movement.position, this.viewer_.scene.globe.ellipsoid);
-                    } else {
-                        setNonPickableFeaturesVisibility(pickedObjects, false);
-                        this.viewer_.scene.render();
-                        coordinate = this.viewer_.scene.pickPosition(movement.position);
-                        setNonPickableFeaturesVisibility(pickedObjects, true);
+                    const coordinate = pickCoordinate(this.viewer_, movement.position, layer.getFeaturePickMode(), pickedObjects);
+                    if (coordinate) {
+                        layer.onFeatureSelect(coordinate, pickInfo);
                     }
-                    layer.onFeatureSelect(coordinate, pickInfo);
                 }
 
                 this.onFeatureSelect_({

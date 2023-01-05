@@ -1,7 +1,4 @@
-import Cartesian2 from 'cesium/Source/Core/Cartesian2';
-import Texture from 'cesium/Source/Renderer/Texture';
-import PixelDataType from 'cesium/Source/Renderer/PixelDatatype';
-import PixelFormat from 'cesium/Source/Core/PixelFormat';
+import { Cartesian2, Texture, PixelDatatype, PixelFormat } from 'cesium';
 
 import { VolumeTileKey } from '@oidajs/core';
 
@@ -115,13 +112,13 @@ export class CesiumVolumeTileTexture {
         let pixelFormat, pixelDataType;
         if (slice.data instanceof HTMLImageElement || slice.data instanceof HTMLCanvasElement) {
             pixelFormat = PixelFormat.RGBA;
-            pixelDataType = PixelDataType.UNSIGNED_BYTE;
+            pixelDataType = PixelDatatype.UNSIGNED_BYTE;
         } else {
             pixelFormat = PixelFormat.LUMINANCE;
             if (slice.data instanceof Float32Array || slice.data instanceof Float64Array) {
-                pixelDataType = PixelDataType.FLOAT;
+                pixelDataType = PixelDatatype.FLOAT;
             } else if (slice.data instanceof Uint8Array) {
-                pixelDataType = PixelFormat.UNSIGNED_BYTE;
+                pixelDataType = PixelDatatype.UNSIGNED_BYTE;
             }
         }
 
@@ -145,10 +142,10 @@ export class CesiumVolumeTileTexture {
         const tileExtent = this.config_.source.getTileExtentForKey(this.config_.tileKey);
         const sizeZ = tileExtent.maxZ - tileExtent.minZ;
         const normZ = (z - tileExtent.minZ) / sizeZ;
-        const gridIdx = Math.floor(normZ * this.sliceGridSize_.x * this.sliceGridSize_.y);
+        const gridIdx = Math.floor(normZ * this.sliceGridSize_!.x * this.sliceGridSize_!.y);
 
-        const gridX = Math.floor(gridIdx % this.sliceGridSize_.x);
-        const gridY = Math.floor(gridIdx / this.sliceGridSize_.x);
+        const gridX = Math.floor(gridIdx % this.sliceGridSize_!.x);
+        const gridY = Math.floor(gridIdx / this.sliceGridSize_!.x);
 
         return {
             x: gridX * tileGrid.tileSize[0],

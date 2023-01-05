@@ -1,4 +1,4 @@
-import Resource from 'cesium/Source/Core/Resource';
+import { Resource } from 'cesium';
 
 import { VolumeSourceConfig, VolumeTileKey, VolumeSliceData } from '@oidajs/core';
 
@@ -33,57 +33,67 @@ export class CesiumVolumeSource {
             slices.forEach((slice) => {
                 // assume that the source provide image data
                 if (!sliceLoader) {
-                    Resource.createIfNeeded(slice.url)
-                        .fetchImage()
-                        .then((image) => {
+                    const request = new Resource({
+                        url: slice.url
+                    }).fetchImage();
+
+                    if (request) {
+                        request.then((image) => {
                             onSliceReady({
                                 z: slice.z,
-                                data: image
+                                data: image as HTMLImageElement
                             });
                         });
+                    }
                 } else {
-                    let resource: Resource;
+                    let request: Promise<ArrayBuffer> | undefined;
 
                     if (slice.postData) {
-                        resource = Resource.createIfNeeded(slice.url).post(slice.postData, {
+                        request = new Resource({
+                            url: slice.url
+                        }).post(slice.postData, {
                             responseType: 'arraybuffer',
                             headers: {
                                 'Content-Type': 'application/x-www-form-urlencoded'
                             }
                         });
                     } else {
-                        resource = Resource.createIfNeeded(slice.url).fetchArrayBuffer();
+                        request = new Resource({
+                            url: slice.url
+                        }).fetchArrayBuffer();
                     }
 
-                    if (onSliceLoadStart) {
-                        onSliceLoadStart();
-                    }
-                    resource.then(
-                        (sliceData) => {
-                            sliceLoader(slice, sliceData).then(
-                                (textureData) => {
-                                    onSliceReady({
-                                        z: slice.z,
-                                        data: textureData
-                                    });
-
-                                    if (onSliceLoadEnd) {
-                                        onSliceLoadEnd();
-                                    }
-                                },
-                                () => {
-                                    if (onSliceLoadEnd) {
-                                        onSliceLoadEnd();
-                                    }
-                                }
-                            );
-                        },
-                        () => {
-                            if (onSliceLoadEnd) {
-                                onSliceLoadEnd();
-                            }
+                    if (request) {
+                        if (onSliceLoadStart) {
+                            onSliceLoadStart();
                         }
-                    );
+                        request.then(
+                            (sliceData) => {
+                                sliceLoader(slice, sliceData).then(
+                                    (textureData) => {
+                                        onSliceReady({
+                                            z: slice.z,
+                                            data: textureData
+                                        });
+
+                                        if (onSliceLoadEnd) {
+                                            onSliceLoadEnd();
+                                        }
+                                    },
+                                    () => {
+                                        if (onSliceLoadEnd) {
+                                            onSliceLoadEnd();
+                                        }
+                                    }
+                                );
+                            },
+                            () => {
+                                if (onSliceLoadEnd) {
+                                    onSliceLoadEnd();
+                                }
+                            }
+                        );
+                    }
                 }
             });
         }, 0);

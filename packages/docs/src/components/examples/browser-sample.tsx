@@ -3,7 +3,7 @@ import BrowserOnly from '@docusaurus/BrowserOnly';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 
-import buildModuleUrl from 'cesium/Source/Core/buildModuleUrl';
+import { buildModuleUrl } from 'cesium';
 
 type BrowserSampleProps = {
     sampleName: string;
@@ -21,6 +21,7 @@ export const BrowserSample = (props: BrowserSampleProps) => {
             </a>
             <BrowserOnly>
                 {() => {
+                    // @ts-ignore
                     buildModuleUrl.setBaseUrl(useBaseUrl('Cesium/'));
 
                     const SampleComponent = lazy(() => {

@@ -92,6 +92,7 @@ const MapVideoLayer = () => {
         window['videoLayer'] = videoLayer;
 
         return () => {
+            mapState.layers.children.removeItemWithId('video');
             videoLayer.dispose();
         };
     }, []);
