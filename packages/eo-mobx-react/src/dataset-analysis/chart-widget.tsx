@@ -1,21 +1,30 @@
 import React, { useState, useEffect, useRef } from 'react';
 import download from 'downloadjs';
 
-import echarts, { EChartOption } from 'echarts/lib/echarts';
+import * as echarts from 'echarts/core';
+
+import { LineSeriesOption } from 'echarts/charts';
+import { CanvasRenderer } from 'echarts/renderers';
+import { DataZoomComponent, DataZoomComponentOption, TooltipComponent, TooltipComponentOption } from 'echarts/components';
+
 import useDimensions from 'react-cool-dimensions';
 
 import { Dropdown, MenuProps } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
 
+echarts.use([CanvasRenderer, DataZoomComponent, TooltipComponent]);
+
 //TODO: move chart export code out of here
 
-export type ChartWidgetProps = {
-    options: echarts.EChartOption;
+export type ChartWidgetBaseOptions = echarts.ComposeOption<DataZoomComponentOption | TooltipComponentOption>;
+
+export type ChartWidgetProps<OPT extends ChartWidgetBaseOptions = ChartWidgetBaseOptions> = {
+    options: OPT;
     isLoading?: boolean;
     showTip?: {
         x?: number;
         y?: number;
-        position?: echarts.EChartOption.Tooltip.Position.Type;
+        position?: TooltipComponentOption['position'];
         seriesIndex?: number;
         dataIndex?: number;
         name?: string;
@@ -33,7 +42,7 @@ export type ChartWidgetProps = {
     onSizeChange?: (size: { width: number; height: number }) => void;
 };
 
-export const ChartWidget = (props: ChartWidgetProps) => {
+export const ChartWidget = <OPT extends ChartWidgetBaseOptions = ChartWidgetBaseOptions>(props: ChartWidgetProps<OPT>) => {
     const { observe, width, height } = useDimensions();
 
     const chartContainer = useRef<HTMLDivElement>(null);
@@ -87,7 +96,6 @@ export const ChartWidget = (props: ChartWidgetProps) => {
     useEffect(() => {
         if (chart) {
             if (props.options) {
-                const currentOptions = chart.getOption();
                 let yAxis = props.options.yAxis;
                 // automatically set the number of split lines (parallel to xAxis) based on the chart height
                 if (Array.isArray(props.options.yAxis)) {
@@ -99,16 +107,30 @@ export const ChartWidget = (props: ChartWidgetProps) => {
                     });
                 }
                 // keep the data zoom current state
-                let dataZoom = props.options.dataZoom;
-                const currentZoom = currentOptions?.dataZoom;
-                if (dataZoom && currentZoom && dataZoom.length === currentZoom.length) {
-                    dataZoom = dataZoom.map((item, idx) => {
-                        return {
-                            ...item,
-                            start: item.start || currentZoom[idx].start,
-                            end: item.end || currentZoom[idx].end
-                        };
-                    });
+                let dataZoom: DataZoomComponentOption[] = [];
+                if (Array.isArray(props.options.dataZoom)) {
+                    dataZoom = props.options.dataZoom;
+                } else if (props.options.dataZoom) {
+                    dataZoom = [props.options.dataZoom];
+                }
+
+                const currentOptions = chart.getOption() as OPT;
+                if (currentOptions) {
+                    const currentZoom: DataZoomComponentOption[] = [];
+                    if (Array.isArray(currentOptions.dataZoom)) {
+                        currentZoom.push(...currentOptions.dataZoom);
+                    } else if (currentOptions.dataZoom) {
+                        currentZoom.push(currentOptions.dataZoom);
+                    }
+                    if (dataZoom && currentZoom && dataZoom.length === currentZoom.length) {
+                        dataZoom = dataZoom.map((item, idx) => {
+                            return {
+                                ...item,
+                                start: item.start || currentZoom[idx].start,
+                                end: item.end || currentZoom[idx].end
+                            };
+                        });
+                    }
                 }
                 chart.setOption(
                     {
@@ -314,12 +336,11 @@ export const ChartWidget = (props: ChartWidgetProps) => {
                     onClick={(evt) => {
                         if (chartContainer.current) {
                             let csvData;
-                            const series: EChartOption.SeriesLine | undefined = props.options.series
-                                ? (props.options.series[0] as EChartOption.SeriesLine)
-                                : undefined;
+                            const series = Array.isArray(props.options.series) ? props.options.series[0] : props.options.series;
 
                             if (series) {
-                                const xAxis = props.options.xAxis![series.xAxisIndex || 0];
+                                // @ts-ignore
+                                const xAxis = props.options.xAxis![(series as LineSeriesOption).xAxisIndex || 0];
 
                                 csvData = `${xAxis.name},${series.name}\n`;
 

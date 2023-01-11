@@ -3,7 +3,16 @@ import classnames from 'classnames';
 
 import { autorun } from 'mobx';
 
-import { EChartOption } from 'echarts/lib/echarts';
+import * as echarts from 'echarts/core';
+import { LineChart, LineSeriesOption } from 'echarts/charts';
+import {
+    TooltipComponent,
+    TooltipComponentOption,
+    LegendComponent,
+    LegendComponentOption,
+    AxisPointerComponent,
+    AxisPointerComponentOption
+} from 'echarts/components';
 
 import {
     DatasetVerticalProfileViz,
@@ -111,6 +120,12 @@ export const VerticalProfileImage = (props: VerticalProfileImageProps) => {
     );
 };
 
+type VerticalProfileChartOption = echarts.ComposeOption<
+    LineSeriesOption | TooltipComponentOption | LegendComponentOption | AxisPointerComponentOption
+>;
+
+echarts.use([LineChart, TooltipComponent, LegendComponent, AxisPointerComponent]);
+
 export type VerticalProfileSeriesProps = {
     verticalProfileViz: DatasetVerticalProfileViz;
     selectedProfile: VerticalProfileItem;
@@ -210,7 +225,7 @@ export const VerticalProfileSeries = (props: VerticalProfileSeriesProps) => {
     }, [props.highlightedCoord, trackCoordinate]);
     */
 
-    const chartOptions: EChartOption = useMemo(() => {
+    const chartOptions = useMemo(() => {
         let selectedDataIdx;
         if (props.selectedCoord && series) {
             selectedDataIdx = Math.round(
@@ -232,67 +247,69 @@ export const VerticalProfileSeries = (props: VerticalProfileSeriesProps) => {
                 data: [variableConfig?.name || ''],
                 right: '10px'
             },
-            tooltip: {
-                trigger: 'axis',
-                transitionDuration: 0,
-                formatter: (params, ticket, callback) => {
-                    const fParams = params[0]! as EChartOption.Tooltip.Format;
-                    if (fParams.value) {
-                        if (trackCoordinate) {
-                            //hack: we use the tooltip formatter as a chart point highlight event emitter
-                            if (fParams.dataIndex !== undefined) {
-                                getGeographicCoord(series.imageData[fParams.dataIndex]).then((geographicCoord) => {
-                                    props.verticalProfileViz.mapLayer?.setHighlihgtedCoordinate({
-                                        profileId: props.selectedProfile.id,
-                                        unprojected: series.imageData[fParams.dataIndex!],
-                                        geographic: geographicCoord
-                                    });
+            tooltip: [
+                {
+                    trigger: 'axis',
+                    transitionDuration: 0,
+                    formatter: (params, ticket, callback) => {
+                        const fParams = params[0]!;
+                        if (fParams.value) {
+                            if (trackCoordinate) {
+                                //hack: we use the tooltip formatter as a chart point highlight event emitter
+                                if (fParams.dataIndex !== undefined) {
+                                    getGeographicCoord(series.imageData[fParams.dataIndex]).then((geographicCoord) => {
+                                        props.verticalProfileViz.mapLayer?.setHighlihgtedCoordinate({
+                                            profileId: props.selectedProfile.id,
+                                            unprojected: series.imageData[fParams.dataIndex!],
+                                            geographic: geographicCoord
+                                        });
 
-                                    if (props.direction === 'horizontal' && geographicCoord) {
-                                        let lon = geographicCoord[0];
-                                        if (geographicCoord[0] > 180) {
-                                            lon = geographicCoord[0] - 360;
-                                        }
-                                        callback(
-                                            ticket,
-                                            `
+                                        if (props.direction === 'horizontal' && geographicCoord) {
+                                            let lon = geographicCoord[0];
+                                            if (geographicCoord[0] > 180) {
+                                                lon = geographicCoord[0] - 360;
+                                            }
+                                            callback(
+                                                ticket,
+                                                `
                                             <div>
                                                 <span>Lon: </span><span>${lon.toFixed(2)}</span>
                                                 <span>Lat: </span><span>${geographicCoord[1].toFixed(2)}</span>
                                             </div>
                                             <div>
                                                 <span>${variableConfig?.name}${
-                                                variableConfig?.units ? ' (' + variableConfig.units + ')' : ''
-                                            }: </span>
+                                                    variableConfig?.units ? ' (' + variableConfig.units + ')' : ''
+                                                }: </span>
                                                 <span>${fParams.value![1].toFixed(2)}</span>
                                             </div>
                                         `
-                                        );
-                                    }
-                                });
+                                            );
+                                        }
+                                    });
+                                }
                             }
-                        }
 
-                        return `
+                            return `
                             <div><span>${
                                 props.direction === 'horizontal' ? 'Distance (km)' : 'Height (km)'
                             }: </span>${fParams.value[0].toFixed(2)}</div>
                             <div><span>${variableConfig?.name}${
-                            variableConfig?.units ? ' (' + variableConfig.units + ')' : ''
-                        }: </span><span>${fParams.value[1].toFixed(2)}</span></div>
+                                variableConfig?.units ? ' (' + variableConfig.units + ')' : ''
+                            }: </span><span>${fParams.value[1].toFixed(2)}</span></div>
                         `;
-                    } else {
-                        return '';
-                    }
-                },
-                axisPointer: {
-                    type: 'line',
-                    snap: true,
-                    lineStyle: {
-                        opacity: 0
+                        } else {
+                            return '';
+                        }
+                    },
+                    axisPointer: {
+                        type: 'line',
+                        snap: true,
+                        lineStyle: {
+                            opacity: 0
+                        }
                     }
                 }
-            },
+            ],
             xAxis: [
                 {
                     type: 'value',
@@ -323,7 +340,6 @@ export const VerticalProfileSeries = (props: VerticalProfileSeriesProps) => {
                     name: variableConfig?.name,
                     yAxisIndex: 0,
                     smooth: true,
-                    // @ts-ignore
                     data: series ? series.chartData : undefined,
                     emphasis: {
                         itemStyle: {
@@ -347,11 +363,11 @@ export const VerticalProfileSeries = (props: VerticalProfileSeriesProps) => {
                 }
             ],
             backgroundColor: 'transparent'
-        };
+        } as VerticalProfileChartOption;
     }, [series, trackCoordinate]);
 
     return (
-        <ChartWidget
+        <ChartWidget<VerticalProfileChartOption>
             options={chartOptions}
             showTip={tipOptions}
             isLoading={isLoading}

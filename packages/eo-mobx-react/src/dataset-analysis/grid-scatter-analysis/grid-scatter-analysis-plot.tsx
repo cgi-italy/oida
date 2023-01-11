@@ -1,7 +1,9 @@
 import React from 'react';
 
-import { EChartOption } from 'echarts';
-import 'echarts/lib/chart/scatter';
+import * as echarts from 'echarts/core';
+import { ScatterChart, ScatterSeriesOption } from 'echarts/charts';
+import { XAXisOption, YAXisOption } from 'echarts/types/dist/shared';
+import { TooltipComponent, TooltipComponentOption, DataZoomComponent, DataZoomComponentOption } from 'echarts/components';
 
 import { LoadingState } from '@oidajs/core';
 import { GridScatterAnalysis, isDomainProvider, NumericDomainMapper } from '@oidajs/eo-mobx';
@@ -9,16 +11,20 @@ import { useSelector } from '@oidajs/ui-react-mobx';
 import { AnalysisLoadingStateMessage } from '../analysis-loading-state-message';
 import { ChartWidget } from '../chart-widget';
 
+type ScatterChartOption = echarts.ComposeOption<ScatterSeriesOption | TooltipComponentOption | DataZoomComponentOption>;
+
+echarts.use([ScatterChart, TooltipComponent, DataZoomComponent]);
+
 export type GridScatterAnalysisPlotProps = {
     gridScatter: GridScatterAnalysis;
 };
 
 export const GridScatterAnalysisPlot = (props: GridScatterAnalysisPlotProps) => {
     const { xAxes, yAxes, chartSeries, loadingState } = useSelector(() => {
-        const chartSeries: EChartOption.SeriesScatter[] = [];
+        const chartSeries: ScatterSeriesOption[] = [];
 
-        const xAxes: EChartOption.XAxis[] = [];
-        const yAxes: EChartOption.YAxis[] = [];
+        const xAxes: XAXisOption[] = [];
+        const yAxes: YAXisOption[] = [];
 
         let loadingState = LoadingState.Init;
 
@@ -110,7 +116,7 @@ export const GridScatterAnalysisPlot = (props: GridScatterAnalysisPlotProps) => 
 
     return (
         <div className='series-chart'>
-            <ChartWidget
+            <ChartWidget<ScatterChartOption>
                 options={{
                     color: color ? [color] : undefined,
                     xAxis: xAxes,

@@ -1,11 +1,18 @@
 import React from 'react';
 import moment from 'moment';
-import { EChartOption } from 'echarts';
-import 'echarts/lib/chart/line';
-import 'echarts/lib/component/tooltip';
-import 'echarts/lib/component/legend';
-import 'echarts/lib/component/axisPointer';
-import 'echarts/lib/component/dataZoom';
+import * as echarts from 'echarts/core';
+import { LineChart, LineSeriesOption } from 'echarts/charts';
+import {
+    TooltipComponent,
+    TooltipComponentOption,
+    LegendComponent,
+    LegendComponentOption,
+    AxisPointerComponent,
+    AxisPointerComponentOption,
+    DataZoomComponent,
+    DataZoomComponentOption
+} from 'echarts/components';
+import { XAXisOption, YAXisOption } from 'echarts/types/dist/shared';
 
 import { LoadingState } from '@oidajs/core';
 import { DatasetPointSeries, DatasetDimension, isValueDomain, DataDomain, isDomainProvider, NumericDomainMapper } from '@oidajs/eo-mobx';
@@ -13,6 +20,12 @@ import { useSelector } from '@oidajs/ui-react-mobx';
 
 import { AnalysisLoadingStateMessage } from '../analysis-loading-state-message';
 import { ChartWidget } from '../chart-widget';
+
+type PointSeriesChartOption = echarts.ComposeOption<
+    LineSeriesOption | TooltipComponentOption | LegendComponentOption | AxisPointerComponentOption | DataZoomComponentOption
+>;
+
+echarts.use([LineChart, TooltipComponent, LegendComponent, AxisPointerComponent, DataZoomComponent]);
 
 export type DatasetPointSeriesChartProps = {
     series: DatasetPointSeries[];
@@ -30,7 +43,7 @@ type LegendDataItem = {
 
 export function DatasetPointSeriesChart(props: DatasetPointSeriesChartProps) {
     const { chartSeries, colors, loadingState, errorMessage, legendData, axes } = useSelector(() => {
-        const chartSeries: EChartOption.SeriesLine[] = [];
+        const chartSeries: LineSeriesOption[] = [];
         const colors: string[] = [];
 
         let loadingState = LoadingState.Init;
@@ -180,7 +193,7 @@ export function DatasetPointSeriesChart(props: DatasetPointSeriesChartProps) {
         );
     }
 
-    const yAxes = Object.keys(axes.y).map((axisUnits, idx) => {
+    const yAxes: YAXisOption[] = Object.keys(axes.y).map((axisUnits, idx) => {
         return {
             type: 'value',
             name: axes.y[axisUnits].label,
@@ -196,7 +209,7 @@ export function DatasetPointSeriesChart(props: DatasetPointSeriesChartProps) {
         };
     });
 
-    const xAxes = Object.keys(axes.x).map((dimensionId) => {
+    const xAxes: XAXisOption[] = Object.keys(axes.x).map((dimensionId) => {
         return {
             type: axes.x[dimensionId].type,
             name: axes.x[dimensionId].label,
@@ -220,77 +233,76 @@ export function DatasetPointSeriesChart(props: DatasetPointSeriesChartProps) {
 
     return (
         <div className='series-chart'>
-            <ChartWidget
-                options={
-                    {
-                        color: colors,
-                        legend: {
-                            data: legendData.map((item) => item.id),
-                            right: '10px',
-                            formatter: (name) => {
-                                return legendData[name].name;
-                            },
-                            tooltip: {
-                                show: true,
-                                formatter: (data: EChartOption.Tooltip.Format) => {
-                                    return legendData[data.name!].description || '';
+            <ChartWidget<PointSeriesChartOption>
+                options={{
+                    color: colors,
+                    legend: {
+                        data: legendData.map((item) => item.id),
+                        right: '10px',
+                        formatter: (name) => {
+                            return legendData[name].name;
+                        },
+                        tooltip: {
+                            show: true,
+                            formatter: (data) => {
+                                return legendData[data.name!].description || '';
+                            }
+                        },
+                        selected: legendData.reduce((selected, item) => {
+                            return {
+                                ...selected,
+                                [item.id]: !item.disabled
+                            };
+                        }, {})
+                    },
+                    dataZoom: [
+                        {
+                            xAxisIndex: xAxes.map((axis, idx) => idx),
+                            type: 'inside',
+                            id: '0'
+                        },
+                        {
+                            xAxisIndex: xAxes.map((axis, idx) => idx),
+                            type: 'slider',
+                            dataBackground: {
+                                lineStyle: {
+                                    opacity: 1,
+                                    color: 'white'
                                 }
                             },
-                            selected: legendData.reduce((selected, item) => {
-                                return {
-                                    ...selected,
-                                    [item.id]: !item.disabled
-                                };
-                            }, {})
-                        },
-                        dataZoom: [
-                            {
-                                xAxisIndex: xAxes.map((axis, idx) => idx),
-                                type: 'inside',
-                                id: '0'
-                            },
-                            {
-                                xAxisIndex: xAxes.map((axis, idx) => idx),
-                                type: 'slider',
-                                dataBackground: {
-                                    lineStyle: {
-                                        opacity: 1,
-                                        color: 'white'
-                                    }
-                                },
-                                id: '1'
-                            }
-                        ],
-                        tooltip: {
-                            trigger: 'axis',
-                            transitionDuration: 0,
-                            formatter: (series: EChartOption.Tooltip.Format[]) => {
-                                const axisValues: Array<{ label: string; content: string[] }> = [];
-                                let idx = 0;
-                                while (idx < series.length) {
-                                    const data = series[idx];
-                                    const seriesInfo = legendData[parseInt(data.seriesName!)];
-                                    const seriesContent = `
+                            id: '1'
+                        }
+                    ],
+                    tooltip: {
+                        trigger: 'axis',
+                        transitionDuration: 0,
+                        formatter: (series) => {
+                            const axisValues: Array<{ label: string; content: string[] }> = [];
+                            let idx = 0;
+                            while (idx < series.length) {
+                                const data = series[idx];
+                                const seriesInfo = legendData[parseInt(data.seriesName!)];
+                                const seriesContent = `
                                     <div class="series-item is-point">
                                         <span>${data.marker}</span>
                                         <span class="label">${seriesInfo.name}:</span>
                                         <span class="value">${data.data[1].toFixed(2)}</span>
                                     </div>`;
-                                    idx++;
+                                idx++;
 
-                                    const axisIndex = (data as any).axisIndex;
+                                const axisIndex = (data as any).axisIndex;
 
-                                    const value = axisValues[axisIndex] || {
-                                        label: data.axisValueLabel,
-                                        content: []
-                                    };
-                                    value.content.push(seriesContent);
+                                const value = axisValues[axisIndex] || {
+                                    label: data.axisValueLabel,
+                                    content: []
+                                };
+                                value.content.push(seriesContent);
 
-                                    axisValues[axisIndex] = value;
-                                }
-                                const items = axisValues
-                                    .map((value, idx) => {
-                                        return `
+                                axisValues[axisIndex] = value;
+                            }
+                            const items = axisValues
+                                .map((value, idx) => {
+                                    return `
                                     <div class="axis-item">
                                         <div class="axis-header">
                                             <span class="label">${xAxes[idx].name}:</span>
@@ -301,42 +313,41 @@ export function DatasetPointSeriesChart(props: DatasetPointSeriesChartProps) {
                                         </div>
                                     </div>
                                 `;
-                                    })
-                                    .join('');
+                                })
+                                .join('');
 
-                                return `
+                            return `
                                 <div class="dataset-dimension-series-tooltip">
                                     ${items}
                                 </div>
                             `;
-                            },
-                            textStyle: {
-                                fontSize: 13
-                            },
-                            axisPointer: {
-                                type: 'line',
-                                snap: true
-                            }
                         },
-                        xAxis: xAxes,
-                        yAxis: yAxes,
-                        grid: {
-                            left: 40,
-                            right: 40,
-                            bottom: 60,
-                            top: 60,
-                            containLabel: true
+                        textStyle: {
+                            fontSize: 13
                         },
-                        series: chartSeries.map((series) => {
-                            return {
-                                ...series,
-                                smooth: props.smooth
-                            };
-                        }),
-                        useUTC: true,
-                        backgroundColor: 'transparent'
-                    } as EChartOption
-                }
+                        axisPointer: {
+                            type: 'line',
+                            snap: true
+                        }
+                    },
+                    xAxis: xAxes,
+                    yAxis: yAxes,
+                    grid: {
+                        left: 40,
+                        right: 40,
+                        bottom: 60,
+                        top: 60,
+                        containLabel: true
+                    },
+                    series: chartSeries.map((series) => {
+                        return {
+                            ...series,
+                            smooth: props.smooth
+                        };
+                    }),
+                    useUTC: true,
+                    backgroundColor: 'transparent'
+                }}
                 onHighlight={(evt, highlighted) => {
                     if (evt.seriesName) {
                         const series = props.series[parseInt(evt.seriesName)];
