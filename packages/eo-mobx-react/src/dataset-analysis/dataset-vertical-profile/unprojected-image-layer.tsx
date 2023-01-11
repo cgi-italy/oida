@@ -13,7 +13,7 @@ import TileSource from 'ol/source/Tile';
 import { Circle as CircleStyle, Fill, Stroke, Style } from 'ol/style';
 import { getVectorContext } from 'ol/render';
 
-import useResizeAware from 'react-resize-aware';
+import useDimensions from 'react-cool-dimensions';
 
 import { olTileSourcesFactory, refreshTileSource } from '@oidajs/map-ol';
 
@@ -42,7 +42,7 @@ type MapType = Map & {
 export const UnprojectedImageLayer = (props: UnprojectedImageLayerProps) => {
     const mapContainer = useRef<HTMLDivElement>(null);
     const [map, setMap] = useState<MapType>();
-    const [resizeListener, size] = useResizeAware();
+    const { observe, width, height } = useDimensions();
 
     useEffect(() => {
         const tileLayer = new TileLayer();
@@ -261,11 +261,16 @@ export const UnprojectedImageLayer = (props: UnprojectedImageLayerProps) => {
         if (map) {
             map.updateSize();
         }
-    }, [size]);
+    }, [width, height]);
 
     return (
-        <div className={'unprojected-image-layer-widget'} ref={mapContainer}>
-            {resizeListener}
-        </div>
+        <div
+            className={'unprojected-image-layer-widget'}
+            ref={(el) => {
+                observe(el);
+                // @ts-ignore
+                mapContainer.current = el;
+            }}
+        />
     );
 };

@@ -118,9 +118,7 @@ export const DropdownFilterer = (props: DropdownFiltererProps) => {
                             }
                         }}
                         onMouseDown={(evt) => {
-                            if (formVisible) {
-                                ignoreNextDocumentClick.current = true;
-                            }
+                            ignoreNextDocumentClick.current = true;
                             const target = evt.target as HTMLElement;
                             if (target.closest('.dropdown-filterer') === elementRef.current) {
                                 if (props.mainFilter) {
@@ -156,7 +154,7 @@ export const DropdownFilterer = (props: DropdownFiltererProps) => {
                             props.onFieldChange(value, undefined);
                             setFormVisible(false);
                         }}
-                        dropdownClassName='dropdown-filterer-form'
+                        popupClassName='dropdown-filterer-form'
                         options={tags}
                         // in non searchable case we set a non empty string to prevent the default backspace clear behaviour
                         searchValue={searchValue}

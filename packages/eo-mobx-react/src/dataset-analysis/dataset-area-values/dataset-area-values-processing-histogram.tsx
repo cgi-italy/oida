@@ -134,7 +134,7 @@ export const DatasetAreaValuesProcessingTable = (props: DatasetAreaValuesProcess
     return (
         <Collapse
             defaultActiveKey={props.processings.map((processing) => processing.id)}
-            expandIconPosition='right'
+            expandIconPosition='end'
             className='dataset-stats-table'
         >
             {infoPanels}

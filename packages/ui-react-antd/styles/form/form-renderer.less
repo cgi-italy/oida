@@ -1,11 +1,14 @@
 @form-item-small-label-font-size: @font-size-sm;
 @form-item-small-margin-bottom: @margin-sm;
-@form-vertical-item-margin: 0 0 0 @margin-xss;
+@form-vertical-item-padding: 0 0 0 @padding-xss;
 
 .ant-form-vertical {
     .ant-form-item {
-        .ant-form-item-control {
-            margin: @form-vertical-item-margin;
+        .ant-form-item-row {
+            flex-grow: 1;
+            .ant-form-item-control {
+                padding: @form-vertical-item-padding;
+            }
         }
     }
 }

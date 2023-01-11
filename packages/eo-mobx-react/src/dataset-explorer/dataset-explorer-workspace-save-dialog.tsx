@@ -131,7 +131,7 @@ export const DatasetExplorerWorkspaceSaveDialog = (props: DatasetExplorerWorkspa
             }}
             onCancel={() => setVisible(false)}
             destroyOnClose={true}
-            visible={visible}
+            open={visible}
             title='Save workspace'
             {...modalProps}
         >

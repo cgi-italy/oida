@@ -19,18 +19,19 @@ export const DatasetExplorerWorkspacesModal = (props: DatasetExplorerWorkspacesM
 
     const tabs = useSelector(() => {
         if (workspaceHandler.providers.length > 1) {
-            const tabs = workspaceHandler.providers.map((provider) => {
-                return <Tabs.TabPane tab={provider.name} key={provider.id} />;
-            });
             return (
                 <Tabs
                     activeKey={props.workspaceHandler.selectedProvider?.id}
                     onChange={(tab) => {
                         props.workspaceHandler.selectProvider(tab);
                     }}
-                >
-                    {tabs}
-                </Tabs>
+                    items={workspaceHandler.providers.map((provider) => {
+                        return {
+                            key: provider.id,
+                            label: provider.name
+                        };
+                    })}
+                />
             );
         } else {
             return undefined;
@@ -45,7 +46,7 @@ export const DatasetExplorerWorkspacesModal = (props: DatasetExplorerWorkspacesM
             pathParamName='workspaceProviderId'
             parentRouteElement={
                 <Modal
-                    visible={visible}
+                    open={visible}
                     onCancel={() => setVisible(false)}
                     title={title}
                     footer={<Button onClick={() => setVisible(false)}>Close</Button>}

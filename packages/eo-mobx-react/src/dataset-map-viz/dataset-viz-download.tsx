@@ -136,7 +136,7 @@ export const DatasetVizDownloadModal = (props: DatasetVizDownloadModalProps) => 
                 loading: formState === DatasetDownloadFormSubmitState.Pending,
                 disabled: formState === DatasetDownloadFormSubmitState.Invalid
             }}
-            visible={visible}
+            open={visible}
             onCancel={() => setVisible(false)}
             afterClose={props.onClose}
             destroyOnClose={true}

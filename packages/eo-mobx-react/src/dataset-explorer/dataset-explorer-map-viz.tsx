@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 
-import { List } from 'antd';
+import { List, ListProps } from 'antd';
 
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 
@@ -9,7 +9,7 @@ import { Map, MapLayer } from '@oidajs/state-mobx';
 import { DatasetExplorer, DatasetViz } from '@oidajs/eo-mobx';
 
 import { ComboToolConfig } from '../hooks/use-dataset-explorer-tools';
-import { DatasetVizDownloadModalProps, DatasetVizListItem } from '../dataset-map-viz';
+import { DatasetVizDownloadModalProps, DatasetVizListItem, DatasetVizListItemProps } from '../dataset-map-viz';
 
 export type DatasetExplorerMapVizProps = {
     explorerState: DatasetExplorer;
@@ -18,8 +18,8 @@ export type DatasetExplorerMapVizProps = {
     datasetDownloadComponent?: React.ComponentType<DatasetVizDownloadModalProps>;
 };
 
-const SortableItem = SortableElement(DatasetVizListItem);
-const SortableList = SortableContainer(List);
+const SortableItem = SortableElement<DatasetVizListItemProps>(DatasetVizListItem);
+const SortableList = SortableContainer<ListProps<any>>(List);
 
 export const DatasetExplorerMapViz = (props: DatasetExplorerMapVizProps) => {
     const datasetMapViews = useSelector(() => {

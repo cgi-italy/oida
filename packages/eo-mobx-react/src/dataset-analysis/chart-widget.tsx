@@ -2,9 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import download from 'downloadjs';
 
 import echarts, { EChartOption } from 'echarts/lib/echarts';
-import useResizeAware from 'react-resize-aware';
+import useDimensions from 'react-cool-dimensions';
 
-import { Menu, Dropdown } from 'antd';
+import { Dropdown, MenuProps } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
 
 //TODO: move chart export code out of here
@@ -34,7 +34,7 @@ export type ChartWidgetProps = {
 };
 
 export const ChartWidget = (props: ChartWidgetProps) => {
-    const [resizeListener, size] = useResizeAware();
+    const { observe, width, height } = useDimensions();
 
     const chartContainer = useRef<HTMLDivElement>(null);
 
@@ -94,7 +94,7 @@ export const ChartWidget = (props: ChartWidgetProps) => {
                     yAxis = props.options.yAxis.map((axisConfig) => {
                         return {
                             ...axisConfig,
-                            splitNumber: Math.floor((size.height || 0) / 80)
+                            splitNumber: Math.floor((height || 0) / 80)
                         };
                     });
                 }
@@ -149,7 +149,7 @@ export const ChartWidget = (props: ChartWidgetProps) => {
                         yAxis: props.options.yAxis.map((axisConfig) => {
                             return {
                                 ...axisConfig,
-                                splitNumber: Math.floor((size.height || 0) / 80)
+                                splitNumber: Math.floor((height || 0) / 80)
                             };
                         })
                     },
@@ -159,12 +159,12 @@ export const ChartWidget = (props: ChartWidgetProps) => {
             }
             if (props.onSizeChange) {
                 props.onSizeChange({
-                    width: size.width || 0,
-                    height: size.height || 0
+                    width: width || 0,
+                    height: height || 0
                 });
             }
         }
-    }, [size]);
+    }, [width, height]);
 
     useEffect(() => {
         if (chart) {
@@ -289,65 +289,67 @@ export const ChartWidget = (props: ChartWidgetProps) => {
         }
     }, [chart, props.onLegendItemSelection]);
 
+    const exportMenuItems: MenuProps['items'] = [
+        {
+            key: 'png',
+            label: (
+                <a
+                    onClick={(evt) => {
+                        if (chart) {
+                            const img = chart.getDataURL({
+                                type: 'png'
+                            });
+                            download(img, 'chart.png', 'image/png');
+                        }
+                    }}
+                >
+                    PNG
+                </a>
+            )
+        },
+        {
+            key: 'csv',
+            label: (
+                <a
+                    onClick={(evt) => {
+                        if (chartContainer.current) {
+                            let csvData;
+                            const series: EChartOption.SeriesLine | undefined = props.options.series
+                                ? (props.options.series[0] as EChartOption.SeriesLine)
+                                : undefined;
+
+                            if (series) {
+                                const xAxis = props.options.xAxis![series.xAxisIndex || 0];
+
+                                csvData = `${xAxis.name},${series.name}\n`;
+
+                                const csvLines = (series.data as number[]).map((item) => {
+                                    if (item[0] instanceof Date) {
+                                        return `${item[0].toISOString()},${item[1]}`;
+                                    } else {
+                                        return `${item[0]},${item[1]}`;
+                                    }
+                                });
+
+                                csvData += csvLines.join('\n');
+
+                                download(csvData, 'chart.csv', 'text/csv');
+                            }
+                        }
+                    }}
+                >
+                    CSV
+                </a>
+            )
+        }
+    ];
     return (
         <React.Fragment>
-            <div className='chart' onMouseEnter={props.onMouseEnter} onMouseLeave={props.onMouseLeave}>
-                {resizeListener}
+            <div className='chart' onMouseEnter={props.onMouseEnter} onMouseLeave={props.onMouseLeave} ref={observe}>
                 <div style={{ width: '100%', height: '100%' }} ref={chartContainer}></div>
             </div>
             <div className='chart-ops'>
-                <Dropdown
-                    overlay={
-                        <Menu>
-                            <Menu.Item>
-                                <a
-                                    onClick={(evt) => {
-                                        if (chart) {
-                                            const img = chart.getDataURL({
-                                                type: 'png'
-                                            });
-                                            download(img, 'chart.png', 'image/png');
-                                        }
-                                    }}
-                                >
-                                    PNG
-                                </a>
-                            </Menu.Item>
-                            <Menu.Item>
-                                <a
-                                    onClick={(evt) => {
-                                        if (chartContainer.current) {
-                                            let csvData;
-                                            const series: EChartOption.SeriesLine | undefined = props.options.series
-                                                ? (props.options.series[0] as EChartOption.SeriesLine)
-                                                : undefined;
-
-                                            if (series) {
-                                                const xAxis = props.options.xAxis![series.xAxisIndex || 0];
-
-                                                csvData = `${xAxis.name},${series.name}\n`;
-
-                                                const csvLines = (series.data as number[]).map((item) => {
-                                                    if (item[0] instanceof Date) {
-                                                        return `${item[0].toISOString()},${item[1]}`;
-                                                    } else {
-                                                        return `${item[0]},${item[1]}`;
-                                                    }
-                                                });
-
-                                                csvData += csvLines.join('\n');
-
-                                                download(csvData, 'chart.csv', 'text/csv');
-                                            }
-                                        }
-                                    }}
-                                >
-                                    CSV
-                                </a>
-                            </Menu.Item>
-                        </Menu>
-                    }
-                >
+                <Dropdown menu={{ items: exportMenuItems }}>
                     <a className='ant-dropdown-link'>
                         Export <DownOutlined />
                     </a>

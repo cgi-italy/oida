@@ -55,16 +55,14 @@ export const DatasetDiscoveryProviderTabsSelector = (props: { datasetDiscovery: 
     const selectedProvider = useSelector(() => props.datasetDiscovery.selectedProvider?.id);
 
     const tabs = useSelector(() => props.datasetDiscovery.providers.filter((provider) => !provider.disabled)).map((provider) => {
-        return (
-            <Tabs.TabPane
-                tab={
-                    <Tooltip title={provider.description}>
-                        <span>{provider.name}</span>
-                    </Tooltip>
-                }
-                key={provider.id}
-            />
-        );
+        return {
+            key: provider.id,
+            label: (
+                <Tooltip title={provider.description}>
+                    <span>{provider.name}</span>
+                </Tooltip>
+            )
+        };
     });
 
     return (
@@ -73,9 +71,8 @@ export const DatasetDiscoveryProviderTabsSelector = (props: { datasetDiscovery: 
             onChange={(tabId) => props.datasetDiscovery.selectProvider(tabId)}
             size='small'
             className='dataset-discovery-provider-tabs-selector'
-        >
-            {tabs}
-        </Tabs>
+            items={tabs}
+        />
     );
 };
 

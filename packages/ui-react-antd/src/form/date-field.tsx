@@ -191,12 +191,11 @@ export const DateFieldRenderer = (props: FormFieldRendererBaseProps<DateField> &
         };
     }
 
-    const pickerRef = useRef<any>();
+    const pickerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         if (pickerRef.current) {
-            const element = ReactDOM.findDOMNode(pickerRef.current) as Element | null;
-            const input = element?.querySelector('input');
+            const input = pickerRef.current.getElementsByTagName('input')[0];
 
             // allow the calendar to change based on the input value, ignoring disabled dates
             const beforeInputChange = () => {
@@ -232,9 +231,8 @@ export const DateFieldRenderer = (props: FormFieldRendererBaseProps<DateField> &
     }, [pickerRef, mode]);
 
     return (
-        <div className='date-field-wrapper'>
+        <div className='date-field-wrapper' ref={pickerRef}>
             <DatePicker
-                ref={pickerRef}
                 value={pickerValue}
                 onChange={onDateChange}
                 allowClear={!required && !readonly}

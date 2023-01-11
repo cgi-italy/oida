@@ -1,5 +1,5 @@
 import React from 'react';
-import useResizeAware from 'react-resize-aware';
+import useDimensions from 'react-cool-dimensions';
 import { Descriptions } from 'antd';
 import { LoadingOutlined, PictureFilled } from '@ant-design/icons';
 
@@ -24,7 +24,7 @@ export type ItemDetailsCardProps = {
 };
 
 export const ItemDetailsCard = (props: ItemDetailsCardProps) => {
-    const [resizeListener, size] = useResizeAware();
+    const { observe, width } = useDimensions();
 
     let cardPreview: JSX.Element | undefined;
     if (props.videoPreview) {
@@ -54,15 +54,14 @@ export const ItemDetailsCard = (props: ItemDetailsCardProps) => {
 
     let numColumns = 1;
     if (props.maxColumnWidth) {
-        numColumns = Math.floor((size.width || 0) / props.maxColumnWidth);
+        numColumns = Math.floor((width || 0) / props.maxColumnWidth);
     }
 
     return (
         <div className='item-details-card'>
             <div className='item-details-card-title'>{props.title}</div>
             <div className='item-details-card-content'>
-                <div className='item-details-card-meta-container'>
-                    {resizeListener}
+                <div className='item-details-card-meta-container' ref={observe}>
                     <Descriptions className='item-details-card-meta' size='small' column={numColumns}>
                         {metaItems}
                     </Descriptions>

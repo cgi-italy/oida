@@ -37,7 +37,9 @@ export const DatasetVerticalScaleSelector = (props: DatasetVerticalScaleSelector
                 value={verticalScale}
                 marks={marks}
                 onChange={(value) => props.verticalScale.setValue(value as number)}
-                tipFormatter={(value) => `${value}x`}
+                tooltip={{
+                    formatter: (value) => `${value}x`
+                }}
             />
         </div>
     );

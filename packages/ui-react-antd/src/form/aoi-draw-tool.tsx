@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Tag, Button, Tooltip, Drawer, Menu, Dropdown, Divider, Popover, Modal } from 'antd';
+import { Tag, Button, Tooltip, Drawer, Dropdown, Divider, Popover, Modal, MenuProps } from 'antd';
 import {
     EnvironmentOutlined,
     LinkOutlined,
@@ -220,23 +220,51 @@ export const AoiDrawTool = (props: AoiDrawToolProps) => {
         )
     };
 
-    const drawToolsMenu = (
-        <Menu>
-            {aoiControls.point && <Menu.Item>{drawingTools[AoiAction.DrawPoint]}</Menu.Item>}
-            {aoiControls.line && <Menu.Item>{drawingTools[AoiAction.DrawLine]}</Menu.Item>}
-            {aoiControls.bbox && <Menu.Item>{drawingTools[AoiAction.DrawBBox]}</Menu.Item>}
-            {aoiControls.polygon && <Menu.Item>{drawingTools[AoiAction.DrawPolygon]}</Menu.Item>}
-            {<Menu.Item>{drawingTools['AoiTextEdit']}</Menu.Item>}
-            {aoiControls.import && <Menu.Item>{drawingTools[AoiAction.Import]}</Menu.Item>}
-        </Menu>
-    );
+    const menuItems = useMemo(() => {
+        const items: MenuProps['items'] = [];
+        if (aoiControls.point) {
+            items.push({
+                key: 'point',
+                label: drawingTools[AoiAction.DrawPoint]
+            });
+        }
+        if (aoiControls.line) {
+            items.push({
+                key: 'line',
+                label: drawingTools[AoiAction.DrawLine]
+            });
+        }
+        if (aoiControls.bbox) {
+            items.push({
+                key: 'bbox',
+                label: drawingTools[AoiAction.DrawBBox]
+            });
+        }
+        if (aoiControls.polygon) {
+            items.push({
+                key: 'polygon',
+                label: drawingTools[AoiAction.DrawPolygon]
+            });
+        }
+        items.push({
+            key: 'edit',
+            label: drawingTools['AoiTextEdit']
+        });
+        if (aoiControls.import) {
+            items.push({
+                key: 'import',
+                label: drawingTools[AoiAction.Import]
+            });
+        }
+        return items;
+    }, [aoiControls]);
 
     return (
         <div className='aoi-draw-tool'>
             <div className='aoi-tool-selector'>
                 {activeAction !== AoiAction.None ? drawingTools[activeAction] : drawingTools[lastUsedTool]}
                 <Dropdown
-                    overlay={drawToolsMenu}
+                    menu={{ items: menuItems }}
                     trigger={['hover']}
                     placement='bottomRight'
                     mouseEnterDelay={0}
@@ -293,13 +321,13 @@ export const AoiDrawTool = (props: AoiDrawToolProps) => {
                 <Drawer
                     push={false}
                     className='aoi-import-drawer'
-                    visible={activeAction === AoiAction.Import}
+                    open={activeAction === AoiAction.Import}
                     width={370}
                     placement={props.importDrawerPlacement || 'left'}
                     onClose={() => {
                         onActiveActionChange(AoiAction.None);
                     }}
-                    afterVisibleChange={(visible) => {
+                    afterOpenChange={(visible) => {
                         if (!visible) {
                             if (importConfig.onImportCancel) {
                                 importConfig.onImportCancel();
@@ -315,7 +343,7 @@ export const AoiDrawTool = (props: AoiDrawToolProps) => {
                 </Drawer>
             )}
             <Modal
-                visible={editModalVisible}
+                open={editModalVisible}
                 onCancel={() => setEditModalVisible(false)}
                 footer={null}
                 width={600}

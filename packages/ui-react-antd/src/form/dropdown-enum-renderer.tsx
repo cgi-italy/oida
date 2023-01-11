@@ -88,9 +88,9 @@ export const DropdownEnumRenderer = (props: DropdownEnumRendererProps) => {
             className='dropdown-enum-renderer'
             trigger={[]}
             placement='bottomLeft'
-            onVisibleChange={(visible) => setDropDownVisible(visible)}
-            visible={!props.readonly && dropDownVisible}
-            overlay={
+            onOpenChange={(visible) => setDropDownVisible(visible)}
+            open={!props.readonly && dropDownVisible}
+            dropdownRender={() => (
                 <React.Fragment>
                     {loadingState === LoadingState.Loading && <LoadingOutlined />}
                     {loadingState === LoadingState.Success && !!choices && (
@@ -104,7 +104,7 @@ export const DropdownEnumRenderer = (props: DropdownEnumRendererProps) => {
                         />
                     )}
                 </React.Fragment>
-            }
+            )}
         >
             <div
                 className={classnames('dropdown-enum-option', { 'ant-dropdown-open': dropDownVisible })}

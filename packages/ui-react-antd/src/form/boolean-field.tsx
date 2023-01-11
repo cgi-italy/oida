@@ -22,9 +22,9 @@ export const BooleanCheckboxFieldRenderer = (
 };
 
 export const BooleanSwitchFieldRenderer = (props: FormFieldRendererBaseProps<BooleanField> & Omit<SwitchProps, 'onChange'>) => {
-    const { value, onChange, title, required, config, autoFocus, ...renderProps } = props;
+    const { value, onChange, title, required, config, autoFocus, readonly, ...renderProps } = props;
 
-    return <Switch checked={value} onChange={onChange} {...renderProps} />;
+    return <Switch checked={value} onChange={onChange} disabled={readonly} {...renderProps} />;
 };
 
 antdFormFieldRendererFactory.register<BooleanField>(BOOLEAN_FIELD_ID, 'checkbox', BooleanCheckboxFieldRenderer);

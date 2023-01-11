@@ -33,7 +33,7 @@ export const AsyncButton = (props: AsyncButtonProps) => {
     const { onClick, ...buttonProps } = props;
 
     return (
-        <Tooltip visible={tooltipVisible} title={props.tooltip}>
+        <Tooltip open={tooltipVisible} title={props.tooltip}>
             <Button
                 onClick={(evt) => {
                     setTooltipVisible(false);

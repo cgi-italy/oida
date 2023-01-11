@@ -33,24 +33,18 @@ export const NumericRangeFieldRenderer = (props: NumericRangeFieldRendererProps)
     }, [props.value?.from, props.value?.to]);
 
     useEffect(() => {
-        if (props.changeDelay) {
-            let debounceTimeout: number | undefined = window.setTimeout(() => {
-                if (inputValue?.from !== props.value?.from || inputValue?.to !== props.value?.to) {
-                    onChange(inputValue);
-                }
-                debounceTimeout = undefined;
-            }, props.changeDelay);
-
-            return () => {
-                if (debounceTimeout) {
-                    window.clearTimeout(debounceTimeout);
-                }
-            };
-        } else {
+        let debounceTimeout: number | undefined = window.setTimeout(() => {
             if (inputValue?.from !== props.value?.from || inputValue?.to !== props.value?.to) {
                 onChange(inputValue);
             }
-        }
+            debounceTimeout = undefined;
+        }, props.changeDelay || 0);
+
+        return () => {
+            if (debounceTimeout) {
+                window.clearTimeout(debounceTimeout);
+            }
+        };
     }, [inputValue]);
 
     const hasLimits = config.min !== undefined && config.max !== undefined;
@@ -94,7 +88,9 @@ export const NumericRangeFieldRenderer = (props: NumericRangeFieldRendererProps)
                 min={config.min}
                 max={config.max}
                 marks={marks}
-                tooltipVisible={false}
+                tooltip={{
+                    open: false
+                }}
                 step={config.step || parseFloat(((config.max! - config.min!) / 100).toPrecision(4))}
                 range={true}
                 disabled={disabled || readonly}

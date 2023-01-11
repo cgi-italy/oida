@@ -266,8 +266,8 @@ export const AoiFieldRenderer = (props: AoiFieldRendererProps) => {
                             }
                             destroyTooltipOnHide={true}
                             title={readonly ? 'Area' : 'Edit area'}
-                            visible={editorVisible}
-                            onVisibleChange={(visible) => setEditorVisible(visible)}
+                            open={editorVisible}
+                            onOpenChange={(visible) => setEditorVisible(visible)}
                             trigger='click'
                             zIndex={1050}
                         >
@@ -298,13 +298,13 @@ export const AoiFieldRenderer = (props: AoiFieldRendererProps) => {
                 <Drawer
                     push={false}
                     className='aoi-import-drawer'
-                    visible={activeAction === AoiAction.Import}
+                    open={activeAction === AoiAction.Import}
                     width={370}
                     placement={props.importDrawerPlacement || 'left'}
                     onClose={() => {
                         onActiveActionChange(AoiAction.None);
                     }}
-                    afterVisibleChange={(visible) => {
+                    afterOpenChange={(visible) => {
                         if (!visible) {
                             if (importConfig.onImportCancel) {
                                 importConfig.onImportCancel();
@@ -322,7 +322,7 @@ export const AoiFieldRenderer = (props: AoiFieldRendererProps) => {
             {EmbeddedMapComponent && (
                 <Modal
                     className='aoi-embedded-map-dialog'
-                    visible={mapVisible}
+                    open={mapVisible}
                     footer={null}
                     centered={true}
                     destroyOnClose={true}

@@ -79,7 +79,9 @@ export const DatasetVolumetricSliceViewSettings = (props: DatasetVolumetricSlice
                     max={1}
                     step={0.005}
                     value={slices.x}
-                    tipFormatter={xToLon}
+                    tooltip={{
+                        formatter: xToLon
+                    }}
                     onChange={(value) => props.viewMode.setXSlice(value as number)}
                 />
             </div>
@@ -106,7 +108,9 @@ export const DatasetVolumetricSliceViewSettings = (props: DatasetVolumetricSlice
                     max={1}
                     step={0.005}
                     value={slices.y}
-                    tipFormatter={yToLat}
+                    tooltip={{
+                        formatter: yToLat
+                    }}
                     onChange={(value) => props.viewMode.setYSlice(value as number)}
                 />
             </div>
@@ -133,7 +137,9 @@ export const DatasetVolumetricSliceViewSettings = (props: DatasetVolumetricSlice
                     max={1}
                     step={0.005}
                     value={slices.z}
-                    tipFormatter={zToHeight}
+                    tooltip={{
+                        formatter: zToHeight
+                    }}
                     onChange={(value) => props.viewMode.setZSlice(value as number)}
                 />
             </div>

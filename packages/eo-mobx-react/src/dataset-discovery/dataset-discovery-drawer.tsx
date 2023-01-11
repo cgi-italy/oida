@@ -67,11 +67,11 @@ export const DatasetDiscoveryDrawer = (props: DatasetDiscoveryDrawerProps) => {
                         closable={false}
                         mask={false}
                         {...drawerProps}
-                        visible={visible}
+                        open={visible}
                         onClose={() => {
                             setVisible(false);
                         }}
-                        afterVisibleChange={(visible) => {
+                        afterOpenChange={(visible) => {
                             if (!visible) {
                                 props.onClose();
                             }
