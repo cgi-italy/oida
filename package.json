@@ -15,7 +15,7 @@
     "lint:check": "eslint \"packages/*/src/**/*.{ts,tsx}\"",
     "lint:fix": "eslint \"packages/*/src/**/*.{ts,tsx}\" --quiet --fix",
     "check-staged": "lint-staged",
-    "watch": "lerna run --stream watch",
+    "watch": "lerna run --stream --concurrency 100 watch",
     "test": "lerna run --stream test",
     "typedoc": "typedoc --tsconfig ./tsconfig.typedoc.json",
     "prepare": "husky install"
