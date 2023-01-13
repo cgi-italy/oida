@@ -8,13 +8,14 @@ import TileLayer from 'ol/layer/Tile';
 import Projection from 'ol/proj/Projection';
 import Point from 'ol/geom/Point';
 import LineString from 'ol/geom/LineString';
+import TileSource from 'ol/source/Tile';
 
 import { Circle as CircleStyle, Fill, Stroke, Style } from 'ol/style';
 import { getVectorContext } from 'ol/render';
 
-import useResizeAware from 'react-resize-aware';
+import useDimensions from 'react-cool-dimensions';
 
-import { olTileSourcesFactory } from '@oidajs/map-ol';
+import { olTileSourcesFactory, refreshTileSource } from '@oidajs/map-ol';
 
 export type UnprojectedImageLayerProps = {
     sourceConfig: any;
@@ -31,17 +32,24 @@ export type UnprojectedImageLayerProps = {
     };
 };
 
+type MapType = Map & {
+    horizontalLine_?: LineString;
+    verticalLine_?: LineString;
+    cursorCoord_?: Point;
+    selectedCoord_?: Point;
+};
+
 export const UnprojectedImageLayer = (props: UnprojectedImageLayerProps) => {
     const mapContainer = useRef<HTMLDivElement>(null);
-    const [map, setMap] = useState<any>();
-    const [resizeListener, size] = useResizeAware();
+    const [map, setMap] = useState<MapType>();
+    const { observe, width, height } = useDimensions();
 
     useEffect(() => {
         const tileLayer = new TileLayer();
 
-        const map = new Map({
+        const map: MapType = new Map({
             layers: [tileLayer],
-            target: mapContainer.current,
+            target: mapContainer.current || undefined,
             controls: []
         });
         setMap(map);
@@ -118,13 +126,13 @@ export const UnprojectedImageLayer = (props: UnprojectedImageLayerProps) => {
         });
 
         const moveListener = listen(viewport, EventType.POINTERMOVE, (evt) => {
-            const px = map.getEventPixel(evt);
+            const px = map.getEventPixel(evt as UIEvent);
             const coord = map.getCoordinateFromPixel(px);
             if (props.onMouseCoord) {
                 if (map.selectedCoord_) {
                     const selectedCoord = map.selectedCoord_.getCoordinates();
                     const mapRes = map.getView().getResolution();
-                    const snapThreshold = 5 * mapRes;
+                    const snapThreshold = 5 * (mapRes || 1);
                     if (Math.abs(coord[0] - selectedCoord[0]) < snapThreshold) {
                         coord[0] = selectedCoord[0];
                     }
@@ -140,7 +148,7 @@ export const UnprojectedImageLayer = (props: UnprojectedImageLayerProps) => {
         const upListener = listen(viewport, EventType.POINTERUP, (evt) => {
             if (potentialClick) {
                 potentialClick = false;
-                const px = map.getEventPixel(evt);
+                const px = map.getEventPixel(evt as UIEvent);
                 const coord = map.getCoordinateFromPixel(px);
                 if (props.onMouseClick) {
                     props.onMouseClick(coord);
@@ -179,8 +187,8 @@ export const UnprojectedImageLayer = (props: UnprojectedImageLayerProps) => {
             extent: extent
         });
 
-        const layer = map.getLayers().item(0);
-        layer.setSource(tileSource);
+        const layer = map.getLayers().item(0) as TileLayer<TileSource>;
+        layer.setSource(tileSource || null);
         layer.setExtent(extent);
 
         map.setView(
@@ -200,13 +208,11 @@ export const UnprojectedImageLayer = (props: UnprojectedImageLayerProps) => {
             return;
         }
 
-        const tileSource = map.getLayers().item(0).getSource();
+        const layer = map.getLayers().item(0) as TileLayer<TileSource>;
+        const tileSource = layer.getSource();
 
         if (tileSource) {
-            for (const id in tileSource.tileCacheForProjection) {
-                tileSource.tileCacheForProjection[id].pruneExceptNewestZ();
-            }
-            tileSource.setKey(new Date().toISOString());
+            refreshTileSource(tileSource);
         }
     }, [props.sourceRevision]);
 
@@ -255,11 +261,16 @@ export const UnprojectedImageLayer = (props: UnprojectedImageLayerProps) => {
         if (map) {
             map.updateSize();
         }
-    }, [size]);
+    }, [width, height]);
 
     return (
-        <div className={'unprojected-image-layer-widget'} ref={mapContainer}>
-            {resizeListener}
-        </div>
+        <div
+            className={'unprojected-image-layer-widget'}
+            ref={(el) => {
+                observe(el);
+                // @ts-ignore
+                mapContainer.current = el;
+            }}
+        />
     );
 };

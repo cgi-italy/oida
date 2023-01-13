@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Dropdown, Menu, Tooltip } from 'antd';
+import { Button, Dropdown, Tooltip } from 'antd';
 import { DeleteOutlined, PlusOutlined, DownOutlined } from '@ant-design/icons';
 
 import { BOOLEAN_FIELD_ID, DATE_RANGE_FIELD_ID, ENUM_FIELD_ID, NUMERIC_RANGE_FIELD_ID, STRING_FIELD_ID } from '@oidajs/core';
@@ -105,6 +105,7 @@ export const DatasetVectorVizFilters = (props: DatasetVectorVizFiltersProps) => 
                         }
                     }}
                     title={featureProperty.name}
+                    changeDelay={500}
                 />
             );
         } else if (featureProperty.type === 'string') {
@@ -165,11 +166,11 @@ export const DatasetVectorVizFilters = (props: DatasetVectorVizFiltersProps) => 
     });
 
     const filterDropdownItems = missingFilters.map((filter) => {
-        return (
-            <Menu.Item key={filter.id} onClick={() => initPropertyFilter(filter)}>
-                {filter.name}
-            </Menu.Item>
-        );
+        return {
+            key: filter.id,
+            onClick: () => initPropertyFilter(filter),
+            label: filter.name
+        };
     });
 
     return (
@@ -177,7 +178,7 @@ export const DatasetVectorVizFilters = (props: DatasetVectorVizFiltersProps) => 
             <div className='dataset-vector-viz-filter-header'>
                 <span>Data filters:</span>
                 <Tooltip title='Add filter'>
-                    <Dropdown overlay={<Menu>{filterDropdownItems}</Menu>} trigger={['click']} disabled={!missingFilters.length}>
+                    <Dropdown menu={{ items: filterDropdownItems }} trigger={['click']} disabled={!missingFilters.length}>
                         <Button type='primary' size='small'>
                             <PlusOutlined />
                             <DownOutlined />

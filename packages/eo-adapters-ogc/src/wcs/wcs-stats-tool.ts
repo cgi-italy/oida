@@ -8,7 +8,7 @@ import {
 import { createWcsStatsProvider, WcsStatsProviderConfig } from './wcs-stats-provider';
 
 /**
- * {@Link getWcsStatsToolConfig} input properties
+ * {@link getWcsStatsToolConfig} input properties
  */
 export type WcsStatsAnalysisConfig = {
     providerConfig: Omit<WcsStatsProviderConfig, 'bands'>;
@@ -20,12 +20,12 @@ export type WcsStatsAnalysisConfig = {
 
 /**
  * A function that given the information of a dataset exposed as a WCS (2.0) coverage,
- * generates a corresponding {@Link DatasetStatsAnalysis} tool configuration.
+ * generates a corresponding {@link DatasetStatsAnalysis} tool configuration.
  * When invoked The tool will use a GetCoverage request to retrieve the dataset raw data in GeoTiff format
  * over a BBOX, and will compute some statistics.
  *
  * @param props The input properties
- * @return The tool configuration object to be included in the {@Link DatasetConfig} tools array
+ * @return The tool configuration object to be included in the {@link DatasetConfig} tools array
  */
 export const getWcsStatsToolConfig = (props: WcsStatsAnalysisConfig) => {
     const provider = createWcsStatsProvider({

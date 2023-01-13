@@ -1,4 +1,4 @@
-import WebMapServiceImageryProvider from 'cesium/Source/Scene/WebMapServiceImageryProvider';
+import { WebMapServiceImageryProvider } from 'cesium';
 
 import { cesiumTileSourcesFactory } from './cesium-tilesources-factory';
 

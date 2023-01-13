@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import useResizeAware from 'react-resize-aware';
+import useDimensions from 'react-cool-dimensions';
 import classnames from 'classnames';
 
 export type ScrollableOverlayProps = {
@@ -8,13 +8,15 @@ export type ScrollableOverlayProps = {
 };
 
 export const ScrollableOverlay = (props: ScrollableOverlayProps) => {
-    const [resizeListener, size] = useResizeAware();
+    const { observe, height } = useDimensions();
     const scrollableContentRef = useRef<HTMLDivElement>(null);
 
     const childrenWithContainerHeight = React.Children.map(props.children, (child) => {
         if (React.isValidElement(child)) {
             //make children aware of the container visible height
-            return React.cloneElement(child, { containerHeight: scrollableContentRef.current?.clientHeight });
+            return React.cloneElement<{ containerHeight: number }>(child as React.ReactElement, {
+                containerHeight: scrollableContentRef.current?.clientHeight
+            });
         }
         return child;
     });
@@ -22,8 +24,7 @@ export const ScrollableOverlay = (props: ScrollableOverlayProps) => {
     return (
         <div className={classnames('scrollable-overlay', props.className)}>
             <div className='scrollable-overlay-content-wrapper' ref={scrollableContentRef}>
-                <div className='scrollable-overlay-content'>
-                    {resizeListener}
+                <div className='scrollable-overlay-content' ref={observe}>
                     {childrenWithContainerHeight}
                 </div>
             </div>
@@ -35,7 +36,7 @@ export const ScrollableOverlay = (props: ScrollableOverlayProps) => {
                     }
                 }}
             >
-                <div className='scrollable-overlay-scroller-overflow' style={{ height: size.height || 0 }} />
+                <div className='scrollable-overlay-scroller-overflow' style={{ height: height || 0 }} />
             </div>
         </div>
     );

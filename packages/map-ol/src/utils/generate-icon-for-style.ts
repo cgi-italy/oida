@@ -1,6 +1,6 @@
 import { toContext } from 'ol/render.js';
 import { Point } from 'ol/geom.js';
-import IconStyle from 'ol/style/Icon';
+import Style from 'ol/style/Style';
 import ImageState from 'ol/ImageState';
 
 import { IPointStyle } from '@oidajs/core';
@@ -11,14 +11,19 @@ const styleParser = new OLStyleParser();
 
 const canvas = document.createElement('canvas');
 
-const getIconData = (iconStyle: IconStyle, width: number, height: number) => {
+const getIconData = (iconStyle: Style, width: number, height: number) => {
     const imageSize = iconStyle.getImage().getSize();
     const wScale = width / imageSize[0];
     const hScale = height / imageSize[1];
 
     iconStyle.getImage().setScale(Math.min(wScale, hScale));
 
-    const vectorContext = toContext(canvas.getContext('2d'), { size: [width, height] });
+    const context = canvas.getContext('2d');
+    if (!context) {
+        throw new Error('Unable to get canvas context');
+    }
+
+    const vectorContext = toContext(context, { size: [width, height] });
 
     vectorContext.setStyle(iconStyle);
     vectorContext.drawGeometry(new Point([width / 2, height / 2]));
@@ -36,7 +41,10 @@ export const generateIconForStyle = (style: IPointStyle, config?: { width?: numb
     const width = config?.width || 32;
     const height = config?.height || 32;
 
-    const iconStyle: IconStyle = styleParser.getStyleForGeometry('Point', { point: style });
+    const iconStyle = styleParser.getStyleForGeometry('Point', { point: style });
+    if (!iconStyle) {
+        throw new Error('Unable to get style from config');
+    }
 
     iconStyle.getImage().load();
 

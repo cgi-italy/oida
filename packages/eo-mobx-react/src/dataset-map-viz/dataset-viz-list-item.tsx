@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { List, Button, Badge, Tooltip, message } from 'antd';
+import { List, Button, Badge, Tooltip, message, Typography } from 'antd';
 import {
     AimOutlined,
     SettingOutlined,
@@ -28,11 +28,12 @@ import { DatasetToolsMenu } from './dataset-tools-menu';
 
 export type DatasetVizListItemProps = {
     datasetExplorer: DatasetExplorer;
-    datasetViz: DatasetViz<MapLayer>;
+    datasetViz: DatasetViz<string, MapLayer>;
     analyticsTools?: ComboToolConfig[];
     mapState?: Map;
     onRemove?: () => void;
     downloadComponent?: React.ComponentType<DatasetVizDownloadModalProps>;
+    disableRenaming?: boolean;
 };
 
 export const DatasetVizListItem = (props: DatasetVizListItemProps) => {
@@ -40,7 +41,7 @@ export const DatasetVizListItem = (props: DatasetVizListItemProps) => {
         const mapLayer = props.datasetViz.mapLayer;
 
         return {
-            name: props.datasetViz.dataset.config.name,
+            name: props.datasetViz.name,
             mapLayer: mapLayer,
             visible: mapLayer.visible.value,
             color: props.datasetViz.dataset.config.color
@@ -161,7 +162,27 @@ export const DatasetVizListItem = (props: DatasetVizListItemProps) => {
                 </Button>
                 <Badge color={vizState.color}></Badge>
                 <div className='viz-item-name' title={vizState.name}>
-                    {vizState.name}
+                    <Typography.Paragraph
+                        editable={
+                            !props.disableRenaming
+                                ? {
+                                      onChange: (value) => {
+                                          if (value) {
+                                              props.datasetViz.setName(value);
+
+                                              // this is to propagate the name change also to analytics charts
+                                              // TODO: analytics should probably use the parent DatasetViz
+                                              // name instead
+                                              props.datasetViz.dataset.config.name = value;
+                                          }
+                                      },
+                                      triggerType: ['text']
+                                  }
+                                : undefined
+                        }
+                    >
+                        {vizState.name}
+                    </Typography.Paragraph>
                 </div>
                 {loadingState.value === LoadingState.Error && (
                     <div className='viz-item-error'>

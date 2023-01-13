@@ -1,4 +1,4 @@
-import { IMapProjection } from '@oidajs/core';
+import { IMapProjection, TileSource } from '@oidajs/core';
 import { SelectionManager, Map, MapProps, TileLayer, MapViewportProps } from '@oidajs/state-mobx';
 
 import { AppModule } from '../app-module';
@@ -8,7 +8,7 @@ export const DEFAULT_MAP_MODULE_ID = 'map';
 export type MapBaseLayerConfig = {
     id: string;
     name: string;
-    config: any;
+    source: TileSource;
 };
 
 export type MapProjectionConfig = IMapProjection & {
@@ -68,9 +68,9 @@ export class MapModule extends AppModule {
                 if (baseLayer) {
                     this.map.layers.children.add(
                         new TileLayer({
-                            id: baseLayer.id,
-                            name: baseLayer.name,
-                            source: baseLayer.config
+                            id: 'base_layer',
+                            name: baseLayer.id,
+                            source: baseLayer.source
                         })
                     );
                 }

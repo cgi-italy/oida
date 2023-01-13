@@ -1,12 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import moment from 'moment';
 import { Badge, Button, Descriptions, Collapse, Space } from 'antd';
-import { EChartOption } from 'echarts';
-import 'echarts/lib/chart/bar';
-import 'echarts/lib/component/tooltip';
-import 'echarts/lib/component/legend';
-import 'echarts/lib/component/axisPointer';
-import 'echarts/lib/component/brush';
+import * as echarts from 'echarts/core';
+import { BarChart, BarSeriesOption } from 'echarts/charts';
+import {
+    TooltipComponent,
+    TooltipComponentOption,
+    LegendComponent,
+    LegendComponentOption,
+    AxisPointerComponent,
+    AxisPointerComponentOption,
+    BrushComponent,
+    BrushComponentOption,
+    GridComponent,
+    GridComponentOption
+} from 'echarts/components';
+import { XAXisOption, YAXisOption } from 'echarts/types/dist/shared';
 
 import { formatNumber, LoadingState, NumberFormatOptions } from '@oidajs/core';
 import {
@@ -21,6 +30,17 @@ import { useSelector } from '@oidajs/ui-react-mobx';
 
 import { AnalysisLoadingStateMessage } from '../analysis-loading-state-message';
 import { ChartWidget } from '../chart-widget';
+
+type AreaHistoyramChartOption = echarts.ComposeOption<
+    | BarSeriesOption
+    | TooltipComponentOption
+    | LegendComponentOption
+    | AxisPointerComponentOption
+    | BrushComponentOption
+    | GridComponentOption
+>;
+
+echarts.use([BarChart, TooltipComponent, LegendComponent, AxisPointerComponent, BrushComponent, GridComponent]);
 
 export type DatasetAreaValuesProcessingTableProps = {
     processings: DatasetAreaValues[];
@@ -134,7 +154,7 @@ export const DatasetAreaValuesProcessingTable = (props: DatasetAreaValuesProcess
     return (
         <Collapse
             defaultActiveKey={props.processings.map((processing) => processing.id)}
-            expandIconPosition='right'
+            expandIconPosition='end'
             className='dataset-stats-table'
         >
             {infoPanels}
@@ -153,16 +173,16 @@ export const DatasetAreaValuesProcessingHistogram = (props: DatasetAreaValuesPro
         brushArea: any;
     }>();
 
-    const [chartGrids, setChartGrids] = useState<EChartOption.Grid[]>([]);
+    const [chartGrids, setChartGrids] = useState<GridComponentOption[]>([]);
 
     const { chartSeries, loadingState, xAxes, yAxes, domainMappers } = useSelector(() => {
-        const chartSeries: EChartOption.SeriesBar[] = [];
+        const chartSeries: BarSeriesOption[] = [];
 
         let loadingState = LoadingState.Init;
 
-        const xAxes: EChartOption.XAxis[] = [];
-        const yAxes: EChartOption.YAxis[] = [];
-        const grids: EChartOption.Grid[] = [];
+        const xAxes: XAXisOption[] = [];
+        const yAxes: YAXisOption[] = [];
+        const grids: GridComponentOption[] = [];
         const domainMappers: NumericDomainMapper[] = [];
 
         const margin = 40;
@@ -247,7 +267,7 @@ export const DatasetAreaValuesProcessingHistogram = (props: DatasetAreaValuesPro
                         value[1],
                         domainMapper.normalizeValue(value[2]),
                         domainMapper.normalizeValue(value[3])
-                    ];
+                    ] as number[];
                 })
             });
         });
@@ -303,7 +323,7 @@ export const DatasetAreaValuesProcessingHistogram = (props: DatasetAreaValuesPro
         <div className='dataset-stats-analysis'>
             <div className='series-chart'>
                 {loadingState === LoadingState.Success && <DatasetAreaValuesProcessingTable processings={props.processings} />}
-                <ChartWidget
+                <ChartWidget<AreaHistoyramChartOption>
                     onSizeChange={(size) => {
                         setChartSize(size);
                     }}
@@ -329,50 +349,48 @@ export const DatasetAreaValuesProcessingHistogram = (props: DatasetAreaValuesPro
                             setSelectedRange(undefined);
                         }
                     }}
-                    options={
-                        {
-                            color: colors,
-                            tooltip: {
-                                trigger: 'item',
-                                transitionDuration: 0,
-                                textStyle: {
-                                    fontSize: 13
-                                },
-                                formatter: (analysis: EChartOption.Tooltip.Format) => {
-                                    return analysis.value
-                                        ? `
+                    options={{
+                        color: colors,
+                        tooltip: {
+                            trigger: 'item',
+                            transitionDuration: 0,
+                            textStyle: {
+                                fontSize: 13
+                            },
+                            formatter: (analysis) => {
+                                return analysis.value
+                                    ? `
                                     <div>
                                         <div>${analysis.dimensionNames![0]} range: ${analysis.value[2]} to ${analysis.value[3]}</div>
                                         <div>Count: ${analysis.value ? analysis.value[1] : ''}</div>
                                     </div>
                                 `
-                                        : '';
-                                }
-                            },
-                            xAxis: xAxes,
-                            yAxis: yAxes,
-                            brush: {
-                                toolbox: ['lineX', 'clear'],
-                                xAxisIndex: xAxes.map((axis, idx) => idx),
-                                outOfBrush: {
-                                    colorAlpha: 0.2
-                                }
-                            },
-                            toolbox: {
-                                feature: {
-                                    brush: {
-                                        title: {
-                                            lineX: 'Select a range',
-                                            clear: 'Clear selection'
-                                        }
+                                    : '';
+                            }
+                        },
+                        xAxis: xAxes,
+                        yAxis: yAxes,
+                        brush: {
+                            toolbox: ['lineX', 'clear'],
+                            xAxisIndex: xAxes.map((axis, idx) => idx),
+                            outOfBrush: {
+                                colorAlpha: 0.2
+                            }
+                        },
+                        toolbox: {
+                            feature: {
+                                brush: {
+                                    title: {
+                                        lineX: 'Select a range',
+                                        clear: 'Clear selection'
                                     }
                                 }
-                            },
-                            grid: chartGrids,
-                            series: chartSeries,
-                            backgroundColor: 'transparent'
-                        } as EChartOption
-                    }
+                            }
+                        },
+                        grid: chartGrids,
+                        series: chartSeries,
+                        backgroundColor: 'transparent'
+                    }}
                     isLoading={loadingState === LoadingState.Loading}
                 />
             </div>

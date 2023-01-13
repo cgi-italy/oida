@@ -7,13 +7,13 @@ import { transform } from 'ol/proj';
 
 import bboxPolygon from '@turf/bbox-polygon';
 
-import { FeatureLayerRendererConfig, FEATURE_LAYER_ID, IFeature, IFeatureLayerRenderer } from '@oidajs/core';
+import { FeatureLayerRendererConfig, FEATURE_LAYER_ID, Geometry, IFeature, IFeatureLayerRenderer, IFeatureStyle } from '@oidajs/core';
 
 import { OLMapLayer } from './ol-map-layer';
 import { olLayersFactory } from './ol-layers-factory';
 import { OLStyleParser } from '../utils/ol-style-parser';
 
-export class OLFeatureLayer extends OLMapLayer<VectorLayer> implements IFeatureLayerRenderer {
+export class OLFeatureLayer extends OLMapLayer<VectorLayer<VectorSource>> implements IFeatureLayerRenderer {
     static readonly FEATURE_DATA_KEY = 'data';
     static readonly FEATURE_LAYER_KEY = 'layer';
     static readonly FEATURE_PICKING_DISABLED_KEY = 'pickingDisabled';
@@ -31,7 +31,7 @@ export class OLFeatureLayer extends OLMapLayer<VectorLayer> implements IFeatureL
         this.onFeatureSelect_ = config.onFeatureSelect;
     }
 
-    addFeature(id, geometry, style, data) {
+    addFeature(id: string, geometry: Geometry, style: IFeatureStyle, data: any) {
         const geom = this.parseGeometry_(geometry);
 
         if (geom) {
@@ -50,17 +50,21 @@ export class OLFeatureLayer extends OLMapLayer<VectorLayer> implements IFeatureL
                 feature.set(OLFeatureLayer.FEATURE_DATA_KEY, data);
             }
             feature.set(OLFeatureLayer.FEATURE_LAYER_KEY, this);
-            this.olImpl_.getSource().addFeature(feature);
-            return feature;
+            this.olImpl_.getSource()!.addFeature(feature);
+            return {
+                id: id,
+                data: data,
+                olFeature: feature
+            };
         }
     }
 
     getFeature(id) {
-        return this.olImpl_.getSource().getFeatureById(id);
+        return this.olImpl_.getSource()!.getFeatureById(id);
     }
 
     hasFeature(id: string) {
-        return !!this.olImpl_.getSource().getFeatureById(id);
+        return !!this.olImpl_.getSource()!.getFeatureById(id);
     }
 
     getFeatureData(id: string) {
@@ -70,33 +74,36 @@ export class OLFeatureLayer extends OLMapLayer<VectorLayer> implements IFeatureL
         }
     }
 
-    updateFeatureGeometry(id, geometry) {
+    updateFeatureGeometry(id: string, geometry: Geometry) {
         const feature = this.getFeature(id);
         if (feature) {
             feature.setGeometry(this.parseGeometry_(geometry));
         }
     }
 
-    updateFeatureStyle(id, style) {
+    updateFeatureStyle(id: string, style: IFeatureStyle) {
         const feature = this.getFeature(id);
         if (feature) {
-            const featureStyle = this.styleParser_.getStyleForGeometry(feature.getGeometry().getType(), style);
-            feature.setStyle(featureStyle);
-            if (featureStyle) {
-                feature.set(OLFeatureLayer.FEATURE_PICKING_DISABLED_KEY, featureStyle.pickingDisabled);
+            const geometry = feature.getGeometry();
+            if (geometry) {
+                const featureStyle = this.styleParser_.getStyleForGeometry(geometry.getType(), style);
+                feature.setStyle(featureStyle);
+                if (featureStyle) {
+                    feature.set(OLFeatureLayer.FEATURE_PICKING_DISABLED_KEY, featureStyle.pickingDisabled);
+                }
             }
         }
     }
 
-    removeFeature(id) {
+    removeFeature(id: string) {
         const feature = this.getFeature(id);
         if (feature) {
-            this.olImpl_.getSource().removeFeature(feature);
+            this.olImpl_.getSource()!.removeFeature(feature);
         }
     }
 
     removeAllFeatures() {
-        this.olImpl_.getSource().clear(true);
+        this.olImpl_.getSource()!.clear(true);
     }
 
     shouldReceiveFeatureHoverEvents() {
@@ -144,7 +151,7 @@ export class OLFeatureLayer extends OLMapLayer<VectorLayer> implements IFeatureL
 
     protected createOLObject_(config: FeatureLayerRendererConfig) {
         const source = new VectorSource({
-            wrapX: this.mapRenderer_.getViewer().getView().wrapX
+            wrapX: this.mapRenderer_.getViewer().getView()['wrapX']
         });
 
         return new VectorLayer({
@@ -152,7 +159,7 @@ export class OLFeatureLayer extends OLMapLayer<VectorLayer> implements IFeatureL
             extent: config.extent,
             zIndex: config.zIndex || 0,
             style: () => {
-                return null;
+                return;
             }
         });
     }

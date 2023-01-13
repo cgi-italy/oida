@@ -1,6 +1,6 @@
 {
   "name": "@oidajs/eo-mobx",
-  "version": "2.4.1",
+  "version": "3.0.0",
   "description": "oida EO library",
   "module": "es/index.js",
   "main": "lib/index.js",
@@ -24,18 +24,18 @@
     "access": "public"
   },
   "peerDependencies": {
+    "lodash": "4.x",
     "mobx": "6.x",
     "moment": "^2.x"
   },
   "dependencies": {
-    "@oidajs/core": "file:../core",
-    "@oidajs/state-mobx": "file:../state-mobx",
+    "@oidajs/core": "*",
+    "@oidajs/state-mobx": "*",
     "@turf/along": "^6.5.0",
     "@turf/length": "^6.5.0",
     "@turf/nearest-point-on-line": "^6.5.0",
-    "chroma-js": "^2.1.2",
-    "lodash": "^4.17.21",
-    "tslib": "^2.3.1",
+    "chroma-js": "^2.4.2",
+    "tslib": "^2.4.1",
     "uuid": "^8.3.2"
   }
 }

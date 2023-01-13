@@ -1,15 +1,17 @@
-import destroyObject from 'cesium/Source/Core/destroyObject';
-import Geometry from 'cesium/Source/Core/Geometry';
-import Matrix4 from 'cesium/Source/Core/Matrix4';
-import GeometryPipeline from 'cesium/Source/Core/GeometryPipeline';
-import VertexArray from 'cesium/Source/Renderer/VertexArray';
-import DrawCommand from 'cesium/Source/Renderer/DrawCommand';
-import ShaderProgram from 'cesium/Source/Renderer/ShaderProgram';
-import ShaderSource from 'cesium/Source/Renderer/ShaderSource';
-import BufferUsage from 'cesium/Source/Renderer/BufferUsage';
-import Appearance from 'cesium/Source/Scene/Appearance';
-import RenderState from 'cesium/Source/Renderer/RenderState';
-import Pass from 'cesium/Source/Renderer/Pass';
+import {
+    destroyObject,
+    Geometry,
+    Matrix4,
+    GeometryPipeline,
+    VertexArray,
+    DrawCommand,
+    ShaderProgram,
+    ShaderSource,
+    BufferUsage,
+    Appearance,
+    RenderState,
+    Pass
+} from 'cesium';
 
 import proj4 from 'proj4';
 
@@ -211,6 +213,7 @@ export abstract class CesiumVolumeTilePrimitive {
     }
 
     protected getRenderState_() {
+        // @ts-ignore: access to private method
         return Appearance.getDefaultRenderState(true, false);
     }
 
@@ -233,5 +236,5 @@ export abstract class CesiumVolumeTilePrimitive {
         };
     }
 
-    protected abstract createGeometry_(context): Geometry;
+    protected abstract createGeometry_(context): Geometry | undefined;
 }

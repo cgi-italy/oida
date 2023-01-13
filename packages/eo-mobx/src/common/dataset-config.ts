@@ -1,15 +1,21 @@
 import { IFormFieldDefinition } from '@oidajs/core';
 
-import { DatasetVizConfig, DatasetVizDefinitions } from '../common';
+import { DatasetVizConfig } from '../common';
 import { DatasetTimeDistributionConfig } from './dataset-time-distribution-config';
 import { DatasetProductSearchConfig } from './dataset-product-search-config';
 import { DatasetDownloadConfig } from './dataset-download-config';
 import { DatasetToolConfig } from './dataset-tool-config';
 import { DatasetSpatialCoverageProvider } from './dataset-spatial-coverage-provider';
 
-export type DatasetMapViewConfig<MAP_VIEW_TYPE extends keyof DatasetVizDefinitions> = {
+export type DatasetMapViewConfig<MAP_VIEW_TYPE extends string> = {
     type: MAP_VIEW_TYPE;
     config: DatasetVizConfig<MAP_VIEW_TYPE>;
+};
+
+export type DatasetConfigJSONSchema = { id: string } & Record<string, any>;
+export type DatasetConfigJSON<T extends DatasetConfigJSONSchema = DatasetConfigJSONSchema> = {
+    factoryType: string;
+    initConfig: T;
 };
 
 /**
@@ -17,7 +23,7 @@ export type DatasetMapViewConfig<MAP_VIEW_TYPE extends keyof DatasetVizDefinitio
  * (e.g. a series of Satellite images collected over time and space, a collection of in-situ data, etc. )
  * It can be used as input to {@link DatasetExplorer.addDataset} to add the dataset
  */
-export type DatasetConfig<MAP_VIEW_TYPE extends keyof DatasetVizDefinitions = keyof DatasetVizDefinitions> = {
+export type DatasetConfig<MAP_VIEW_TYPE extends string = string> = {
     /** The unique dataset identifier */
     id: string;
     /** The dataset name */
@@ -51,4 +57,6 @@ export type DatasetConfig<MAP_VIEW_TYPE extends keyof DatasetVizDefinitions = ke
     tools?: DatasetToolConfig[];
     /** Dataset download configuration */
     download?: DatasetDownloadConfig;
+    /** An object that can be used to create this config from {@link datasetConfigFactory} */
+    factoryInit?: DatasetConfigJSON;
 };

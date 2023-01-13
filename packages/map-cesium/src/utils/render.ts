@@ -1,13 +1,14 @@
-import JulianDate from 'cesium/Source/Core/JulianDate';
+import { JulianDate, Scene, DataSource, Visualizer } from 'cesium';
 
-const updateVisualizers = (dataSource, time) => {
+const updateVisualizers = (dataSource: DataSource, time: JulianDate) => {
     if (!time) {
         return true;
     }
 
     let pendingUpdate = false;
 
-    const visualizers = dataSource._visualizers;
+    // @ts-ignore: need access to private member
+    const visualizers: Visualizer[] = dataSource._visualizers;
 
     if (visualizers) {
         visualizers.forEach((visualizer) => {
@@ -18,7 +19,7 @@ const updateVisualizers = (dataSource, time) => {
     return pendingUpdate;
 };
 
-export const updateDataSource = (dataSource, scene) => {
+export const updateDataSource = (dataSource: DataSource, scene: Scene) => {
     const pendingUpdate = updateVisualizers(dataSource, scene.lastRenderTime);
 
     if (pendingUpdate) {

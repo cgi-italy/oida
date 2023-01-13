@@ -10,13 +10,13 @@ export const GRID_SCATTER_ANALYSIS = 'grid_scatter_analysis';
 export type GridScatterAnalysisProps = {
     xAnalysis?: DatasetAreaValues | Omit<DatasetAreaValuesProps, 'vizType'>;
     yAnalysis?: DatasetAreaValues | Omit<DatasetAreaValuesProps, 'vizType'>;
-} & Omit<DatasetAnalysisProps, 'type' | 'processings'>;
+} & Omit<DatasetAnalysisProps<typeof GRID_SCATTER_ANALYSIS>, 'type' | 'processings'>;
 
 /**
  * A combo analysis that extracts a grid of values for two or three different datasets
  * to enable scatter analyses
  */
-export class GridScatterAnalysis extends DatasetAnalysis<DatasetAreaValues> {
+export class GridScatterAnalysis extends DatasetAnalysis<typeof GRID_SCATTER_ANALYSIS, DatasetAreaValues> {
     protected subscriptionTracker_: SubscriptionTracker;
 
     constructor(props: GridScatterAnalysisProps) {

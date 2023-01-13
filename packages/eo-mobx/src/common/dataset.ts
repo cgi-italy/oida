@@ -21,6 +21,12 @@ export type DatasetProps = {
  * shared across all {@link DatasetViz | dataset visualizations}
  */
 export class Dataset {
+    protected static instances_: Map<string, WeakRef<Dataset>> = new Map();
+
+    static getInstance(id: string) {
+        return this.instances_.get(id)?.deref();
+    }
+
     /** The dataset configuration */
     readonly config: DatasetConfig;
     /** The dataset selected area of interest */
@@ -41,6 +47,8 @@ export class Dataset {
         this.toi = props.toi;
 
         this.onToiUpdate_ = props.onToiUpdate;
+
+        Dataset.instances_.set(props.config.id, new WeakRef(this));
 
         makeObservable(this);
     }

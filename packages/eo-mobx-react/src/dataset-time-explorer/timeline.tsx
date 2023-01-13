@@ -382,6 +382,13 @@ export const Timeline = (props: TimelineProps) => {
                         }
                     };
 
+                    const getSelectedRange = () => {
+                        const startTime = timelineInstance.getCustomTime(startMarkerId);
+                        const endTime = timelineInstance.getCustomTime(endMarkerId);
+
+                        return endTime < startTime ? { start: endTime, end: startTime } : { start: startTime, end: endTime };
+                    };
+
                     const onDrawStart = (evt) => {
                         timelineInstance.setCustomTime(evt.time, startMarkerId);
                         timelineInstance.addCustomTime(evt.time, endMarkerId);
@@ -406,25 +413,21 @@ export const Timeline = (props: TimelineProps) => {
 
                     const onDrawMove = (evt) => {
                         const evtTime = timelineInstance.getEventProperties(evt).time;
-
                         timelineInstance.setCustomTime(evtTime, endMarkerId);
+
                         props.timelineItems.update({
                             id: range.id,
-                            end: evtTime
+                            ...getSelectedRange()
                         });
                     };
 
                     const onDrawEnd = (evt) => {
                         timelineInstance.setCustomTime(evt.time, endMarkerId);
-
+                        const selectedRange = getSelectedRange();
+                        range.onRangeUpdate(selectedRange);
                         props.timelineItems.update({
                             id: range.id,
-                            end: evt.time
-                        });
-
-                        range.onRangeUpdate({
-                            start: timelineInstance.getCustomTime(startMarkerId),
-                            end: evt.time
+                            ...selectedRange
                         });
 
                         timelineInstance.off('click', onDrawEnd);

@@ -1,13 +1,15 @@
-import Cartesian3 from 'cesium/Source/Core/Cartesian3';
-import Color from 'cesium/Source/Core/Color';
-import PrimitiveCollection from 'cesium/Source/Scene/PrimitiveCollection';
-import GeometryInstance from 'cesium/Source/Core/GeometryInstance';
-import PolylineGeometry from 'cesium/Source/Core/PolylineGeometry';
-import GroundPolylineGeometry from 'cesium/Source/Core/GroundPolylineGeometry';
-import ColorGeometryInstanceAttribute from 'cesium/Source/Core/ColorGeometryInstanceAttribute';
-import GroundPolylinePrimitive from 'cesium/Source/Scene/GroundPolylinePrimitive';
-import Primitive from 'cesium/Source/Scene/Primitive';
-import PolylineColorAppearance from 'cesium/Source/Scene/PolylineColorAppearance';
+import {
+    Cartesian3,
+    Color,
+    PrimitiveCollection,
+    GeometryInstance,
+    PolylineGeometry,
+    GroundPolylineGeometry,
+    ColorGeometryInstanceAttribute,
+    GroundPolylinePrimitive,
+    Primitive,
+    PolylineColorAppearance
+} from 'cesium';
 
 import { ILineStyle } from '@oidajs/core';
 

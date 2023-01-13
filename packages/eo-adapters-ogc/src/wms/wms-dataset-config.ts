@@ -16,7 +16,7 @@ import { getWmsLayerRasterView, WmsRasterSourceFiltersSerializer, WmsRasterSourc
 import { WmsLayerStyle } from './wms-client';
 
 /**
- * The configuration object for the {@Link getWmsDatasetConfig} function
+ * The configuration object for the {@link getWmsDatasetConfig} function
  */
 export type WmsDatasetConfig = {
     /** The WMS service */
@@ -31,15 +31,15 @@ export type WmsDatasetConfig = {
     /** If true any time dimension available on the wms layer will be ignored and no time distribution provider will be instanciated */
     disableTimeDimension?: boolean;
     /**
-     * By default if the WMS layer has a time dimension the dataset will be initialized with a {@Link WmsTimeDistributionProvider}
+     * By default if the WMS layer has a time dimension the dataset will be initialized with a {@link WmsTimeDistributionProvider}
      * It can be overriden here
      */
     timeDistributionProvider?: DatasetTimeDistributionProvider;
-    /** See the corresponding option in {@Link WmsLayerRasterViewConfig}*/
+    /** See the corresponding option in {@link WmsLayerRasterViewConfig}*/
     getPresetFromStyle?: (style: WmsLayerStyle) => Partial<RasterBandPreset>;
-    /** See the corresponding option in {@Link WmsRasterSourceProviderConfig} */
+    /** See the corresponding option in {@link WmsRasterSourceProviderConfig} */
     tileGridOptions?: WmsRasterSourceTileGridOptions;
-    /** See the corresponding option in {@Link WmsRasterSourceProviderConfig} */
+    /** See the corresponding option in {@link WmsRasterSourceProviderConfig} */
     additionalFiltersSerializer?: WmsRasterSourceFiltersSerializer;
 };
 
@@ -47,7 +47,7 @@ export type WmsDatasetConfig = {
  * Get the EO dataset configuration for a WMS layer. Additional information will be retrieved through a getCapabilities request.
  * If the layer present a time dimension, it will be used to enable time exploration (and in case of ncWMS for time series operations)
  * @params config: the request configuration object
- * @return The dataset configuration object. It can be used as input to the {@Link DatasetExplorer.addDataset} method
+ * @return The dataset configuration object. It can be used as input to the {@link DatasetExplorer.addDataset} method
  */
 export const getWmsDatasetConfig = (config: WmsDatasetConfig) => {
     const wmsService = config.service;

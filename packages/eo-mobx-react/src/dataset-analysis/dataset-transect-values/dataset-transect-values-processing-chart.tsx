@@ -1,10 +1,15 @@
 import React, { useCallback, useState } from 'react';
 import moment from 'moment';
-import { EChartOption } from 'echarts';
-import 'echarts/lib/chart/line';
-import 'echarts/lib/component/tooltip';
-import 'echarts/lib/component/legend';
-import 'echarts/lib/component/axisPointer';
+import * as echarts from 'echarts/core';
+import { LineChart, LineSeriesOption } from 'echarts/charts';
+import {
+    TooltipComponent,
+    TooltipComponentOption,
+    LegendComponent,
+    LegendComponentOption,
+    AxisPointerComponent,
+    AxisPointerComponentOption
+} from 'echarts/components';
 
 import { LoadingState } from '@oidajs/core';
 import { DatasetTransectValues, isDomainProvider, NumericDomainMapper } from '@oidajs/eo-mobx';
@@ -12,6 +17,12 @@ import { useSelector } from '@oidajs/ui-react-mobx';
 
 import { AnalysisLoadingStateMessage } from '../analysis-loading-state-message';
 import { ChartWidget } from '../chart-widget';
+
+type TransectChartOption = echarts.ComposeOption<
+    LineSeriesOption | TooltipComponentOption | LegendComponentOption | AxisPointerComponentOption
+>;
+
+echarts.use([LineChart, TooltipComponent, LegendComponent, AxisPointerComponent]);
 
 export type DatasetTransectValuesProcessingChartProps = {
     series: DatasetTransectValues[];
@@ -30,7 +41,7 @@ export function DatasetTransectValuesProcessingChart(props: DatasetTransectValue
     const [trackCoordinate, setTrackCoordinate] = useState(true);
 
     const { chartSeries, colors, loadingState, legendData, yAxes } = useSelector(() => {
-        const chartSeries: EChartOption.SeriesLine[] = [];
+        const chartSeries: LineSeriesOption[] = [];
         const colors: string[] = [];
 
         let loadingState = LoadingState.Init;
@@ -142,7 +153,7 @@ export function DatasetTransectValuesProcessingChart(props: DatasetTransectValue
     });
 
     const tooltipFormatter = useCallback(
-        (series: EChartOption.Tooltip.Format[]) => {
+        (series) => {
             if (!series.length) {
                 return '';
             }
@@ -246,63 +257,61 @@ export function DatasetTransectValuesProcessingChart(props: DatasetTransectValue
 
     return (
         <div className='series-chart'>
-            <ChartWidget
+            <ChartWidget<TransectChartOption>
                 onMouseEnter={() => setTrackCoordinate(true)}
                 onMouseLeave={disableCoordinateTrack}
-                options={
-                    {
-                        color: colors,
-                        legend: {
-                            data: legendData.map((item) => item.id),
-                            right: '10px',
-                            formatter: (name) => {
-                                return legendData[name].name;
-                            },
-                            tooltip: {
-                                show: true,
-                                formatter: (data: EChartOption.Tooltip.Format) => {
-                                    return legendData[data.name!].description || '';
-                                }
-                            },
-                            selected: legendData.reduce((selected, item) => {
-                                return {
-                                    ...selected,
-                                    [item.id]: !item.disabled
-                                };
-                            }, {})
+                options={{
+                    color: colors,
+                    legend: {
+                        data: legendData.map((item) => item.id),
+                        right: '10px',
+                        formatter: (name) => {
+                            return legendData[name].name;
                         },
                         tooltip: {
-                            trigger: 'axis',
-                            transitionDuration: 0,
-                            formatter: tooltipFormatter,
-                            textStyle: {
-                                fontSize: 13
-                            },
-                            axisPointer: {
-                                type: 'line',
-                                snap: true
+                            show: true,
+                            formatter: (data) => {
+                                return legendData[data.name!].description || '';
                             }
                         },
-                        xAxis: [
-                            {
-                                type: 'value',
-                                name: 'Relative distance (km)',
-                                nameLocation: 'middle',
-                                nameGap: 20
-                            }
-                        ],
-                        yAxis: yAx,
-                        grid: {
-                            left: 40,
-                            right: 40,
-                            bottom: 40,
-                            top: 60,
-                            containLabel: true
+                        selected: legendData.reduce((selected, item) => {
+                            return {
+                                ...selected,
+                                [item.id]: !item.disabled
+                            };
+                        }, {})
+                    },
+                    tooltip: {
+                        trigger: 'axis',
+                        transitionDuration: 0,
+                        formatter: tooltipFormatter,
+                        textStyle: {
+                            fontSize: 13
                         },
-                        series: chartSeries,
-                        backgroundColor: 'transparent'
-                    } as EChartOption
-                }
+                        axisPointer: {
+                            type: 'line',
+                            snap: true
+                        }
+                    },
+                    xAxis: [
+                        {
+                            type: 'value',
+                            name: 'Relative distance (km)',
+                            nameLocation: 'middle',
+                            nameGap: 20
+                        }
+                    ],
+                    yAxis: yAx,
+                    grid: {
+                        left: 40,
+                        right: 40,
+                        bottom: 40,
+                        top: 60,
+                        containLabel: true
+                    },
+                    series: chartSeries,
+                    backgroundColor: 'transparent'
+                }}
                 onHighlight={(evt, highlighted) => {
                     if (evt.seriesName) {
                         const series = props.series[parseInt(evt.seriesName)];

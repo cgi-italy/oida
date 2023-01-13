@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 
 import GridLayout from 'react-grid-layout';
-import useResizeAware from 'react-resize-aware';
+import useDimensions from 'react-cool-dimensions';
 
-import { Button } from 'antd';
+import { Button, Typography } from 'antd';
 import { DragOutlined, CloseOutlined } from '@ant-design/icons';
 
 import { LayoutSectionItem, LayoutSectionProps } from '@oidajs/ui-react-core';
@@ -60,19 +60,19 @@ export const DashboardPane = (props: LayoutSectionProps & DashboardPaneProps) =>
     const getInitialLayout = (component: LayoutSectionItem) => {
         //@ts-ignore
         const preferredLayout = component.preferredLayout;
-        const height = props.containerHeight || size.height;
-        if (preferredLayout && size.width && height) {
-            const w = Math.floor(Math.min(preferredLayout.width / size.width, 1.0) * props.numCols);
-            const h = Math.floor(Math.min(height, preferredLayout.height) / rowSnapHeight);
+        const layoutHeight = props.containerHeight || height;
+        if (preferredLayout && width && layoutHeight) {
+            const w = Math.floor(Math.min(preferredLayout.width / width, 1.0) * props.numCols);
+            const h = Math.floor(Math.min(layoutHeight, preferredLayout.height) / rowSnapHeight);
             let x = 0;
             let y = 0;
             if (!preferredLayout.position || preferredLayout.position === 'tr') {
                 x = props.numCols - w;
             } else if (preferredLayout.position === 'bl') {
-                y = Math.floor((height - preferredLayout.height) / rowSnapHeight);
+                y = Math.floor((layoutHeight - preferredLayout.height) / rowSnapHeight);
             } else if (preferredLayout.position === 'br') {
                 x = props.numCols - w;
-                y = Math.floor((height - preferredLayout.height) / rowSnapHeight);
+                y = Math.floor((layoutHeight - preferredLayout.height) / rowSnapHeight);
             }
             x = Math.max(0, x);
             y = Math.max(0, y);
@@ -131,7 +131,7 @@ export const DashboardPane = (props: LayoutSectionProps & DashboardPaneProps) =>
         return updatedLayout;
     };
 
-    const [resizeListener, size] = useResizeAware();
+    const { observe, width, height } = useDimensions();
     const [closedWidgetsLayout, setClosedWidgetsLayout] = useState({});
     const [layout, setLayout] = useState(() => getLayoutFromComponents({}));
     const [updateTracker] = useState<{ evt?: { type: string; item?: any } }>({
@@ -155,7 +155,24 @@ export const DashboardPane = (props: LayoutSectionProps & DashboardPaneProps) =>
                     <Button type='link' className='widget-drag-btn'>
                         <DragOutlined />
                     </Button>
-                    {component.title}
+                    <div className='widget-title' title={component.title?.toString()}>
+                        {component.onRename ? (
+                            <Typography.Paragraph
+                                editable={{
+                                    onChange: (value) => {
+                                        if (value) {
+                                            component.onRename!(value);
+                                        }
+                                    },
+                                    triggerType: ['text']
+                                }}
+                            >
+                                {component.title}
+                            </Typography.Paragraph>
+                        ) : (
+                            <React.Fragment>{component.title}</React.Fragment>
+                        )}
+                    </div>
                     {component.onClose && (
                         <Button
                             type='link'
@@ -194,10 +211,9 @@ export const DashboardPane = (props: LayoutSectionProps & DashboardPaneProps) =>
     }, [props.components]);
 
     return (
-        <div className='dashboard-pane' style={props.style}>
-            {resizeListener}
+        <div className='dashboard-pane' style={props.style} ref={observe}>
             <GridLayout
-                width={size.width || 100}
+                width={width || 100}
                 autoSize={true}
                 compactType={props.compactType}
                 isBounded={false}

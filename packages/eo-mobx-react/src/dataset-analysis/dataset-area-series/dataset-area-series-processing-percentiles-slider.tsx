@@ -1,11 +1,15 @@
 import React from 'react';
 import moment from 'moment';
-import { EChartOption } from 'echarts';
-import 'echarts/lib/chart/bar';
-import 'echarts/lib/component/tooltip';
-import 'echarts/lib/component/legend';
-import 'echarts/lib/component/axisPointer';
-import 'echarts/lib/component/brush';
+import * as echarts from 'echarts/core';
+import { LineChart, LineSeriesOption } from 'echarts/charts';
+import {
+    TooltipComponent,
+    TooltipComponentOption,
+    AxisPointerComponent,
+    AxisPointerComponentOption,
+    DataZoomComponent,
+    DataZoomComponentOption
+} from 'echarts/components';
 import chroma from 'chroma-js';
 
 import { formatNumber, getTextColorForBackground } from '@oidajs/core';
@@ -20,6 +24,12 @@ import {
 } from '@oidajs/eo-mobx';
 
 import { ChartWidget } from '../chart-widget';
+
+type PercentilesChartOption = echarts.ComposeOption<
+    LineSeriesOption | TooltipComponentOption | AxisPointerComponentOption | DataZoomComponentOption
+>;
+
+echarts.use([LineChart, TooltipComponent, AxisPointerComponent, DataZoomComponent]);
 
 export type DatasetAreaSeriesProcessingPercentilesSliderProps = {
     items: DatasetAreaSeriesDataItem[];
@@ -112,154 +122,150 @@ export const DatasetAreaSeriesProcessingPercentilesSlider = (props: DatasetAreaS
 
     return (
         <div className='dataset-sequence-stats-slider'>
-            <ChartWidget
-                options={
-                    {
-                        color: props.color ? [props.color] : undefined,
-                        tooltip: {
-                            triggerOn: 'click',
-                            transitionDuration: 0,
-                            textStyle: {
-                                fontSize: 13
+            <ChartWidget<PercentilesChartOption>
+                options={{
+                    color: props.color ? [props.color] : undefined,
+                    tooltip: {
+                        triggerOn: 'click',
+                        transitionDuration: 0,
+                        textStyle: {
+                            fontSize: 13
+                        },
+                        formatter: (item) => {
+                            if (item && item.length) {
+                                props.onActiveItemChange(item[0].dataIndex!);
+                            }
+                            return '';
+                        }
+                    },
+                    xAxis: [
+                        {
+                            type: axisType,
+                            name: `${props.dimensionConfig.name} ${props.dimensionConfig.units ? `(${props.dimensionConfig.units})` : ''}`,
+                            nameLocation: 'middle',
+                            axisLabel: {
+                                formatter: axisFormatter
                             },
-                            formatter: (item: EChartOption.Tooltip.Format[]) => {
-                                if (item && item.length) {
-                                    props.onActiveItemChange(item[0].dataIndex!);
-                                }
-                                return '';
-                            }
-                        },
-                        xAxis: [
-                            {
-                                type: axisType,
-                                name: `${props.dimensionConfig.name} ${
-                                    props.dimensionConfig.units ? `(${props.dimensionConfig.units})` : ''
-                                }`,
-                                nameLocation: 'middle',
-                                axisLabel: {
-                                    formatter: axisFormatter
-                                },
-                                nameGap: 25,
-                                axisLine: {
-                                    onZero: false
-                                },
-                                axisPointer: {
-                                    value: props.items[props.activeItem].x,
-                                    snap: true,
-                                    handle: {
-                                        show: true,
-                                        color: props.color,
-                                        size: 30,
-                                        margin: 20
-                                    },
-                                    lineStyle: {
-                                        color: props.color,
-                                        width: 2
-                                    },
-                                    label: {
-                                        show: true,
-                                        formatter: axisFormatter ? (item) => axisFormatter(item.value) : undefined,
-                                        backgroundColor: props.color,
-                                        margin: 35,
-                                        color: handleTextColor
-                                    }
-                                }
-                            }
-                        ],
-                        yAxis: [
-                            {
-                                type: 'value',
-                                nameLocation: 'end',
-                                name: `${props.variableConfig.name} ${props.variableConfig.units ? `(${props.variableConfig.units})` : ''}`,
-                                nameGap: 10,
-                                nameTextStyle: {
-                                    align: 'left'
-                                },
-                                axisLabel: {
-                                    formatter: (value) => {
-                                        return formatNumber(value + min, {
-                                            maxLength: 6
-                                        });
-                                    }
-                                },
-                                axisLine: {
-                                    onZero: false
-                                },
-                                scale: true
-                            }
-                        ],
-                        grid: {
-                            left: 20,
-                            right: 40,
-                            bottom: 50,
-                            top: 30,
-                            containLabel: true
-                        },
-                        series: chartSeries.map((series, idx) => {
-                            return {
-                                type: 'line',
-                                smooth: true,
-                                data: series.data,
-                                itemStyle: {
-                                    color: series.lineColor
+                            nameGap: 25,
+                            axisLine: {
+                                onZero: false
+                            },
+                            axisPointer: {
+                                value: props.items[props.activeItem].x,
+                                snap: true,
+                                handle: {
+                                    show: true,
+                                    color: props.color,
+                                    size: 30,
+                                    margin: 20
                                 },
                                 lineStyle: {
-                                    color: series.lineColor,
-                                    width: series.width,
-                                    opacity: series.lineOpacity
-                                },
-                                areaStyle: {
                                     color: props.color,
-                                    opacity: series.areaOpacity,
-                                    origin: idx === 0 ? 'start' : 'auto'
+                                    width: 2
                                 },
-                                showSymbol: series.showSymbols,
-                                emphasis: {
-                                    areaStyle: {
-                                        opacity: 1
-                                    }
-                                },
-                                symbolSize: 5,
-                                z: chartSeries.length - idx,
-                                stack: true
-                            };
-                        }),
-                        dataZoom: [
-                            {
-                                xAxisIndex: 0,
-                                type: 'inside',
-                                filterMode: 'none',
-                                id: '0'
-                            },
-                            {
-                                yAxisIndex: 0,
-                                type: 'inside',
-                                filterMode: 'none',
-                                id: '1'
-                            },
-                            {
-                                xAxisIndex: 0,
-                                type: 'slider',
-                                filterMode: 'none',
-                                dataBackground: {
-                                    lineStyle: {
-                                        opacity: 0,
-                                        color: 'white'
-                                    }
-                                },
-                                id: '2'
-                            },
-                            {
-                                yAxisIndex: 0,
-                                type: 'slider',
-                                filterMode: 'none',
-                                showDataShadow: false,
-                                id: '3'
+                                label: {
+                                    show: true,
+                                    formatter: axisFormatter ? (item) => axisFormatter(item.value) : undefined,
+                                    backgroundColor: props.color,
+                                    margin: 35,
+                                    color: handleTextColor
+                                }
                             }
-                        ],
-                        backgroundColor: 'transparent'
-                    } as EChartOption
-                }
+                        }
+                    ],
+                    yAxis: [
+                        {
+                            type: 'value',
+                            nameLocation: 'end',
+                            name: `${props.variableConfig.name} ${props.variableConfig.units ? `(${props.variableConfig.units})` : ''}`,
+                            nameGap: 10,
+                            nameTextStyle: {
+                                align: 'left'
+                            },
+                            axisLabel: {
+                                formatter: (value) => {
+                                    return formatNumber(value + min, {
+                                        maxLength: 6
+                                    });
+                                }
+                            },
+                            axisLine: {
+                                onZero: false
+                            },
+                            scale: true
+                        }
+                    ],
+                    grid: {
+                        left: 20,
+                        right: 40,
+                        bottom: 50,
+                        top: 30,
+                        containLabel: true
+                    },
+                    series: chartSeries.map((series, idx) => {
+                        return {
+                            type: 'line',
+                            smooth: true,
+                            data: series.data,
+                            itemStyle: {
+                                color: series.lineColor
+                            },
+                            lineStyle: {
+                                color: series.lineColor,
+                                width: series.width,
+                                opacity: series.lineOpacity
+                            },
+                            areaStyle: {
+                                color: props.color,
+                                opacity: series.areaOpacity,
+                                origin: idx === 0 ? 'start' : 'auto'
+                            },
+                            showSymbol: series.showSymbols,
+                            emphasis: {
+                                areaStyle: {
+                                    opacity: 1
+                                }
+                            },
+                            symbolSize: 5,
+                            z: chartSeries.length - idx,
+                            stack: 'stack'
+                        };
+                    }),
+                    dataZoom: [
+                        {
+                            xAxisIndex: 0,
+                            type: 'inside',
+                            filterMode: 'none',
+                            id: '0'
+                        },
+                        {
+                            yAxisIndex: 0,
+                            type: 'inside',
+                            filterMode: 'none',
+                            id: '1'
+                        },
+                        {
+                            xAxisIndex: 0,
+                            type: 'slider',
+                            filterMode: 'none',
+                            dataBackground: {
+                                lineStyle: {
+                                    opacity: 0,
+                                    color: 'white'
+                                }
+                            },
+                            id: '2'
+                        },
+                        {
+                            yAxisIndex: 0,
+                            type: 'slider',
+                            filterMode: 'none',
+                            showDataShadow: false,
+                            id: '3'
+                        }
+                    ],
+                    backgroundColor: 'transparent'
+                }}
                 isLoading={props.isLoading}
             />
         </div>

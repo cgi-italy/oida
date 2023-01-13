@@ -55,7 +55,7 @@ export type DatasetAreaSeriesProps = Omit<
     dataMask?: Partial<DatasetAreaValuesDataMask>;
 };
 
-export class DatasetAreaSeries extends DatasetProcessing<undefined> {
+export class DatasetAreaSeries extends DatasetProcessing<typeof DATASET_AREA_SERIES_PROCESSING, undefined> {
     readonly config: DatasetAreaSeriesConfig;
     @observable.ref sequenceDimension: string | undefined;
     @observable.ref sequenceVariable: string | undefined;
@@ -156,7 +156,7 @@ export class DatasetAreaSeries extends DatasetProcessing<undefined> {
                 if (this.parent instanceof RasterMapViz) {
                     const parentBandMode = this.parent.bandMode.value;
                     if (parentBandMode?.type === RasterBandModeType.Single && parentBandMode.band === variable) {
-                        this.colorMap = new ColorMap(parentBandMode.colorMap.asProps());
+                        this.colorMap = new ColorMap(parentBandMode.colorMap.getSnapshot());
                     }
                 }
 
@@ -220,7 +220,7 @@ export class DatasetAreaSeries extends DatasetProcessing<undefined> {
                         range: this.sequenceRange,
                         dimensionValues: new Map(this.dimensions.values),
                         additionalParameters: this.additionalParameters.asArray(),
-                        colorMap: this.colorMap?.asProps(),
+                        colorMap: this.colorMap?.getSnapshot(),
                         dataMask: this.dataMask
                     })
                     .then((data) => {
@@ -247,7 +247,7 @@ export class DatasetAreaSeries extends DatasetProcessing<undefined> {
             sequenceVariable: this.sequenceVariable,
             sequenceRange: this.sequenceRange,
             autoUpdate: this.autoUpdate
-        }) as DatasetAreaSeries;
+        });
     }
 
     dispose() {
@@ -280,7 +280,7 @@ export class DatasetAreaSeries extends DatasetProcessing<undefined> {
                 return {
                     aoi: this.geometry,
                     dimensions: new Map(this.dimensions.values),
-                    colorMap: this.colorMap?.asProps(),
+                    colorMap: this.colorMap?.getSnapshot(),
                     additionalParameters: this.additionalParameters.asArray()
                 };
             },

@@ -1,7 +1,4 @@
-import Event from 'cesium/Source/Core/Event';
-import GeographicTilingScheme from 'cesium/Source/Core/GeographicTilingScheme';
-import Credit from 'cesium/Source/Core/Credit';
-import DeveloperError from 'cesium/Source/Core/DeveloperError';
+import { Event, GeographicTilingScheme, Credit, DeveloperError } from 'cesium';
 
 import { get as getProj } from 'ol/proj';
 import TileState from 'ol/TileState';

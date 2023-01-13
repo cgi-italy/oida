@@ -1,7 +1,7 @@
 import { IMapLayerRenderer, MapLayerRendererConfig } from './map-layer-renderer';
 import { TileSource } from './tile-sources/tile-source';
 
-export type TileGridConfig = {
+export type BaseTileGridConfig = {
     tileSize?: number | number[];
     gridSize?: number[];
     forceUniformResolution?: boolean;
@@ -11,8 +11,17 @@ export type TileGridConfig = {
     minRes?: number;
     extent?: number[];
     resolutions?: number[];
+};
+
+export type WmtsTileGridConfig = BaseTileGridConfig & {
+    isWMTS: true;
     matrixIds?: string[];
-    isWMTS?: boolean;
+};
+
+export type TileGridConfig = BaseTileGridConfig | WmtsTileGridConfig;
+
+export const isWmtsTileGridConfig = (gridConfig: TileGridConfig): gridConfig is WmtsTileGridConfig => {
+    return (gridConfig as WmtsTileGridConfig).isWMTS === true;
 };
 
 type TileGridParamsOptions = {

@@ -6,7 +6,17 @@ import { register } from 'ol/proj/proj4';
 import proj4 from 'proj4';
 import { getCenter as getExtentCenter } from 'ol/extent';
 
-import { IMapRenderer, IMapRendererProps, IMapViewport, IMapProjection, FitExtentOptions } from '@oidajs/core';
+import {
+    IMapRenderer,
+    IMapRendererProps,
+    IMapViewport,
+    IMapProjection,
+    FitExtentOptions,
+    exportImage,
+    ImageExportOptions,
+    BBox,
+    Size
+} from '@oidajs/core';
 
 import { olLayersFactory } from '../layers/ol-layers-factory';
 import { olInteractionsFactory } from '../interactions/ol-interactions-factory';
@@ -18,8 +28,7 @@ import 'ol/ol.css';
 export const OL_RENDERER_ID = 'ol';
 
 export class OLMapRenderer implements IMapRenderer {
-    private viewer_: Map;
-    private layerGroup_: OLGroupLayer | undefined;
+    private viewer_!: Map;
 
     constructor(props: IMapRendererProps) {
         this.initRenderer_(props);
@@ -92,15 +101,14 @@ export class OLMapRenderer implements IMapRenderer {
         if (projection.getCode() !== 'EPSG:4326') {
             extent = transformExtent(extent, projection, 'EPSG:4326');
             if (isNaN(extent[0]) || isNaN(extent[1]) || isNaN(extent[2]) || isNaN(extent[3])) {
-                return null;
+                return undefined;
             }
         }
 
-        return extent;
+        return extent as BBox;
     }
 
     setLayerGroup(group: OLGroupLayer) {
-        this.layerGroup_ = group;
         this.viewer_.setLayerGroup(group.getOLObject());
     }
 
@@ -117,7 +125,7 @@ export class OLMapRenderer implements IMapRenderer {
     }
 
     getSize() {
-        return this.viewer_.getSize();
+        return this.viewer_.getSize() as Size;
     }
 
     updateSize() {
@@ -126,8 +134,62 @@ export class OLMapRenderer implements IMapRenderer {
         }
     }
 
+    export(options: ImageExportOptions) {
+        return new Promise<string>((resolve, reject) => {
+            // extracted from https://openlayers.org/en/latest/examples/export-map.html
+            this.viewer_.once('rendercomplete', () => {
+                const mapCanvas = document.createElement('canvas');
+                const size = this.viewer_.getSize() || [options.width || 1024, options.height || 1024];
+                mapCanvas.width = size[0];
+                mapCanvas.height = size[1];
+                const mapContext = mapCanvas.getContext('2d');
+                if (mapContext) {
+                    Array.prototype.forEach.call(
+                        this.viewer_.getViewport().querySelectorAll('.ol-layer canvas, canvas.ol-layer'),
+                        (canvas) => {
+                            if (canvas.width > 0) {
+                                const opacity = canvas.parentNode.style.opacity || canvas.style.opacity;
+                                mapContext.globalAlpha = opacity === '' ? 1 : Number(opacity);
+                                let matrix;
+                                const transform = canvas.style.transform;
+                                if (transform) {
+                                    // Get the transform parameters from the style's transform matrix
+                                    matrix = transform
+                                        .match(/^matrix\(([^(]*)\)$/)[1]
+                                        .split(',')
+                                        .map(Number);
+                                } else {
+                                    matrix = [
+                                        parseFloat(canvas.style.width) / canvas.width,
+                                        0,
+                                        0,
+                                        parseFloat(canvas.style.height) / canvas.height,
+                                        0,
+                                        0
+                                    ];
+                                }
+                                // Apply the transform to the export map context
+                                CanvasRenderingContext2D.prototype.setTransform.apply(mapContext, matrix);
+                                const backgroundColor = canvas.parentNode.style.backgroundColor;
+                                if (backgroundColor) {
+                                    mapContext.fillStyle = backgroundColor;
+                                    mapContext.fillRect(0, 0, canvas.width, canvas.height);
+                                }
+                                mapContext.drawImage(canvas, 0, 0);
+                            }
+                        }
+                    );
+                    mapContext.globalAlpha = 1;
+                    mapContext.setTransform(1, 0, 0, 1, 0, 0);
+                }
+                resolve(exportImage(mapCanvas, options));
+            });
+            this.viewer_.renderSync();
+        });
+    }
+
     destroy() {
-        this.viewer_.setTarget(null);
+        this.viewer_.setTarget(undefined);
     }
 
     private initRenderer_(props: IMapRendererProps) {
@@ -163,14 +225,28 @@ export class OLMapRenderer implements IMapRenderer {
         }
     }
 
-    private computeCurrentView_(): IMapViewport {
+    private computeCurrentView_(): IMapViewport | undefined {
         const view = this.viewer_.getView();
         let center = view.getCenter();
-        const resolution = view.getResolution() * view.getProjection().getMetersPerUnit();
+        if (!center) {
+            return undefined;
+        }
+        let resolution = view.getResolution();
+        if (!resolution) {
+            return undefined;
+        }
+        const viewMetersPerUnit = view.getProjection().getMetersPerUnit();
+        if (viewMetersPerUnit) {
+            resolution *= viewMetersPerUnit;
+        }
+
         const rotation = view.getRotation();
 
         if (view.getProjection().getCode() !== 'EPSG:4326') {
             center = transform(center, view.getProjection(), 'EPSG:4326');
+        }
+        if (!center) {
+            return undefined;
         }
 
         return {
@@ -178,7 +254,7 @@ export class OLMapRenderer implements IMapRenderer {
             resolution,
             rotation,
             pitch: 0
-        };
+        } as IMapViewport;
     }
 
     private createViewFromProps_(viewProps: IMapViewport, projProps: IMapProjection) {
@@ -191,10 +267,12 @@ export class OLMapRenderer implements IMapRenderer {
             }
         }
 
-        const projection = getProj(projProps.code);
+        const projection = getProj(projProps.code) || undefined;
         const extent = projProps.extent || undefined;
-        if (extent) {
-            projection.setExtent(projProps.extent);
+        if (projection && extent) {
+            // TODO: check if this is required and if it affects subsequent usage of the same projection
+            // without an extent (side effect on projection object?)
+            projection.setExtent(extent);
         }
         const view = new View({
             projection,

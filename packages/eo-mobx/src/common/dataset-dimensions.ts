@@ -1,5 +1,5 @@
 import { SubscriptionTracker } from '@oidajs/core';
-import { action, makeObservable, observable, ObservableMap, reaction, runInAction } from 'mobx';
+import { action, IKeyValueMap, makeObservable, observable, ObservableMap, reaction, runInAction } from 'mobx';
 
 import { Dataset } from './dataset';
 import { TimeSearchDirection } from './dataset-time-distribution-provider';
@@ -24,7 +24,15 @@ export type DatasetDimensionsProps = {
     /** The dataset dimensions configuration */
     dimensions?: DatasetDimension<DimensionDomainType>[];
     /** The initial dimension values */
-    dimensionValues?: Record<string, CategoricalDimensionValueType> | Map<string, CategoricalDimensionValueType>;
+    dimensionValues?:
+        | Record<string, CategoricalDimensionValueType>
+        | Map<string, CategoricalDimensionValueType>
+        | Array<[string, string | number]>;
+
+    rangeValues?:
+        | IKeyValueMap<DimensionRangeType>
+        | Map<string, DimensionRangeType>
+        | Array<[string, Array<string | number> | ValueDomain<string | number>]>;
     /**
      * An optional getter to retrieve the currently selected dataset variable.
      * Should be specified if any of the dimension domain depends on the selected dataset variable
@@ -48,15 +56,30 @@ export class DatasetDimensions implements DataDomainProviderFilters {
         this.dataset_ = props.dataset;
 
         this.variableGetter_ = props.currentVariable;
-        this.values = observable.map(props.dimensionValues, {
-            deep: false
-        });
-        this.ranges = observable.map(
-            {},
-            {
+
+        if (Array.isArray(props.dimensionValues) || Array.isArray(props.rangeValues)) {
+            this.values = observable.map(
+                {},
+                {
+                    deep: false
+                }
+            );
+            this.ranges = observable.map(
+                {},
+                {
+                    deep: false
+                }
+            );
+            this.applySnapshot(props);
+        } else {
+            this.values = observable.map(props.dimensionValues, {
                 deep: false
-            }
-        );
+            });
+            this.ranges = observable.map(props.rangeValues, {
+                deep: false
+            });
+        }
+
         this.domains = observable.map(
             {},
             {
@@ -150,6 +173,63 @@ export class DatasetDimensions implements DataDomainProviderFilters {
 
     getDimensionDomain<T extends DimensionDomainType = DimensionDomainType>(dimension: string) {
         return this.domains.get(dimension) as T | undefined;
+    }
+
+    getSnapshot() {
+        return {
+            dimensionValues: this.values.toJSON().map(([key, value]) => {
+                if (value instanceof Date) {
+                    return [key, value.toISOString()];
+                } else {
+                    return [key, value];
+                }
+            }),
+            rangeValues: this.ranges.toJSON().map(([key, range]) => {
+                if (key === 'time') {
+                    if (Array.isArray(range)) {
+                        return [key, range.map((value) => (value as Date).toISOString())];
+                    } else {
+                        return [
+                            key,
+                            {
+                                min: (range.min as Date).toISOString(),
+                                max: (range.max as Date).toISOString()
+                            }
+                        ];
+                    }
+                } else {
+                    return [key, range];
+                }
+            })
+        };
+    }
+
+    applySnapshot(snapshot) {
+        // TODO: currently there is not a way to extract the dimension value type from its config
+        // we should probably add a property to DatasetDimension (e.g. dataType). For the time
+        // being we check only for dimension with id equal to 'time' and convert string values to dates
+        this.values.replace(
+            snapshot.dimensionValues.map(([key, value]) => {
+                if (key === 'time') {
+                    return [key, new Date(value)];
+                } else {
+                    return [key, value];
+                }
+            })
+        );
+        this.ranges.replace(
+            snapshot.rangeValues.map(([key, range]) => {
+                if (key === 'time') {
+                    if (Array.isArray(range)) {
+                        return [key, range.map((value) => new Date(value))];
+                    } else {
+                        return [key, { min: new Date(range.min), max: new Date(range.max) }];
+                    }
+                } else {
+                    return [key, range];
+                }
+            })
+        );
     }
 
     dispose() {

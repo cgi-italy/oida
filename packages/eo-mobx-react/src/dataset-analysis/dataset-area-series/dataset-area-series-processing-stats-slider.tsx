@@ -1,11 +1,15 @@
 import React from 'react';
 import moment from 'moment';
-import { EChartOption } from 'echarts';
-import 'echarts/lib/chart/bar';
-import 'echarts/lib/component/tooltip';
-import 'echarts/lib/component/legend';
-import 'echarts/lib/component/axisPointer';
-import 'echarts/lib/component/brush';
+import * as echarts from 'echarts/core';
+import { LineChart, LineSeriesOption } from 'echarts/charts';
+import {
+    TooltipComponent,
+    TooltipComponentOption,
+    AxisPointerComponent,
+    AxisPointerComponentOption,
+    DataZoomComponent,
+    DataZoomComponentOption
+} from 'echarts/components';
 
 import { getTextColorForBackground } from '@oidajs/core';
 import {
@@ -19,6 +23,12 @@ import {
 } from '@oidajs/eo-mobx';
 
 import { ChartWidget } from '../chart-widget';
+
+type StatsSeriesChartOption = echarts.ComposeOption<
+    LineSeriesOption | TooltipComponentOption | AxisPointerComponentOption | DataZoomComponentOption
+>;
+
+echarts.use([LineChart, TooltipComponent, AxisPointerComponent, DataZoomComponent]);
 
 export type DatasetAreaSeriesProcessingStatsSliderProps = {
     items: DatasetAreaSeriesDataItem[];
@@ -93,164 +103,160 @@ export const DatasetAreaSeriesProcessingStatsSlider = (props: DatasetAreaSeriesP
 
     return (
         <div className='dataset-sequence-stats-slider'>
-            <ChartWidget
-                options={
-                    {
-                        color: props.color ? [props.color] : undefined,
-                        tooltip: {
-                            triggerOn: 'click',
-                            transitionDuration: 0,
-                            textStyle: {
-                                fontSize: 13
+            <ChartWidget<StatsSeriesChartOption>
+                options={{
+                    color: props.color ? [props.color] : undefined,
+                    tooltip: {
+                        triggerOn: 'click',
+                        transitionDuration: 0,
+                        textStyle: {
+                            fontSize: 13
+                        },
+                        formatter: (item) => {
+                            if (item && item.length) {
+                                props.onActiveItemChange(item[0].dataIndex!);
+                            }
+                            return '';
+                        }
+                    },
+                    xAxis: [
+                        {
+                            type: axisType,
+                            name: `${props.dimensionConfig.name} ${props.dimensionConfig.units ? `(${props.dimensionConfig.units})` : ''}`,
+                            nameLocation: 'middle',
+                            axisLabel: {
+                                formatter: axisFormatter
                             },
-                            formatter: (item: EChartOption.Tooltip.Format[]) => {
-                                if (item && item.length) {
-                                    props.onActiveItemChange(item[0].dataIndex!);
-                                }
-                                return '';
-                            }
-                        },
-                        xAxis: [
-                            {
-                                type: axisType,
-                                name: `${props.dimensionConfig.name} ${
-                                    props.dimensionConfig.units ? `(${props.dimensionConfig.units})` : ''
-                                }`,
-                                nameLocation: 'middle',
-                                axisLabel: {
-                                    formatter: axisFormatter
-                                },
-                                nameGap: 25,
-                                axisLine: {
-                                    onZero: false
-                                },
-                                axisPointer: {
-                                    value: props.items[props.activeItem].x,
-                                    snap: true,
-                                    handle: {
-                                        show: true,
-                                        color: props.color,
-                                        size: 30,
-                                        margin: 20
-                                    },
-                                    lineStyle: {
-                                        color: props.color,
-                                        width: 2
-                                    },
-                                    label: {
-                                        show: true,
-                                        formatter: axisFormatter ? (item) => axisFormatter(item.value) : undefined,
-                                        backgroundColor: props.color,
-                                        margin: 35,
-                                        color: handleTextColor
-                                    }
-                                }
-                            }
-                        ],
-                        yAxis: [
-                            {
-                                type: 'value',
-                                nameLocation: 'end',
-                                name: `${props.variableConfig.name} ${props.variableConfig.units ? `(${props.variableConfig.units})` : ''}`,
-                                nameGap: 10,
-                                nameTextStyle: {
-                                    align: 'left'
-                                },
-                                axisLine: {
-                                    onZero: false
-                                },
-                                scale: true
-                            }
-                        ],
-                        grid: {
-                            left: 20,
-                            right: 40,
-                            bottom: 50,
-                            top: 30,
-                            containLabel: true
-                        },
-                        series: [
-                            {
-                                type: 'line',
-                                smooth: true,
-                                data: chartMinData,
-                                itemStyle: {
-                                    color: props.color
+                            nameGap: 25,
+                            axisLine: {
+                                onZero: false
+                            },
+                            axisPointer: {
+                                value: props.items[props.activeItem].x,
+                                snap: true,
+                                handle: {
+                                    show: true,
+                                    color: props.color,
+                                    size: 30,
+                                    margin: 20
                                 },
                                 lineStyle: {
                                     color: props.color,
                                     width: 2
                                 },
-                                areaStyle: {
-                                    //TODO: this should be equal to the chart background color
-                                    color: '#333333',
-                                    origin: 'start',
-                                    opacity: 1
-                                },
-                                z: -1,
-                                showSymbol: false
-                            },
-                            {
-                                type: 'line',
-                                smooth: true,
-                                data: chartMaxData,
-                                itemStyle: {
-                                    color: props.color
-                                },
-                                lineStyle: {
-                                    color: props.color,
-                                    width: 2
-                                },
-                                areaStyle: {
-                                    color: props.color,
-                                    opacity: 0.2,
-                                    origin: 'start'
-                                },
-                                z: -2,
-                                showSymbol: false
-                            },
-                            {
-                                type: 'line',
-                                smooth: true,
-                                data: chartMeanData,
-                                itemStyle: {
-                                    color: props.color
-                                },
-                                symbolSize: 6,
-                                lineStyle: {
-                                    width: 3
+                                label: {
+                                    show: true,
+                                    formatter: axisFormatter ? (item) => axisFormatter(item.value) : undefined,
+                                    backgroundColor: props.color,
+                                    margin: 35,
+                                    color: handleTextColor
                                 }
-                            },
-                            {
-                                type: 'line',
-                                smooth: true,
-                                data: chartMeanMinusSigmaData,
-                                itemStyle: {
-                                    color: props.color
-                                },
-                                lineStyle: {
-                                    width: 1.5,
-                                    type: 'dotted'
-                                },
-                                showSymbol: false
-                            },
-                            {
-                                type: 'line',
-                                smooth: true,
-                                data: chartMeanPlusSigmaData,
-                                itemStyle: {
-                                    color: props.color
-                                },
-                                lineStyle: {
-                                    width: 1.5,
-                                    type: 'dotted'
-                                },
-                                showSymbol: false
                             }
-                        ],
-                        backgroundColor: 'transparent'
-                    } as EChartOption
-                }
+                        }
+                    ],
+                    yAxis: [
+                        {
+                            type: 'value',
+                            nameLocation: 'end',
+                            name: `${props.variableConfig.name} ${props.variableConfig.units ? `(${props.variableConfig.units})` : ''}`,
+                            nameGap: 10,
+                            nameTextStyle: {
+                                align: 'left'
+                            },
+                            axisLine: {
+                                onZero: false
+                            },
+                            scale: true
+                        }
+                    ],
+                    grid: {
+                        left: 20,
+                        right: 40,
+                        bottom: 50,
+                        top: 30,
+                        containLabel: true
+                    },
+                    series: [
+                        {
+                            type: 'line',
+                            smooth: true,
+                            data: chartMinData,
+                            itemStyle: {
+                                color: props.color
+                            },
+                            lineStyle: {
+                                color: props.color,
+                                width: 2
+                            },
+                            areaStyle: {
+                                //TODO: this should be equal to the chart background color
+                                color: '#333333',
+                                origin: 'start',
+                                opacity: 1
+                            },
+                            z: -1,
+                            showSymbol: false
+                        },
+                        {
+                            type: 'line',
+                            smooth: true,
+                            data: chartMaxData,
+                            itemStyle: {
+                                color: props.color
+                            },
+                            lineStyle: {
+                                color: props.color,
+                                width: 2
+                            },
+                            areaStyle: {
+                                color: props.color,
+                                opacity: 0.2,
+                                origin: 'start'
+                            },
+                            z: -2,
+                            showSymbol: false
+                        },
+                        {
+                            type: 'line',
+                            smooth: true,
+                            data: chartMeanData,
+                            itemStyle: {
+                                color: props.color
+                            },
+                            symbolSize: 6,
+                            lineStyle: {
+                                width: 3
+                            }
+                        },
+                        {
+                            type: 'line',
+                            smooth: true,
+                            data: chartMeanMinusSigmaData,
+                            itemStyle: {
+                                color: props.color
+                            },
+                            lineStyle: {
+                                width: 1.5,
+                                type: 'dotted'
+                            },
+                            showSymbol: false
+                        },
+                        {
+                            type: 'line',
+                            smooth: true,
+                            data: chartMeanPlusSigmaData,
+                            itemStyle: {
+                                color: props.color
+                            },
+                            lineStyle: {
+                                width: 1.5,
+                                type: 'dotted'
+                            },
+                            showSymbol: false
+                        }
+                    ],
+                    backgroundColor: 'transparent'
+                }}
                 isLoading={props.isLoading}
             />
         </div>

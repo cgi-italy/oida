@@ -1,17 +1,23 @@
 import { transform } from 'ol/proj';
 import { pointerMove } from 'ol/events/condition';
+import Map from 'ol/Map';
 
-import { IFeatureHoverInteractionProps, FEATURE_HOVER_INTERACTION_ID, IFeatureHoverInteractionImplementation } from '@oidajs/core';
+import {
+    IFeatureHoverInteractionProps,
+    FEATURE_HOVER_INTERACTION_ID,
+    IFeatureHoverInteractionImplementation,
+    IFeature
+} from '@oidajs/core';
 
-import { OLSelectInteraction } from '../utils/ol-select-interaction';
+import { OLSelectEvent, OLSelectInteraction } from '../utils/ol-select-interaction';
 import { OLMapRenderer } from '../map/ol-map-renderer';
 import { OLMapLayer } from '../layers/ol-map-layer';
 import { OLFeatureLayer } from '../layers/ol-feature-layer';
 import { olInteractionsFactory } from './ol-interactions-factory';
 
 export class OLFeatureHoverInteraction implements IFeatureHoverInteractionImplementation {
-    private viewer_;
-    private olInteraction_;
+    private viewer_: Map;
+    private olInteraction_!: OLSelectInteraction;
 
     constructor(config: IFeatureHoverInteractionProps<OLMapRenderer>) {
         this.viewer_ = config.mapRenderer.getViewer();
@@ -29,27 +35,28 @@ export class OLFeatureHoverInteraction implements IFeatureHoverInteractionImplem
 
     destroy() {
         this.viewer_.removeInteraction(this.olInteraction_);
-        delete this.olInteraction_;
+        this.olInteraction_.dispose();
     }
 
-    initInteraction_(onFeatureHover) {
+    protected initInteraction_(onFeatureHover: (hovered: IFeature<any> | undefined) => void) {
         this.olInteraction_ = new OLSelectInteraction({
             condition: pointerMove,
             hitTolerance: 5
         });
 
-        this.olInteraction_.on('select', (evt) => {
-            const selected = evt.selected;
+        //@ts-ignore
+        this.olInteraction_.on('select', (evt: OLSelectEvent) => {
+            const selected = evt.selected[0];
             if (selected) {
-                const feature = {
-                    id: selected.getId(),
-                    data: selected.get(OLFeatureLayer.FEATURE_DATA_KEY)
-                };
-
-                if (feature.data) {
+                const featureId = selected.getId();
+                const featureData = selected.get(OLFeatureLayer.FEATURE_DATA_KEY);
+                if (typeof featureId === 'string' && featureData) {
+                    const feature: IFeature = {
+                        id: featureId,
+                        data: featureData
+                    };
                     this.viewer_.getViewport().style.cursor = 'pointer';
                     onFeatureHover(feature);
-
                     const layer: OLMapLayer | undefined = selected.get(OLFeatureLayer.FEATURE_LAYER_KEY);
                     if (layer && layer.shouldReceiveFeatureHoverEvents()) {
                         let coordinate = evt.mapBrowserEvent.coordinate;

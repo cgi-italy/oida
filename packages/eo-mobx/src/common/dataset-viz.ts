@@ -7,30 +7,51 @@ import { MapLayer } from '@oidajs/state-mobx';
 import { Dataset } from './dataset';
 import { DatasetDimensions, DatasetDimensionsProps, HasDatasetDimensions } from './dataset-dimensions';
 
-const datasetVizFactory = createDynamicFactory<DatasetViz<MapLayer | undefined>>('datasetVizFactory');
+const datasetVizFactory = createDynamicFactory<DatasetViz<string, MapLayer | undefined>>('datasetVizFactory');
 
 export type DatasetVizProps<TYPE extends string = string, CONFIG extends Record<string, any> = Record<string, any>> = {
     dataset: Dataset;
     vizType: TYPE;
     config: CONFIG;
     id?: string;
-    parent?: DatasetViz<any>;
+    name?: string;
+    parent?: DatasetViz<string, any>;
+    mapLayer?: {
+        opacity: number;
+        visible: boolean;
+    };
 } & DatasetDimensionsProps;
 
-export interface DatasetVizDefinitions {}
-export interface DatasetVizTypes {}
+export interface DatasetVizDefinitions extends Record<string, DatasetVizProps> {}
+export interface DatasetVizTypes extends Record<string, DatasetViz<string, MapLayer | undefined>> {}
 
-export type DatasetVizDefinition<TYPE extends keyof DatasetVizDefinitions = keyof DatasetVizDefinitions> = { vizType: TYPE } & Extract<
-    DatasetVizDefinitions[TYPE],
-    DatasetVizProps<TYPE>
->;
+export type DatasetVizDefinition<TYPE extends string = Extract<keyof DatasetVizDefinitions, string>> = {
+    vizType: TYPE;
+} & TYPE extends keyof DatasetVizDefinitions
+    ? DatasetVizDefinitions[TYPE]
+    : DatasetVizProps<TYPE>;
 
-export type DatasetVizType<TYPE extends keyof DatasetVizTypes = keyof DatasetVizTypes> = Extract<
-    DatasetVizTypes[TYPE],
-    DatasetViz<MapLayer | undefined>
->;
+export type DatasetVizType<TYPE extends string = Extract<keyof DatasetVizTypes, string>> = TYPE extends keyof DatasetVizTypes
+    ? DatasetVizTypes[TYPE]
+    : DatasetViz<TYPE, MapLayer | undefined>;
 
-export type DatasetVizConfig<TYPE extends keyof DatasetVizDefinitions = keyof DatasetVizDefinitions> = DatasetVizDefinition<TYPE>['config'];
+export type DatasetVizConfig<TYPE extends string = Extract<keyof DatasetVizDefinitions, string>> = TYPE extends keyof DatasetVizDefinitions
+    ? DatasetVizDefinition<TYPE>['config']
+    : Record<string, any>;
+
+export type SerializableType = string | number | boolean | null | undefined | Array<SerializableType> | { [x: string]: SerializableType };
+
+export type DatasetVizSnapshot<TYPE extends string = string> = {
+    id: string;
+    datasetId: string;
+    name: string;
+    vizType: TYPE;
+    parentId?: string;
+    mapLayer?: {
+        opacity: number;
+        visible: boolean;
+    };
+};
 
 /**
  * Base abstract class for {@link Dataset} visualization. A dataset visualization can include a {@link MapLayer}
@@ -38,8 +59,10 @@ export type DatasetVizConfig<TYPE extends keyof DatasetVizDefinitions = keyof Da
  *
  * @template T the type of MapLayer associated to this visualization
  */
-export abstract class DatasetViz<T extends MapLayer | undefined = undefined> implements HasDatasetDimensions {
-    static create<TYPE extends keyof DatasetVizTypes>(props: DatasetVizDefinition<TYPE>): DatasetVizType<TYPE> {
+export abstract class DatasetViz<T extends string, M extends MapLayer | undefined = undefined> implements HasDatasetDimensions {
+    protected static instances_: Map<string, WeakRef<DatasetViz<string, any>>> = new Map();
+
+    static create<TYPE extends string>(props: DatasetVizDefinition<TYPE>): DatasetVizType<TYPE> {
         const datasetViz = datasetVizFactory.create(props.vizType, props);
         if (!datasetViz) {
             throw new Error(`DatasetViz.create: Unable to create dataset viz of type ${props.vizType}`);
@@ -47,7 +70,7 @@ export abstract class DatasetViz<T extends MapLayer | undefined = undefined> imp
         return datasetViz as DatasetVizType<TYPE>;
     }
 
-    static register<TYPE extends keyof DatasetVizDefinitions, V extends DatasetViz<MapLayer | undefined>>(
+    static register<TYPE extends string, V extends DatasetViz<string, MapLayer | undefined>>(
         vizType: TYPE,
         vizCtor: new (props: Omit<DatasetVizDefinition<TYPE>, 'vizType'>) => V
     ) {
@@ -56,22 +79,64 @@ export abstract class DatasetViz<T extends MapLayer | undefined = undefined> imp
         });
     }
 
+    static getInstance(id: string) {
+        return DatasetViz.instances_.get(id)?.deref();
+    }
+
+    static createFromSnapshot<TYPE extends string>(snapshot: DatasetVizSnapshot<TYPE>) {
+        const { datasetId, parentId, ...vizProps } = snapshot;
+        const dataset = Dataset.getInstance(datasetId);
+        if (!dataset) {
+            throw new Error(`No dataset instancewith id ${datasetId} available`);
+        }
+        const isMapViz = dataset.config.mapView?.type === snapshot.vizType;
+        if (isMapViz) {
+            return DatasetViz.create({
+                ...vizProps,
+                config: dataset.config.mapView!.config,
+                dataset: dataset,
+                parent: parentId ? DatasetViz.getInstance(parentId) : undefined
+            }) as DatasetVizType<TYPE>;
+        } else {
+            const processingTool = dataset.config.tools?.find((tool) => {
+                return tool.type === snapshot.vizType;
+            });
+            if (!processingTool) {
+                throw new Error(`No visualization of type ${snapshot.vizType} available for dataset ${datasetId}`);
+            }
+            return DatasetViz.create({
+                ...vizProps,
+                config: processingTool.config,
+                dataset: dataset,
+                parent: parentId ? DatasetViz.getInstance(parentId) : undefined
+            }) as DatasetVizType<TYPE>;
+        }
+    }
+
     readonly id: string;
-    readonly vizType: string;
+    readonly vizType: T;
     readonly dataset: Dataset;
-    readonly parent: DatasetViz<any> | undefined;
-    readonly mapLayer: T;
+    readonly parent: DatasetViz<string, any> | undefined;
+    readonly mapLayer: M;
     readonly dimensions: DatasetDimensions;
     @observable widgetVisible: boolean;
+    @observable name: string;
 
-    constructor(props: DatasetVizProps) {
+    constructor(props: DatasetVizProps<T>) {
         this.id = props.id || uuid();
         this.parent = props.parent;
         this.vizType = props.vizType;
         this.dataset = props.dataset;
         this.mapLayer = this.initMapLayer_(props);
+        if (this.mapLayer && props.mapLayer) {
+            this.mapLayer?.visible.setValue(props.mapLayer.visible);
+            this.mapLayer?.opacity.setValue(props.mapLayer.opacity);
+        }
         this.dimensions = new DatasetDimensions(props);
+        this.name = props.name || props.dataset.config.name;
         this.widgetVisible = true;
+
+        DatasetViz.instances_.set(this.id, new WeakRef(this));
 
         makeObservable(this);
     }
@@ -81,15 +146,39 @@ export abstract class DatasetViz<T extends MapLayer | undefined = undefined> imp
         this.widgetVisible = widgetVisible;
     }
 
+    @action
+    setName(name: string) {
+        this.name = name;
+    }
+
     get widgetName() {
-        return this.dataset.config.name;
+        return this.name;
+    }
+
+    getSnapshot(): DatasetVizSnapshot<T> {
+        return {
+            id: this.id,
+            datasetId: this.dataset.id,
+            name: this.name,
+            vizType: this.vizType,
+            parentId: this.parent?.id,
+            mapLayer:
+                this.mapLayer !== undefined
+                    ? {
+                          opacity: this.mapLayer.opacity.value,
+                          visible: this.mapLayer.visible.value
+                      }
+                    : undefined,
+            ...this.dimensions.getSnapshot()
+        };
     }
 
     dispose() {
         this.dimensions.dispose();
+        DatasetViz.instances_.delete(this.id);
     }
 
-    protected clone_(specProps?: Record<string, any>) {
+    protected clone_(specProps?: Record<string, any>): this {
         return new (this.constructor as any)({
             parent: this.parent,
             vizType: this.vizType,
@@ -99,5 +188,5 @@ export abstract class DatasetViz<T extends MapLayer | undefined = undefined> imp
         });
     }
 
-    protected abstract initMapLayer_(props: DatasetVizProps): T;
+    protected abstract initMapLayer_(props: DatasetVizProps<T>): M;
 }

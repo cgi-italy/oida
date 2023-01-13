@@ -22,7 +22,7 @@ olTileSourcesFactory.register('wms', function (config) {
             ...parameters
         },
         crossOrigin: config.crossOrigin,
-        tileGrid: config.tileGrid ? getTileGridFromConfig(config.srs, config.tileGrid) : null,
+        tileGrid: config.tileGrid ? getTileGridFromConfig(config.srs, config.tileGrid) : undefined,
         projection: config.srs,
         wrapX: config.wrapX
     });

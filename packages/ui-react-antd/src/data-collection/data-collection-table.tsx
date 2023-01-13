@@ -2,17 +2,67 @@ import React, { useState } from 'react';
 import classnames from 'classnames';
 import { useDrop } from 'react-dnd';
 import { NativeTypes } from 'react-dnd-html5-backend';
-import useResizeAware from 'react-resize-aware';
-import { Table, Menu, Dropdown, Empty, ConfigProvider } from 'antd';
+import useDimensions from 'react-cool-dimensions';
+import { Table, Dropdown, Empty, ConfigProvider, MenuProps } from 'antd';
 import { ColumnType } from 'antd/lib/table/interface';
 import { EllipsisOutlined, CloseCircleOutlined } from '@ant-design/icons';
 
 import { LoadingState, SortOrder, SelectionMode } from '@oidajs/core';
-import { DataCollectionProps, DataPagerRenderer, DataFiltererRenderer, useScrollIntoView } from '@oidajs/ui-react-core';
+import {
+    DataCollectionProps,
+    DataPagerRenderer,
+    DataFiltererRenderer,
+    useScrollIntoView,
+    DataCollectionItemAction
+} from '@oidajs/ui-react-core';
 
 import { DataPager } from './data-pager';
 import { DropdownFilterer } from './dropdown-filterer';
 import { DataCollectionItemActionButton } from './data-collection-item-action-button';
+
+type DataCollectionTableItemActionsProps<T> = {
+    itemActions: ((item: T) => DataCollectionItemAction[]) | undefined;
+    item: T;
+    expandActions?: boolean;
+};
+
+const DataCollectionTableItemActions = <T extends object>(props: DataCollectionTableItemActionsProps<T>) => {
+    const actions = props.itemActions ? props.itemActions(props.item) : undefined;
+    if (!actions) {
+        return null;
+    } else {
+        if (props.expandActions) {
+            const actionItems = actions.map((action, idx) => {
+                return <DataCollectionItemActionButton key={idx} action={action} />;
+            });
+
+            return <div className='table-item-actions'>{actionItems}</div>;
+        } else {
+            const actionItems: MenuProps['items'] = actions.map((action, idx) => {
+                return {
+                    key: idx,
+                    label: (
+                        <DataCollectionItemActionButton
+                            action={{
+                                ...action,
+                                primary: false
+                            }}
+                            type='text'
+                        />
+                    )
+                };
+            });
+
+            return (
+                <Dropdown menu={{ items: actionItems }} placement='bottomRight' mouseEnterDelay={0.05} mouseLeaveDelay={0.05}>
+                    <a className='ant-dropdown-link' onClick={(e) => e.preventDefault()}>
+                        <EllipsisOutlined />
+                    </a>
+                </Dropdown>
+            );
+        }
+    }
+};
 
 export type DataCollectionTableColumn<T> = ColumnType<T> & {
     minTableWidth?: number;
@@ -28,7 +78,7 @@ export type DataCollectionTableProps<T> = {
 } & DataCollectionProps<T>;
 
 export function DataCollectionTable<T extends object>(props: DataCollectionTableProps<T>) {
-    const [resizeListener, size] = useResizeAware();
+    const { observe, width, height } = useDimensions();
 
     const { items, paging, sorting, filters, filtererRender, pagerRender, columns } = props;
 
@@ -36,7 +86,7 @@ export function DataCollectionTable<T extends object>(props: DataCollectionTable
 
     const tableColumns = columns
         .filter((column) => {
-            if (column.minTableWidth && (size.width || 0) < column.minTableWidth) {
+            if (column.minTableWidth && (width || 0) < column.minTableWidth) {
                 return false;
             } else {
                 return true;
@@ -66,45 +116,7 @@ export function DataCollectionTable<T extends object>(props: DataCollectionTable
     tableColumns.push({
         key: 'actions',
         render: (item, record) => {
-            const actions = itemActions ? itemActions(record) : undefined;
-            if (!actions) {
-                return null;
-            } else {
-                if (props.expandActions) {
-                    const actionItems = actions.map((action, idx) => {
-                        return <DataCollectionItemActionButton key={idx} action={action} />;
-                    });
-
-                    return <div className='table-item-actions'>{actionItems}</div>;
-                } else {
-                    const actionItems = actions.map((action, idx) => {
-                        return (
-                            <Menu.Item key={idx}>
-                                <DataCollectionItemActionButton
-                                    action={{
-                                        ...action,
-                                        primary: false
-                                    }}
-                                    type='text'
-                                />
-                            </Menu.Item>
-                        );
-                    });
-
-                    return (
-                        <Dropdown
-                            overlay={<Menu>{actionItems}</Menu>}
-                            placement='bottomRight'
-                            mouseEnterDelay={0.05}
-                            mouseLeaveDelay={0.05}
-                        >
-                            <a className='ant-dropdown-link' onClick={(e) => e.preventDefault()}>
-                                <EllipsisOutlined />
-                            </a>
-                        </Dropdown>
-                    );
-                }
-            }
+            return <DataCollectionTableItemActions item={record} itemActions={itemActions} expandActions={props.expandActions} />;
         },
         width: props.expandActions ? undefined : 40,
         align: 'right',
@@ -202,8 +214,7 @@ export function DataCollectionTable<T extends object>(props: DataCollectionTable
         <ConfigProvider renderEmpty={emptyRenderer}>
             <div className={classnames('data-collection-table', props.className, { 'full-height': props.fullHeight })}>
                 {filters && <DataFilterer {...filters} />}
-                <div className='data-collection-table-container'>
-                    {props.fullHeight && resizeListener}
+                <div className='data-collection-table-container' ref={observe}>
                     <Table<T>
                         components={components}
                         loading={items.loadingState === LoadingState.Loading}
@@ -272,7 +283,7 @@ export function DataCollectionTable<T extends object>(props: DataCollectionTable
                         scroll={
                             props.fullHeight
                                 ? {
-                                      y: (size.height || 40) - 40
+                                      y: (height || 40) - 40
                                   }
                                 : undefined
                         }

@@ -1,13 +1,14 @@
 import TileLayer from 'ol/layer/Tile';
+import OLTileSource from 'ol/source/Tile';
 
 import { TILE_LAYER_ID, ITileLayerRenderer, TileLayerRendererConfig, TileSource } from '@oidajs/core';
 
 import { olTileSourcesFactory } from './tilesources/ol-tilesources-factory';
-
+import { refreshTileSource } from './tilesources/ol-tilesource-utils';
 import { olLayersFactory } from './ol-layers-factory';
 import { OLMapLayer } from './ol-map-layer';
 
-export class OLTileLayer extends OLMapLayer<TileLayer> implements ITileLayerRenderer {
+export class OLTileLayer extends OLMapLayer<TileLayer<OLTileSource>> implements ITileLayerRenderer {
     protected onTileLoadStart_: (() => void) | undefined;
     protected onTileLoadEnd_: (() => void) | undefined;
 
@@ -18,30 +19,31 @@ export class OLTileLayer extends OLMapLayer<TileLayer> implements ITileLayerRend
     updateSource(sourceConfig: TileSource) {
         const prevSource = this.olImpl_.getSource();
         if (prevSource) {
-            prevSource.un('tileloadstart', this.onTileLoadStart_);
-            prevSource.un('tileloadend', this.onTileLoadEnd_);
-            prevSource.un('tileloaderror', this.onTileLoadEnd_);
+            if (this.onTileLoadStart_) {
+                prevSource.un('tileloadstart', this.onTileLoadStart_!);
+            }
+            if (this.onTileLoadEnd_) {
+                prevSource.un('tileloadend', this.onTileLoadEnd_);
+                prevSource.un('tileloaderror', this.onTileLoadEnd_);
+            }
         }
 
         const source = sourceConfig ? this.createTileSource_(sourceConfig) : undefined;
-        this.olImpl_.setSource(source);
+        this.olImpl_.setSource(source || null);
     }
 
     setMinZoomLevel(level: number | undefined) {
-        this.olImpl_.setMinZoom(level);
+        this.olImpl_.setMinZoom(typeof level === 'number' ? level : -Infinity);
     }
 
     setMaxZoomLevel(level: number | undefined) {
-        this.olImpl_.setMaxZoom(level);
+        this.olImpl_.setMaxZoom(typeof level === 'number' ? level : Infinity);
     }
 
     forceRefresh() {
         const source = this.olImpl_.getSource();
         if (source) {
-            for (const id in source.tileCacheForProjection) {
-                source.tileCacheForProjection[id].pruneExceptNewestZ();
-            }
-            source.setKey(new Date().toISOString());
+            refreshTileSource(source);
         }
     }
 

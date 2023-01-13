@@ -21,7 +21,7 @@ export type FormDataProps = {
  * React hook that given an array of form field definition and a filter state object, extract the form field values from the state
  * in a format that can be passed to a component implementing the {@link FormRenderer} interface. Every time the field values object is
  * updated the hook is re-executed
- * @returns properties object that can be passed to the FormRenderer {{@link FormRenderer}} implementation
+ * @returns properties object that can be passed to the {@link FormRenderer} implementation
  */
 export const useFormData = (props: FormDataProps) => {
     const { fieldValues, fields } = props;

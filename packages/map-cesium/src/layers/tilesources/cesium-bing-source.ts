@@ -1,5 +1,5 @@
-import BingMapsImageryProvider from 'cesium/Source/Scene/BingMapsImageryProvider';
-import BingMapsStyle from 'cesium/Source/Scene/BingMapsStyle';
+import { BingMapsImageryProvider, BingMapsStyle } from 'cesium';
+
 import { cesiumTileSourcesFactory } from './cesium-tilesources-factory';
 
 cesiumTileSourcesFactory.register('bing', (config) => {
@@ -7,7 +7,7 @@ cesiumTileSourcesFactory.register('bing', (config) => {
 
     for (const key in BingMapsStyle) {
         if (config.imagerySet === BingMapsStyle[key]) {
-            mapStyle = key;
+            mapStyle = BingMapsStyle[key];
             break;
         }
     }

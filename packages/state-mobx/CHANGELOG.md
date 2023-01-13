@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.1.0](https://github.com/cgi-italy/oida/compare/@oidajs/state-mobx@2.0.5...@oidajs/state-mobx@2.1.0) (2022-12-22)
+
+
+### Features
+
+* add preliminary workspace save/load support ([508f00a](https://github.com/cgi-italy/oida/commit/508f00a7b360c0e4283a5d472750c8ee54fd1a58))
+
+
+
+
+
 ## [2.0.5](https://github.com/cgi-italy/oida/compare/@oidajs/state-mobx@2.0.4...@oidajs/state-mobx@2.0.5) (2022-10-05)
 
 **Note:** Version bump only for package @oidajs/state-mobx

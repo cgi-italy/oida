@@ -30,7 +30,7 @@ export type AoiModuleConfig = {
 };
 
 /**
- * The {@Link AoiModule} initialization object
+ * The {@link AoiModule} initialization object
  */
 export type AoiModuleProps = {
     mapModule: MapModule;
@@ -52,8 +52,8 @@ export class AoiModule extends AppModule {
     readonly aoiSources: IndexedCollection<AoiSource>;
     /**
      * The AOI map layer. It is automatically added to the map on module initialization.
-     * By default it will display the aois within the {@Link AoiModule.aois} collection.
-     * If an {@Link AoiModule.activeSource active source} is defined, aois within the source will be
+     * By default it will display the aois within the {@link AoiModule.aois} collection.
+     * If an {@link AoiModule.activeSource active source} is defined, aois within the source will be
      * displayed instead
      *
      */
@@ -155,7 +155,7 @@ export class AoiModule extends AppModule {
 
     /**
      * Set the active AOI source. The aois within the source will be displayed on map.
-     * When no active source is defined the {@Link AoiModule.aois} will be visible on map
+     * When no active source is defined the {@link AoiModule.aois} will be visible on map
      *
      * @param activeSource The active source id or reference
      * @memberof AoiModule

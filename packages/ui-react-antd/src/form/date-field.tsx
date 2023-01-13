@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { DatePicker, Select, Spin } from 'antd';
 import { DatePickerProps } from 'antd/lib/date-picker';
-import { PanelMode } from 'rc-picker/lib/interface';
 import moment from 'moment';
 
 import { FormFieldRendererBaseProps } from '@oidajs/ui-react-core';
@@ -28,7 +27,7 @@ export const DateFieldRenderer = (props: FormFieldRendererBaseProps<DateField> &
     }>();
 
     const [open, setOpen] = useState(false);
-    const [mode, setMode] = useState<PanelMode>('date');
+    const [mode, setMode] = useState<DatePickerProps['mode']>('date');
 
     const pickerValue = useMemo(() => (value ? moment.utc(value) : undefined), [value, open]);
 
@@ -192,12 +191,11 @@ export const DateFieldRenderer = (props: FormFieldRendererBaseProps<DateField> &
         };
     }
 
-    const pickerRef = useRef<any>();
+    const pickerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         if (pickerRef.current) {
-            const element = ReactDOM.findDOMNode(pickerRef.current) as Element | null;
-            const input = element?.querySelector('input');
+            const input = pickerRef.current.getElementsByTagName('input')[0];
 
             // allow the calendar to change based on the input value, ignoring disabled dates
             const beforeInputChange = () => {
@@ -233,9 +231,8 @@ export const DateFieldRenderer = (props: FormFieldRendererBaseProps<DateField> &
     }, [pickerRef, mode]);
 
     return (
-        <div className='date-field-wrapper'>
+        <div className='date-field-wrapper' ref={pickerRef}>
             <DatePicker
-                ref={pickerRef}
                 value={pickerValue}
                 onChange={onDateChange}
                 allowClear={!required && !readonly}

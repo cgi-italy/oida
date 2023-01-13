@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { reaction } from 'mobx';
 import classNames from 'classnames';
-import useResizeAware from 'react-resize-aware';
+import useDimensions from 'react-cool-dimensions';
 
 import { Map, MapRendererController } from '@oidajs/state-mobx';
 
@@ -16,7 +16,7 @@ export type MapComponentProps = {
 export const MapComponent = (props: MapComponentProps) => {
     const { mapState, className, style } = props;
 
-    const [resizeListener, size] = useResizeAware();
+    const { observe, width, height } = useDimensions();
 
     const mapContainer = useRef<HTMLDivElement>(null);
 
@@ -58,15 +58,21 @@ export const MapComponent = (props: MapComponentProps) => {
     }, [mapState]);
 
     useEffect(() => {
-        if (size && size.width && size.height) {
+        if (width && height) {
             mapState.renderer.implementation?.updateSize();
         }
-    }, [size]);
+    }, [width, height]);
 
     return (
-        <div className={classNames('map-widget', className)} style={style} ref={mapContainer}>
-            {resizeListener}
-        </div>
+        <div
+            className={classNames('map-widget', className)}
+            style={style}
+            ref={(el) => {
+                observe(el);
+                // @ts-ignore
+                mapContainer.current = el;
+            }}
+        ></div>
     );
 };
 

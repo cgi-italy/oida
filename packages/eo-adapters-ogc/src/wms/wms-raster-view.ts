@@ -1,7 +1,7 @@
 import { intersects, getIntersection } from 'ol/extent';
 import { transformExtent } from 'ol/proj';
 
-import { getGeometryExtent, NUMERIC_FIELD_ID, QueryFilter, STRING_FIELD_ID, TileGridConfig, TileSource } from '@oidajs/core';
+import { BBox, getGeometryExtent, NUMERIC_FIELD_ID, QueryFilter, STRING_FIELD_ID, TileGridConfig, TileSource } from '@oidajs/core';
 import {
     RasterMapViz,
     RasterMapVizConfig,
@@ -31,7 +31,7 @@ export type WmsRasterSourceProviderConfig = {
      */
     spatialCoverageProvider?: DatasetSpatialCoverageProvider;
     /**
-     * This function is used to serialize the {@Link Dataset.additionalFilters} as additional WMS request parameters
+     * This function is used to serialize the {@link Dataset.additionalFilters} as additional WMS request parameters
      * If not provided by default all string and numeric filters will be serialized as key value pairs
      */
     additionalFiltersSerializer?: WmsRasterSourceFiltersSerializer;
@@ -97,12 +97,13 @@ export const createWmsRasterSourceProvider = (config: WmsRasterSourceProviderCon
         return extent.then((extent) => {
             if (aoiFilter && !aoiFilter.props?.fromMapViewport) {
                 let aoiExtent = getGeometryExtent(aoiFilter.geometry);
-                aoiExtent = transformExtent(aoiExtent, 'EPSG:4326', crs);
-
-                if (!intersects(extent, aoiExtent)) {
-                    return Promise.resolve(undefined);
-                } else {
-                    extent = getIntersection(extent, aoiExtent);
+                if (aoiExtent) {
+                    aoiExtent = transformExtent(aoiExtent, 'EPSG:4326', crs) as BBox;
+                    if (!intersects(extent, aoiExtent)) {
+                        return Promise.resolve(undefined);
+                    } else {
+                        extent = getIntersection(extent, aoiExtent);
+                    }
                 }
             }
 
@@ -148,7 +149,7 @@ export const createWmsRasterSourceProvider = (config: WmsRasterSourceProviderCon
 
 export type WmsLayerRasterViewConfig = WmsRasterSourceProviderConfig & {
     /**
-     * By default WMS layer styles are mapped to {@Link RasterBandPreset} using the information
+     * By default WMS layer styles are mapped to {@link RasterBandPreset} using the information
      * obtained from the layer capabilities. It is possible to override any of the default values
      * through this function
      */

@@ -7,13 +7,6 @@ import { Opacity, OpacityProps, HasOpacity, LoadingStatus, LoadingStatusProps, H
 
 export const MAP_LAYER_TYPE = 'mapLayer';
 
-export interface MapLayerDefinitions {}
-export interface MapLayerTypes {}
-export type MapLayerDefinition<TYPE extends keyof MapLayerDefinitions = keyof MapLayerDefinitions> = MapLayerDefinitions[TYPE];
-export type MapLayerType<TYPE extends keyof MapLayerTypes> = MapLayerTypes[TYPE];
-
-const mapLayerFactory = createDynamicFactory<MapLayer, MapLayerDefinitions>('datasetDiscoveryProviderFactory');
-
 export type MapLayerProps<TYPE extends string = string> = {
     name?: string;
     zIndex?: number;
@@ -22,6 +15,15 @@ export type MapLayerProps<TYPE extends string = string> = {
 } & Omit<EntityProps, 'entityType'> &
     OpacityProps &
     LoadingStatusProps;
+
+export interface MapLayerDefinitions {}
+export interface MapLayerTypes {}
+export type MapLayerDefinition<TYPE extends keyof MapLayerDefinitions = keyof MapLayerDefinitions> = {
+    layerType: TYPE;
+} & MapLayerDefinitions[TYPE];
+export type MapLayerType<TYPE extends keyof MapLayerTypes> = MapLayerTypes[TYPE];
+
+const mapLayerFactory = createDynamicFactory<MapLayer>('mapLayersFactory');
 
 export class MapLayer extends Entity implements HasOpacity, HasLoadingStatus {
     static create<TYPE extends keyof MapLayerDefinitions>(props: MapLayerDefinition<TYPE>): MapLayerType<TYPE> {

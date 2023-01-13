@@ -65,7 +65,7 @@ const MapRastersPointInfoWidget = observer((props: MapRastersPointInfoWidgetProp
             {!rastersData.length && <div>No data</div>}
             <Collapse
                 activeKey={activePanes}
-                expandIconPosition='right'
+                expandIconPosition='end'
                 onChange={(expandedKeys) => {
                     const collpasedUpdated = props.combinedAnalysis.processings.reduce((collapsed, processing) => {
                         if (expandedKeys.indexOf(processing.id) === -1) {

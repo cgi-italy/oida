@@ -5,16 +5,19 @@
     "outDir": "./es",
     "rootDir": "./src"
   },
-  "include": [
-    "src/**/*"
-  ],
+  "include": ["src/**/*"],
   "references": [
     {
       "path": "../core"
     },
     {
       "path": "../state-mobx"
+    },
+    {
+      "path": "../eo-mobx"
+    },
+    {
+      "path": "../ui-react-mobx"
     }
   ]
 }
-

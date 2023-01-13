@@ -1,6 +1,5 @@
 import proj4 from 'proj4';
 import { register } from 'ol/proj/proj4';
-import { transformExtent } from 'ol/proj';
 import { getIntersection } from 'ol/extent';
 import { fromArrayBuffer } from 'geotiff';
 
@@ -13,7 +12,7 @@ import { AdamServiceParamsSerializer } from './utils/adam-service-params-seriali
 import { getWcsTimeFilterSubset, getCoverageWcsParams, getAoiWcsParams } from './utils';
 
 export type AdamSpatialCoverageProvider = (
-    mapView: DatasetViz<any>,
+    mapView: DatasetViz<string, any>,
     keepDatasetSrs?: boolean
 ) => Promise<
     | {
@@ -86,7 +85,7 @@ export const getAdamDatasetSpatialCoverageProvider = (
     let spatialCoverageProvider: AdamSpatialCoverageProvider;
 
     if (datasetConfig.type === 'vector') {
-        spatialCoverageProvider = (mapView: DatasetViz<any>) => {
+        spatialCoverageProvider = (mapView: DatasetViz<string, any>) => {
             let bbox = datasetConfig.bbox;
 
             if (mapView instanceof DatasetVectorMapViz) {
@@ -109,7 +108,7 @@ export const getAdamDatasetSpatialCoverageProvider = (
             });
         };
     } else if (datasetConfig.type === 'vertical_profile') {
-        spatialCoverageProvider = (mapView: DatasetViz<any>) => {
+        spatialCoverageProvider = (mapView: DatasetViz<string, any>) => {
             let bbox: number[] | undefined;
 
             if (mapView instanceof DatasetVerticalProfileViz) {
@@ -150,7 +149,7 @@ export const getAdamDatasetSpatialCoverageProvider = (
             };
         }
 
-        spatialCoverageProvider = (mapView: DatasetViz<any>, keepDatasetSrs?: boolean) => {
+        spatialCoverageProvider = (mapView: DatasetViz<string, any>, keepDatasetSrs?: boolean) => {
             if (mapView instanceof RasterMapViz) {
                 if (datasetConfig.minZoomLevel || datasetConfig.aoiRequired) {
                     // typically this is set when coarse zoom levels are too slow to retrieve (e.g. hundreds of images are involved).
@@ -207,7 +206,9 @@ export const getAdamDatasetSpatialCoverageProvider = (
                             subdataset: wcsCoverage.subdataset,
                             subset: subsets
                         },
-                        paramsSerializer: AdamServiceParamsSerializer,
+                        paramsSerializer: {
+                            serialize: AdamServiceParamsSerializer
+                        },
                         responseType: 'arraybuffer'
                     })
                     .then((response) => {

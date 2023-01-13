@@ -70,7 +70,9 @@ export class AdamCswProductSearchProvider implements DatasetProductSearchProvide
                     ...this.geCSWParams_(queryParams)
                 },
                 responseType: 'document',
-                paramsSerializer: AdamServiceParamsSerializer
+                paramsSerializer: {
+                    serialize: AdamServiceParamsSerializer
+                }
             })
             .then((response) => {
                 return this.parseGetRecordResponse_(response.data);
@@ -128,7 +130,10 @@ export class AdamCswProductSearchProvider implements DatasetProductSearchProvide
             const feed = doc.getElementsByTagNameNS(this.xmlNamespaces.atom, 'feed')[0];
 
             const totalResults = parseInt(feed.getElementsByTagNameNS(this.xmlNamespaces.os, 'totalResults')[0].childNodes[0].nodeValue!);
-            const pageSize = parseInt(feed.getElementsByTagNameNS(this.xmlNamespaces.os, 'itemsPerPage')[0].childNodes[0].nodeValue!);
+
+            //adam csw catalogue has a server side limit of 10 records and the content of itemsPerPage
+            //node is not reliable on last page response so we fix it here
+            const pageSize = 10; // parseInt(feed.getElementsByTagNameNS(this.xmlNamespaces.os, 'itemsPerPage')[0].childNodes[0].nodeValue!);
 
             const entries = feed.getElementsByTagNameNS(this.xmlNamespaces.atom, 'entry');
             const records = Array.from(entries).map((entry) => {
@@ -179,8 +184,7 @@ export class AdamCswProductSearchProvider implements DatasetProductSearchProvide
             return {
                 total: totalResults,
                 results: records,
-                pageSize: 10 //adam csw catalogue has a server side limit of 10 records and the content of itemsPerPage
-                // node is not reliable on last page response so we fix it here
+                pageSize: pageSize
             };
         } catch (e) {
             return {

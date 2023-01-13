@@ -1,4 +1,4 @@
-import { autorun, reaction } from 'mobx';
+import { reaction } from 'mobx';
 import debounce from 'lodash/debounce';
 
 import { AoiValue, randomColorFactory } from '@oidajs/core';
@@ -85,27 +85,37 @@ export const bindAoiValueToMap = (props: bindAoiValueToMapProps) => {
                 }
                 if (value && valueProps.fromMapViewport) {
                     if (!viewportObserverDisposer) {
-                        viewportObserverDisposer = autorun(() => {
-                            const renderer = props.map.renderer.implementation;
-                            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                            const viewport = {
-                                center: props.map.view.viewport.center,
-                                resolution: props.map.view.viewport.resolution,
-                                pitch: props.map.view.viewport.pitch,
-                                rotation: props.map.view.viewport.rotation
-                            };
-
-                            if (renderer) {
-                                const viewportExtent = renderer.getViewportExtent();
-                                debouncedAoiUpdate({
-                                    ...value,
-                                    geometry: {
-                                        type: 'BBox',
-                                        bbox: viewportExtent
+                        viewportObserverDisposer = reaction(
+                            () => {
+                                return {
+                                    renderer: props.map.renderer.implementation,
+                                    viewport: {
+                                        center: props.map.view.viewport.center,
+                                        resolution: props.map.view.viewport.resolution,
+                                        pitch: props.map.view.viewport.pitch,
+                                        rotation: props.map.view.viewport.rotation
                                     }
-                                });
+                                };
+                            },
+                            (data) => {
+                                const { renderer } = data;
+                                if (renderer) {
+                                    const viewportExtent = renderer.getViewportExtent();
+                                    if (viewportExtent) {
+                                        debouncedAoiUpdate({
+                                            ...value,
+                                            geometry: {
+                                                type: 'BBox',
+                                                bbox: viewportExtent
+                                            }
+                                        });
+                                    }
+                                }
+                            },
+                            {
+                                fireImmediately: true
                             }
-                        });
+                        );
                     }
                 } else {
                     if (viewportObserverDisposer) {

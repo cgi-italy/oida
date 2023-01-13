@@ -1,4 +1,4 @@
-import { QueryParams as QueryCriteria } from '@oidajs/core';
+import { QueryParams as QueryCriteria, STRING_FIELD_ID } from '@oidajs/core';
 import { DatasetDiscoveryProvider, DatasetDiscoveryProviderProps } from '@oidajs/eo-mobx';
 import { Entity, QueryParams, QueryParamsProps, AsyncDataFetcher } from '@oidajs/state-mobx';
 import { autorun, reaction, when } from 'mobx';
@@ -7,6 +7,11 @@ import { AdamDatasetFactoryConfig, AdamDatasetFactory, getAdamDatasetFactory } f
 import { AdamOpensearchDatasetDiscoveryClient } from './adam-opensearch-dataset-discovery-client';
 
 export const ADAM_OPENSEARCH_DATASET_DISCOVERY_ITEM_TYPE = 'adam_opensearch_discovery_item';
+
+export type AdamOpensearchDatasetDiscoveryJsonSchema = {
+    id: string;
+    datasetId: string;
+};
 
 export type AdamOpensearchDatasetDiscoveryProviderItemProps = {
     metadata: AdamOpensearchDatasetMetadata;
@@ -38,7 +43,10 @@ export type AdamOpensearchDatasetDiscoveryProviderProps = {
     queryParams?: QueryParamsProps;
 } & DatasetDiscoveryProviderProps<typeof ADAM_OPENSEARCH_DATASET_DISCOVERY_PROVIDER_TYPE>;
 
-export class AdamOpensearchDatasetDiscoveryProvider extends DatasetDiscoveryProvider<AdamOpensearchDatasetDiscoveryProviderItem> {
+export class AdamOpensearchDatasetDiscoveryProvider extends DatasetDiscoveryProvider<
+    AdamOpensearchDatasetDiscoveryProviderItem,
+    AdamOpensearchDatasetDiscoveryJsonSchema
+> {
     readonly criteria: QueryParams;
     readonly searchClient: AdamOpensearchDatasetDiscoveryClient;
     protected datasetFactory_: AdamDatasetFactory;
@@ -68,10 +76,48 @@ export class AdamOpensearchDatasetDiscoveryProvider extends DatasetDiscoveryProv
         return this.asyncDataFetcher_.loadingStatus;
     }
 
-    createDataset(item: AdamOpensearchDatasetDiscoveryProviderItem) {
-        return this.searchClient.getAdamDatasetConfig(item.metadata).then((datasetConfig) => {
-            return this.datasetFactory_(datasetConfig);
+    createDataset(item: AdamOpensearchDatasetDiscoveryProviderItem, id?: string) {
+        return this.searchClient.getAdamDatasetConfig(item.metadata).then((adamDatasetConfig) => {
+            const datasetConfig = this.datasetFactory_(adamDatasetConfig);
+            if (id) {
+                datasetConfig.id = id;
+            }
+            return {
+                ...datasetConfig,
+                factoryInit: {
+                    factoryType: this.getFactoryId_(),
+                    initConfig: {
+                        id: datasetConfig.id,
+                        datasetId: item.id
+                    }
+                }
+            };
         });
+    }
+
+    createDatasetFromConfig(config: AdamOpensearchDatasetDiscoveryJsonSchema) {
+        return this.searchClient
+            .searchDatasets({
+                filters: [
+                    {
+                        key: 'datasetId',
+                        type: STRING_FIELD_ID,
+                        value: config.datasetId
+                    }
+                ]
+            })
+            .then((response) => {
+                const dataset = response.features[0];
+                if (!dataset) {
+                    throw new Error(`No dataset with id ${config.datasetId} found`);
+                }
+                return this.createDataset(
+                    new AdamOpensearchDatasetDiscoveryProviderItem({
+                        metadata: dataset
+                    }),
+                    config.id
+                );
+            });
     }
 
     protected retrieveData_() {

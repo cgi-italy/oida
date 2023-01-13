@@ -21,7 +21,8 @@ export const centerOnMap = (renderer: IMapRenderer, geometry: Geometry, options:
     }
 
     if (options.notIfInViewport) {
-        if (!booleanDisjoint(bboxPolygon(renderer.getViewportExtent()), bboxPolygon(extent))) {
+        const viewportExtent = renderer.getViewportExtent();
+        if (viewportExtent && !booleanDisjoint(bboxPolygon(viewportExtent), bboxPolygon(extent))) {
             return;
         }
     }

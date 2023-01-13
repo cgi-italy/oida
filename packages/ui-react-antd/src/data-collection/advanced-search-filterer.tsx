@@ -82,9 +82,9 @@ export const AdvancedSearchFilterer = (props: AdvancedSearchFiltererProps) => {
     const advancedSearchPanel = (
         <Dropdown
             trigger={[]}
-            visible={advancedSearchVisible}
-            onVisibleChange={(visible) => setAdvancedSearchVisible(visible)}
-            overlay={
+            open={advancedSearchVisible}
+            onOpenChange={(visible) => setAdvancedSearchVisible(visible)}
+            dropdownRender={() => (
                 <React.Fragment>
                     {advancedSearchVisible && (
                         <React.Fragment>
@@ -100,7 +100,7 @@ export const AdvancedSearchFilterer = (props: AdvancedSearchFiltererProps) => {
                         </React.Fragment>
                     )}
                 </React.Fragment>
-            }
+            )}
             className={classnames('advanced-search-filterer', { 'without-main-filter': !mainFilter })}
             overlayClassName='advanced-search-filterer-dropdown'
         >

@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect, useCallback } from 'react';
 import ReactDOM from 'react-dom';
 import { autorun } from 'mobx';
 import classnames from 'classnames';
-import useResizeAware from 'react-resize-aware';
+import useDimensions from 'react-cool-dimensions';
 import { TimelineGroup, TimelineItem, TimelineEventPropertiesResult } from 'vis-timeline/peer';
 import { DataSet } from 'vis-data/peer';
 import moment from 'moment';
@@ -175,7 +175,11 @@ export const DatasetDiscoveryTimeline = (props: DatasetExplorerTimelineProps) =>
     );
     const [editableRanges, setEditableRanges] = useState<any>([]);
     const [groupLabelsMode, setGroupLabelsMode] = useState(TimelineGroupLabelsMode.Block);
-    const [timeSelectionMode, setTimeSelectionMode] = useState(DatasetTimelineTimeSelectionMode.Instant);
+    const [timeSelectionMode, setTimeSelectionMode] = useState(
+        !props.explorerState.toi || props.explorerState.toi instanceof Date
+            ? DatasetTimelineTimeSelectionMode.Instant
+            : DatasetTimelineTimeSelectionMode.Range
+    );
     const [isCompressed, setIsCompressed] = useState(false);
 
     const selectedToi = useSelector(() => props.explorerState.toi);
@@ -457,43 +461,37 @@ export const DatasetDiscoveryTimeline = (props: DatasetExplorerTimelineProps) =>
             } else {
                 onSelectedDateChange(new Date());
             }
-
-            return () => {
-                props.explorerState.setToi(undefined);
-            };
         }
     }, [timeSelectionMode]);
 
-    const [resizeListener, size] = useResizeAware();
+    const { observe, width } = useDimensions();
 
     const timePixelResolution = 16;
 
     useEffect(() => {
-        if (timeExplorer && size.width) {
+        if (timeExplorer && width) {
             timeExplorer.timeRange.setResolution(
-                timePixelResolution *
-                    Math.round((timeExplorer.timeRange.end.getTime() - timeExplorer.timeRange.start.getTime()) / size.width)
+                timePixelResolution * Math.round((timeExplorer.timeRange.end.getTime() - timeExplorer.timeRange.start.getTime()) / width)
             );
         }
-    }, [size, timeExplorer]);
+    }, [width, timeExplorer]);
 
     const onRangeChange = useCallback(
         (range) => {
             if (timeExplorer && range.start && range.end) {
                 timeExplorer.timeRange.setValue(range.start, range.end);
-                if (size.width) {
+                if (width) {
                     timeExplorer.timeRange.setResolution(
-                        timePixelResolution * Math.round((range.end.getTime() - range.start.getTime()) / size.width)
+                        timePixelResolution * Math.round((range.end.getTime() - range.start.getTime()) / width)
                     );
                 }
             }
         },
-        [size, timeExplorer]
+        [width, timeExplorer]
     );
 
     return (
-        <div className='dataset-explorer-timeline'>
-            {resizeListener}
+        <div className='dataset-explorer-timeline' ref={observe}>
             <DatasetExplorerTimelineToolbar
                 onDrawRange={() => props.explorerState.setToi(undefined)}
                 groupLabelsMode={groupLabelsMode}

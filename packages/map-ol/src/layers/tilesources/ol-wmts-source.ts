@@ -1,4 +1,5 @@
 import WMTSSource from 'ol/source/WMTS';
+import WMTSTileGrid from 'ol/tilegrid/WMTS';
 
 import { getTileGridFromConfig, getUrlFromConfig } from './ol-tilesource-utils';
 
@@ -17,7 +18,7 @@ olTileSourcesFactory.register('wmts', function (config) {
         tileGrid: getTileGridFromConfig(config.srs, {
             ...config.tileGrid,
             isWMTS: true
-        }),
+        }) as WMTSTileGrid,
         projection: config.srs,
         wrapX: config.wrapX
     });

@@ -85,10 +85,10 @@ export const DatasetColorScaleSelector = (props: DatasetColorScaleSelectorProps)
         <Dropdown
             trigger={['click']}
             placement='bottomLeft'
-            onVisibleChange={(visible) => setDropDownVisible(visible)}
-            visible={dropDownVisible}
+            onOpenChange={(visible) => setDropDownVisible(visible)}
+            open={dropDownVisible}
             overlayClassName='dataset-colormap-preset-dropdown'
-            overlay={
+            dropdownRender={() => (
                 <DatasetColorScaleList
                     colorScales={props.colorScales}
                     selectedColorScale={selectedColorScale}
@@ -97,7 +97,7 @@ export const DatasetColorScaleSelector = (props: DatasetColorScaleSelectorProps)
                         setDropDownVisible(false);
                     }}
                 />
-            }
+            )}
         >
             <div className='dataset-colormap-preset'>
                 {selectedColorScaleConfig && <DatasetColorScaleSelectorItem colorScale={selectedColorScaleConfig} />}
@@ -178,7 +178,9 @@ export const DatasetColorMapRangeSelector = (props: DatasetColorMapRangeSelector
                 step={variableDomain.step}
                 range={true}
                 marks={marks}
-                tooltipVisible={false}
+                tooltip={{
+                    open: false
+                }}
                 onChange={(value) => {
                     const range = {
                         min: domainMapper.denormalizeValue(value[0]),

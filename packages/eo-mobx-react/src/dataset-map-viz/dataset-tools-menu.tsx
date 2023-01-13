@@ -1,5 +1,6 @@
 import React from 'react';
-import { Button, Dropdown, Menu } from 'antd';
+import { Button, Dropdown } from 'antd';
+import { MenuItemType } from 'antd/lib/menu/hooks/useItems';
 
 import { DatasetExplorer, DatasetViz } from '@oidajs/eo-mobx';
 import { ComboToolConfig, useDatasetExplorerTools } from '../hooks';
@@ -7,7 +8,7 @@ import { ComboToolConfig, useDatasetExplorerTools } from '../hooks';
 export type DatasetToolsMenuProps = {
     datasetExplorer: DatasetExplorer;
     analyticsTools: ComboToolConfig[];
-    datasetViz: DatasetViz<any>;
+    datasetViz: DatasetViz<string, any>;
     icon: React.ReactNode;
 };
 
@@ -22,16 +23,17 @@ export const DatasetToolsMenu = (props: DatasetToolsMenuProps) => {
         return null;
     }
 
-    const toolsMenuItems = tools.map((tool) => {
-        return (
-            <Menu.Item key={tool.id} icon={tool.icon} onClick={() => tool.callback()}>
-                {tool.name}
-            </Menu.Item>
-        );
+    const toolsMenuItems: MenuItemType[] = tools.map((tool) => {
+        return {
+            key: tool.id,
+            icon: tool.icon,
+            onClick: () => tool.callback(),
+            label: tool.name
+        };
     });
 
     return (
-        <Dropdown overlay={<Menu>{toolsMenuItems}</Menu>}>
+        <Dropdown menu={{ items: toolsMenuItems }}>
             <Button size='small' type='link'>
                 {props.icon}
             </Button>

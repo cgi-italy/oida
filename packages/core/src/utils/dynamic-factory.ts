@@ -16,9 +16,9 @@ export interface IDynamicFactory<
      * @param objectCreator The factory creation function. It receives a configuration object and returns an
      * object of type T
      */
-    register<R extends string>(id: R, objectCreator: (config: COMMON_CONFIG & CONFIG[R]) => T): void;
+    register<R extends string>(id: R, objectCreator: (config: COMMON_CONFIG & CONFIG[R]) => T | undefined): void;
     /**
-     * Create an object given its type idenitifier (it shall be previously registered with {@Link IDynamicFactory.create}) and
+     * Create an object given its type idenitifier (it shall be previously registered with {@link IDynamicFactory.register}) and
      * a configuration object
      * @param id The type identifier
      * @param config The configuration object
@@ -28,6 +28,10 @@ export interface IDynamicFactory<
      * Check if a type identifier was registered in the factory
      */
     isRegistered(id: string): boolean;
+    /**
+     * Get the list of registered types
+     */
+    getRegisteredTypes(): string[];
 }
 
 /**
@@ -43,14 +47,14 @@ export const createDynamicFactory = <
 >(
     factoryId: string
 ): IDynamicFactory<T, CONFIG, COMMON_CONFIG> => {
-    const REGISTERED_TYPES: { [s: string]: (config: any) => T } = {};
+    const REGISTERED_TYPES: { [s: string]: (config: any) => T | undefined } = {};
 
     const getRegisteredType = (id: string) => {
         return REGISTERED_TYPES[id];
     };
 
     return {
-        register: <R extends string>(id: R, objectCreator: (config: COMMON_CONFIG & CONFIG[R]) => T) => {
+        register: <R extends string>(id: R, objectCreator: (config: COMMON_CONFIG & CONFIG[R]) => T | undefined) => {
             if (getRegisteredType(id)) {
                 throw new Error(`Dynamic factory ${factoryId}: factory already registered for type ${id}`);
             }
@@ -64,6 +68,9 @@ export const createDynamicFactory = <
         },
         isRegistered: (id: string): boolean => {
             return getRegisteredType(id) !== undefined;
+        },
+        getRegisteredTypes: () => {
+            return Object.keys(REGISTERED_TYPES);
         }
     };
 };

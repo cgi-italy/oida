@@ -1,12 +1,18 @@
-import Cartesian3 from 'cesium/Source/Core/Cartesian3';
-import Cartographic from 'cesium/Source/Core/Cartographic';
-import CesiumMath from 'cesium/Source/Core/Math';
-import Rectangle from 'cesium/Source/Core/Rectangle';
-import PolygonHierarchy from 'cesium/Source/Core/PolygonHierarchy';
-import Color from 'cesium/Source/Core/Color';
-import ScreenSpaceEventHandler from 'cesium/Source/Core/ScreenSpaceEventHandler';
-import ScreenSpaceEventType from 'cesium/Source/Core/ScreenSpaceEventType';
-import CallbackProperty from 'cesium/Source/DataSources/CallbackProperty';
+import {
+    Cartesian3,
+    Cartographic,
+    Math as CesiumMath,
+    Rectangle,
+    PolygonHierarchy,
+    Color,
+    ScreenSpaceEventHandler,
+    ScreenSpaceEventType,
+    CallbackProperty,
+    CustomDataSource,
+    Entity,
+    CesiumWidget,
+    JulianDate
+} from 'cesium';
 
 import {
     IFeatureDrawInteractionProps,
@@ -28,12 +34,12 @@ const defaultDrawStyle = {
 
 export class CesiumFeatureDrawInteraction implements IFeatureDrawInteractionImplementation {
     private mapRenderer_: CesiumMapRenderer;
-    private dataSource_;
-    private drawEntity_;
-    private cursorEntity_;
-    private viewer_;
-    private handler_;
-    private drawStyle_;
+    private dataSource_: CustomDataSource;
+    private drawEntity_: Entity | undefined;
+    private cursorEntity_: Entity | undefined;
+    private viewer_: CesiumWidget;
+    private handler_: ScreenSpaceEventHandler | undefined;
+    private drawStyle_: typeof defaultDrawStyle;
 
     constructor(props: IFeatureDrawInteractionProps<CesiumMapRenderer>) {
         this.mapRenderer_ = props.mapRenderer;
@@ -66,14 +72,12 @@ export class CesiumFeatureDrawInteraction implements IFeatureDrawInteractionImpl
         }
 
         if (mode !== FeatureDrawMode.Off) {
-            //prevent a crash on globe zoom in/out while drawing
-            this.viewer_.scene.pickTranslucentDepth = false;
-
             this.handler_ = new ScreenSpaceEventHandler(this.viewer_.scene.canvas);
 
             let cursorPosition = new Cartesian3();
 
             this.cursorEntity_ = this.dataSource_.entities.add({
+                // @ts-ignore: incomplete cesium typing
                 position: new CallbackProperty(() => {
                     return cursorPosition;
                 }, false),
@@ -258,6 +262,7 @@ export class CesiumFeatureDrawInteraction implements IFeatureDrawInteractionImpl
                 let circlePoint = new Cartesian3(0, 1, 0);
 
                 this.drawEntity_ = this.dataSource_.entities.add({
+                    // @ts-ignore: incomplete cesium typing
                     position: new CallbackProperty(() => {
                         return center;
                     }, false),
@@ -303,10 +308,6 @@ export class CesiumFeatureDrawInteraction implements IFeatureDrawInteractionImpl
                     }
                 }, ScreenSpaceEventType.MOUSE_MOVE);
             }
-        } else {
-            if (this.viewer_.scene) {
-                this.viewer_.scene.pickTranslucentDepth = true;
-            }
         }
 
         this.mapRenderer_.defaultDataSourceUpdate();
@@ -333,19 +334,20 @@ export class CesiumFeatureDrawInteraction implements IFeatureDrawInteractionImpl
 
     protected getDrawnGeometry_(mode) {
         if (mode === FeatureDrawMode.Point) {
-            const coords = this.getCoordinates_(this.drawEntity_.position.getValue());
+            const position = this.drawEntity_!.position!.getValue(JulianDate.now())!;
+            const coords = this.getCoordinates_(position);
             return {
                 type: 'Point',
                 coordinates: coords
             };
         } else if (mode === FeatureDrawMode.Line) {
-            const positions = this.drawEntity_.polyline.positions.getValue();
+            const positions = this.drawEntity_!.polyline!.positions!.getValue(JulianDate.now());
             return {
                 type: 'LineString',
                 coordinates: positions.map((position) => this.getCoordinates_(position))
             };
         } else if (mode === FeatureDrawMode.BBox) {
-            const rectangle = this.drawEntity_.rectangle.coordinates.getValue();
+            const rectangle = this.drawEntity_!.rectangle!.coordinates!.getValue(JulianDate.now());
             const bbox = [
                 CesiumMath.toDegrees(rectangle.west),
                 CesiumMath.toDegrees(rectangle.south),
@@ -357,14 +359,14 @@ export class CesiumFeatureDrawInteraction implements IFeatureDrawInteractionImpl
                 bbox: bbox
             };
         } else if (mode === FeatureDrawMode.Polygon) {
-            const positions = this.drawEntity_.polyline.positions.getValue();
+            const positions = this.drawEntity_!.polyline!.positions!.getValue(JulianDate.now());
             return {
                 type: 'Polygon',
                 coordinates: [positions.map((position) => this.getCoordinates_(position))]
             };
         } else if (mode === FeatureDrawMode.Circle) {
-            const center = this.drawEntity_.position.getValue();
-            const radius = this.drawEntity_.ellipse.semiMajorAxis.getValue();
+            const center = this.drawEntity_!.position!.getValue(JulianDate.now())!;
+            const radius = this.drawEntity_!.ellipse!.semiMajorAxis!.getValue(JulianDate.now());
             return {
                 type: 'Circle',
                 center: this.getCoordinates_(center),

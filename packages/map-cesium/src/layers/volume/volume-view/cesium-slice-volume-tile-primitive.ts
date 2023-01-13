@@ -1,10 +1,4 @@
-import Cartesian3 from 'cesium/Source/Core/Cartesian3';
-import GeometryAttribute from 'cesium/Source/Core/GeometryAttribute';
-import Geometry from 'cesium/Source/Core/Geometry';
-import GeometryPipeline from 'cesium/Source/Core/GeometryPipeline';
-import ComponentDatatype from 'cesium/Source/Core/ComponentDatatype';
-import PrimitiveType from 'cesium/Source/Core/PrimitiveType';
-import BoundingSphere from 'cesium/Source/Core/BoundingSphere';
+import { Cartesian3, GeometryAttribute, Geometry, GeometryPipeline, ComponentDatatype, PrimitiveType, BoundingSphere } from 'cesium';
 
 import { CesiumVolumeTilePrimitive, CesiumVolumeTilePrimitiveConfig } from '../cesium-volume-tile-primitive';
 
@@ -92,6 +86,7 @@ export class CesiumSliceVolumeTilePrimitive extends CesiumVolumeTilePrimitive {
                     componentsPerAttribute: 3,
                     values: positions
                 }),
+                // @ts-ignore: custom attributes should be allowed by typings
                 str: new GeometryAttribute({
                     componentDatatype: ComponentDatatype.FLOAT,
                     componentsPerAttribute: 3,
@@ -100,6 +95,7 @@ export class CesiumSliceVolumeTilePrimitive extends CesiumVolumeTilePrimitive {
             },
             indices: indices,
             primitiveType: PrimitiveType.TRIANGLES,
+            // @ts-ignore: typed array should be allowed by typings
             boundingSphere: BoundingSphere.fromVertices(positions)
         });
 
@@ -139,6 +135,7 @@ export class CesiumSliceVolumeTilePrimitive extends CesiumVolumeTilePrimitive {
             ...reproject([absX, extent.minY, extent.maxZ])
         ]);
 
+        // @ts-ignore: typed array should be allowed by typings
         const positions = Cartesian3.packArray(cartesianPositions, new Float32Array(cartesianPositions.length * 3));
 
         const str = new Float32Array([normX, 0, 0, normX, 1, 0, normX, 1, 1, normX, 0, 1]);
@@ -173,6 +170,7 @@ export class CesiumSliceVolumeTilePrimitive extends CesiumVolumeTilePrimitive {
             ...reproject([extent.minX, absY, extent.maxZ])
         ]);
 
+        // @ts-ignore: typed array should be allowed by typings
         const positions = Cartesian3.packArray(cartesianPositions, new Float32Array(cartesianPositions.length * 3));
 
         const str = new Float32Array([0, normY, 0, 1, normY, 0, 1, normY, 1, 0, normY, 1]);
@@ -207,6 +205,7 @@ export class CesiumSliceVolumeTilePrimitive extends CesiumVolumeTilePrimitive {
             ...reproject([extent.maxX, extent.minY, absZ])
         ]);
 
+        // @ts-ignore: typed array should be allowed by typings
         const positions = Cartesian3.packArray(cartesianPositions, new Float32Array(cartesianPositions.length * 3));
 
         const str = new Float32Array([0, 0, normZ, 0, 1, normZ, 1, 1, normZ, 1, 0, normZ]);

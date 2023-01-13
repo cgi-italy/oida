@@ -14,6 +14,7 @@ export const MAP_RASTERS_POINT_INFO_ANALYSIS = 'map_rasters_point_info_analysis'
  * The {@link MapRastersPointInfo} configuration
  */
 export type MapRasterInfoProps = {
+    id?: string;
     name: string;
     datasetExplorer: DatasetExplorer;
     mouseCoordsInteraction: MouseCoordsInteraction;
@@ -28,14 +29,14 @@ export type MapRasterInfoProps = {
  * every time the user clicks on a map location. A dataset shall have a
  * {@link DatasetRasterPointInfo} amongst its tools to be queried through this analysis.
  */
-export class MapRastersPointInfo extends DatasetAnalysis<DatasetRasterPointInfo> {
+export class MapRastersPointInfo extends DatasetAnalysis<typeof MAP_RASTERS_POINT_INFO_ANALYSIS, DatasetRasterPointInfo> {
     @observable.ref location: MouseCoords | undefined;
 
     protected datasetExplorer_: DatasetExplorer;
     protected mouseCoordsInteraction_: MouseCoordsInteraction;
     protected featureDrawInteraction_: FeatureDrawInteraction | undefined;
     protected mapSelection_: SelectionManager | undefined;
-    protected datasetsTracker_: ArrayTracker<DatasetExplorerItem, (() => void) | void>;
+    protected datasetsTracker_: ArrayTracker<DatasetExplorerItem, (() => void) | undefined>;
     protected subscriptionTracker_: SubscriptionTracker;
 
     constructor(props: MapRasterInfoProps) {
@@ -87,6 +88,7 @@ export class MapRastersPointInfo extends DatasetAnalysis<DatasetRasterPointInfo>
                         this.removeProcessing(rasterPointInfo);
                     };
                 }
+                return undefined;
             },
             onItemRemove: (disposer) => {
                 if (disposer) {
@@ -141,6 +143,17 @@ export class MapRastersPointInfo extends DatasetAnalysis<DatasetRasterPointInfo>
         } else {
             this.visible.setValue(false);
         }
+    }
+
+    getSnapshot() {
+        return {
+            ...super.getSnapshot(),
+            location: this.location
+        };
+    }
+
+    applySnapshot(snapshot) {
+        this.setLocation(snapshot.location);
     }
 
     dispose() {

@@ -1,6 +1,6 @@
 {
   "name": "@oidajs/map-cesium",
-  "version": "3.2.1",
+  "version": "3.3.0",
   "description": "Cesium map renderer wrapper library",
   "module": "es/index.js",
   "main": "lib/index.js",
@@ -25,11 +25,11 @@
     "access": "public"
   },
   "dependencies": {
-    "@oidajs/core": "file:../core",
-    "tslib": "^2.3.1"
+    "@oidajs/core": "*",
+    "tslib": "^2.4.1"
   },
   "peerDependencies": {
-    "cesium": "^1.88.0",
-    "proj4": "^2.6.0"
+    "cesium": "^1.100.0",
+    "proj4": "^2.8.0"
   }
 }

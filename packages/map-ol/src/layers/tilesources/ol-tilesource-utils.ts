@@ -2,8 +2,10 @@ import { get as getProjection } from 'ol/proj.js';
 
 import WMTSTileGrid from 'ol/tilegrid/WMTS';
 import TileGrid from 'ol/tilegrid/TileGrid';
+import TileSource from 'ol/source/Tile';
+import TileImageSource from 'ol/source/TileImage';
 
-import { TileGridConfig, computeTileGridParams } from '@oidajs/core';
+import { TileGridConfig, isWmtsTileGridConfig, computeTileGridParams } from '@oidajs/core';
 
 const getRootLevelResolution = (extent: number[], gridSize: number[], tileSize: number[]) => {
     const rootXResolution = (extent[2] - extent[0]) / gridSize[0] / tileSize[0];
@@ -11,7 +13,7 @@ const getRootLevelResolution = (extent: number[], gridSize: number[], tileSize: 
     return Math.max(rootXResolution, rootYResolution);
 };
 
-export const getTileGridFromConfig = (srs, tileGridConfig?: TileGridConfig) => {
+export const getTileGridFromConfig = (srs, tileGridConfig?: TileGridConfig): TileGrid => {
     tileGridConfig = tileGridConfig || {};
 
     const projection = getProjection(srs);
@@ -24,7 +26,7 @@ export const getTileGridFromConfig = (srs, tileGridConfig?: TileGridConfig) => {
     let extent = tileGridConfig.extent;
 
     if (!extent) {
-        extent = projection.getExtent();
+        extent = projection?.getExtent();
     }
 
     if (!extent) {
@@ -70,7 +72,7 @@ export const getTileGridFromConfig = (srs, tileGridConfig?: TileGridConfig) => {
         resolutions: resolutions
     };
 
-    if (tileGridConfig.isWMTS) {
+    if (isWmtsTileGridConfig(tileGridConfig)) {
         let matrixIds = tileGridConfig.matrixIds;
         if (!matrixIds) {
             matrixIds = resolutions.map((resolution, idx) => {
@@ -100,5 +102,47 @@ export const getUrlFromConfig = (sourceConfig) => {
         return {
             url
         };
+    }
+};
+
+export enum TileRefreshMode {
+    Clear,
+    KeepCurrentZLevel,
+    KeepAll
+}
+/**
+ * Force a tile source refresh.
+ * Cache is invalidated and map tiles data is requested again from the source
+ * @param tileSource The source to refresh
+ * @param refreshMode Specify the map tile refresh mode.
+ * When set to {@link TileRefreshMode.KeepCurrentZLevel} (the default) the source is refreshed without clearing
+ * the current level cache. (Current tiles will not disappear from the map, but updated asynchronously)
+ * When set to {@link TileRefreshMode.Clear}, the cache is cleared before refreshing (The map layer will disappear and tiles
+ * loaded again)
+ * When set to {@link TileRefreshMode.KeepAll}, the cache is not invalidated. Old cached tiles will be updated once loaded
+ * on the map
+ */
+export const refreshTileSource = (tileSource: TileSource, refreshMode = TileRefreshMode.KeepCurrentZLevel) => {
+    if (refreshMode === TileRefreshMode.KeepCurrentZLevel) {
+        const sourceKey = new Date().toISOString();
+        // we're using some protected methods so the ts-ignore directives
+        if (tileSource instanceof TileImageSource) {
+            // @ts-ignore
+            const tileCaches = tileSource.tileCacheForProjection;
+            for (const key in tileCaches) {
+                tileCaches[key].pruneExceptNewestZ();
+            }
+        } else {
+            // @ts-ignore
+            tileSource.tileCache.pruneExceptNewestZ();
+        }
+        // @ts-ignore
+        tileSource.setKey(sourceKey);
+    } else if (refreshMode === TileRefreshMode.Clear) {
+        tileSource.refresh();
+    } else {
+        const sourceKey = new Date().toISOString();
+        // @ts-ignore
+        tileSource.setKey(sourceKey);
     }
 };

@@ -1,6 +1,6 @@
 {
   "name": "@oidajs/eo-adapters-ogc-react",
-  "version": "2.1.4",
+  "version": "2.2.0",
   "description": "oida EO OGC adapters react components",
   "module": "es/index.js",
   "main": "lib/index.js",
@@ -32,20 +32,20 @@
     "mobx": "6.x",
     "mobx-react": "7.x",
     "moment": "2.x",
-    "react": "^16.18.0 || ^17.0.0",
-    "react-dom": "^16.18.0 || ^17.0.0",
+    "react": "^16.18.0 || ^17.0.0 || ^18.0.0",
+    "react-dom": "^16.18.0 || ^17.0.0 || ^18.0.0",
     "react-router": "6.x",
     "react-router-dom": "6.x"
   },
   "dependencies": {
-    "@oidajs/core": "file:../core",
-    "@oidajs/eo-adapters-ogc": "file:../eo-adapters-ogc",
-    "@oidajs/eo-mobx": "file:../eo-mobx",
-    "@oidajs/eo-mobx-react": "file:../eo-mobx-react",
-    "@oidajs/state-mobx": "file:../state-mobx",
-    "@oidajs/ui-react-antd": "file:../ui-react-antd",
-    "@oidajs/ui-react-core": "file:../ui-react-core",
-    "@oidajs/ui-react-mobx": "file:../ui-react-mobx",
-    "tslib": "^2.3.1"
+    "@oidajs/core": "*",
+    "@oidajs/eo-adapters-ogc": "*",
+    "@oidajs/eo-mobx": "*",
+    "@oidajs/eo-mobx-react": "*",
+    "@oidajs/state-mobx": "*",
+    "@oidajs/ui-react-antd": "*",
+    "@oidajs/ui-react-core": "*",
+    "@oidajs/ui-react-mobx": "*",
+    "tslib": "^2.4.1"
   }
 }

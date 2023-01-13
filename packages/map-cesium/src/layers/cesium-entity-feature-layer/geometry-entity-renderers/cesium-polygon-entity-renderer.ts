@@ -1,14 +1,11 @@
-import Cartesian3 from 'cesium/Source/Core/Cartesian3';
-import Color from 'cesium/Source/Core/Color';
-import ArcType from 'cesium/Source/Core/ArcType';
-import Entity from 'cesium/Source/DataSources/Entity';
-import PolygonHierarchy from 'cesium/Source/Core/PolygonHierarchy';
-import PolygonGraphics from 'cesium/Source/DataSources/PolygonGraphics';
-import HeightReference from 'cesium/Source/Scene/HeightReference';
+import { Cartesian3, Color, ArcType, Entity, PolygonHierarchy, PolygonGraphics, HeightReference } from 'cesium';
+
+import { IFeatureStyle } from '@oidajs/core';
 
 import { CesiumGeometryEntityRenderer } from './cesium-geometry-entity-renderer-factory';
 
-import { IFeatureStyle } from '@oidajs/core';
+const FEATURE_STYLE_KEY = 'featureStyle';
+const LAYER_OPTIONS_KEY = 'layerOptions';
 
 const getPolygonHierarchy = (coordinates) => {
     const outer = coordinates[0];
@@ -35,7 +32,7 @@ export const createPolygonEntity = (id: string, geometry: GeoJSON.Polygon, featu
 
     const polygonHierarchy = getPolygonHierarchy(geometry.coordinates);
 
-    let heightReference = HeightReference.None;
+    let heightReference = HeightReference.NONE;
     if (layerOptions && layerOptions.clampToGround) {
         heightReference = HeightReference.CLAMP_TO_GROUND;
     }
@@ -102,8 +99,8 @@ export const createMultiPolygonEntity = (id, geometry: GeoJSON.MultiPolygon, fea
         show: polygonStyle.visible
     });
 
-    multiPolygonEntity.featureStyle = featureStyle;
-    multiPolygonEntity.layerOptions = layerOptions;
+    multiPolygonEntity[FEATURE_STYLE_KEY] = featureStyle;
+    multiPolygonEntity[LAYER_OPTIONS_KEY] = layerOptions;
 
     geometry.coordinates.forEach((polygonCoords, idx) => {
         const polygonEntity = createPolygonEntity(
@@ -112,13 +109,14 @@ export const createMultiPolygonEntity = (id, geometry: GeoJSON.MultiPolygon, fea
             featureStyle,
             layerOptions
         );
-        polygonEntity.parent = multiPolygonEntity;
+        polygonEntity!.parent = multiPolygonEntity;
     });
 
     return multiPolygonEntity;
 };
 
-export const updateMultiPolygonEntityGeometry = (multiPolygonEntity, geometry: GeoJSON.MultiPolygon) => {
+export const updateMultiPolygonEntityGeometry = (multiPolygonEntity: Entity, geometry: GeoJSON.MultiPolygon) => {
+    // @ts-ignore: need access to private entity children
     const polygonEntities = multiPolygonEntity._children;
     const coordinates = geometry.coordinates;
 
@@ -129,10 +127,10 @@ export const updateMultiPolygonEntityGeometry = (multiPolygonEntity, geometry: G
             const polygonEntity = createPolygonEntity(
                 `${multiPolygonEntity.id}_${i}`,
                 { type: 'Polygon', coordinates: coordinates[i] },
-                multiPolygonEntity.featureStyle,
-                multiPolygonEntity.layerOptions
+                multiPolygonEntity[FEATURE_STYLE_KEY],
+                multiPolygonEntity[LAYER_OPTIONS_KEY]
             );
-            polygonEntity.parent = multiPolygonEntity;
+            polygonEntity!.parent = multiPolygonEntity;
         }
     }
 

@@ -1,11 +1,11 @@
-import Cartesian3 from 'cesium/Source/Core/Cartesian3';
-import Color from 'cesium/Source/Core/Color';
-import Entity from 'cesium/Source/DataSources/Entity';
-import PolylineGraphics from 'cesium/Source/DataSources/PolylineGraphics';
+import { Cartesian3, Color, Entity, PolylineGraphics } from 'cesium';
 
 import { IFeatureStyle } from '@oidajs/core';
 
 import { CesiumGeometryEntityRenderer } from './cesium-geometry-entity-renderer-factory';
+
+const FEATURE_STYLE_KEY = 'featureStyle';
+const LAYER_OPTIONS_KEY = 'layerOptions';
 
 export const createLineEntity = (id: string, geometry: GeoJSON.LineString, featureStyle: IFeatureStyle, layerOptions?) => {
     const style = featureStyle.line;
@@ -51,7 +51,7 @@ export const updateLineEntityStyle = (lineEntity, featureStyle: IFeatureStyle) =
     polyline.zIndex = style.zIndex || 0;
 };
 
-export const createMultiLineEntity = (id, geometry: GeoJSON.MultiLineString, featureStyle: IFeatureStyle, layerOptions) => {
+export const createMultiLineEntity = (id: string, geometry: GeoJSON.MultiLineString, featureStyle: IFeatureStyle, layerOptions) => {
     const lineStyle = featureStyle.line;
 
     if (!lineStyle) {
@@ -63,18 +63,21 @@ export const createMultiLineEntity = (id, geometry: GeoJSON.MultiLineString, fea
         show: lineStyle.visible
     });
 
-    multiLineEntity.featureStyle = featureStyle;
-    multiLineEntity.layerOptions = layerOptions;
+    multiLineEntity[FEATURE_STYLE_KEY] = featureStyle;
+    multiLineEntity[LAYER_OPTIONS_KEY] = layerOptions;
 
     geometry.coordinates.forEach((lineCoords, idx) => {
         const lineEntity = createLineEntity(`${id}_${idx}`, { type: 'LineString', coordinates: lineCoords }, featureStyle, layerOptions);
-        lineEntity.parent = multiLineEntity;
+        if (lineEntity) {
+            lineEntity.parent = multiLineEntity;
+        }
     });
 
     return multiLineEntity;
 };
 
-export const updateMultiLineEntityGeometry = (multiLineEntity, geometry: GeoJSON.MultiLineString) => {
+export const updateMultiLineEntityGeometry = (multiLineEntity: Entity, geometry: GeoJSON.MultiLineString) => {
+    // @ts-ignore: need access to private entity children
     const lineEntities = multiLineEntity._children;
     const coordinates = geometry.coordinates;
 
@@ -85,10 +88,10 @@ export const updateMultiLineEntityGeometry = (multiLineEntity, geometry: GeoJSON
             const lineEntity = createLineEntity(
                 `${multiLineEntity.id}_${i}`,
                 { type: 'LineString', coordinates: coordinates[i] },
-                multiLineEntity.featureStyle,
-                multiLineEntity.layerOptions
+                multiLineEntity[FEATURE_STYLE_KEY],
+                multiLineEntity[LAYER_OPTIONS_KEY]
             );
-            lineEntity.parent = multiLineEntity;
+            lineEntity!.parent = multiLineEntity;
         }
     }
 
@@ -101,8 +104,9 @@ export const updateMultiLineEntityGeometry = (multiLineEntity, geometry: GeoJSON
     });
 };
 
-export const updateMultiLineEntityStyle = (multiLineEntity, featureStyle: IFeatureStyle) => {
-    multiLineEntity.featureStyle = featureStyle;
+export const updateMultiLineEntityStyle = (multiLineEntity: Entity, featureStyle: IFeatureStyle) => {
+    multiLineEntity[FEATURE_STYLE_KEY] = featureStyle;
+    // @ts-ignore: need access to private entity children
     const lineEntities = multiLineEntity._children;
     lineEntities.forEach((lineEntity) => {
         updateLineEntityStyle(lineEntity, featureStyle);

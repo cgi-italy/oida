@@ -1,7 +1,4 @@
-import Cartesian2 from 'cesium/Source/Core/Cartesian2';
-import Texture from 'cesium/Source/Renderer/Texture';
-
-import destroyObject from 'cesium/Source/Core/destroyObject';
+import { Cartesian2, Texture, destroyObject } from 'cesium';
 
 import { VolumeTileKey } from '@oidajs/core';
 
@@ -131,10 +128,7 @@ export class CesiumVolumeTileSet {
             this.colorMap_ = {
                 texture: undefined,
                 needsUpdate: true,
-                range: {
-                    min: 0,
-                    max: 100
-                },
+                range: new Cartesian2(0, 100),
                 clamp: true,
                 noDataValue: 0,
                 colorMap: new Image(),

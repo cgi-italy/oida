@@ -4,7 +4,7 @@ import { DatasetProcessing } from '@oidajs/eo-mobx';
 import { Map, SelectionManager } from '@oidajs/state-mobx';
 
 export type useAnalysisGeometryProps = {
-    analysis: DatasetProcessing<any>;
+    analysis: DatasetProcessing<string, any>;
     map: Map;
     mapSelection: SelectionManager;
 };
@@ -57,7 +57,7 @@ export const useAnalysisGeometry = (props: useAnalysisGeometryProps) => {
     };
 };
 
-export const useAnalysisGeometryFromModule = (analysis: DatasetProcessing<any>, mapModuleId?: string) => {
+export const useAnalysisGeometryFromModule = (analysis: DatasetProcessing<string, any>, mapModuleId?: string) => {
     const moduleState = useMapModule(mapModuleId);
 
     return useAnalysisGeometry({

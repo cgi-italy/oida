@@ -64,9 +64,9 @@ export const DatasetBandPresetSelector = (props: DatasetBandPresetSelectorProps)
             <Dropdown
                 trigger={['click']}
                 placement='bottomLeft'
-                onVisibleChange={(visible) => setDropDownVisible(visible)}
-                visible={dropDownVisible}
-                overlay={
+                onOpenChange={(visible) => setDropDownVisible(visible)}
+                open={dropDownVisible}
+                dropdownRender={() => (
                     <DatasetBandPresetList
                         presets={props.presets}
                         selectedPreset={selectedPreset}
@@ -75,7 +75,7 @@ export const DatasetBandPresetSelector = (props: DatasetBandPresetSelectorProps)
                             setDropDownVisible(false);
                         }}
                     />
-                }
+                )}
             >
                 <div className='dataset-raster-band-preset'>
                     {selectedPresetConfig && <DatasetBandPresetSelectorItem preset={selectedPresetConfig} />}

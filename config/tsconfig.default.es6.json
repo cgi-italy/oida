@@ -4,7 +4,7 @@
     "declarationMap": true,
     "composite": true,
     "module": "es6",
-    "lib": ["es6", "dom"],
+    "lib": ["es2021", "dom"],
     "sourceMap": true,
     "inlineSources": true,
     "strict": true,

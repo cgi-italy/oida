@@ -3,8 +3,9 @@ import { IObservableArray, observable, action, makeObservable } from 'mobx';
 import { Active, ActiveProps, FeatureStyleGetter, IsActivable, IsEntity } from '@oidajs/state-mobx';
 import { Geometry, createDynamicFactory } from '@oidajs/core';
 
-import { DatasetConfig } from '../common';
+import { DatasetConfig, DatasetConfigJSONSchema } from '../common';
 import { DatasetExplorerItemInitialState } from '../dataset-explorer';
+import { datasetConfigFactory } from '../utils';
 
 export interface DatasetDiscoveryProviderItem extends IsEntity {
     geometry?: Geometry;
@@ -17,6 +18,8 @@ export type DatasetDiscoveryProviderProps<TYPE extends string = string> = {
     description?: string;
     disabled?: boolean;
 } & ActiveProps;
+
+export type DatasetExplorerItemConfig = DatasetConfig & { initialState?: DatasetExplorerItemInitialState };
 
 export interface DatasetDiscoveryProviderDefinitions {}
 export interface DatasetDiscoveryProviderTypes {}
@@ -35,7 +38,7 @@ const discoveryProviderFactory = createDynamicFactory<DatasetDiscoveryProvider>(
 /**
  * A class to manage the state of an EO dataset discovery provider.
  * Inherited classes shall implement the data retrieval logic and populate
- * the {@Link DatasetDiscoveryProvider.results_} array
+ * the {@link DatasetDiscoveryProvider.results_} array
  *
  * Example:
  *
@@ -86,9 +89,12 @@ const discoveryProviderFactory = createDynamicFactory<DatasetDiscoveryProvider>(
  * ```
  *
  * @template T the provider dataset record type
+ * @template J the provider json configuration schema
  */
-export abstract class DatasetDiscoveryProvider<T extends DatasetDiscoveryProviderItem = DatasetDiscoveryProviderItem>
-    implements IsActivable
+export abstract class DatasetDiscoveryProvider<
+    T extends DatasetDiscoveryProviderItem = DatasetDiscoveryProviderItem,
+    J extends DatasetConfigJSONSchema = DatasetConfigJSONSchema
+> implements IsActivable
 {
     /**
      * Create a dataset discovery provider instance given a configuration object
@@ -105,7 +111,7 @@ export abstract class DatasetDiscoveryProvider<T extends DatasetDiscoveryProvide
     }
 
     /**
-     * Register a dataset discovery provider type for factory creation thorugh {@Link DatasetDiscoveryProvider.create}
+     * Register a dataset discovery provider type for factory creation thorugh {@link DatasetDiscoveryProvider.create}
      * @param providerType The unique discovery provider type identifier
      * @param providerCtor The provider constructor
      */
@@ -128,7 +134,7 @@ export abstract class DatasetDiscoveryProvider<T extends DatasetDiscoveryProvide
     /** The provider description */
     readonly description: string | undefined;
     /** Indicate if the provider is currently active (e.g. enable data retrieval).
-     * It is usually set by the {@Link DatasetDiscovery} based on the currently selected provider
+     * It is usually set by the {@link DatasetDiscovery} based on the currently selected provider
      **/
     readonly active: Active;
 
@@ -159,13 +165,24 @@ export abstract class DatasetDiscoveryProvider<T extends DatasetDiscoveryProvide
         });
         this.mapFeatureStyler_ = undefined;
 
+        datasetConfigFactory.register(this.getFactoryId_(), (config) => {
+            return this.createDatasetFromConfig(config);
+        });
+
         makeObservable(this);
     }
 
     /**
      * create the dataset configuration for a specific item
      */
-    abstract createDataset(item: T): Promise<(DatasetConfig & { initialState?: DatasetExplorerItemInitialState }) | undefined>;
+    abstract createDataset(item: T, id?: string): Promise<DatasetExplorerItemConfig>;
+
+    /**
+     * create a dataset configuration from json config.
+     * usually not called directly but from the {@link datasetConfigFactory}
+     * @param config the input configuration
+     */
+    abstract createDatasetFromConfig(config: J): Promise<DatasetExplorerItemConfig>;
 
     @action
     setDisabled(disabled: boolean) {
@@ -183,5 +200,9 @@ export abstract class DatasetDiscoveryProvider<T extends DatasetDiscoveryProvide
     @action
     protected setResults_(results: T[]) {
         this.results.replace(results);
+    }
+
+    protected getFactoryId_() {
+        return `discovery.${this.id}`;
     }
 }

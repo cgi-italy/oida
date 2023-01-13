@@ -1,6 +1,6 @@
 {
   "name": "@oidajs/map-ol",
-  "version": "3.2.1",
+  "version": "3.3.0",
   "description": "Openlayers map renderer wrapper library",
   "module": "es/index.js",
   "main": "lib/index.js",
@@ -24,12 +24,12 @@
     "access": "public"
   },
   "dependencies": {
-    "@oidajs/core": "file:../core",
+    "@oidajs/core": "*",
     "@turf/bbox-polygon": "^6.5.0",
-    "tslib": "^2.3.1"
+    "tslib": "^2.4.1"
   },
   "peerDependencies": {
-    "ol": "^6.2.0",
-    "proj4": "^2.6.0"
+    "ol": "7.x",
+    "proj4": "2.x"
   }
 }

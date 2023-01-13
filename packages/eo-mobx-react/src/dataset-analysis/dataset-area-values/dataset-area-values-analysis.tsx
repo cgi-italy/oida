@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { IObservableArray } from 'mobx';
 import { Form, Button } from 'antd';
 import { LeftOutlined } from '@ant-design/icons';
@@ -84,6 +84,13 @@ export const DatasetAreaValuesAnalysisWidget = (props: DatasetAnalysisWidgetFact
     const canRunQuery = useSelector(() => {
         return processings.every((item) => item.canRunQuery);
     });
+
+    useEffect(() => {
+        if (canRunQuery) {
+            processings.forEach((item) => item.retrieveData());
+            setFiltersVisible(false);
+        }
+    }, []);
 
     return (
         <div className='dataset-chart'>

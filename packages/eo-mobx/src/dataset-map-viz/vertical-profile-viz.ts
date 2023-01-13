@@ -115,7 +115,7 @@ export type DatasetVerticalProfileVizProps = Omit<
 > &
     VerticalScaleProps;
 
-export class DatasetVerticalProfileViz extends DatasetViz<VerticalProfileLayer<VerticalProfileItem>> {
+export class DatasetVerticalProfileViz extends DatasetViz<typeof VERTICAL_PROFILE_VIZ_TYPE, VerticalProfileLayer<VerticalProfileItem>> {
     readonly config: VerticalProfileVizConfig;
     @observable verticalScale: VerticalScale;
     @observable tileSourceRevision: number;
@@ -161,7 +161,9 @@ export class DatasetVerticalProfileViz extends DatasetViz<VerticalProfileLayer<V
 
         this.widgetName_ = this.dataset.config.name;
 
-        this.bandMode = new RasterBandMode();
+        this.bandMode = new RasterBandMode({
+            config: props.config.bandMode
+        });
         getRasterBandModeFromConfig({
             config: props.config.bandMode
         }).then((bandModeProps) => {

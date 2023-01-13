@@ -16,7 +16,7 @@ export enum DatasetDownloadFormSubmitState {
 }
 
 export type DatasetDownloadProps = {
-    datasetViz: DatasetViz<any>;
+    datasetViz: DatasetViz<string, any>;
     onSubmitStateChange: (submitState: DatasetDownloadFormSubmitState) => void;
     formId?: string;
     formInstance?: FormInstance;
@@ -136,7 +136,7 @@ export const DatasetVizDownloadModal = (props: DatasetVizDownloadModalProps) => 
                 loading: formState === DatasetDownloadFormSubmitState.Pending,
                 disabled: formState === DatasetDownloadFormSubmitState.Invalid
             }}
-            visible={visible}
+            open={visible}
             onCancel={() => setVisible(false)}
             afterClose={props.onClose}
             destroyOnClose={true}

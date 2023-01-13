@@ -1,6 +1,6 @@
 {
   "name": "@oidajs/eo-video-react",
-  "version": "2.0.6",
+  "version": "2.0.7",
   "description": "oida EO video adapters react components",
   "module": "es/index.js",
   "main": "lib/index.js",
@@ -28,23 +28,23 @@
   "peerDependencies": {
     "antd": "4.x",
     "classnames": "2.x",
-    "lodash": "^4.x",
+    "lodash": "4.x",
     "mobx": "6.x",
     "mobx-react": "7.x",
     "moment": "2.x",
-    "react": "^16.18.0 || ^17.0.0",
-    "react-dom": "^16.18.0 || ^17.0.0"
+    "react": "^16.18.0 || ^17.0.0 || ^18.0.0",
+    "react-dom": "^16.18.0 || ^17.0.0 || ^18.0.0"
   },
   "dependencies": {
-    "@oidajs/core": "file:../core",
-    "@oidajs/eo-mobx": "file:../eo-mobx",
-    "@oidajs/eo-mobx-react": "file:../eo-mobx-react",
-    "@oidajs/eo-video": "file:../eo-video",
-    "@oidajs/state-mobx": "file:../state-mobx",
-    "@oidajs/ui-react-antd": "file:../ui-react-antd",
-    "@oidajs/ui-react-core": "file:../ui-react-core",
-    "@oidajs/ui-react-mobx": "file:../ui-react-mobx",
-    "tslib": "^2.3.1",
+    "@oidajs/core": "*",
+    "@oidajs/eo-mobx": "*",
+    "@oidajs/eo-mobx-react": "*",
+    "@oidajs/eo-video": "*",
+    "@oidajs/state-mobx": "*",
+    "@oidajs/ui-react-antd": "*",
+    "@oidajs/ui-react-core": "*",
+    "@oidajs/ui-react-mobx": "*",
+    "tslib": "^2.4.1",
     "uuid": "^8.3.2"
   }
 }

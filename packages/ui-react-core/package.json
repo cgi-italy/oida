@@ -1,6 +1,6 @@
 {
   "name": "@oidajs/ui-react-core",
-  "version": "6.3.0",
+  "version": "6.4.0",
   "description": "ui core components",
   "module": "es/index.js",
   "main": "lib/index.js",
@@ -27,16 +27,16 @@
   },
   "peerDependencies": {
     "classnames": "^2.2.6",
-    "react": "^16.18.0 || ^17.0.0",
-    "react-dom": "^16.18.0 || ^17.0.0",
-    "react-draggable": "^4.x",
+    "react": "^16.18.0 || ^17.0.0 || ^18.0.0",
+    "react-dom": "^16.18.0 || ^17.0.0 || ^18.0.0",
     "react-router": "6.x",
     "react-router-dom": "6.x"
   },
   "dependencies": {
-    "@oidajs/core": "file:../core",
-    "react-resize-aware": "^3.1.1",
-    "scroll-into-view-if-needed": "^2.2.28",
-    "tslib": "^2.3.1"
+    "@oidajs/core": "*",
+    "react-cool-dimensions": "^3.0.0",
+    "react-draggable": "^4.4.5",
+    "scroll-into-view-if-needed": "^2.2.31",
+    "tslib": "^2.4.1"
   }
 }

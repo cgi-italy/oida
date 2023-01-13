@@ -1,3 +1,5 @@
+import { PrimitiveCollection } from 'cesium';
+
 import { IPointStyle, ILineStyle, IPolygonStyle, FeatureGeometry } from '@oidajs/core';
 
 export type GeometryStyle = IPointStyle | ILineStyle | IPolygonStyle;
@@ -15,7 +17,7 @@ export interface CesiumGeometryPrimitiveFeature<
 }
 
 export interface CesiumGeometryPrimitiveRenderer<F extends CesiumGeometryPrimitiveFeature = CesiumGeometryPrimitiveFeature> {
-    getPrimitives(): any[];
+    getPrimitives(): PrimitiveCollection;
     addFeature(id: string, geometry: FeatureGeometry, style: F['style'], data: any): F;
     updateGeometry(feature: F, geometry: FeatureGeometry): void;
     updateStyle(feature: F, style: F['style']): void;

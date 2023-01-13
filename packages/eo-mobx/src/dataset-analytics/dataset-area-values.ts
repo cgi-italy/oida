@@ -15,6 +15,7 @@ import {
     DimensionDomainType
 } from '../common';
 import { DatasetProcessing, DatasetProcessingProps } from './dataset-processing';
+import { DatasetAnalysis, DatasetAnalysisProps } from './dataset-analysis';
 
 export const DATASET_AREA_VALUES_PROCESSING = 'dataset_area_values_processing';
 
@@ -72,7 +73,7 @@ export type DatasetAreaValuesProps = Omit<
     dataMask?: Partial<DatasetAreaValuesDataMask>;
 };
 
-export class DatasetAreaValues extends DatasetProcessing<undefined> {
+export class DatasetAreaValues extends DatasetProcessing<typeof DATASET_AREA_VALUES_PROCESSING, undefined> {
     readonly config: DatasetAreaValuesConfig;
     @observable.ref variable: string | undefined;
     @observable.ref data: DatasetAreaValuesData | undefined;
@@ -189,7 +190,7 @@ export class DatasetAreaValues extends DatasetProcessing<undefined> {
             config: this.config,
             variable: this.variable,
             autoUpdate: this.autoUpdate
-        }) as DatasetAreaValues;
+        });
     }
 
     dispose() {
@@ -231,5 +232,14 @@ export class DatasetAreaValues extends DatasetProcessing<undefined> {
 
     protected initMapLayer_() {
         return undefined;
+    }
+}
+
+export class DatasetAreaValuesAnalysis extends DatasetAnalysis<typeof DATASET_AREA_VALUES_PROCESSING, DatasetAreaValues> {
+    constructor(props: Omit<DatasetAnalysisProps<typeof DATASET_AREA_VALUES_PROCESSING, DatasetAreaValues>, 'type'>) {
+        super({
+            type: DATASET_AREA_VALUES_PROCESSING,
+            ...props
+        });
     }
 }

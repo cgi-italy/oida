@@ -1,9 +1,4 @@
-import Cartesian3 from 'cesium/Source/Core/Cartesian3';
-import PrimitiveCollection from 'cesium/Source/Scene/PrimitiveCollection';
-import DataSourceCollection from 'cesium/Source/DataSources/DataSourceCollection';
-import CustomDataSource from 'cesium/Source/DataSources/CustomDataSource';
-import ImageryLayerCollection from 'cesium/Source/Scene/ImageryLayerCollection';
-import ImageryLayer from 'cesium/Source/Scene/ImageryLayer';
+import { Cartesian3, PrimitiveCollection, DataSourceCollection, CustomDataSource, ImageryLayerCollection, ImageryLayer } from 'cesium';
 
 import { IMapLayerRenderer, MapLayerRendererConfig } from '@oidajs/core';
 
@@ -17,7 +12,7 @@ export class CesiumMapLayer implements IMapLayerRenderer {
     protected visible_: boolean;
     protected alpha_: number;
     protected imageries_;
-    protected primitives_;
+    protected primitives_!: PrimitiveCollection;
     protected dataSources_;
 
     constructor(config: MapLayerRendererConfig) {
@@ -56,12 +51,14 @@ export class CesiumMapLayer implements IMapLayerRenderer {
     }
 
     setZIndex(zIndex) {
-        this.imageries_.zIndex = zIndex;
-        this.mapRenderer_.refreshImageriesFromEvent({
-            type: 'zIndex',
-            collection: this.imageries_,
-            zIndex: zIndex
-        });
+        if (zIndex !== this.imageries_.zIndex) {
+            this.imageries_.zIndex = zIndex;
+            this.mapRenderer_.refreshImageriesFromEvent({
+                type: 'zIndex',
+                collection: this.imageries_,
+                zIndex: zIndex
+            });
+        }
     }
 
     setExtent(extent: number[] | undefined) {

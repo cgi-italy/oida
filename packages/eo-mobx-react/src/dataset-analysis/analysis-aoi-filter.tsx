@@ -14,7 +14,7 @@ import { useMapAoiDrawerFromModule, useAoiAction, useSelector, useMapAoiImporter
 import { useAnalysisGeometryFromModule } from './use-analysis-geometry';
 
 export type AnalysisAoiFilterProps = {
-    analysis: DatasetProcessing<any>;
+    analysis: DatasetProcessing<string, any>;
     supportedGeometries: AoiSupportedGeometry[];
 };
 

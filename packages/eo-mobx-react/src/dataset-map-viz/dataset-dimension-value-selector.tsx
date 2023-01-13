@@ -54,7 +54,9 @@ export const DatasetValueDimensionSelector = (props: DatasetValueDimensionSelect
                     value={value}
                     marks={marks}
                     onChange={(value) => props.dimensionsState.setValue(props.dimension.id, value as number)}
-                    tipFormatter={(value) => `${value} ${props.dimension.units}`}
+                    tooltip={{
+                        formatter: (value) => `${value} ${props.dimension.units}`
+                    }}
                 />
             </div>
         );
@@ -62,7 +64,14 @@ export const DatasetValueDimensionSelector = (props: DatasetValueDimensionSelect
         return (
             <div className='dataset-dimension-value-selector'>
                 <span>{props.dimension.name}: </span>
-                <InputNumber value={value} onChange={(value) => props.dimensionsState.setValue(props.dimension.id, value)} />
+                <InputNumber
+                    value={value}
+                    onChange={(value) => {
+                        if (typeof value === 'number') {
+                            props.dimensionsState.setValue(props.dimension.id, value);
+                        }
+                    }}
+                />
                 {props.dimension.units && <span>{props.dimension.units}</span>}
             </div>
         );

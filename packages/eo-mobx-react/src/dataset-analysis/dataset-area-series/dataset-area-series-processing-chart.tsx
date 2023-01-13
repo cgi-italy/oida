@@ -77,7 +77,7 @@ export const DatasetAreaSeriesProcessingChart = (props: DatasetAreaSeriesProcess
         }, 1000);
 
         const colorMapTrackerDisposer = reaction(
-            () => props.series.colorMap?.asProps(),
+            () => props.series.colorMap?.getSnapshot(),
             (colorMap) => {
                 updateSeriesData();
             }
@@ -236,7 +236,9 @@ export const DatasetAreaSeriesProcessingChart = (props: DatasetAreaSeriesProcess
                                             0: valueFormatter(items[0].x),
                                             [items.length - 1]: valueFormatter(items[items.length - 1].x)
                                         }}
-                                        tipFormatter={null}
+                                        tooltip={{
+                                            formatter: null
+                                        }}
                                         step={1}
                                         onChange={(value) => setActiveThumb(value as number)}
                                     />

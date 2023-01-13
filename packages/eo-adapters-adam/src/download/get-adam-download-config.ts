@@ -106,7 +106,9 @@ export const getAdamDatasetDownloadConfig = (
                     data: requestConfig.postData,
                     params: requestConfig.params,
                     responseType: 'blob',
-                    paramsSerializer: AdamServiceParamsSerializer
+                    paramsSerializer: {
+                        serialize: AdamServiceParamsSerializer
+                    }
                 })
                 .then((response) => {
                     download(response.data, requestConfig.params.coverageId, request.format);

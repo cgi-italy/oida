@@ -29,8 +29,8 @@ export const useTileSourceSelector = (props: TileSourceSelectorProps) => {
             if (source) {
                 const layer = group.children.itemAt(layerIdx);
                 if (layer instanceof TileLayer) {
-                    layer.setSource(source.config);
-                    layer.setName(source.name);
+                    layer.setSource(source.source);
+                    layer.setName(source.id);
                 }
             }
         }

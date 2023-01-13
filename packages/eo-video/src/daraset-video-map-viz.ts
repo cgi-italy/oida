@@ -23,7 +23,7 @@ export type DatasetVideoMapVizConfig = {
 
 export type DatasetVideoMapVizProps = DatasetVizProps<typeof VIDEO_VIZ_TYPE, DatasetVideoMapVizConfig>;
 
-export class DatasetVideoMapViz extends DatasetViz<GeoImageLayer> {
+export class DatasetVideoMapViz extends DatasetViz<typeof VIDEO_VIZ_TYPE, GeoImageLayer> {
     source!: AdaptiveVideoLayer;
     readonly config: DatasetVideoMapVizConfig;
     protected subscriptionTracker_: SubscriptionTracker;

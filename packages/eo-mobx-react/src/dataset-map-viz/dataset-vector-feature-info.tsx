@@ -135,7 +135,7 @@ export const DatasetVectorFeatureInfo = <T extends VectorFeatureProperties = Vec
         Object.entries(props.vectorFeature.properties).forEach(([key, value]) => {
             items.push(
                 <Descriptions.Item key={key} label={key}>
-                    {value}
+                    {value?.toString()}
                 </Descriptions.Item>
             );
         });

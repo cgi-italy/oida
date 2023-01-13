@@ -50,12 +50,19 @@ export class ColorMapDomain {
         this.noDataValue = noDataValue;
     }
 
-    asProps(): ColorMapDomainProps {
+    getSnapshot(): ColorMapDomainProps {
         return {
             mapRange: this.mapRange,
             clamp: this.clamp,
             noDataValue: this.noDataValue
         };
+    }
+
+    @action
+    applySnapshot(snapshot: ColorMapDomainProps) {
+        this.mapRange = snapshot.mapRange;
+        this.clamp = snapshot.clamp !== undefined ? snapshot.clamp : true;
+        this.noDataValue = snapshot.noDataValue;
     }
 }
 
@@ -64,6 +71,10 @@ export type ColorMapProps = {
     domain?: ColorMapDomain | ColorMapDomainProps;
 };
 
+export type ColorMapSnapshot = {
+    colorScale: string;
+    domain?: ColorMapDomainProps;
+};
 export class ColorMap {
     @observable.ref colorScale: string;
     @observable.ref domain: ColorMapDomain | undefined;
@@ -93,10 +104,16 @@ export class ColorMap {
         }
     }
 
-    asProps(): ColorMapProps {
+    getSnapshot(): ColorMapSnapshot {
         return {
             colorScale: this.colorScale,
-            domain: this.domain?.asProps()
+            domain: this.domain?.getSnapshot()
         };
+    }
+
+    @action
+    applySnapshot(snapshot: ColorMapSnapshot) {
+        this.colorScale = snapshot.colorScale;
+        this.domain = snapshot.domain ? new ColorMapDomain(snapshot.domain) : undefined;
     }
 }

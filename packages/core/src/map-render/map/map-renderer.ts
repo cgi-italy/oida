@@ -1,4 +1,5 @@
 import { IDynamicFactory } from '../../utils/dynamic-factory';
+import { ImageExportOptions } from '../../utils/image-utils';
 import { IMapInteractionImplementation } from '../interactions/map-interaction-implementation';
 import { IMapLayerRenderer, IMapLayerRendererConfigDefinitions } from '../layers/map-layer-renderer';
 import { IGroupLayerRenderer } from '../layers/group-layer-renderer';
@@ -47,12 +48,13 @@ export interface IMapRenderer {
     setViewport(viewport: IMapViewport, animate?: boolean): void;
     updateRendererProps(props: Record<string, any>): void;
     fitExtent(extent: BBox, options?: FitExtentOptions): void;
-    getViewportExtent(): BBox;
+    getViewportExtent(): BBox | undefined;
     getLayersFactory(): IDynamicFactory<IMapLayerRenderer, IMapLayerRendererConfigDefinitions>;
     getInteractionsFactory(): IDynamicFactory<IMapInteractionImplementation>;
     setLayerGroup(group: IGroupLayerRenderer);
-    getSize(): Size;
+    getSize(): Size | undefined;
     updateSize(): void;
+    export(options: ImageExportOptions): Promise<string | undefined>;
     destroy(): void;
 }
 

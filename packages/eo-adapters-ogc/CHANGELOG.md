@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.4.0](https://github.com/cgi-italy/oida/compare/@oidajs/eo-adapters-ogc@2.3.1...@oidajs/eo-adapters-ogc@2.4.0) (2022-12-22)
+
+
+### Features
+
+* add factory for dataset config generation from json object ([508829e](https://github.com/cgi-italy/oida/commit/508829e70a216c6772197f642117bb3f1947e3ea))
+* add preliminary workspace save/load support ([508f00a](https://github.com/cgi-italy/oida/commit/508f00a7b360c0e4283a5d472750c8ee54fd1a58))
+
+
+
+
+
 ## [2.3.1](https://github.com/cgi-italy/oida/compare/@oidajs/eo-adapters-ogc@2.3.0...@oidajs/eo-adapters-ogc@2.3.1) (2022-10-05)
 
 

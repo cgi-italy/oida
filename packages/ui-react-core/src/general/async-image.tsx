@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { LoadingState } from '@oidajs/core';
 
 /**
- * {@Link AsyncImage} component properties
+ * {@link AsyncImage} component properties
  */
 export type AsyncImageProps = {
     /**

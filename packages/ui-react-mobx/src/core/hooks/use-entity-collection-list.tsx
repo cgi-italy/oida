@@ -14,7 +14,7 @@ export type DataCollectionAction<T> = Omit<DataCollectionItemAction, 'callback'>
 };
 
 /**
- * {@Link useDataCollectionActions} input props
+ * {@link useDataCollectionActions} input props
  */
 export type UseDataCollectionActionsProps<T> = {
     entity: T;
@@ -50,7 +50,7 @@ export const useDataCollectionActions = <T,>(props: UseDataCollectionActionsProp
 };
 
 /**
- * {@Link useEntityCollectionList} input props
+ * {@link useEntityCollectionList} input props
  */
 export type UseEntityCollectionListProps<T extends IsEntity> = {
     /**
@@ -76,11 +76,11 @@ export type UseEntityCollectionListProps<T extends IsEntity> = {
 
 /**
  * A React hook that given an observable array of entities will return a set of properties to be used
- * as input for a {@Link DataCollectionItemsRenderer}. The hook will react to state changes to the
+ * as input for a {@link DataCollectionItemsRenderer}. The hook will react to state changes to the
  * underlying items array. It will bind hovering and selection state of each entity to the corresponding
- * item {@Link DataCollectionItemState}
+ * item {@link DataCollectionItemState}
  * @param props The hook input parameters
- * @return properties to be used as input to a {@Link DataCollectionItemsRenderer}
+ * @return properties to be used as input to a {@link DataCollectionItemsRenderer}
  */
 export const useEntityCollectionList = <T extends IsEntity>(props: UseEntityCollectionListProps<T>) => {
     const { items, actions } = props;

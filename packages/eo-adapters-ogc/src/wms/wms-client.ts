@@ -167,7 +167,7 @@ export class WmsClient {
                         case 'application/json':
                             return response.data;
                         default: {
-                            const features = this.featureInfoParser_.read(response.data);
+                            const features = this.featureInfoParser_.readFeatures(response.data);
                             return this.geoJsonParser_.writeFeaturesObject(features);
                         }
                     }
@@ -234,7 +234,8 @@ export class WmsClient {
 
     protected throwOnServiceException_(response: AxiosResponse) {
         //Sometimes geoserver returns a service exception XML with a 200 status code
-        if (/xml/.test(response.headers['content-type'])) {
+        const contentType = response.headers['content-type'];
+        if (contentType && /xml/.test(contentType)) {
             const parser = new DOMParser();
             let errorMessage = 'Service error';
             try {
