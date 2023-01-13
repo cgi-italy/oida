@@ -1,4 +1,4 @@
-image: node:16.13.1
+image: node:18.12.1
 
 cache:
   untracked: true
@@ -29,7 +29,7 @@ install_dependencies:
       - 'packages/*/node_modules'
     policy: pull-push
   script:
-    - npm ci
+    - npm ci --ignore-scripts
   only:
     - branches
 

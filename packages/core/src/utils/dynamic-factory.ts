@@ -18,7 +18,7 @@ export interface IDynamicFactory<
      */
     register<R extends string>(id: R, objectCreator: (config: COMMON_CONFIG & CONFIG[R]) => T | undefined): void;
     /**
-     * Create an object given its type idenitifier (it shall be previously registered with {@Link IDynamicFactory.create}) and
+     * Create an object given its type idenitifier (it shall be previously registered with {@link IDynamicFactory.register}) and
      * a configuration object
      * @param id The type identifier
      * @param config The configuration object

@@ -31,7 +31,7 @@ export type WmsRasterSourceProviderConfig = {
      */
     spatialCoverageProvider?: DatasetSpatialCoverageProvider;
     /**
-     * This function is used to serialize the {@Link Dataset.additionalFilters} as additional WMS request parameters
+     * This function is used to serialize the {@link Dataset.additionalFilters} as additional WMS request parameters
      * If not provided by default all string and numeric filters will be serialized as key value pairs
      */
     additionalFiltersSerializer?: WmsRasterSourceFiltersSerializer;
@@ -149,7 +149,7 @@ export const createWmsRasterSourceProvider = (config: WmsRasterSourceProviderCon
 
 export type WmsLayerRasterViewConfig = WmsRasterSourceProviderConfig & {
     /**
-     * By default WMS layer styles are mapped to {@Link RasterBandPreset} using the information
+     * By default WMS layer styles are mapped to {@link RasterBandPreset} using the information
      * obtained from the layer capabilities. It is possible to override any of the default values
      * through this function
      */

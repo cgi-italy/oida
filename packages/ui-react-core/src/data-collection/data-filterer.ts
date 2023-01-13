@@ -1,6 +1,6 @@
 import { FormRendererProps } from '../form';
 
-/** {@Link DataFiltererRenderer} props */
+/** {@link DataFiltererRenderer} props */
 export type DataFiltererProps = FormRendererProps & {
     mainFilter?: string;
 };

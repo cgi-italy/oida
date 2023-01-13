@@ -212,7 +212,9 @@ export class AdamOpenSearchClient {
             .request<AdamOpensearchProductSearchResponse>({
                 url: `${this.serviceUrl_}/search`,
                 params: params,
-                paramsSerializer: AdamOpenSearchClient.searchParamsSerializer_
+                paramsSerializer: {
+                    serialize: AdamOpenSearchClient.searchParamsSerializer_
+                }
             })
             .then((response) => {
                 return response.data;

@@ -24,9 +24,9 @@
     "access": "public"
   },
   "dependencies": {
-    "@oidajs/core": "file:../core",
+    "@oidajs/core": "*",
     "@turf/bbox-polygon": "^6.5.0",
-    "tslib": "^2.3.1"
+    "tslib": "^2.4.1"
   },
   "peerDependencies": {
     "ol": "7.x",

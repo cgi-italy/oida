@@ -1,8 +1,5 @@
 {
   "command": {
-    "bootstrap": {
-      "hoist": true
-    },
     "publish": {
       "conventionalCommits": true,
       "verifyAccess": false,
@@ -13,8 +10,6 @@
     "**/__tests__/**",
     "**/*.md"
   ],
-  "packages": [
-    "packages/*"
-  ],
+  "useWorkspaces": true,
   "version": "independent"
 }

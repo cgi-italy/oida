@@ -38,14 +38,14 @@
     "react-router-dom": "6.x"
   },
   "dependencies": {
-    "@oidajs/core": "file:../core",
-    "@oidajs/eo-adapters-ogc": "file:../eo-adapters-ogc",
-    "@oidajs/eo-mobx": "file:../eo-mobx",
-    "@oidajs/eo-mobx-react": "file:../eo-mobx-react",
-    "@oidajs/state-mobx": "file:../state-mobx",
-    "@oidajs/ui-react-antd": "file:../ui-react-antd",
-    "@oidajs/ui-react-core": "file:../ui-react-core",
-    "@oidajs/ui-react-mobx": "file:../ui-react-mobx",
-    "tslib": "^2.3.1"
+    "@oidajs/core": "*",
+    "@oidajs/eo-adapters-ogc": "*",
+    "@oidajs/eo-mobx": "*",
+    "@oidajs/eo-mobx-react": "*",
+    "@oidajs/state-mobx": "*",
+    "@oidajs/ui-react-antd": "*",
+    "@oidajs/ui-react-core": "*",
+    "@oidajs/ui-react-mobx": "*",
+    "tslib": "^2.4.1"
   }
 }

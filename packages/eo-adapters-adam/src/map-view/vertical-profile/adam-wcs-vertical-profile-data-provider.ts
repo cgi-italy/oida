@@ -182,7 +182,9 @@ export class AdamWcsVerticalProfileDataProvider {
                         ...wcsParams,
                         subset: subset
                     },
-                    paramsSerializer: AdamServiceParamsSerializer
+                    paramsSerializer: {
+                        serialize: AdamServiceParamsSerializer
+                    }
                 })
                 .then((response) => {
                     let series;
@@ -257,7 +259,9 @@ export class AdamWcsVerticalProfileDataProvider {
                 url: this.config_.serviceUrl,
                 method: 'GET',
                 params: wcsParams,
-                paramsSerializer: AdamServiceParamsSerializer
+                paramsSerializer: {
+                    serialize: AdamServiceParamsSerializer
+                }
             })
             .then((response) => {
                 const profiles: AdamWcsVerticalProfile[] = response.data.prods.map((prod) =>

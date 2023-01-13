@@ -25,6 +25,7 @@
   },
   "peerDependencies": {
     "classnames": "2.x",
+    "lodash": "4.x",
     "mobx": "6.x",
     "mobx-react": "^7.x",
     "react": "^16.18.0 || ^17.0.0 || ^18.0.0",
@@ -33,15 +34,14 @@
     "react-router-dom": "6.x"
   },
   "dependencies": {
-    "@oidajs/core": "file:../core",
-    "@oidajs/state-mobx": "file:../state-mobx",
-    "@oidajs/ui-react-core": "file:../ui-react-core",
-    "chroma-js": "^2.1.2",
+    "@oidajs/core": "*",
+    "@oidajs/state-mobx": "*",
+    "@oidajs/ui-react-core": "*",
+    "chroma-js": "^2.4.2",
     "downloadjs": "^1.4.7",
-    "lodash": "^4.17.21",
     "lz-string": "^1.4.4",
-    "query-string": "^7.0.1",
+    "query-string": "^8.1.0",
     "react-cool-dimensions": "^3.0.0",
-    "tslib": "^2.3.1"
+    "tslib": "^2.4.1"
   }
 }

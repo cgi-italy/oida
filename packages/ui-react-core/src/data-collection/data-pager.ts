@@ -1,4 +1,4 @@
-/** {@Link DataPagerRenderer} props */
+/** {@link DataPagerRenderer} props */
 export type DataPagerProps = {
     pageSize: number;
     page: number;

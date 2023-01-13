@@ -2,14 +2,14 @@ import axios, { AxiosRequestConfig, AxiosInstance, AxiosResponse } from 'axios';
 import { CancelablePromise } from './cancelable-promise';
 
 const cancelableRequest = function <T = any, R = AxiosResponse<T>>(this: AxiosInstance, config: AxiosRequestConfig) {
-    const source = axios.CancelToken.source();
+    const abortController = new AbortController();
 
     const request = this.request<T, R>({
         ...config,
-        cancelToken: source.token
+        signal: abortController.signal
     });
 
-    return CancelablePromise(request, source.cancel);
+    return CancelablePromise(request, abortController.abort);
 };
 
 export type AxiosInstanceWithCancellation = AxiosInstance & {

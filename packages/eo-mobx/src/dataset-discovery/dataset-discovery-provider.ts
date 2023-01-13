@@ -38,7 +38,7 @@ const discoveryProviderFactory = createDynamicFactory<DatasetDiscoveryProvider>(
 /**
  * A class to manage the state of an EO dataset discovery provider.
  * Inherited classes shall implement the data retrieval logic and populate
- * the {@Link DatasetDiscoveryProvider.results_} array
+ * the {@link DatasetDiscoveryProvider.results_} array
  *
  * Example:
  *
@@ -111,7 +111,7 @@ export abstract class DatasetDiscoveryProvider<
     }
 
     /**
-     * Register a dataset discovery provider type for factory creation thorugh {@Link DatasetDiscoveryProvider.create}
+     * Register a dataset discovery provider type for factory creation thorugh {@link DatasetDiscoveryProvider.create}
      * @param providerType The unique discovery provider type identifier
      * @param providerCtor The provider constructor
      */
@@ -134,7 +134,7 @@ export abstract class DatasetDiscoveryProvider<
     /** The provider description */
     readonly description: string | undefined;
     /** Indicate if the provider is currently active (e.g. enable data retrieval).
-     * It is usually set by the {@Link DatasetDiscovery} based on the currently selected provider
+     * It is usually set by the {@link DatasetDiscovery} based on the currently selected provider
      **/
     readonly active: Active;
 

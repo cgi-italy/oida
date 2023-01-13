@@ -206,7 +206,9 @@ export const getAdamDatasetSpatialCoverageProvider = (
                             subdataset: wcsCoverage.subdataset,
                             subset: subsets
                         },
-                        paramsSerializer: AdamServiceParamsSerializer,
+                        paramsSerializer: {
+                            serialize: AdamServiceParamsSerializer
+                        },
                         responseType: 'arraybuffer'
                     })
                     .then((response) => {

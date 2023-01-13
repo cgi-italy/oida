@@ -70,7 +70,9 @@ export class AdamCswProductSearchProvider implements DatasetProductSearchProvide
                     ...this.geCSWParams_(queryParams)
                 },
                 responseType: 'document',
-                paramsSerializer: AdamServiceParamsSerializer
+                paramsSerializer: {
+                    serialize: AdamServiceParamsSerializer
+                }
             })
             .then((response) => {
                 return this.parseGetRecordResponse_(response.data);

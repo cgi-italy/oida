@@ -1,0 +1,33 @@
+{
+  "tasksRunnerOptions": {
+    "default": {
+      "runner": "nx/tasks-runners/default",
+      "options": {
+        "cacheableOperations": [
+          "build:es",
+          "build:umd",
+          "lint",
+          "test"
+        ]
+      }
+    }
+  },
+  "targetDefaults": {
+    "build:es": {
+      "dependsOn": [
+        "^build:es"
+      ],
+      "outputs": [
+        "{projectRoot}/es"
+      ]
+    },
+    "build:umd": {
+      "dependsOn": [
+        "^build:umd"
+      ],
+      "outputs": [
+        "{projectRoot}/lib"
+      ]
+    }
+  }
+}

@@ -59,7 +59,9 @@ export class AdamWpsAnalysisProvider {
                         datainputs: this.serializeWpsInputs_(wpsInputs)
                     },
                     responseType: 'document',
-                    paramsSerializer: AdamServiceParamsSerializer
+                    paramsSerializer: {
+                        serialize: AdamServiceParamsSerializer
+                    }
                 })
                 .then((response) => {
                     const data = this.parseBBoxTimeSeriesResponse_(response.data);
@@ -113,7 +115,9 @@ export class AdamWpsAnalysisProvider {
                     datainputs: this.serializeWpsInputs_(wpsInputs)
                 },
                 responseType: 'document',
-                paramsSerializer: AdamServiceParamsSerializer
+                paramsSerializer: {
+                    serialize: AdamServiceParamsSerializer
+                }
             })
             .then((response) => {
                 const data = this.parseTransectSeriesResponse_(response.data);

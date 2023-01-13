@@ -5,7 +5,7 @@ export type DataSortField = {
     name: string;
 };
 
-/** {@Link DataSorterRenderer} props */
+/** {@link DataSorterRenderer} props */
 export type DataSorterProps = {
     sortableFields: Array<DataSortField>;
     sortKey: string;

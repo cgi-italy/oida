@@ -47,7 +47,7 @@ export const formFieldRendererFactory = () => {
     };
 
     /**
-     * Get the renderer from a form field definition. If multiple renderers are available the {@Link FormFieldCommon definition}
+     * Get the renderer from a form field definition. If multiple renderers are available the {@link FormFieldCommon}
      * renderConfig id can be used to select a specific one.
      * @param definition The form field definition
      * @returns the renderer id and the registered renderer React component

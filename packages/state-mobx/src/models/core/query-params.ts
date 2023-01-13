@@ -10,7 +10,7 @@ export const setReactionForFilterType = (type: string, reaction: FilterTypeReact
     filterTypeReactions[type] = reaction;
 };
 
-/** {@Link DataFilters} props */
+/** {@link DataFilters} props */
 export type DataFiltersProps<FILTER extends QueryFilter = any> = {
     /** The initial filter values */
     values?: IObservableMapInitialValues<string, FILTER>;
@@ -107,7 +107,7 @@ export class DataFilters<FILTERS extends QueryFilter = any> {
     }
 }
 
-/** {@Linki DataSorting} props */
+/** {@link DataSorting} props */
 export type DataSortingProps = {
     key: string;
     order?: SortOrder;
@@ -141,7 +141,7 @@ export class DataSorting {
     }
 }
 
-/** {@Link DataPaging} props */
+/** {@link DataPaging} props */
 export type DataPagingProps = {
     page?: number;
     pageSize?: number;
@@ -226,7 +226,7 @@ export class DataPaging {
     }
 }
 
-/** {@Link QueryParam} props */
+/** {@link QueryParam} props */
 export type QueryParamsProps<FILTERS extends QueryFilter = any> = {
     filters?: DataFilters<FILTERS> | DataFiltersProps<FILTERS>;
     paging?: DataPaging | DataPagingProps;
@@ -235,7 +235,7 @@ export type QueryParamsProps<FILTERS extends QueryFilter = any> = {
 
 /**
  * A class to manage a collection query state.
- * It combines {@Link DataFilters}, {@Link DataPaging} and {@Link DataSorting}
+ * It combines {@link DataFilters}, {@link DataPaging} and {@link DataSorting}
  */
 export class QueryParams<FILTERS extends QueryFilter = any> {
     filters: DataFilters<FILTERS>;

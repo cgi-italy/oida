@@ -29,8 +29,13 @@
     "./packages/eo-video-react/src/index.ts"
   ],
   "includes": "./packages",
-  "exclude": ["node_modules/**", "**/*.spec.ts", "./packages/docs/**"],
+  "exclude": [
+    "node_modules/**",
+    "**/*.spec.ts",
+    "./packages/docs/**"
+  ],
   "readme": "README.md",
-  "plugin": ["nlfurniss-typedoc-plugin-sourcefile-url"],
-  "sourcefile-url-prefix": "https://gitlab.dev.eoss-cloud.it/frontend/oida/blob/master/"
+  "plugin": [],
+  "sourceLinkTemplate": "https://gitlab.dev.eoss-cloud.it/frontend/oida/blob/{gitRevision}/{path}#L{line}",
+  "gitRevision": "master"
 }

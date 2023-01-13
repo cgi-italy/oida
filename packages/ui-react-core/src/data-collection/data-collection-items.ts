@@ -23,7 +23,7 @@ export type DataCollectionItemState = {
     hovered: boolean;
 };
 
-/** {@Link DataCollectionItemsRenderer} component input properties*/
+/** {@link DataCollectionItemsRenderer} component input properties*/
 export type DataCollectionItemsProps<T> = {
     /** The data array */
     data: T[];

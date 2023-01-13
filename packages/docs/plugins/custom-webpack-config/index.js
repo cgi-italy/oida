@@ -19,7 +19,13 @@ module.exports = function (context, options) {
                     fallback: {
                         http: false,
                         https: false,
-                        zlib: false
+                        zlib: false,
+                        url: false
+                    },
+                    alias: {
+                        // use workspace react (otherwise two different version of react will be used)
+                        react: path.resolve('../../node_modules/react'),
+                        "react-dom": path.resolve('../../node_modules/react-dom'),
                     }
                 },
                 module: {

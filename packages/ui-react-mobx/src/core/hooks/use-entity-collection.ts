@@ -9,7 +9,7 @@ import { useFormData } from './use-form-data';
 import { useDataPaging } from './use-data-paging';
 
 /**
- * {@Link useEntityCollection} hook props
+ * {@link useEntityCollection} hook props
  **/
 export type UseEntityCollectionProps<T extends IsEntity> = UseEntityCollectionListProps<T> & {
     /** The collection query parameters state */
@@ -29,10 +29,10 @@ export type UseEntityCollectionProps<T extends IsEntity> = UseEntityCollectionLi
 
 /**
  * A React hook that will extract from the state a set of properties to be used
- * as input for a {@Link DataCollectionRenderer}. The hook is a composition of {@Link @useEntityCollectionList},
- * {@Link useDataPaging}, {@Link useDataSorting} and {@Link useFormData} hooks
+ * as input for a {@link DataCollectionRenderer}. The hook is a composition of {@link @useEntityCollectionList},
+ * {@link useDataPaging}, {@link useDataSorting} and {@link useFormData} hooks
  * @param props The hook input parameters
- * @return properties to be used as input to a {@Link DataCollectionRenderer}
+ * @return properties to be used as input to a {@link DataCollectionRenderer}
  */
 export const useEntityCollection: <T extends IsEntity>(props: UseEntityCollectionProps<T>) => DataCollectionProps<T> | undefined = <
     T extends IsEntity

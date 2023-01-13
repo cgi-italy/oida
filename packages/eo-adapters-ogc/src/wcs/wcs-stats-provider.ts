@@ -17,7 +17,7 @@ import {
 
 import { WcsService } from './wcs-service';
 
-/** Configuration for the {@Link createWcsStatsProvider} function */
+/** Configuration for the {@link createWcsStatsProvider} function */
 export type WcsStatsProviderConfig = {
     /** The wcs service where the dataset coverage is exposed */
     wcsService: WcsService;
@@ -139,7 +139,7 @@ export const extractStatisticsFromTiffData = (
 };
 
 /**
- * Create a {@Link DatasetStatsProvider} that when invoked will use a GetCoverage request to retrieve
+ * Create a {@link DatasetStatsProvider} that when invoked will use a GetCoverage request to retrieve
  * the dataset raw data in GeoTiff format over the request BBOX, and will compute some statistics.
  *
  * @param config The input configuration object
@@ -197,7 +197,11 @@ export const createWcsStatsProvider = (config: WcsStatsProviderConfig) => {
                 url: config.wcsService.getServiceUrl(),
                 responseType: 'arraybuffer',
                 params: params,
-                paramsSerializer: urlParamsSerializer
+                paramsSerializer: {
+                    serialize: (params) => {
+                        return urlParamsSerializer(params);
+                    }
+                }
             })
             .then((response) => {
                 const bandConfig = config.bands.find((band) => band.id === request.variable);

@@ -4,8 +4,8 @@ import { createDynamicFactory } from '@oidajs/core';
 import { DatasetDiscoveryProvider, DatasetExplorer } from '@oidajs/eo-mobx';
 
 /**
- * Input props provided to the {@Link DatasetDiscoveryProviderFactory} create method
- * to generate the UI for a {@Link DatasetDiscoveryProvider}
+ * Input props provided to the {@link DatasetDiscoveryProviderFactory} create method
+ * to generate the UI for a {@link DatasetDiscoveryProvider}
  */
 export type DatasetDiscoveryProviderProps = {
     provider: DatasetDiscoveryProvider;
@@ -18,8 +18,8 @@ export interface DatasetDiscoveryProviderDefinitions {}
 
 /**
  * A {@link IDynamicFactory | dynamic factory} for DatasetDiscoveryProvider components.
- * Used to automatically generate the provider widgets for all {@Link DatasetDiscoveryProvider}
- * added to the {@Link DatasetDiscovery}
+ * Used to automatically generate the provider widgets for all {@link DatasetDiscoveryProvider}
+ * added to the {@link DatasetDiscovery}
  *
  * Sample usage:
  *

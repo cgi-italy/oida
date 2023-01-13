@@ -36,7 +36,7 @@ export class MapRastersPointInfo extends DatasetAnalysis<typeof MAP_RASTERS_POIN
     protected mouseCoordsInteraction_: MouseCoordsInteraction;
     protected featureDrawInteraction_: FeatureDrawInteraction | undefined;
     protected mapSelection_: SelectionManager | undefined;
-    protected datasetsTracker_: ArrayTracker<DatasetExplorerItem, (() => void) | void>;
+    protected datasetsTracker_: ArrayTracker<DatasetExplorerItem, (() => void) | undefined>;
     protected subscriptionTracker_: SubscriptionTracker;
 
     constructor(props: MapRasterInfoProps) {
@@ -88,6 +88,7 @@ export class MapRastersPointInfo extends DatasetAnalysis<typeof MAP_RASTERS_POIN
                         this.removeProcessing(rasterPointInfo);
                     };
                 }
+                return undefined;
             },
             onItemRemove: (disposer) => {
                 if (disposer) {

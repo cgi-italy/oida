@@ -139,7 +139,9 @@ export class AdamWcsSeriesProvider {
                     subset: subset
                 },
                 responseType: 'json',
-                paramsSerializer: AdamServiceParamsSerializer
+                paramsSerializer: {
+                    serialize: AdamServiceParamsSerializer
+                }
             })
             .then((response) => {
                 return this.parseWcsResponse_(response.data, dimensionConfig!, request).then((data) => {

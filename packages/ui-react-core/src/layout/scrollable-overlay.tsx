@@ -14,7 +14,9 @@ export const ScrollableOverlay = (props: ScrollableOverlayProps) => {
     const childrenWithContainerHeight = React.Children.map(props.children, (child) => {
         if (React.isValidElement(child)) {
             //make children aware of the container visible height
-            return React.cloneElement(child, { containerHeight: scrollableContentRef.current?.clientHeight });
+            return React.cloneElement<{ containerHeight: number }>(child as React.ReactElement, {
+                containerHeight: scrollableContentRef.current?.clientHeight
+            });
         }
         return child;
     });
