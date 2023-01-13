@@ -15,6 +15,7 @@ export type DatasetExplorerMapVizProps = {
     explorerState: DatasetExplorer;
     analyticsTools?: ComboToolConfig[];
     mapState?: Map;
+    disableDatasetRenaming?: boolean;
     datasetDownloadComponent?: React.ComponentType<DatasetVizDownloadModalProps>;
 };
 
@@ -42,6 +43,7 @@ export const DatasetExplorerMapViz = (props: DatasetExplorerMapVizProps) => {
                 mapState={props.mapState}
                 onRemove={() => props.explorerState.removeDataset(view.id)}
                 downloadComponent={props.datasetDownloadComponent}
+                disableRenaming={props.disableDatasetRenaming}
             />
         );
     });

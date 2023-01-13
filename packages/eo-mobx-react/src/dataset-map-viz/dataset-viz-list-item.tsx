@@ -33,6 +33,7 @@ export type DatasetVizListItemProps = {
     mapState?: Map;
     onRemove?: () => void;
     downloadComponent?: React.ComponentType<DatasetVizDownloadModalProps>;
+    disableRenaming?: boolean;
 };
 
 export const DatasetVizListItem = (props: DatasetVizListItemProps) => {
@@ -162,19 +163,23 @@ export const DatasetVizListItem = (props: DatasetVizListItemProps) => {
                 <Badge color={vizState.color}></Badge>
                 <div className='viz-item-name' title={vizState.name}>
                     <Typography.Paragraph
-                        editable={{
-                            onChange: (value) => {
-                                if (value) {
-                                    props.datasetViz.setName(value);
+                        editable={
+                            !props.disableRenaming
+                                ? {
+                                      onChange: (value) => {
+                                          if (value) {
+                                              props.datasetViz.setName(value);
 
-                                    // this is to propagate the name change also to analytics charts
-                                    // TODO: analytics should probably use the parent DatasetViz
-                                    // name instead
-                                    props.datasetViz.dataset.config.name = value;
-                                }
-                            },
-                            triggerType: ['text']
-                        }}
+                                              // this is to propagate the name change also to analytics charts
+                                              // TODO: analytics should probably use the parent DatasetViz
+                                              // name instead
+                                              props.datasetViz.dataset.config.name = value;
+                                          }
+                                      },
+                                      triggerType: ['text']
+                                  }
+                                : undefined
+                        }
                     >
                         {vizState.name}
                     </Typography.Paragraph>

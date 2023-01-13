@@ -27,6 +27,8 @@ export type DatasetAnalysesDashboardProps = DashboardPaneProps & {
             position?: 'tl' | 'tr' | 'bl' | 'br';
         }
     >;
+    /** disable analysis widget titles edit */
+    disableRenaming?: boolean;
 };
 
 /**
@@ -76,9 +78,11 @@ export const DatasetAnalysesDashboard = (props: DatasetAnalysesDashboardProps) =
                                 analysis.visible.setValue(false);
                             }
                         },
-                        onRename: (name) => {
-                            analysis.setName(name);
-                        }
+                        onRename: !props.disableRenaming
+                            ? (name) => {
+                                  analysis.setName(name);
+                              }
+                            : undefined
                     };
                 }
             });
