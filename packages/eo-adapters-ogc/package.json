@@ -1,6 +1,6 @@
 {
   "name": "@oidajs/eo-adapters-ogc",
-  "version": "2.4.0",
+  "version": "2.4.1",
   "description": "oida EO ogc adapters",
   "module": "es/index.js",
   "main": "lib/index.js",
@@ -24,9 +24,9 @@
     "access": "public"
   },
   "dependencies": {
-    "@oidajs/core": "*",
-    "@oidajs/eo-geotiff": "*",
-    "@oidajs/eo-mobx": "*",
+    "@oidajs/core": "^4.5.1",
+    "@oidajs/eo-geotiff": "^3.0.3",
+    "@oidajs/eo-mobx": "^3.0.1",
     "echarts-stat": "^1.2.0",
     "tslib": "^2.4.1"
   }

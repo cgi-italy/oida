@@ -1,6 +1,6 @@
 {
   "name": "@oidajs/eo-adapters-adam",
-  "version": "3.1.0",
+  "version": "3.1.1",
   "description": "oida EO adam adapters",
   "module": "es/index.js",
   "main": "lib/index.js",
@@ -24,11 +24,11 @@
     "access": "public"
   },
   "dependencies": {
-    "@oidajs/core": "*",
-    "@oidajs/eo-geotiff": "*",
-    "@oidajs/eo-mobx": "*",
-    "@oidajs/map-cesium": "*",
-    "@oidajs/map-ol": "*",
+    "@oidajs/core": "^4.5.1",
+    "@oidajs/eo-geotiff": "^3.0.3",
+    "@oidajs/eo-mobx": "^3.0.1",
+    "@oidajs/map-cesium": "^3.3.1",
+    "@oidajs/map-ol": "^3.3.1",
     "@turf/rewind": "^6.5.0",
     "tslib": "^2.4.1"
   }
