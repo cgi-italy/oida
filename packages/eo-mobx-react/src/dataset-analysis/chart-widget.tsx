@@ -75,8 +75,10 @@ export const ChartWidget = <OPT extends ChartWidgetBaseOptions = ChartWidgetBase
             chartInstance.on('highlight', onHighlightEvt);
             chartInstance.on('downplay', onDownPlayEvt);
             return () => {
-                chartInstance.off('highlight', onHighlightEvt);
-                chartInstance.off('downplay', onDownPlayEvt);
+                if (!chartInstance.isDisposed()) {
+                    chartInstance.off('highlight', onHighlightEvt);
+                    chartInstance.off('downplay', onDownPlayEvt);
+                }
             };
         }
     }, [chart, props.onHighlight]);
@@ -88,7 +90,9 @@ export const ChartWidget = <OPT extends ChartWidgetBaseOptions = ChartWidgetBase
         if (chartInstance && onItemClick) {
             chartInstance.on('click', onItemClick);
             return () => {
-                chartInstance.off('click', onItemClick);
+                if (!chartInstance.isDisposed()) {
+                    chartInstance.off('click', onItemClick);
+                }
             };
         }
     }, [chart, props.onItemClick]);
@@ -228,7 +232,7 @@ export const ChartWidget = <OPT extends ChartWidgetBaseOptions = ChartWidgetBase
                     seriesIndex: highlightedSeries
                 });
                 return () => {
-                    if (chart) {
+                    if (chart && !chart.isDisposed()) {
                         chart.dispatchAction({
                             type: 'downplay',
                             seriesIndex: highlightedSeries
@@ -242,7 +246,7 @@ export const ChartWidget = <OPT extends ChartWidgetBaseOptions = ChartWidgetBase
     useEffect(() => {
         if (chart) {
             if (props.brushMode && props.brushMode !== 'none') {
-                chart!.dispatchAction({
+                chart.dispatchAction({
                     type: 'takeGlobalCursor',
                     key: 'brush',
                     brushOption: {
@@ -272,7 +276,9 @@ export const ChartWidget = <OPT extends ChartWidgetBaseOptions = ChartWidgetBase
         if (chartInstance && onBrushSelected) {
             chartInstance.on('brushEnd', onBrushSelected);
             return () => {
-                chartInstance.off('brushEnd', onBrushSelected);
+                if (!chartInstance.isDisposed()) {
+                    chartInstance.off('brushEnd', onBrushSelected);
+                }
             };
         }
     }, [chart, props.onBrushEnd]);
@@ -294,7 +300,9 @@ export const ChartWidget = <OPT extends ChartWidgetBaseOptions = ChartWidgetBase
         if (chartInstance && onDataZoom) {
             chartInstance.on('datazoom', onDataZoom);
             return () => {
-                chartInstance.off('datazoom', onDataZoom);
+                if (!chartInstance.isDisposed()) {
+                    chartInstance.off('datazoom', onDataZoom);
+                }
             };
         }
     }, [chart, props.onDataZoom]);
@@ -306,7 +314,9 @@ export const ChartWidget = <OPT extends ChartWidgetBaseOptions = ChartWidgetBase
         if (chartInstance && onLegendItemSelection) {
             chartInstance.on('legendselectchanged', onLegendItemSelection);
             return () => {
-                chartInstance.off('legendselectchanged', onLegendItemSelection);
+                if (!chartInstance.isDisposed()) {
+                    chartInstance.off('legendselectchanged', onLegendItemSelection);
+                }
             };
         }
     }, [chart, props.onLegendItemSelection]);
