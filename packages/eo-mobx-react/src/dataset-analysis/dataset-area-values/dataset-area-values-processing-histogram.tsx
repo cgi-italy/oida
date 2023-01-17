@@ -383,6 +383,7 @@ export const DatasetAreaValuesProcessingHistogram = (props: DatasetAreaValuesPro
                         toolbox: {
                             feature: {
                                 brush: {
+                                    show: false,
                                     title: {
                                         lineX: 'Select a range',
                                         clear: 'Clear selection'
