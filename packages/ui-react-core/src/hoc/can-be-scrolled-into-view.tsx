@@ -10,7 +10,8 @@ export const useScrollIntoView = (props: useScrollIntoViewProps) => {
     useEffect(() => {
         if (props.scrollToElement && props.element) {
             scrollIntoView(props.element, {
-                scrollMode: 'if-needed'
+                scrollMode: 'if-needed',
+                behavior: 'smooth'
             });
         }
     }, [props.element, props.scrollToElement]);
