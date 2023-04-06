@@ -1,6 +1,6 @@
 {
   "name": "@oidajs/eo-video",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "oida EO video library",
   "module": "es/index.js",
   "main": "lib/index.js",
@@ -28,10 +28,10 @@
     "mobx": "6.x"
   },
   "dependencies": {
-    "@oidajs/core": "^4.5.1",
-    "@oidajs/eo-mobx": "^3.0.1",
-    "@oidajs/state-mobx": "^2.1.1",
-    "@oidajs/ui-react-mobx": "^4.4.1",
+    "@oidajs/core": "^4.6.0",
+    "@oidajs/eo-mobx": "^3.0.2",
+    "@oidajs/state-mobx": "^2.1.2",
+    "@oidajs/ui-react-mobx": "^4.4.2",
     "mediaelement": "^4.2.16",
     "tslib": "^2.4.1",
     "uuid": "^8.3.2"

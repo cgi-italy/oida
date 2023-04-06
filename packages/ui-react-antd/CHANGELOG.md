@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.4.2](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/ui-react-antd@6.4.1...@oidajs/ui-react-antd@6.4.2) (2023-04-06)
+
+**Note:** Version bump only for package @oidajs/ui-react-antd
+
 ## [6.4.1](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/ui-react-antd@6.4.0...@oidajs/ui-react-antd@6.4.1) (2023-01-13)
 
 **Note:** Version bump only for package @oidajs/ui-react-antd

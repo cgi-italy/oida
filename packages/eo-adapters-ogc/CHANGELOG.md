@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.4.2](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-adapters-ogc@2.4.1...@oidajs/eo-adapters-ogc@2.4.2) (2023-04-06)
+
+### Bug Fixes
+
+- parse json wms feature info before returning it as output ([803f5bb](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/803f5bbf38935631c99ca3a45e96b7affae184d3))
+
 ## [2.4.1](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-adapters-ogc@2.4.0...@oidajs/eo-adapters-ogc@2.4.1) (2023-01-13)
 
 **Note:** Version bump only for package @oidajs/eo-adapters-ogc

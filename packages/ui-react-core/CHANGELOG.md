@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.4.2](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/ui-react-core@6.4.1...@oidajs/ui-react-core@6.4.2) (2023-04-06)
+
+### Bug Fixes
+
+- use smooth scrolling in useScrollIntoView hook ([0dea546](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/0dea546d8cfe7f6715dcfc57f82ae98c11986ba2))
+
 ## [6.4.1](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/ui-react-core@6.4.0...@oidajs/ui-react-core@6.4.1) (2023-01-13)
 
 **Note:** Version bump only for package @oidajs/ui-react-core

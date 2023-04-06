@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.6.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/core@4.5.1...@oidajs/core@4.6.0) (2023-04-06)
+
+### Bug Fixes
+
+- bind abortcontroller instance to abort method in axios cancelableRequest ([0997d8f](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/0997d8fc1569116cb80a2682e8c5e1e15a2f984b))
+
+### Features
+
+- add type guard for query filter type inference ([6b56475](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/6b56475674464ca5d6372ed427428bd2c21ac0e4))
+
 ## [4.5.1](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/core@4.5.0...@oidajs/core@4.5.1) (2023-01-13)
 
 **Note:** Version bump only for package @oidajs/core

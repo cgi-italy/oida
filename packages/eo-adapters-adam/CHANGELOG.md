@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.2.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-adapters-adam@3.1.1...@oidajs/eo-adapters-adam@3.2.0) (2023-04-06)
+
+### Features
+
+- implement new adam opensearch discovery interface ([a31e9ef](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/a31e9ef835f55a526a9d3b67a0518d0a32acb6b3))
+
 ## [3.1.1](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-adapters-adam@3.1.0...@oidajs/eo-adapters-adam@3.1.1) (2023-01-13)
 
 **Note:** Version bump only for package @oidajs/eo-adapters-adam

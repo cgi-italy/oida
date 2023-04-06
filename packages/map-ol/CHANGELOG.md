@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.3.2](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/map-ol@3.3.1...@oidajs/map-ol@3.3.2) (2023-04-06)
+
+**Note:** Version bump only for package @oidajs/map-ol
+
 ## [3.3.1](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/map-ol@3.3.0...@oidajs/map-ol@3.3.1) (2023-01-13)
 
 **Note:** Version bump only for package @oidajs/map-ol

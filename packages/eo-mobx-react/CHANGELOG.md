@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.1.1](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-mobx-react@4.1.0...@oidajs/eo-mobx-react@4.1.1) (2023-04-06)
+
+### Bug Fixes
+
+- add missing toolbox component in area histogram chart ([07a7009](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/07a70092ee3aa545eae8790ca863ec205e71ede4))
+- hide toolbox bar in area stats histogram ([bdfbac8](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/bdfbac89fa041717af5ab2e94618f9a768f8b199))
+
 # [4.1.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-mobx-react@4.0.0...@oidajs/eo-mobx-react@4.1.0) (2023-01-13)
 
 ### Bug Fixes
