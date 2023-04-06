@@ -20,7 +20,7 @@ export const downloadAdamWcsRaster = (datasetConfig: AdamWcsDatasetConfig, raste
         }
     }
 
-    const aoiParams = getAoiWcsParams(datasetConfig, rasterView.dataset.aoi);
+    const aoiParams = getAoiWcsParams(rasterView.dataset.aoi, datasetConfig.coverageExtent, datasetConfig.requestExtentOffset);
     if (aoiParams) {
         subsets.push(...aoiParams.wcsSubsets);
     }

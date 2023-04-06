@@ -87,7 +87,7 @@ export const getAdamVolumetricMapViewConfig = (factoryConfig: AdamDatasetFactory
 
             const aoiFilter = volumetricViz.dataset.aoi;
 
-            const aoiParams = getAoiWcsParams(datasetConfig, aoiFilter);
+            const aoiParams = getAoiWcsParams(aoiFilter, datasetConfig.coverageExtent, datasetConfig.requestExtentOffset);
 
             if (!aoiParams) {
                 return undefined;

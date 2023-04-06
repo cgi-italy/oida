@@ -1,4 +1,5 @@
 export * from './adam-service-params-serializer';
+export * from './extract-wcs-params-from-link';
 export * from './adam-wcs-colormaps';
 export * from './get-wcs-time-filter-subset';
 export * from './get-aoi-wcs-params';

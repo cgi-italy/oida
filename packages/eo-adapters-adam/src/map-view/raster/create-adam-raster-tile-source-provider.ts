@@ -129,7 +129,7 @@ export const createAdamRasterTileSourceProvider = (
             if (!coverageExtent) {
                 return Promise.reject(new Error('Error retrieving coverage data'));
             }
-            const aoiParams = getAoiWcsParams(datasetConfig, aoi, coverageExtent);
+            const aoiParams = getAoiWcsParams(aoi, coverageExtent, datasetConfig.requestExtentOffset);
 
             if (!aoiParams) {
                 return Promise.reject(new Error('The layer extent does not intersect the selected area of interest'));
