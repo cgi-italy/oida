@@ -11,8 +11,8 @@
     "cz": "git-cz",
     "link": "lerna exec --stream -- npm link",
     "postlink": "rimraf \"packages/*/node_modules\" \"packages/*/package-lock.json\"",
-    "lint:check": "eslint \"packages/*/src/**/*.{ts,tsx}\"",
-    "lint:fix": "eslint \"packages/*/src/**/*.{ts,tsx}\" --quiet --fix",
+    "lint:check": "lerna run --stream lint:check",
+    "lint:fix": "lerna run --stream lint:fix",
     "check-staged": "lint-staged",
     "watch": "lerna run --stream --concurrency 100 watch",
     "test": "lerna run --stream test",
@@ -28,7 +28,7 @@
       "node_modules/.bin/eslint --"
     ],
     "packages/*/src/**/*.{ts, tsx}": [
-      "lerna run --parallel test -- -- --findRelatedTests"
+      "lerna run --stream test -- --passWithNoTests --findRelatedTests"
     ]
   },
   "devDependencies": {

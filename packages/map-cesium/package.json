@@ -1,6 +1,6 @@
 {
   "name": "@oidajs/map-cesium",
-  "version": "3.3.0",
+  "version": "3.3.2",
   "description": "Cesium map renderer wrapper library",
   "module": "es/index.js",
   "main": "lib/index.js",
@@ -16,7 +16,8 @@
     "build:umd": "tsc --project tsconfig.umd.json",
     "clean": "rimraf ./lib ./es ./types ./tsconfig.tsbuildinfo",
     "watch": "cross-env TSC_WATCHFILE=UseFsEventsWithFallbackDynamicPolling tsc --watch --preserveWatchOutput",
-    "lint": "tslint --project ./tsconfig.json",
+    "lint:check": "eslint \"./src/**/*.{ts,tsx}\"",
+    "lint:fix": "eslint \"./src/**/*.{ts,tsx}\" --quiet --fix",
     "test": "jest --config ./jest.config.js"
   },
   "author": "stefano marra",
@@ -25,7 +26,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@oidajs/core": "*",
+    "@oidajs/core": "^4.6.0",
     "tslib": "^2.4.1"
   },
   "peerDependencies": {

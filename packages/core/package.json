@@ -1,6 +1,6 @@
 {
   "name": "@oidajs/core",
-  "version": "4.5.0",
+  "version": "4.6.0",
   "description": "core utils and definitions",
   "module": "es/index.js",
   "main": "lib/index.js",
@@ -15,7 +15,8 @@
     "build:umd": "tsc --project tsconfig.umd.json",
     "clean": "rimraf ./lib ./es ./types ./tsconfig.tsbuildinfo",
     "watch": "cross-env TSC_WATCHFILE=UseFsEventsWithFallbackDynamicPolling tsc --watch --preserveWatchOutput",
-    "lint": "tslint --project ./tsconfig.json",
+    "lint:check": "eslint \"./src/**/*.{ts,tsx}\"",
+    "lint:fix": "eslint \"./src/**/*.{ts,tsx}\" --quiet --fix",
     "test": "jest --config ./jest.config.js"
   },
   "author": "stefano marra",
@@ -37,7 +38,7 @@
     "tslib": "^2.4.1"
   },
   "peerDependencies": {
-    "moment": "^2.x",
-    "axios": "^1.0.0"
+    "axios": "^1.0.0",
+    "moment": "^2.x"
   }
 }

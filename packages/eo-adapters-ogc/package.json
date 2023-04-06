@@ -1,6 +1,6 @@
 {
   "name": "@oidajs/eo-adapters-ogc",
-  "version": "2.4.0",
+  "version": "2.4.2",
   "description": "oida EO ogc adapters",
   "module": "es/index.js",
   "main": "lib/index.js",
@@ -15,7 +15,8 @@
     "build:umd": "tsc --project tsconfig.umd.json",
     "clean": "rimraf ./lib ./es ./types ./tsconfig.tsbuildinfo",
     "watch": "cross-env TSC_WATCHFILE=UseFsEventsWithFallbackDynamicPolling tsc --watch --preserveWatchOutput",
-    "lint": "tslint --project ./tsconfig.json",
+    "lint:check": "eslint \"./src/**/*.{ts,tsx}\"",
+    "lint:fix": "eslint \"./src/**/*.{ts,tsx}\" --quiet --fix",
     "test": "jest --config ./jest.config.js"
   },
   "author": "stefano marra",
@@ -24,9 +25,9 @@
     "access": "public"
   },
   "dependencies": {
-    "@oidajs/core": "*",
-    "@oidajs/eo-geotiff": "*",
-    "@oidajs/eo-mobx": "*",
+    "@oidajs/core": "^4.6.0",
+    "@oidajs/eo-geotiff": "^3.0.4",
+    "@oidajs/eo-mobx": "^3.0.2",
     "echarts-stat": "^1.2.0",
     "tslib": "^2.4.1"
   }

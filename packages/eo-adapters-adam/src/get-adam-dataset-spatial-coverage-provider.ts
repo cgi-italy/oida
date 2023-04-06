@@ -192,7 +192,7 @@ export const getAdamDatasetSpatialCoverageProvider = (
                 }
                 subsets.push(...wcsCoverage.dimensionSubsets);
 
-                const aoiParams = getAoiWcsParams(datasetConfig, mapView.dataset.aoi);
+                const aoiParams = getAoiWcsParams(mapView.dataset.aoi, datasetConfig.coverageExtent, datasetConfig.requestExtentOffset);
                 if (aoiParams) {
                     subsets.push(...aoiParams.wcsSubsets);
                 }

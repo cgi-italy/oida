@@ -33,6 +33,7 @@ export type AdamWcsTileSource = {
     colortable?: string;
     colorrange?: string;
     requestExtentOffset?: number[];
+    otherWcsParams?: Record<string, string | string[]>;
 };
 
 declare module '@oidajs/core' {
@@ -54,7 +55,8 @@ olTileSourcesFactory.register(ADAM_WCS_SOURCE_ID, (config) => {
         colorrange: config.colorrange,
         colortable: config.colortable,
         subdataset: config.subdataset,
-        size: `(${tileSize})`
+        size: `(${tileSize})`,
+        ...config.otherWcsParams
     };
 
     return new XYZSource({
@@ -196,7 +198,8 @@ cesiumTileSourcesFactory.register(ADAM_WCS_SOURCE_ID, (config) => {
             format: config.format,
             colorrange: config.colorrange,
             colortable: config.colortable,
-            size: `(${tileGrid.config.tileWidth},${tileGrid.config.tileHeight})`
+            size: `(${tileGrid.config.tileWidth},${tileGrid.config.tileHeight})`,
+            ...config.otherWcsParams
         };
 
         const tileSource = new UrlTemplateImageryProvider({

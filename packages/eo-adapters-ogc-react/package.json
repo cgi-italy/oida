@@ -1,6 +1,6 @@
 {
   "name": "@oidajs/eo-adapters-ogc-react",
-  "version": "2.2.0",
+  "version": "2.2.2",
   "description": "oida EO OGC adapters react components",
   "module": "es/index.js",
   "main": "lib/index.js",
@@ -17,7 +17,8 @@
     "build:umd": "tsc --project tsconfig.umd.json",
     "clean": "rimraf ./lib ./es ./types ./tsconfig.tsbuildinfo",
     "watch": "cross-env TSC_WATCHFILE=UseFsEventsWithFallbackDynamicPolling tsc --watch --preserveWatchOutput",
-    "lint": "tslint --project ./tsconfig.json",
+    "lint:check": "eslint \"./src/**/*.{ts,tsx}\"",
+    "lint:fix": "eslint \"./src/**/*.{ts,tsx}\" --quiet --fix",
     "test": "jest --config ./jest.config.js"
   },
   "author": "stefano marra",
@@ -38,14 +39,14 @@
     "react-router-dom": "6.x"
   },
   "dependencies": {
-    "@oidajs/core": "*",
-    "@oidajs/eo-adapters-ogc": "*",
-    "@oidajs/eo-mobx": "*",
-    "@oidajs/eo-mobx-react": "*",
-    "@oidajs/state-mobx": "*",
-    "@oidajs/ui-react-antd": "*",
-    "@oidajs/ui-react-core": "*",
-    "@oidajs/ui-react-mobx": "*",
+    "@oidajs/core": "^4.6.0",
+    "@oidajs/eo-adapters-ogc": "^2.4.2",
+    "@oidajs/eo-mobx": "^3.0.2",
+    "@oidajs/eo-mobx-react": "^4.1.1",
+    "@oidajs/state-mobx": "^2.1.2",
+    "@oidajs/ui-react-antd": "^6.4.2",
+    "@oidajs/ui-react-core": "^6.4.2",
+    "@oidajs/ui-react-mobx": "^4.4.2",
     "tslib": "^2.4.1"
   }
 }

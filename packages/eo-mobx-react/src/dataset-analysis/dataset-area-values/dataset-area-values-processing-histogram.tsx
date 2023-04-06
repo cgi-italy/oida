@@ -13,7 +13,9 @@ import {
     BrushComponent,
     BrushComponentOption,
     GridComponent,
-    GridComponentOption
+    GridComponentOption,
+    ToolboxComponent,
+    ToolboxComponentOption
 } from 'echarts/components';
 import { XAXisOption, YAXisOption } from 'echarts/types/dist/shared';
 
@@ -38,9 +40,10 @@ type AreaHistoyramChartOption = echarts.ComposeOption<
     | AxisPointerComponentOption
     | BrushComponentOption
     | GridComponentOption
+    | ToolboxComponentOption
 >;
 
-echarts.use([BarChart, TooltipComponent, LegendComponent, AxisPointerComponent, BrushComponent, GridComponent]);
+echarts.use([BarChart, TooltipComponent, LegendComponent, AxisPointerComponent, BrushComponent, GridComponent, ToolboxComponent]);
 
 export type DatasetAreaValuesProcessingTableProps = {
     processings: DatasetAreaValues[];
@@ -380,6 +383,7 @@ export const DatasetAreaValuesProcessingHistogram = (props: DatasetAreaValuesPro
                         toolbox: {
                             feature: {
                                 brush: {
+                                    show: false,
                                     title: {
                                         lineX: 'Select a range',
                                         clear: 'Clear selection'

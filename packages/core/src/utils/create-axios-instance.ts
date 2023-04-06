@@ -9,7 +9,7 @@ const cancelableRequest = function <T = any, R = AxiosResponse<T>>(this: AxiosIn
         signal: abortController.signal
     });
 
-    return CancelablePromise(request, abortController.abort);
+    return CancelablePromise(request, abortController.abort.bind(abortController));
 };
 
 export type AxiosInstanceWithCancellation = AxiosInstance & {

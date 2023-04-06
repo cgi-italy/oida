@@ -3,21 +3,17 @@ import { getIntersection, isEmpty } from 'ol/extent';
 
 import { BBox, getGeometryExtent, AoiValue } from '@oidajs/core';
 
-import { AdamWcsDatasetConfig } from '../adam-dataset-config';
-
 export const getAoiWcsParams = (
-    datasetConfig: AdamWcsDatasetConfig,
-    aoiFilter: AoiValue | undefined,
-    currentCoverageExtent?: { bbox: number[]; srs: string }
+    aoiFilter?: AoiValue | undefined,
+    coverageExtent?: { bbox: number[]; srs: string },
+    requestExtentOffset?: number[]
 ) => {
-    let extent = currentCoverageExtent || datasetConfig.coverageExtent;
-    if (extent) {
-        // deep clone to avoid side effects
-        extent = {
-            bbox: [...extent.bbox],
-            srs: extent.srs
-        };
-    }
+    let extent = coverageExtent
+        ? {
+              bbox: [...coverageExtent.bbox],
+              srs: coverageExtent.srs
+          }
+        : undefined;
 
     let wktFilter: string | undefined;
     let wcsSubsets: string[] = [];
@@ -50,11 +46,11 @@ export const getAoiWcsParams = (
 
             wktFilter = `geometry=POLYGON((${polygonCoords}))`;
         }
-        if (datasetConfig.requestExtentOffset) {
-            extent.bbox[0] += datasetConfig.requestExtentOffset[0];
-            extent.bbox[2] += datasetConfig.requestExtentOffset[0];
-            extent.bbox[1] += datasetConfig.requestExtentOffset[1];
-            extent.bbox[3] += datasetConfig.requestExtentOffset[1];
+        if (requestExtentOffset) {
+            extent.bbox[0] += requestExtentOffset[0];
+            extent.bbox[2] += requestExtentOffset[0];
+            extent.bbox[1] += requestExtentOffset[1];
+            extent.bbox[3] += requestExtentOffset[1];
         }
         if (extent.srs === 'EPSG:4326') {
             wcsSubsets = [`Lon(${extent.bbox[0]},${extent.bbox[2]})`, `Lat(${extent.bbox[1]},${extent.bbox[3]})`];

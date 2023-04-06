@@ -1,6 +1,6 @@
 {
   "name": "@oidajs/map-cesium-ol-tile-source",
-  "version": "2.0.7",
+  "version": "2.0.9",
   "description": "Cesium map renderer wrapper library",
   "module": "es/index.js",
   "main": "lib/index.js",
@@ -15,7 +15,8 @@
     "build:umd": "tsc --project tsconfig.umd.json",
     "clean": "rimraf ./lib ./es ./types ./tsconfig.tsbuildinfo",
     "watch": "cross-env TSC_WATCHFILE=UseFsEventsWithFallbackDynamicPolling tsc --watch --preserveWatchOutput",
-    "lint": "tslint --project ./tsconfig.json",
+    "lint:check": "eslint \"./src/**/*.{ts,tsx}\"",
+    "lint:fix": "eslint \"./src/**/*.{ts,tsx}\" --quiet --fix",
     "test": "jest --config ./jest.config.js"
   },
   "author": "stefano marra",
@@ -24,8 +25,8 @@
     "access": "public"
   },
   "dependencies": {
-    "@oidajs/map-cesium": "*",
-    "@oidajs/map-ol": "*",
+    "@oidajs/map-cesium": "^3.3.2",
+    "@oidajs/map-ol": "^3.3.2",
     "tslib": "^2.4.1"
   },
   "peerDependencies": {

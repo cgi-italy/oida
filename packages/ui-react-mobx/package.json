@@ -1,6 +1,6 @@
 {
   "name": "@oidajs/ui-react-mobx",
-  "version": "4.4.0",
+  "version": "4.4.2",
   "description": "react hooks and components for state-mobx",
   "module": "es/index.js",
   "main": "lib/index.js",
@@ -15,7 +15,8 @@
     "build:umd": "tsc --project tsconfig.umd.json",
     "clean": "rimraf ./lib ./es ./types ./tsconfig.tsbuildinfo",
     "watch": "cross-env TSC_WATCHFILE=UseFsEventsWithFallbackDynamicPolling tsc --watch --preserveWatchOutput",
-    "lint": "tslint --project ./tsconfig.json",
+    "lint:check": "eslint \"./src/**/*.{ts,tsx}\"",
+    "lint:fix": "eslint \"./src/**/*.{ts,tsx}\" --quiet --fix",
     "test": "jest --config ./jest.config.js"
   },
   "author": "stefano marra",
@@ -34,9 +35,9 @@
     "react-router-dom": "6.x"
   },
   "dependencies": {
-    "@oidajs/core": "*",
-    "@oidajs/state-mobx": "*",
-    "@oidajs/ui-react-core": "*",
+    "@oidajs/core": "^4.6.0",
+    "@oidajs/state-mobx": "^2.1.2",
+    "@oidajs/ui-react-core": "^6.4.2",
     "chroma-js": "^2.4.2",
     "downloadjs": "^1.4.7",
     "lz-string": "^1.4.4",
