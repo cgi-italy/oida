@@ -3,8 +3,9 @@ import Icon from 'ol/style/Icon';
 import Circle from 'ol/style/Circle';
 import Stroke from 'ol/style/Stroke';
 import Fill from 'ol/style/Fill';
+import Text from 'ol/style/Text';
 
-import { GeometryTypes, IFeatureStyle, IPointStyle, isIcon, ILineStyle, IPolygonStyle } from '@oidajs/core';
+import { GeometryTypes, IFeatureStyle, IPointStyle, isIcon, ILineStyle, IPolygonStyle, ILabelStyle } from '@oidajs/core';
 
 export type OLStyle = Style & { pickingDisabled?: boolean };
 export class OLStyleParser {
@@ -31,6 +32,10 @@ export class OLStyleParser {
                     pickingDisabled = style.polygon?.pickingDisabled || false;
                     break;
             }
+        }
+
+        if (style.label && style.label.visible && olStyle) {
+            this.setLabelStyle_(olStyle, style.label);
         }
 
         if (olStyle) {
@@ -128,5 +133,21 @@ export class OLStyleParser {
         }
 
         return style;
+    }
+
+    protected setLabelStyle_(style: OLStyle, labelStyle: ILabelStyle) {
+        style.setText(
+            new Text({
+                text: labelStyle.text,
+                fill: labelStyle.fillColor ? new Fill({ color: this.parseColor_(labelStyle.fillColor) }) : undefined,
+                stroke: labelStyle.strokeColor
+                    ? new Stroke({ width: labelStyle.strokeWidth ?? 1, color: this.parseColor_(labelStyle.strokeColor) })
+                    : undefined,
+                offsetX: labelStyle.offsetX,
+                offsetY: labelStyle.offsetY,
+                font: labelStyle.font,
+                scale: labelStyle.scale
+            })
+        );
     }
 }

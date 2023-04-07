@@ -1,13 +1,14 @@
 import React from 'react';
 import { Checkbox, Select } from 'antd';
 
-import { DatasetVectorMapViz, NumericFeaturePropertyDescriptor, NUMERIC_FEATURE_PROPERTY_TYPE, VECTOR_VIZ_TYPE } from '@oidajs/eo-mobx';
+import { DatasetVectorMapViz, ENUM_FEATURE_PROPERTY_TYPE, NUMERIC_FEATURE_PROPERTY_TYPE, VECTOR_VIZ_TYPE } from '@oidajs/eo-mobx';
 import { useSelector } from '@oidajs/ui-react-mobx';
 
 import { DatasetVizSettingsFactory } from './dataset-viz-settings-factory';
 import { DatasetColorMapSelector } from './dataset-colormap-selector';
 import { DatasetVectorVizFilters } from './dataset-vector-viz-filters';
 import { DatasetDimensionValueSelector } from './dataset-dimension-value-selector';
+import { DatasetDiscreteColorMapEditor } from './dataset-discrete-colormap-editor';
 
 export type DatasetVectorVizSettingsProps = {
     datasetViz: DatasetVectorMapViz;
@@ -22,32 +23,34 @@ export const DatasetVectorVizSettings = (props: DatasetVectorVizSettingsProps) =
         });
     }
 
-    const numericProperties = useSelector(() => {
+    const colorableProperties = useSelector(() => {
         return props.datasetViz.featureDescriptor?.properties.filter((property) => {
-            return property.type === NUMERIC_FEATURE_PROPERTY_TYPE;
-        }) as NumericFeaturePropertyDescriptor[] | undefined;
+            return property.type === NUMERIC_FEATURE_PROPERTY_TYPE || property.type === ENUM_FEATURE_PROPERTY_TYPE;
+        });
     });
 
-    const colorMap = useSelector(() => props.datasetViz.colorMap);
     const colorProperty = useSelector(() => {
         if (props.datasetViz.colorProperty) {
-            return numericProperties?.find((property) => property.id === props.datasetViz.colorProperty);
+            return colorableProperties?.find((property) => property.id === props.datasetViz.colorProperty);
         } else {
             return undefined;
         }
-    }, [numericProperties]);
+    }, [colorableProperties]);
+
+    const colorMap = useSelector(() => props.datasetViz.colorMap);
+    const enumColorMap = useSelector(() => props.datasetViz.discreteColorMap);
 
     return (
         <div className='dataset-vector-viz-settings'>
             {dimensionSelectors}
             <DatasetVectorVizFilters dataset={props.datasetViz} />
-            {!!numericProperties?.length && !!props.datasetViz.config.colorScales?.length && (
+            {!!colorableProperties?.length && !!props.datasetViz.config.colorScales?.length && (
                 <div className='dataset-vector-viz-colormap'>
                     <Checkbox
                         checked={!!colorProperty}
                         onChange={(evt) => {
                             if (evt.target.checked) {
-                                props.datasetViz.setColorProperty(numericProperties[0].id);
+                                props.datasetViz.setColorProperty(colorableProperties[0].id);
                             } else {
                                 props.datasetViz.setColorProperty(undefined);
                             }
@@ -61,7 +64,7 @@ export const DatasetVectorVizSettings = (props: DatasetVectorVizSettingsProps) =
                             <Select
                                 value={colorProperty.id}
                                 onChange={(value) => props.datasetViz.setColorProperty(value)}
-                                options={numericProperties.map((property) => {
+                                options={colorableProperties.map((property) => {
                                     return {
                                         label: property.name,
                                         value: property.id,
@@ -71,12 +74,15 @@ export const DatasetVectorVizSettings = (props: DatasetVectorVizSettingsProps) =
                             />
                         </div>
                     )}
-                    {colorProperty && colorMap && (
+                    {colorProperty && colorMap && colorProperty.type === NUMERIC_FEATURE_PROPERTY_TYPE && (
                         <DatasetColorMapSelector
                             colorMap={colorMap}
                             colorScales={props.datasetViz.config.colorScales}
                             variable={colorProperty}
                         />
+                    )}
+                    {colorProperty && enumColorMap && colorProperty.type === ENUM_FEATURE_PROPERTY_TYPE && (
+                        <DatasetDiscreteColorMapEditor enumColorMap={enumColorMap} enumProperty={colorProperty} />
                     )}
                 </div>
             )}

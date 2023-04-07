@@ -1,7 +1,7 @@
 import { action, autorun, computed, IObservableArray, makeObservable, observable, reaction, runInAction } from 'mobx';
 import chroma from 'chroma-js';
 
-import { Geometry, LoadingState, SubscriptionTracker } from '@oidajs/core';
+import { Geometry, LoadingState, randomColorFactory, SubscriptionTracker } from '@oidajs/core';
 import {
     DataFilters,
     DataFiltersProps,
@@ -18,9 +18,8 @@ import {
     VisibleProps
 } from '@oidajs/state-mobx';
 
-import { ColorMap, ColorScale, DatasetDimension, DatasetViz, DatasetVizProps, DimensionDomainType } from '../common';
-import { VectorFeatureDescriptor, VectorFeatureProperties } from './vector-feature-descriptor';
-
+import { ColorMap, ColorScale, DatasetDimension, DatasetViz, DatasetVizProps, DimensionDomainType, DiscreteColorMap } from '../common';
+import { EnumFeaturePropertyDescriptor, VectorFeatureDescriptor, VectorFeatureProperties } from './vector-feature-descriptor';
 /**
  * Default feature style factory for {@link DatasetVectorMapViz}. Used when no featureStyleFactory is
  * provided in {@link DatasetVectorMapVizConfig}
@@ -69,7 +68,19 @@ export const defaultVectoreFeatureStyleFactory = (color?: string) => {
                 strokeWidth: feature.selected.value ? 3 : 2,
                 fillColor: color.alpha(opacity).gl(),
                 zIndex: zIndex
-            }
+            },
+            ...(feature.label && {
+                label: {
+                    text: feature.label,
+                    visible: feature.visible.value,
+                    zIndex: zIndex,
+                    fillColor: chroma('FEFEFE').gl(),
+                    strokeColor: chroma('333').gl(),
+                    strokeWidth: 1,
+                    offsetY: 15,
+                    scale: 1.5
+                }
+            })
         };
     };
 
@@ -81,6 +92,7 @@ export type DatasetVectorFeatureProps<T extends VectorFeatureProperties = Vector
     geometry: Geometry;
     properties: T;
     color?: string;
+    label?: string;
 } & VisibleProps &
     SelectedProps &
     HoveredProps;
@@ -95,6 +107,7 @@ export class DatasetVectorFeature<T extends VectorFeatureProperties = VectorFeat
     readonly geometry: Geometry;
     readonly properties: T;
     @observable.ref color: string | undefined;
+    @observable.ref label: string | undefined;
 
     constructor(props: DatasetVectorFeatureProps<T>) {
         this.id = props.id;
@@ -104,6 +117,7 @@ export class DatasetVectorFeature<T extends VectorFeatureProperties = VectorFeat
         this.geometry = props.geometry;
         this.properties = props.properties;
         this.color = props.color;
+        this.label = props.label;
 
         makeObservable(this);
     }
@@ -111,6 +125,11 @@ export class DatasetVectorFeature<T extends VectorFeatureProperties = VectorFeat
     @action
     setColor(color: string | undefined) {
         this.color = color;
+    }
+
+    @action
+    setLabel(label: string | undefined) {
+        this.label = label;
     }
 }
 
@@ -182,6 +201,10 @@ export class DatasetVectorMapViz extends DatasetViz<typeof VECTOR_VIZ_TYPE, Feat
     @observable.ref colorMap: ColorMap | undefined;
     /** The id of the feature property used for dynamic coloring */
     @observable.ref colorProperty: string | undefined;
+    /** The color map used if the feature type is enum */
+    @observable.ref discreteColorMap: DiscreteColorMap | undefined;
+    /** The properties that will be shown by the label */
+    @observable.ref labelProperties: string[] | undefined;
     /**
      * The property filters state. It is responsability of the {@link VectorDataProvider} to
      * filter the results based on the current filtering state
@@ -206,7 +229,9 @@ export class DatasetVectorMapViz extends DatasetViz<typeof VECTOR_VIZ_TYPE, Feat
         this.config = props.config;
         this.colorProperty = undefined;
         this.colorMap = undefined;
+        this.discreteColorMap = undefined;
         this.chromaScale_ = undefined;
+
         this.propertyFilters =
             props.propertyFilters instanceof DataFilters ? props.propertyFilters : new DataFilters(props.propertyFilters);
 
@@ -217,6 +242,7 @@ export class DatasetVectorMapViz extends DatasetViz<typeof VECTOR_VIZ_TYPE, Feat
 
         if (typeof props.config.featureDescriptor !== 'function') {
             this.featureDescriptor = props.config.featureDescriptor;
+            this.labelProperties = props.config.featureDescriptor!.labelProps;
         }
 
         this.subscriptionTracker_ = new SubscriptionTracker();
@@ -232,13 +258,16 @@ export class DatasetVectorMapViz extends DatasetViz<typeof VECTOR_VIZ_TYPE, Feat
      */
     @action
     setColorProperty(propertyId: string | undefined) {
+        if (propertyId === this.colorProperty) {
+            return;
+        }
         if (propertyId) {
-            if (!this.config.colorScales?.length) {
-                this.colorProperty = undefined;
-                return;
-            }
             const featureProperty = this.featureDescriptor?.properties.find((feature) => feature.id === propertyId);
             if (featureProperty && featureProperty.type === 'number') {
+                if (!this.config.colorScales?.length) {
+                    this.colorProperty = undefined;
+                    return;
+                }
                 if (!this.colorMap) {
                     this.colorMap = new ColorMap({
                         colorScale: this.config.colorScales[0].id
@@ -252,12 +281,28 @@ export class DatasetVectorMapViz extends DatasetViz<typeof VECTOR_VIZ_TYPE, Feat
                     clamp: this.colorMap.domain?.clamp
                 });
                 this.colorProperty = propertyId;
+            } else if (featureProperty && featureProperty.type === 'enum') {
+                const randomColor = randomColorFactory();
+                this.discreteColorMap = new DiscreteColorMap({
+                    items: featureProperty.options.map((value) => {
+                        return {
+                            value: value.value.toString(),
+                            color: value.color ? chroma(value.color).hex() : chroma(randomColor()).hex()
+                        };
+                    })
+                });
+                this.colorProperty = propertyId;
             } else {
                 this.colorProperty = undefined;
             }
         } else {
             this.colorProperty = undefined;
         }
+    }
+
+    @action
+    setLabelProperties(labelProperties: string[] | undefined) {
+        this.labelProperties = labelProperties;
     }
 
     /** The currently selected feature */
@@ -296,6 +341,34 @@ export class DatasetVectorMapViz extends DatasetViz<typeof VECTOR_VIZ_TYPE, Feat
     }
 
     /**
+     * Update the label showed on the map based on the {@link DatasetVectorMapViz.labelProperties}
+     */
+    @action
+    protected updateFeatureLabel_() {
+        const labelGetter = this.featureLabelGetter;
+        this.data_.forEach((feature) => feature.setLabel(labelGetter(feature)));
+    }
+
+    @computed
+    protected get featureLabelGetter() {
+        if (this.labelProperties) {
+            const labelIds: Record<string, string> = {};
+            this.featureDescriptor?.properties.forEach((property) => {
+                labelIds[property.id] = property.name;
+            });
+            return (feature) => {
+                return this.labelProperties!.map((label) => {
+                    return `${labelIds[label]}: ${feature.properties[label]}`;
+                }).join('\n');
+            };
+        } else {
+            return (feature) => {
+                return undefined;
+            };
+        }
+    }
+
+    /**
      * The function used to update the {@link DatasetVectorFeature}. Every time one of the observable dendencies of this
      * function is updated, the {@link DatasetVectorMapViz.updateFeatureColors_} function is automatically called
      */
@@ -322,6 +395,10 @@ export class DatasetVectorMapViz extends DatasetViz<typeof VECTOR_VIZ_TYPE, Feat
                     return chromaScale(value).hex();
                 }
             };
+        } else if (colorProperty && colorProperty.type === 'enum') {
+            return (feature) => {
+                return this.discreteColorMap?.mapItems[feature.properties[colorProperty.id]];
+            };
         } else {
             return (feature) => {
                 return undefined;
@@ -336,12 +413,14 @@ export class DatasetVectorMapViz extends DatasetViz<typeof VECTOR_VIZ_TYPE, Feat
     @action
     protected refreshData_(data: DatasetVectorFeatureProps[]) {
         const colorGetter = this.featureColorGetter;
+        const labelGetter = this.featureLabelGetter;
         this.data_.replace(
             data.map(
                 (props) =>
                     new DatasetVectorFeature({
                         ...props,
-                        color: colorGetter(props)
+                        color: colorGetter(props),
+                        label: labelGetter(props)
                     })
             )
         );
@@ -390,12 +469,14 @@ export class DatasetVectorMapViz extends DatasetViz<typeof VECTOR_VIZ_TYPE, Feat
                     const handleNextValue = (data: DatasetVectorFeatureProps<VectorFeatureProperties>[]) => {
                         runInAction(() => {
                             const colorGetter = this.featureColorGetter;
+                            const labelGetter = this.featureLabelGetter;
                             this.data_.push(
                                 ...data.map(
                                     (props) =>
                                         new DatasetVectorFeature({
                                             ...props,
-                                            color: colorGetter(props)
+                                            color: colorGetter(props),
+                                            label: labelGetter(props)
                                         })
                                 )
                             );
@@ -450,6 +531,31 @@ export class DatasetVectorMapViz extends DatasetViz<typeof VECTOR_VIZ_TYPE, Feat
             }
         );
 
+        const featureLabelUpdateDisposer = reaction(
+            () => this.labelProperties,
+            () => {
+                this.updateFeatureLabel_();
+            },
+            {
+                fireImmediately: true
+            }
+        );
+
+        const enumColorUpdateDisposer = reaction(
+            () => this.discreteColorMap?.mapItems,
+            () => {
+                const enumProp = this.featureDescriptor?.properties.find(
+                    (feature) => feature.id === this.colorProperty
+                ) as EnumFeaturePropertyDescriptor;
+                if (this.discreteColorMap) {
+                    enumProp.options.forEach((option) => {
+                        option.color = this.discreteColorMap!.mapItems[option.value];
+                    });
+                }
+                this.updateFeatureColors_();
+            }
+        );
+
         // enable dataset widget visibility when a feature is selected (i.e. display feature information)
         const widgetVisibilityDisposer = autorun(() => {
             if (this.selectedFeature) {
@@ -463,6 +569,8 @@ export class DatasetVectorMapViz extends DatasetViz<typeof VECTOR_VIZ_TYPE, Feat
         this.subscriptionTracker_.addSubscription(chromaScaleUpdateDisposer);
         this.subscriptionTracker_.addSubscription(featureColorUpdateDisposer);
         this.subscriptionTracker_.addSubscription(widgetVisibilityDisposer);
+        this.subscriptionTracker_.addSubscription(enumColorUpdateDisposer);
+        this.subscriptionTracker_.addSubscription(featureLabelUpdateDisposer);
 
         const featureDescriptor = this.config.featureDescriptor;
         if (typeof featureDescriptor === 'function') {

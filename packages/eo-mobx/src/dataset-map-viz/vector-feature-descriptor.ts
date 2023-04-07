@@ -80,6 +80,8 @@ export const ENUM_FEATURE_PROPERTY_TYPE = 'enum';
 export type EnumFeaturePropertyOption = {
     name: string;
     value: string | number;
+    color?: string;
+    description?: string;
 };
 export type EnumFeaturePropertyDescriptor = FeaturePropertyDescriptorCommon<typeof ENUM_FEATURE_PROPERTY_TYPE> & {
     /** The enum allowed values */
@@ -132,6 +134,8 @@ export type VectorFeatureDescriptor = {
     typeName: string;
     title?: string;
     description?: string;
+    iconUrl?: string;
+    labelProps?: string[];
     properties: VectorFeaturePropertyDescriptor[];
 };
 
