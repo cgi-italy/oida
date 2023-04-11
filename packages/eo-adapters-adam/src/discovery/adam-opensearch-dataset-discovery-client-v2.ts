@@ -105,6 +105,7 @@ export class AdamOpensearchDatasetDiscoveryClientV2 {
                         wcsParams: {
                             subset: wcsParams.subset,
                             subdataset: wcsParams.subdataset,
+                            _id: product._id.$oid,
                             ...wcsParams.parameters
                         },
                         domain: {
