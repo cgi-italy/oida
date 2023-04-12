@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.2.2](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-adapters-adam@3.2.1...@oidajs/eo-adapters-adam@3.2.2) (2023-04-12)
+
+**Note:** Version bump only for package @oidajs/eo-adapters-adam
+
 ## [3.2.1](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-adapters-adam@3.2.0...@oidajs/eo-adapters-adam@3.2.1) (2023-04-12)
 
 ### Bug Fixes

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.0.6](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-geotiff@3.0.5...@oidajs/eo-geotiff@3.0.6) (2023-04-12)
+
+### Performance Improvements
+
+- keep track of pending requests in geotiff renderer ([7819276](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/7819276e4f7942c1d2e89a8986ea1a4bba6c90eb))
+
 ## [3.0.5](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-geotiff@3.0.4...@oidajs/eo-geotiff@3.0.5) (2023-04-12)
 
 **Note:** Version bump only for package @oidajs/eo-geotiff
