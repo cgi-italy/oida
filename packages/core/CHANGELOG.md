@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.7.0](https://github.com/cgi-italy/oida/compare/@oidajs/core@4.6.0...@oidajs/core@4.7.0) (2023-04-12)
+
+### Features
+
+- improve visualization for vector datasets ([93eb608](https://github.com/cgi-italy/oida/commit/93eb608ed11d3faf09dd85d262cf5e90ff3694b5))
+
 # [4.6.0](https://github.com/cgi-italy/oida/compare/@oidajs/core@4.5.1...@oidajs/core@4.6.0) (2023-04-06)
 
 ### Bug Fixes

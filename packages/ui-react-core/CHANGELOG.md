@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.4.3](https://github.com/cgi-italy/oida/compare/@oidajs/ui-react-core@6.4.2...@oidajs/ui-react-core@6.4.3) (2023-04-12)
+
+**Note:** Version bump only for package @oidajs/ui-react-core
+
 ## [6.4.2](https://github.com/cgi-italy/oida/compare/@oidajs/ui-react-core@6.4.1...@oidajs/ui-react-core@6.4.2) (2023-04-06)
 
 ### Bug Fixes

@@ -1,4 +1,6 @@
-import { ENUM_FIELD_ID, NUMERIC_RANGE_FIELD_ID, QueryFilter, STRING_FIELD_ID } from '@oidajs/core';
+import moment from 'moment';
+
+import { DATE_RANGE_FIELD_ID, ENUM_FIELD_ID, NUMERIC_RANGE_FIELD_ID, QueryFilter, STRING_FIELD_ID } from '@oidajs/core';
 import {
     DatasetVectorFeatureProps,
     VectorFeatureDescriptor,
@@ -6,7 +8,8 @@ import {
     VectorFeaturePropertyDescriptor,
     ENUM_FEATURE_PROPERTY_TYPE,
     NUMERIC_FEATURE_PROPERTY_TYPE,
-    STRING_FEATURE_PROPERTY_TYPE
+    STRING_FEATURE_PROPERTY_TYPE,
+    DATE_FEATURE_PROPERTY_TYPE
 } from '../dataset-map-viz';
 
 /**
@@ -51,7 +54,13 @@ export const getVectorFeaturesFilterer = (featureDescriptor: VectorFeatureDescri
                         }
                     } else if (featureProperty.type === STRING_FEATURE_PROPERTY_TYPE && filter.type === STRING_FIELD_ID) {
                         const value = feature.properties[filter.key] as FeaturePropertyValueTypes[typeof STRING_FEATURE_PROPERTY_TYPE];
-                        if (value.toLowerCase().search(filter.value.toLowerCase()) === -1) {
+                        if (filter.value && value.toLowerCase().search(filter.value.toLowerCase()) === -1) {
+                            filtered = true;
+                            break;
+                        }
+                    } else if (featureProperty.type === DATE_FEATURE_PROPERTY_TYPE && filter.type === DATE_RANGE_FIELD_ID) {
+                        const value = feature.properties[filter.key] as FeaturePropertyValueTypes[typeof DATE_FEATURE_PROPERTY_TYPE];
+                        if (moment.utc(value) > filter.value.end || moment.utc(value) < filter.value.start) {
                             filtered = true;
                             break;
                         }

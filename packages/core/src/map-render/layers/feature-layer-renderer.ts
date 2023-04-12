@@ -39,10 +39,22 @@ export interface IPolygonStyle extends IGeometryStyle {
     strokeWidth?: number;
 }
 
+export interface ILabelStyle extends IGeometryStyle {
+    fillColor?: Color;
+    strokeColor?: Color;
+    strokeWidth?: number;
+    text: string;
+    font?: string;
+    offsetX?: number;
+    offsetY?: number;
+    scale?: number;
+}
+
 export interface IFeatureStyle {
     point?: IPointStyle;
     line?: ILineStyle;
     polygon?: IPolygonStyle;
+    label?: ILabelStyle;
 }
 
 export type FeatureGeometry = Exclude<Geometry, GeoJSON.GeometryCollection | GeometryCollection>;

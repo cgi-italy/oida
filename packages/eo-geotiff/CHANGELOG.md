@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.0.5](https://github.com/cgi-italy/oida/compare/@oidajs/eo-geotiff@3.0.4...@oidajs/eo-geotiff@3.0.5) (2023-04-12)
+
+**Note:** Version bump only for package @oidajs/eo-geotiff
+
 ## [3.0.4](https://github.com/cgi-italy/oida/compare/@oidajs/eo-geotiff@3.0.3...@oidajs/eo-geotiff@3.0.4) (2023-04-06)
 
 **Note:** Version bump only for package @oidajs/eo-geotiff

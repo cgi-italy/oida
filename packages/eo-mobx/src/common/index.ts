@@ -13,3 +13,4 @@ export * from './dataset-spatial-coverage-provider';
 export * from './dataset-tool-config';
 export * from './dataset';
 export * from './dataset-viz';
+export * from './discrete-color-map';

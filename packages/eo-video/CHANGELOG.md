@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.1.3](https://github.com/cgi-italy/oida/compare/@oidajs/eo-video@2.1.2...@oidajs/eo-video@2.1.3) (2023-04-12)
+
+**Note:** Version bump only for package @oidajs/eo-video
+
 ## [2.1.2](https://github.com/cgi-italy/oida/compare/@oidajs/eo-video@2.1.1...@oidajs/eo-video@2.1.2) (2023-04-06)
 
 **Note:** Version bump only for package @oidajs/eo-video

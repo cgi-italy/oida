@@ -5,3 +5,4 @@ packages/*/es
 packages/*/lib
 packages/*/types
 .docz
+.idea

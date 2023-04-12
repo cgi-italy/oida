@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.2.1](https://github.com/cgi-italy/oida/compare/@oidajs/eo-adapters-adam@3.2.0...@oidajs/eo-adapters-adam@3.2.1) (2023-04-12)
+
+### Bug Fixes
+
+- add \_id parameter to adam wcs call ([8b0ab7c](https://github.com/cgi-italy/oida/commit/8b0ab7c00fe6e768f48aaf03add2a327b92d567a))
+
 # [3.2.0](https://github.com/cgi-italy/oida/compare/@oidajs/eo-adapters-adam@3.1.1...@oidajs/eo-adapters-adam@3.2.0) (2023-04-06)
 
 ### Features
