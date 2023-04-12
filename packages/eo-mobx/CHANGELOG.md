@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.1.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-mobx@3.0.2...@oidajs/eo-mobx@3.1.0) (2023-04-12)
+
+### Features
+
+- improve visualization for vector datasets ([93eb608](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/93eb608ed11d3faf09dd85d262cf5e90ff3694b5))
+
 ## [3.0.2](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-mobx@3.0.1...@oidajs/eo-mobx@3.0.2) (2023-04-06)
 
 **Note:** Version bump only for package @oidajs/eo-mobx
