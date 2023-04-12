@@ -8,7 +8,7 @@ import { AxiosInstanceWithCancellation, EpsgIoDefinitionProvider } from '@oidajs
 import { PlottyRenderer } from './plotty-renderer';
 
 export type GeotiffRendererConfig = {
-    cache?: LruCache<string, GeotiffRendererData | null>;
+    cache?: LruCache<string, ArrayBuffer | null>;
     plottyInstance?: plot;
     axiosInstace?: AxiosInstanceWithCancellation;
 };
@@ -54,7 +54,7 @@ export class GeotiffRenderer {
     }
 
     protected static srsDefProvider_ = new EpsgIoDefinitionProvider();
-    protected static defaultCacheInstance_: LruCache<string, GeotiffRendererData | null> | undefined;
+    protected static defaultCacheInstance_: LruCache<string, ArrayBuffer | null> | undefined;
     protected static decoder_: Pool | undefined = undefined;
 
     /**
@@ -73,7 +73,7 @@ export class GeotiffRenderer {
             GeotiffRenderer.defaultCacheInstance_ = new LruCache({
                 maxSize: 1e8,
                 sizeCalculation: (item, key) => {
-                    return item ? item.values.byteLength : 1;
+                    return item ? item.byteLength : 1;
                 }
             });
         }
@@ -92,7 +92,7 @@ export class GeotiffRenderer {
         return [GeotiffRenderer.transformCanvas_, GeotiffRenderer.transformContext_!];
     }
 
-    protected cache_: LruCache<string, GeotiffRendererData | null>;
+    protected cache_: LruCache<string, ArrayBuffer | null>;
     protected plotty_: PlottyRenderer;
     protected axiosInstance_: AxiosInstanceWithCancellation | undefined;
     protected pendingRequests_: Record<string, Promise<GeotiffRenderRequestResponse | undefined>>;
@@ -137,11 +137,17 @@ export class GeotiffRenderer {
                 } else {
                     return new Promise((resolve, reject) => {
                         requestAnimationFrame(() => {
-                            const canvas = this.renderTiffImage_(cachedData);
-                            resolve({
-                                imageData: canvas.toDataURL(),
-                                newSrsDefinition: false
-                            });
+                            this.renderFromBuffer({
+                                data: cachedData,
+                                outputExtent: params.outputExtent,
+                                outputSrs: params.outputSrs
+                            })
+                                .then((response) => {
+                                    resolve(response);
+                                })
+                                .catch(() => {
+                                    resolve(undefined);
+                                });
                         });
                     });
                 }
@@ -155,35 +161,21 @@ export class GeotiffRenderer {
 
         const request = requestHandler<ArrayBuffer>(dataRequest)
             .then((response) => {
-                return this.renderBuffer_({
+                delete this.pendingRequests_[params.url];
+
+                if (!params.disableCache) {
+                    this.cache_.set(params.url, response.data);
+                }
+
+                return this.renderFromBuffer({
                     data: response.data,
                     outputExtent: params.outputExtent,
                     outputSrs: params.outputSrs
-                })
-                    .then((response) => {
-                        const { canvas, newSrsDefinition, ...renderData } = response;
-
-                        if (!params.disableCache) {
-                            this.cache_.set(params.url, renderData);
-                        }
-                        delete this.pendingRequests_[params.url];
-                        return {
-                            imageData: canvas.toDataURL(),
-                            newSrsDefinition
-                        };
-                    })
-                    .catch(() => {
-                        if (params.retryCount) {
-                            return this.renderFromUrl({
-                                ...params,
-                                retryCount: params.retryCount - 1
-                            });
-                        }
-                        delete this.pendingRequests_[params.url];
-                        return undefined;
-                    });
+                });
             })
             .catch(() => {
+                delete this.pendingRequests_[params.url];
+
                 if (params.retryCount) {
                     return this.renderFromUrl({
                         ...params,
@@ -193,7 +185,7 @@ export class GeotiffRenderer {
                 if (!params.disableCache) {
                     this.cache_.set(params.url, null);
                 }
-                delete this.pendingRequests_[params.url];
+
                 return undefined;
             });
 
