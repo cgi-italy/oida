@@ -38,6 +38,11 @@ export type GeotiffRendererData = {
     flipY?: boolean;
 };
 
+export type GeotiffRenderRequestResponse = {
+    imageData: string;
+    newSrsDefinition: boolean;
+};
+
 export class GeotiffRenderer {
     /**
      * Set a decoder (pool) to use for geotiff deconding.
@@ -90,6 +95,7 @@ export class GeotiffRenderer {
     protected cache_: LruCache<string, GeotiffRendererData | null>;
     protected plotty_: PlottyRenderer;
     protected axiosInstance_: AxiosInstanceWithCancellation | undefined;
+    protected pendingRequests_: Record<string, Promise<GeotiffRenderRequestResponse | undefined>>;
 
     constructor(config: GeotiffRendererConfig) {
         this.cache_ = config.cache || GeotiffRenderer.getDefaultCacheInstance_();
@@ -99,6 +105,7 @@ export class GeotiffRenderer {
         });
 
         this.axiosInstance_ = config.axiosInstace;
+        this.pendingRequests_ = {};
     }
 
     get cache() {
@@ -109,7 +116,7 @@ export class GeotiffRenderer {
         return this.plotty_;
     }
 
-    renderFromUrl(params: RenderFromUrlParams): Promise<{ imageData: string; newSrsDefinition: boolean } | undefined> {
+    renderFromUrl(params: RenderFromUrlParams): Promise<GeotiffRenderRequestResponse | undefined> {
         const dataRequest: AxiosRequestConfig = {
             url: params.url,
             method: params.postData ? 'POST' : 'GET',
@@ -123,7 +130,7 @@ export class GeotiffRenderer {
         }
 
         if (!params.disableCache) {
-            const cachedData = this.cache.get(params.url);
+            const cachedData = this.cache_.get(params.url);
             if (cachedData !== undefined) {
                 if (cachedData === null) {
                     return Promise.resolve(undefined);
@@ -141,7 +148,12 @@ export class GeotiffRenderer {
             }
         }
 
-        return requestHandler<ArrayBuffer>(dataRequest)
+        const pendingRequest = this.pendingRequests_[params.url];
+        if (pendingRequest !== undefined) {
+            return pendingRequest;
+        }
+
+        const request = requestHandler<ArrayBuffer>(dataRequest)
             .then((response) => {
                 return this.renderBuffer_({
                     data: response.data,
@@ -154,6 +166,7 @@ export class GeotiffRenderer {
                         if (!params.disableCache) {
                             this.cache_.set(params.url, renderData);
                         }
+                        delete this.pendingRequests_[params.url];
                         return {
                             imageData: canvas.toDataURL(),
                             newSrsDefinition
@@ -166,6 +179,7 @@ export class GeotiffRenderer {
                                 retryCount: params.retryCount - 1
                             });
                         }
+                        delete this.pendingRequests_[params.url];
                         return undefined;
                     });
             })
@@ -179,8 +193,13 @@ export class GeotiffRenderer {
                 if (!params.disableCache) {
                     this.cache_.set(params.url, null);
                 }
+                delete this.pendingRequests_[params.url];
                 return undefined;
             });
+
+        this.pendingRequests_[params.url] = request;
+
+        return request;
     }
 
     renderFromBuffer(params: RenderFromBufferParams) {
