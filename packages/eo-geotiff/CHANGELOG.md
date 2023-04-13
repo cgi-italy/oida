@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.0.7](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-geotiff@3.0.6...@oidajs/eo-geotiff@3.0.7) (2023-04-13)
+
+### Performance Improvements
+
+- enable request caching through geotiff renderer for adam spatial coverage provider ([78f92d1](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/78f92d1118012d4c9026211e5b8313ad6bce1a54))
+
 ## [3.0.6](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-geotiff@3.0.5...@oidajs/eo-geotiff@3.0.6) (2023-04-12)
 
 ### Performance Improvements
