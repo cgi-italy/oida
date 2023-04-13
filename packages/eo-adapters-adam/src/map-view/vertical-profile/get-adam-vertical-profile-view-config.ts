@@ -46,17 +46,17 @@ export const getAdamVerticalProfileViewConfig = (
         autorun(() => {
             const bandMode = mapViz.bandMode.value;
             if (bandMode?.type === RasterBandModeType.Single) {
-                renderer.setColorScale(bandMode.colorMap.colorScale);
-                tileRenderer.setColorScale(bandMode.colorMap.colorScale);
+                renderer.plotty.setColorScale(bandMode.colorMap.colorScale);
+                tileRenderer.plotty.setColorScale(bandMode.colorMap.colorScale);
                 const domain = bandMode.colorMap.domain;
                 if (domain) {
-                    renderer.setDomain([domain.mapRange.min, domain.mapRange.max]);
-                    renderer.setClamp(domain.clamp);
-                    renderer.setNoDataValue(domain.noDataValue);
+                    renderer.plotty.setDomain([domain.mapRange.min, domain.mapRange.max]);
+                    renderer.plotty.setClamp(domain.clamp);
+                    renderer.plotty.setNoDataValue(domain.noDataValue);
 
-                    tileRenderer.setDomain([domain.mapRange.min, domain.mapRange.max]);
-                    tileRenderer.setClamp(domain.clamp);
-                    tileRenderer.setNoDataValue(domain.noDataValue);
+                    tileRenderer.plotty.setDomain([domain.mapRange.min, domain.mapRange.max]);
+                    tileRenderer.plotty.setClamp(domain.clamp);
+                    tileRenderer.plotty.setNoDataValue(domain.noDataValue);
                 }
                 mapViz.refreshData();
                 mapViz.refreshTileView();

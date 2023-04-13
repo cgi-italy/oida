@@ -52,16 +52,9 @@ const getMultiBandColorRange = (
 export const createAdamRasterTileSourceProvider = (
     factoryConfig: AdamDatasetFactoryConfig,
     datasetConfig: AdamWcsDatasetConfig,
-    axiosInstance: AxiosInstanceWithCancellation,
     spatialCoverageProvider: AdamSpatialCoverageProvider,
-    useRawData?: boolean
+    geotiffLoader?: GeotiffLoader
 ) => {
-    let geotiffLoader: GeotiffLoader | undefined;
-
-    if (useRawData) {
-        geotiffLoader = createGeoTiffLoader({ axiosInstance, rotateImage: false });
-    }
-
     const datasetBandsDict: Record<string, AdamDatasetCoverageBand> = {};
 
     if (isMultiBandCoverage(datasetConfig.coverages)) {

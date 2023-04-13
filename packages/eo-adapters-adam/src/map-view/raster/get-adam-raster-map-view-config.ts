@@ -1,6 +1,5 @@
 import { autorun } from 'mobx';
 
-import { AxiosInstanceWithCancellation } from '@oidajs/core';
 import { TileLayer } from '@oidajs/state-mobx';
 import {
     RasterMapViz,
@@ -12,29 +11,27 @@ import {
 } from '@oidajs/eo-mobx';
 import { getPlottyColorScales } from '@oidajs/eo-geotiff';
 
-import { AdamWcsDatasetConfig, AdamDatasetRenderMode, isMultiBandCoverage } from '../../adam-dataset-config';
+import { AdamWcsDatasetConfig, isMultiBandCoverage } from '../../adam-dataset-config';
 import { AdamDatasetFactoryConfig } from '../../get-adam-dataset-factory';
+import { GeotiffLoader } from '../../utils';
 import { createAdamRasterTileSourceProvider } from './create-adam-raster-tile-source-provider';
 import { AdamSpatialCoverageProvider } from '../../get-adam-dataset-spatial-coverage-provider';
 
 import trueColorPreview from './true-color-preset-preview';
 
 export const getAdamRasterMapViewConfig = (
-    axiosInstance: AxiosInstanceWithCancellation,
     factoryConfig: AdamDatasetFactoryConfig,
     datasetConfig: AdamWcsDatasetConfig,
-    spatialCoverageProvider: AdamSpatialCoverageProvider
+    spatialCoverageProvider: AdamSpatialCoverageProvider,
+    geotiffLoader?: GeotiffLoader
 ) => {
     let afterInit: ((mapViz: RasterMapViz) => void) | undefined = undefined;
-
-    const useRawData = datasetConfig.renderMode !== AdamDatasetRenderMode.ServerSide;
 
     const { provider, tiffLoader } = createAdamRasterTileSourceProvider(
         factoryConfig,
         datasetConfig,
-        axiosInstance,
         spatialCoverageProvider,
-        useRawData
+        geotiffLoader
     );
 
     if (tiffLoader) {
@@ -43,12 +40,12 @@ export const getAdamRasterMapViewConfig = (
                 () => {
                     const bandMode = mapViz.bandMode.value;
                     if (bandMode?.type === RasterBandModeType.Single) {
-                        tiffLoader.renderer.setColorScale(bandMode.colorMap.colorScale);
+                        tiffLoader.renderer.plotty.setColorScale(bandMode.colorMap.colorScale);
                         const domain = bandMode.colorMap.domain;
                         if (domain) {
-                            tiffLoader.renderer.setDomain([domain.mapRange.min, domain.mapRange.max]);
-                            tiffLoader.renderer.setClamp(domain.clamp);
-                            tiffLoader.renderer.setNoDataValue(domain.noDataValue);
+                            tiffLoader.renderer.plotty.setDomain([domain.mapRange.min, domain.mapRange.max]);
+                            tiffLoader.renderer.plotty.setClamp(domain.clamp);
+                            tiffLoader.renderer.plotty.setNoDataValue(domain.noDataValue);
                         }
 
                         mapViz.mapLayer.children.items.forEach((layer) => {

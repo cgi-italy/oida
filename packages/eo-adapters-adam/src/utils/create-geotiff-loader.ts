@@ -1,9 +1,8 @@
-import LruCache from 'lru-cache';
 import proj4 from 'proj4';
 import { register } from 'ol/proj/proj4';
 
 import { AxiosInstanceWithCancellation } from '@oidajs/core';
-import { GeotiffRenderer, PlottyRenderer, GeotiffRendererData } from '@oidajs/eo-geotiff';
+import { GeotiffRenderer } from '@oidajs/eo-geotiff';
 
 import { AdamWcsTileLoadFunctionSource } from '../map-view/adam-wcs-tile-source';
 
@@ -14,15 +13,17 @@ export type createGeotiffTileLoaderProps = {
 
 export type GeotiffLoader = {
     load: (source: AdamWcsTileLoadFunctionSource) => Promise<string>;
-    renderer: PlottyRenderer;
-    dataCache: LruCache<string, GeotiffRendererData | null>;
+    renderer: GeotiffRenderer;
 };
 
 export const createGeoTiffLoader = (props: createGeotiffTileLoaderProps): GeotiffLoader => {
     const { axiosInstance, rotateImage } = props;
 
     const geotiffRenderer = new GeotiffRenderer({
-        axiosInstace: axiosInstance
+        axiosInstace: axiosInstance,
+        onNewSrsRegistration: () => {
+            register(proj4);
+        }
     });
 
     // vertical profile rendering needs the image to be rotated by 90 degrees and mirrored
@@ -53,34 +54,26 @@ export const createGeoTiffLoader = (props: createGeotiffTileLoaderProps): Geotif
                 outputSrs: source.requestSrs,
                 retryCount: 2
             })
-            .then((response) => {
-                if (!response) {
-                    return '';
-                } else {
-                    if (response.newSrsDefinition) {
-                        register(proj4);
-                    }
-                    if (getRotatedImage) {
-                        return new Promise<string>((resolve, reject) => {
-                            const image = new Image();
-                            image.src = response.imageData;
-                            image.addEventListener('load', () => {
-                                resolve(getRotatedImage!(image));
-                            });
-                            image.addEventListener('error', () => {
-                                resolve('');
-                            });
+            .then((dataUri) => {
+                if (getRotatedImage) {
+                    return new Promise<string>((resolve, reject) => {
+                        const image = new Image();
+                        image.src = dataUri;
+                        image.addEventListener('load', () => {
+                            resolve(getRotatedImage!(image));
                         });
-                    } else {
-                        return response.imageData;
-                    }
+                        image.addEventListener('error', () => {
+                            resolve('');
+                        });
+                    });
+                } else {
+                    return dataUri;
                 }
             });
     };
 
     return {
         load,
-        renderer: geotiffRenderer.plotty,
-        dataCache: geotiffRenderer.cache
+        renderer: geotiffRenderer
     };
 };

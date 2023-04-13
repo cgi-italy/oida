@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.0.7](https://github.com/cgi-italy/oida/compare/@oidajs/eo-geotiff@3.0.6...@oidajs/eo-geotiff@3.0.7) (2023-04-13)
+
+### Performance Improvements
+
+- enable request caching through geotiff renderer for adam spatial coverage provider ([78f92d1](https://github.com/cgi-italy/oida/commit/78f92d1118012d4c9026211e5b8313ad6bce1a54))
+
+## [3.0.6](https://github.com/cgi-italy/oida/compare/@oidajs/eo-geotiff@3.0.5...@oidajs/eo-geotiff@3.0.6) (2023-04-12)
+
+### Performance Improvements
+
+- keep track of pending requests in geotiff renderer ([7819276](https://github.com/cgi-italy/oida/commit/7819276e4f7942c1d2e89a8986ea1a4bba6c90eb))
+
 ## [3.0.5](https://github.com/cgi-italy/oida/compare/@oidajs/eo-geotiff@3.0.4...@oidajs/eo-geotiff@3.0.5) (2023-04-12)
 
 **Note:** Version bump only for package @oidajs/eo-geotiff

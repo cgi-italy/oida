@@ -1,8 +1,9 @@
 import { AxiosInstanceWithCancellation } from '@oidajs/core';
 
-import { AdamDatasetConfig } from '../adam-dataset-config';
+import { AdamDatasetConfig, AdamDatasetRenderMode } from '../adam-dataset-config';
 import { AdamDatasetFactoryConfig } from '../get-adam-dataset-factory';
 import { AdamSpatialCoverageProvider } from '../get-adam-dataset-spatial-coverage-provider';
+import { GeotiffLoader } from '../utils';
 
 import { getAdamRasterMapViewConfig } from './raster';
 import { getAdamVerticalProfileViewConfig } from './vertical-profile';
@@ -15,6 +16,7 @@ export const getAdamDatasetMapViewConfig = (
     factoryConfig: AdamDatasetFactoryConfig,
     datasetConfig: AdamDatasetConfig,
     spatialCoverageProvider: AdamSpatialCoverageProvider,
+    geotiffLoader: GeotiffLoader,
     openSearchClient?: AdamOpenSearchClient
 ) => {
     if (datasetConfig.type === 'vertical_profile') {
@@ -22,7 +24,12 @@ export const getAdamDatasetMapViewConfig = (
     } else if (datasetConfig.type === 'volume') {
         return getAdamVolumetricMapViewConfig(factoryConfig, datasetConfig);
     } else if (datasetConfig.type === 'raster') {
-        return getAdamRasterMapViewConfig(axiosInstance, factoryConfig, datasetConfig, spatialCoverageProvider);
+        return getAdamRasterMapViewConfig(
+            factoryConfig,
+            datasetConfig,
+            spatialCoverageProvider,
+            datasetConfig.renderMode === AdamDatasetRenderMode.ClientSide ? geotiffLoader : undefined
+        );
     } else if (datasetConfig.type === 'vector' && openSearchClient) {
         return getAdamVectorMapViewConfig(datasetConfig, openSearchClient);
     }

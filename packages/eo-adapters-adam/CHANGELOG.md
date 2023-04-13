@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.2.3](https://github.com/cgi-italy/oida/compare/@oidajs/eo-adapters-adam@3.2.2...@oidajs/eo-adapters-adam@3.2.3) (2023-04-13)
+
+### Performance Improvements
+
+- enable request caching through geotiff renderer for adam spatial coverage provider ([78f92d1](https://github.com/cgi-italy/oida/commit/78f92d1118012d4c9026211e5b8313ad6bce1a54))
+
+## [3.2.2](https://github.com/cgi-italy/oida/compare/@oidajs/eo-adapters-adam@3.2.1...@oidajs/eo-adapters-adam@3.2.2) (2023-04-12)
+
+**Note:** Version bump only for package @oidajs/eo-adapters-adam
+
 ## [3.2.1](https://github.com/cgi-italy/oida/compare/@oidajs/eo-adapters-adam@3.2.0...@oidajs/eo-adapters-adam@3.2.1) (2023-04-12)
 
 ### Bug Fixes

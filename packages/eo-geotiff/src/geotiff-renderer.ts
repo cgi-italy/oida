@@ -1,6 +1,6 @@
 import LruCache from 'lru-cache';
 import { plot } from 'plotty';
-import { fromArrayBuffer, Pool } from 'geotiff';
+import { fromArrayBuffer, Pool, GeoTIFFImage } from 'geotiff';
 import proj4 from 'proj4';
 import axios, { AxiosRequestConfig } from 'axios';
 
@@ -8,21 +8,25 @@ import { AxiosInstanceWithCancellation, EpsgIoDefinitionProvider } from '@oidajs
 import { PlottyRenderer } from './plotty-renderer';
 
 export type GeotiffRendererConfig = {
-    cache?: LruCache<string, GeotiffRendererData | null>;
+    cache?: LruCache<string, ArrayBuffer | null>;
     plottyInstance?: plot;
     axiosInstace?: AxiosInstanceWithCancellation;
+    onNewSrsRegistration?: (srs: string) => void;
 };
 
-export type RenderFromUrlParams = {
+export type GeotiffUrlRequestParams = {
     url: string;
     postData?: any;
-    outputExtent?: number[];
-    outputSrs?: string;
     disableCache?: boolean;
     retryCount?: number;
 };
 
-export type RenderFromBufferParams = {
+export type GeotiffRenderFromUrlParams = GeotiffUrlRequestParams & {
+    outputExtent?: number[];
+    outputSrs?: string;
+};
+
+export type GeotiffRenderFromBufferParams = {
     data: ArrayBuffer;
     outputExtent?: number[];
     outputSrs?: string;
@@ -38,6 +42,11 @@ export type GeotiffRendererData = {
     flipY?: boolean;
 };
 
+export type GeotiffRenderRequestResponse = {
+    imageData: string;
+    newSrsDefinition: boolean;
+};
+
 export class GeotiffRenderer {
     /**
      * Set a decoder (pool) to use for geotiff deconding.
@@ -49,7 +58,7 @@ export class GeotiffRenderer {
     }
 
     protected static srsDefProvider_ = new EpsgIoDefinitionProvider();
-    protected static defaultCacheInstance_: LruCache<string, GeotiffRendererData | null> | undefined;
+    protected static defaultCacheInstance_: LruCache<string, ArrayBuffer | null> | undefined;
     protected static decoder_: Pool | undefined = undefined;
 
     /**
@@ -68,7 +77,7 @@ export class GeotiffRenderer {
             GeotiffRenderer.defaultCacheInstance_ = new LruCache({
                 maxSize: 1e8,
                 sizeCalculation: (item, key) => {
-                    return item ? item.values.byteLength : 1;
+                    return item ? item.byteLength : 1;
                 }
             });
         }
@@ -87,9 +96,11 @@ export class GeotiffRenderer {
         return [GeotiffRenderer.transformCanvas_, GeotiffRenderer.transformContext_!];
     }
 
-    protected cache_: LruCache<string, GeotiffRendererData | null>;
+    protected cache_: LruCache<string, ArrayBuffer | null>;
     protected plotty_: PlottyRenderer;
     protected axiosInstance_: AxiosInstanceWithCancellation | undefined;
+    protected pendingRequests_: Record<string, Promise<ArrayBuffer>>;
+    protected srsRegistrationCb_?: (srs: string) => void;
 
     constructor(config: GeotiffRendererConfig) {
         this.cache_ = config.cache || GeotiffRenderer.getDefaultCacheInstance_();
@@ -99,6 +110,8 @@ export class GeotiffRenderer {
         });
 
         this.axiosInstance_ = config.axiosInstace;
+        this.pendingRequests_ = {};
+        this.srsRegistrationCb_ = config.onNewSrsRegistration;
     }
 
     get cache() {
@@ -109,7 +122,33 @@ export class GeotiffRenderer {
         return this.plotty_;
     }
 
-    renderFromUrl(params: RenderFromUrlParams): Promise<{ imageData: string; newSrsDefinition: boolean } | undefined> {
+    renderFromUrl(params: GeotiffRenderFromUrlParams): Promise<string> {
+        return this.retrieveTiffData_(params).then((data) => {
+            return this.renderFromBuffer({
+                data: data,
+                outputExtent: params.outputExtent,
+                outputSrs: params.outputSrs
+            });
+        });
+    }
+
+    renderFromBuffer(params: GeotiffRenderFromBufferParams) {
+        return this.renderBuffer_(params).then((canvas) => {
+            return canvas.toDataURL();
+        });
+    }
+
+    extractGeotiffExtentFromUrl(params: GeotiffUrlRequestParams) {
+        return this.retrieveTiffData_(params).then((data) => {
+            return fromArrayBuffer(data).then((tiff) => {
+                return tiff.getImage().then((image) => {
+                    return this.getGeotiffExtent_(image);
+                });
+            });
+        });
+    }
+
+    protected retrieveTiffData_(params: GeotiffUrlRequestParams): Promise<ArrayBuffer> {
         const dataRequest: AxiosRequestConfig = {
             url: params.url,
             method: params.postData ? 'POST' : 'GET',
@@ -123,55 +162,32 @@ export class GeotiffRenderer {
         }
 
         if (!params.disableCache) {
-            const cachedData = this.cache.get(params.url);
+            const cachedData = this.cache_.get(params.url);
             if (cachedData !== undefined) {
-                if (cachedData === null) {
-                    return Promise.resolve(undefined);
-                } else {
-                    return new Promise((resolve, reject) => {
-                        requestAnimationFrame(() => {
-                            const canvas = this.renderTiffImage_(cachedData);
-                            resolve({
-                                imageData: canvas.toDataURL(),
-                                newSrsDefinition: false
-                            });
-                        });
-                    });
-                }
+                return cachedData === null ? Promise.reject(new Error('Unable to retrieve data')) : Promise.resolve(cachedData);
             }
         }
 
-        return requestHandler<ArrayBuffer>(dataRequest)
-            .then((response) => {
-                return this.renderBuffer_({
-                    data: response.data,
-                    outputExtent: params.outputExtent,
-                    outputSrs: params.outputSrs
-                })
-                    .then((response) => {
-                        const { canvas, newSrsDefinition, ...renderData } = response;
+        const pendingRequest = this.pendingRequests_[params.url];
+        if (pendingRequest !== undefined) {
+            return pendingRequest;
+        }
 
-                        if (!params.disableCache) {
-                            this.cache_.set(params.url, renderData);
-                        }
-                        return {
-                            imageData: canvas.toDataURL(),
-                            newSrsDefinition
-                        };
-                    })
-                    .catch(() => {
-                        if (params.retryCount) {
-                            return this.renderFromUrl({
-                                ...params,
-                                retryCount: params.retryCount - 1
-                            });
-                        }
-                        return undefined;
-                    });
+        const request = requestHandler<ArrayBuffer>(dataRequest)
+            .then((response) => {
+                delete this.pendingRequests_[params.url];
+
+                if (!params.disableCache) {
+                    this.cache_.set(params.url, response.data);
+                }
+
+                return response.data;
             })
-            .catch(() => {
+            .catch((error) => {
+                delete this.pendingRequests_[params.url];
+
                 if (params.retryCount) {
-                    return this.renderFromUrl({
+                    return this.retrieveTiffData_({
                         ...params,
                         retryCount: params.retryCount - 1
                     });
@@ -179,23 +195,16 @@ export class GeotiffRenderer {
                 if (!params.disableCache) {
                     this.cache_.set(params.url, null);
                 }
-                return undefined;
+
+                throw error;
             });
+
+        this.pendingRequests_[params.url] = request;
+
+        return request;
     }
 
-    renderFromBuffer(params: RenderFromBufferParams) {
-        return this.renderBuffer_(params).then((response) => {
-            const { canvas, newSrsDefinition } = response;
-            return {
-                imageData: canvas.toDataURL(),
-                newSrsDefinition
-            };
-        });
-    }
-
-    protected renderBuffer_(
-        params: RenderFromBufferParams
-    ): Promise<GeotiffRendererData & { newSrsDefinition: boolean; canvas: HTMLCanvasElement }> {
+    protected renderBuffer_(params: GeotiffRenderFromBufferParams): Promise<HTMLCanvasElement> {
         return fromArrayBuffer(params.data).then((tiff) => {
             return tiff.getImage().then((image) => {
                 return image.readRasters({ pool: GeotiffRenderer.decoder_ }).then((data) => {
@@ -208,24 +217,18 @@ export class GeotiffRenderer {
                     // when y pixel size is positivie (very uncommon) we need to flip vertically the rendered image
                     const resolution = image.getResolution() || [];
 
-                    return this.getImageExtent_(image, params.outputSrs).then((imageExtentData) => {
+                    return this.getGeotiffExtent_(image, params.outputSrs).then((imageExtent) => {
                         const renderData: GeotiffRendererData = {
                             values: data[0] as ArrayBuffer,
                             width: image.getWidth(),
                             height: image.getHeight(),
                             noData: noData,
                             outputExtent: params.outputExtent,
-                            imageExtent: imageExtentData.extent,
+                            imageExtent: imageExtent.bbox,
                             flipY: resolution[1] > 0
                         };
 
-                        const canvas = this.renderTiffImage_(renderData);
-
-                        return {
-                            ...renderData,
-                            newSrsDefinition: imageExtentData.newSrsDefinition,
-                            canvas: canvas
-                        };
+                        return this.renderTiffImage_(renderData);
                     });
                 });
             });
@@ -237,31 +240,34 @@ export class GeotiffRenderer {
         this.plotty_.setFlipY(data.flipY || false);
         let outputCanvas = this.plotty_.render(data.values, data.width, data.height);
         if (data.outputExtent) {
-            outputCanvas = this.wrapImage_(outputCanvas, data.imageExtent, data.outputExtent);
+            outputCanvas = this.warpImage_(outputCanvas, data.imageExtent, data.outputExtent);
         }
         return outputCanvas;
     }
 
-    protected getImageExtent_(image, outputSrs?: string) {
+    protected getGeotiffExtent_(image: GeoTIFFImage, outputSrs?: string): Promise<{ srs: string; bbox: number[] }> {
         const imageExtent: number[] = image.getBoundingBox();
-        if (outputSrs) {
-            const imageSrs = this.getImageSrs_(image);
-            if (imageSrs && imageSrs !== outputSrs) {
-                // if the image is in a different srs than the requested output reproject the extent to the output srs and then
-                // handle the rescaling. it works only if the two srs axes are aligned
-                return this.registerSrs_(imageSrs).then(() => {
-                    const extent = this.transformExtent_(image.getBoundingBox(), imageSrs, outputSrs);
+        const imageSrs = this.getImageSrs_(image);
+        if (imageSrs) {
+            return this.registerSrs_(imageSrs).then(() => {
+                if (outputSrs && imageSrs !== outputSrs) {
                     return {
-                        extent: extent,
-                        newSrsDefinition: true
+                        srs: outputSrs || imageSrs,
+                        bbox: this.transformExtent_(imageExtent, imageSrs, outputSrs)
                     };
-                });
-            }
+                } else {
+                    return {
+                        srs: imageSrs,
+                        bbox: imageExtent
+                    };
+                }
+            });
+        } else {
+            return Promise.resolve({
+                bbox: imageExtent,
+                srs: 'custom'
+            });
         }
-        return Promise.resolve({
-            extent: imageExtent,
-            newSrsDefinition: false
-        });
     }
 
     protected transformExtent_(extent: number[], sourceSrs: string, destSrs: string): number[] {
@@ -285,6 +291,9 @@ export class GeotiffRenderer {
                 .getSrsDefinition(code)
                 .then((srsDef) => {
                     proj4.defs(code, srsDef);
+                    if (this.srsRegistrationCb_) {
+                        this.srsRegistrationCb_(code);
+                    }
                 })
                 .then(() => {
                     return true;
@@ -308,7 +317,7 @@ export class GeotiffRenderer {
         }
     }
 
-    protected wrapImage_(sourceCanvas: HTMLCanvasElement, sourceExtent: number[], outputExtent: number[]) {
+    protected warpImage_(sourceCanvas: HTMLCanvasElement, sourceExtent: number[], outputExtent: number[]) {
         const sourceWidth = sourceExtent[2] - sourceExtent[0];
         const sourceHeight = sourceExtent[3] - sourceExtent[1];
         const outputWidth = outputExtent[2] - outputExtent[0];
