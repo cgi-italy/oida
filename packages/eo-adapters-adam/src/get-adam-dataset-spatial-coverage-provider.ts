@@ -1,10 +1,11 @@
 import proj4 from 'proj4';
 import { register } from 'ol/proj/proj4';
 import { getIntersection } from 'ol/extent';
-import { fromArrayBuffer } from 'geotiff';
+import { transformExtent } from 'ol/proj';
 
-import { AxiosInstanceWithCancellation, EpsgIoDefinitionProvider, GeometryCollection, getGeometryExtent } from '@oidajs/core';
+import { GeometryCollection, getGeometryExtent } from '@oidajs/core';
 import { RasterMapViz, DatasetVectorMapViz, DatasetViz, DatasetVerticalProfileViz } from '@oidajs/eo-mobx';
+import { GeotiffRenderer } from '@oidajs/eo-geotiff';
 
 import { AdamDatasetConfig } from './adam-dataset-config';
 import { AdamDatasetFactoryConfig } from './get-adam-dataset-factory';
@@ -22,63 +23,8 @@ export type AdamSpatialCoverageProvider = (
     | undefined
 >;
 
-//TODO: This utils were extracted from the eo-geotiff library for lack of time
-// Refactor the code to use the GeotiffLoader class instead
-
-const srsDefProvider = new EpsgIoDefinitionProvider();
-
-const getGeotiffSrs = (image) => {
-    const imageSrs: number = image.geoKeys.ProjectedCSTypeGeoKey || image.geoKeys.GeographicTypeGeoKey;
-    if (imageSrs) {
-        if (imageSrs < 32767) {
-            return `EPSG:${imageSrs}`;
-        } else {
-            return undefined;
-        }
-    } else {
-        return undefined;
-    }
-};
-
-const registerSrs = (code: string) => {
-    if (!proj4.defs(code)) {
-        return srsDefProvider
-            .getSrsDefinition(code)
-            .then((srsDef) => {
-                proj4.defs(code, srsDef);
-            })
-            .then(() => {
-                return true;
-            });
-    } else {
-        return Promise.resolve(false);
-    }
-};
-
-const transformExtent = (extent: number[], sourceSrs: string, destSrs: string): number[] => {
-    const ll = proj4(sourceSrs, destSrs, [extent[0], extent[1]]);
-    const ur = proj4(sourceSrs, destSrs, [extent[2], extent[3]]);
-
-    return [...ll, ...ur];
-};
-
-const getGeotiffExtent = (image) => {
-    const imageExtent: number[] = image.getBoundingBox();
-    const imageSrs = getGeotiffSrs(image);
-    if (imageSrs) {
-        return registerSrs(imageSrs).then(() => {
-            return {
-                bbox: imageExtent,
-                srs: imageSrs
-            };
-        });
-    } else {
-        return Promise.resolve(undefined);
-    }
-};
-
 export const getAdamDatasetSpatialCoverageProvider = (
-    axiosInstance: AxiosInstanceWithCancellation,
+    geotiffRenderer: GeotiffRenderer,
     factoryConfig: AdamDatasetFactoryConfig,
     datasetConfig: AdamDatasetConfig
 ) => {
@@ -196,70 +142,45 @@ export const getAdamDatasetSpatialCoverageProvider = (
                 if (aoiParams) {
                     subsets.push(...aoiParams.wcsSubsets);
                 }
-
-                return axiosInstance
-                    .cancelableRequest({
-                        url: factoryConfig.wcsServiceUrl,
-                        params: {
+                return geotiffRenderer
+                    .extractGeotiffExtentFromUrl({
+                        url: `${factoryConfig.wcsServiceUrl}?${AdamServiceParamsSerializer({
                             ...wcsParams,
                             coverageId: wcsCoverage.coverageId,
                             subdataset: wcsCoverage.subdataset,
                             subset: subsets
-                        },
-                        paramsSerializer: {
-                            serialize: AdamServiceParamsSerializer
-                        },
-                        responseType: 'arraybuffer'
+                        })}`
                     })
-                    .then((response) => {
-                        return fromArrayBuffer(response.data)
-                            .then((tiff) => {
-                                return tiff
-                                    .getImage()
-                                    .then((image) => {
-                                        return getGeotiffExtent(image).then((extent) => {
-                                            if (!keepDatasetSrs && extent.srs !== 'EPSG:4326') {
-                                                extent.bbox = transformExtent(extent.bbox, extent.srs, 'EPSG:4326');
-                                                extent.srs = 'EPSG:4326';
-                                                if (geogCoverageExtent) {
-                                                    extent.bbox = getIntersection(extent.bbox, geogCoverageExtent.bbox);
-                                                }
-                                            } else {
-                                                if (datasetConfig.coverageExtent) {
-                                                    // when the coverage includes images in different srs, the output of the
-                                                    // GetCoverage can be in any of them, but the subset should be specified in the global
-                                                    // coverage srs (typically EPSG:4326). So we force the extent to be in the
-                                                    // configured srs.
-                                                    if (datasetConfig.coverageExtent.srs !== extent.srs) {
-                                                        extent.bbox = transformExtent(
-                                                            extent.bbox,
-                                                            extent.srs,
-                                                            datasetConfig.coverageExtent.srs
-                                                        );
-                                                        extent.srs = datasetConfig.coverageExtent.srs;
-                                                    }
-                                                    extent.bbox = getIntersection(extent.bbox, datasetConfig.coverageExtent.bbox);
-                                                }
-                                            }
+                    .then((extent) => {
+                        if (!keepDatasetSrs && extent.srs !== 'EPSG:4326') {
+                            extent.bbox = transformExtent(extent.bbox, extent.srs, 'EPSG:4326');
+                            extent.srs = 'EPSG:4326';
+                            if (geogCoverageExtent) {
+                                extent.bbox = getIntersection(extent.bbox, geogCoverageExtent.bbox);
+                            }
+                        } else {
+                            if (datasetConfig.coverageExtent) {
+                                // when the coverage includes images in different srs, the output of the
+                                // GetCoverage can be in any of them, but the subset should be specified in the global
+                                // coverage srs (typically EPSG:4326). So we force the extent to be in the
+                                // configured srs.
+                                if (datasetConfig.coverageExtent.srs !== extent.srs) {
+                                    extent.bbox = transformExtent(extent.bbox, extent.srs, datasetConfig.coverageExtent.srs);
+                                    extent.srs = datasetConfig.coverageExtent.srs;
+                                }
+                                extent.bbox = getIntersection(extent.bbox, datasetConfig.coverageExtent.bbox);
+                            }
+                        }
 
-                                            if (datasetConfig.requestExtentOffset) {
-                                                extent.bbox[0] -= datasetConfig.requestExtentOffset[0];
-                                                extent.bbox[2] -= datasetConfig.requestExtentOffset[0];
-                                                extent.bbox[1] -= datasetConfig.requestExtentOffset[1];
-                                                extent.bbox[3] -= datasetConfig.requestExtentOffset[1];
-                                            }
-                                            return extent;
-                                        });
-                                    })
-                                    .catch((error) => {
-                                        return Promise.resolve(keepDatasetSrs ? datasetConfig.coverageExtent : geogCoverageExtent);
-                                    });
-                            })
-                            .catch((error) => {
-                                return Promise.resolve(keepDatasetSrs ? datasetConfig.coverageExtent : geogCoverageExtent);
-                            });
+                        if (datasetConfig.requestExtentOffset) {
+                            extent.bbox[0] -= datasetConfig.requestExtentOffset[0];
+                            extent.bbox[2] -= datasetConfig.requestExtentOffset[0];
+                            extent.bbox[1] -= datasetConfig.requestExtentOffset[1];
+                            extent.bbox[3] -= datasetConfig.requestExtentOffset[1];
+                        }
+                        return extent;
                     })
-                    .catch(() => {
+                    .catch((error) => {
                         return Promise.resolve(keepDatasetSrs ? datasetConfig.coverageExtent : geogCoverageExtent);
                     });
             } else {

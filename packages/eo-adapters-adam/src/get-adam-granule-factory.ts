@@ -1,13 +1,11 @@
 import { v4 as uuid } from 'uuid';
 import { autorun } from 'mobx';
-import proj4 from 'proj4';
-import { register } from 'ol/proj/proj4';
-import { fromArrayBuffer, GeoTIFFImage } from 'geotiff';
 import download from 'downloadjs';
+import { transformExtent } from 'ol/proj';
 
-import { createAxiosInstance, AxiosInstanceWithCancellation, EpsgIoDefinitionProvider, TileSource, NUMERIC_FIELD_ID } from '@oidajs/core';
+import { createAxiosInstance, AxiosInstanceWithCancellation, TileSource, NUMERIC_FIELD_ID } from '@oidajs/core';
 import { TileLayer } from '@oidajs/state-mobx';
-import { getPlottyColorScales } from '@oidajs/eo-geotiff';
+import { GeotiffRenderer, getPlottyColorScales } from '@oidajs/eo-geotiff';
 import {
     DatasetConfig,
     DatasetMapViewConfig,
@@ -24,64 +22,8 @@ import {
 import { AdamGranuleConfig } from './adam-granule-config';
 import { ADAM_WCS_SOURCE_ID } from './map-view';
 import { AdamSpatialCoverageProvider } from './get-adam-dataset-spatial-coverage-provider';
-import { AdamServiceParamsSerializer, createGeoTiffLoader, getAoiWcsParams, getColormapWcsParams } from './utils';
+import { AdamServiceParamsSerializer, createGeoTiffLoader, GeotiffLoader, getAoiWcsParams, getColormapWcsParams } from './utils';
 import { AdamDatasetDownloadConfig } from './download';
-
-//TODO: This utils were extracted from the eo-geotiff library for lack of time
-// Refactor the code to use the GeotiffLoader class instead
-
-const srsDefProvider = new EpsgIoDefinitionProvider();
-
-const getGeotiffSrs = (image: GeoTIFFImage) => {
-    const imageSrs: number = image.geoKeys.ProjectedCSTypeGeoKey || image.geoKeys.GeographicTypeGeoKey;
-    if (imageSrs) {
-        if (imageSrs < 32767) {
-            return `EPSG:${imageSrs}`;
-        } else {
-            return undefined;
-        }
-    } else {
-        return undefined;
-    }
-};
-
-const registerSrs = (code: string) => {
-    if (!proj4.defs(code)) {
-        return srsDefProvider
-            .getSrsDefinition(code)
-            .then((srsDef) => {
-                proj4.defs(code, srsDef);
-                register(proj4);
-            })
-            .then(() => {
-                return true;
-            });
-    } else {
-        return Promise.resolve(false);
-    }
-};
-
-const transformExtent = (extent: number[], sourceSrs: string, destSrs: string): number[] => {
-    const ll = proj4(sourceSrs, destSrs, [extent[0], extent[1]]);
-    const ur = proj4(sourceSrs, destSrs, [extent[2], extent[3]]);
-
-    return [...ll, ...ur];
-};
-
-const getGeotiffExtent = (image: GeoTIFFImage): Promise<{ bbox: number[]; srs: string } | undefined> => {
-    const imageExtent = image.getBoundingBox();
-    const imageSrs = getGeotiffSrs(image);
-    if (imageSrs) {
-        return registerSrs(imageSrs).then(() => {
-            return {
-                bbox: imageExtent,
-                srs: imageSrs
-            };
-        });
-    } else {
-        return Promise.resolve(undefined);
-    }
-};
 
 export const getGranuleCoverageWcsParams = (granuleConfig: AdamGranuleConfig, bandMode: RasterBandMode) => {
     if (bandMode.value instanceof RasterBandModeSingle) {
@@ -100,7 +42,7 @@ export const getGranuleCoverageWcsParams = (granuleConfig: AdamGranuleConfig, ba
 };
 
 export const getAdamGranuleSpatialCoverageProvider = (
-    axiosInstance: AxiosInstanceWithCancellation,
+    geotiffRenderer: GeotiffRenderer,
     granuleConfig: AdamGranuleConfig
 ): AdamSpatialCoverageProvider => {
     return (mapView: DatasetViz<string, any>, keepDatasetSrs?: boolean) => {
@@ -146,33 +88,23 @@ export const getAdamGranuleSpatialCoverageProvider = (
             }
 
             if (wcsUrl && wcsParams.coverageId) {
-                return axiosInstance
-                    .cancelableRequest({
-                        url: wcsUrl,
-                        params: {
+                return geotiffRenderer
+                    .extractGeotiffExtentFromUrl({
+                        url: `${wcsUrl}?${AdamServiceParamsSerializer({
                             ...wcsParams,
                             subset: subsets
-                        },
-                        paramsSerializer: {
-                            serialize: AdamServiceParamsSerializer
-                        },
-                        responseType: 'arraybuffer'
+                        })}`
                     })
-                    .then((response) => {
-                        return fromArrayBuffer(response.data).then((tiff) => {
-                            return tiff.getImage().then((image) => {
-                                return getGeotiffExtent(image).then((extent) => {
-                                    if (!extent) {
-                                        throw new Error('Unable to extract tiff extent');
-                                    }
-                                    if (!keepDatasetSrs && extent.srs !== 'EPSG:4326') {
-                                        extent.bbox = transformExtent(extent.bbox, extent.srs, 'EPSG:4326');
-                                        extent.srs = 'EPSG:4326';
-                                    }
-                                    return extent;
-                                });
-                            });
-                        });
+                    .then((extent) => {
+                        if (!keepDatasetSrs && extent.srs !== 'EPSG:4326') {
+                            const geogExtent = transformExtent(extent.bbox, extent.srs, 'EPSG:4326');
+                            return {
+                                bbox: geogExtent,
+                                srs: 'EPSG:4326'
+                            };
+                        } else {
+                            return extent;
+                        }
                     })
                     .catch((error) => {
                         if (!mapView.dataset.aoi) {
@@ -315,11 +247,9 @@ export const getAdamGranuleDownloadConfig = (axiosInstance: AxiosInstanceWithCan
 
 export const createAdamGranuleRasterTileSourceProvider = (
     granuleConfig: AdamGranuleConfig,
-    axiosInstance: AxiosInstanceWithCancellation,
+    geotiffLoader: GeotiffLoader,
     spatialCoverageProvider: AdamSpatialCoverageProvider
 ) => {
-    const geotiffLoader = createGeoTiffLoader({ axiosInstance, rotateImage: false });
-
     const provider = (rasterView: RasterMapViz) => {
         if (granuleConfig.aoiRequired && !rasterView.dataset.aoi) {
             return Promise.reject(new Error('Select an area of interest to visualize data from this layer'));
@@ -389,23 +319,23 @@ export const createAdamGranuleRasterTileSourceProvider = (
 };
 
 export const getAdamGranuleRasterMapViewConfig = (
-    axiosInstance: AxiosInstanceWithCancellation,
+    geotiffLoader: GeotiffLoader,
     granuleConfig: AdamGranuleConfig,
     spatialCoverageProvider: AdamSpatialCoverageProvider
 ) => {
-    const { provider, tiffLoader } = createAdamGranuleRasterTileSourceProvider(granuleConfig, axiosInstance, spatialCoverageProvider);
+    const { provider, tiffLoader } = createAdamGranuleRasterTileSourceProvider(granuleConfig, geotiffLoader, spatialCoverageProvider);
 
     const afterInit = (mapViz: RasterMapViz) => {
         autorun(
             () => {
                 const bandMode = mapViz.bandMode.value;
                 if (bandMode?.type === RasterBandModeType.Single) {
-                    tiffLoader.renderer.setColorScale(bandMode.colorMap.colorScale);
+                    tiffLoader.renderer.plotty.setColorScale(bandMode.colorMap.colorScale);
                     const domain = bandMode.colorMap.domain;
                     if (domain) {
-                        tiffLoader.renderer.setDomain([domain.mapRange.min, domain.mapRange.max]);
-                        tiffLoader.renderer.setClamp(domain.clamp);
-                        tiffLoader.renderer.setNoDataValue(domain.noDataValue);
+                        tiffLoader.renderer.plotty.setDomain([domain.mapRange.min, domain.mapRange.max]);
+                        tiffLoader.renderer.plotty.setClamp(domain.clamp);
+                        tiffLoader.renderer.plotty.setNoDataValue(domain.noDataValue);
                     }
 
                     mapViz.mapLayer.children.items.forEach((layer) => {
@@ -453,14 +383,16 @@ export const getAdamGranuleFactory = () => {
     const axiosInstance = createAxiosInstance();
 
     const datasetFactory = (config: AdamGranuleConfig) => {
-        const spatialCoverageProvider = getAdamGranuleSpatialCoverageProvider(axiosInstance, config);
+        const geotiffLoader = createGeoTiffLoader({ axiosInstance, rotateImage: false });
+
+        const spatialCoverageProvider = getAdamGranuleSpatialCoverageProvider(geotiffLoader.renderer, config);
 
         const datasetConfig: DatasetConfig = {
             id: uuid(),
             name: config.name,
             color: config.color,
             filters: [],
-            mapView: getAdamGranuleRasterMapViewConfig(axiosInstance, config, spatialCoverageProvider),
+            mapView: getAdamGranuleRasterMapViewConfig(geotiffLoader, config, spatialCoverageProvider),
             tools: [],
             download: getAdamGranuleDownloadConfig(axiosInstance, config),
             spatialCoverageProvider: (mapView) => {

@@ -57,7 +57,7 @@ export const createVerticalProfileDataProvider = (
                     minHeight: 0
                 },
                 style: {
-                    fillImage: imageData as string
+                    fillImage: imageData
                 }
             };
             return verticalProfile;
@@ -181,7 +181,7 @@ export const createVerticalProfileDataProvider = (
                 })
                 .then((dataUrl) => {
                     return geotiffLoader.load({ url: dataUrl }).then((imageData) => {
-                        return imageData as string;
+                        return imageData;
                     });
                 });
         }

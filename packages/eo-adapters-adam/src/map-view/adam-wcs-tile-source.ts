@@ -101,14 +101,20 @@ olTileSourcesFactory.register(ADAM_WCS_SOURCE_ID, (config) => {
                     tileLoadParams.requestExtent = tileGrid.getTileCoordExtent(tile.getTileCoord());
                     tileLoadParams.requestSrs = config.srs || 'EPSG:4326';
                 }
-                config.tileLoadFunction(tileLoadParams).then((sourceDataUrl) => {
-                    if (sourceDataUrl) {
-                        (tile.getImage() as HTMLImageElement).src = sourceDataUrl;
-                    } else {
+                config
+                    .tileLoadFunction(tileLoadParams)
+                    .then((sourceDataUrl) => {
+                        if (sourceDataUrl) {
+                            (tile.getImage() as HTMLImageElement).src = sourceDataUrl;
+                        } else {
+                            // @ts-ignore: need access to private method
+                            tile.handleImageError_();
+                        }
+                    })
+                    .catch(() => {
                         // @ts-ignore: need access to private method
                         tile.handleImageError_();
-                    }
-                });
+                    });
             } else {
                 let retryCount = 3;
 

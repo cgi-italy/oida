@@ -11,6 +11,7 @@ import { getAdamDatasetToolsConfig } from './tools';
 import { getAdamDatasetMapViewConfig } from './map-view';
 import { getAdamDatasetSpatialCoverageProvider } from './get-adam-dataset-spatial-coverage-provider';
 import { AdamOpenSearchClient, AdamOpensearchMetadataModelVersion } from './common';
+import { createGeoTiffLoader } from './utils';
 
 export type AdamDatasetFactoryConfig = {
     wcsServiceUrl: string;
@@ -34,9 +35,11 @@ export const getAdamDatasetFactory = (factoryConfig: AdamDatasetFactoryConfig) =
     }
 
     const datasetFactory = (config: AdamDatasetConfig) => {
+        const geotiffLoader = createGeoTiffLoader({ axiosInstance, rotateImage: false });
+
         const productSearchConfig = getAdamDatasetProductSearchConfig(axiosInstance, factoryConfig, config, openSearchClient);
         const timeDistributionConfig = getAdamDatasetTimeDistributionConfig(axiosInstance, config, productSearchConfig?.searchProvider);
-        const spatialCoverageProvider = getAdamDatasetSpatialCoverageProvider(axiosInstance, factoryConfig, config);
+        const spatialCoverageProvider = getAdamDatasetSpatialCoverageProvider(geotiffLoader.renderer, factoryConfig, config);
 
         const datasetConfig: DatasetConfig = {
             id: uuid(),
@@ -45,7 +48,14 @@ export const getAdamDatasetFactory = (factoryConfig: AdamDatasetFactoryConfig) =
             filters: [],
             productSearch: productSearchConfig,
             timeDistribution: timeDistributionConfig,
-            mapView: getAdamDatasetMapViewConfig(axiosInstance, factoryConfig, config, spatialCoverageProvider, openSearchClient),
+            mapView: getAdamDatasetMapViewConfig(
+                axiosInstance,
+                factoryConfig,
+                config,
+                spatialCoverageProvider,
+                geotiffLoader,
+                openSearchClient
+            ),
             tools: getAdamDatasetToolsConfig(axiosInstance, factoryConfig, config, timeDistributionConfig?.provider),
             download: getAdamDatasetDownloadConfig(axiosInstance, factoryConfig, config),
             spatialCoverageProvider: (mapView) => {
