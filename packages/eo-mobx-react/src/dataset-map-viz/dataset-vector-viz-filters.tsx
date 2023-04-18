@@ -3,7 +3,7 @@ import { Button, Dropdown, Tooltip } from 'antd';
 import { DeleteOutlined, PlusOutlined, DownOutlined } from '@ant-design/icons';
 
 import { BOOLEAN_FIELD_ID, DATE_RANGE_FIELD_ID, ENUM_FIELD_ID, NUMERIC_RANGE_FIELD_ID, STRING_FIELD_ID } from '@oidajs/core';
-import { InputFieldRenderer, NumericRangeFieldRenderer, SelectEnumRenderer } from '@oidajs/ui-react-antd';
+import { DateRangeFieldRenderer, InputFieldRenderer, NumericRangeFieldRenderer, SelectEnumRenderer } from '@oidajs/ui-react-antd';
 import { useSelector } from '@oidajs/ui-react-mobx';
 import { DatasetVectorMapViz, VectorFeaturePropertyDescriptor } from '@oidajs/eo-mobx';
 
@@ -71,8 +71,8 @@ export const DatasetVectorVizFilters = (props: DatasetVectorVizFiltersProps) => 
             props.dataset.propertyFilters.set(
                 property.id,
                 {
-                    start: property.domain?.min,
-                    end: property.domain?.max
+                    start: property.domain?.min || new Date(0),
+                    end: property.domain?.max || new Date()
                 },
                 DATE_RANGE_FIELD_ID
             );
@@ -137,6 +137,20 @@ export const DatasetVectorVizFilters = (props: DatasetVectorVizFiltersProps) => 
                     }}
                 />
             );
+        } else if (featureProperty.type === 'date') {
+            filterElement = (
+                <DateRangeFieldRenderer
+                    config={{
+                        minDate: featureProperty.domain?.min,
+                        maxDate: featureProperty.domain?.max
+                    }}
+                    value={filter.value}
+                    required={true}
+                    onChange={(value) => {
+                        props.dataset.propertyFilters.set(featureProperty.id, value, DATE_RANGE_FIELD_ID);
+                    }}
+                />
+            );
         }
         //TODO: add filters for other feature property types
 
@@ -178,7 +192,12 @@ export const DatasetVectorVizFilters = (props: DatasetVectorVizFiltersProps) => 
             <div className='dataset-vector-viz-filter-header'>
                 <span>Data filters:</span>
                 <Tooltip title='Add filter'>
-                    <Dropdown menu={{ items: filterDropdownItems }} trigger={['click']} disabled={!missingFilters.length}>
+                    <Dropdown
+                        menu={{ items: filterDropdownItems }}
+                        trigger={['click']}
+                        disabled={!missingFilters.length}
+                        overlayClassName='dataset-vector-viz-filters-dropdown-items'
+                    >
                         <Button type='primary' size='small'>
                             <PlusOutlined />
                             <DownOutlined />
