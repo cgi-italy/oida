@@ -20,6 +20,7 @@ import {
 
 import { ColorMap, ColorScale, DatasetDimension, DatasetViz, DatasetVizProps, DimensionDomainType, DiscreteColorMap } from '../common';
 import { EnumFeaturePropertyDescriptor, VectorFeatureDescriptor, VectorFeatureProperties } from './vector-feature-descriptor';
+import { createPropertiesDescriptorFromFeatures } from '../utils';
 /**
  * Default feature style factory for {@link DatasetVectorMapViz}. Used when no featureStyleFactory is
  * provided in {@link DatasetVectorMapVizConfig}
@@ -242,7 +243,7 @@ export class DatasetVectorMapViz extends DatasetViz<typeof VECTOR_VIZ_TYPE, Feat
 
         if (typeof props.config.featureDescriptor !== 'function') {
             this.featureDescriptor = props.config.featureDescriptor;
-            this.labelProperties = props.config.featureDescriptor!.labelProps;
+            this.labelProperties = props.config.featureDescriptor?.labelProps;
         }
 
         this.subscriptionTracker_ = new SubscriptionTracker();
@@ -305,10 +306,10 @@ export class DatasetVectorMapViz extends DatasetViz<typeof VECTOR_VIZ_TYPE, Feat
         this.labelProperties = labelProperties;
     }
 
-    /** The currently selected feature */
+    /** The currently selected features */
     @computed
-    get selectedFeature() {
-        return this.data_.find((feature) => feature.selected.value);
+    get selectedFeatures() {
+        return this.data_.filter((feature) => feature.selected.value);
     }
 
     dispose() {
@@ -411,19 +412,29 @@ export class DatasetVectorMapViz extends DatasetViz<typeof VECTOR_VIZ_TYPE, Feat
      * @param data the new feature array
      */
     @action
-    protected refreshData_(data: DatasetVectorFeatureProps[]) {
+    protected setData_(data: DatasetVectorFeatureProps[], append?: boolean) {
+        if (!this.featureDescriptor && data.length) {
+            // infer the feature descriptor from data
+            this.featureDescriptor = {
+                typeName: '',
+                properties: createPropertiesDescriptorFromFeatures(data.map((feature) => feature.properties))
+            };
+        }
         const colorGetter = this.featureColorGetter;
         const labelGetter = this.featureLabelGetter;
-        this.data_.replace(
-            data.map(
-                (props) =>
-                    new DatasetVectorFeature({
-                        ...props,
-                        color: colorGetter(props),
-                        label: labelGetter(props)
-                    })
-            )
-        );
+
+        const newData = data.map((props) => {
+            return new DatasetVectorFeature({
+                ...props,
+                color: colorGetter(props),
+                label: labelGetter(props)
+            });
+        });
+        if (append) {
+            this.data_.push(...newData);
+        } else {
+            this.data_.replace(newData);
+        }
     }
 
     protected afterInit_() {
@@ -467,20 +478,7 @@ export class DatasetVectorMapViz extends DatasetViz<typeof VECTOR_VIZ_TYPE, Feat
                     // retrieve data in batches until the generator completes
                     let next = dataRequest.next();
                     const handleNextValue = (data: DatasetVectorFeatureProps<VectorFeatureProperties>[]) => {
-                        runInAction(() => {
-                            const colorGetter = this.featureColorGetter;
-                            const labelGetter = this.featureLabelGetter;
-                            this.data_.push(
-                                ...data.map(
-                                    (props) =>
-                                        new DatasetVectorFeature({
-                                            ...props,
-                                            color: colorGetter(props),
-                                            label: labelGetter(props)
-                                        })
-                                )
-                            );
-                        });
+                        this.setData_(data, true);
                         next = dataRequest.next();
                         if (!next.done) {
                             runningDataPromise = next.value;
@@ -500,7 +498,7 @@ export class DatasetVectorMapViz extends DatasetViz<typeof VECTOR_VIZ_TYPE, Feat
                 } else {
                     dataRequest
                         .then((data) => {
-                            this.refreshData_(data);
+                            this.setData_(data);
                             this.mapLayer.loadingStatus.setValue(LoadingState.Success);
                         })
                         .catch(onDataError);
@@ -558,7 +556,7 @@ export class DatasetVectorMapViz extends DatasetViz<typeof VECTOR_VIZ_TYPE, Feat
 
         // enable dataset widget visibility when a feature is selected (i.e. display feature information)
         const widgetVisibilityDisposer = autorun(() => {
-            if (this.selectedFeature) {
+            if (this.selectedFeatures.length) {
                 this.setWidgetVisible(true);
             } else {
                 this.setWidgetVisible(false);

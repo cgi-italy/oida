@@ -3,7 +3,6 @@
 
     .ant-descriptions-row {
         .ant-descriptions-item {
-
             padding-bottom: @padding-xss;
 
             .ant-descriptions-item-label {
@@ -21,5 +20,46 @@
             }
         }
     }
+}
 
+.dataset-vector-feature-info-table {
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    padding: @padding-xs;
+
+    .table-controls {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: @margin-sm;
+
+        .table-items-info {
+            margin-left: @margin-xs;
+            color: @text-color-secondary;
+        }
+    }
+    .table-content {
+        height: 100%;
+        overflow: hidden;
+
+        .ant-table-body {
+            overflow-y: auto !important;
+        }
+        .ant-table-pagination {
+            margin: @margin-xs 0;
+        }
+        .table-cell-content {
+            display: inline-block;
+            min-width: 80px;
+            max-width: 250px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+
+            img {
+                max-height: 70px;
+            }
+        }
+    }
 }

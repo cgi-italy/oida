@@ -38,6 +38,8 @@ export type FeaturePropertyDescriptorCommon<TYPE extends keyof FeaturePropertyVa
     description?: string;
     /** A boolean flag indicating if filtering should be enabled for this property */
     filterable?: boolean;
+    /** A boolean flag indicating if records can be sorted based on the value of this property */
+    sortable?: boolean;
     /** A boolean flag indicating if the property is an array of values */
     isArray?: boolean;
     /** A boolean flag indicating if the feature is required*/
