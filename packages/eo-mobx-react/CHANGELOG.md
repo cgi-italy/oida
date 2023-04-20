@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.3.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-mobx-react@4.2.0...@oidajs/eo-mobx-react@4.3.0) (2023-04-20)
+
+### Bug Fixes
+
+- use name from descriptor in vector discrete colormap editor ([498991b](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/498991b889937df9079f925a0258f763c4047f37))
+
+### Features
+
+- add support for vector date range filter ([3c3318b](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/3c3318b7bfe2b4000eeecf838fe54d2a58c907ac))
+- use data table for vector feature multi selection ([7651a6b](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/7651a6bbedc356f73eef9fb945decb090ca6be46))
+
 # [4.2.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-mobx-react@4.1.1...@oidajs/eo-mobx-react@4.2.0) (2023-04-12)
 
 ### Features

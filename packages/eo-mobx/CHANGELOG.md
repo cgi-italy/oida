@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.2.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-mobx@3.1.0...@oidajs/eo-mobx@3.2.0) (2023-04-20)
+
+### Features
+
+- use data table for vector feature multi selection ([7651a6b](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/7651a6bbedc356f73eef9fb945decb090ca6be46))
+
 # [3.1.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-mobx@3.0.2...@oidajs/eo-mobx@3.1.0) (2023-04-12)
 
 ### Features
