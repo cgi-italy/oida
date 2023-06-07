@@ -390,7 +390,8 @@ export class CesiumMapRenderer implements IMapRenderer {
             sceneMode: this.getSceneMode_(renderProps),
             mapProjection: mapProjection,
             requestRenderMode: true,
-            mapMode2D: projection.wrapX ? MapMode2D.INFINITE_SCROLL : MapMode2D.ROTATE
+            mapMode2D: projection.wrapX ? MapMode2D.INFINITE_SCROLL : MapMode2D.ROTATE,
+            creditContainer: props.creditsTarget
         });
 
         this.viewer_.scene.primitives.destroyPrimitives = false;

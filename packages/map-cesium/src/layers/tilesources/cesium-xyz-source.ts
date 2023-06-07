@@ -10,6 +10,7 @@ cesiumTileSourcesFactory.register('xyz', (config) => {
         return new UrlTemplateImageryProvider({
             url: getUrlFromTemplate(config),
             tilingScheme: tileGrid.scheme,
+            credit: config.credits,
             ...tileGrid.config
         });
     }

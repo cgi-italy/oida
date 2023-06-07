@@ -26,6 +26,7 @@ export interface IMapRendererProps {
     projection: IMapProjection;
     viewport: IMapViewport;
     target?: HTMLElement;
+    creditsTarget?: HTMLElement;
     onViewUpdating?: (viewport?: IMapViewport) => void;
     onViewUpdated?: (viewport?: IMapViewport) => void;
 }
