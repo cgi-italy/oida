@@ -1,0 +1,32 @@
+{
+  "name": "@oidajs/eo-adapters-planetary-computer",
+  "version": "0.1.0",
+  "description": "oida EO adapters for Microsoft Planetary Computer APIs",
+  "module": "es/index.js",
+  "main": "lib/index.js",
+  "types": "types/index.d.ts",
+  "files": [
+    "es",
+    "lib",
+    "types"
+  ],
+  "scripts": {
+    "build:es": "tsc",
+    "build:umd": "tsc --project tsconfig.umd.json",
+    "clean": "rimraf ./lib ./es ./types ./tsconfig.tsbuildinfo",
+    "watch": "cross-env TSC_WATCHFILE=UseFsEventsWithFallbackDynamicPolling tsc --watch --preserveWatchOutput",
+    "lint:check": "eslint \"./src/**/*.{ts,tsx}\"",
+    "lint:fix": "eslint \"./src/**/*.{ts,tsx}\" --quiet --fix",
+    "test": "jest --config ./jest.config.js"
+  },
+  "author": "stefano marra",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@oidajs/core": "^4.7.0",
+    "@oidajs/eo-mobx": "^3.2.0",
+    "tslib": "^2.4.1"
+  }
+}
