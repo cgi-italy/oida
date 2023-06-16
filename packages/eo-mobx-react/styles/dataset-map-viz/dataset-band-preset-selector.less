@@ -5,19 +5,22 @@
         img {
             max-width: 100%;
         }
+
+        .dataset-raster-band-preset-legend-values {
+            display: flex;
+            justify-content: space-between;
+            font-size: @font-size-sm;
+        }
     }
 }
 
 .dataset-raster-band-presets {
-
     border: solid 1px @border-color-base;
     border-radius: 5px;
     overflow: hidden;
-
 }
 
 .dataset-raster-band-preset {
-
     display: flex;
     align-items: center;
 
@@ -59,26 +62,20 @@
     }
 
     &:hover {
-        background: @item-hover-bg
+        background: @item-hover-bg;
     }
 }
 
-
-
 .ant-dropdown-trigger.dataset-raster-band-preset {
-
     border: solid 1px @border-color-base;
     border-radius: @border-radius-base;
 
     &.ant-dropdown-open {
         border-color: @primary-color;
     }
-
 }
 
-
 .ant-dropdown {
-
     .dataset-raster-band-presets {
         background: @component-background;
         box-shadow: @shadow-1-down;
@@ -88,5 +85,4 @@
             border-bottom: none;
         }
     }
-
 }

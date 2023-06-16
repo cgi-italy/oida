@@ -87,6 +87,13 @@ export const DatasetBandPresetSelector = (props: DatasetBandPresetSelectorProps)
             {selectedPresetConfig && selectedPresetConfig.legend && (
                 <div className='dataset-raster-band-preset-legend'>
                     <img src={selectedPresetConfig.legend} />
+                    {selectedPresetConfig.legendValues && (
+                        <div className='dataset-raster-band-preset-legend-values'>
+                            {selectedPresetConfig.legendValues.map((value) => (
+                                <span>{value}</span>
+                            ))}
+                        </div>
+                    )}
                 </div>
             )}
         </div>

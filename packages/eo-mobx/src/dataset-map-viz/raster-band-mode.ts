@@ -24,6 +24,7 @@ export type RasterBandPreset = {
     name: string;
     preview?: string;
     legend?: string;
+    legendValues?: number[];
     description?: string;
 };
 
