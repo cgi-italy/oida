@@ -49,7 +49,7 @@ export type DatasetVariable<D extends DataDomain<unknown>> = {
 
 export type DatasetDimension<D extends DataDomain<unknown>> = DatasetVariable<D>;
 
-export type DistributionHistogramBin = [x_center: number, count: number, x_min: number, x_max: number];
+export type DistributionHistogramBin = [x_center: number, count: number, x_min: number, x_max: number, label?: string];
 export type DistributionPercentile = [percentile: number, value: number];
 
 export type NumericalValueDomain = ValueDomain<number> & {
