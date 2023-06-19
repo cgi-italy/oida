@@ -13,7 +13,7 @@ export const BrowserSample = (props: BrowserSampleProps) => {
     const docsContext = useDocusaurusContext();
 
     const codeLink = `${docsContext.siteConfig.customFields.gitlabDocsUrl}/src/components/examples/${props.sampleName}`;
-
+    const baseUrl = useBaseUrl('Cesium/');
     return (
         <div>
             <a href={codeLink} target='_black'>
@@ -22,7 +22,7 @@ export const BrowserSample = (props: BrowserSampleProps) => {
             <BrowserOnly>
                 {() => {
                     // @ts-ignore
-                    buildModuleUrl.setBaseUrl(useBaseUrl('Cesium/'));
+                    buildModuleUrl.setBaseUrl(baseUrl);
 
                     const SampleComponent = lazy(() => {
                         return import(`./${props.sampleName}/${props.sampleName}`).then((sampleModule) => {

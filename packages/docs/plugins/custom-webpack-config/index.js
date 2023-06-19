@@ -25,8 +25,13 @@ module.exports = function (context, options) {
                     alias: {
                         // use workspace react (otherwise two different version of react will be used)
                         react: path.resolve('../../node_modules/react'),
-                        "react-dom": path.resolve('../../node_modules/react-dom'),
+                        'react-dom': path.resolve('../../node_modules/react-dom')
                     }
+                },
+                snapshot: {
+                    // by default webpack does not track changes to node_modules directory
+                    // when working with linked oida/poieo libraries we want to track changes to them
+                    managedPaths: [/node_modules\/(!@oidajs)/]
                 },
                 module: {
                     rules: [
@@ -37,6 +42,27 @@ module.exports = function (context, options) {
                             use: [
                                 {
                                     loader: 'source-map-loader'
+                                }
+                            ]
+                        },
+                        {
+                            test: /\.jsx?$/,
+                            include: /node_modules[/\\]ol[/\\]/,
+                            use: [
+                                {
+                                    loader: 'babel-loader',
+                                    options: {
+                                        presets: [
+                                            '@babel/typescript',
+                                            [
+                                                '@babel/env',
+                                                {
+                                                    targets: 'ie 11'
+                                                }
+                                            ]
+                                        ],
+                                        sourceMaps: false
+                                    }
                                 }
                             ]
                         }

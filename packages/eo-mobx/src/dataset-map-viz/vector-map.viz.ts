@@ -1,7 +1,7 @@
 import { action, autorun, computed, IObservableArray, makeObservable, observable, reaction, runInAction } from 'mobx';
 import chroma from 'chroma-js';
 
-import { Geometry, LoadingState, randomColorFactory, SubscriptionTracker } from '@oidajs/core';
+import { FeatureClusteringConfig, Geometry, LoadingState, randomColorFactory, SubscriptionTracker } from '@oidajs/core';
 import {
     DataFilters,
     DataFiltersProps,
@@ -21,6 +21,7 @@ import {
 import { ColorMap, ColorScale, DatasetDimension, DatasetViz, DatasetVizProps, DimensionDomainType, DiscreteColorMap } from '../common';
 import { EnumFeaturePropertyDescriptor, VectorFeatureDescriptor, VectorFeatureProperties } from './vector-feature-descriptor';
 import { createPropertiesDescriptorFromFeatures } from '../utils';
+
 /**
  * Default feature style factory for {@link DatasetVectorMapViz}. Used when no featureStyleFactory is
  * provided in {@link DatasetVectorMapVizConfig}
@@ -86,6 +87,34 @@ export const defaultVectoreFeatureStyleFactory = (color?: string) => {
     };
 
     return featureStyleGetter;
+};
+
+const defaultClusterImage =
+    'data:image/png;base64,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';
+
+/**
+ * Default cluster style function. Used when clustering is enabled but no clustering
+ * style is defined in the {@link DatasetVectorMapVizConfig} mapLayerOptions
+ * @param features the cluster features
+ * @returns the style for the cluster
+ */
+export const defaultClusterStyle: FeatureClusteringConfig<DatasetVectorFeature>['style'] = (features) => {
+    const allSelected = features.every((feature) => feature.model.selected.value);
+    const someSelected = !allSelected && features.some((feature) => feature.model.selected.value);
+    return {
+        label: {
+            text: `${features.length}`,
+            visible: true,
+            fillColor: allSelected ? [0, 0, 0] : [1, 1, 1]
+        },
+        point: {
+            url: defaultClusterImage,
+            scale: 0.1 + 0.05 * `${features.length}`.length,
+            color: allSelected ? [1, 1, 0] : someSelected ? [1, 0.5, 0] : [0.4, 0.4, 0.8],
+            visible: true,
+            zIndex: allSelected ? 1 : 0
+        }
+    };
 };
 
 export type DatasetVectorFeatureProps<T extends VectorFeatureProperties = VectorFeatureProperties> = {
@@ -176,6 +205,10 @@ export type DatasetVectorMapVizConfig = {
      * used as input for the internal {@link FeatureLayer}.
      */
     featureStyleFactory?: (color?: string) => FeatureStyleGetter<DatasetVectorFeature>;
+
+    mapLayerOptions?: {
+        clustering: Partial<FeatureClusteringConfig<DatasetVectorFeature>>;
+    };
 
     dimensions?: DatasetDimension<DimensionDomainType>[];
 };
@@ -582,14 +615,22 @@ export class DatasetVectorMapViz extends DatasetViz<typeof VECTOR_VIZ_TYPE, Feat
         }
     }
 
-    protected initMapLayer_(props) {
+    protected initMapLayer_(props: DatasetVectorMapVizProps) {
+        const clusteringConfig = props.config.mapLayerOptions?.clustering;
         return new FeatureLayer<DatasetVectorFeature>({
             id: `${this.id}_layer`,
             config: {
                 geometryGetter: (feature) => feature.geometry,
                 styleGetter: props.config.featureStyleFactory
                     ? props.config.featureStyleFactory(this.dataset.config.color)
-                    : defaultVectoreFeatureStyleFactory(this.dataset.config.color)
+                    : defaultVectoreFeatureStyleFactory(this.dataset.config.color),
+                clustering: clusteringConfig?.enabled
+                    ? {
+                          enabled: true,
+                          style: clusteringConfig.style || defaultClusterStyle,
+                          distance: clusteringConfig.distance
+                      }
+                    : undefined
             }
         });
     }

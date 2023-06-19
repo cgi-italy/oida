@@ -38,7 +38,8 @@ export class FeatureLayerController<T extends FeatureInterface> extends MapLayer
     }
 
     protected createLayerRenderer_(mapRenderer: IMapRenderer) {
-        const { styleGetter, geometryGetter, onFeatureSelect, onFeatureHover, rendererOptions } = this.mapLayer_.config.value || {};
+        const { styleGetter, geometryGetter, onFeatureSelect, onFeatureHover, clustering, rendererOptions } =
+            this.mapLayer_.config.value || {};
         if (styleGetter) {
             this.styleGetter_ = styleGetter;
         }
@@ -59,6 +60,7 @@ export class FeatureLayerController<T extends FeatureInterface> extends MapLayer
                       onFeatureSelect(feature.data.model, coordinate);
                   }
                 : undefined,
+            clustering: clustering,
             ...layerRendererOptions
         });
     }

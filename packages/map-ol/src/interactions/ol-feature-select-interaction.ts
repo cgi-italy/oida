@@ -1,23 +1,21 @@
 import { transform } from 'ol/proj';
 import Map from 'ol/Map';
+import { click, platformModifierKeyOnly, shiftKeyOnly } from 'ol/events/condition';
 
 import {
     IFeatureSelectInteractionProps,
     FEATURE_SELECT_INTERACTION_ID,
     IFeatureSelectInteractionImplementation,
     SelectionMode,
-    IFeature,
     FeatureSelectCallback
 } from '@oidajs/core';
 
 import { OLSelectInteraction, OLSelectEvent } from '../utils/ol-select-interaction';
-import { click, platformModifierKeyOnly, shiftKeyOnly } from 'ol/events/condition';
-
-import { olInteractionsFactory } from './ol-interactions-factory';
 import { OLMapRenderer } from '../map/ol-map-renderer';
 import { OLFeatureLayer } from '../layers/ol-feature-layer';
 import { OLMapLayer } from '../layers/ol-map-layer';
-import { FeatureLike } from 'ol/Feature';
+import { getFeaturesData } from '../utils';
+import { olInteractionsFactory } from './ol-interactions-factory';
 
 export class OLFeatureSelectInteraction implements IFeatureSelectInteractionImplementation {
     private viewer_: Map;
@@ -74,11 +72,15 @@ export class OLFeatureSelectInteraction implements IFeatureSelectInteractionImpl
                     // will cycle through the features under the cursor
                     lastSelectedFeatureIdx = (lastSelectedFeatureIdx + 1) % features.length;
                     const selected = features[lastSelectedFeatureIdx];
-                    const feature = this.getFeatureForSelection_(selected);
-                    if (feature) {
-                        onFeatureSelect({
-                            feature: feature,
-                            mode: selectionMode
+                    const selectedFeatures = getFeaturesData(selected);
+                    if (selectedFeatures.length) {
+                        selectedFeatures.forEach((feature) => {
+                            onFeatureSelect({
+                                feature: feature,
+                                mode: selectionMode
+                            });
+                            // add all remaining features to the selection (cluster selection)
+                            selectionMode = SelectionMode.Add;
                         });
 
                         const layer: OLMapLayer | undefined = selected.get(OLFeatureLayer.FEATURE_LAYER_KEY);
@@ -88,7 +90,7 @@ export class OLFeatureSelectInteraction implements IFeatureSelectInteractionImpl
                             if (proj.getCode() !== 'EPSG:4326') {
                                 coordinate = transform(coordinate, proj, 'EPSG:4326');
                             }
-                            layer.onFeatureSelect(coordinate, feature);
+                            layer.onFeatureSelect(coordinate, selectedFeatures[0]);
                         }
                     } else {
                         onFeatureSelect({
@@ -99,11 +101,13 @@ export class OLFeatureSelectInteraction implements IFeatureSelectInteractionImpl
                 } else {
                     lastSelectedFeatureIdx = -1;
                     features.forEach((selected) => {
-                        const feature = this.getFeatureForSelection_(selected);
-                        if (feature) {
-                            onFeatureSelect({
-                                feature: feature,
-                                mode: selectionMode
+                        const selectedFeatures = getFeaturesData(selected);
+                        if (selectedFeatures.length) {
+                            selectedFeatures.forEach((feature) => {
+                                onFeatureSelect({
+                                    feature: feature,
+                                    mode: selectionMode
+                                });
                             });
                         }
                     });
@@ -116,19 +120,6 @@ export class OLFeatureSelectInteraction implements IFeatureSelectInteractionImpl
                 });
             }
         });
-    }
-
-    protected getFeatureForSelection_(selection: FeatureLike): IFeature | undefined {
-        const featureId = selection.getId();
-        const featureData = selection.get(OLFeatureLayer.FEATURE_DATA_KEY);
-        if (typeof featureId === 'string' && featureData) {
-            return {
-                id: featureId,
-                data: featureData
-            };
-        } else {
-            return undefined;
-        }
     }
 }
 
