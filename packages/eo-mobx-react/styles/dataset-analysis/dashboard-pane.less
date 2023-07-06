@@ -12,6 +12,7 @@
         background: @component-background;
         display: flex;
         flex-direction: column;
+        border-radius: ~'@{borderRadius}px';
 
         .widget-header {
             display: flex;
@@ -45,6 +46,8 @@
             flex-grow: 1;
             overflow: auto;
             margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
             .scrollbar(8px, @primary-color, @primary-2);
         }
 

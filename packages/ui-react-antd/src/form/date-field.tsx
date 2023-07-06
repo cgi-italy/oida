@@ -1,15 +1,20 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import ReactDOM from 'react-dom';
-import { DatePicker, Select, Spin } from 'antd';
-import { DatePickerProps } from 'antd/lib/date-picker';
-import moment from 'moment';
+import { DatePicker, Select, Spin, DatePickerProps } from 'antd';
+
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
 
 import { FormFieldRendererBaseProps } from '@oidajs/ui-react-core';
 import { DateField, DATE_FIELD_ID } from '@oidajs/core';
 
 import { antdFormFieldRendererFactory } from './antd-form-field-renderer-factory';
 
-export const DateFieldRenderer = (props: FormFieldRendererBaseProps<DateField> & Omit<DatePickerProps, 'value' | 'onChange'>) => {
+dayjs.extend(utc);
+
+export const DateFieldRenderer = (
+    props: FormFieldRendererBaseProps<DateField> &
+        Omit<DatePickerProps, 'value' | 'onChange' | 'picker'> & { picker?: 'date' | 'week' | 'month' | 'quarter' | 'year' }
+) => {
     const { value, onChange, title, required, config, autoFocus, readonly, ...renderProps } = props;
 
     const [selectableDates, setSelectableDates] = useState<{
@@ -21,7 +26,7 @@ export const DateFieldRenderer = (props: FormFieldRendererBaseProps<DateField> &
     });
 
     const [selectableTimes, setSelectableTimes] = useState<{
-        date: moment.Moment;
+        date: dayjs.Dayjs;
         times: string[];
         pendingRequest?: Promise<string[]>;
     }>();
@@ -29,21 +34,17 @@ export const DateFieldRenderer = (props: FormFieldRendererBaseProps<DateField> &
     const [open, setOpen] = useState(false);
     const [mode, setMode] = useState<DatePickerProps['mode']>('date');
 
-    const pickerValue = useMemo(() => (value ? moment.utc(value) : undefined), [value, open]);
+    const pickerValue = useMemo(() => (value ? dayjs.utc(value) : undefined), [value, open]);
 
-    const onDateChange = (value: moment.Moment | null) => {
+    const onDateChange = (value: dayjs.Dayjs | null) => {
         if (value) {
             if (!value.isUTC()) {
-                value.add(value.utcOffset(), 'minutes').utc();
+                value = value.add(value.utcOffset(), 'minutes').utc();
             }
             if (!config.withTime) {
-                value.set({
-                    hour: 0,
-                    minute: 0,
-                    second: 0
-                });
+                value = value.set('hour', 0).set('minute', 0).set('second', 0);
             }
-            value.set({ millisecond: 0 });
+            value = value.set('millisecond', 0);
             onChange(value.toDate());
             if (config.selectableTimes) {
                 //retrieve the available times for the selected date and
@@ -51,11 +52,12 @@ export const DateFieldRenderer = (props: FormFieldRendererBaseProps<DateField> &
                 updateSelectableTimes(value.toDate())?.then((times) => {
                     if (times.length) {
                         const timeComponents = times[0].split(':');
-                        value.set('hours', parseInt(timeComponents[0]));
-                        value.set('minutes', parseInt(timeComponents[1]));
-                        value.set('seconds', parseInt(timeComponents[2]));
+                        value = value!
+                            .set('hours', parseInt(timeComponents[0]))
+                            .set('minutes', parseInt(timeComponents[1]))
+                            .set('seconds', parseInt(timeComponents[2]));
 
-                        onChange(value.toDate());
+                        onChange(value!.toDate());
                     }
                 });
             }
@@ -65,16 +67,17 @@ export const DateFieldRenderer = (props: FormFieldRendererBaseProps<DateField> &
     };
 
     const onTimeChange = (time: string) => {
-        const value = moment.utc(props.value);
         const timeComponents = time.split(':');
-        value.set('hours', parseInt(timeComponents[0]));
-        value.set('minutes', parseInt(timeComponents[1]));
-        value.set('seconds', parseInt(timeComponents[2]));
+        const value = dayjs
+            .utc(props.value)
+            .set('hours', parseInt(timeComponents[0]))
+            .set('minutes', parseInt(timeComponents[1]))
+            .set('seconds', parseInt(timeComponents[2]));
 
         onChange(value.toDate());
     };
 
-    const isDateSelectable = (date: moment.Moment) => {
+    const isDateSelectable = (date: dayjs.Dayjs) => {
         if (!selectableDates.dates) {
             return true;
         } else {
@@ -98,7 +101,7 @@ export const DateFieldRenderer = (props: FormFieldRendererBaseProps<DateField> &
                 const pendingRequest = config.selectableTimes(value).then((times) => {
                     if (!pendingRequest.isCanceled) {
                         setSelectableTimes({
-                            date: moment(props.value),
+                            date: dayjs.utc(props.value),
                             times: times
                         });
                     }
@@ -107,7 +110,7 @@ export const DateFieldRenderer = (props: FormFieldRendererBaseProps<DateField> &
                 setSelectableTimes({
                     times: [],
                     pendingRequest: pendingRequest,
-                    date: moment(props.value)
+                    date: dayjs.utc(props.value)
                 });
 
                 return pendingRequest;
@@ -117,19 +120,19 @@ export const DateFieldRenderer = (props: FormFieldRendererBaseProps<DateField> &
         }
     };
 
-    const updateSelectableDates = (value: moment.Moment, mode: 'date' | 'month') => {
+    const updateSelectableDates = (value: dayjs.Dayjs, mode: 'date' | 'month') => {
         if (typeof config.selectableDates === 'function') {
             let range;
             if (mode === 'date') {
                 range = {
-                    start: value.clone().startOf('month').toDate(),
-                    end: value.clone().endOf('month').toDate(),
+                    start: value.startOf('month').toDate(),
+                    end: value.endOf('month').toDate(),
                     resolution: 'day'
                 };
             } else if (mode === 'month') {
                 range = {
-                    start: value.clone().startOf('year').toDate(),
-                    end: value.clone().endOf('year').toDate(),
+                    start: value.startOf('year').toDate(),
+                    end: value.endOf('year').toDate(),
                     resolution: 'month'
                 };
             }
@@ -182,7 +185,7 @@ export const DateFieldRenderer = (props: FormFieldRendererBaseProps<DateField> &
 
     let disabledDates;
     if (config.minDate || config.maxDate || selectableDates) {
-        disabledDates = (current: moment.Moment) => {
+        disabledDates = (current: dayjs.Dayjs) => {
             return (
                 (config.minDate && current.isBefore(config.minDate, 'date')) ||
                 (config.maxDate && current.isAfter(config.maxDate, 'date')) ||
@@ -209,7 +212,7 @@ export const DateFieldRenderer = (props: FormFieldRendererBaseProps<DateField> &
             const onInputChange = (evt) => {
                 const stringValue = evt.target.value;
                 if (/[0-9]{4}-[0-9]{2}-[0-9]{2}/.test(stringValue)) {
-                    const value = moment.utc(stringValue);
+                    const value = dayjs.utc(stringValue);
                     if (value.isValid()) {
                         setTimeout(() => {
                             if (mode === 'date' || mode === 'month') {
@@ -248,7 +251,7 @@ export const DateFieldRenderer = (props: FormFieldRendererBaseProps<DateField> &
                     }
                     if (open) {
                         setMode('date');
-                        updateSelectableDates(moment.utc(value), 'date');
+                        updateSelectableDates(dayjs.utc(value), 'date');
                     }
                     setOpen(open);
                 }}
@@ -269,7 +272,7 @@ export const DateFieldRenderer = (props: FormFieldRendererBaseProps<DateField> &
                 showTime={
                     config.withTime && !config.selectableTimes
                         ? {
-                              defaultValue: moment.utc('00:00:00', 'HH:mm:ss')
+                              defaultValue: dayjs.utc('00:00:00', 'HH:mm:ss')
                           }
                         : false
                 }
@@ -286,7 +289,7 @@ export const DateFieldRenderer = (props: FormFieldRendererBaseProps<DateField> &
                             value: time
                         };
                     })}
-                    value={moment.utc(props.value).format('HH:mm:ss')}
+                    value={dayjs.utc(props.value).format('HH:mm:ss')}
                     onChange={(value) => onTimeChange(value as string)}
                 />
             )}

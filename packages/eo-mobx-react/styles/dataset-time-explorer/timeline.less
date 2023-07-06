@@ -16,6 +16,7 @@
                     width: fit-content;
                     padding-left: 15px;
                     min-width: 150px;
+                    box-sizing: border-box;
 
                     .vis-labelset {
                         .vis-label {
@@ -30,6 +31,7 @@
                                 white-space: nowrap;
                                 overflow: hidden;
                                 text-overflow: ellipsis;
+                                box-sizing: border-box;
                             }
                         }
                     }
@@ -37,7 +39,7 @@
             }
 
             &.vis-bottom {
-                background: @background-color-base;
+                background: @colorBgSpotlight;
             }
 
             .vis-foreground .vis-group {
@@ -111,6 +113,7 @@
                     width: 8px;
                     border-radius: 4px;
                     margin-left: -4px;
+                    box-sizing: border-box;
 
                     .vis-item.vis-dot {
                         display: none;

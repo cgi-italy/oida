@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import copyToClipboard from 'copy-to-clipboard';
-import { Input, Button, message, Tooltip, Select, Typography } from 'antd';
+import { Input, Button, App, Tooltip, Select, Typography } from 'antd';
 import { CopyOutlined, CheckOutlined, UndoOutlined } from '@ant-design/icons';
 
 import { AoiSupportedGeometry, AoiValue, FormFieldState } from '@oidajs/core';
@@ -13,6 +13,8 @@ export type AoiTextEditorProps = {
 } & FormFieldState<AoiValue>;
 
 export const AoiTextEditor = (props: AoiTextEditorProps) => {
+    const { message } = App.useApp();
+
     const validFormats = useMemo(() => {
         const geometry = props.value?.geometry;
         if (!geometry || geometry.type === 'GeometryCollection' || geometry.type === 'GeometryCollectionEx') {
@@ -84,6 +86,7 @@ export const AoiTextEditor = (props: AoiTextEditorProps) => {
     useEffect(() => {
         formatAreaValue();
     }, [props.value, format]);
+
     return (
         <div className='aoi-text-editor'>
             <div className='aoi-text-editor-format'>

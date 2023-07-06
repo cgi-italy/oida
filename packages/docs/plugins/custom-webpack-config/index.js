@@ -1,6 +1,9 @@
 const webpack = require('webpack');
 const path = require('path');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const { convertLegacyToken } = require('@ant-design/compatible/lib');
+const { theme } = require('antd/lib');
+const { default: createAliasToken } = require('antd/lib/theme/util/alias');
 
 const oidaNodeModulesDir = '../../node_modules';
 const cesiumSource = 'cesium/Build/Cesium';
@@ -10,6 +13,8 @@ module.exports = function (context, options) {
     return {
         name: 'custom-webpack-config',
         configureWebpack(config, isServer, utils) {
+            const mapToken = createAliasToken(theme.defaultAlgorithm(theme.defaultSeed));
+            const v4Token = convertLegacyToken(mapToken);
             // enable examples debugging
             return {
                 devtool: 'eval-source-map',
@@ -62,6 +67,24 @@ module.exports = function (context, options) {
                                             ]
                                         ],
                                         sourceMaps: false
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            test: /\.less$/,
+                            use: [
+                                {
+                                    loader: 'less-loader',
+                                    options: {
+                                        sourceMap: true,
+                                        lessOptions: {
+                                            javascriptEnabled: true,
+                                            modifyVars: {
+                                                ...v4Token,
+                                                ...mapToken
+                                            }
+                                        }
                                     }
                                 }
                             ]

@@ -1,6 +1,6 @@
 .dataset-discovery-drawer {
     .ant-drawer-header {
-        padding: 0;
+        padding: ~'@{paddingXS}px @{padding}px 0 @{padding}px';
         flex-shrink: 0;
 
         .ant-drawer-header-title {
@@ -8,6 +8,31 @@
 
             .ant-drawer-title {
                 overflow: hidden;
+
+                .dataset-discovery-drawer-title {
+                    display: flex;
+                    align-items: center;
+
+                    .ant-btn {
+                        margin-right: ~'@{marginXS}px';
+                    }
+                }
+
+                .dataset-discovery-drawer-provider-selector {
+                    font-size: ~'@{fontSize}px';
+                    font-weight: normal;
+                    padding-top: ~'@{paddingXS}px';
+                    padding-left: ~'@{paddingXS}px';
+
+                    .ant-tabs {
+                        .ant-tabs-nav {
+                            margin: 0;
+                            &::before {
+                                display: none;
+                            }
+                        }
+                    }
+                }
 
                 .ant-page-header {
                     padding-top: 6px;

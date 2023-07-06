@@ -10,23 +10,21 @@
     scrollbar-width: auto;
 }
 
-
 .scrollbar(@size, @thumb, @track: lighten(@thumb, 25%)) {
-
     //webkit
     &::-webkit-scrollbar {
-        width:  @size;
+        width: @size;
         height: @size;
     }
 
     &::-webkit-scrollbar-thumb {
         background: @thumb;
-        border-radius: @size / 2;
+        border-radius: (@size / 2);
     }
 
     &::-webkit-scrollbar-track {
         background: @track;
-        border-radius: @size / 2;
+        border-radius: (@size / 2);
     }
 
     //Firefox
@@ -40,5 +38,4 @@
     scrollbar-shadow-color: darken(@thumb, 20%);
     scrollbar-darkshadow-color: darken(@thumb, 30%);
     scrollbar-highlight-color: lighten(@thumb, 10%);
-
 }

@@ -1,7 +1,10 @@
 .aoi-draw-tool {
-    background: @component-background;
+    background: @colorBgContainer;
     display: flex;
     align-items: center;
+    border-radius: ~'@{borderRadius}px';
+    border: 1px solid @colorBorder;
+    overflow: hidden;
 
     .ant-divider {
         top: 0;
@@ -11,8 +14,14 @@
         display: flex;
         align-items: center;
 
-        .anticon {
-            font-size: 18px;
+        .ant-btn {
+            .anticon {
+                font-size: 15px;
+            }
+            border: none;
+            border-right: solid 1px @colorBorderSecondary;
+            box-shadow: none;
+            border-radius: 0px;
         }
 
         .aoi-tool-selector-more {
@@ -31,15 +40,31 @@
 
     .ant-dropdown-menu {
         padding: 0;
+        border-radius: ~'@{borderRadius}px';
 
         .ant-dropdown-menu-item {
             padding: 0;
 
             .ant-btn {
                 width: 100%;
+                border-radius: 0;
 
                 .anticon {
                     font-size: 18px;
+                }
+            }
+
+            &:first-child {
+                .ant-btn {
+                    border-top-left-radius: ~'@{borderRadius}px';
+                    border-top-right-radius: ~'@{borderRadius}px';
+                }
+            }
+
+            &:last-child {
+                .ant-btn {
+                    border-bottom-left-radius: ~'@{borderRadius}px';
+                    border-bottom-right-radius: ~'@{borderRadius}px';
                 }
             }
         }

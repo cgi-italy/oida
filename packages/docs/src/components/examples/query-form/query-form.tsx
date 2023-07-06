@@ -1,4 +1,5 @@
 import React from 'react';
+import { App as AntdApp } from 'antd';
 import { DataFilters } from '@oidajs/state-mobx';
 import { useFormData } from '@oidajs/ui-react-mobx';
 import { QueryFilter, IFormFieldDefinition, getFormFieldSerializer, IFormFieldType } from '@oidajs/core';
@@ -122,10 +123,10 @@ const formFields: IFormFieldDefinition[] = [
 
 const QueryForm = () => {
     return (
-        <div>
+        <AntdApp>
             <StatefulForm fields={formFields} formState={formState} />
             <FormSerializer fields={formFields} formState={formState} />
-        </div>
+        </AntdApp>
     );
 };
 

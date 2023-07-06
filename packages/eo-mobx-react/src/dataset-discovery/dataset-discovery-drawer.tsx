@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, useResolvedPath } from 'react-router-dom';
-import { Tooltip, Drawer, PageHeader } from 'antd';
+import { Drawer, Button } from 'antd';
 import { DrawerProps } from 'antd/lib/drawer';
 import { CloseOutlined } from '@ant-design/icons';
 
@@ -50,18 +50,15 @@ export const DatasetDiscoveryDrawer = (props: DatasetDiscoveryDrawerProps) => {
                         className='dataset-discovery-drawer'
                         push={false}
                         title={
-                            <PageHeader
-                                title={props.title || 'Data discovery'}
-                                onBack={() => setVisible(false)}
-                                backIcon={
-                                    props.backIcon || (
-                                        <Tooltip title='Back to map'>
-                                            <CloseOutlined />
-                                        </Tooltip>
-                                    )
-                                }
-                                footer={<ProviderSelector datasetDiscovery={datasetDiscovery} />}
-                            ></PageHeader>
+                            <React.Fragment>
+                                <div className='dataset-discovery-drawer-title'>
+                                    <Button type='link' icon={<CloseOutlined />} onClick={() => setVisible(false)} />
+                                    <div>{props.title || 'Data discovery'}</div>
+                                </div>
+                                <div className='dataset-discovery-drawer-provider-selector'>
+                                    <ProviderSelector datasetDiscovery={datasetDiscovery} />
+                                </div>
+                            </React.Fragment>
                         }
                         placement='right'
                         closable={false}

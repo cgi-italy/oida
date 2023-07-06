@@ -8,8 +8,9 @@
 
         .dataset-band-group {
             padding: 5px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: @border-radius-base;
+            background: @color-bg-secondary;
+            box-shadow: @boxShadow;
+            border-radius: ~'@{borderRadius}px';
             margin: 5px 0px 0px 5px;
 
             .dataset-band-items {
@@ -23,7 +24,7 @@
                     transform: translate(0);
 
                     .ant-avatar {
-                        box-shadow: 3px 2px 2px @background-color-base;
+                        box-shadow: 3px 2px 2px @colorBgBase;
                     }
 
                     &.is-dragging {
@@ -57,12 +58,12 @@
 
             &.can-drop {
                 .dataset-channel-item-target {
-                    border: dashed 2px @text-color;
+                    border: dashed 2px @colorText;
                 }
 
                 &.is-hover {
                     .dataset-channel-item-target {
-                        border: dashed 2px @primary-color;
+                        border: dashed 2px @colorPrimary;
                     }
                 }
             }

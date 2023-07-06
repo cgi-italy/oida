@@ -1,6 +1,6 @@
 import React from 'react';
 import moment from 'moment';
-import { Slider, Select, InputNumber, Button, Tooltip } from 'antd';
+import { Slider, Select, InputNumber, Button, Tooltip, Space } from 'antd';
 import { StepForwardOutlined, StepBackwardOutlined } from '@ant-design/icons';
 
 import {
@@ -97,111 +97,113 @@ export const DatasetTimeDimensionSelector = (props: DatasetTimeDimensionSelector
     return (
         <div className='dataset-dimension-value-selector'>
             <span>{props.dimension.name}: </span>
-            {timeDistributionProvider && (
-                <Tooltip title='Previous'>
-                    <Button
-                        disabled={domain && domain.min && (!value || value.getTime() <= domain.min.getTime())}
-                        onClick={() => {
-                            if (value) {
-                                timeDistributionProvider
-                                    .getNearestItem(
-                                        moment(value).subtract(1, 'second').toDate(),
-                                        TimeSearchDirection.Backward,
-                                        props.dimensionsState
-                                    )
-                                    .then((value) => {
-                                        if (value) {
-                                            props.dimensionsState.setValue(props.dimension.id, value.start);
-                                        }
-                                    });
-                            }
-                        }}
-                    >
-                        <StepBackwardOutlined />
-                    </Button>
-                </Tooltip>
-            )}
-            <DateFieldRenderer
-                value={value}
-                onChange={(value) => props.dimensionsState.setValue(props.dimension.id, value as Date)}
-                required={true}
-                config={{
-                    minDate: domain ? domain.min : undefined,
-                    maxDate: domain ? domain.max : undefined,
-                    selectableDates: timeDistributionProvider
-                        ? (range) => {
-                              return timeDistributionProvider.getTimeDistribution(range, props.dimensionsState, 0).then((items) => {
-                                  const selectableDates: Set<string> = new Set();
-                                  let format: string;
-                                  if (range.resolution === 'day') {
-                                      format = 'YYYY-MM-DD';
-                                  } else if (range.resolution === 'month') {
-                                      format = 'YYYY-MM';
-                                  } else {
-                                      format = 'YYYY';
-                                  }
-                                  items.forEach((item) => {
-                                      const end = (item as TimeDistributionRangeItem).end;
-                                      if (end) {
-                                          const current = moment(item.start);
-                                          while (current.isBefore(end, range.resolution)) {
-                                              selectableDates.add(current.format(format));
-                                              current.add(1, range.resolution);
-                                          }
+            <Space.Compact>
+                {timeDistributionProvider && (
+                    <Tooltip title='Previous'>
+                        <Button
+                            disabled={domain && domain.min && (!value || value.getTime() <= domain.min.getTime())}
+                            onClick={() => {
+                                if (value) {
+                                    timeDistributionProvider
+                                        .getNearestItem(
+                                            moment(value).subtract(1, 'second').toDate(),
+                                            TimeSearchDirection.Backward,
+                                            props.dimensionsState
+                                        )
+                                        .then((value) => {
+                                            if (value) {
+                                                props.dimensionsState.setValue(props.dimension.id, value.start);
+                                            }
+                                        });
+                                }
+                            }}
+                        >
+                            <StepBackwardOutlined />
+                        </Button>
+                    </Tooltip>
+                )}
+                <DateFieldRenderer
+                    value={value}
+                    onChange={(value) => props.dimensionsState.setValue(props.dimension.id, value as Date)}
+                    required={true}
+                    config={{
+                        minDate: domain ? domain.min : undefined,
+                        maxDate: domain ? domain.max : undefined,
+                        selectableDates: timeDistributionProvider
+                            ? (range) => {
+                                  return timeDistributionProvider.getTimeDistribution(range, props.dimensionsState, 0).then((items) => {
+                                      const selectableDates: Set<string> = new Set();
+                                      let format: string;
+                                      if (range.resolution === 'day') {
+                                          format = 'YYYY-MM-DD';
+                                      } else if (range.resolution === 'month') {
+                                          format = 'YYYY-MM';
                                       } else {
-                                          selectableDates.add(moment(item.start).format(format));
+                                          format = 'YYYY';
                                       }
-                                  });
-                                  return selectableDates;
-                              });
-                          }
-                        : undefined,
-                    selectableTimes: timeDistributionProvider
-                        ? (date) => {
-                              const dateMoment = moment(date);
-                              return timeDistributionProvider
-                                  .getTimeDistribution(
-                                      {
-                                          start: dateMoment.startOf('day').toDate(),
-                                          end: dateMoment.endOf('day').toDate()
-                                      },
-                                      props.dimensionsState,
-                                      0
-                                  )
-                                  .then((items) => {
-                                      return items.map((item) => {
-                                          return moment.utc(item.start).format('HH:mm:ss');
+                                      items.forEach((item) => {
+                                          const end = (item as TimeDistributionRangeItem).end;
+                                          if (end) {
+                                              const current = moment(item.start);
+                                              while (current.isBefore(end, range.resolution)) {
+                                                  selectableDates.add(current.format(format));
+                                                  current.add(1, range.resolution);
+                                              }
+                                          } else {
+                                              selectableDates.add(moment(item.start).format(format));
+                                          }
                                       });
+                                      return selectableDates;
                                   });
-                          }
-                        : undefined,
-                    withTime: true
-                }}
-            />
-            {timeDistributionProvider && (
-                <Tooltip title='Next'>
-                    <Button
-                        disabled={domain && domain.max && (!value || value.getTime() >= domain.max.getTime())}
-                        onClick={() => {
-                            if (value) {
-                                timeDistributionProvider
-                                    .getNearestItem(
-                                        moment(value).add(1, 'second').toDate(),
-                                        TimeSearchDirection.Forward,
-                                        props.dimensionsState
-                                    )
-                                    .then((value) => {
-                                        if (value) {
-                                            props.dimensionsState.setValue(props.dimension.id, value.start);
-                                        }
-                                    });
-                            }
-                        }}
-                    >
-                        <StepForwardOutlined />
-                    </Button>
-                </Tooltip>
-            )}
+                              }
+                            : undefined,
+                        selectableTimes: timeDistributionProvider
+                            ? (date) => {
+                                  const dateMoment = moment(date);
+                                  return timeDistributionProvider
+                                      .getTimeDistribution(
+                                          {
+                                              start: dateMoment.startOf('day').toDate(),
+                                              end: dateMoment.endOf('day').toDate()
+                                          },
+                                          props.dimensionsState,
+                                          0
+                                      )
+                                      .then((items) => {
+                                          return items.map((item) => {
+                                              return moment.utc(item.start).format('HH:mm:ss');
+                                          });
+                                      });
+                              }
+                            : undefined,
+                        withTime: true
+                    }}
+                />
+                {timeDistributionProvider && (
+                    <Tooltip title='Next'>
+                        <Button
+                            disabled={domain && domain.max && (!value || value.getTime() >= domain.max.getTime())}
+                            onClick={() => {
+                                if (value) {
+                                    timeDistributionProvider
+                                        .getNearestItem(
+                                            moment(value).add(1, 'second').toDate(),
+                                            TimeSearchDirection.Forward,
+                                            props.dimensionsState
+                                        )
+                                        .then((value) => {
+                                            if (value) {
+                                                props.dimensionsState.setValue(props.dimension.id, value.start);
+                                            }
+                                        });
+                                }
+                            }}
+                        >
+                            <StepForwardOutlined />
+                        </Button>
+                    </Tooltip>
+                )}
+            </Space.Compact>
         </div>
     );
 };

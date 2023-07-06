@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { Menu, Divider } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
 import classnames from 'classnames';
+import { MenuItemType, SubMenuType } from 'antd/es/menu/hooks/useItems';
 
 export type AppHeaderNavItem = {
     id: string;
@@ -24,7 +25,7 @@ export type AppHeaderProps = {
     extraContent?: React.ReactNode;
 };
 
-const getMenuElement = (item: AppHeaderNavItem) => {
+const getMenuElement = (item: AppHeaderNavItem): SubMenuType | MenuItemType => {
     if (item.subitems && item.subitems.length) {
         const subItems = item.subitems.map((item) => {
             return getMenuElement(item);
@@ -38,22 +39,25 @@ const getMenuElement = (item: AppHeaderNavItem) => {
             <span>{item.title}</span>
         );
 
-        return (
-            <Menu.SubMenu
-                key={item.id}
-                icon={item.icon}
-                onTitleClick={item.onClick}
-                title={
-                    <React.Fragment>
-                        <span>{content}</span>
-                        <DownOutlined />
-                    </React.Fragment>
-                }
-                popupClassName='app-header-menu-popup'
-            >
-                {subItems}
-            </Menu.SubMenu>
-        );
+        return {
+            key: item.id,
+            icon: item.icon,
+            onTitleClick: item.onClick,
+            title: (
+                <React.Fragment>
+                    <span>{content}</span>
+                    <DownOutlined />
+                </React.Fragment>
+            ),
+            popupClassName: 'app-header-menu-popup',
+            label: (
+                <React.Fragment>
+                    <span>{content}</span>
+                    <DownOutlined />
+                </React.Fragment>
+            ),
+            children: subItems
+        } as SubMenuType;
     } else {
         const content = item.href ? (
             <a href={item.href.src} target={item.href.target || '_blank'}>
@@ -62,11 +66,12 @@ const getMenuElement = (item: AppHeaderNavItem) => {
         ) : (
             item.title
         );
-        return (
-            <Menu.Item key={item.id} icon={item.icon} onClick={item.onClick}>
-                {content}
-            </Menu.Item>
-        );
+        return {
+            key: item.id,
+            icon: item.icon,
+            onClick: item.onClick,
+            label: content
+        } as MenuItemType;
     }
 };
 
@@ -94,9 +99,8 @@ export const AppHeader = (props: AppHeaderProps) => {
                 className='app-header-menu'
                 mode='horizontal'
                 selectedKeys={props.selectedMenuItem ? [props.selectedMenuItem] : undefined}
-            >
-                {menuItems}
-            </Menu>
+                items={menuItems}
+            />
             <div className='app-header-extra'>{props.extraContent}</div>
         </div>
     );

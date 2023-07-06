@@ -54,7 +54,13 @@ const DataCollectionTableItemActions = <T extends object>(props: DataCollectionT
             });
 
             return (
-                <Dropdown menu={{ items: actionItems }} placement='bottomRight' mouseEnterDelay={0.05} mouseLeaveDelay={0.05}>
+                <Dropdown
+                    menu={{ items: actionItems }}
+                    placement='bottomRight'
+                    mouseEnterDelay={0.05}
+                    mouseLeaveDelay={0.05}
+                    overlayClassName='data-collection-table-item-actions-menu'
+                >
                     <a className='ant-dropdown-link' onClick={(e) => e.preventDefault()}>
                         <EllipsisOutlined />
                     </a>

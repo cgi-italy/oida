@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { List, Button, Badge, Tooltip, message, Typography } from 'antd';
+import { List, Button, Badge, Tooltip, App, Typography } from 'antd';
 import {
     AimOutlined,
     SettingOutlined,
@@ -37,6 +37,8 @@ export type DatasetVizListItemProps = {
 };
 
 export const DatasetVizListItem = (props: DatasetVizListItemProps) => {
+    const { message } = App.useApp();
+
     const vizState = useSelector(() => {
         const mapLayer = props.datasetViz.mapLayer;
 

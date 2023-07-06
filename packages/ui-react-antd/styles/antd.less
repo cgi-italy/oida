@@ -1,22 +1,38 @@
 .ant-btn {
     &.ant-btn-icon-only {
         border-radius: @ant-icon-btn-border-radius;
-    }
-}
-.ant-drawer {
-    .ant-drawer-content {
-        .ant-drawer-header {
-            background: @ant-drawer-header-bg;
-            color: @ant-drawer-header-color;
-            border-bottom: @ant-drawer-header-border;
-
-            .ant-drawer-title {
-                color: @ant-drawer-header-color;
-            }
+        .ant-btn-icon {
+            display: flex;
+            justify-content: center;
         }
     }
 }
+.ant-drawer {
+    .ant-drawer-header {
+        background: @ant-drawer-header-bg;
+    }
+    .ant-drawer-content {
+        color: @colorText;
+    }
+}
 
+.ant-modal {
+    .ant-modal-content {
+        padding: 0;
+        .ant-modal-header {
+            padding: @ant-modal-head-padding;
+            border-bottom: @ant-modal-header-border;
+        }
+        .ant-modal-body {
+            padding: @ant-modal-body-padding;
+        }
+        .ant-modal-footer {
+            padding: @ant-modal-footer-padding;
+            margin-top: 0;
+            border-top: @ant-modal-footer-border;
+        }
+    }
+}
 .ant-carousel {
     .slick-dots {
         position: unset;
@@ -48,6 +64,9 @@
         &:hover,
         &:focus {
             color: @ant-carousel-arrow-color-hover;
+        }
+        &::before {
+            display: none;
         }
     }
 }

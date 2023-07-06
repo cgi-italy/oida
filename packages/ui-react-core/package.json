@@ -37,7 +37,7 @@
     "@oidajs/core": "^4.7.0",
     "react-cool-dimensions": "^3.0.0",
     "react-draggable": "^4.4.5",
-    "scroll-into-view-if-needed": "^2.2.31",
+    "scroll-into-view-if-needed": "^3.0.6",
     "tslib": "^2.4.1"
   }
 }

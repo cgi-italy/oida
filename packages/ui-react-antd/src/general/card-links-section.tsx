@@ -7,6 +7,11 @@ import { ContentPageSection } from '@oidajs/ui-react-core';
 
 import { CardLink, CardLinkProps } from './card-link';
 
+const CarouselIcon = (props) => {
+    const { currentSlide, slideCount, ...remainingProps } = props;
+    return <span {...remainingProps}></span>;
+};
+
 export type CardLinksSectionProps = {
     title: React.ReactNode;
     cards: CardLinkProps[];
@@ -38,7 +43,20 @@ export const CardLinksSection = (props: CardLinksSectionProps) => {
             );
         }
         cardSection = (
-            <Carousel arrows dots={true} prevArrow={<LeftOutlined />} nextArrow={<RightOutlined />}>
+            <Carousel
+                arrows
+                dots={true}
+                prevArrow={
+                    <CarouselIcon>
+                        <LeftOutlined />
+                    </CarouselIcon>
+                }
+                nextArrow={
+                    <CarouselIcon>
+                        <RightOutlined />
+                    </CarouselIcon>
+                }
+            >
                 {carouselPages}
             </Carousel>
         );

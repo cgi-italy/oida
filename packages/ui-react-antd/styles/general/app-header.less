@@ -24,6 +24,7 @@
         .app-header-logo {
             padding: @app-header-logo-padding;
             height: 100%;
+            box-sizing: border-box;
             img {
                 height: 100%;
                 padding: 0px;
@@ -117,13 +118,17 @@
 
 .app-header-menu-popup {
     user-select: none;
-    .ant-menu-item {
-        &:hover {
-            background: @app-header-menu-item-hover-bg;
-        }
-        &.ant-menu-item-selected {
-            background-color: @app-header-menu-item-active-bg;
-            color: @app-header-menu-item-active-color;
+    .ant-menu.ant-menu-sub.ant-menu-vertical {
+        .ant-menu-item {
+            height: @app-header-menu-item-height;
+            line-height: @app-header-menu-item-height;
+            &:hover {
+                background: @app-header-menu-item-hover-bg;
+            }
+            &.ant-menu-item-selected {
+                background-color: @app-header-menu-item-active-bg;
+                color: @app-header-menu-item-active-color;
+            }
         }
     }
 }

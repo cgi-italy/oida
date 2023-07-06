@@ -30,10 +30,11 @@
     "access": "public"
   },
   "peerDependencies": {
-    "antd": "^4.x",
+    "@ant-design/compatible": "5.x",
+    "antd": "5.x",
     "classnames": "^2.2.6",
     "lodash": "4.x",
-    "moment": "^2.x",
+    "moment": "2.x",
     "react": "^16.18.0 || ^17.0.0 || ^18.0.0",
     "react-dom": "^16.18.0 || ^17.0.0 || ^18.0.0"
   },

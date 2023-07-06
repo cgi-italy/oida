@@ -12,22 +12,21 @@ export const AntdBreadcrumb = (props: BreadcrumbProps) => {
     const LinkItem = props.linkItem || BreadcrumbRouterLinkItem;
 
     const breadcrumbItems = items.map((item, idx) => {
-        return (
-            <Breadcrumb.Item key={item.key}>
-                {idx !== items.length - 1 ? (
-                    item.onClick ? (
-                        <a onClick={item.onClick}>{item.title}</a>
-                    ) : (
-                        <LinkItem {...item}></LinkItem>
-                    )
-                ) : item.activeContent ? (
-                    item.activeContent
-                ) : (
-                    item.title
-                )}
-            </Breadcrumb.Item>
-        );
+        let content: React.ReactNode;
+        if (idx !== items.length - 1) {
+            if (item.onClick) {
+                content = <a onClick={item.onClick}>{item.title}</a>;
+            } else {
+                content = <LinkItem {...item}></LinkItem>;
+            }
+        } else {
+            content = item.activeContent ? item.activeContent : item.title;
+        }
+        return {
+            key: item.key,
+            title: content
+        };
     });
 
-    return <Breadcrumb className='app-breadcrumb'>{breadcrumbItems}</Breadcrumb>;
+    return <Breadcrumb className='app-breadcrumb' items={breadcrumbItems} />;
 };

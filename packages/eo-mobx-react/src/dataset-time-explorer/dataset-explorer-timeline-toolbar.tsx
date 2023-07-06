@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Tooltip } from 'antd';
+import { Button, Space, Tooltip } from 'antd';
 import {
     ColumnWidthOutlined,
     AimOutlined,
@@ -39,7 +39,7 @@ export const DatasetExplorerTimelineToolbar = (props: DatasetDiscoveryTimelineTo
 
     if (!isRangeMode) {
         timeField = (
-            <React.Fragment>
+            <Space.Compact size='small'>
                 <Tooltip title='Previous step'>
                     <Button size='small' onClick={props.onGoToPrevItem}>
                         <StepBackwardOutlined />
@@ -50,7 +50,6 @@ export const DatasetExplorerTimelineToolbar = (props: DatasetDiscoveryTimelineTo
                         withTime: false
                     }}
                     size='small'
-                    bordered={false}
                     format={'YYYY-MM-DD HH:mm:ss'}
                     suffixIcon={null}
                     required={true}
@@ -62,7 +61,7 @@ export const DatasetExplorerTimelineToolbar = (props: DatasetDiscoveryTimelineTo
                         <StepForwardOutlined />
                     </Button>
                 </Tooltip>
-            </React.Fragment>
+            </Space.Compact>
         );
     } else {
         timeField = (
@@ -72,7 +71,6 @@ export const DatasetExplorerTimelineToolbar = (props: DatasetDiscoveryTimelineTo
                 }}
                 format={'YYYY-MM-DD HH:mm:ss'}
                 size='small'
-                bordered={false}
                 suffixIcon={null}
                 required={false}
                 value={props.selectedTime as DateRangeValue}

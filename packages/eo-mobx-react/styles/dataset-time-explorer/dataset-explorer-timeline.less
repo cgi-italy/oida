@@ -4,7 +4,7 @@
 
     .dataset-timeline-toolbar {
         position: absolute;
-        top: -32px;
+        top: -30px;
         padding-bottom: 5px;
         background: @component-background;
         border: solid 1px @border-color-base;
@@ -19,7 +19,6 @@
         }
         .dataset-timeline-time-selector {
             margin: 0 5px 0px 20px;
-            border: solid 1px @border-color-split;
             input {
                 text-align: center;
             }
@@ -68,6 +67,7 @@
             bottom: -5px;
             border: 2px solid fade(@primary-color, 80%);
             border-radius: 8px;
+            box-sizing: border-box;
         }
 
         &.is-compressed {
