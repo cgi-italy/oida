@@ -101,10 +101,9 @@ export function DataCollectionItemsList<T>(props: DataCollectionItemsListProps<T
 
     let lastClickedRowIndex = -1;
 
-    const listItems = props.data.map((item, listIndex) => {
+    const itemRenderer = (item, listIndex) => {
         return (
             <ListItem<T>
-                key={keyGetter(item)}
                 item={item}
                 itemState={itemState}
                 itemActions={itemActions}
@@ -149,7 +148,7 @@ export function DataCollectionItemsList<T>(props: DataCollectionItemsListProps<T
                 fileDropProps={fileDropProps}
             />
         );
-    });
+    };
 
     const { data, loadingState, ...listProps } = renderProps;
 
@@ -167,10 +166,10 @@ export function DataCollectionItemsList<T>(props: DataCollectionItemsListProps<T
                 size={props.size || 'small'}
                 loading={loadingState === LoadingState.Loading}
                 rowKey={keyGetter}
+                dataSource={props.data}
+                renderItem={itemRenderer}
                 {...listProps}
-            >
-                <ul className='ant-list-items'>{listItems}</ul>
-            </List>
+            />
         );
     }
 }
