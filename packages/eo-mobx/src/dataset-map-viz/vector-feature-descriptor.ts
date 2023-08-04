@@ -98,6 +98,8 @@ export type DateFeaturePropertyDescriptor = FeaturePropertyDescriptorCommon<type
         min: Date;
         max: Date;
     };
+    inputStringFormat?: string;
+    outputStringFormat?: string;
 };
 
 export const COMPOSITE_FEATURE_PROPERTY_TYPE = 'composite';
@@ -133,11 +135,8 @@ export type VectorFeaturePropertyDescriptor =
  * The feature descriptor type. Defines the schema of a vector feature
  */
 export type VectorFeatureDescriptor = {
-    typeName: string;
     title?: string;
     description?: string;
-    iconUrl?: string;
-    labelProps?: string[];
     properties: VectorFeaturePropertyDescriptor[];
 };
 

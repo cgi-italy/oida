@@ -54,7 +54,6 @@ export const getAdamVectorMapViewConfig = (datasetConfig: AdamVectorDatasetConfi
         dimensions: datasetConfig.dimensions,
         featureDescriptor: (vectorViz) => {
             const featureDescriptor: VectorFeatureDescriptor = {
-                typeName: `${datasetConfig.id}_featuretype`,
                 properties: defaultAdamFeatureProperties.slice()
             };
 
@@ -68,7 +67,6 @@ export const getAdamVectorMapViewConfig = (datasetConfig: AdamVectorDatasetConfi
                     const subdatasetProperties = featureProperties[subdataset];
                     if (subdatasetProperties) {
                         featureDescriptor.properties.push(...subdatasetProperties);
-                        featureDescriptor.typeName = `${datasetConfig.id}_${subdataset}_featuretype`;
                     }
                 }
             }

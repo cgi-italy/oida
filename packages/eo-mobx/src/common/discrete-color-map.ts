@@ -14,8 +14,8 @@ export class DiscreteColorMap {
 
     constructor(props: DiscreteColorMapProps) {
         this.mapItems = {};
-        props.items.forEach((value) => {
-            this.mapItems[value.value] = value.color;
+        props.items.forEach((item) => {
+            this.mapItems[item.value] = item.color;
         });
         makeObservable(this);
     }
@@ -23,5 +23,16 @@ export class DiscreteColorMap {
     @action
     setColorMapItemColor(value: string, color: string) {
         this.mapItems = { ...this.mapItems, [value]: color };
+    }
+
+    getSnapshot(): DiscreteColorMapProps {
+        return {
+            items: Object.entries(this.mapItems).map(([value, color]) => {
+                return {
+                    value: value,
+                    color: color
+                };
+            })
+        };
     }
 }

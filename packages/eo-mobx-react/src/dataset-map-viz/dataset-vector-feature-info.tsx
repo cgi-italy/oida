@@ -42,7 +42,7 @@ const formatVectorFeaturePropertyValue = (property: VectorFeaturePropertyDescrip
         });
     } else if (property.type === 'date') {
         return formatDate(value as moment.MomentInput, {
-            format: 'YYYY-MM-DD HH:mm'
+            format: property.outputStringFormat || 'YYYY-MM-DD HH:mm'
         });
     } else if (property.type === 'enum') {
         const option = property.options.find((option) => option.value === value);
@@ -53,14 +53,14 @@ const formatVectorFeaturePropertyValue = (property: VectorFeaturePropertyDescrip
         }
     } else if (property.type === 'string' && typeof value === 'string') {
         const key = idx !== undefined ? `${property.id}_${idx}` : undefined;
-        if (property.subType === 'url') {
+        if (property.subType === 'imageUrl') {
+            return <img src={value} key={key} />;
+        } else if (property.subType === 'url' || /[a-zA-Z]+:\/\//.test(value)) {
             return (
                 <a href={value} key={key} target='_blank'>
                     {value}
                 </a>
             );
-        } else if (property.subType === 'imageUrl') {
-            return <img src={value} key={key} />;
         } else {
             return value as string;
         }
@@ -75,25 +75,18 @@ const formatVectorFeaturePropertyValue = (property: VectorFeaturePropertyDescrip
     }
 };
 
-const extractVectorFeaturePropertyValue = (property: VectorFeaturePropertyDescriptor, featureProps: VectorFeatureProperties) => {
-    const rawValue = property.valueExtractor ? property.valueExtractor(featureProps) : featureProps[property.id];
-    if (rawValue !== undefined && rawValue !== null && rawValue !== '') {
-        return property.parser ? property.parser(rawValue) : rawValue;
-    } else {
-        return undefined;
-    }
-};
-
-const formatVectorFeatureProperty = (property: VectorFeaturePropertyDescriptor, featureProps: VectorFeatureProperties) => {
-    const value = extractVectorFeaturePropertyValue(property, featureProps);
-    if (value !== undefined) {
+const formatVectorFeatureProperty = (
+    property: VectorFeaturePropertyDescriptor,
+    propertyValue: FeaturePropertyValueType | FeaturePropertyValueType[]
+) => {
+    if (propertyValue !== undefined) {
         let formattedValue: string | JSX.Element | JSX.Element[] | undefined;
         const formatter: VectorFeaturePropertyFormatter =
             (property.formatter as VectorFeaturePropertyFormatter) || formatVectorFeaturePropertyValue.bind(undefined, property);
 
         // If the property is an array call the formatter function for each item
-        if (property.isArray && Array.isArray(value)) {
-            const items = value.map((item, idx) => formatter(item, idx));
+        if (property.isArray && Array.isArray(propertyValue)) {
+            const items = propertyValue.map((item, idx) => formatter(item, idx));
             if (items.length) {
                 // by default display an array as a comma separated string list, unless the formatter returns a JSX element
                 if (typeof items[0] === 'string') {
@@ -103,8 +96,8 @@ const formatVectorFeatureProperty = (property: VectorFeaturePropertyDescriptor, 
                     formattedValue = items as JSX.Element[];
                 }
             }
-        } else if (!Array.isArray(value)) {
-            formattedValue = formatter(value);
+        } else if (!Array.isArray(propertyValue)) {
+            formattedValue = formatter(propertyValue);
         }
 
         return formattedValue;
@@ -117,7 +110,7 @@ const exportVectorFeaturePropertyValue = (property: VectorFeaturePropertyDescrip
     } else if (property.type === 'composite') {
         return `(${property.properties
             .map((property) => {
-                return `${property.name}: ${exportVectorFeatureProperty(property, value as VectorFeatureProperties)}`;
+                return `${property.name}: ${exportVectorFeaturePropertyValue(property, value[property.id])}`;
             })
             .join(', ')})`;
     } else if (property.type === 'date') {
@@ -129,18 +122,19 @@ const exportVectorFeaturePropertyValue = (property: VectorFeaturePropertyDescrip
     }
 };
 
-const exportVectorFeatureProperty = (property: VectorFeaturePropertyDescriptor, featureProps: VectorFeatureProperties) => {
-    const value = extractVectorFeaturePropertyValue(property, featureProps);
-
-    if (value !== undefined) {
-        if (Array.isArray(value)) {
-            return value
+const exportVectorFeatureProperty = (
+    property: VectorFeaturePropertyDescriptor,
+    propertyValue: FeaturePropertyValueType | FeaturePropertyValueType[]
+) => {
+    if (propertyValue !== undefined) {
+        if (Array.isArray(propertyValue)) {
+            return propertyValue
                 .map((v) => {
                     return exportVectorFeaturePropertyValue(property, v);
                 })
                 .join(', ');
         } else {
-            return exportVectorFeaturePropertyValue(property, value);
+            return exportVectorFeaturePropertyValue(property, propertyValue);
         }
     } else {
         return '';
@@ -170,7 +164,7 @@ export const DatasetVectorFeatureInfo = <T extends VectorFeatureProperties = Vec
     }
 
     featureProperties.forEach((property) => {
-        const formattedValue = formatVectorFeatureProperty(property, props.vectorFeature.properties);
+        const formattedValue = formatVectorFeatureProperty(property, props.vectorFeature.properties[property.id]);
 
         if (formattedValue) {
             let label: React.ReactNode = property.name;
@@ -236,8 +230,8 @@ export const DatasetVectorFeatureInfoTable = <T extends VectorFeatureProperties 
             ellipsis: true,
             sorter: property.sortable
                 ? (a, b, order) => {
-                      const firstValue = extractVectorFeaturePropertyValue(property, a);
-                      const secondValue = extractVectorFeaturePropertyValue(property, b);
+                      const firstValue = a[property.id];
+                      const secondValue = b[property.id];
 
                       if (firstValue === secondValue) {
                           return 0;
@@ -250,8 +244,8 @@ export const DatasetVectorFeatureInfoTable = <T extends VectorFeatureProperties 
                       }
                   }
                 : undefined,
-            render: (_value, record, _index) => {
-                const formattedValue = formatVectorFeatureProperty(property, record);
+            render: (value) => {
+                const formattedValue = formatVectorFeatureProperty(property, value);
                 return <span className='table-cell-content'>{formattedValue}</span>;
             }
         };
@@ -276,7 +270,7 @@ export const DatasetVectorFeatureInfoTable = <T extends VectorFeatureProperties 
             .map((item) => {
                 return featureProperties
                     .map((property) => {
-                        return `"${exportVectorFeatureProperty(property, item)}"`;
+                        return `"${exportVectorFeatureProperty(property, item[property.id])}"`;
                     })
                     .join(',');
             })
