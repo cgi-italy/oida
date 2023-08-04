@@ -37,3 +37,9 @@ export const getGeometryExtent = (geometry: Geometry): GeoJSON.BBox | undefined 
 
     return bbox(geometry);
 };
+
+export const getFeaturesExtent = (features: Array<{ geometry: Geometry }>): GeoJSON.BBox | undefined => {
+    return features.reduce((extent: GeoJSON.BBox | undefined, feature) => {
+        return mergeExtents(extent, getGeometryExtent(feature.geometry));
+    }, undefined);
+};
