@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.5.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-adapters-ogc@2.4.6...@oidajs/eo-adapters-ogc@2.5.0) (2023-08-09)
+
+### Features
+
+- add preliminary wfs support ([9604449](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/960444966ffc3640a44fbc100fd5cbd0d0447f8d))
+
 ## [2.4.6](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-adapters-ogc@2.4.5...@oidajs/eo-adapters-ogc@2.4.6) (2023-04-20)
 
 **Note:** Version bump only for package @oidajs/eo-adapters-ogc

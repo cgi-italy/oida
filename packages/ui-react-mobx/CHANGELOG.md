@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.4.4](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/ui-react-mobx@4.4.3...@oidajs/ui-react-mobx@4.4.4) (2023-08-09)
+
+**Note:** Version bump only for package @oidajs/ui-react-mobx
+
 ## [4.4.3](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/ui-react-mobx@4.4.2...@oidajs/ui-react-mobx@4.4.3) (2023-04-12)
 
 **Note:** Version bump only for package @oidajs/ui-react-mobx

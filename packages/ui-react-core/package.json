@@ -1,6 +1,6 @@
 {
   "name": "@oidajs/ui-react-core",
-  "version": "6.4.3",
+  "version": "6.4.4",
   "description": "ui core components",
   "module": "es/index.js",
   "main": "lib/index.js",
@@ -34,7 +34,7 @@
     "react-router-dom": "6.x"
   },
   "dependencies": {
-    "@oidajs/core": "^4.7.0",
+    "@oidajs/core": "^4.8.0",
     "react-cool-dimensions": "^3.0.0",
     "react-draggable": "^4.4.5",
     "scroll-into-view-if-needed": "^3.0.6",

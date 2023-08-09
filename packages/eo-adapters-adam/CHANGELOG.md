@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.3.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-adapters-adam@3.2.4...@oidajs/eo-adapters-adam@3.3.0) (2023-08-09)
+
+### Features
+
+- improve support for vector datasets ([448035d](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/448035dcc5ffe6c1b343620ddb891e2391f6540b))
+
 ## [3.2.4](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-adapters-adam@3.2.3...@oidajs/eo-adapters-adam@3.2.4) (2023-04-20)
 
 **Note:** Version bump only for package @oidajs/eo-adapters-adam

@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.4.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-mobx-react@4.3.0...@oidajs/eo-mobx-react@4.4.0) (2023-08-09)
+
+### Features
+
+- add support for setting legend values in dataset raster preset ([c6cf168](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/c6cf168da28c0901062cdf3931ff13c37f7b2968))
+- improve support for vector datasets ([448035d](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/448035dcc5ffe6c1b343620ddb891e2391f6540b))
+
 # [4.3.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-mobx-react@4.2.0...@oidajs/eo-mobx-react@4.3.0) (2023-04-20)
 
 ### Bug Fixes

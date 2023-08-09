@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.4.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/map-cesium@3.3.3...@oidajs/map-cesium@3.4.0) (2023-08-09)
+
+### Features
+
+- add support for map credits ([6bc14a4](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/6bc14a4ad94f86f49bcbce8e3a9915ec7f094ab3))
+- add support for vector layer clustering ([f3af823](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/f3af8230102604859fd8294b5568408a25e5f828))
+
 ## [3.3.3](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/map-cesium@3.3.2...@oidajs/map-cesium@3.3.3) (2023-04-12)
 
 **Note:** Version bump only for package @oidajs/map-cesium

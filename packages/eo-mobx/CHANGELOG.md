@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.3.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-mobx@3.2.0...@oidajs/eo-mobx@3.3.0) (2023-08-09)
+
+### Bug Fixes
+
+- add missing optional label definition in DistributionHistogramBin ([cab23f7](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/cab23f7edd92b191f4f3319bf59c5385094dc58b))
+
+### Features
+
+- add support for setting legend values in dataset raster preset ([c6cf168](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/c6cf168da28c0901062cdf3931ff13c37f7b2968))
+- add support for vector layer clustering ([f3af823](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/f3af8230102604859fd8294b5568408a25e5f828))
+- improve support for vector datasets ([448035d](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/448035dcc5ffe6c1b343620ddb891e2391f6540b))
+
 # [3.2.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-mobx@3.1.0...@oidajs/eo-mobx@3.2.0) (2023-04-20)
 
 ### Features
