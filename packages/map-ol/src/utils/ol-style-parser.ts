@@ -68,7 +68,8 @@ export class OLStyleParser {
                 new Icon({
                     src: pointStyle.url,
                     color: pointStyle.color ? this.parseColor_(pointStyle.color) : undefined,
-                    scale: pointStyle.scale
+                    scale: pointStyle.scale,
+                    declutterMode: 'none' // we want decluttering enabled only for labels
                 })
             );
         } else {
@@ -76,7 +77,8 @@ export class OLStyleParser {
                 new Circle({
                     radius: pointStyle.radius || 8,
                     fill: pointStyle.fillColor ? new Fill({ color: this.parseColor_(pointStyle.fillColor) }) : undefined,
-                    stroke: pointStyle.strokeColor ? new Stroke({ color: this.parseColor_(pointStyle.strokeColor) }) : undefined
+                    stroke: pointStyle.strokeColor ? new Stroke({ color: this.parseColor_(pointStyle.strokeColor) }) : undefined,
+                    declutterMode: 'none' // we want decluttering enabled only for labels
                 })
             );
         }

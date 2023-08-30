@@ -192,7 +192,8 @@ export class OLFeatureLayer extends OLMapLayer<VectorLayer<VectorSource>> implem
             source: source,
             extent: config.extent,
             zIndex: config.zIndex || 0,
-            style: style
+            style: style,
+            declutter: true // enable label decluterring
         });
     }
 
