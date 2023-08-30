@@ -27,6 +27,10 @@
         border-radius: (@size / 2);
     }
 
+    &::-webkit-scrollbar-corner {
+        background: @track;
+    }
+
     //Firefox
     scrollbar-color: @thumb @track;
     .scrollbar-width(@size);

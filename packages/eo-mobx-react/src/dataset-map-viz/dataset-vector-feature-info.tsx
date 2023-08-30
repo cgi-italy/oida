@@ -228,22 +228,20 @@ export const DatasetVectorFeatureInfoTable = <T extends VectorFeatureProperties 
             dataIndex: property.id,
             key: property.id,
             ellipsis: true,
-            sorter: property.sortable
-                ? (a, b, order) => {
-                      const firstValue = a[property.id];
-                      const secondValue = b[property.id];
+            sorter: (a, b, order) => {
+                const firstValue = a[property.id];
+                const secondValue = b[property.id];
 
-                      if (firstValue === secondValue) {
-                          return 0;
-                      } else if (firstValue === undefined) {
-                          return order === 'ascend' ? 1 : -1;
-                      } else if (secondValue === undefined) {
-                          return order === 'ascend' ? -1 : 1;
-                      } else {
-                          return firstValue > secondValue ? 1 : -1;
-                      }
-                  }
-                : undefined,
+                if (firstValue === secondValue) {
+                    return 0;
+                } else if (firstValue === undefined) {
+                    return order === 'ascend' ? 1 : -1;
+                } else if (secondValue === undefined) {
+                    return order === 'ascend' ? -1 : 1;
+                } else {
+                    return firstValue > secondValue ? 1 : -1;
+                }
+            },
             render: (value) => {
                 const formattedValue = formatVectorFeatureProperty(property, value);
                 return <span className='table-cell-content'>{formattedValue}</span>;
