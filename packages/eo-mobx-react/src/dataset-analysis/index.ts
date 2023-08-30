@@ -15,3 +15,4 @@ export * from './dataset-selector';
 export * from './analysis-loading-state-message';
 export * from './analysis-series-actions';
 export * from './dataset-explorer-tools-dropdown';
+export * from './dataset-area-distribution';

@@ -74,7 +74,7 @@ export class WfsClient {
             requestParams.cql_filter = request.cqlFilter;
         }
         if (request.bbox) {
-            requestParams.bbox = request.bbox.join(',');
+            requestParams.bbox = `${request.bbox[1]},${request.bbox[0]},${request.bbox[3]},${request.bbox[2]}`;
         }
         if (request.featureId) {
             requestParams.featureID = request.featureId;
