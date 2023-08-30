@@ -116,7 +116,7 @@ export interface FeaturePropertyValueTypes {
     [ENUM_FEATURE_PROPERTY_TYPE]: string | number;
     [DATE_FEATURE_PROPERTY_TYPE]: Date;
     [COMPOSITE_FEATURE_PROPERTY_TYPE]: {
-        [key: string]: FeaturePropertyValueType;
+        [key: string]: FeaturePropertyValueType | FeaturePropertyValueType[];
     };
 }
 
