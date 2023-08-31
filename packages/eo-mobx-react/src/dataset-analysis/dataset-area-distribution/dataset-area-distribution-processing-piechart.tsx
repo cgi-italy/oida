@@ -1,12 +1,12 @@
 import React from 'react';
-import { Empty } from 'antd';
+import { Empty, theme } from 'antd';
 import * as echarts from 'echarts/core';
 import { PieChart, PieSeriesOption } from 'echarts/charts';
 import { TooltipComponent, TooltipComponentOption, LegendComponent, LegendComponentOption } from 'echarts/components';
 
-import { LoadingState, randomColorFactory } from '@oidajs/core';
+import { AreaUnit, formatArea, LoadingState, randomColorFactory } from '@oidajs/core';
 import { useSelector } from '@oidajs/ui-react-mobx';
-import { DatasetAreaDistribution } from '@oidajs/eo-mobx';
+import { DatasetAreaDistribution, EnumFeaturePropertyOption } from '@oidajs/eo-mobx';
 
 import { AnalysisLoadingStateMessage } from '../analysis-loading-state-message';
 import { ChartWidget } from '../chart-widget';
@@ -39,36 +39,98 @@ export const DatasetAreaValuesProcessingPieChart = (props: DatasetAreaDistributi
                 loadingState = LoadingState.Error;
             }
 
-            const colorMap: Record<string, string | undefined> = {};
-            if (descriptor) {
-                descriptor.options.map((option) => {
-                    return (colorMap[option.value] = option.color ?? undefined);
-                });
-            }
+            const optionsMap = descriptor?.options.reduce((optionsMap: Record<string, EnumFeaturePropertyOption>, option) => {
+                return {
+                    ...optionsMap,
+                    [option.value]: {
+                        color: option.color,
+                        description: option.description,
+                        name: option.name,
+                        value: option.value
+                    }
+                };
+            }, {});
 
             const randomColor = randomColorFactory();
             const colors: string[] = [];
-            const series = processing.data?.map((data) => {
-                if (colorMap[data.name]) colors.push(colorMap[data.name] ?? randomColor());
+            const series = Object.entries(processing.data?.totals || []).map(([propertyValue, total]) => {
+                const optionConfig = optionsMap ? optionsMap[propertyValue] : undefined;
+                colors.push(optionConfig?.color || randomColor());
                 return {
-                    value: data.count,
-                    name: data.name
+                    value: total,
+                    name: optionConfig?.name || propertyValue
                 };
             });
 
             if (series?.length) {
+                const valueFormatter = (value: number) => {
+                    let formattedValue: number | string = value;
+                    if (processing.data?.measureType === 'area') {
+                        formattedValue = formatArea(value, {
+                            inputUnits: AreaUnit.METERS2,
+                            outputUnits: AreaUnit.KM2,
+                            appendUnits: true,
+                            precision: 3
+                        });
+                    }
+                    return formattedValue;
+                };
+
                 pieDataSeries.push({
                     name: processing.name,
                     type: 'pie',
                     radius: '50%',
                     data: series,
                     showEmptyCircle: false,
-                    ...(colors.length > 0 && { color: colors })
+                    color: colors,
+                    tooltip: {
+                        formatter: (item) => {
+                            return `${item.name}: ${valueFormatter(item.value)} (${item.percent})%`;
+                        }
+                    },
+                    labelLine: {
+                        length: 15,
+                        length2: 0,
+                        maxSurfaceAngle: 80
+                    },
+                    label: {
+                        //formatter: '{per|{d}%}\n{b|{b}:} {c}',
+                        formatter: (item) => {
+                            return [`{b|${item.name}:}`, `{per|${valueFormatter(item.value as number)} (${item.percent}%)}`].join('\n');
+                        },
+                        fontSize: 15,
+                        color: token.colorPrimary,
+                        rich: {
+                            per: {
+                                padding: [0, 0, 8, 0],
+                                color: token.colorPrimary,
+                                lineHeight: 22,
+                                align: 'center',
+                                fontSize: 14,
+                                fontWeight: 'bold'
+                            },
+                            b: {
+                                color: '#FFFFFF',
+                                lineHeight: 22,
+                                align: 'center',
+                                fontSize: 13
+                            },
+                            c: {
+                                color: '#FFFFFF',
+                                lineHeight: 22,
+                                align: 'center',
+                                fontSize: 13,
+                                fontWeight: 'bold'
+                            }
+                        }
+                    }
                 });
             }
         });
         return { pieDataSeries, loadingState };
     });
+
+    const { token } = theme.useToken();
 
     if (loadingState === LoadingState.Init || loadingState === LoadingState.Error) {
         return <AnalysisLoadingStateMessage loadingState={loadingState} initMessage='Fill the series params to retrieve the data' />;
@@ -86,41 +148,7 @@ export const DatasetAreaValuesProcessingPieChart = (props: DatasetAreaDistributi
                 },
                 tooltip: {
                     trigger: 'item',
-                    confine: true,
-                    formatter: '{a} <br/>{b}: {c} ({d}%)'
-                },
-                labelLine: {
-                    length: 15,
-                    length2: 0,
-                    maxSurfaceAngle: 80
-                },
-                label: {
-                    formatter: '{per|{d}%}\n{b|{b}:} {c}',
-                    fontSize: 15,
-                    color: '#b0a1e4',
-                    rich: {
-                        per: {
-                            padding: [8, 0, 0, 0],
-                            color: '#b0a1e4',
-                            lineHeight: 22,
-                            align: 'center',
-                            fontSize: 15,
-                            fontWeight: 'bold'
-                        },
-                        b: {
-                            color: '#FFFFFF',
-                            lineHeight: 22,
-                            align: 'center',
-                            fontSize: 13
-                        },
-                        c: {
-                            color: '#FFFFFF',
-                            lineHeight: 22,
-                            align: 'center',
-                            fontSize: 13,
-                            fontWeight: 'bold'
-                        }
-                    }
+                    confine: true
                 },
                 series: pieDataSeries
             }}

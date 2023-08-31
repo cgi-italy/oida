@@ -12,12 +12,21 @@ export type DatasetAreaDistributionRequest = {
     geometry: GeoJSON.Polygon | GeoJSON.MultiPolygon | CircleGeometry | BBoxGeometry;
 };
 
-export type DatasetAreaDistributionData = {
-    name: string;
-    count: number;
+export type DatasetAreaDistributionEnumTotals = {
+    type: 'enum_totals';
+    totals: Record<string, number>;
+    /**
+     * The measure type of the per class total.
+     * When set to 'length' the totals are assumed to be in meters.
+     * When set to 'area' the totals are assumed to be in squared meters.
+     * If omitted 'count' is assumed
+     **/
+    measureType?: 'count' | 'length' | 'area';
 };
 
-export type DatasetAreaDistributionProvider = (request: DatasetAreaDistributionRequest) => Promise<DatasetAreaDistributionData[]>;
+export type DatasetAreaDistributionData = DatasetAreaDistributionEnumTotals;
+
+export type DatasetAreaDistributionProvider = (request: DatasetAreaDistributionRequest) => Promise<DatasetAreaDistributionData>;
 
 export type DatasetAreaDistributionConfig = {
     variables: EnumFeaturePropertyDescriptor[];
@@ -36,10 +45,10 @@ export type DatasetAreaDistributionProps = Omit<
 export class DatasetAreaDistribution extends DatasetProcessing<typeof DATASET_AREA_DISTRIBUTION_PROCESSING, undefined> {
     readonly config: DatasetAreaDistributionConfig;
     @observable.ref variable: string | undefined;
-    @observable.ref data: DatasetAreaDistributionData[] | undefined;
+    @observable.ref data: DatasetAreaDistributionData | undefined;
     @observable.ref autoUpdate: boolean;
 
-    protected dataFetcher_: AsyncDataFetcher<DatasetAreaDistributionData[] | undefined, DatasetAreaDistributionRequest>;
+    protected dataFetcher_: AsyncDataFetcher<DatasetAreaDistributionData | undefined, DatasetAreaDistributionRequest>;
     protected subscriptionTracker_: SubscriptionTracker;
 
     constructor(props: Omit<DatasetAreaDistributionProps, 'vizType'>) {
@@ -129,7 +138,7 @@ export class DatasetAreaDistribution extends DatasetProcessing<typeof DATASET_AR
     }
 
     @action
-    protected setData(data: DatasetAreaDistributionData[] | undefined) {
+    protected setData(data: DatasetAreaDistributionData | undefined) {
         this.data = data;
     }
 

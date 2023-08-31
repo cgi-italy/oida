@@ -137,6 +137,8 @@ export type VectorFeaturePropertyDescriptor =
 export type VectorFeatureDescriptor = {
     title?: string;
     description?: string;
+    /** When specified can be used to provide more specific analytic tools */
+    geometryType?: GeoJSON.GeoJsonGeometryTypes;
     properties: VectorFeaturePropertyDescriptor[];
 };
 
