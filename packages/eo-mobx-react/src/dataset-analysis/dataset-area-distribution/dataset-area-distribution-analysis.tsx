@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { IObservableArray } from 'mobx';
 import { Button, Form } from 'antd';
 import { LeftOutlined } from '@ant-design/icons';
@@ -9,18 +9,16 @@ import { useSelector } from '@oidajs/ui-react-mobx';
 import { DatasetAnalysisWidgetFactory, DatasetAnalysisWidgetFactoryConfig } from '../dataset-analysis-widget-factory';
 import { DatasetSelector } from '../dataset-selector';
 import { DatasetAreaDistributionProcessingFilters } from './dataset-area-distribution-processing-filters';
-import { DatasetAreaValuesProcessingPieChart } from './dataset-area-distribution-processing-piechart';
+import { DatasetAreaValuesProcessingChart } from './dataset-area-distribution-processing-chart';
 
 export const DatasetAreaDistributionAnalysisWidget = (props: DatasetAnalysisWidgetFactoryConfig) => {
     const [filtersVisible, setFiltersVisible] = useState(true);
 
-    const processing = props.combinedAnalysis.processings as IObservableArray<DatasetAreaDistribution>;
+    const processings = props.combinedAnalysis.processings as IObservableArray<DatasetAreaDistribution>;
 
     const statsFilter = useSelector(
         () =>
-            processing.map((processing, index) => {
-                processing.setAutoUpdate(false);
-
+            processings.map((processing, index) => {
                 const avaialbleDatasetItems = props.datasetExplorerItems.filter((item) => {
                     return item.dataset.config.tools?.find((tool) => tool.type === DATASET_AREA_DISTRIBUTION_PROCESSING);
                 });
@@ -71,15 +69,28 @@ export const DatasetAreaDistributionAnalysisWidget = (props: DatasetAnalysisWidg
     );
 
     const canRunQuery = useSelector(() => {
-        return processing.every((item) => item.canRunQuery);
+        return processings.every((item) => item.canRunQuery);
     });
 
     useEffect(() => {
-        if (canRunQuery) {
-            processing.forEach((item) => item.retrieveData());
+        // this is to support autorun on workspace load
+        // TODO: handle this at workspace load level
+        let shouldRetrieveData = canRunQuery;
+        processings.forEach((item) => {
+            if (item.autoUpdate) {
+                item.setAutoUpdate(false);
+            } else {
+                shouldRetrieveData = false;
+            }
+        });
+
+        if (shouldRetrieveData) {
+            processings.forEach((item) => item.retrieveData());
             setFiltersVisible(false);
         }
     }, []);
+
+    const actionContainer = useRef<HTMLDivElement>(null);
 
     return (
         <div className='dataset-chart'>
@@ -90,7 +101,7 @@ export const DatasetAreaDistributionAnalysisWidget = (props: DatasetAnalysisWidg
                         className='dataset-chart-search-btn'
                         type='primary'
                         onClick={() => {
-                            processing.forEach((item) => item.retrieveData());
+                            processings.forEach((item) => item.retrieveData());
                             setFiltersVisible(false);
                         }}
                         disabled={!canRunQuery}
@@ -101,18 +112,21 @@ export const DatasetAreaDistributionAnalysisWidget = (props: DatasetAnalysisWidg
             )}
             {!filtersVisible && (
                 <div className='dataset-chart-result'>
-                    <Button
-                        className='dataset-chart-modify-params-btn'
-                        type='link'
-                        icon={<LeftOutlined />}
-                        onClick={() => {
-                            processing.forEach((item) => item.visible.setValue(true));
-                            setFiltersVisible(true);
-                        }}
-                    >
-                        Modify parameters
-                    </Button>
-                    <DatasetAreaValuesProcessingPieChart processing={processing} />
+                    <div className='dataset-chart-actions'>
+                        <Button
+                            className='dataset-chart-modify-params-btn'
+                            type='link'
+                            icon={<LeftOutlined />}
+                            onClick={() => {
+                                processings.forEach((item) => item.visible.setValue(true));
+                                setFiltersVisible(true);
+                            }}
+                        >
+                            Modify parameters
+                        </Button>
+                        <div ref={actionContainer} />
+                    </div>
+                    <DatasetAreaValuesProcessingChart processings={processings} actionContainer={actionContainer} />
                 </div>
             )}
         </div>
