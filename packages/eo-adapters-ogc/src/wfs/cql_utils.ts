@@ -46,8 +46,8 @@ export const getCqlClauseForQueryFilter = (filter: QueryFilter) => {
         return `strToLowerCase(${filter.key}) LIKE '%${filter.value.toLowerCase()}%'`;
     } else if (isQueryFilterOfType(filter, AOI_FIELD_ID)) {
         const flippedGeometry = flipGeometryCoords(filter.value.geometry);
-        if (flippedGeometry.type === 'BBox') {
-            return `BBOX(${filter.key}, ${flippedGeometry.bbox.join(',')})`;
+        if (filter.value.geometry.type === 'BBox') {
+            return `BBOX(${filter.key}, ${filter.value.geometry.bbox.join(',')}, 'EPSG:4326')`;
         } else if (flippedGeometry.type === 'Circle') {
             return `DWITHIN(${filter.key}, POINT(${flippedGeometry.center.join(' ')}), ${flippedGeometry.radius}, 'meters')`;
         } else {
