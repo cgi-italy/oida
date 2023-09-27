@@ -5,3 +5,4 @@ export * from './dataset-explorer';
 export * from './dataset-analysis';
 export * from './dataset-discovery';
 export * from './hooks';
+export * from './utils';
