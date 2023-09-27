@@ -13,6 +13,7 @@ export type WfsGetFeaturesRequest = {
     featureId?: string;
     count?: number;
     offset?: number;
+    sortBy?: string;
     properties?: string[];
     fesFilter?: string;
     cqlFilter?: string;
@@ -63,6 +64,9 @@ export class WfsClient {
         }
         if (request.offset !== undefined) {
             requestParams.startIndex = request.offset;
+        }
+        if (request.sortBy !== undefined) {
+            requestParams.sortBy = request.sortBy;
         }
         if (request.properties && request.properties.length) {
             requestParams.propertyName = request.properties.join(',');
