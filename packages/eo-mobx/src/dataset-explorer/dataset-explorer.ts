@@ -307,6 +307,7 @@ export class DatasetExplorer {
             active: true
         });
         this.mapLayer.children.add(this.analytics.geometryLayer);
+        this.mapLayer.children.add(this.analytics.processingsLayer);
 
         this.subscriptionTracker_ = new SubscriptionTracker();
 
