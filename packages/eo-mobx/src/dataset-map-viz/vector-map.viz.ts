@@ -97,7 +97,7 @@ export const defaultVectoreFeatureStyleFactory = (config?: VectorFeatureStyleFac
                 visible: feature.visible.value,
                 strokeColor: color.gl(),
                 strokeWidth: feature.selected.value ? 3 : 2,
-                fillColor: color.alpha(opacity).gl(),
+                fillColor: color.alpha(color.alpha() * opacity).gl(),
                 zIndex: zIndex
             },
             ...(feature.label && {
