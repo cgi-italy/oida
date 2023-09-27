@@ -104,13 +104,15 @@ export const useEntityCollectionList = <T extends IsEntity>(props: UseEntityColl
                     };
                 }, [entity]);
             },
-            itemActions: (entity: T) => {
-                return useDataCollectionActions({
-                    entity: entity,
-                    actions: actions || [],
-                    trackActionsDefinitions: props.trackActionsDefinitions
-                });
-            },
+            itemActions: actions
+                ? (entity: T) => {
+                      return useDataCollectionActions({
+                          entity: entity,
+                          actions: actions,
+                          trackActionsDefinitions: props.trackActionsDefinitions
+                      });
+                  }
+                : undefined,
             onHoverAction: (item: T, hovered: boolean) => {
                 selectionManager!.setHovered(hovered ? item : undefined);
             },
