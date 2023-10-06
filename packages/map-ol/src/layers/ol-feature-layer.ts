@@ -1,6 +1,7 @@
 import VectorSource from 'ol/source/Vector';
 import ClusterSource from 'ol/source/Cluster';
 import VectorLayer from 'ol/layer/Vector';
+import VectorImageLayer from 'ol/layer/VectorImage';
 import Feature from 'ol/Feature';
 import GeoJSON from 'ol/format/GeoJSON';
 import Circle from 'ol/geom/Circle';
@@ -15,6 +16,11 @@ import { OLMapLayer } from './ol-map-layer';
 import { olLayersFactory } from './ol-layers-factory';
 import { OLStyleParser } from '../utils/ol-style-parser';
 
+export type OLFeatureLayerProps = {
+    /** set this flag to improve performance when rendering an high number of vertices */
+    useImageRenderer?: boolean;
+};
+
 export class OLFeatureLayer extends OLMapLayer<VectorLayer<VectorSource>> implements IFeatureLayerRenderer {
     static readonly FEATURE_DATA_KEY = 'data';
     static readonly FEATURE_LAYER_KEY = 'layer';
@@ -27,7 +33,7 @@ export class OLFeatureLayer extends OLMapLayer<VectorLayer<VectorSource>> implem
     protected vectorSource_!: VectorSource;
     protected clusterRecomputeTimeout_: number | undefined;
 
-    constructor(config: FeatureLayerRendererConfig) {
+    constructor(config: FeatureLayerRendererConfig & OLFeatureLayerProps) {
         super(config);
         this.geomParser_ = new GeoJSON();
         this.styleParser_ = new OLStyleParser();
@@ -158,7 +164,7 @@ export class OLFeatureLayer extends OLMapLayer<VectorLayer<VectorSource>> implem
         });
     }
 
-    protected createOLObject_(config: FeatureLayerRendererConfig) {
+    protected createOLObject_(config: FeatureLayerRendererConfig & OLFeatureLayerProps) {
         let source = new VectorSource({
             wrapX: this.mapRenderer_.getViewer().getView()['wrapX']
         });
@@ -188,7 +194,8 @@ export class OLFeatureLayer extends OLMapLayer<VectorLayer<VectorSource>> implem
             };
         }
 
-        return new VectorLayer({
+        const VectorLayerRenderer = config.useImageRenderer ? VectorImageLayer : VectorLayer;
+        return new VectorLayerRenderer({
             source: source,
             extent: config.extent,
             zIndex: config.zIndex || 0,

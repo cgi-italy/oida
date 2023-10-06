@@ -255,6 +255,7 @@ export type DatasetVectorMapVizConfig = {
         clustering?: Partial<FeatureClusteringConfig<DatasetVectorFeature>>;
         labelProps?: string[];
         iconUrl?: string;
+        optimizeSpeed?: boolean;
     };
     dimensions?: DatasetDimension<DimensionDomainType>[];
 };
@@ -706,7 +707,12 @@ export class DatasetVectorMapViz extends DatasetViz<typeof VECTOR_VIZ_TYPE, Feat
                           style: clusteringConfig.style || defaultClusterStyleFactory(styleFactoryConfig),
                           distance: clusteringConfig.distance
                       }
-                    : undefined
+                    : undefined,
+                rendererOptions: {
+                    ol: {
+                        useImageRenderer: props.config.mapLayerOptions?.optimizeSpeed
+                    }
+                }
             }
         });
     }
