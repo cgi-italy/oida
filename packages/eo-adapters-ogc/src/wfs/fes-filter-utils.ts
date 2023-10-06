@@ -93,6 +93,25 @@ export const getFesFilterClauseForQueryFilter = (filter: QueryFilter) => {
                     </gml:exterior>
                 </gml:Polygon>
             </fes:Intersects>`;
+        } else if (flippedGeometry.type === 'MultiPolygon') {
+            return `<fes:Intersects>
+            <fes:ValueReference>${filter.key}</fes:ValueReference>
+            <gml:MultiSurface srsName="urn:x-ogc:def:crs:EPSG:4326">
+                ${flippedGeometry.coordinates.map((polygonCoords) => {
+                    return `<gml:surfaceMember>
+                        <gml:Polygon>
+                            <gml:exterior>
+                                <gml:LinearRing>
+                                    <gml:posList>
+                                        ${polygonCoords[0].map((coord) => coord.join(' ')).join(' ')}
+                                    </gml:posList>
+                                </gml:LinearRing>
+                            </gml:exterior>
+                        </gml:Polygon>
+                    </gml:surfaceMember>`;
+                })}
+            </gml:MultiSurface>
+        </fes:Intersects>`;
         } else if (filter.value.geometry.type === 'Circle') {
             return `<fes:DWithin>
                 <fes:ValueReference>${filter.key}</fes:ValueReference>

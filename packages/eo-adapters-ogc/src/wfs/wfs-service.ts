@@ -19,9 +19,16 @@ export class WfsService {
     }
 
     getFeatures(request: Omit<WfsGetFeaturesRequest, 'serviceUrl'>) {
-        return this.wfsClient_.getFeatures({
-            serviceUrl: this.url_,
-            ...request
-        });
+        if (request.fesFilter) {
+            return this.wfsClient_.getFeaturesPost({
+                serviceUrl: this.url_,
+                ...request
+            });
+        } else {
+            return this.wfsClient_.getFeatures({
+                serviceUrl: this.url_,
+                ...request
+            });
+        }
     }
 }
