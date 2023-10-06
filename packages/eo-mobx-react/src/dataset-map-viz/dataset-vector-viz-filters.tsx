@@ -16,8 +16,8 @@ export type FeaturePropertySelectorProps = {
 export const FeaturePropertySelector = (props: FeaturePropertySelectorProps) => {
     const choices = props.featureProperties.map((featureProperty) => {
         let name = featureProperty.name;
-        if (featureProperty.units) {
-            name += ` (${featureProperty.units})`;
+        if (featureProperty.quantity?.units) {
+            name += ` (${featureProperty.quantity.units})`;
         }
         return {
             name: name,

@@ -63,7 +63,7 @@ export const DatasetVectorFeatureInfo = <T extends VectorFeatureProperties = Vec
                     label={label}
                     className={`dataset-vector-feature-property dataset-vector-feature-property-${property.id}`}
                 >
-                    {formattedValue} {property.units}
+                    {formattedValue} {property.quantity?.units || ''}
                 </Descriptions.Item>
             );
         }

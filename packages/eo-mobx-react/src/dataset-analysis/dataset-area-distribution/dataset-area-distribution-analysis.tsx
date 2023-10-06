@@ -10,6 +10,7 @@ import { DatasetAnalysisWidgetFactory, DatasetAnalysisWidgetFactoryConfig } from
 import { DatasetSelector } from '../dataset-selector';
 import { DatasetAreaDistributionProcessingFilters } from './dataset-area-distribution-processing-filters';
 import { DatasetAreaValuesProcessingChart } from './dataset-area-distribution-processing-chart';
+import { AnalysisSeriesActions } from '../analysis-series-actions';
 
 export const DatasetAreaDistributionAnalysisWidget = (props: DatasetAnalysisWidgetFactoryConfig) => {
     const [filtersVisible, setFiltersVisible] = useState(true);
@@ -29,6 +30,10 @@ export const DatasetAreaDistributionAnalysisWidget = (props: DatasetAnalysisWidg
                         props.combinedAnalysis.removeProcessing(processing);
                     }, 0);
                 }
+
+                const availableTargets = props.availableCombos[props.combinedAnalysis.type].filter(
+                    (combo) => combo.id !== props.combinedAnalysis.id
+                );
 
                 return (
                     <div className='analysis-parameters' key={processing.id}>
@@ -62,6 +67,12 @@ export const DatasetAreaDistributionAnalysisWidget = (props: DatasetAnalysisWidg
                             </Form.Item>
                             <DatasetAreaDistributionProcessingFilters processing={processing} />
                         </Form>
+                        <AnalysisSeriesActions
+                            analysis={processing}
+                            idx={index}
+                            availableTargets={availableTargets}
+                            combinedAnalysis={props.combinedAnalysis}
+                        />
                     </div>
                 );
             }),
