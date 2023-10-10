@@ -55,14 +55,14 @@ export const defaultVectoreFeatureStyleFactory = (config?: VectorFeatureStyleFac
 
     const featureStyleGetter: FeatureStyleGetter<DatasetVectorFeature> = (feature: DatasetVectorFeature) => {
         let color = feature.color ? chroma(feature.color) : defaultColor;
-        let opacity = 0.1;
+        let opacity = 0.7;
 
         if (feature.selected.value) {
-            color = chroma(1.0, 1.0, 0.0, 'gl');
-            opacity = 0.4;
+            color = chroma(1.0, 1.0, 0.0, 'gl').alpha(1);
+            opacity = 1;
         } else if (feature.hovered.value) {
             color = color.brighten(0.3);
-            opacity = 0.2;
+            opacity = 1;
         }
 
         let zIndex = 0;
@@ -95,7 +95,7 @@ export const defaultVectoreFeatureStyleFactory = (config?: VectorFeatureStyleFac
             },
             polygon: {
                 visible: feature.visible.value,
-                strokeColor: color.gl(),
+                strokeColor: color.darken(0.3).gl(),
                 strokeWidth: feature.selected.value ? 3 : 2,
                 fillColor: color.alpha(color.alpha() * opacity).gl(),
                 zIndex: zIndex
