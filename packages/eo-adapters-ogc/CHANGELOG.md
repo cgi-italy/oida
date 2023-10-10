@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.6.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-adapters-ogc@2.5.0...@oidajs/eo-adapters-ogc@2.6.0) (2023-10-10)
+
+### Bug Fixes
+
+- force crs specification in cql bbox filter ([d317420](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/d317420ca210ef829c1eb50b46132b7d32fc64e1))
+
+### Features
+
+- add area distribution analysis for vector datasets ([c23416a](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/c23416a249705f80159dedeae039d2f5d8355c7c))
+- add support for wfs filter encoding specification (FES) ([463f357](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/463f357a133a593c7ec71efa9cf704923b5abc37))
+
 # [2.5.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-adapters-ogc@2.4.6...@oidajs/eo-adapters-ogc@2.5.0) (2023-08-09)
 
 ### Features

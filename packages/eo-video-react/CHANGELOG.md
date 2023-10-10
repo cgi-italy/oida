@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.0.13](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-video-react@2.0.12...@oidajs/eo-video-react@2.0.13) (2023-10-10)
+
+**Note:** Version bump only for package @oidajs/eo-video-react
+
 ## [2.0.12](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-video-react@2.0.11...@oidajs/eo-video-react@2.0.12) (2023-08-09)
 
 **Note:** Version bump only for package @oidajs/eo-video-react

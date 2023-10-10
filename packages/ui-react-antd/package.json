@@ -1,6 +1,6 @@
 {
   "name": "@oidajs/ui-react-antd",
-  "version": "6.4.4",
+  "version": "6.5.0",
   "description": "antd components",
   "module": "es/index.js",
   "main": "lib/index.js",
@@ -40,7 +40,7 @@
   },
   "dependencies": {
     "@oidajs/core": "^4.8.0",
-    "@oidajs/ui-react-core": "^6.4.4",
+    "@oidajs/ui-react-core": "^6.5.0",
     "@terraformer/wkt": "^2.1.2",
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "^16.0.1",

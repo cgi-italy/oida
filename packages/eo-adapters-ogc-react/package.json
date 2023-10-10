@@ -1,6 +1,6 @@
 {
   "name": "@oidajs/eo-adapters-ogc-react",
-  "version": "2.2.7",
+  "version": "2.2.8",
   "description": "oida EO OGC adapters react components",
   "module": "es/index.js",
   "main": "lib/index.js",
@@ -40,13 +40,13 @@
   },
   "dependencies": {
     "@oidajs/core": "^4.8.0",
-    "@oidajs/eo-adapters-ogc": "^2.5.0",
-    "@oidajs/eo-mobx": "^3.3.0",
-    "@oidajs/eo-mobx-react": "^4.4.0",
-    "@oidajs/state-mobx": "^2.2.0",
-    "@oidajs/ui-react-antd": "^6.4.4",
-    "@oidajs/ui-react-core": "^6.4.4",
-    "@oidajs/ui-react-mobx": "^4.4.4",
+    "@oidajs/eo-adapters-ogc": "^2.6.0",
+    "@oidajs/eo-mobx": "^3.4.0",
+    "@oidajs/eo-mobx-react": "^4.5.0",
+    "@oidajs/state-mobx": "^2.2.1",
+    "@oidajs/ui-react-antd": "^6.5.0",
+    "@oidajs/ui-react-core": "^6.5.0",
+    "@oidajs/ui-react-mobx": "^4.5.0",
     "tslib": "^2.4.1"
   }
 }

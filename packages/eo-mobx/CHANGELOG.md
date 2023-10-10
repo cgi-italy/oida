@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.4.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-mobx@3.3.0...@oidajs/eo-mobx@3.4.0) (2023-10-10)
+
+### Bug Fixes
+
+- make analysis processing layers visible on map ([7151431](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/71514315794cfe5285686181985f9e98220cb0fc))
+- solve issue with polygon alpha in vector map viz style ([a57493c](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/a57493c8b9f1688e26f16bc4a87abfd84cef802d))
+
+### Features
+
+- add area distribution analysis for vector datasets ([c23416a](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/c23416a249705f80159dedeae039d2f5d8355c7c))
+- add support for combining multiple charts in vector distribution analysis ([4fe525e](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/4fe525ec747048451615cba7f402c8c2c27629bb))
+- add support for multivar vector distribution analysis ([645ae9a](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/645ae9aef33b06fdeb7cea589b7957246d034075))
+- add support for OL VectorImageLayer for speed optimized vector rendering ([68f5a3d](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/68f5a3db64b64e6f1466fa6f3185d77404e080f0))
+- add support for per class total surface analysis in DatasetAreaDistribution ([44fb3e6](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/44fb3e63a3df52e4b6488e8adf73ad8701f327ba))
+- implement a data table tool for vector datasets ([5b7ef94](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/5b7ef943eb649db32c4c5e3cb5e0300ca522c1f3))
+
 # [3.3.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-mobx@3.2.0...@oidajs/eo-mobx@3.3.0) (2023-08-09)
 
 ### Bug Fixes

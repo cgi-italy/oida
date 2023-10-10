@@ -1,6 +1,6 @@
 {
   "name": "@oidajs/eo-mobx",
-  "version": "3.3.0",
+  "version": "3.4.0",
   "description": "oida EO library",
   "module": "es/index.js",
   "main": "lib/index.js",
@@ -31,7 +31,7 @@
   },
   "dependencies": {
     "@oidajs/core": "^4.8.0",
-    "@oidajs/state-mobx": "^2.2.0",
+    "@oidajs/state-mobx": "^2.2.1",
     "@turf/along": "^6.5.0",
     "@turf/length": "^6.5.0",
     "@turf/nearest-point-on-line": "^6.5.0",

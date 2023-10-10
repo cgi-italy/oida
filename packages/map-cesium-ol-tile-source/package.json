@@ -1,6 +1,6 @@
 {
   "name": "@oidajs/map-cesium-ol-tile-source",
-  "version": "2.0.11",
+  "version": "2.0.12",
   "description": "Cesium map renderer wrapper library",
   "module": "es/index.js",
   "main": "lib/index.js",
@@ -26,7 +26,7 @@
   },
   "dependencies": {
     "@oidajs/map-cesium": "^3.4.0",
-    "@oidajs/map-ol": "^3.5.0",
+    "@oidajs/map-ol": "^3.6.0",
     "tslib": "^2.4.1"
   },
   "peerDependencies": {

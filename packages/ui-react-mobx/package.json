@@ -1,6 +1,6 @@
 {
   "name": "@oidajs/ui-react-mobx",
-  "version": "4.4.4",
+  "version": "4.5.0",
   "description": "react hooks and components for state-mobx",
   "module": "es/index.js",
   "main": "lib/index.js",
@@ -36,8 +36,8 @@
   },
   "dependencies": {
     "@oidajs/core": "^4.8.0",
-    "@oidajs/state-mobx": "^2.2.0",
-    "@oidajs/ui-react-core": "^6.4.4",
+    "@oidajs/state-mobx": "^2.2.1",
+    "@oidajs/ui-react-core": "^6.5.0",
     "chroma-js": "^2.4.2",
     "downloadjs": "^1.4.7",
     "lz-string": "^1.4.4",

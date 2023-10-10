@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.5.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/ui-react-antd@6.4.4...@oidajs/ui-react-antd@6.5.0) (2023-10-10)
+
+### Features
+
+- allow passing additional antd properties to data collection table ([4ec6b40](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/4ec6b40445cd317512da41c632f86c575e6725fc))
+
 ## [6.4.4](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/ui-react-antd@6.4.3...@oidajs/ui-react-antd@6.4.4) (2023-08-09)
 
 **Note:** Version bump only for package @oidajs/ui-react-antd

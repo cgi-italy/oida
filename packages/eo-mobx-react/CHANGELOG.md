@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.5.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-mobx-react@4.4.0...@oidajs/eo-mobx-react@4.5.0) (2023-10-10)
+
+### Features
+
+- add area distribution analysis for vector datasets ([c23416a](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/c23416a249705f80159dedeae039d2f5d8355c7c))
+- add opacity control to vector dataset settings ([ff9f989](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/ff9f989e769dade83e2f37ed74e396d431c702b5))
+- add support for combining multiple charts in vector distribution analysis ([4fe525e](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/4fe525ec747048451615cba7f402c8c2c27629bb))
+- add support for multivar vector distribution analysis ([645ae9a](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/645ae9aef33b06fdeb7cea589b7957246d034075))
+- add support for per class total surface analysis in DatasetAreaDistribution ([44fb3e6](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/44fb3e63a3df52e4b6488e8adf73ad8701f327ba))
+- enable column sorting for all properties in DatasetVectorFeatureInfoTable ([8cc4831](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/8cc4831fefd152d51159551b0806cfc3685d3b46))
+- implement a data table tool for vector datasets ([5b7ef94](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/5b7ef943eb649db32c4c5e3cb5e0300ca522c1f3))
+
 # [4.4.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-mobx-react@4.3.0...@oidajs/eo-mobx-react@4.4.0) (2023-08-09)
 
 ### Features

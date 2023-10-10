@@ -1,6 +1,6 @@
 {
   "name": "@oidajs/eo-adapters-planetary-computer",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "oida EO adapters for Microsoft Planetary Computer APIs",
   "module": "es/index.js",
   "main": "lib/index.js",
@@ -26,7 +26,7 @@
   },
   "dependencies": {
     "@oidajs/core": "^4.8.0",
-    "@oidajs/eo-mobx": "^3.3.0",
+    "@oidajs/eo-mobx": "^3.4.0",
     "tslib": "^2.4.1"
   }
 }

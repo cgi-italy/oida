@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.5.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/ui-react-mobx@4.4.4...@oidajs/ui-react-mobx@4.5.0) (2023-10-10)
+
+### Bug Fixes
+
+- solve issue with single geometry geojson aoi import ([b1ba879](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/b1ba87959450500e26905c2832ed2db14c3600be))
+
+### Features
+
+- allow passing additional antd properties to data collection table ([4ec6b40](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/4ec6b40445cd317512da41c632f86c575e6725fc))
+
 ## [4.4.4](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/ui-react-mobx@4.4.3...@oidajs/ui-react-mobx@4.4.4) (2023-08-09)
 
 **Note:** Version bump only for package @oidajs/ui-react-mobx

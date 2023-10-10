@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.5.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/ui-react-core@6.4.4...@oidajs/ui-react-core@6.5.0) (2023-10-10)
+
+### Features
+
+- enable column sorting for all properties in DatasetVectorFeatureInfoTable ([8cc4831](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/8cc4831fefd152d51159551b0806cfc3685d3b46))
+
 ## [6.4.4](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/ui-react-core@6.4.3...@oidajs/ui-react-core@6.4.4) (2023-08-09)
 
 **Note:** Version bump only for package @oidajs/ui-react-core

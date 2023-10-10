@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.6.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/map-ol@3.5.0...@oidajs/map-ol@3.6.0) (2023-10-10)
+
+### Features
+
+- add support for OL VectorImageLayer for speed optimized vector rendering ([68f5a3d](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/68f5a3db64b64e6f1466fa6f3185d77404e080f0))
+- enable label decluttering in OL feature layer ([7bf5486](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/7bf548678742367a71eb9fe99e4a72f94728f58e))
+
 # [3.5.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/map-ol@3.4.0...@oidajs/map-ol@3.5.0) (2023-08-09)
 
 ### Features

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.2.1](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/state-mobx@2.2.0...@oidajs/state-mobx@2.2.1) (2023-10-10)
+
+### Bug Fixes
+
+- prevent debounced function invocation on debounce unset in AsyncDataFetcher ([1cb0ef6](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/1cb0ef6b15ff097b1c6741683d5f450c7c51b4c1))
+
 # [2.2.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/state-mobx@2.1.3...@oidajs/state-mobx@2.2.0) (2023-08-09)
 
 ### Features
