@@ -38,11 +38,19 @@
                     .ant-descriptions-row {
                         td {
                             padding-bottom: 0px;
+                            .ant-descriptions-item-container {
+                                overflow: hidden;
+                                .ant-descriptions-item-content {
+                                    white-space: nowrap;
+                                    justify-content: end;
+                                    color: @primary-color;
+                                    overflow: hidden;
 
-                            .ant-descriptions-item-content {
-                                white-space: nowrap;
-                                justify-content: end;
-                                color: @primary-color;
+                                    > div {
+                                        overflow: hidden;
+                                        text-overflow: ellipsis;
+                                    }
+                                }
                             }
                         }
 
