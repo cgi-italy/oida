@@ -354,9 +354,9 @@ export class DatasetExplorer {
             initialState: initialState
         });
 
-        this.items.push(item);
+        this.items.unshift(item);
         if (this.mapExplorer && item.mapViz?.mapLayer) {
-            this.mapExplorer.mapLayer.children.add(item.mapViz.mapLayer, 0);
+            this.mapExplorer.mapLayer.children.add(item.mapViz.mapLayer);
         }
         return item;
     }
