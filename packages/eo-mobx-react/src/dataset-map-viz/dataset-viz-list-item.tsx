@@ -10,7 +10,8 @@ import {
     EyeInvisibleOutlined,
     DragOutlined,
     CloseOutlined,
-    WarningOutlined
+    WarningOutlined,
+    SwapOutlined
 } from '@ant-design/icons';
 import { SortableHandle } from 'react-sortable-hoc';
 
@@ -34,6 +35,10 @@ export type DatasetVizListItemProps = {
     onRemove?: () => void;
     downloadComponent?: React.ComponentType<DatasetVizDownloadModalProps>;
     disableRenaming?: boolean;
+    comparison?: {
+        onSetIsTargetToggle: () => void;
+        isTarget: boolean;
+    };
 };
 
 export const DatasetVizListItem = (props: DatasetVizListItemProps) => {
@@ -138,6 +143,18 @@ export const DatasetVizListItem = (props: DatasetVizListItemProps) => {
         }
     }
 
+    if (props.comparison) {
+        actions.push({
+            id: 'compare',
+            icon: <SwapOutlined />,
+            title: 'Swipe tool',
+            active: props.comparison.isTarget,
+            callback: () => {
+                props.comparison?.onSetIsTargetToggle();
+            }
+        });
+    }
+
     const DragHandle = SortableHandle(() => (
         <div className='viz-drag-button'>
             <DragOutlined />
@@ -207,7 +224,7 @@ export const DatasetVizListItem = (props: DatasetVizListItemProps) => {
                                         title: action.title,
                                         icon: action.icon,
                                         callback: action.callback,
-                                        primary: action.id === activeAction
+                                        primary: action.active || action.id === activeAction
                                     }}
                                 />
                             );

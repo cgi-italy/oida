@@ -26,4 +26,25 @@ export class CesiumGroupLayer extends CesiumMapLayer implements IGroupLayerRende
 
         layer.setParent(null);
     }
+
+    moveLayer(layer: CesiumMapLayer, prevIdx: number, newIdx: number) {
+        const moveOffset = newIdx - prevIdx;
+        if (moveOffset > 0) {
+            for (let i = 0; i < moveOffset; ++i) {
+                this.primitives_.raise(layer.getPrimitives());
+                this.dataSources_.raise(layer.getDataSources());
+                this.imageries_.raise(layer.getImageries());
+            }
+        } else {
+            for (let i = moveOffset; i < 0; ++i) {
+                this.primitives_.lower(layer.getPrimitives());
+                this.dataSources_.lower(layer.getDataSources());
+                this.imageries_.lower(layer.getImageries());
+            }
+        }
+        this.mapRenderer_.refreshImageriesFromEvent({
+            type: 'order',
+            collection: this.imageries_
+        });
+    }
 }

@@ -378,6 +378,7 @@ export class DatasetExplorer {
             this.items.splice(newIdx, 0, item);
 
             if (this.mapExplorer && item.mapViz?.mapLayer) {
+                // TODO: the map layer new index is not valid if one of the items doesn't have a map visualization
                 this.mapExplorer.mapLayer.children.move(item.mapViz.mapLayer, this.items.length - newIdx - 1);
             }
         }

@@ -30,8 +30,8 @@ export class CesiumMapLayer implements IMapLayerRenderer {
         if (config.opacity !== undefined) {
             this.setOpacity(config.opacity);
         }
-        if (config.zIndex !== undefined) {
-            this.setZIndex(config.zIndex);
+        if (config.zIndex) {
+            this.updateImageryZIndex_(this.imageries_, config.zIndex);
         }
     }
 
@@ -51,12 +51,12 @@ export class CesiumMapLayer implements IMapLayerRenderer {
     }
 
     setZIndex(zIndex) {
-        if (zIndex !== this.imageries_.zIndex) {
+        if ((zIndex || 0) !== (this.imageries_.zIndex || 0)) {
             this.imageries_.zIndex = zIndex;
+            this.updateImageryZIndex_(this.imageries_, this.getZIndex());
             this.mapRenderer_.refreshImageriesFromEvent({
-                type: 'zIndex',
-                collection: this.imageries_,
-                zIndex: zIndex
+                type: 'order',
+                collection: this.imageries_
             });
         }
     }
@@ -72,6 +72,7 @@ export class CesiumMapLayer implements IMapLayerRenderer {
             this.updateImageryOpacity_(this.imageries_);
             this.updateImageryVisibility_(this.imageries_, this.parent_.isVisible());
             this.updateDataSourcesVisibility_(this.dataSources_, this.parent_.isVisible());
+            this.updateImageryZIndex_(this.imageries_, this.parent_.getZIndex());
         }
     }
 
@@ -89,6 +90,10 @@ export class CesiumMapLayer implements IMapLayerRenderer {
         } else {
             return this.visible_;
         }
+    }
+
+    getZIndex() {
+        return this.imageries_.zIndex ? this.imageries_.zIndex : this.parent_?.getZIndex();
     }
 
     getImageries() {
@@ -246,6 +251,18 @@ export class CesiumMapLayer implements IMapLayerRenderer {
         } else {
             for (let i = 0; i < imageries.length; ++i) {
                 this.updateImageryOpacity_(imageries.get(i));
+            }
+        }
+    }
+
+    protected updateImageryZIndex_(imageries, parentZIndex: number) {
+        imageries = imageries || this.imageries_;
+
+        if (imageries instanceof ImageryLayer) {
+            imageries['zIndex'] = parentZIndex;
+        } else {
+            for (let i = 0; i < imageries.length; ++i) {
+                this.updateImageryZIndex_(imageries.get(i), imageries.zIndex || parentZIndex);
             }
         }
     }
