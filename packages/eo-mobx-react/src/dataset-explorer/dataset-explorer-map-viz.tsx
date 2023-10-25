@@ -1,10 +1,8 @@
 import React, { useRef } from 'react';
-
 import { List, ListProps } from 'antd';
-
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 
-import { LAYER_SWIPE_INTERACTION_ID } from '@oidajs/core';
+import { ILayerSwipeInteractionImplementation, LAYER_SWIPE_INTERACTION_ID } from '@oidajs/core';
 import { LayerSwipeInteraction, Map, MapLayer } from '@oidajs/state-mobx';
 import { useSelector } from '@oidajs/ui-react-mobx';
 import { DatasetExplorer, DatasetViz } from '@oidajs/eo-mobx';
@@ -34,7 +32,28 @@ export const DatasetExplorerMapViz = (props: DatasetExplorerMapVizProps) => {
         return props.explorerState.items.map((datasetView, idx) => {
             const mapViz = datasetView.mapViz;
             if (mapViz && mapViz.mapLayer) {
-                const isComparisonTarget = mapViz.mapLayer === swipeInteraction?.targetLayer;
+                let comparisonConfig: DatasetVizListItemProps['comparison'];
+                let isComparisonTarget = false;
+                if (swipeInteraction?.implementation) {
+                    const swipeSupportedLayers = (
+                        swipeInteraction.implementation as ILayerSwipeInteractionImplementation
+                    ).getSupportedLayerTypes();
+                    const isSwipeSupported = swipeSupportedLayers.indexOf(mapViz.mapLayer.layerType) !== -1;
+                    if (isSwipeSupported) {
+                        isComparisonTarget = mapViz.mapLayer === swipeInteraction.targetLayer;
+                        comparisonConfig = {
+                            isTarget: isComparisonTarget,
+                            onSetIsTargetToggle: () => {
+                                if (isComparisonTarget) {
+                                    swipeInteraction.setTargetLayer(undefined);
+                                } else {
+                                    swipeInteraction.setTargetLayer(mapViz.mapLayer);
+                                }
+                            }
+                        };
+                    }
+                }
+
                 return (
                     <SortableItem
                         key={datasetView.dataset.id}
@@ -48,21 +67,12 @@ export const DatasetExplorerMapViz = (props: DatasetExplorerMapVizProps) => {
                             if (isComparisonTarget) {
                                 //TODO: should this be done automatically by the
                                 // swipe interaction on target layer remove?
-                                swipeInteraction.setTargetLayer(undefined);
+                                swipeInteraction!.setTargetLayer(undefined);
                             }
                         }}
                         downloadComponent={props.datasetDownloadComponent}
                         disableRenaming={props.disableDatasetRenaming}
-                        comparison={{
-                            isTarget: isComparisonTarget,
-                            onSetIsTargetToggle: () => {
-                                if (isComparisonTarget) {
-                                    swipeInteraction.setTargetLayer(undefined);
-                                } else {
-                                    swipeInteraction?.setTargetLayer(mapViz.mapLayer);
-                                }
-                            }
-                        }}
+                        comparison={comparisonConfig}
                     />
                 );
             } else {

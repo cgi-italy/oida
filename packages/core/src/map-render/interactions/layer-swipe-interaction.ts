@@ -13,4 +13,5 @@ export type ILayerSwipeInteractionProps<T extends IMapRenderer = IMapRenderer> =
 export interface ILayerSwipeInteractionImplementation extends IMapInteractionImplementation {
     setTargetLayer: (layer: IMapLayerRenderer | undefined) => void;
     setSwipePosition: (position: number) => void;
+    getSupportedLayerTypes: () => string[];
 }

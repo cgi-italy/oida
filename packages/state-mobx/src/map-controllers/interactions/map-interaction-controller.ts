@@ -34,6 +34,7 @@ export class MapInteractionController<
     }
 
     protected bindToInteractionState_() {
+        this.interaction_.setImplementation(this.interactionImpl_);
         this.subscriptionTracker_.addSubscription(
             autorun(() => {
                 this.interactionImpl_!.setActive(this.interaction_.active.value);
@@ -42,6 +43,7 @@ export class MapInteractionController<
     }
 
     protected unbindFromInteractionState_() {
+        this.interaction_.setImplementation(undefined);
         this.subscriptionTracker_.unsubscribe();
     }
 

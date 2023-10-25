@@ -4,7 +4,9 @@ import {
     ILayerSwipeInteractionProps,
     LAYER_SWIPE_INTERACTION_ID,
     ILayerSwipeInteractionImplementation,
-    IMapLayerRenderer
+    IMapLayerRenderer,
+    TILE_LAYER_ID,
+    GROUP_LAYER_ID
 } from '@oidajs/core';
 
 import { CesiumMapRenderer } from '../map/cesium-map-renderer';
@@ -41,6 +43,10 @@ export class CesiumLayerSwipeInteraction implements ILayerSwipeInteractionImplem
         if (this.isActive_ && this.currentTarget_) {
             this.viewer_.scene.requestRender();
         }
+    }
+
+    getSupportedLayerTypes() {
+        return [TILE_LAYER_ID, GROUP_LAYER_ID];
     }
 
     setActive(active) {

@@ -9,7 +9,11 @@ import {
     ILayerSwipeInteractionProps,
     LAYER_SWIPE_INTERACTION_ID,
     ILayerSwipeInteractionImplementation,
-    IMapLayerRenderer
+    IMapLayerRenderer,
+    IMAGE_LAYER_ID,
+    FEATURE_LAYER_ID,
+    GROUP_LAYER_ID,
+    TILE_LAYER_ID
 } from '@oidajs/core';
 
 import { OLMapRenderer } from '../map/ol-map-renderer';
@@ -70,6 +74,10 @@ export class OLLayerSwipeInteraction implements ILayerSwipeInteractionImplementa
         if (this.isActive_ && this.currentTarget_) {
             this.viewer_.render();
         }
+    }
+
+    getSupportedLayerTypes() {
+        return [IMAGE_LAYER_ID, TILE_LAYER_ID, FEATURE_LAYER_ID, GROUP_LAYER_ID];
     }
 
     setActive(active) {
