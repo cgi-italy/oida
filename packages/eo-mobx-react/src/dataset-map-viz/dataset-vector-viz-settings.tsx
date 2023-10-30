@@ -9,6 +9,7 @@ import { DatasetColorMapSelector } from './dataset-colormap-selector';
 import { DatasetVectorVizFilters } from './dataset-vector-viz-filters';
 import { DatasetDimensionValueSelector } from './dataset-dimension-value-selector';
 import { DatasetDiscreteColorMapEditor } from './dataset-discrete-colormap-editor';
+import { DatasetVizOpacityControl } from './dataset-viz-opacity-control';
 
 export type DatasetVectorVizSettingsProps = {
     datasetViz: DatasetVectorMapViz;
@@ -42,6 +43,7 @@ export const DatasetVectorVizSettings = (props: DatasetVectorVizSettingsProps) =
 
     return (
         <div className='dataset-vector-viz-settings'>
+            <DatasetVizOpacityControl datasetViz={props.datasetViz} />
             {dimensionSelectors}
             <DatasetVectorVizFilters dataset={props.datasetViz} />
             {!!colorableProperties?.length && !!props.datasetViz.config.colorScales?.length && (

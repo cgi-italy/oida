@@ -1,17 +1,10 @@
 import { transformExtent } from 'ol/proj';
 
-import { AxiosInstanceWithCancellation, TileSource } from '@oidajs/core';
+import { TileSource } from '@oidajs/core';
 import { RasterMapViz, RasterBandModeSingle, RasterBandModePreset, RasterBandModeCombination, RasterBandMode } from '@oidajs/eo-mobx';
 
 import { ADAM_WCS_SOURCE_ID } from '../adam-wcs-tile-source';
-import {
-    getWcsTimeFilterSubset,
-    getAoiWcsParams,
-    getCoverageWcsParams,
-    getColormapWcsParams,
-    createGeoTiffLoader,
-    GeotiffLoader
-} from '../../utils';
+import { getWcsTimeFilterSubset, getAoiWcsParams, getCoverageWcsParams, getColormapWcsParams, GeotiffLoader } from '../../utils';
 import { isMultiBandCoverage, AdamDatasetCoverageBand, AdamWcsDatasetConfig } from '../../adam-dataset-config';
 import { AdamDatasetFactoryConfig } from '../../get-adam-dataset-factory';
 import { AdamSpatialCoverageProvider } from '../../get-adam-dataset-spatial-coverage-provider';

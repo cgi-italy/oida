@@ -9,3 +9,4 @@ export * from './app-side-nav';
 export * from './app-header';
 export * from './card-link';
 export * from './card-links-section';
+export * from './page-header';

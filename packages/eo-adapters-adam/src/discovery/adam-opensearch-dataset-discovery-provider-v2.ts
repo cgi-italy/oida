@@ -1,6 +1,6 @@
 import { action, computed, IObservableArray, IReactionDisposer, makeObservable, observable, reaction, when } from 'mobx';
 
-import { LoadingState, SortOrder, STRING_FIELD_ID } from '@oidajs/core';
+import { AxiosInstanceWithCancellation, LoadingState, SortOrder, STRING_FIELD_ID } from '@oidajs/core';
 import { Entity, QueryParams, AsyncDataFetcher, DataFilters, DataFiltersProps } from '@oidajs/state-mobx';
 import { DatasetDiscoveryProvider, DatasetDiscoveryProviderProps } from '@oidajs/eo-mobx';
 
@@ -50,6 +50,7 @@ export const ADAM_OPENSEARCH_DATASET_DISCOVERY_PROVIDER_TYPE_V2 = 'adam_opensear
 export type AdamOpensearchDatasetDiscoveryProviderPropsV2 = {
     searchClient: AdamOpensearchDatasetDiscoveryClientV2;
     commonFilters?: DataFilters | DataFiltersProps;
+    axiosInstance?: AxiosInstanceWithCancellation | undefined;
 } & DatasetDiscoveryProviderProps<typeof ADAM_OPENSEARCH_DATASET_DISCOVERY_PROVIDER_TYPE_V2>;
 
 export type AdamOpenSearchDatasetQuery = {
@@ -92,7 +93,9 @@ export class AdamOpensearchDatasetDiscoveryProviderV2 extends DatasetDiscoveryPr
         this.currentStep_ = AdamOpensearchDatasetDiscoveryStep.QueryDefinition;
         this.searchClient = props.searchClient;
 
-        this.datasetFactory_ = getAdamGranuleFactory();
+        this.datasetFactory_ = getAdamGranuleFactory({
+            axiosInstance: props.axiosInstance
+        });
 
         this.datasetFetcher_ = new AsyncDataFetcher({
             dataFetcher: () => {

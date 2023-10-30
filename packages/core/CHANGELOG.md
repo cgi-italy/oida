@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.9.0](https://github.com/cgi-italy/oida/compare/@oidajs/core@4.8.0...@oidajs/core@4.9.0) (2023-10-30)
+
+### Bug Fixes
+
+- disable swipe tool for unsupport layer types ([cec6694](https://github.com/cgi-italy/oida/commit/cec6694c3b5b38bebcd6ec4652ceee0b12b1b6b5))
+
+### Features
+
+- add layer swipe interaction and tool ([507ecd8](https://github.com/cgi-italy/oida/commit/507ecd877baf8724346932876fb925d910388af3))
+
+# [4.8.0](https://github.com/cgi-italy/oida/compare/@oidajs/core@4.7.0...@oidajs/core@4.8.0) (2023-08-09)
+
+### Features
+
+- add method for computing the extent of a set of features ([0f73aa4](https://github.com/cgi-italy/oida/commit/0f73aa4eb6dba29553dac7bf3b05814cd6772388))
+- add preliminary support for planetary computer datasets ([7a8faf9](https://github.com/cgi-italy/oida/commit/7a8faf93705d98f9d2f4c37e34f778c7327969b4))
+- add support for map credits ([6bc14a4](https://github.com/cgi-italy/oida/commit/6bc14a4ad94f86f49bcbce8e3a9915ec7f094ab3))
+- add support for vector layer clustering ([f3af823](https://github.com/cgi-italy/oida/commit/f3af8230102604859fd8294b5568408a25e5f828))
+
 # [4.7.0](https://github.com/cgi-italy/oida/compare/@oidajs/core@4.6.0...@oidajs/core@4.7.0) (2023-04-12)
 
 ### Features

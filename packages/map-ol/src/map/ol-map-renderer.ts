@@ -5,6 +5,7 @@ import { get as getProj, transform, transformExtent } from 'ol/proj';
 import { register } from 'ol/proj/proj4';
 import proj4 from 'proj4';
 import { getCenter as getExtentCenter } from 'ol/extent';
+import Attribution from 'ol/control/Attribution.js';
 
 import {
     IMapRenderer,
@@ -197,7 +198,7 @@ export class OLMapRenderer implements IMapRenderer {
 
         this.viewer_ = new Map({
             target: props.target,
-            controls: [],
+            controls: [new Attribution({ target: props.creditsTarget, collapseLabel: '<' })],
             layers: [],
             view: this.createViewFromProps_(props.viewport, props.projection)
         });

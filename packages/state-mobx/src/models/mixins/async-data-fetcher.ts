@@ -54,6 +54,10 @@ export class AsyncDataFetcher<RESPONSE = any, PARAMS = any> implements HasLoadin
         if (debounceInterval) {
             this.debouncedRequest_ = debounce(
                 (params: PARAMS, resolve: (value: RESPONSE | PromiseLike<RESPONSE>) => void, reject: (reason: any) => void) => {
+                    if (!this.debouncedRequest_) {
+                        // debounce has been unset
+                        return;
+                    }
                     this.invokeFetchRequest_(params).then(
                         (response) => {
                             resolve(response);

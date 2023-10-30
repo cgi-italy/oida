@@ -307,6 +307,7 @@ export class DatasetExplorer {
             active: true
         });
         this.mapLayer.children.add(this.analytics.geometryLayer);
+        this.mapLayer.children.add(this.analytics.processingsLayer);
 
         this.subscriptionTracker_ = new SubscriptionTracker();
 
@@ -353,9 +354,9 @@ export class DatasetExplorer {
             initialState: initialState
         });
 
-        this.items.push(item);
+        this.items.unshift(item);
         if (this.mapExplorer && item.mapViz?.mapLayer) {
-            this.mapExplorer.mapLayer.children.add(item.mapViz.mapLayer, 0);
+            this.mapExplorer.mapLayer.children.add(item.mapViz.mapLayer);
         }
         return item;
     }
@@ -377,6 +378,7 @@ export class DatasetExplorer {
             this.items.splice(newIdx, 0, item);
 
             if (this.mapExplorer && item.mapViz?.mapLayer) {
+                // TODO: the map layer new index is not valid if one of the items doesn't have a map visualization
                 this.mapExplorer.mapLayer.children.move(item.mapViz.mapLayer, this.items.length - newIdx - 1);
             }
         }

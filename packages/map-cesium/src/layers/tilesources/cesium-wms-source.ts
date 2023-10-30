@@ -15,6 +15,7 @@ cesiumTileSourcesFactory.register('wms', (config) => {
                 format: 'image/png',
                 ...config.parameters
             },
+            credit: config.credits,
             enablePickFeatures: false,
             tilingScheme: tileGrid.scheme,
             ...tileGrid.config

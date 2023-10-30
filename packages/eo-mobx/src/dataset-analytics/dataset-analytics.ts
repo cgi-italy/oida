@@ -2,7 +2,7 @@ import { IObservableArray, observable, action, makeObservable, ObservableMap } f
 import chroma from 'chroma-js';
 
 import { IFeatureStyle } from '@oidajs/core';
-import { ArrayTracker, FeatureLayer, FeatureStyleGetter } from '@oidajs/state-mobx';
+import { ArrayTracker, FeatureLayer, FeatureStyleGetter, GroupLayer } from '@oidajs/state-mobx';
 
 import { DatasetAnalysis } from './dataset-analysis';
 import { DatasetProcessing } from './dataset-processing';
@@ -61,6 +61,7 @@ export type DatasetAnalyticsProps = {
 export class DatasetAnalytics {
     @observable.ref active: boolean;
     geometryLayer: FeatureLayer<DatasetProcessing<string, any>>;
+    processingsLayer: GroupLayer;
     analyses: ObservableMap<string, DatasetAnalysis>;
     /**
      * Contains references to the combo analyses items. This array is used as source
@@ -92,6 +93,10 @@ export class DatasetAnalytics {
             }
         });
 
+        this.processingsLayer = new GroupLayer({
+            id: 'analysis-layers'
+        });
+
         this.analysisTrackers_ = new Map();
 
         makeObservable(this);
@@ -112,10 +117,16 @@ export class DatasetAnalytics {
                 idGetter: (item) => item.id,
                 onItemAdd: (item) => {
                     this.items_.push(item);
+                    if (item.mapLayer) {
+                        this.processingsLayer.children.add(item.mapLayer);
+                    }
                     return item;
                 },
                 onItemRemove: (item: DatasetProcessing<string, any>) => {
                     this.items_.remove(item);
+                    if (item.mapLayer) {
+                        this.processingsLayer.children.remove(item.mapLayer);
+                    }
                     // automatically remove the analysis if empty
                     if (analysis.destroyOnClose) {
                         setTimeout(() => {

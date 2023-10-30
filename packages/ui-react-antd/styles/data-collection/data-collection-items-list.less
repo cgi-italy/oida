@@ -24,7 +24,9 @@
         cursor: pointer;
         user-select: none;
         border: solid 1px @data-collection-list-item-border-color;
-
+        box-shadow: @data-collection-list-item-box-shadow;
+        border-radius: @data-collection-list-item-border-radius;
+        padding: @data-collection-list-item-padding;
         background: @data-collection-list-item-bg;
         margin-bottom: @data-collection-list-item-margin-bottom-md;
 
@@ -38,7 +40,7 @@
             }
 
             &.hovered {
-                background-color: lighten(@data-collection-list-item-selected-bg, 3%);
+                background-color: @data-collection-list-item-selected-hover-bg;
             }
         }
 
@@ -67,6 +69,10 @@
             .ant-btn {
                 padding: 0 8px;
 
+                .ant-btn-icon {
+                    margin-inline-end: 0;
+                }
+
                 .anticon {
                     svg {
                         shape-rendering: auto;
@@ -83,6 +89,7 @@
     &.ant-list-sm {
         .ant-list-item {
             margin-bottom: @data-collection-list-item-margin-bottom-sm;
+            padding: @data-collection-list-item-padding-sm;
 
             .ant-list-item-action {
                 .ant-btn {
@@ -103,6 +110,7 @@
 
                 .action-content {
                     display: inline-block;
+                    margin-inline-start: 8px;
                 }
             }
         }

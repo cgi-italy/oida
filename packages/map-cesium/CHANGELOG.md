@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.5.0](https://github.com/cgi-italy/oida/compare/@oidajs/map-cesium@3.4.0...@oidajs/map-cesium@3.5.0) (2023-10-30)
+
+### Bug Fixes
+
+- disable swipe tool for unsupport layer types ([cec6694](https://github.com/cgi-italy/oida/commit/cec6694c3b5b38bebcd6ec4652ceee0b12b1b6b5))
+
+### Features
+
+- add layer swipe interaction and tool ([507ecd8](https://github.com/cgi-italy/oida/commit/507ecd877baf8724346932876fb925d910388af3))
+
+# [3.4.0](https://github.com/cgi-italy/oida/compare/@oidajs/map-cesium@3.3.3...@oidajs/map-cesium@3.4.0) (2023-08-09)
+
+### Features
+
+- add support for map credits ([6bc14a4](https://github.com/cgi-italy/oida/commit/6bc14a4ad94f86f49bcbce8e3a9915ec7f094ab3))
+- add support for vector layer clustering ([f3af823](https://github.com/cgi-italy/oida/commit/f3af8230102604859fd8294b5568408a25e5f828))
+
 ## [3.3.3](https://github.com/cgi-italy/oida/compare/@oidajs/map-cesium@3.3.2...@oidajs/map-cesium@3.3.3) (2023-04-12)
 
 **Note:** Version bump only for package @oidajs/map-cesium

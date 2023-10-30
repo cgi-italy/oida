@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.0.14](https://github.com/cgi-italy/oida/compare/@oidajs/eo-video-react@2.0.13...@oidajs/eo-video-react@2.0.14) (2023-10-30)
+
+**Note:** Version bump only for package @oidajs/eo-video-react
+
+## [2.0.13](https://github.com/cgi-italy/oida/compare/@oidajs/eo-video-react@2.0.12...@oidajs/eo-video-react@2.0.13) (2023-10-10)
+
+**Note:** Version bump only for package @oidajs/eo-video-react
+
+## [2.0.12](https://github.com/cgi-italy/oida/compare/@oidajs/eo-video-react@2.0.11...@oidajs/eo-video-react@2.0.12) (2023-08-09)
+
+**Note:** Version bump only for package @oidajs/eo-video-react
+
+## [2.0.11](https://github.com/cgi-italy/oida/compare/@oidajs/eo-video-react@2.0.10...@oidajs/eo-video-react@2.0.11) (2023-04-20)
+
+**Note:** Version bump only for package @oidajs/eo-video-react
+
 ## [2.0.10](https://github.com/cgi-italy/oida/compare/@oidajs/eo-video-react@2.0.9...@oidajs/eo-video-react@2.0.10) (2023-04-12)
 
 **Note:** Version bump only for package @oidajs/eo-video-react

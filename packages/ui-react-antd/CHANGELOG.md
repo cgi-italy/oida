@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.6.0](https://github.com/cgi-italy/oida/compare/@oidajs/ui-react-antd@6.5.0...@oidajs/ui-react-antd@6.6.0) (2023-10-30)
+
+### Features
+
+- add layer swipe interaction and tool ([507ecd8](https://github.com/cgi-italy/oida/commit/507ecd877baf8724346932876fb925d910388af3))
+
+# [6.5.0](https://github.com/cgi-italy/oida/compare/@oidajs/ui-react-antd@6.4.4...@oidajs/ui-react-antd@6.5.0) (2023-10-10)
+
+### Features
+
+- allow passing additional antd properties to data collection table ([4ec6b40](https://github.com/cgi-italy/oida/commit/4ec6b40445cd317512da41c632f86c575e6725fc))
+
+## [6.4.4](https://github.com/cgi-italy/oida/compare/@oidajs/ui-react-antd@6.4.3...@oidajs/ui-react-antd@6.4.4) (2023-08-09)
+
+**Note:** Version bump only for package @oidajs/ui-react-antd
+
 ## [6.4.3](https://github.com/cgi-italy/oida/compare/@oidajs/ui-react-antd@6.4.2...@oidajs/ui-react-antd@6.4.3) (2023-04-12)
 
 **Note:** Version bump only for package @oidajs/ui-react-antd

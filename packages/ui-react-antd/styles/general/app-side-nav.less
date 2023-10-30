@@ -8,9 +8,9 @@
     z-index: 1;
     user-select: none;
 
-    .ant-menu {
+    .ant-menu.app-side-nav-menu {
         flex-grow: 1;
-        border: none;
+        border: none !important;
         background: transparent;
 
         .ant-menu-item {
@@ -20,8 +20,10 @@
             color: @app-side-nav-item-color;
             font-size: @app-side-nav-item-font-size;
             width: 100%;
+            border-radius: 0;
 
             &:hover {
+                color: @app-side-nav-item-hover-color;
                 background-color: @app-side-nav-item-hover-bg;
             }
 
@@ -53,6 +55,7 @@
         flex-grow: 0;
         flex-shrink: 0;
         color: @app-side-nav-item-color;
+        border-radius: 0;
     }
 
     &.collapsed {

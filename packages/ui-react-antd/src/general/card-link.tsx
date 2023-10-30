@@ -9,7 +9,7 @@ export type CardLinkProps = {
     content: React.ReactNode;
     linkText?: string;
     onLinkClick?: () => void;
-} & CardProps;
+} & Omit<CardProps, 'content'>;
 
 export const CardLink = (props: CardLinkProps) => {
     const { layout, title, content, linkText, onLinkClick, className, ...cardProps } = props;

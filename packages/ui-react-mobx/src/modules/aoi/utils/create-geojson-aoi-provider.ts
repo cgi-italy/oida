@@ -38,7 +38,14 @@ export const GeoJsonAoiParser = (input: File | string, nameProp?: string) => {
                 };
             });
         } else {
-            return [data];
+            return [
+                {
+                    id: inputName,
+                    name: inputName,
+                    geometry: data,
+                    properties: {}
+                }
+            ];
         }
     };
 

@@ -1,3 +1,5 @@
+import { MeasuredQuantity } from '../common';
+
 /**
  * The feature property formatter output types. Can be extended through declaration merging (e.g. for jsx output)
  */
@@ -38,12 +40,14 @@ export type FeaturePropertyDescriptorCommon<TYPE extends keyof FeaturePropertyVa
     description?: string;
     /** A boolean flag indicating if filtering should be enabled for this property */
     filterable?: boolean;
+    /** A boolean flag indicating if records can be sorted based on the value of this property */
+    sortable?: boolean;
     /** A boolean flag indicating if the property is an array of values */
     isArray?: boolean;
     /** A boolean flag indicating if the feature is required*/
     required?: boolean;
-    /** The feature property units */
-    units?: string;
+    /** The feature property measured quantity */
+    quantity?: MeasuredQuantity;
     /** An optional formatter function used for value display. When undefined is returned the property value will be omitted */
     formatter?: VectorFeaturePropertyFormatter<TYPE>;
     /** An optional parser used to transform the raw feature value to the property value type (e.g. a string to a Date) */
@@ -96,6 +100,8 @@ export type DateFeaturePropertyDescriptor = FeaturePropertyDescriptorCommon<type
         min: Date;
         max: Date;
     };
+    inputStringFormat?: string;
+    outputStringFormat?: string;
 };
 
 export const COMPOSITE_FEATURE_PROPERTY_TYPE = 'composite';
@@ -112,7 +118,7 @@ export interface FeaturePropertyValueTypes {
     [ENUM_FEATURE_PROPERTY_TYPE]: string | number;
     [DATE_FEATURE_PROPERTY_TYPE]: Date;
     [COMPOSITE_FEATURE_PROPERTY_TYPE]: {
-        [key: string]: FeaturePropertyValueType;
+        [key: string]: FeaturePropertyValueType | FeaturePropertyValueType[];
     };
 }
 
@@ -131,11 +137,10 @@ export type VectorFeaturePropertyDescriptor =
  * The feature descriptor type. Defines the schema of a vector feature
  */
 export type VectorFeatureDescriptor = {
-    typeName: string;
     title?: string;
     description?: string;
-    iconUrl?: string;
-    labelProps?: string[];
+    /** When specified can be used to provide more specific analytic tools */
+    geometryType?: GeoJSON.GeoJsonGeometryTypes;
     properties: VectorFeaturePropertyDescriptor[];
 };
 

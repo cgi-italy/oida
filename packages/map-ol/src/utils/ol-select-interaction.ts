@@ -23,12 +23,14 @@ export type OLSelectInteractionConfig = {
     condition?: (mapBrowserEvent: MapBrowserEvent<any>) => boolean;
     hitTolerance?: number;
     drillPick?: boolean;
+    enableOnDrag?: boolean;
 };
 
 export class OLSelectInteraction extends Interaction {
     private condition_: (mapBrowserEvent: MapBrowserEvent<any>) => boolean;
     private hitTolerance_: number;
     private drillPick_: boolean;
+    private enableOnDrag_: boolean;
 
     constructor(options: OLSelectInteractionConfig) {
         super({
@@ -40,10 +42,11 @@ export class OLSelectInteraction extends Interaction {
         this.hitTolerance_ = options.hitTolerance ? options.hitTolerance : 0;
         this.condition_ = options.condition || singleClick;
         this.drillPick_ = options.drillPick || false;
+        this.enableOnDrag_ = options.enableOnDrag || false;
     }
 
     protected handleEvent_(mapBrowserEvent: MapBrowserEvent<UIEvent>) {
-        if (!this.condition_(mapBrowserEvent)) {
+        if (!this.condition_(mapBrowserEvent) || (mapBrowserEvent.dragging && !this.enableOnDrag_)) {
             return true;
         }
 

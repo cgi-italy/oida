@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.2.9](https://github.com/cgi-italy/oida/compare/@oidajs/eo-adapters-ogc-react@2.2.8...@oidajs/eo-adapters-ogc-react@2.2.9) (2023-10-30)
+
+**Note:** Version bump only for package @oidajs/eo-adapters-ogc-react
+
+## [2.2.8](https://github.com/cgi-italy/oida/compare/@oidajs/eo-adapters-ogc-react@2.2.7...@oidajs/eo-adapters-ogc-react@2.2.8) (2023-10-10)
+
+**Note:** Version bump only for package @oidajs/eo-adapters-ogc-react
+
+## [2.2.7](https://github.com/cgi-italy/oida/compare/@oidajs/eo-adapters-ogc-react@2.2.6...@oidajs/eo-adapters-ogc-react@2.2.7) (2023-08-09)
+
+**Note:** Version bump only for package @oidajs/eo-adapters-ogc-react
+
+## [2.2.6](https://github.com/cgi-italy/oida/compare/@oidajs/eo-adapters-ogc-react@2.2.5...@oidajs/eo-adapters-ogc-react@2.2.6) (2023-04-20)
+
+**Note:** Version bump only for package @oidajs/eo-adapters-ogc-react
+
 ## [2.2.5](https://github.com/cgi-italy/oida/compare/@oidajs/eo-adapters-ogc-react@2.2.4...@oidajs/eo-adapters-ogc-react@2.2.5) (2023-04-13)
 
 **Note:** Version bump only for package @oidajs/eo-adapters-ogc-react

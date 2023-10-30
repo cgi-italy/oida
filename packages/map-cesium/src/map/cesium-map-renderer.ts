@@ -15,7 +15,8 @@ import {
     ImageryLayer,
     CustomDataSource,
     DataSourceCollection,
-    DataSourceDisplay
+    DataSourceDisplay,
+    ImageryLayerCollection
 } from 'cesium';
 
 import 'cesium/Source/Widgets/CesiumWidget/CesiumWidget.css';
@@ -173,24 +174,9 @@ export class CesiumMapRenderer implements IMapRenderer {
     }
 
     refreshImageries() {
-        if (!this.layerGroup_) {
-            return;
-        }
-        const rootCollection = this.layerGroup_.getImageries()._layers;
-
-        const reduceFunction = (imageries, item) => {
-            if (item instanceof ImageryLayer) {
-                return [...imageries, item];
-            } else {
-                return item._layers.reduce(reduceFunction, imageries);
-            }
-        };
-
-        const imageries = rootCollection.reduce(reduceFunction, []);
-
+        const imageryLayers = this.getSortedImageryLayers_();
         this.viewer_.imageryLayers.removeAll(false);
-
-        imageries.forEach((item) => {
+        imageryLayers.forEach((item) => {
             this.viewer_.imageryLayers.add(item);
         });
     }
@@ -235,6 +221,20 @@ export class CesiumMapRenderer implements IMapRenderer {
             const imageriesToRemove = this.getImageryLayers_(item);
             imageriesToRemove.forEach((imagery) => {
                 this.viewer_.imageryLayers.remove(imagery, false);
+            });
+        } else if (type === 'order') {
+            const imageryLayers = this.getSortedImageryLayers_();
+            imageryLayers.forEach((imagery, newIdx) => {
+                const prevIdx = this.viewer_.imageryLayers.indexOf(imagery);
+                let indexOffset = newIdx - prevIdx;
+                while (indexOffset > 0) {
+                    this.viewer_.imageryLayers.raise(imagery);
+                    indexOffset--;
+                }
+                while (indexOffset < 0) {
+                    this.viewer_.imageryLayers.lower(imagery);
+                    indexOffset++;
+                }
             });
         }
     }
@@ -390,7 +390,8 @@ export class CesiumMapRenderer implements IMapRenderer {
             sceneMode: this.getSceneMode_(renderProps),
             mapProjection: mapProjection,
             requestRenderMode: true,
-            mapMode2D: projection.wrapX ? MapMode2D.INFINITE_SCROLL : MapMode2D.ROTATE
+            mapMode2D: projection.wrapX ? MapMode2D.INFINITE_SCROLL : MapMode2D.ROTATE,
+            creditContainer: props.creditsTarget
         });
 
         this.viewer_.scene.primitives.destroyPrimitives = false;
@@ -545,5 +546,39 @@ export class CesiumMapRenderer implements IMapRenderer {
         return {
             destination: Cartesian3.fromDegrees(viewProps.center[0], viewProps.center[1], distance)
         };
+    }
+
+    protected getSortedImageryLayers_() {
+        if (!this.layerGroup_) {
+            return [];
+        }
+
+        const rootCollection: (ImageryLayer | ImageryLayerCollection)[] = this.layerGroup_.getImageries()._layers;
+
+        const reduceFunction = (imageries: ImageryLayer[], item: ImageryLayer | ImageryLayerCollection): ImageryLayer[] => {
+            if (item instanceof ImageryLayer) {
+                return [...imageries, item];
+            } else {
+                // @ts-ignore
+                return item._layers.reduce(reduceFunction, imageries);
+            }
+        };
+
+        return rootCollection.reduce(reduceFunction, []).sort((firstImage, secondImage) => {
+            if (firstImage.isBaseLayer()) {
+                return -1;
+            }
+            if (secondImage.isBaseLayer()) {
+                return 1;
+            } else {
+                const firstZIndex = firstImage['zIndex'] || 0;
+                const secondZIndex = secondImage['zIndex'] || 0;
+                if (firstZIndex === secondZIndex) {
+                    return 0;
+                } else {
+                    return firstZIndex < secondZIndex ? -1 : 1;
+                }
+            }
+        });
     }
 }

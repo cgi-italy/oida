@@ -8,3 +8,4 @@ export * from './use-map-viewport';
 export * from './use-map-selection';
 export * from './use-center-on-map';
 export * from './use-export-map';
+export * from './use-layer-swipe-interaction';

@@ -4,7 +4,7 @@
     padding: 0.5rem 1rem;
     display: flex;
     flex-direction: column;
-    height: 100%;
+    flex-grow: 1;
     overflow: hidden;
 
     .dataset-chart-form {
@@ -56,7 +56,7 @@
             flex-grow: 0;
             flex-shrink: 0;
             display: flex;
-            background: rgba(255, 255, 255, 0.02);
+            background: @color-bg-secondary;
             border-radius: @border-radius-base;
             margin-bottom: 0.5rem;
 
@@ -162,14 +162,20 @@
     }
 
     .series-chart {
+        display: flex;
+        flex-direction: column;
         flex-grow: 1;
         flex-shrink: 1;
         overflow-y: auto;
         .scrollbar(8px, @primary-color, @primary-2);
 
+        .series-chart-title {
+            text-align: center;
+        }
+
         .chart {
             position: relative;
-            height: 100%;
+            flex-grow: 1;
             overflow: hidden;
             min-height: 200px;
 

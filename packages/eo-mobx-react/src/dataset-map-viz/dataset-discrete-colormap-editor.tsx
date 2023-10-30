@@ -15,7 +15,7 @@ export const DatasetDiscreteColorMapEditor = (props: DatasetDiscreteColorMapEdit
         return props.enumColorMap.mapItems;
     }, [props.enumColorMap]);
     const LegendItems = Object.entries(enumColorMap).map((colorProps) => {
-        const elementDescription = props.enumProperty.options.find((prop) => prop.name === colorProps[0])?.description;
+        const option = props.enumProperty.options.find((option) => option.value === colorProps[0]);
         return (
             <div key={colorProps[0]} className='enum-legend-element'>
                 <input
@@ -26,10 +26,10 @@ export const DatasetDiscreteColorMapEditor = (props: DatasetDiscreteColorMapEdit
                         props.enumColorMap.setColorMapItemColor(colorProps[0], value.target.value);
                     }}
                 />
-                <span className='enum-legend-element-description'>{colorProps[0]}</span>
-                {elementDescription && (
+                <span className='enum-legend-element-description'>{option?.name || colorProps[0]}</span>
+                {option?.description && (
                     <div className='enum-legend-description-tooltip'>
-                        <Tooltip placement='right' title={elementDescription}>
+                        <Tooltip placement='right' title={option.description}>
                             <QuestionCircleOutlined />
                         </Tooltip>
                     </div>

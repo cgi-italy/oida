@@ -3,6 +3,31 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.6.1](https://github.com/cgi-italy/oida/compare/@oidajs/eo-adapters-ogc@2.6.0...@oidajs/eo-adapters-ogc@2.6.1) (2023-10-30)
+
+**Note:** Version bump only for package @oidajs/eo-adapters-ogc
+
+# [2.6.0](https://github.com/cgi-italy/oida/compare/@oidajs/eo-adapters-ogc@2.5.0...@oidajs/eo-adapters-ogc@2.6.0) (2023-10-10)
+
+### Bug Fixes
+
+- force crs specification in cql bbox filter ([d317420](https://github.com/cgi-italy/oida/commit/d317420ca210ef829c1eb50b46132b7d32fc64e1))
+
+### Features
+
+- add area distribution analysis for vector datasets ([c23416a](https://github.com/cgi-italy/oida/commit/c23416a249705f80159dedeae039d2f5d8355c7c))
+- add support for wfs filter encoding specification (FES) ([463f357](https://github.com/cgi-italy/oida/commit/463f357a133a593c7ec71efa9cf704923b5abc37))
+
+# [2.5.0](https://github.com/cgi-italy/oida/compare/@oidajs/eo-adapters-ogc@2.4.6...@oidajs/eo-adapters-ogc@2.5.0) (2023-08-09)
+
+### Features
+
+- add preliminary wfs support ([9604449](https://github.com/cgi-italy/oida/commit/960444966ffc3640a44fbc100fd5cbd0d0447f8d))
+
+## [2.4.6](https://github.com/cgi-italy/oida/compare/@oidajs/eo-adapters-ogc@2.4.5...@oidajs/eo-adapters-ogc@2.4.6) (2023-04-20)
+
+**Note:** Version bump only for package @oidajs/eo-adapters-ogc
+
 ## [2.4.5](https://github.com/cgi-italy/oida/compare/@oidajs/eo-adapters-ogc@2.4.4...@oidajs/eo-adapters-ogc@2.4.5) (2023-04-13)
 
 **Note:** Version bump only for package @oidajs/eo-adapters-ogc

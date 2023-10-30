@@ -14,3 +14,4 @@ export * from './dataset-tool-config';
 export * from './dataset';
 export * from './dataset-viz';
 export * from './discrete-color-map';
+export * from './measured-quantity';

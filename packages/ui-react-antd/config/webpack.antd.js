@@ -1,4 +1,10 @@
+const { convertLegacyToken } = require('@ant-design/compatible/lib');
+const { theme } = require('antd/lib');
+const { default: createAliasToken } = require('antd/lib/theme/util/alias');
+
 const config = (config = {}) => {
+    const mapToken = config.themeToken || createAliasToken(theme.defaultAlgorithm(theme.defaultSeed));
+    const v4Token = convertLegacyToken(mapToken);
 
     let styleLoader = config.styleLoader || 'style-loader';
 
@@ -8,7 +14,7 @@ const config = (config = {}) => {
     };
 
     let lessLoaderOptions = config.lessLoaderOptions || {};
-    let {lessOptions, ...otherLessLoaderOptions} = lessLoaderOptions;
+    let { lessOptions, ...otherLessLoaderOptions } = lessLoaderOptions;
 
     return {
         module: {
@@ -30,7 +36,11 @@ const config = (config = {}) => {
                                 sourceMap: true,
                                 lessOptions: {
                                     ...lessOptions,
-                                    javascriptEnabled: true
+                                    javascriptEnabled: true,
+                                    modifyVars: {
+                                        ...v4Token,
+                                        ...mapToken
+                                    }
                                 },
                                 ...otherLessLoaderOptions
                             }
@@ -39,7 +49,7 @@ const config = (config = {}) => {
                 }
             ]
         }
-    }
-}
+    };
+};
 
 module.exports = config;

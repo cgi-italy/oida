@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid';
 
-import { createAxiosInstance } from '@oidajs/core';
+import { AxiosInstanceWithCancellation, createAxiosInstance } from '@oidajs/core';
 import { DatasetConfig, ProductSearchRecord } from '@oidajs/eo-mobx';
 
 import { AdamDatasetConfig } from './adam-dataset-config';
@@ -20,10 +20,11 @@ export type AdamDatasetFactoryConfig = {
     opensearchUrl?: string;
     opensearchMetadataModelVersion?: AdamOpensearchMetadataModelVersion;
     productSearchRecordContent?: (item: ProductSearchRecord) => any;
+    axiosInstance?: AxiosInstanceWithCancellation;
 };
 
 export const getAdamDatasetFactory = (factoryConfig: AdamDatasetFactoryConfig) => {
-    const axiosInstance = createAxiosInstance();
+    const axiosInstance = factoryConfig.axiosInstance || createAxiosInstance();
 
     let openSearchClient: AdamOpenSearchClient | undefined;
     if (factoryConfig.opensearchUrl) {

@@ -19,11 +19,12 @@ export type AppSideNavProps = {
 
 export const AppSideNav = (props: AppSideNavProps) => {
     const navItems = props.items.map((item) => {
-        return (
-            <Menu.Item key={item.id} onClick={item.onClick} icon={item.icon}>
-                {item.title}
-            </Menu.Item>
-        );
+        return {
+            key: item.id,
+            onClick: item.onClick,
+            icon: item.icon,
+            label: item.title
+        };
     });
 
     const onCollapsedChange = props.onCollapsedChange;
@@ -35,9 +36,8 @@ export const AppSideNav = (props: AppSideNavProps) => {
                 mode='inline'
                 inlineCollapsed={props.collapsed}
                 selectedKeys={props.selectedItem ? [props.selectedItem] : undefined}
-            >
-                {navItems}
-            </Menu>
+                items={navItems}
+            />
             {onCollapsedChange && (
                 <Button
                     className='app-side-nav-collapse-btn'

@@ -15,6 +15,7 @@ cesiumTileSourcesFactory.register('wmts', (config) => {
             format: config.format,
             tileMatrixSetID: config.matrixSet,
             tilingScheme: tileGrid.scheme,
+            credit: config.credits,
             ...tileGrid.config
         });
     }

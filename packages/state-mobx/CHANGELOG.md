@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.3.0](https://github.com/cgi-italy/oida/compare/@oidajs/state-mobx@2.2.1...@oidajs/state-mobx@2.3.0) (2023-10-30)
+
+### Bug Fixes
+
+- disable swipe tool for unsupport layer types ([cec6694](https://github.com/cgi-italy/oida/commit/cec6694c3b5b38bebcd6ec4652ceee0b12b1b6b5))
+
+### Features
+
+- add layer swipe interaction and tool ([507ecd8](https://github.com/cgi-italy/oida/commit/507ecd877baf8724346932876fb925d910388af3))
+
+## [2.2.1](https://github.com/cgi-italy/oida/compare/@oidajs/state-mobx@2.2.0...@oidajs/state-mobx@2.2.1) (2023-10-10)
+
+### Bug Fixes
+
+- prevent debounced function invocation on debounce unset in AsyncDataFetcher ([1cb0ef6](https://github.com/cgi-italy/oida/commit/1cb0ef6b15ff097b1c6741683d5f450c7c51b4c1))
+
+# [2.2.0](https://github.com/cgi-italy/oida/compare/@oidajs/state-mobx@2.1.3...@oidajs/state-mobx@2.2.0) (2023-08-09)
+
+### Features
+
+- add support for vector layer clustering ([f3af823](https://github.com/cgi-italy/oida/commit/f3af8230102604859fd8294b5568408a25e5f828))
+
 ## [2.1.3](https://github.com/cgi-italy/oida/compare/@oidajs/state-mobx@2.1.2...@oidajs/state-mobx@2.1.3) (2023-04-12)
 
 **Note:** Version bump only for package @oidajs/state-mobx

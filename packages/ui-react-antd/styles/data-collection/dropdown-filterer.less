@@ -36,7 +36,6 @@
         bottom: 1px;
         right: 1px;
         height: auto;
-        z-index: 10;
 
         border-top-left-radius: 0;
         border-bottom-left-radius: 0;
@@ -58,10 +57,29 @@
 }
 
 .dropdown-filterer-form {
-    padding: 10px 20px 10px 10px;
+    padding: 10px 10px 10px 10px;
+    max-height: 70vh;
+    overflow: hidden;
 
-    .dropdown-filterer-form-actions {
-        width: 100%;
-        justify-content: flex-end;
+    &:not(.ant-select-dropdown-hidden) {
+        display: flex;
+        flex-direction: column;
+    }
+
+    > div {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+
+        .ant-form {
+            overflow: auto;
+            padding-right: 10px;
+            margin-bottom: 15px;
+        }
+
+        .dropdown-filterer-form-actions {
+            justify-content: flex-end;
+            padding-right: 10px;
+        }
     }
 }

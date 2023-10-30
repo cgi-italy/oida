@@ -1,6 +1,6 @@
 import Group from 'ol/layer/Group';
 
-import { GROUP_LAYER_ID, IGroupLayerRenderer, MapLayerRendererConfig } from '@oidajs/core';
+import { GROUP_LAYER_ID, IGroupLayerRenderer, IMapLayerRenderer, MapLayerRendererConfig } from '@oidajs/core';
 
 import { OLMapLayer } from './ol-map-layer';
 import { olLayersFactory } from './ol-layers-factory';
@@ -20,6 +20,11 @@ export class OLGroupLayer extends OLMapLayer<Group> implements IGroupLayerRender
 
     removeLayer(layer: OLMapLayer) {
         this.olImpl_.getLayers().remove(layer.getOLObject());
+    }
+
+    moveLayer(layer: OLMapLayer, prevIdx: number, newIdx: number) {
+        this.olImpl_.getLayers().remove(layer.getOLObject());
+        this.olImpl_.getLayers().insertAt(newIdx, layer.getOLObject());
     }
 
     protected createOLObject_(config: MapLayerRendererConfig) {

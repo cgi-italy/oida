@@ -6,5 +6,5 @@ import chroma from 'chroma-js';
  * @returns the suggested text color (black or white)
  */
 export const getTextColorForBackground = (backgroundColor: string) => {
-    return chroma.contrast(backgroundColor, 'white') > chroma.contrast(backgroundColor, 'black') ? 'white' : 'black';
+    return chroma(backgroundColor).luminance() < 0.4 ? 'white' : 'black';
 };

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Select, Button, Input } from 'antd';
+import { Select, Button, Space } from 'antd';
 import { SelectProps } from 'antd/lib/select';
 import { SortAscendingOutlined, SortDescendingOutlined } from '@ant-design/icons';
 
@@ -8,7 +8,6 @@ import { SortOrder } from '@oidajs/core';
 import { DataSorterProps } from '@oidajs/ui-react-core';
 
 const Option = Select.Option;
-const InputGroup = Input.Group;
 
 export const DataSortCombo = (props: SelectProps<string> & DataSorterProps) => {
     const { sortableFields, sortKey, sortOrder, onSortChange, onSortClear, ...selectProps } = props;
@@ -34,7 +33,7 @@ export const DataSortCombo = (props: SelectProps<string> & DataSorterProps) => {
     });
 
     return (
-        <InputGroup compact className='data-sort-combo'>
+        <Space.Compact className='data-sort-combo'>
             <Select
                 {...selectProps}
                 allowClear={true}
@@ -52,6 +51,6 @@ export const DataSortCombo = (props: SelectProps<string> & DataSorterProps) => {
                 icon={sortOrder === SortOrder.Ascending ? <SortAscendingOutlined /> : <SortDescendingOutlined />}
                 onClick={switchSortOrder}
             ></Button>
-        </InputGroup>
+        </Space.Compact>
     );
 };

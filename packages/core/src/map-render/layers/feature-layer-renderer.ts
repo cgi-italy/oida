@@ -64,9 +64,19 @@ export type IFeature<T = any> = {
     data: T;
 };
 
+export type FeatureClusteringConfig<T = any> = {
+    enabled: boolean;
+    style: (clusterFeatures: { model: T }[]) => {
+        label: ILabelStyle;
+        point: IPointStyle;
+    };
+    distance?: number;
+};
+
 export type FeatureLayerRendererConfig<T = any> = MapLayerRendererConfig & {
     onFeatureHover?: (feature: IFeature<T>, coordinate: GeoJSON.Position) => void;
     onFeatureSelect?: (feature: IFeature<T>, coordinate: GeoJSON.Position) => void;
+    clustering?: FeatureClusteringConfig;
 };
 
 export interface IFeatureLayerRenderer<T = any> extends IMapLayerRenderer {

@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.6.0](https://github.com/cgi-italy/oida/compare/@oidajs/ui-react-core@6.5.0...@oidajs/ui-react-core@6.6.0) (2023-10-30)
+
+### Features
+
+- add layer swipe interaction and tool ([507ecd8](https://github.com/cgi-italy/oida/commit/507ecd877baf8724346932876fb925d910388af3))
+
+# [6.5.0](https://github.com/cgi-italy/oida/compare/@oidajs/ui-react-core@6.4.4...@oidajs/ui-react-core@6.5.0) (2023-10-10)
+
+### Features
+
+- enable column sorting for all properties in DatasetVectorFeatureInfoTable ([8cc4831](https://github.com/cgi-italy/oida/commit/8cc4831fefd152d51159551b0806cfc3685d3b46))
+
+## [6.4.4](https://github.com/cgi-italy/oida/compare/@oidajs/ui-react-core@6.4.3...@oidajs/ui-react-core@6.4.4) (2023-08-09)
+
+**Note:** Version bump only for package @oidajs/ui-react-core
+
 ## [6.4.3](https://github.com/cgi-italy/oida/compare/@oidajs/ui-react-core@6.4.2...@oidajs/ui-react-core@6.4.3) (2023-04-12)
 
 **Note:** Version bump only for package @oidajs/ui-react-core

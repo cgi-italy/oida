@@ -1,6 +1,6 @@
 import { observable, action, makeObservable, IObservableArray } from 'mobx';
 
-import { FEATURE_LAYER_ID, Geometry, IFeatureStyle } from '@oidajs/core';
+import { FeatureClusteringConfig, FEATURE_LAYER_ID, Geometry, IFeatureStyle } from '@oidajs/core';
 
 import { MapLayer, MapLayerProps } from './map-layer';
 import { IsHoverable, IsSelectable, Config, ConfigProps, HasConfig } from '../../mixins';
@@ -17,6 +17,7 @@ export type FeatureLayerConfig<T extends FeatureInterface> = {
     styleGetter: FeatureStyleGetter<T>;
     onFeatureHover?: (feature: T, coordinate: GeoJSON.Position) => void;
     onFeatureSelect?: (feature: T, coordinate: GeoJSON.Position) => void;
+    clustering?: FeatureClusteringConfig<T>;
     rendererOptions?: Record<string, { [props: string]: any }>;
 };
 

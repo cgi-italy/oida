@@ -1,0 +1,60 @@
+.map-swipe-tool {
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+    width: @map-layer-swipe-tool-line-width;
+    left: -(@map-layer-swipe-tool-line-width / 2);
+    background: @colorBorderSecondary;
+    z-index: @map-layer-swipe-tool-zindex;
+
+    .map-swipe-tool-handle {
+        position: absolute;
+        top: 50%;
+        transform: translateX(-(@map-layer-swipe-tool-handle-width / 2 - 1)) translateY(-(@map-layer-swipe-tool-handle-height / 2));
+        width: @map-layer-swipe-tool-handle-width;
+        height: @map-layer-swipe-tool-handle-height;
+        cursor: ew-resize;
+        pointer-events: all;
+        padding: 0;
+        margin: 0;
+        transition-property: background-color;
+        font-size: 19px;
+        line-height: 19px;
+    }
+
+    .map-swipe-tool-target-name {
+        position: absolute;
+        width: max-content;
+        left: ~'@{margin}px';
+        top: ~'@{margin}px';
+        background: @colorBgContainer;
+        padding: ~'@{paddingXXS}px @{paddingXS}px';
+        border-radius: ~'@{borderRadius}px';
+    }
+
+    .map-swipe-tool-title {
+        position: absolute;
+        width: max-content;
+        top: ~'@{margin}px';
+        background: @colorBgContainer;
+        padding: ~'@{paddingXXS}px @{paddingXS}px';
+        border-radius: ~'@{borderRadius}px';
+
+        &.map-swipe-tool-source-title {
+            transform: translateX(-100%);
+            left: ~'-@{margin}px';
+        }
+
+        &.map-swipe-tool-target-title {
+            left: ~'@{margin}px';
+        }
+    }
+
+    &.is-disabled {
+        display: none;
+    }
+
+    &:hover {
+        background: @colorBorder;
+    }
+}

@@ -1,10 +1,13 @@
 import VectorSource from 'ol/source/Vector';
+import ClusterSource from 'ol/source/Cluster';
 import VectorLayer from 'ol/layer/Vector';
+import VectorImageLayer from 'ol/layer/VectorImage';
 import Feature from 'ol/Feature';
 import GeoJSON from 'ol/format/GeoJSON';
 import Circle from 'ol/geom/Circle';
+import { StyleFunction } from 'ol/style/Style';
 import { transform } from 'ol/proj';
-
+import EventType from 'ol/events/EventType';
 import bboxPolygon from '@turf/bbox-polygon';
 
 import { FeatureLayerRendererConfig, FEATURE_LAYER_ID, Geometry, IFeature, IFeatureLayerRenderer, IFeatureStyle } from '@oidajs/core';
@@ -13,17 +16,24 @@ import { OLMapLayer } from './ol-map-layer';
 import { olLayersFactory } from './ol-layers-factory';
 import { OLStyleParser } from '../utils/ol-style-parser';
 
+export type OLFeatureLayerProps = {
+    /** set this flag to improve performance when rendering an high number of vertices */
+    useImageRenderer?: boolean;
+};
+
 export class OLFeatureLayer extends OLMapLayer<VectorLayer<VectorSource>> implements IFeatureLayerRenderer {
     static readonly FEATURE_DATA_KEY = 'data';
     static readonly FEATURE_LAYER_KEY = 'layer';
     static readonly FEATURE_PICKING_DISABLED_KEY = 'pickingDisabled';
 
-    protected geomParser_;
+    protected geomParser_: GeoJSON;
     protected styleParser_: OLStyleParser;
     protected onFeatureHover_: ((feature: IFeature<any>, coordinate: GeoJSON.Position) => void) | undefined;
     protected onFeatureSelect_: ((feature: IFeature<any>, coordinate: GeoJSON.Position) => void) | undefined;
+    protected vectorSource_!: VectorSource;
+    protected clusterRecomputeTimeout_: number | undefined;
 
-    constructor(config: FeatureLayerRendererConfig) {
+    constructor(config: FeatureLayerRendererConfig & OLFeatureLayerProps) {
         super(config);
         this.geomParser_ = new GeoJSON();
         this.styleParser_ = new OLStyleParser();
@@ -50,7 +60,9 @@ export class OLFeatureLayer extends OLMapLayer<VectorLayer<VectorSource>> implem
                 feature.set(OLFeatureLayer.FEATURE_DATA_KEY, data);
             }
             feature.set(OLFeatureLayer.FEATURE_LAYER_KEY, this);
-            this.olImpl_.getSource()!.addFeature(feature);
+
+            this.delayClusterRecomputation_();
+            this.vectorSource_.addFeature(feature);
             return {
                 id: id,
                 data: data,
@@ -60,11 +72,11 @@ export class OLFeatureLayer extends OLMapLayer<VectorLayer<VectorSource>> implem
     }
 
     getFeature(id) {
-        return this.olImpl_.getSource()!.getFeatureById(id);
+        return this.vectorSource_.getFeatureById(id);
     }
 
     hasFeature(id: string) {
-        return !!this.olImpl_.getSource()!.getFeatureById(id);
+        return !!this.vectorSource_.getFeatureById(id);
     }
 
     getFeatureData(id: string) {
@@ -77,6 +89,7 @@ export class OLFeatureLayer extends OLMapLayer<VectorLayer<VectorSource>> implem
     updateFeatureGeometry(id: string, geometry: Geometry) {
         const feature = this.getFeature(id);
         if (feature) {
+            this.delayClusterRecomputation_();
             feature.setGeometry(this.parseGeometry_(geometry));
         }
     }
@@ -86,6 +99,7 @@ export class OLFeatureLayer extends OLMapLayer<VectorLayer<VectorSource>> implem
         if (feature) {
             const geometry = feature.getGeometry();
             if (geometry) {
+                this.delayClusterRecomputation_(true);
                 const featureStyle = this.styleParser_.getStyleForGeometry(geometry.getType(), style);
                 feature.setStyle(featureStyle);
                 if (featureStyle) {
@@ -98,12 +112,13 @@ export class OLFeatureLayer extends OLMapLayer<VectorLayer<VectorSource>> implem
     removeFeature(id: string) {
         const feature = this.getFeature(id);
         if (feature) {
-            this.olImpl_.getSource()!.removeFeature(feature);
+            this.delayClusterRecomputation_();
+            this.vectorSource_.removeFeature(feature);
         }
     }
 
     removeAllFeatures() {
-        this.olImpl_.getSource()!.clear(true);
+        this.vectorSource_.clear(true);
     }
 
     shouldReceiveFeatureHoverEvents() {
@@ -143,29 +158,80 @@ export class OLFeatureLayer extends OLMapLayer<VectorLayer<VectorSource>> implem
             geometry = bboxPolygon(geometry.bbox).geometry;
         }
 
-        return this.geomParser_.readGeometryFromObject(geometry, {
+        return this.geomParser_.readGeometry(geometry, {
             dataProjection: 'EPSG:4326',
             featureProjection: this.mapRenderer_.getViewer().getView().getProjection()
         });
     }
 
-    protected createOLObject_(config: FeatureLayerRendererConfig) {
-        const source = new VectorSource({
+    protected createOLObject_(config: FeatureLayerRendererConfig & OLFeatureLayerProps) {
+        let source = new VectorSource({
             wrapX: this.mapRenderer_.getViewer().getView()['wrapX']
         });
 
-        return new VectorLayer({
+        let style: StyleFunction = () => {
+            return;
+        };
+
+        this.vectorSource_ = source;
+
+        const clustering = config.clustering;
+        if (clustering?.enabled) {
+            source = new ClusterSource({
+                wrapX: this.mapRenderer_.getViewer().getView()['wrapX'],
+                distance: config.clustering?.distance,
+                source: this.vectorSource_
+            });
+
+            style = (feature) => {
+                const features = feature.get('features');
+                if (features.length > 1) {
+                    const clusterStyle = clustering.style(features.map((feature) => feature.get(OLFeatureLayer.FEATURE_DATA_KEY)));
+                    return this.styleParser_.getStyleForGeometry('Point', clusterStyle);
+                } else {
+                    return features[0].getStyle();
+                }
+            };
+        }
+
+        const VectorLayerRenderer = config.useImageRenderer ? VectorImageLayer : VectorLayer;
+        return new VectorLayerRenderer({
             source: source,
             extent: config.extent,
             zIndex: config.zIndex || 0,
-            style: () => {
-                return;
-            }
+            style: style,
+            declutter: true // enable label decluterring
         });
     }
 
     protected destroyOLObject_() {
         this.olImpl_.dispose();
+    }
+
+    /**
+     * Delay clusters recomputation (automatically called after a feature add/remove/update)
+     * Usefull when multiple operations are done in a loop, to prevent
+     * useless work
+     * @param preventRefresh disable cluster recomputation
+     */
+    protected delayClusterRecomputation_(preventRefresh = false) {
+        const clusterSsource = this.olImpl_.getSource();
+        if (clusterSsource instanceof ClusterSource) {
+            if (this.clusterRecomputeTimeout_) {
+                clearTimeout(this.clusterRecomputeTimeout_);
+            }
+            // temporary remove the source change event listener
+            this.vectorSource_.removeEventListener(EventType.CHANGE, clusterSsource['boundRefresh_']);
+            this.clusterRecomputeTimeout_ = setTimeout(() => {
+                this.vectorSource_.addEventListener(EventType.CHANGE, clusterSsource['boundRefresh_']);
+                if (!preventRefresh) {
+                    clusterSsource.refresh();
+                } else {
+                    this.olImpl_.changed();
+                }
+                delete this.clusterRecomputeTimeout_;
+            });
+        }
     }
 }
 

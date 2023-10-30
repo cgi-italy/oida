@@ -5,6 +5,7 @@ export type ArrayTrackerConfig<T, S> = {
     items: IObservableArray<T>;
     onItemAdd: (item: T, idx: number) => S;
     onItemRemove: (trackerState: S) => void;
+    onItemMove?: (item: T, prevIndex: number, newIndex: number) => void;
 };
 
 export class ArrayTracker<T, S> {
@@ -30,10 +31,48 @@ export class ArrayTracker<T, S> {
     }
 
     protected bindToCollectionState_() {
+        let potentialMove: { timeout: number; item: T; prevIndex: number } | undefined;
+
+        const onItemMove = this.trackerConfig_.onItemMove;
+
         this.stateSubscription_ = observe(
             this.trackerConfig_.items,
             (change) => {
                 if (change.type === 'splice') {
+                    if (onItemMove) {
+                        // try to detect the "move" event as a remove, immediately followed by an add
+                        if (potentialMove) {
+                            // there is a pending remove
+                            clearTimeout(potentialMove.timeout);
+                            if (change.removed.length === 0 && change.added.length === 1 && change.added[0] === potentialMove.item) {
+                                // move event
+                                onItemMove(potentialMove.item, potentialMove.prevIndex, change.index);
+                                potentialMove = undefined;
+                                return;
+                            } else {
+                                // no add after remove. propagate remove event
+                                this.onItemRemoved_(this.idGetter_(potentialMove.item));
+                                potentialMove = undefined;
+                            }
+                        } else {
+                            if (change.removed.length === 1 && change.added.length === 0) {
+                                // remove event. wait to propagate to check if it is a "move"
+                                potentialMove = {
+                                    item: change.removed[0],
+                                    prevIndex: change.index,
+                                    timeout: setTimeout(() => {
+                                        // no other events after remove. propagate remove event
+                                        if (potentialMove) {
+                                            this.onItemRemoved_(this.idGetter_(potentialMove.item));
+                                        }
+                                        potentialMove = undefined;
+                                    })
+                                };
+                                return;
+                            }
+                        }
+                    }
+
                     let idx = change.index;
 
                     change.removed.forEach((item) => {

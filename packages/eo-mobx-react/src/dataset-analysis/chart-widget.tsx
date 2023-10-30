@@ -190,7 +190,7 @@ export const ChartWidget = <OPT extends ChartWidgetBaseOptions = ChartWidgetBase
                 });
             }
         }
-    }, [width, height]);
+    }, [chart, width, height]);
 
     useEffect(() => {
         if (chart) {

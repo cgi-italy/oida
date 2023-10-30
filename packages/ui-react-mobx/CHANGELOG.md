@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.6.0](https://github.com/cgi-italy/oida/compare/@oidajs/ui-react-mobx@4.5.0...@oidajs/ui-react-mobx@4.6.0) (2023-10-30)
+
+### Features
+
+- add layer swipe interaction and tool ([507ecd8](https://github.com/cgi-italy/oida/commit/507ecd877baf8724346932876fb925d910388af3))
+
+# [4.5.0](https://github.com/cgi-italy/oida/compare/@oidajs/ui-react-mobx@4.4.4...@oidajs/ui-react-mobx@4.5.0) (2023-10-10)
+
+### Bug Fixes
+
+- solve issue with single geometry geojson aoi import ([b1ba879](https://github.com/cgi-italy/oida/commit/b1ba87959450500e26905c2832ed2db14c3600be))
+
+### Features
+
+- allow passing additional antd properties to data collection table ([4ec6b40](https://github.com/cgi-italy/oida/commit/4ec6b40445cd317512da41c632f86c575e6725fc))
+
+## [4.4.4](https://github.com/cgi-italy/oida/compare/@oidajs/ui-react-mobx@4.4.3...@oidajs/ui-react-mobx@4.4.4) (2023-08-09)
+
+**Note:** Version bump only for package @oidajs/ui-react-mobx
+
 ## [4.4.3](https://github.com/cgi-italy/oida/compare/@oidajs/ui-react-mobx@4.4.2...@oidajs/ui-react-mobx@4.4.3) (2023-04-12)
 
 **Note:** Version bump only for package @oidajs/ui-react-mobx

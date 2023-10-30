@@ -1,5 +1,5 @@
 import React from 'react';
-import { message } from 'antd';
+import { App } from 'antd';
 import { SearchOutlined, PlusOutlined } from '@ant-design/icons';
 
 import { STRING_FIELD_ID, IFormFieldDefinition } from '@oidajs/core';
@@ -16,6 +16,8 @@ export type WmsDiscoveryProviderResultsProps = {
 };
 
 export const WmsDiscoveryProviderResults = (props: WmsDiscoveryProviderResultsProps) => {
+    const { message } = App.useApp();
+
     const searchFilters: IFormFieldDefinition[] = [
         {
             name: 'search',

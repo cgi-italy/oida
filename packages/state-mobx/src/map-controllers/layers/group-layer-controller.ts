@@ -33,7 +33,10 @@ export class GroupLayerController extends MapLayerController<IGroupLayerRenderer
         this.layersTracker_ = new ArrayTracker({
             items: this.mapLayer_.children.items,
             onItemAdd: this.createChildLayer_.bind(this),
-            onItemRemove: this.destroyChildLayer_.bind(this)
+            onItemRemove: this.destroyChildLayer_.bind(this),
+            onItemMove: (item, prevIndex, newIndex) => {
+                this.layerRenderer_!.moveLayer(item.renderer!, prevIndex, newIndex);
+            }
         });
     }
 

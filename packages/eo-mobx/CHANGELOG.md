@@ -3,6 +3,50 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.5.0](https://github.com/cgi-italy/oida/compare/@oidajs/eo-mobx@3.4.0...@oidajs/eo-mobx@3.5.0) (2023-10-30)
+
+### Bug Fixes
+
+- put new datasets added to the map on top ([4170d21](https://github.com/cgi-italy/oida/commit/4170d217954f5ea4b57a2e71f802a92c4e4858cb))
+
+### Features
+
+- add layer swipe interaction and tool ([507ecd8](https://github.com/cgi-italy/oida/commit/507ecd877baf8724346932876fb925d910388af3))
+
+# [3.4.0](https://github.com/cgi-italy/oida/compare/@oidajs/eo-mobx@3.3.0...@oidajs/eo-mobx@3.4.0) (2023-10-10)
+
+### Bug Fixes
+
+- make analysis processing layers visible on map ([7151431](https://github.com/cgi-italy/oida/commit/71514315794cfe5285686181985f9e98220cb0fc))
+- solve issue with polygon alpha in vector map viz style ([a57493c](https://github.com/cgi-italy/oida/commit/a57493c8b9f1688e26f16bc4a87abfd84cef802d))
+
+### Features
+
+- add area distribution analysis for vector datasets ([c23416a](https://github.com/cgi-italy/oida/commit/c23416a249705f80159dedeae039d2f5d8355c7c))
+- add support for combining multiple charts in vector distribution analysis ([4fe525e](https://github.com/cgi-italy/oida/commit/4fe525ec747048451615cba7f402c8c2c27629bb))
+- add support for multivar vector distribution analysis ([645ae9a](https://github.com/cgi-italy/oida/commit/645ae9aef33b06fdeb7cea589b7957246d034075))
+- add support for OL VectorImageLayer for speed optimized vector rendering ([68f5a3d](https://github.com/cgi-italy/oida/commit/68f5a3db64b64e6f1466fa6f3185d77404e080f0))
+- add support for per class total surface analysis in DatasetAreaDistribution ([44fb3e6](https://github.com/cgi-italy/oida/commit/44fb3e63a3df52e4b6488e8adf73ad8701f327ba))
+- implement a data table tool for vector datasets ([5b7ef94](https://github.com/cgi-italy/oida/commit/5b7ef943eb649db32c4c5e3cb5e0300ca522c1f3))
+
+# [3.3.0](https://github.com/cgi-italy/oida/compare/@oidajs/eo-mobx@3.2.0...@oidajs/eo-mobx@3.3.0) (2023-08-09)
+
+### Bug Fixes
+
+- add missing optional label definition in DistributionHistogramBin ([cab23f7](https://github.com/cgi-italy/oida/commit/cab23f7edd92b191f4f3319bf59c5385094dc58b))
+
+### Features
+
+- add support for setting legend values in dataset raster preset ([c6cf168](https://github.com/cgi-italy/oida/commit/c6cf168da28c0901062cdf3931ff13c37f7b2968))
+- add support for vector layer clustering ([f3af823](https://github.com/cgi-italy/oida/commit/f3af8230102604859fd8294b5568408a25e5f828))
+- improve support for vector datasets ([448035d](https://github.com/cgi-italy/oida/commit/448035dcc5ffe6c1b343620ddb891e2391f6540b))
+
+# [3.2.0](https://github.com/cgi-italy/oida/compare/@oidajs/eo-mobx@3.1.0...@oidajs/eo-mobx@3.2.0) (2023-04-20)
+
+### Features
+
+- use data table for vector feature multi selection ([7651a6b](https://github.com/cgi-italy/oida/commit/7651a6bbedc356f73eef9fb945decb090ca6be46))
+
 # [3.1.0](https://github.com/cgi-italy/oida/compare/@oidajs/eo-mobx@3.0.2...@oidajs/eo-mobx@3.1.0) (2023-04-12)
 
 ### Features

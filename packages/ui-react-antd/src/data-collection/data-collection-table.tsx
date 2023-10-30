@@ -3,7 +3,7 @@ import classnames from 'classnames';
 import { useDrop } from 'react-dnd';
 import { NativeTypes } from 'react-dnd-html5-backend';
 import useDimensions from 'react-cool-dimensions';
-import { Table, Dropdown, Empty, ConfigProvider, MenuProps } from 'antd';
+import { Table, Dropdown, Empty, ConfigProvider, MenuProps, TableProps } from 'antd';
 import { ColumnType } from 'antd/lib/table/interface';
 import { EllipsisOutlined, CloseCircleOutlined } from '@ant-design/icons';
 
@@ -21,46 +21,52 @@ import { DropdownFilterer } from './dropdown-filterer';
 import { DataCollectionItemActionButton } from './data-collection-item-action-button';
 
 type DataCollectionTableItemActionsProps<T> = {
-    itemActions: ((item: T) => DataCollectionItemAction[]) | undefined;
+    itemActions: (item: T) => DataCollectionItemAction[];
     item: T;
     expandActions?: boolean;
 };
 
 const DataCollectionTableItemActions = <T extends object>(props: DataCollectionTableItemActionsProps<T>) => {
-    const actions = props.itemActions ? props.itemActions(props.item) : undefined;
-    if (!actions) {
+    const actions = props.itemActions(props.item);
+
+    if (!actions.length) {
         return null;
+    }
+    if (props.expandActions) {
+        const actionItems = actions.map((action, idx) => {
+            return <DataCollectionItemActionButton key={idx} action={action} />;
+        });
+
+        return <div className='table-item-actions'>{actionItems}</div>;
     } else {
-        if (props.expandActions) {
-            const actionItems = actions.map((action, idx) => {
-                return <DataCollectionItemActionButton key={idx} action={action} />;
-            });
+        const actionItems: MenuProps['items'] = actions.map((action, idx) => {
+            return {
+                key: idx,
+                label: (
+                    <DataCollectionItemActionButton
+                        action={{
+                            ...action,
+                            primary: false
+                        }}
+                        type='text'
+                    />
+                )
+            };
+        });
 
-            return <div className='table-item-actions'>{actionItems}</div>;
-        } else {
-            const actionItems: MenuProps['items'] = actions.map((action, idx) => {
-                return {
-                    key: idx,
-                    label: (
-                        <DataCollectionItemActionButton
-                            action={{
-                                ...action,
-                                primary: false
-                            }}
-                            type='text'
-                        />
-                    )
-                };
-            });
-
-            return (
-                <Dropdown menu={{ items: actionItems }} placement='bottomRight' mouseEnterDelay={0.05} mouseLeaveDelay={0.05}>
-                    <a className='ant-dropdown-link' onClick={(e) => e.preventDefault()}>
-                        <EllipsisOutlined />
-                    </a>
-                </Dropdown>
-            );
-        }
+        return (
+            <Dropdown
+                menu={{ items: actionItems }}
+                placement='bottomRight'
+                mouseEnterDelay={0.05}
+                mouseLeaveDelay={0.05}
+                overlayClassName='data-collection-table-item-actions-menu'
+            >
+                <a className='ant-dropdown-link' onClick={(e) => e.preventDefault()}>
+                    <EllipsisOutlined />
+                </a>
+            </Dropdown>
+        );
     }
 };
 
@@ -75,12 +81,27 @@ export type DataCollectionTableProps<T> = {
     fullHeight?: boolean;
     className?: string;
     expandActions?: boolean;
-} & DataCollectionProps<T>;
+    extraHeaderContent?: React.ReactNode;
+} & DataCollectionProps<T> &
+    Omit<TableProps<T>, 'pagination' | 'components' | 'dataSource' | 'loading' | 'onRow' | 'rowKey' | 'columns' | 'onChange' | 'scroll'>;
 
 export function DataCollectionTable<T extends object>(props: DataCollectionTableProps<T>) {
     const { observe, width, height } = useDimensions();
 
-    const { items, paging, sorting, filters, filtererRender, pagerRender, columns } = props;
+    const {
+        items,
+        paging,
+        sorting,
+        filters,
+        filtererRender,
+        pagerRender,
+        columns,
+        className,
+        fullHeight,
+        expandActions,
+        extraHeaderContent,
+        ...tableProps
+    } = props;
 
     const { itemState, itemActions } = items;
 
@@ -113,16 +134,18 @@ export function DataCollectionTable<T extends object>(props: DataCollectionTable
             };
         });
 
-    tableColumns.push({
-        key: 'actions',
-        render: (item, record) => {
-            return <DataCollectionTableItemActions item={record} itemActions={itemActions} expandActions={props.expandActions} />;
-        },
-        width: props.expandActions ? undefined : 40,
-        align: 'right',
-        sorter: undefined,
-        sortOrder: null
-    });
+    if (itemActions) {
+        tableColumns.push({
+            key: 'actions',
+            render: (item, record) => {
+                return <DataCollectionTableItemActions item={record} itemActions={itemActions} expandActions={props.expandActions} />;
+            },
+            width: props.expandActions ? undefined : 40,
+            align: 'right',
+            sorter: undefined,
+            sortOrder: null
+        });
+    }
 
     const RowRenderer = (props) => {
         if (props.children.length) {
@@ -213,9 +236,13 @@ export function DataCollectionTable<T extends object>(props: DataCollectionTable
     return (
         <ConfigProvider renderEmpty={emptyRenderer}>
             <div className={classnames('data-collection-table', props.className, { 'full-height': props.fullHeight })}>
-                {filters && <DataFilterer {...filters} />}
+                <div className='data-collection-table-header'>
+                    {filters && <DataFilterer {...filters} />}
+                    {extraHeaderContent}
+                </div>
                 <div className='data-collection-table-container' ref={observe}>
                     <Table<T>
+                        {...tableProps}
                         components={components}
                         loading={items.loadingState === LoadingState.Loading}
                         dataSource={items.data}

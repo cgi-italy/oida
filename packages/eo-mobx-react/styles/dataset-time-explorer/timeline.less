@@ -1,28 +1,26 @@
-@group-labels-width: 250px;
-@range-item-min-width: 10px;
-
 .timeline {
-    background: @component-background;
+    background: @timeline-bg;
 
     .vis-timeline {
         border: none;
 
         .vis-panel {
-            border-color: @border-color-split;
+            border-color: @colorBorderSecondary;
 
             &.vis-left {
                 .vis-content {
-                    max-width: 250px;
+                    min-width: @timeline-labels-section-min-width;
+                    max-width: @timeline-labels-section-max-width;
                     width: fit-content;
                     padding-left: 15px;
-                    min-width: 150px;
+                    box-sizing: border-box;
 
                     .vis-labelset {
                         .vis-label {
-                            font-size: @font-size-sm;
-                            color: @text-color;
+                            font-size: @timeline-label-font-size;
+                            color: @timeline-label-color;
                             border: none;
-                            box-shadow: 0 -1px 0 @border-color-split;
+                            box-shadow: 0 -1px 0 @colorBorderSecondary;
 
                             .vis-inner {
                                 width: 100%;
@@ -30,6 +28,7 @@
                                 white-space: nowrap;
                                 overflow: hidden;
                                 text-overflow: ellipsis;
+                                box-sizing: border-box;
                             }
                         }
                     }
@@ -37,26 +36,26 @@
             }
 
             &.vis-bottom {
-                background: @background-color-base;
+                background: @timeline-calendar-bg;
             }
 
             .vis-foreground .vis-group {
-                box-shadow: 0 -1px 0 @border-color-split;
+                box-shadow: 0 -1px 0 @colorBorderSecondary;
                 border: none;
                 cursor: pointer;
 
                 &:hover {
-                    background-color: rgba(255, 255, 255, 0.04);
+                    background-color: @timeline-row-hover-bg;
                 }
             }
 
             .vis-time-axis {
                 .vis-grid {
                     &.vis-major {
-                        border-color: @border-color-split;
+                        border-color: @colorBorderSecondary;
                     }
                     &.vis-minor {
-                        border-color: @border-color-base;
+                        border-color: @colorBorderSecondary;
                     }
                 }
 
@@ -64,12 +63,12 @@
                     padding: 1px;
 
                     &.vis-major {
-                        color: @text-color;
+                        color: @colorText;
                         font-size: 0.8rem;
                     }
 
                     &.vis-minor {
-                        color: @text-color-secondary;
+                        color: @colorTextSecondary;
                         font-size: 0.7rem;
                     }
                 }
@@ -78,8 +77,8 @@
             .vis-item {
                 &.vis-range {
                     // ensure a min pixel width
-                    padding-right: @range-item-min-width;
-                    left: -(@range-item-min-width / 2);
+                    padding-right: @timeline-range-item-min-width;
+                    left: -(@timeline-range-item-min-width / 2);
                     box-sizing: content-box;
 
                     .vis-item-overflow {
@@ -111,6 +110,7 @@
                     width: 8px;
                     border-radius: 4px;
                     margin-left: -4px;
+                    box-sizing: border-box;
 
                     .vis-item.vis-dot {
                         display: none;
@@ -122,13 +122,13 @@
                 }
 
                 &.editable-range {
-                    background-color: rgba(@primary-color, 0.2);
-                    border: solid 1px rgba(@primary-color, 0.5);
+                    background-color: @timeline-range-bg;
+                    border: @timeline-range-border;
                     border-bottom: none;
                     cursor: grab;
 
                     &:hover {
-                        background-color: rgba(@primary-color, 0.3);
+                        background-color: @timeline-range-bg-hover;
                     }
                     &.dragging {
                         cursor: grabbing;
@@ -137,19 +137,19 @@
             }
 
             .vis-custom-time {
-                background-color: @primary-color;
-                width: 4px;
-                margin-left: -2px;
+                background-color: @timeline-cursor-color;
+                width: @timeline-curosr-width;
+                margin-left: -(@timeline-curosr-width / 2);
                 cursor: ew-resize;
                 box-shadow: 1px -1px 3px #000000a6;
-                border-radius: 5px;
+                border-radius: @timeline-cursor-border-radius;
                 height: 46px !important;
                 bottom: 0px !important;
                 top: auto !important;
 
                 &:hover {
-                    width: 6px;
-                    margin-left: -3px;
+                    width: @timeline-cursor-width-hover;
+                    margin-left: -(@timeline-cursor-width-hover / 2);
                     z-index: 2;
                 }
             }

@@ -29,7 +29,7 @@ export const DatasetVizProgressControl = (props: DatasetVizProgressControlProps)
             showInfo={false}
             status='active'
             strokeLinecap='square'
-            strokeWidth={2}
+            size={[-1, 2]}
             percent={loading.percentage !== undefined ? Math.max(loading.percentage, 20) : 50}
         ></Progress>
     );

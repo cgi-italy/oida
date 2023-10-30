@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.3.2](https://github.com/cgi-italy/oida/compare/@oidajs/eo-adapters-adam@3.3.1...@oidajs/eo-adapters-adam@3.3.2) (2023-10-30)
+
+### Bug Fixes
+
+- allow for external axios instance in adam dataset factory ([a5ac653](https://github.com/cgi-italy/oida/commit/a5ac653f7c0f1958c8ebb4d3b7aa1810f705b876))
+
+## [3.3.1](https://github.com/cgi-italy/oida/compare/@oidajs/eo-adapters-adam@3.3.0...@oidajs/eo-adapters-adam@3.3.1) (2023-10-10)
+
+**Note:** Version bump only for package @oidajs/eo-adapters-adam
+
+# [3.3.0](https://github.com/cgi-italy/oida/compare/@oidajs/eo-adapters-adam@3.2.4...@oidajs/eo-adapters-adam@3.3.0) (2023-08-09)
+
+### Features
+
+- improve support for vector datasets ([448035d](https://github.com/cgi-italy/oida/commit/448035dcc5ffe6c1b343620ddb891e2391f6540b))
+
+## [3.2.4](https://github.com/cgi-italy/oida/compare/@oidajs/eo-adapters-adam@3.2.3...@oidajs/eo-adapters-adam@3.2.4) (2023-04-20)
+
+**Note:** Version bump only for package @oidajs/eo-adapters-adam
+
 ## [3.2.3](https://github.com/cgi-italy/oida/compare/@oidajs/eo-adapters-adam@3.2.2...@oidajs/eo-adapters-adam@3.2.3) (2023-04-13)
 
 ### Performance Improvements

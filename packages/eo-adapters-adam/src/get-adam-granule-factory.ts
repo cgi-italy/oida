@@ -379,8 +379,12 @@ export const getAdamGranuleRasterMapViewConfig = (
     } as DatasetMapViewConfig<typeof RASTER_VIZ_TYPE>;
 };
 
-export const getAdamGranuleFactory = () => {
-    const axiosInstance = createAxiosInstance();
+export type AdamGranuleFactoryConfig = {
+    axiosInstance?: AxiosInstanceWithCancellation;
+};
+
+export const getAdamGranuleFactory = (config?: AdamGranuleFactoryConfig) => {
+    const axiosInstance = config?.axiosInstance || createAxiosInstance();
 
     const datasetFactory = (config: AdamGranuleConfig) => {
         const geotiffLoader = createGeoTiffLoader({ axiosInstance, rotateImage: false });

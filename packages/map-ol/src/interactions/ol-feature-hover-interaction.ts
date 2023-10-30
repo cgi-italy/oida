@@ -9,7 +9,7 @@ import {
     IFeature
 } from '@oidajs/core';
 
-import { OLSelectEvent, OLSelectInteraction } from '../utils/ol-select-interaction';
+import { OLSelectEvent, OLSelectInteraction, getFeaturesData } from '../utils';
 import { OLMapRenderer } from '../map/ol-map-renderer';
 import { OLMapLayer } from '../layers/ol-map-layer';
 import { OLFeatureLayer } from '../layers/ol-feature-layer';
@@ -48,23 +48,20 @@ export class OLFeatureHoverInteraction implements IFeatureHoverInteractionImplem
         this.olInteraction_.on('select', (evt: OLSelectEvent) => {
             const selected = evt.selected[0];
             if (selected) {
-                const featureId = selected.getId();
-                const featureData = selected.get(OLFeatureLayer.FEATURE_DATA_KEY);
-                if (typeof featureId === 'string' && featureData) {
-                    const feature: IFeature = {
-                        id: featureId,
-                        data: featureData
-                    };
+                const selectedFeatures = getFeaturesData(selected);
+                if (selectedFeatures.length) {
                     this.viewer_.getViewport().style.cursor = 'pointer';
-                    onFeatureHover(feature);
-                    const layer: OLMapLayer | undefined = selected.get(OLFeatureLayer.FEATURE_LAYER_KEY);
-                    if (layer && layer.shouldReceiveFeatureHoverEvents()) {
-                        let coordinate = evt.mapBrowserEvent.coordinate;
-                        const proj = this.viewer_.getView().getProjection();
-                        if (proj.getCode() !== 'EPSG:4326') {
-                            coordinate = transform(coordinate, proj, 'EPSG:4326');
+                    if (selectedFeatures.length === 1) {
+                        onFeatureHover(selectedFeatures[0]);
+                        const layer: OLMapLayer | undefined = selected.get(OLFeatureLayer.FEATURE_LAYER_KEY);
+                        if (layer && layer.shouldReceiveFeatureHoverEvents()) {
+                            let coordinate = evt.mapBrowserEvent.coordinate;
+                            const proj = this.viewer_.getView().getProjection();
+                            if (proj.getCode() !== 'EPSG:4326') {
+                                coordinate = transform(coordinate, proj, 'EPSG:4326');
+                            }
+                            layer.onFeatureHover(coordinate, selectedFeatures[0]);
                         }
-                        layer.onFeatureHover(coordinate, feature);
                     }
                 } else {
                     this.viewer_.getViewport().style.cursor = '';
