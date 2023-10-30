@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.3.2](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-adapters-adam@3.3.1...@oidajs/eo-adapters-adam@3.3.2) (2023-10-30)
+
+### Bug Fixes
+
+- allow for external axios instance in adam dataset factory ([a5ac653](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/a5ac653f7c0f1958c8ebb4d3b7aa1810f705b876))
+
 ## [3.3.1](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-adapters-adam@3.3.0...@oidajs/eo-adapters-adam@3.3.1) (2023-10-10)
 
 **Note:** Version bump only for package @oidajs/eo-adapters-adam

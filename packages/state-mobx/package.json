@@ -1,6 +1,6 @@
 {
   "name": "@oidajs/state-mobx",
-  "version": "2.2.1",
+  "version": "2.3.0",
   "description": "oida mobx state management library",
   "module": "es/index.js",
   "main": "lib/index.js",
@@ -29,7 +29,7 @@
     "moment": "^2.x"
   },
   "dependencies": {
-    "@oidajs/core": "^4.8.0",
+    "@oidajs/core": "^4.9.0",
     "tslib": "^2.4.1"
   }
 }

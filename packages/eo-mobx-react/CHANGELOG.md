@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.6.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-mobx-react@4.5.0...@oidajs/eo-mobx-react@4.6.0) (2023-10-30)
+
+### Bug Fixes
+
+- disable swipe tool for unsupport layer types ([cec6694](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/cec6694c3b5b38bebcd6ec4652ceee0b12b1b6b5))
+
+### Features
+
+- add layer swipe interaction and tool ([507ecd8](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/507ecd877baf8724346932876fb925d910388af3))
+
 # [4.5.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-mobx-react@4.4.0...@oidajs/eo-mobx-react@4.5.0) (2023-10-10)
 
 ### Features

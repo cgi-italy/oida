@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.5.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-mobx@3.4.0...@oidajs/eo-mobx@3.5.0) (2023-10-30)
+
+### Bug Fixes
+
+- put new datasets added to the map on top ([4170d21](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/4170d217954f5ea4b57a2e71f802a92c4e4858cb))
+
+### Features
+
+- add layer swipe interaction and tool ([507ecd8](https://gitlab.dev.eoss-cloud.it/frontend/oida/commit/507ecd877baf8724346932876fb925d910388af3))
+
 # [3.4.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-mobx@3.3.0...@oidajs/eo-mobx@3.4.0) (2023-10-10)
 
 ### Bug Fixes

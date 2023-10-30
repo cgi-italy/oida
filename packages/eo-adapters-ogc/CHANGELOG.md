@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.6.1](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-adapters-ogc@2.6.0...@oidajs/eo-adapters-ogc@2.6.1) (2023-10-30)
+
+**Note:** Version bump only for package @oidajs/eo-adapters-ogc
+
 # [2.6.0](https://gitlab.dev.eoss-cloud.it/frontend/oida/compare/@oidajs/eo-adapters-ogc@2.5.0...@oidajs/eo-adapters-ogc@2.6.0) (2023-10-10)
 
 ### Bug Fixes
